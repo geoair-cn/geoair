@@ -28,6 +28,27 @@
 	<packaging>pom</packaging>
 	<description>geoair-dependencies</description>
 
+	<url>https://gitee.com/geoair/geoair-dependencies</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>zhangfengji</name>
+			<email>manfred@sonatype.com</email>
+			<organization>geoair</organization>
+			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+		</developer>
+	</developers>
+
+
+
+
 	<properties>
 		<geoair.version>23.geoair.0-SNAPSHOT</geoair.version>
 		<geoair.comp.version>23.geoair-comp.0-SNAPSHOT</geoair.comp.version>
