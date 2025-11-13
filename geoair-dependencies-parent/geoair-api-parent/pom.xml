@@ -1,0 +1,52 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cn.geoair.dependencies</groupId>
+		<artifactId>geoair-dependencies-parent</artifactId>
+		<version>23.geoair.0-SNAPSHOT<!--geoairdependenciesversion--></version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>geoair-api-parent</artifactId>
+	<name>geoair-api-parent</name>
+	<packaging>pom</packaging>
+	<description>geoair api parent</description>
+
+	<properties>
+		<skipTests>true</skipTests>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies></dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins></plugins>
+		</pluginManagement>
+    	<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>109-release</id>
+			<url>http://139.9.119.98:9051/repository/109-release/</url>
+		</repository>
+		<snapshotRepository>
+			<id>109-snapshot</id>
+			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+</project>

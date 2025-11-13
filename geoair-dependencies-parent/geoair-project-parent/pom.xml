@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cn.geoair.dependencies</groupId>
+		<artifactId>geoair-dependencies-parent</artifactId>
+		<version>23.geoair.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>geoair-project-parent</artifactId>
+	<name>geoair-project-parent</name>
+	<packaging>pom</packaging>
+	<description>geoair project parent</description>
+
+	<properties></properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>cn.geoair.gishubteam.upms</groupId>
+				<artifactId>upms-api</artifactId>
+				<version>23.upms.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tc.cloudplatform</groupId>
+				<artifactId>fileaccess-server-api</artifactId>
+				<version>23.file-access.0-SNAPSHOT</version>
+			</dependency>
+
+
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies></dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins></plugins>
+		</pluginManagement>
+
+		<plugins></plugins>
+
+
+	</build>
+
+</project>
