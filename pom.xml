@@ -527,14 +527,14 @@
 
 
 	<distributionManagement>
-		<repository>
-			<id>109-release</id>
-			<url>http://139.9.119.98:9051/repository/109-release/</url>
-		</repository>
-		<snapshotRepository>
-			<id>109-snapshot</id>
-			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>
-		</snapshotRepository>
+<!--		<repository>-->
+<!--			<id>109-release</id>-->
+<!--			<url>http://139.9.119.98:9051/repository/109-release/</url>-->
+<!--		</repository>-->
+<!--		<snapshotRepository>-->
+<!--			<id>109-snapshot</id>-->
+<!--			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>-->
+<!--		</snapshotRepository>-->
 	</distributionManagement>
 	<build>
 		<pluginManagement>
@@ -577,7 +577,17 @@
 			</plugins>
 		</pluginManagement>
 
-		<plugins></plugins>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.9.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

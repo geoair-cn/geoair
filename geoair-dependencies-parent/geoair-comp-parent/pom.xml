@@ -35,14 +35,14 @@
 	</build>
 
 	<distributionManagement>
-		<repository>
-			<id>109-release</id>
-			<url>http://139.9.119.98:9051/repository/109-release/</url>
-		</repository>
-		<snapshotRepository>
-			<id>109-snapshot</id>
-			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>
-		</snapshotRepository>
+<!--		<repository>-->
+<!--			<id>109-release</id>-->
+<!--			<url>http://139.9.119.98:9051/repository/109-release/</url>-->
+<!--		</repository>-->
+<!--		<snapshotRepository>-->
+<!--			<id>109-snapshot</id>-->
+<!--			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>-->
+<!--		</snapshotRepository>-->
 	</distributionManagement>
 
 </project>
