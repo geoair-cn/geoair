@@ -44,7 +44,7 @@
 
 	</dependencyManagement>
 
-	<dependencies></dependencies>
+
 
 	<modules>
 		<module>geoair-api-parent</module>
@@ -53,7 +53,5 @@
 		<module>geoair-spring-boot-starter-parent</module>
 	</modules>
 
-	<distributionManagement>
 
-	</distributionManagement>
 </project>
