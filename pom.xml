@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
-		<version>2.7.0</version>
+		<version>2.7.18</version>
 		<relativePath />
 	</parent>
 
@@ -13,7 +13,7 @@
   	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.18</version>
         <relativePath/>
     </parent>
     -->
@@ -65,8 +65,8 @@
 		<maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
 		<redisson.version>3.18.0</redisson.version>
 <!--		<satokenversion>1.35.0.RC</satokenversion>-->
-		<satokenversion>1.39.0</satokenversion>
-		<spring-boot.version>2.7.0</spring-boot.version>
+		<satokenversion>1.44.0</satokenversion>
+		<spring-boot.version>2.7.18</spring-boot.version>
 		<fastjson.version>2.0.9</fastjson.version>
 
 		<geotools.version>26.5</geotools.version>
@@ -216,7 +216,8 @@
 				<groupId>cn.hutool</groupId>
 				<artifactId>hutool-all</artifactId>
 <!--				<version>5.8.3</version>-->
-				<version>5.8.26</version>   <!--			升级最新版本 20240219 by zhangjun-->
+<!--				<version>5.8.26</version>   &lt;!&ndash;			升级最新版本 20240219 by zhangjun&ndash;&gt;-->
+				<version>5.8.42</version>   <!--			升级最新版本 20251206 by zhangjun-->
 			</dependency>
 
 
