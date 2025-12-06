@@ -10,21 +10,14 @@
         <relativePath/>
     </parent>
 
-    <!--
-      <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.18</version>
-        <relativePath/>
-    </parent>
-    -->
+
     <modules>
         <module>geoair-dependencies-parent</module>
     </modules>
 
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-dependencies</artifactId>
-    <version>23.0.1</version>
+    <version>23.0.2-SNAPSHOT</version>
     <name>geoair-dependencies</name>
     <packaging>pom</packaging>
     <description>geoair-dependencies</description>
@@ -55,8 +48,8 @@
 
 
     <properties>
-        <geoair.version>23.0.1</geoair.version>
-        <geoair.comp.version>23.0.1</geoair.comp.version>
+        <geoair.version>23.0.2-SNAPSHOT</geoair.version>
+        <geoair.comp.version>23.0.2-SNAPSHOT</geoair.comp.version>
         <java.version>1.8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

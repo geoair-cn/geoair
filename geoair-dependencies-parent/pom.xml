@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
 		<artifactId>geoair-dependencies</artifactId>
-		<version>23.0.1</version>
+		<version>23.0.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -15,8 +15,8 @@
 	<description>geoair-dependencies-parent</description>
 
 	<properties>
-		<geoair.version>23.0.1</geoair.version>
-		<geoair.comp.version>23.0.1</geoair.comp.version>
+		<geoair.version>23.0.2-SNAPSHOT</geoair.version>
+		<geoair.comp.version>23.0.2-SNAPSHOT</geoair.comp.version>
 		<skipTests>true</skipTests>
 	</properties>
 
