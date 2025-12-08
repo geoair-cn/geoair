@@ -1,0 +1,52 @@
+# IntelliJ IDEA 配置文件
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# 编译输出目录
+out/
+build/
+target/
+
+# 日志文件
+logs/
+*.log
+
+# 临时文件
+tmp/
+temp/
+
+# 系统自动生成的文件
+.DS_Store
+Thumbs.db
+
+# 本地配置文件（如数据库密码等）
+*.properties.local
+*.yml.local
+
+# Maven 相关（如果使用 Maven）
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle 相关（如果使用 Gradle）
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Java 字节码文件
+*.class
+
+#  IDEA 索引缓存
+*.idx
+*.iws.bak
+
+# 运行时生成的文件
+*.pid
+*.seed
+*.swo
+*.swp
