@@ -15,29 +15,15 @@
 	<description>geoair-dependencies-parent</description>
 
 	<properties>
-		<geoair.version>23.0.2-SNAPSHOT</geoair.version>
-		<geoair.comp.version>23.0.2-SNAPSHOT</geoair.comp.version>
+		<geoair.version>${project.version}</geoair.version>
+		<geoair.comp.version>${project.version}</geoair.comp.version>
 		<skipTests>true</skipTests>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 
-<!--			<dependency>-->
-<!--				<groupId>cn.geoair</groupId>-->
-<!--				<artifactId>geoair</artifactId>-->
-<!--				<version>${geoair.version}</version>-->
-<!--				<type>pom</type>-->
-<!--				<scope>import</scope>-->
-<!--			</dependency>-->
 
-<!--			<dependency>-->
-<!--				<groupId>cn.geoair.comp</groupId>-->
-<!--				<artifactId>geoair-comp</artifactId>-->
-<!--				<version>${geoair.comp.version}</version>-->
-<!--				<type>pom</type>-->
-<!--				<scope>import</scope>-->
-<!--			</dependency>-->
 
 
 		</dependencies>
@@ -48,9 +34,10 @@
 
 	<modules>
 		<module>geoair-api-parent</module>
+		<module>geoair-module-pom</module>
 		<module>geoair-comp-parent</module>
 		<module>geoair-project-parent</module>
-		<module>geoair-geotools-parent</module>
+
 		<module>geoair-spring-boot-starter-parent</module>
 	</modules>
 

@@ -4,15 +4,15 @@
 
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
-		<artifactId>geoair-dependencies-parent</artifactId>
+		<artifactId>geoair-module-pom</artifactId>
 		<version>23.0.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>geoair-geotools-parent</artifactId>
-	<name>geoair-geotools-parent</name>
+	<artifactId>geoair-geotools-module</artifactId>
+	<name>geoair-geotools-module</name>
 	<packaging>pom</packaging>
-	<description>geoair geotools parent</description>
+	<description>geoair geotools module</description>
 
 	<url>https://gitee.com/geoair/geoair-dependencies</url>
 
@@ -38,7 +38,7 @@
 		<url>https://gitee.com/geoair/geoair-dependencies</url>
 	</scm>
 
- 
+
 
 	<dependencyManagement>
 		<dependencies>
@@ -489,8 +489,8 @@
 				<groupId>org.geotools.xsd</groupId>
 				<artifactId>gt-xsd-wps</artifactId>
 				<version>${geotools.version}</version>
-			</dependency>	
-			
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

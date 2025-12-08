@@ -4,19 +4,15 @@
 
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
-		<artifactId>geoair-dependencies-parent</artifactId>
-		<version>23.0.2-SNAPSHOT </version>
+		<artifactId>geoair-module-pom</artifactId>
+		<version>23.0.2-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>geoair-api-parent</artifactId>
-	<name>geoair-api-parent</name>
+	<artifactId>geoair-template-module</artifactId>
+	<name>geoair-template-module</name>
 	<packaging>pom</packaging>
-	<description>geoair api parent</description>
-
-	<properties>
-		<skipTests>true</skipTests>
-	</properties>
+	<description>geoair template module</description>
 
 	<url>https://gitee.com/geoair/geoair-dependencies</url>
 
@@ -42,14 +38,15 @@
 		<url>https://gitee.com/geoair/geoair-dependencies</url>
 	</scm>
 
+
+
 	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-project-parent</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
+	 <dependencies>
+
+
+
+
+	 </dependencies>
 	</dependencyManagement>
 
 	<dependencies></dependencies>
@@ -58,23 +55,10 @@
 		<pluginManagement>
 			<plugins></plugins>
 		</pluginManagement>
-    	<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
-	<distributionManagement>
-<!--		<repository>-->
-<!--			<id>109-release</id>-->
-<!--			<url>http://139.9.119.98:9051/repository/109-release/</url>-->
-<!--		</repository>-->
-<!--		<snapshotRepository>-->
-<!--			<id>109-snapshot</id>-->
-<!--			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>-->
-<!--		</snapshotRepository>-->
-	</distributionManagement>
+		<plugins></plugins>
+
+
+	</build>
 
 </project>

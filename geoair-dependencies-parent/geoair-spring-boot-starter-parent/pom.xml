@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
 		<artifactId>geoair-dependencies-parent</artifactId>
-		<version>23.0.2-SNAPSHOT<!--geoairdependenciesversion--></version>
+		<version>23.0.2-SNAPSHOT </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -47,13 +47,13 @@
 	<profiles></profiles>
 	-->
 	<dependencyManagement>
-<!--		<dependencies>-->
-<!--			<dependency>-->
-<!--				<groupId>tk.mybatis</groupId>-->
-<!--				<artifactId>mapper-spring-boot-starter</artifactId>-->
-<!--				<version>2.0.4</version>-->
-<!--			</dependency>-->
-<!--		</dependencies>-->
+		<dependencies>
+			<dependency>
+				<groupId>cn.geoair.dependencies</groupId>
+				<artifactId>geoair-project-parent</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 	<build>
 

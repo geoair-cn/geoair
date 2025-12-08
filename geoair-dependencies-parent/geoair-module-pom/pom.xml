@@ -10,10 +10,14 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>geoair-comp-parent</artifactId>
-    <name>geoair-comp-parent</name>
+    <artifactId>geoair-module-pom</artifactId>
+    <name>geoair-module-parent</name>
     <packaging>pom</packaging>
-    <description>geoair-component-parent</description>
+    <description>geoair module pom</description>
+
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
 
@@ -38,39 +42,35 @@
         <developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
         <url>https://gitee.com/geoair/geoair-dependencies</url>
     </scm>
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
 
     <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>cn.geoair.dependencies</groupId>
-                <artifactId>geoair-project-parent</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
+
     </dependencyManagement>
 
     <dependencies></dependencies>
+
+    <modules>
+        <module>geoair-geotools-module</module>
+        <module>geoair-swagger-module</module>
+        <module>geoair-spring-module</module>
+        <module>geoair-template-module</module>
+        <module>geoair-other-module</module>
+    </modules>
 
     <build>
         <pluginManagement>
             <plugins></plugins>
         </pluginManagement>
-
-        <plugins></plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>
-        <!--		<repository>-->
-        <!--			<id>109-release</id>-->
-        <!--			<url>http://139.9.119.98:9051/repository/109-release/</url>-->
-        <!--		</repository>-->
-        <!--		<snapshotRepository>-->
-        <!--			<id>109-snapshot</id>-->
-        <!--			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>-->
-        <!--		</snapshotRepository>-->
+
     </distributionManagement>
 
 </project>
