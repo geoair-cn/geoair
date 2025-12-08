@@ -67,6 +67,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>tk.mybatis</groupId>
                 <artifactId>mapper-spring-boot</artifactId>
                 <version>4.2.0</version>
