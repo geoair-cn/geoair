@@ -48,8 +48,8 @@
 
 
     <properties>
-        <geoair.version>23.0.2-SNAPSHOT</geoair.version>
-        <geoair.comp.version>23.0.2-SNAPSHOT</geoair.comp.version>
+        <geoair.version>${project.version}</geoair.version>
+        <geoair.comp.version>${project.version}</geoair.comp.version>
         <java.version>1.8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -82,10 +82,10 @@
 
 
     <distributionManagement>
-<!--        <snapshotRepository>-->
-<!--            <id>ossrh</id>-->
-<!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
-<!--        </snapshotRepository>-->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
+        </snapshotRepository>
         <repository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
