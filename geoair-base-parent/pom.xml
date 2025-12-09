@@ -1,13 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-dependencies</artifactId>
 		<version>2.7.18</version>
 		<relativePath/>
 	</parent>
+	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.geoair.dependencies</groupId>
 	<artifactId>geoair-base-parent</artifactId>
 	<name>geoair-base-parent</name>
@@ -26,7 +25,7 @@
 
 	<developers>
 		<developer>
-			<name>zhangfengji</name>
+			<name>张逢吉</name>
 			<email>1159856928@qq.com</email>
 			<organization>geoair</organization>
 			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
@@ -43,14 +42,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-base-properties</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 
 			<dependency>
 				<groupId>cn.geoair.dependencies</groupId>

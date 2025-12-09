@@ -10,8 +10,6 @@
     <packaging>pom</packaging>
 
 
-
-
     <description>geoair-dependencies</description>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
@@ -25,7 +23,7 @@
 
     <developers>
         <developer>
-            <name>zhangfengji</name>
+            <name>张逢吉</name>
             <email>1159856928@qq.com</email>
             <organization>geoair</organization>
             <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
@@ -43,7 +41,6 @@
         <module>geoair-base-parent</module>
         <module>geoair-dependencies-parent</module>
         <module>geoair-module-pom</module>
-        <module>geoair-base-properties</module>
     </modules>
 
 
