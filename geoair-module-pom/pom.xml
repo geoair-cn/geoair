@@ -11,7 +11,7 @@
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-module-pom</artifactId>
-    <version>23.0.2</version>
+    <version>23.0.3</version>
     <name>geoair-module-parent</name>
     <packaging>pom</packaging>
     <description>用于定义各个组件的依赖管理</description>
@@ -65,7 +65,7 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies></dependencies>
+
 
     <modules>
         <module>geoair-geotools-module</module>

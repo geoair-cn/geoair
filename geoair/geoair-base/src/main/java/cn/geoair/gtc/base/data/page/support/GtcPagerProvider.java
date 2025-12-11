@@ -1,0 +1,18 @@
+package cn.geoair.gtc.base.data.page.support;
+
+import cn.geoair.gtc.base.data.page.GiPager;
+import cn.geoair.gtc.base.data.page.GiPagerProvider;
+
+/**
+ * 默认的Pager对象提供者 返回  gtcPager 类型
+ * @author Ray
+ *
+ */
+public class GtcPagerProvider implements GiPagerProvider  {
+
+	@Override
+	public <T> GiPager<T> getPager(Class<T> clazz) {
+        return new GtcPager<T>(clazz);
+	}
+
+}

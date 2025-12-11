@@ -1,0 +1,30 @@
+package cn.geoair.gtc.base.gpa.entity;
+
+import java.io.Serializable;
+
+import cn.geoair.gtc.base.gpa.dao.GiCreateDao;
+
+/**
+ * 可以保存的模型
+ * @author Ray
+ *
+ * @param <ID> 主键类型
+ */
+public interface GiEntitySaveable<ID extends Serializable> extends GiEntityable<ID> {
+
+
+	@SuppressWarnings("unchecked")
+	default <T extends GiEntitySaveable<ID>> GiCreateDao<T,ID> insertDao(){
+		return GiCreateDao.getDao((Class<T>)this.modelClass());
+	}
+
+	default void save() {
+		this.insertDao(). gtcAccess(this);
+	}
+
+
+	default void saveSelective() {
+		this.insertDao(). gtcAccessSelective(this);
+	}
+
+}

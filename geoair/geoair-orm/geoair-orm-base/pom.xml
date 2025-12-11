@@ -1,0 +1,77 @@
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cn.geoair.orm</groupId>
+		<artifactId>geoair-orm</artifactId>
+		<version>23.0.3<!--gtcversion--></version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<version>23.0.3<!--gtcversion--></version>
+  <artifactId>geoair-orm-base</artifactId>
+  <packaging>jar</packaging>
+  <name>geoair-orm-base</name>
+
+  <description>通用orm的定义</description>
+	<url>https://gitee.com/geoair/geoair</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>zhangfengji</name>
+			<email>1159856928@qq.com</email>
+			<organization>geoair</organization>
+			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>https://gitee.com/geoair/geoair-dependencies.git</connection>
+		<developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+		<url>https://gitee.com/geoair/geoair</url>
+	</scm>
+
+	<dependencies>
+
+
+		<dependency>
+			<groupId>cn.geoair</groupId>
+			<artifactId>geoair-base</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.persistence</groupId>
+        	<artifactId>javax.persistence-api</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjrt</artifactId>
+		</dependency>
+
+		 -->
+
+		<!-- spring jdbc
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		 -->
+
+    </dependencies>
+
+</project>
