@@ -1,206 +1,245 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-dependencies</artifactId>
-		<version>2.7.18</version>
-		<relativePath/>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>cn.geoair.dependencies</groupId>
-	<artifactId>geoair-base-parent</artifactId>
-	<name>geoair-base-parent</name>
-	<version>23.0.3</version>
-	<packaging>pom</packaging>
-	<description>geoair base parent   用于Gir基础库的依赖约束</description>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.7.18</version>
+        <relativePath/>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.geoair.dependencies</groupId>
+    <artifactId>geoair-base-parent</artifactId>
+    <name>geoair-base-parent</name>
+    <version>23.0.3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <description>geoair base parent 用于Gir基础库的依赖约束</description>
 
-	<url>https://gitee.com/geoair/geoair-dependencies</url>
+    <url>https://gitee.com/geoair/geoair-dependencies</url>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<name>张逢吉</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>张逢吉</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>https://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-	</scm>
-
-
-
-	<dependencyManagement>
-		<dependencies>
-
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-geotools-module</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-spring-module</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-other-module</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+    <scm>
+        <connection>https://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+    </scm>
 
 
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-swagger-module</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-geotools-module</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-spring-module</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-other-module</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
 
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-swagger-module</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://central.sonatype.com/repository/maven-snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-	<build>
-		<pluginManagement>
 
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>${maven-source-plugin.version}</version>
-					<configuration>
-						<attach>true</attach>
-					</configuration>
-					<executions>
-						<execution>
-							<phase>compile</phase>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven-compiler-plugin.version}</version>
-					<configuration>
-						<parameters>true</parameters>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>${maven-javadoc-plugin.version}</version>
-					<executions>
-						<execution>
-							<id>attach-javadocs</id>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>1.5</version>
-					<executions>
-						<execution>
-							<id>sign-artifacts</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>sign</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.sonatype.central</groupId>
-					<artifactId>central-publishing-maven-plugin</artifactId>
-					<version>0.9.0</version>
-					<extensions>true</extensions>
-					<configuration>
-						<publishingServerId>central</publishingServerId>
-					</configuration>
-				</plugin>
+        </dependencies>
+    </dependencyManagement>
 
-			</plugins>
-		</pluginManagement>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+    <build>
 
-		<plugins>
 
-		</plugins>
-	</build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                    <configuration>
+                        <attach>true</attach>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <!-- 源码版本 -->
+                        <source>8</source>
+                        <!-- 目标字节码版本 -->
+                        <target>8</target>
+                        <!-- 编码（可选，避免中文乱码） -->
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.5</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.9.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <!--					<classifier>bak</classifier>-->
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <!-- 源码版本 -->
+                    <source>8</source>
+                    <!-- 目标字节码版本 -->
+                    <target>8</target>
+                    <!-- 编码（可选，避免中文乱码） -->
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!--生成源码插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--生成API文档插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
 
 	<profiles>
 		<profile>
-
 			<id>central</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+
+			<distributionManagement>
+				<snapshotRepository>
+					<id>ossrh</id>
+					<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+				</snapshotRepository>
+				<repository>
+					<id>ossrh</id>
+					<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+				</repository>
+			</distributionManagement>
 			<build>
 				<!--发布到中央SNAPSHOT仓库插件-->
 				<plugins>
-					<!--生成源码插件-->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!--生成API文档插件-->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
 					<!--gpg插件-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -214,9 +253,7 @@
 								</goals>
 							</execution>
 						</executions>
-
 					</plugin>
-
 					<plugin>
 						<groupId>org.sonatype.central</groupId>
 						<artifactId>central-publishing-maven-plugin</artifactId>
@@ -226,13 +263,28 @@
 							<publishingServerId>central</publishingServerId>
 						</configuration>
 					</plugin>
-
 				</plugins>
 			</build>
 
 
 		</profile>
 
+		<profile>
+			<id>group</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<distributionManagement>
+				<repository>
+					<id>releases</id>
+					<url>http://10.11.16.188:8081/repository/maven-releases/</url>
+				</repository>
+				<snapshotRepository>
+					<id>snapshots</id>
+					<url>http://10.11.16.188:8081/repository/maven-snapshots/</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
 	</profiles>
 
 </project>

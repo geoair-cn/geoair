@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
-        <version>23.0.3</version>
+        <version>23.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -62,15 +62,6 @@
         <plugins></plugins>
     </build>
 
-    <distributionManagement>
-        <!--		<repository>-->
-        <!--			<id>109-release</id>-->
-        <!--			<url>http://139.9.119.98:9051/repository/109-release/</url>-->
-        <!--		</repository>-->
-        <!--		<snapshotRepository>-->
-        <!--			<id>109-snapshot</id>-->
-        <!--			<url>http://139.9.119.98:9051/repository/109-snapshot/</url>-->
-        <!--		</snapshotRepository>-->
-    </distributionManagement>
+
 
 </project>

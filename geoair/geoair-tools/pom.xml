@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>cn.geoair</groupId>
 		<artifactId>geoair</artifactId>
-		<version>23.0.3<!--gtcversion--></version>
+		<version>23.0.3-SNAPSHOT<!--gtcversion--></version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>geoair-tools</artifactId>
-	<version>23.0.3</version>
+	<version>23.0.3-SNAPSHOT</version>
 	<name>geoair-tools</name>
 	<description>工具库</description>
 
