@@ -103,9 +103,6 @@
     <profiles>
         <profile>
             <id>central</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <distributionManagement>
                 <snapshotRepository>
                     <id>ossrh</id>
