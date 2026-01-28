@@ -61,6 +61,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.locationtech.jts.io</groupId>
+				<artifactId>jts-io-common</artifactId>
+				<version>${jts.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>no.ecc.vectortile</groupId>
 				<artifactId>java-vector-tile</artifactId>
 				<version>1.3.16</version>
