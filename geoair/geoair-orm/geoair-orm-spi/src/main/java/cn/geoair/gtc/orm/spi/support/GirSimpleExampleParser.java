@@ -3,7 +3,7 @@ package cn.geoair.gtc.orm.spi.support;
 
 import cn.geoair.gtc.base.data.tuples.GkPair;
 import cn.geoair.gtc.base.json.GirJSON;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityColumn;
+import cn.geoair.gtc.orm.spi.entity.GirEntityColumn;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,10 +127,10 @@ public class GirSimpleExampleParser {
         //Map<String, Object> stringObjectMap = JSONObject.parseObject(JSONObject.toJSONString(updateEntity)).getInnerMap();
         StringBuilder sql = new StringBuilder();
         //获取全部列
-        Set<GtcEntityColumn> columnSet =  GirEntityHelper.getColumns( girExample.getEntityClass());
+        Set<GirEntityColumn> columnSet =  GirEntityHelper.getColumns( girExample.getEntityClass());
         //当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
         StringBuilder updatesql = new StringBuilder();
-        for ( GtcEntityColumn column : columnSet) {
+        for ( GirEntityColumn column : columnSet) {
             if (!column.isId() && column.isUpdatable()) {
                 Object columnValue = stringObjectMap.get(column.getProperty());
                 if (notNull) {

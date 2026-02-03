@@ -51,7 +51,7 @@ public class TkGithubPageHelper implements GiPageExcuter{
 	 * @return
 	 */
 
-	public static String orderBySqlFromGtcSort(GirSort sort) {
+	public static String orderBySqlFromGirSort(GirSort sort) {
 
 		if(sort != null) {
 
@@ -106,7 +106,7 @@ public class TkGithubPageHelper implements GiPageExcuter{
 	public <F> GiPager<F> excutePage(GfunPageExcute<F> pageExcute,GiPageParam pageParam) {
 
 		//PageHelper.orderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
-        Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(), TkGithubPageHelper.orderBySqlFromGtcSort(pageParam.sort()));
+        Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(), TkGithubPageHelper.orderBySqlFromGirSort(pageParam.sort()));
         //page.setOrderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
 
         Iterable<F> list = pageExcute.excute();

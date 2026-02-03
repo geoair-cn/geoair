@@ -12,9 +12,9 @@ import java.util.Set;
 
 /**
  */
-public class GtcInsertListProvider extends MapperTemplate {
+public class GirInsertListProvider extends MapperTemplate {
 
-    public GtcInsertListProvider(Class<?> mapperClass, MapperHelper mapperHelper) {
+    public GirInsertListProvider(Class<?> mapperClass, MapperHelper mapperHelper) {
         super(mapperClass, mapperHelper);
     }
 

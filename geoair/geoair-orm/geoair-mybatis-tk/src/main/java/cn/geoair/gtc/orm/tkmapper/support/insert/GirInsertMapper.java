@@ -10,7 +10,7 @@ import tk.mybatis.mapper.annotation.RegisterMapper;
  * @param <T>
  */
 @RegisterMapper
-public interface GtcInsertMapper<T> {
+public interface GirInsertMapper<T> {
 
 
 	/**
@@ -19,7 +19,7 @@ public interface GtcInsertMapper<T> {
      * @param record
      * @return
      */
-    @InsertProvider(type =  GtcInsertProvider.class, method = "dynamicSQL")
+    @InsertProvider(type =  GirInsertProvider.class, method = "dynamicSQL")
     int insert(T record);
 
 
@@ -29,7 +29,7 @@ public interface GtcInsertMapper<T> {
      * @param record
      * @return
      */
-    @InsertProvider(type =  GtcInsertProvider.class, method = "dynamicSQL")
+    @InsertProvider(type =  GirInsertProvider.class, method = "dynamicSQL")
     int insertSelective(T record);
 
 }

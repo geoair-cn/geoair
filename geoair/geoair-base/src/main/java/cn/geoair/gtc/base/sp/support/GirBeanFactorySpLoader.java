@@ -2,7 +2,7 @@ package cn.geoair.gtc.base.sp.support;
 
 import java.lang.reflect.Type;
 
-import cn.geoair.gtc.base.bean.GtcBeanHelper;
+import cn.geoair.gtc.base.bean.GirBeanHelper;
 import cn.geoair.gtc.base.bean.GirNoSuchBeanException;
 import cn.geoair.gtc.base.bean.GirNoUniqueBeanException;
 import cn.geoair.gtc.base.exception.GirException;
@@ -22,12 +22,12 @@ public class GirBeanFactorySpLoader extends GirCacheSpLoader {
 			t = super.load(cls, types);
 		}
 		if(t == null) {
-			if( GtcBeanHelper.getProvider() != null) {
+			if( GirBeanHelper.getProvider() != null) {
 				try {
 					if(types.length > 0) {
-						t =  GtcBeanHelper.getProvider().getBean(cls, types);
+						t =  GirBeanHelper.getProvider().getBean(cls, types);
 					}else {
-						t =  GtcBeanHelper.getProvider().getBean(cls);
+						t =  GirBeanHelper.getProvider().getBean(cls);
 					}
 				}catch( GirNoUniqueBeanException nex) {
 					throw nex;

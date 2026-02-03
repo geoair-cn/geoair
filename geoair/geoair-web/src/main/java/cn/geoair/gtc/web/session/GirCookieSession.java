@@ -6,7 +6,7 @@ import cn.geoair.gtc.web.util.GutilCookie;
 
 
 
-@GtcSessionAn(catalog=" gtc:session:cookie-sessions:")
+@GirSessionAn(catalog=" gtc:session:cookie-sessions:")
 public class GirCookieSession extends GirHttpSession {
 	private static final long serialVersionUID = -9083487544487755650L;
 

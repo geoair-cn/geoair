@@ -55,8 +55,8 @@ public class GirSessionConfig implements Serializable{
 
 	public GirSessionConfig(Class<? extends HttpSession> sessionClass) {
 		this.sessionClass = sessionClass;
-		 GtcSessionAn an = sessionClass.getAnnotation( GtcSessionAn.class);
-		if(an != null && ! GtcSessionAn.NULL.equals(an.catalog())) {
+		 GirSessionAn an = sessionClass.getAnnotation( GirSessionAn.class);
+		if(an != null && ! GirSessionAn.NULL.equals(an.catalog())) {
 			catalog = an.catalog();
 			cacheName = an.cacheName();
 		}

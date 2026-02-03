@@ -4,17 +4,17 @@ import java.util.concurrent.Callable;
 
 import cn.geoair.gtc.base.cache.GiCache;
 
-public class GtcMemoryCache implements GiCache {
+public class GirMemoryCache implements GiCache {
 
-	protected static GtcCacheMap<Object,Object> cacheMap = new GtcCacheMap<Object,Object>();
+	protected static GirCacheMap<Object,Object> cacheMap = new GirCacheMap<Object,Object>();
 
 	private String name;
 
-	public GtcMemoryCache() {
+	public GirMemoryCache() {
 		name = this.getClass().getName();
 	}
 
-	public GtcMemoryCache(String name) {
+	public GirMemoryCache(String name) {
 		this.name = name;
 	}
 

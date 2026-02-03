@@ -4,7 +4,7 @@
 //import javax.servlet.http.HttpSession;
 //import  com.gtc.base.user.session.GiUserSession;
 //
-//public class GtcWebUserSession implements GiUserSession{
+//public class GirWebUserSession implements GiUserSession{
 //
 //	/**
 //	 *
@@ -13,7 +13,7 @@
 //
 //	private HttpSession httpSession;
 //
-//	public GtcWebUserSession(HttpSession httpSession){
+//	public GirWebUserSession(HttpSession httpSession){
 //		this.httpSession = httpSession;
 //	}
 //

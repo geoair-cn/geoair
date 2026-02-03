@@ -8,9 +8,9 @@ package cn.geoair.gtc.orm.spi.entity;
  *
  * @author zhangjun
  */
-public class GtcEntityColumn {
+public class GirEntityColumn {
     //
-    protected GtcEntityTable table;
+    protected GirEntityTable table;
     // 字段名称
     protected String property;
     // 字段对应的数据库表名
@@ -39,12 +39,12 @@ public class GtcEntityColumn {
      *
      * @since 3.5.0
      */
-    private GtcEntityField gtcEntityField;
+    private GirEntityField girEntityField;
 
-    public GtcEntityColumn() {
+    public GirEntityColumn() {
     }
 
-    public GtcEntityColumn(GtcEntityTable table) {
+    public GirEntityColumn(GirEntityTable table) {
         this.table = table;
     }
 
@@ -54,7 +54,7 @@ public class GtcEntityColumn {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-         GtcEntityColumn that = (GtcEntityColumn) o;
+         GirEntityColumn that = (GirEntityColumn) o;
 
         if (id != that.id) return false;
         if (identity != that.identity) return false;
@@ -104,12 +104,12 @@ public class GtcEntityColumn {
     }
 
 
-    public GtcEntityField getEntityField() {
-        return  gtcEntityField;
+    public GirEntityField getEntityField() {
+        return girEntityField;
     }
 
-    public void setEntityField( GtcEntityField gtcEntityField) {
-        this. gtcEntityField =  gtcEntityField;
+    public void setEntityField( GirEntityField girEntityField) {
+        this.girEntityField = girEntityField;
     }
 
     public String getGenerator() {
@@ -145,11 +145,11 @@ public class GtcEntityColumn {
         this.property = property;
     }
 
-    public GtcEntityTable getTable() {
+    public GirEntityTable getTable() {
         return table;
     }
 
-    public void setTable( GtcEntityTable table) {
+    public void setTable( GirEntityTable table) {
         this.table = table;
     }
 

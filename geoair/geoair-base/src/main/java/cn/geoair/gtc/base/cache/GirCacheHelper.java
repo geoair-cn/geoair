@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.cache;
 
-import cn.geoair.gtc.base.cache.support.GtcMemoryCacheManager;
+import cn.geoair.gtc.base.cache.support.GirMemoryCacheManager;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
@@ -49,7 +49,7 @@ public class GirCacheHelper {
 	 * 提供基于内存的缓存实现，用于存储和管理缓存数据。
 	 * </p>
 	 */
-	private static GtcMemoryCacheManager memoryCacheManager = new GtcMemoryCacheManager();
+	private static GirMemoryCacheManager memoryCacheManager = new GirMemoryCacheManager();
 
 	/**
 	 * 默认缓存获取实现

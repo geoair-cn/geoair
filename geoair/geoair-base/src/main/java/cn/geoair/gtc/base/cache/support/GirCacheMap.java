@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 
-public class GtcCacheMap<K,V> implements Map<K,V> {
+public class GirCacheMap<K,V> implements Map<K,V> {
 
 
     private Map<K,V> hashMap;
@@ -27,24 +27,24 @@ public class GtcCacheMap<K,V> implements Map<K,V> {
      * @param initialCapacity 初始容量
      * @param loadFactor 负载因子
      */
-    public GtcCacheMap(int initialCapacity, float loadFactor) {
+    public GirCacheMap(int initialCapacity, float loadFactor) {
         hashMap = new ConcurrentHashMap<K,V>(initialCapacity,loadFactor);
         timeMap = new ConcurrentHashMap<K,Long>(initialCapacity,loadFactor);
     }
-    
+
     /**
      * 构造方法，指定初始容量
      * @param initialCapacity 初始容量
      */
-    public GtcCacheMap(int initialCapacity) {
+    public GirCacheMap(int initialCapacity) {
         hashMap = new ConcurrentHashMap<K,V>(initialCapacity);
         timeMap = new ConcurrentHashMap<K,Long>(initialCapacity);
     }
-    
+
     /**
      * 默认构造方法
      */
-    public GtcCacheMap() {
+    public GirCacheMap() {
         hashMap = new ConcurrentHashMap<K,V>();
         timeMap = new ConcurrentHashMap<K,Long>();
     }
@@ -68,7 +68,7 @@ public class GtcCacheMap<K,V> implements Map<K,V> {
             return expire_(key,Long.valueOf(milliseconds));
         }
     }
-    
+
     /**
      * 设置键的过期时间的内部实现
      * @param key 键
@@ -100,7 +100,7 @@ public class GtcCacheMap<K,V> implements Map<K,V> {
         }
         return 0;
     }
-    
+
     /**
      * 以毫秒为单位获取key的剩余时间
      * @param key 键
@@ -109,7 +109,7 @@ public class GtcCacheMap<K,V> implements Map<K,V> {
     public long pttl(K key){
         return pttl_(key);
     }
-    
+
     /**
      * 以毫秒为单位获取key的剩余时间的内部实现
      * @param key 键

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import cn.geoair.gtc.base.bean.GiBeanFactory;
 import cn.geoair.gtc.base.bean.GirBeanDefinitionStoreException;
 import cn.geoair.gtc.base.bean.GirBeanException;
-import cn.geoair.gtc.base.bean.GtcBeanHelper;
+import cn.geoair.gtc.base.bean.GirBeanHelper;
 import cn.geoair.gtc.base.bean.GirBeanNotOfRequiredTypeException;
 import cn.geoair.gtc.base.bean.GirNoSuchBeanException;
 import cn.geoair.gtc.base.bean.GirNoUniqueBeanException;
@@ -47,7 +47,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 
 	protected final GiLogger logger =  GirLogger.getLoger(SpringContextBean4Gir.class);
 
-	@GaMethodHandImpl(implClass= GtcBeanHelper.class,implMethod="getProvider",type=ImplType.expectfirst)
+	@GaMethodHandImpl(implClass= GirBeanHelper.class,implMethod="getProvider",type=ImplType.expectfirst)
 	private static GiBeanFactory getProvider() {
 		return beanProvider;
 	}

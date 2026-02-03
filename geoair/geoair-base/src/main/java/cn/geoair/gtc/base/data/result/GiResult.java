@@ -67,7 +67,7 @@ public interface GiResult<T> extends GiValuable<T> {
 
 	/**
 	 * 设置消息提示类型
-	 * @param alertTypeEnum GtcEmAlertType枚举类型的消息提示类型
+	 * @param alertTypeEnum GirEmAlertType枚举类型的消息提示类型
 	 * @return 当前GiResult实例
 	 */
 	default public GiResult<T> andAlertTypeEnum( GirEmAlertType alertTypeEnum){

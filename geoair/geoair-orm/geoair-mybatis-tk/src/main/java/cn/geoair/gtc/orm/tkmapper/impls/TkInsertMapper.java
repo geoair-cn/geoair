@@ -7,11 +7,11 @@ import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiCreateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.gtc.orm.mybatis.impls.MyBatisMapper;
-import cn.geoair.gtc.orm.tkmapper.support.insert.GtcInsertListMapper;
-import cn.geoair.gtc.orm.tkmapper.support.insert.GtcInsertMapper;
+import cn.geoair.gtc.orm.tkmapper.support.insert.GirInsertListMapper;
+import cn.geoair.gtc.orm.tkmapper.support.insert.GirInsertMapper;
 
 
-public interface TkInsertMapper<T extends GiEntitySaveable<PK>,PK extends Serializable> extends MyBatisMapper<T,PK>, GtcInsertMapper<T>, GiCreateDao<T,PK>{
+public interface TkInsertMapper<T extends GiEntitySaveable<PK>,PK extends Serializable> extends MyBatisMapper<T,PK>, GirInsertMapper<T>, GiCreateDao<T,PK>{
 
     /**
      * 保存一条记录(属性不判空，为空的属性插入为空，无视数据库默认值)
@@ -34,14 +34,14 @@ public interface TkInsertMapper<T extends GiEntitySaveable<PK>,PK extends Serial
 	@Override
     default List<PK>  gtcAccess(List<T> records) {
 
-    	if(this instanceof GtcInsertListMapper) {
+    	if(this instanceof GirInsertListMapper) {
     		/**
     	     * 批量插入，支持批量插入的数据库可以使用，例如MySQL,PG,H2等
     	     * <p>
     	     * 该方法支持 @KeySql 注解的 genId 方式
     	     *
     	     */
-    		((GtcInsertListMapper)this).insertList(records);
+    		((GirInsertListMapper)this).insertList(records);
 
     	}else if(this instanceof tk.mybatis.mapper.additional.insert.InsertListMapper) {
     		/**

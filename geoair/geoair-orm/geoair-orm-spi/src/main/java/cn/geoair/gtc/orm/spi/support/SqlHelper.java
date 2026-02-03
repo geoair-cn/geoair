@@ -8,7 +8,7 @@ package cn.geoair.gtc.orm.spi.support;
 
 import cn.geoair.gtc.base.data.tuples.GkPair;
 import cn.geoair.gtc.base.util.GutilStr;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityColumn;
+import cn.geoair.gtc.orm.spi.entity.GirEntityColumn;
 //import javafx.util.GkPair;
 
 import java.util.*;
@@ -23,10 +23,10 @@ public class SqlHelper {
      * @return
      */
     public static String getAllColumns(Class<?> entityClass) {
-        Set<GtcEntityColumn> columnSet =  GirEntityHelper.getColumns(entityClass);
+        Set<GirEntityColumn> columnSet =  GirEntityHelper.getColumns(entityClass);
         StringBuilder sql = new StringBuilder();
-        for ( GtcEntityColumn gtcEntityColumn : columnSet) {
-            sql.append( gtcEntityColumn.getSelectColumn()).append(",");
+        for ( GirEntityColumn girEntityColumn : columnSet) {
+            sql.append( girEntityColumn.getSelectColumn()).append(",");
         }
         return sql.substring(0, sql.length() - 1);
     }
@@ -54,7 +54,7 @@ public class SqlHelper {
     public static String selectCount(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        Set<GtcEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
+        Set<GirEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
         if (pkColumns.size() == 1) {
             sql.append("COUNT(").append(pkColumns.iterator().next().getColumn()).append(") ");
         } else {
@@ -72,7 +72,7 @@ public class SqlHelper {
     public static String selectCountExists(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT CASE WHEN ");
-        Set<GtcEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
+        Set<GirEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
         if (pkColumns.size() == 1) {
             sql.append("COUNT(").append(pkColumns.iterator().next().getColumn()).append(") ");
         } else {
@@ -160,8 +160,8 @@ public class SqlHelper {
     public static String getSelectColumn(GirExample girExample, Set<String> selectColumns) {
         StringBuilder allColumn = new StringBuilder();
         if ( girExample != null) {
-            Set<GtcEntityColumn> entityClassColumns =  girExample.table.getEntityClassColumns();
-            for ( GtcEntityColumn entityClassColumn : entityClassColumns) {
+            Set<GirEntityColumn> entityClassColumns =  girExample.table.getEntityClassColumns();
+            for ( GirEntityColumn entityClassColumn : entityClassColumns) {
                 allColumn.append(entityClassColumn.getSelectColumn()).append(",");
             }
             return allColumn.substring(0, allColumn.length() - 1);

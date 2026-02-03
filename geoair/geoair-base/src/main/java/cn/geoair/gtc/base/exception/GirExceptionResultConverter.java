@@ -47,8 +47,8 @@ public abstract class GirExceptionResultConverter {
 	static {
 		primitiveExceptionAlertTypeMap.put(Exception.class,  GirEmAlertType.不弹框0.value());
 		primitiveExceptionAlertTypeMap.put( GirException.class,  GirEmAlertType.无需关闭的错误3.value());
-//		primitiveExceptionAlertTypeMap.put( gtcNoLoginException.class,  GtcEmAlertType.无需关闭的错误3.value());
-//		primitiveExceptionAlertTypeMap.put( gtcPermissionException.class,  GtcEmAlertType.无需关闭的提示1.value());
+//		primitiveExceptionAlertTypeMap.put( gtcNoLoginException.class,  GirEmAlertType.无需关闭的错误3.value());
+//		primitiveExceptionAlertTypeMap.put( gtcPermissionException.class,  GirEmAlertType.无需关闭的提示1.value());
 		primitiveExceptionAlertTypeMap.put( GirValidateException.class,  GirEmAlertType.无需关闭的提示1.value());
 	}
 

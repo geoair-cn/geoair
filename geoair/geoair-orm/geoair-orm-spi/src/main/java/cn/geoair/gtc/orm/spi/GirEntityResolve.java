@@ -6,7 +6,7 @@ package cn.geoair.gtc.orm.spi;
  * @description： TODO
  */
 
-import cn.geoair.gtc.orm.spi.entity.GtcEntityTable;
+import cn.geoair.gtc.orm.spi.entity.GirEntityTable;
 
 /**
  * 解析实体类接口
@@ -22,7 +22,7 @@ public interface GirEntityResolve {
      * @param
      * @return
      */
-     GtcEntityTable resolveEntity(Class<?> entityClass);
+     GirEntityTable resolveEntity(Class<?> entityClass);
 
     /**
      * 解析类为 EntityTable
@@ -31,7 +31,7 @@ public interface GirEntityResolve {
      * @param
      * @return
      */
-     GtcEntityTable resolveEntity(Object entityidentification);
+     GirEntityTable resolveEntity(Object entityidentification);
 
 
 }

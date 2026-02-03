@@ -13,7 +13,7 @@ import cn.geoair.gtc.base.cache.GiCache;
  * @author Ray
  *
  */
-public class GtcMemoryCacheManager /*implements CacheManager*/ {
+public class GirMemoryCacheManager /*implements CacheManager*/ {
 
 	private final ConcurrentMap<String, GiCache> cacheMap = new ConcurrentHashMap<>(16);
 
@@ -24,11 +24,11 @@ public class GtcMemoryCacheManager /*implements CacheManager*/ {
 	private boolean storeByValue = false;
 
 
-	public GtcMemoryCacheManager() {
+	public GirMemoryCacheManager() {
 	}
 
 
-	public GtcMemoryCacheManager(String... cacheNames) {
+	public GirMemoryCacheManager(String... cacheNames) {
 		setCacheNames(Arrays.asList(cacheNames));
 	}
 
@@ -98,7 +98,7 @@ public class GtcMemoryCacheManager /*implements CacheManager*/ {
 	}
 
 	protected GiCache createConcurrentMapCache(String name) {
-		return new GtcMemoryCache(name);
+		return new GirMemoryCache(name);
 	}
 
 }

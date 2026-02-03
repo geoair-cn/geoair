@@ -1,6 +1,6 @@
 package cn.geoair.gtc.web.session;
 
-@GtcSessionAn(catalog=" gtc:session:token-sessions:")
+@GirSessionAn(catalog=" gtc:session:token-sessions:")
 public class GirTokenSession extends GirHttpSession {
 
 	private static final long serialVersionUID = -7622639754610367089L;

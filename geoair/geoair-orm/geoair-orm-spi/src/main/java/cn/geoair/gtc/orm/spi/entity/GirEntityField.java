@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
  *
  * @author zhangjun
  */
-public class GtcEntityField {
+public class GirEntityField {
 
     // 字段名称
     private String name;
@@ -29,7 +29,7 @@ public class GtcEntityField {
      * @param field              字段
      * @param propertyDescriptor 字段name对应的property
      */
-    public GtcEntityField(Field field, PropertyDescriptor propertyDescriptor) {
+    public GirEntityField(Field field, PropertyDescriptor propertyDescriptor) {
         if (field != null) {
             this.field = field;
             this.name = field.getName();
@@ -48,7 +48,7 @@ public class GtcEntityField {
      *
      * @param other
      */
-    public void copyFromPropertyDescriptor( GtcEntityField other) {
+    public void copyFromPropertyDescriptor( GirEntityField other) {
         this.setter = other.setter;
         this.getter = other.getter;
         this.javaType = other.javaType;
@@ -122,7 +122,7 @@ public class GtcEntityField {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-         GtcEntityField that = (GtcEntityField) o;
+         GirEntityField that = (GirEntityField) o;
 
         return !(name != null ? !name.equals(that.name) : that.name != null);
 

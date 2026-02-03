@@ -2,9 +2,9 @@ package cn.geoair.gtc.orm.spi.support;
 
 import cn.geoair.gtc.base.util.GutilReflection;
 import cn.geoair.gtc.base.util.GutilStr;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityColumn;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityField;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityTable;
+import cn.geoair.gtc.orm.spi.entity.GirEntityColumn;
+import cn.geoair.gtc.orm.spi.entity.GirEntityField;
+import cn.geoair.gtc.orm.spi.entity.GirEntityTable;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -38,9 +38,9 @@ public class GirExample {
 
     protected Class<?> entityClass;
 
-    protected GtcEntityTable table;
+    protected GirEntityTable table;
     //属性和列对应
-    protected Map<String, GtcEntityColumn> propertyMap;
+    protected Map<String, GirEntityColumn> propertyMap;
     //动态表名
     protected String tableName;
 
@@ -228,11 +228,11 @@ public class GirExample {
 
     public static class OrderBy {
         //属性和列对应
-        protected Map<String, GtcEntityColumn> propertyMap;
+        protected Map<String, GirEntityColumn> propertyMap;
         private GirExample girExample;
         private Boolean isProperty;
 
-        public OrderBy(GirExample girExample, Map<String, GtcEntityColumn> propertyMap) {
+        public OrderBy(GirExample girExample, Map<String, GirEntityColumn> propertyMap) {
             this.girExample = girExample;
             this.propertyMap = propertyMap;
         }
@@ -289,9 +289,9 @@ public class GirExample {
         //连接条件
         protected String andOr;
         //属性和列对应
-        protected Map<String, GtcEntityColumn> propertyMap;
+        protected Map<String, GirEntityColumn> propertyMap;
 
-        protected GeneratedCriteria(Map<String, GtcEntityColumn> propertyMap, boolean exists, boolean notNull) {
+        protected GeneratedCriteria(Map<String, GirEntityColumn> propertyMap, boolean exists, boolean notNull) {
             super();
             this.exists = exists;
             this.notNull = notNull;
@@ -534,8 +534,8 @@ public class GirExample {
                     }
                 }
             }
-            List<GtcEntityField> fields =  GirFieldHelper.getFields(param.getClass());
-            for ( GtcEntityField field : fields) {
+            List<GirEntityField> fields =  GirFieldHelper.getFields(param.getClass());
+            for ( GirEntityField field : fields) {
                 String property = field.getName();
                 //属性和列对应Map中有此属性
                 if (propertyMap.get(property) != null) {
@@ -713,7 +713,7 @@ public class GirExample {
 
     public static class Criteria extends GeneratedCriteria {
 
-        protected Criteria(Map<String, GtcEntityColumn> propertyMap, boolean exists, boolean notNull) {
+        protected Criteria(Map<String, GirEntityColumn> propertyMap, boolean exists, boolean notNull) {
             super(propertyMap, exists, notNull);
         }
     }
@@ -839,9 +839,9 @@ public class GirExample {
 
     public static class Builder {
         private final Class<?> entityClass;
-        protected GtcEntityTable table;
+        protected GirEntityTable table;
         //属性和列对应
-        protected Map<String, GtcEntityColumn> propertyMap;
+        protected Map<String, GirEntityColumn> propertyMap;
         private StringBuilder orderByClause;
         private boolean distinct;
         private boolean exists;
@@ -1118,9 +1118,9 @@ public class GirExample {
         if (selectColumns != null && selectColumns.size() > 0) {
             //不需要处理
         } else if (excludeColumns != null && excludeColumns.size() > 0) {
-            Collection<GtcEntityColumn>  gtcEntityColumns = propertyMap.values();
-            selectColumns = new LinkedHashSet<String>( gtcEntityColumns.size() - excludeColumns.size());
-            for ( GtcEntityColumn column :  gtcEntityColumns) {
+            Collection<GirEntityColumn> girEntityColumns = propertyMap.values();
+            selectColumns = new LinkedHashSet<String>( girEntityColumns.size() - excludeColumns.size());
+            for ( GirEntityColumn column : girEntityColumns) {
                 if (!excludeColumns.contains(column.getColumn())) {
                     selectColumns.add(column.getSelectColumn());
                 }

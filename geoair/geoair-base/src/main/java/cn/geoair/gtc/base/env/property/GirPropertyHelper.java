@@ -13,7 +13,7 @@ public class GirPropertyHelper {
 //	}
 //	*/
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.env.SpringEnvironment4Gtc")
+	@GaMethodHandDefine(expectClassName = "com.gtc.spi.env.SpringEnvironment4Gir")
 	public static GiPropertier getPropertier() {
 		return (GiPropertier) GkMethodHand.invokeSelf();
 	}

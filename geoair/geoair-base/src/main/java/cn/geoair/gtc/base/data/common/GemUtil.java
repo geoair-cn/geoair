@@ -30,11 +30,11 @@ public class GemUtil {
 
 
     /**
-     * 枚举转换成GtcVisualValueKid模型
+     * 枚举转换成GirVisualValueKid模型
      * @param <T> 枚举类型
      * @param <K> 枚举值类型
      * @param enumClz 枚举类class对象
-     * @return GtcVisualValueKid列表
+     * @return GirVisualValueKid列表
      */
 	public static <T extends Enum<T> & GiVisualValuable<K>,K> List<GirVisualValueKid<K>> extractEnumVisualValueKid(Class<T> enumClz) {
         List<GirVisualValueKid<K>> list = new ArrayList<>();

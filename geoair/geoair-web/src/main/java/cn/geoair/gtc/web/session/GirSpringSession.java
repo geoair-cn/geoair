@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSessionContext;
 import cn.geoair.gtc.web.util.GirHttpServletHelper;
 
 @SuppressWarnings("deprecation")
-@GtcSessionAn(catalog=" gtc:session:spring-sessions:")
+@GirSessionAn(catalog=" gtc:session:spring-sessions:")
 public class GirSpringSession extends GirHttpSession {
 
 	private static final long serialVersionUID = -7622639754610367089L;

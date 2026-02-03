@@ -1,7 +1,7 @@
 package cn.geoair.gtc.orm.spi.support;
 
 
-import cn.geoair.gtc.orm.spi.entity.GtcEntityField;
+import cn.geoair.gtc.orm.spi.entity.GirEntityField;
 
 import javax.persistence.Entity;
 import java.beans.BeanInfo;
@@ -34,7 +34,7 @@ public class GirFieldHelper {
      * @param entityClass
      * @return
      */
-    public static List<GtcEntityField> getFields(Class<?> entityClass) {
+    public static List<GirEntityField> getFields(Class<?> entityClass) {
         // 判断这个对象是不是map对象
         return fieldHelper.getFields(entityClass);
     }
@@ -45,7 +45,7 @@ public class GirFieldHelper {
      * @param entityClass
      * @return
      */
-    public static List<GtcEntityField> getProperties(Class<?> entityClass) {
+    public static List<GirEntityField> getProperties(Class<?> entityClass) {
         return fieldHelper.getProperties(entityClass);
     }
 
@@ -56,14 +56,14 @@ public class GirFieldHelper {
      * @return
      * @throws IntrospectionException
      */
-    public static List<GtcEntityField> getAll(Class<?> entityClass) {
-        List<GtcEntityField> fields = fieldHelper.getFields(entityClass);
-        List<GtcEntityField> properties = fieldHelper.getProperties(entityClass);
+    public static List<GirEntityField> getAll(Class<?> entityClass) {
+        List<GirEntityField> fields = fieldHelper.getFields(entityClass);
+        List<GirEntityField> properties = fieldHelper.getProperties(entityClass);
         //拼到一起，名字相同的合并
-        List<GtcEntityField> all = new ArrayList<GtcEntityField>();
-        Set<GtcEntityField> usedSet = new HashSet<GtcEntityField>();
-        for ( GtcEntityField field : fields) {
-            for ( GtcEntityField property : properties) {
+        List<GirEntityField> all = new ArrayList<GirEntityField>();
+        Set<GirEntityField> usedSet = new HashSet<GirEntityField>();
+        for ( GirEntityField field : fields) {
+            for ( GirEntityField property : properties) {
                 if (!usedSet.contains(property) && field.getName().equals(property.getName())) {
                     field.copyFromPropertyDescriptor(property);
                     usedSet.add(property);
@@ -72,7 +72,7 @@ public class GirFieldHelper {
             }
             all.add(field);
         }
-        for ( GtcEntityField property : properties) {
+        for ( GirEntityField property : properties) {
             if (!usedSet.contains(property)) {
                 all.add(property);
             }
@@ -90,7 +90,7 @@ public class GirFieldHelper {
          * @param entityClass
          * @return
          */
-        List<GtcEntityField> getFields(Class<?> entityClass);
+        List<GirEntityField> getFields(Class<?> entityClass);
 
         /**
          * 获取全部的属性，通过方法名获取
@@ -98,7 +98,7 @@ public class GirFieldHelper {
          * @param entityClass
          * @return
          */
-        List<GtcEntityField> getProperties(Class<?> entityClass);
+        List<GirEntityField> getProperties(Class<?> entityClass);
     }
 
     /**
@@ -112,12 +112,12 @@ public class GirFieldHelper {
          * @return
          */
         @Override
-        public List<GtcEntityField> getFields(Class<?> entityClass) {
-            List<GtcEntityField> fields = _getFields(entityClass, null, null);
-            List<GtcEntityField> properties = getProperties(entityClass);
-            Set<GtcEntityField> usedSet = new HashSet<GtcEntityField>();
-            for ( GtcEntityField field : fields) {
-                for ( GtcEntityField property : properties) {
+        public List<GirEntityField> getFields(Class<?> entityClass) {
+            List<GirEntityField> fields = _getFields(entityClass, null, null);
+            List<GirEntityField> properties = getProperties(entityClass);
+            Set<GirEntityField> usedSet = new HashSet<GirEntityField>();
+            for ( GirEntityField field : fields) {
+                for ( GirEntityField property : properties) {
                     if (!usedSet.contains(property) && field.getName().equals(property.getName())) {
                         //泛型的情况下通过属性可以得到实际的类型
                         field.setJavaType(property.getJavaType());
@@ -136,9 +136,9 @@ public class GirFieldHelper {
          * @param level
          * @return
          */
-        private List<GtcEntityField> _getFields(Class<?> entityClass, List<GtcEntityField> fieldList, Integer level) {
+        private List<GirEntityField> _getFields(Class<?> entityClass, List<GirEntityField> fieldList, Integer level) {
             if (fieldList == null) {
-                fieldList = new ArrayList<GtcEntityField>();
+                fieldList = new ArrayList<GirEntityField>();
             }
             if (level == null) {
                 level = 0;
@@ -154,10 +154,10 @@ public class GirFieldHelper {
                 if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
                     if (level.intValue() != 0) {
                         //将父类的字段放在前面
-                        fieldList.add(index, new GtcEntityField(field, null));
+                        fieldList.add(index, new GirEntityField(field, null));
                         index++;
                     } else {
-                        fieldList.add(new GtcEntityField(field, null));
+                        fieldList.add(new GirEntityField(field, null));
                     }
                 }
             }
@@ -179,8 +179,8 @@ public class GirFieldHelper {
          * @return
          */
         @Override
-        public List<GtcEntityField> getProperties(Class<?> entityClass) {
-            List<GtcEntityField> GtcEntityFields = new ArrayList<GtcEntityField>();
+        public List<GirEntityField> getProperties(Class<?> entityClass) {
+            List<GirEntityField> girEntityFields = new ArrayList<GirEntityField>();
             BeanInfo beanInfo = null;
             try {
                 beanInfo = Introspector.getBeanInfo(entityClass);
@@ -190,10 +190,10 @@ public class GirFieldHelper {
             PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor desc : descriptors) {
                 if (!desc.getName().equals("class")) {
-                     GtcEntityFields.add(new GtcEntityField(null, desc));
+                     girEntityFields.add(new GirEntityField(null, desc));
                 }
             }
-            return GtcEntityFields;
+            return girEntityFields;
         }
     }
 
@@ -203,8 +203,8 @@ public class GirFieldHelper {
     static class Jdk6_7FieldHelper implements IFieldHelper {
 
         @Override
-        public List<GtcEntityField> getFields(Class<?> entityClass) {
-            List<GtcEntityField> fieldList = new ArrayList<GtcEntityField>();
+        public List<GirEntityField> getFields(Class<?> entityClass) {
+            List<GirEntityField> fieldList = new ArrayList<GirEntityField>();
             _getFields(entityClass, fieldList, _getGenericTypeMap(entityClass), null);
             return fieldList;
         }
@@ -216,9 +216,9 @@ public class GirFieldHelper {
          * @return
          */
         @Override
-        public List<GtcEntityField> getProperties(Class<?> entityClass) {
+        public List<GirEntityField> getProperties(Class<?> entityClass) {
             Map<String, Class<?>> genericMap = _getGenericTypeMap(entityClass);
-            List<GtcEntityField> GtcEntityFields = new ArrayList<GtcEntityField>();
+            List<GirEntityField> girEntityFields = new ArrayList<GirEntityField>();
             BeanInfo beanInfo;
             try {
                 beanInfo = Introspector.getBeanInfo(entityClass);
@@ -228,21 +228,21 @@ public class GirFieldHelper {
             PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor desc : descriptors) {
                 if (desc != null && !"class".equals(desc.getName())) {
-                     GtcEntityField gtcEntityField = new GtcEntityField(null, desc);
+                     GirEntityField girEntityField = new GirEntityField(null, desc);
                     if (desc.getReadMethod() != null
                             && desc.getReadMethod().getGenericReturnType() != null
                             && desc.getReadMethod().getGenericReturnType() instanceof TypeVariable) {
-                         gtcEntityField.setJavaType(genericMap.get(((TypeVariable) desc.getReadMethod().getGenericReturnType()).getName()));
+                         girEntityField.setJavaType(genericMap.get(((TypeVariable) desc.getReadMethod().getGenericReturnType()).getName()));
                     } else if (desc.getWriteMethod() != null
                             && desc.getWriteMethod().getGenericParameterTypes() != null
                             && desc.getWriteMethod().getGenericParameterTypes().length == 1
                             && desc.getWriteMethod().getGenericParameterTypes()[0] instanceof TypeVariable) {
-                         gtcEntityField.setJavaType(genericMap.get(((TypeVariable) desc.getWriteMethod().getGenericParameterTypes()[0]).getName()));
+                         girEntityField.setJavaType(genericMap.get(((TypeVariable) desc.getWriteMethod().getGenericParameterTypes()[0]).getName()));
                     }
-                     GtcEntityFields.add( gtcEntityField);
+                     girEntityFields.add(girEntityField);
                 }
             }
-            return GtcEntityFields;
+            return girEntityFields;
         }
 
         /**
@@ -251,7 +251,7 @@ public class GirFieldHelper {
          * @param genericMap
          * @param level
          */
-        private void _getFields(Class<?> entityClass, List<GtcEntityField> fieldList, Map<String, Class<?>> genericMap, Integer level) {
+        private void _getFields(Class<?> entityClass, List<GirEntityField> fieldList, Map<String, Class<?>> genericMap, Integer level) {
             if (fieldList == null) {
                 throw new NullPointerException("fieldList参数不能为空!");
             }
@@ -266,22 +266,22 @@ public class GirFieldHelper {
             for (Field field : fields) {
                 //忽略static和transient字段#106
                 if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())) {
-                     GtcEntityField gtcEntityField = new GtcEntityField(field, null);
+                     GirEntityField girEntityField = new GirEntityField(field, null);
                     if (field.getGenericType() != null && field.getGenericType() instanceof TypeVariable) {
                         if (genericMap == null || !genericMap.containsKey(((TypeVariable) field.getGenericType()).getName())) {
                             throw new RuntimeException(entityClass + "字段" + field.getName() + "的泛型类型无法获取!");
                         } else {
-                             gtcEntityField.setJavaType(genericMap.get(((TypeVariable) field.getGenericType()).getName()));
+                             girEntityField.setJavaType(genericMap.get(((TypeVariable) field.getGenericType()).getName()));
                         }
                     } else {
-                         gtcEntityField.setJavaType(field.getType());
+                         girEntityField.setJavaType(field.getType());
                     }
                     if (level.intValue() != 0) {
                         //将父类的字段放在前面
-                        fieldList.add(index,  gtcEntityField);
+                        fieldList.add(index, girEntityField);
                         index++;
                     } else {
-                        fieldList.add( gtcEntityField);
+                        fieldList.add(girEntityField);
                     }
                 }
             }

@@ -12,7 +12,7 @@ import java.util.List;
  * @param <T> 不能为空
  */
 @RegisterMapper
-public interface GtcInsertListMapper<T> {
+public interface GirInsertListMapper<T> {
 
     /**
      * 批量插入，支持批量插入的数据库可以使用，例如MySQL,PG,H2等
@@ -22,6 +22,6 @@ public interface GtcInsertListMapper<T> {
      * @param recordList
      * @return
      */
-    @InsertProvider(type =  GtcInsertListProvider.class, method = "dynamicSQL")
+    @InsertProvider(type =  GirInsertListProvider.class, method = "dynamicSQL")
     int insertList(List<? extends T> recordList);
 }

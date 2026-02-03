@@ -4,7 +4,7 @@
 //import java.util.Collection;
 //
 //import  com.gtc.base.log.GiLoger;
-//import com.gtc.base.log.GtcLoger;
+//import com.gtc.base.log.GirLoger;
 //import  com.gtc.base.user.permission.GiPermission;
 //import  com.gtc.base.user.permission.GiPermissionUser;
 //import  com.gtc.base.user.session.GiSessionUser;
@@ -16,7 +16,7 @@
 //
 //
 //
-//	public static GiLoger logger =  GtcLoger.getLoger(GiWebPermissionUser.class);
+//	public static GiLoger logger =  GirLoger.getLoger(GiWebPermissionUser.class);
 //
 //
 //    /**

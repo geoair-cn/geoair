@@ -44,16 +44,16 @@ public class PlusGithubPageHelper implements GiPageExcuter{
 	 * @return
 	 */
 
-	public static String orderBySqlFromGtcSort(GirSort sort) {
-		Gir.log.error("暂时不支持GtcSort生成排序。");
+	public static String orderBySqlFromGirSort(GirSort sort) {
+		Gir.log.error("暂时不支持GirSort生成排序。");
 //		if(sort != null) {
 //
-//        	Iterator<GtcOrder<?>> iterator = sort.iterator();
+//        	Iterator<GirOrder<?>> iterator = sort.iterator();
 //
 //        	StringBuilder orderBy = new StringBuilder();
 //        	while(iterator.hasNext()) {
 //
-//        		GtcOrder<?> order = iterator.next();
+//        		GirOrder<?> order = iterator.next();
 //
 //        		if(order.getPropertyFun() != null) {
 //
@@ -99,7 +99,7 @@ public class PlusGithubPageHelper implements GiPageExcuter{
 	public <F> GiPager<F> excutePage(GfunPageExcute<F> pageExcute,GiPageParam pageParam) {
 
 		//PageHelper.orderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
-        Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(), PlusGithubPageHelper.orderBySqlFromGtcSort(pageParam.sort()));
+        Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(), PlusGithubPageHelper.orderBySqlFromGirSort(pageParam.sort()));
         //page.setOrderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
 
         Iterable<F> list = pageExcute.excute();

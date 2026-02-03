@@ -17,7 +17,7 @@ import cn.geoair.gtc.base.tool.GkConsoleTable;
 import cn.geoair.gtc.base.bean.GirBeanException;
 import cn.geoair.gtc.base.bean.GiBeanFactory;
 import cn.geoair.gtc.base.bean.GirBeanDefinitionStoreException;
-import cn.geoair.gtc.base.bean.GtcBeanHelper;
+import cn.geoair.gtc.base.bean.GirBeanHelper;
 import cn.geoair.gtc.base.bean.GirNoSuchBeanException;
 
 /**
@@ -27,7 +27,7 @@ import cn.geoair.gtc.base.bean.GirNoSuchBeanException;
  * 命名规范：</br>
  * Ga* annotation 注解</br>
  * Gi* interface 接口</br>
- * Gtc* 实现类</br>
+ * Gir* 实现类</br>
  * Gutil* util 工具类</br>
  * Gfun*  function 函数接口</br>
  * Gk* kit 内建工具类</br>
@@ -273,97 +273,97 @@ public abstract class Gir {
 
 		@Override
 		public Object getBean(String name) throws GirBeanException {
-			return  GtcBeanHelper.getProvider().getBean(name);
+			return  GirBeanHelper.getProvider().getBean(name);
 		}
 
 		@Override
 		public <T> T getBean(String name, Class<T> requiredType) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBean(name,requiredType);
+			return  GirBeanHelper.getProvider().getBean(name,requiredType);
 		}
 
 		@Override
 		public Object getBean(String name, Object... args) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBean(name, args);
+			return  GirBeanHelper.getProvider().getBean(name, args);
 		}
 
 		@Override
 		public <T> T getBean(Class<T> requiredType, Object... args) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBean(requiredType, args);
+			return  GirBeanHelper.getProvider().getBean(requiredType, args);
 		}
 
 		@Override
 		public <T> T getBean(Class<T> requiredType) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBean(requiredType);
+			return  GirBeanHelper.getProvider().getBean(requiredType);
 		}
 
 		@Override
 		public <T> T getBean(Class<T> requiredType, Type[] genericType) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBean(requiredType, genericType);
+			return  GirBeanHelper.getProvider().getBean(requiredType, genericType);
 		}
 
 		@Override
 		public <T> Map<String, T> getBeans(Class<T> clazz, Type[] genericType) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBeans(clazz, genericType);
+			return  GirBeanHelper.getProvider().getBeans(clazz, genericType);
 		}
 
 		@Override
 		public <T> Map<String, T> getBeans(Class<T> clazz) throws GirBeanException {
 
-			return  GtcBeanHelper.getProvider().getBeans(clazz);
+			return  GirBeanHelper.getProvider().getBeans(clazz);
 		}
 
 		@Override
 		public boolean containsBean(String name) {
 
-			return  GtcBeanHelper.getProvider().containsBean(name);
+			return  GirBeanHelper.getProvider().containsBean(name);
 		}
 
 		@Override
 		public boolean isSingleton(String name) throws GirNoSuchBeanException {
 
-			return  GtcBeanHelper.getProvider().isSingleton(name);
+			return  GirBeanHelper.getProvider().isSingleton(name);
 		}
 
 		@Override
 		public boolean isPrototype(String name) throws GirNoSuchBeanException {
 
-			return  GtcBeanHelper.getProvider().isPrototype(name);
+			return  GirBeanHelper.getProvider().isPrototype(name);
 		}
 
 		@Override
 		public boolean isTypeMatch(String name, Class<?> typeToMatch) throws GirNoSuchBeanException {
 
-			return  GtcBeanHelper.getProvider().isTypeMatch(name, typeToMatch);
+			return  GirBeanHelper.getProvider().isTypeMatch(name, typeToMatch);
 		}
 
 		@Override
 		public Class<?> getType(String name) throws GirNoSuchBeanException {
 
-			return  GtcBeanHelper.getProvider().getType(name);
+			return  GirBeanHelper.getProvider().getType(name);
 		}
 
 		@Override
 		public String[] getAliases(String name) {
 
-			return  GtcBeanHelper.getProvider().getAliases(name);
+			return  GirBeanHelper.getProvider().getAliases(name);
 		}
 
 		@Override
 		public void register(String name, Class<?> beanClass) throws GirBeanDefinitionStoreException {
 
-			 GtcBeanHelper.getProvider().register(name, beanClass);
+			 GirBeanHelper.getProvider().register(name, beanClass);
 		}
 
 		@Override
 		public void register(String name, Class<?> beanClass, boolean singleton) throws GirBeanDefinitionStoreException {
 
-			 GtcBeanHelper.getProvider().register(name, beanClass, singleton);
+			 GirBeanHelper.getProvider().register(name, beanClass, singleton);
 		}
 
 	};
@@ -400,7 +400,7 @@ public abstract class Gir {
 	/**
 	 * 将对象转换为JSON格式
 	 * @param json 要转换的对象
-	 * @return GtcJSON对象，可用于进一步操作
+	 * @return GirJSON对象，可用于进一步操作
 	 */
 	public static GirJSON toJson(Object json) {
 		return  GirJSON.toJson(json);

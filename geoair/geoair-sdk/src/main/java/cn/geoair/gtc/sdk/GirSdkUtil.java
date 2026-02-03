@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import cn.geoair.gtc.base.Gir;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONObject;
-import cn.geoair.gtc.base.cache.support.GtcMemoryCache;
+import cn.geoair.gtc.base.cache.support.GirMemoryCache;
 import cn.geoair.gtc.base.log.GiLogger;
 import cn.geoair.gtc.base.log.GirLogger;
 import cn.geoair.gtc.sdk.body.GiRequestBody;
@@ -390,7 +390,7 @@ public class GirSdkUtil {
 	}
 
 
-	private static GtcMemoryCache memoryCache = new GtcMemoryCache();
+	private static GirMemoryCache memoryCache = new GirMemoryCache();
 
 
 	public static void validate(HttpServletRequest request, gtcSdkSecretProvider secretProvider) throws Exception {

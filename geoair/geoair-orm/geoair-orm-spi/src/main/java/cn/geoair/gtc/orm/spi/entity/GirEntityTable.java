@@ -10,19 +10,19 @@ import java.util.*;
  * @date ：Created in 2022/6/30 15:04
  * @description： 实体表对象
  */
-public class GtcEntityTable {
+public class GirEntityTable {
 
     //属性和列对应
-    protected Map<String, GtcEntityColumn> propertyMap;
+    protected Map<String, GirEntityColumn> propertyMap;
     private String name;
     private String catalog;
     private String schema;
     private String orderByClause;
     private String baseSelect;
     //实体类 => 全部列属性
-    private Set<GtcEntityColumn> entityClassColumns;
+    private Set<GirEntityColumn> entityClassColumns;
     //实体类 => 主键信息
-    private Set<GtcEntityColumn> entityClassPKColumns;
+    private Set<GirEntityColumn> entityClassPKColumns;
     //useGenerator包含多列的时候需要用到
     private List<String> keyProperties;
     private List<String> keyColumns;
@@ -30,11 +30,11 @@ public class GtcEntityTable {
     //类
     private Class<?> entityClass;
 
-    public GtcEntityTable(Class<?> entityClass) {
+    public GirEntityTable(Class<?> entityClass) {
         this.entityClass = entityClass;
     }
 
-    public GtcEntityTable() {
+    public GirEntityTable() {
 
     }
 
@@ -42,8 +42,8 @@ public class GtcEntityTable {
      * 初始化 - Example 会使用
      */
     public void initPropertyMap() {
-        propertyMap = new HashMap<String, GtcEntityColumn>(getEntityClassColumns().size());
-        for ( GtcEntityColumn column : getEntityClassColumns()) {
+        propertyMap = new HashMap<String, GirEntityColumn>(getEntityClassColumns().size());
+        for ( GirEntityColumn column : getEntityClassColumns()) {
             propertyMap.put(column.getProperty(), column);
         }
     }
@@ -69,19 +69,19 @@ public class GtcEntityTable {
         return entityClass;
     }
 
-    public Set<GtcEntityColumn> getEntityClassColumns() {
+    public Set<GirEntityColumn> getEntityClassColumns() {
         return entityClassColumns;
     }
 
-    public void setEntityClassColumns(Set<GtcEntityColumn> entityClassColumns) {
+    public void setEntityClassColumns(Set<GirEntityColumn> entityClassColumns) {
         this.entityClassColumns = entityClassColumns;
     }
 
-    public Set<GtcEntityColumn> getEntityClassPKColumns() {
+    public Set<GirEntityColumn> getEntityClassPKColumns() {
         return entityClassPKColumns;
     }
 
-    public void setEntityClassPKColumns(Set<GtcEntityColumn> entityClassPKColumns) {
+    public void setEntityClassPKColumns(Set<GirEntityColumn> entityClassPKColumns) {
         this.entityClassPKColumns = entityClassPKColumns;
     }
 
@@ -143,7 +143,7 @@ public class GtcEntityTable {
         return "";
     }
 
-    public Map<String, GtcEntityColumn> getPropertyMap() {
+    public Map<String, GirEntityColumn> getPropertyMap() {
         return propertyMap;
     }
 

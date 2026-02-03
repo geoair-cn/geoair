@@ -12,9 +12,9 @@ import java.util.Set;
  *  gtcInsertProvider实现类
  *
  */
-public class GtcInsertProvider extends MapperTemplate {
+public class GirInsertProvider extends MapperTemplate {
 
-    public GtcInsertProvider(Class<?> mapperClass, MapperHelper mapperHelper) {
+    public GirInsertProvider(Class<?> mapperClass, MapperHelper mapperHelper) {
         super(mapperClass, mapperHelper);
     }
 

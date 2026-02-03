@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import cn.geoair.gtc.base.bean.GtcBeanHelper;
+import cn.geoair.gtc.base.bean.GirBeanHelper;
 import cn.geoair.gtc.base.data.model.GiModelable;
 import cn.geoair.gtc.base.util.GutilClass;
 
@@ -20,7 +20,7 @@ public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
 	 * @return 指定类型的Dao实例
 	 */
 	public static <DAO extends GiDao<M,PK>,M extends GiModelable<PK>,PK extends Serializable> DAO getDao(Class<DAO> daoCls,Class<M> modelCls) {
-		return  GtcBeanHelper.getProvider().getBean(daoCls, new Type[] {modelCls,GiModelable.getIDClass(modelCls)});
+		return  GirBeanHelper.getProvider().getBean(daoCls, new Type[] {modelCls,GiModelable.getIDClass(modelCls)});
 	}
 
 

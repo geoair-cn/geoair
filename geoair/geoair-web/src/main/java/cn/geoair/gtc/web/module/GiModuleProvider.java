@@ -3,14 +3,14 @@ package cn.geoair.gtc.web.module;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import cn.geoair.gtc.base.bean.GtcBeanHelper;
+import cn.geoair.gtc.base.bean.GirBeanHelper;
 
 public interface GiModuleProvider<T extends GiModule> {
 
 
 	@SuppressWarnings("unchecked")
 	public static <T extends GiModule> GiModuleProvider<T> getModuleProvider(Class<T> moduleClass) {
-		return  GtcBeanHelper.getProvider().getBean(GiModuleProvider.class,new Type[] {moduleClass});
+		return  GirBeanHelper.getProvider().getBean(GiModuleProvider.class,new Type[] {moduleClass});
 	}
 
     /**

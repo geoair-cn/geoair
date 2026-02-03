@@ -2,11 +2,11 @@
 //
 //import java.io.Serializable;
 //import  com.gtc.base.data.GiVisuable;
-//import com.gtc.base.data.model.support.GtcVisualTreeModelKid;
+//import com.gtc.base.data.model.support.GirVisualTreeModelKid;
 //
 //public interface GiVisualTreeModelable<ID extends Serializable> extends GiTreeModelable<ID>,GiVisuable {
 //
-//	default GtcVisualTreeModelKid<ID> toVisualTreeModelKid() {
-//		return  GtcVisualTreeModelKid.valueWith(this.id(), this.display(), this.parentId());
+//	default GirVisualTreeModelKid<ID> toVisualTreeModelKid() {
+//		return  GirVisualTreeModelKid.valueWith(this.id(), this.display(), this.parentId());
 //	}
 //}

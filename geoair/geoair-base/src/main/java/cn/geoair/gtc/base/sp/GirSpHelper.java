@@ -86,7 +86,7 @@ public class GirSpHelper {
      * 支持泛型类型参数，按以下顺序查找实现类：
      * 1. 检查接口是否标记为单例，如果是则优先从缓存获取
      * 2. 按照@GkSP注解中指定的loader顺序加载
-     * 3. 如果前面都未找到，则使用默认的GtcPlaceHolderSpLoader加载
+     * 3. 如果前面都未找到，则使用默认的GirPlaceHolderSpLoader加载
      *
      * @param <T> 泛型类型
      * @param requiredType 接口类型

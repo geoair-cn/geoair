@@ -9,9 +9,9 @@ package cn.geoair.gtc.orm.spi.support;
 import cn.geoair.gtc.base.log.GiLogger;
 import cn.geoair.gtc.base.log.GirLogger;
 import cn.geoair.gtc.orm.spi.GirEntityResolve;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityColumn;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityTable;
-import cn.geoair.gtc.orm.spi.jpa.GtcJpaGirEntityResolve;
+import cn.geoair.gtc.orm.spi.entity.GirEntityColumn;
+import cn.geoair.gtc.orm.spi.entity.GirEntityTable;
+import cn.geoair.gtc.orm.spi.jpa.GirJpaGirEntityResolve;
 
 
 import java.util.Map;
@@ -30,11 +30,11 @@ public class GirEntityHelper {
     /**
      * 实体类 => 表对象
      */
-    private static final Map<Class<?>, GtcEntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, GtcEntityTable>();
+    private static final Map<Class<?>, GirEntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, GirEntityTable>();
     /**
      * 实体类解析器
      */
-    private static GirEntityResolve resolve = new GtcJpaGirEntityResolve();
+    private static GirEntityResolve resolve = new GirJpaGirEntityResolve();
 
 
     /**
@@ -43,13 +43,13 @@ public class GirEntityHelper {
      * @param entityClass
      * @return
      */
-    public static GtcEntityTable getEntityTable(Class<?> entityClass) {
+    public static GirEntityTable getEntityTable(Class<?> entityClass) {
         initEntityNameMap(entityClass);
-         GtcEntityTable gtcEntityTable = entityTableMap.get(entityClass);
-        if ( gtcEntityTable == null) {
+         GirEntityTable girEntityTable = entityTableMap.get(entityClass);
+        if ( girEntityTable == null) {
             throw new RuntimeException("无法获取实体类" + entityClass.getCanonicalName() + "对应的表名!");
         }
-        return  gtcEntityTable;
+        return girEntityTable;
     }
 
     /**
@@ -58,14 +58,14 @@ public class GirEntityHelper {
      * @param entityClass
      * @return
      */
-    public static GtcEntityTable getEntityTable(Class<?> entityClass, GirEntityResolve resolve) {
-         GtcEntityTable gtcEntityTable = resolve.resolveEntity(entityClass);
-        if ( gtcEntityTable == null) {
+    public static GirEntityTable getEntityTable(Class<?> entityClass, GirEntityResolve resolve) {
+         GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+        if ( girEntityTable == null) {
             throw new RuntimeException("无法通过该解析器" + resolve.getClass().getName() + "获取实体对象!");
         } else {
-            entityTableMap.put(entityClass,  gtcEntityTable);
+            entityTableMap.put(entityClass, girEntityTable);
         }
-        return  gtcEntityTable;
+        return girEntityTable;
     }
 
     /**
@@ -74,14 +74,14 @@ public class GirEntityHelper {
      * @param resolve
      * @return
      */
-    public static GtcEntityTable updateEntityTable(Class<?> entityClass, GirEntityResolve resolve) {
-         GtcEntityTable gtcEntityTable = resolve.resolveEntity(entityClass);
-        if ( gtcEntityTable == null) {
+    public static GirEntityTable updateEntityTable(Class<?> entityClass, GirEntityResolve resolve) {
+         GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+        if ( girEntityTable == null) {
             throw new RuntimeException("无法通过该解析器" + resolve.getClass().getName() + "获取实体对象!");
         } else {
-            entityTableMap.put(entityClass,  gtcEntityTable);
+            entityTableMap.put(entityClass, girEntityTable);
         }
-        return  gtcEntityTable;
+        return girEntityTable;
     }
 
     /**
@@ -89,14 +89,14 @@ public class GirEntityHelper {
      * @param entityClass
      * @return
      */
-    public static GtcEntityTable updateEntityTable(Class<?> entityClass) {
-         GtcEntityTable gtcEntityTable = resolve.resolveEntity(entityClass);
-        if ( gtcEntityTable == null) {
+    public static GirEntityTable updateEntityTable(Class<?> entityClass) {
+         GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+        if ( girEntityTable == null) {
             throw new RuntimeException("无法通过该解析器" + resolve.getClass().getName() + "获取实体对象!");
         } else {
-            entityTableMap.put(entityClass,  gtcEntityTable);
+            entityTableMap.put(entityClass, girEntityTable);
         }
-        return  gtcEntityTable;
+        return girEntityTable;
     }
 
     /**
@@ -106,12 +106,12 @@ public class GirEntityHelper {
      * @return
      */
     public static String getOrderByClause(Class<?> entityClass) {
-         GtcEntityTable table = getEntityTable(entityClass);
+         GirEntityTable table = getEntityTable(entityClass);
         if (table.getOrderByClause() != null) {
             return table.getOrderByClause();
         }
         StringBuilder orderBy = new StringBuilder();
-        for ( GtcEntityColumn column : table.getEntityClassColumns()) {
+        for ( GirEntityColumn column : table.getEntityClassColumns()) {
             if (column.getOrderBy() != null) {
                 if (orderBy.length() != 0) {
                     orderBy.append(",");
@@ -129,7 +129,7 @@ public class GirEntityHelper {
      * @param entityClass
      * @return
      */
-    public static Set<GtcEntityColumn> getColumns(Class<?> entityClass) {
+    public static Set<GirEntityColumn> getColumns(Class<?> entityClass) {
         return getEntityTable(entityClass).getEntityClassColumns();
     }
 
@@ -139,7 +139,7 @@ public class GirEntityHelper {
      * @param entityClass
      * @return
      */
-    public static Set<GtcEntityColumn> getPKColumns(Class<?> entityClass) {
+    public static Set<GirEntityColumn> getPKColumns(Class<?> entityClass) {
         return getEntityTable(entityClass).getEntityClassPKColumns();
     }
 
@@ -150,28 +150,28 @@ public class GirEntityHelper {
      * @return
      */
     public static String getSelectColumns(Class<?> entityClass) {
-         GtcEntityTable gtcEntityTable = getEntityTable(entityClass);
-        if ( gtcEntityTable.getBaseSelect() != null) {
-            return  gtcEntityTable.getBaseSelect();
+         GirEntityTable girEntityTable = getEntityTable(entityClass);
+        if ( girEntityTable.getBaseSelect() != null) {
+            return  girEntityTable.getBaseSelect();
         }
-        Set<GtcEntityColumn> columnList = getColumns(entityClass);
+        Set<GirEntityColumn> columnList = getColumns(entityClass);
         StringBuilder selectBuilder = new StringBuilder();
         boolean skipAlias = Map.class.isAssignableFrom(entityClass);
-        for ( GtcEntityColumn gtcEntityColumn : columnList) {
-            selectBuilder.append( gtcEntityColumn.getSelectColumn());
-            if (!skipAlias && ! gtcEntityColumn.getSelectColumn().equalsIgnoreCase( gtcEntityColumn.getProperty())) {
+        for ( GirEntityColumn girEntityColumn : columnList) {
+            selectBuilder.append( girEntityColumn.getSelectColumn());
+            if (!skipAlias && ! girEntityColumn.getSelectColumn().equalsIgnoreCase( girEntityColumn.getProperty())) {
                 //不等的时候分几种情况，例如`DESC`
-                if ( gtcEntityColumn.getSelectColumn().substring(1,  gtcEntityColumn.getSelectColumn().length() - 1).equalsIgnoreCase( gtcEntityColumn.getProperty())) {
+                if ( girEntityColumn.getSelectColumn().substring(1,  girEntityColumn.getSelectColumn().length() - 1).equalsIgnoreCase( girEntityColumn.getProperty())) {
                     selectBuilder.append(",");
                 } else {
-                    selectBuilder.append(" AS ").append( gtcEntityColumn.getProperty()).append(",");
+                    selectBuilder.append(" AS ").append( girEntityColumn.getProperty()).append(",");
                 }
             } else {
                 selectBuilder.append(",");
             }
         }
-         gtcEntityTable.setBaseSelect(selectBuilder.substring(0, selectBuilder.length() - 1));
-        return  gtcEntityTable.getBaseSelect();
+         girEntityTable.setBaseSelect(selectBuilder.substring(0, selectBuilder.length() - 1));
+        return  girEntityTable.getBaseSelect();
     }
 
     /**
@@ -184,8 +184,8 @@ public class GirEntityHelper {
             return;
         }
         //创建并缓存EntityTable
-         GtcEntityTable gtcEntityTable = resolve.resolveEntity(entityClass);
-        entityTableMap.put(entityClass,  gtcEntityTable);
+         GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+        entityTableMap.put(entityClass, girEntityTable);
     }
 
     /**

@@ -1,7 +1,7 @@
 package cn.geoair.gtc.orm.spi.mybatisplus;
 
 import cn.geoair.gtc.orm.spi.GirEntityResolve;
-import cn.geoair.gtc.orm.spi.entity.GtcEntityTable;
+import cn.geoair.gtc.orm.spi.entity.GirEntityTable;
 
 /**
  * @author ：张俊
@@ -10,12 +10,12 @@ import cn.geoair.gtc.orm.spi.entity.GtcEntityTable;
  */
 public class GirMybatisPlusGirEntityResolve implements GirEntityResolve {
     @Override
-    public GtcEntityTable resolveEntity(Class<?> entityClass) {
+    public GirEntityTable resolveEntity(Class<?> entityClass) {
         return null;
     }
 
     @Override
-    public GtcEntityTable resolveEntity(Object entityidentification) {
+    public GirEntityTable resolveEntity(Object entityidentification) {
         return null;
     }
 
