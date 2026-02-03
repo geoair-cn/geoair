@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import cn.geoair.gtc.base.util.GutilReflection;
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 
 /**
  * 可显示的数据
@@ -51,7 +51,7 @@ public interface GiVisuable extends Serializable {
 				Enum<?> e = (Enum<?>)this;
 				return e.name();
 			}else {
-				 Gtc.log.error("枚举 {} 没有标记显示键,在显示属性上加注解@GaModelField(isDisplay = true)或覆写 display()方法", myClass.getName());
+				 Gir.log.error("枚举 {} 没有标记显示键,在显示属性上加注解@GaModelField(isDisplay = true)或覆写 display()方法", myClass.getName());
 			}
 
 		}else {
@@ -64,7 +64,7 @@ public interface GiVisuable extends Serializable {
 					e.printStackTrace();
 				}
 			}
-			 Gtc.log.error("类  {} 没有标记显示键,在值属性上加注解@GaModelField(isDisplay = true)或覆写 display()方法", myClass.getName());
+			 Gir.log.error("类  {} 没有标记显示键,在值属性上加注解@GaModelField(isDisplay = true)或覆写 display()方法", myClass.getName());
 		}
 		return null;
 

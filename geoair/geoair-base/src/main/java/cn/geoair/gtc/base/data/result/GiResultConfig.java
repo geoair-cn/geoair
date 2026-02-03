@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.data.result;
 
-import cn.geoair.gtc.base.data.result.support.GtcResultConfig;
+import cn.geoair.gtc.base.data.result.support.GirResultConfig;
 import cn.geoair.gtc.base.sp.annotation.GkSP;
 
 /**
@@ -9,7 +9,7 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
  *
  */
 
-@GkSP(placeHolderClass= GtcResultConfig.class)
+@GkSP(placeHolderClass= GirResultConfig.class)
 public interface GiResultConfig {
 
 

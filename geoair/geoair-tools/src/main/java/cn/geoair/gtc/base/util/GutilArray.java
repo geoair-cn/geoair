@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.def.GkEditor;
 import cn.geoair.gtc.base.def.GkFilter;
 import cn.geoair.gtc.base.def.GkMatcher;
@@ -856,7 +856,7 @@ public class GutilArray extends PrimitiveArrayUtil{
 		 *
 		 * @param obj 对象，可以是对象数组或者基本类型数组
 		 * @return 包装类型数组或对象数组
-		 * @throws GtcException 对象为非数组
+		 * @throws GirException 对象为非数组
 		 */
 		public static Object[] wrap(Object obj) {
 			if (null == obj) {

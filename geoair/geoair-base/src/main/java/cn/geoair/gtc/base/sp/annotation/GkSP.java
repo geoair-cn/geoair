@@ -6,9 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.geoair.gtc.base.sp.support.GtcJdkSpLoader;
+import cn.geoair.gtc.base.sp.support.GirJdkSpLoader;
 import cn.geoair.gtc.base.sp.GkSpLoader;
-import cn.geoair.gtc.base.sp.support.GtcBeanFactorySpLoader;
+import cn.geoair.gtc.base.sp.support.GirBeanFactorySpLoader;
 
 
 /**
@@ -34,7 +34,7 @@ public @interface GkSP {
      * Provider 加载器配置，按顺序
      * @return
      */
-    public Class<? extends GkSpLoader>[] loader() default { GtcBeanFactorySpLoader.class, GtcJdkSpLoader.class};
+    public Class<? extends GkSpLoader>[] loader() default { GirBeanFactorySpLoader.class, GirJdkSpLoader.class};
 
     /**
      * 设置默认实现类,需要有无参构造函数,不带泛型的接口默认选择第一个，优先级大于placeHolders

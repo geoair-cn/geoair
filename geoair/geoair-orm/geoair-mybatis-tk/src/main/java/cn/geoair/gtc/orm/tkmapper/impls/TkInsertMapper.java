@@ -3,7 +3,7 @@ package cn.geoair.gtc.orm.tkmapper.impls;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiCreateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.gtc.orm.mybatis.impls.MyBatisMapper;
@@ -68,7 +68,7 @@ public interface TkInsertMapper<T extends GiEntitySaveable<PK>,PK extends Serial
     		 */
     		((tk.mybatis.mapper.additional.dialect.oracle.InsertListMapper)this).insertList(records);
     	}else {
-    		throw new GtcException("{} 没有实现任何批量插入接口;"
+    		throw new GirException("{} 没有实现任何批量插入接口;"
     				+ "支持批量插入的数据库(MySQL,PG,H2等)没有主键策略，自建组件生成方式实现 com.gtc.orm.tkmapper.support.insert. gtcInsertListMapper;"
     				//+ "支持批量插入的数据库(MySQL,PG,H2等)没有主键策略实现tk.mybatis.mapper.additional.insert.InsertListMapper;"
     				+ "支持批量插入的数据库(MySQL,PG,H2等)自增主键策略实现tk.mybatis.mapper.common.special.InsertListMapper;"

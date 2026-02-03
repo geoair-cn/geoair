@@ -8,8 +8,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.geoair.gtc.base.log.GiLoger;
-import cn.geoair.gtc.base.log.GtcLoger;
+import cn.geoair.gtc.base.log.GiLogger;
+import cn.geoair.gtc.base.log.GirLogger;
 
 /**
  *
@@ -18,7 +18,7 @@ import cn.geoair.gtc.base.log.GtcLoger;
  */
 public final class GutilCookie {
 
-	protected static final GiLoger logger =  GtcLoger.getLoger(GutilCookie.class);
+	protected static final GiLogger logger =  GirLogger.getLoger(GutilCookie.class);
 
 	/**
 	 * 添加Cookie
@@ -40,7 +40,7 @@ public final class GutilCookie {
 		/** http://localhost:8080/ 设置访问路径 */
 		cookie.setPath("/");
 		/** 添加cookie到用户浏览器 */
-		 GtcHttpServletHelper.getResponse().addCookie(cookie);
+		 GirHttpServletHelper.getResponse().addCookie(cookie);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public final class GutilCookie {
 			/** 设置有效时间 */
 			cookie.setMaxAge(maxAge);
 			/** 添加cookie到用户浏览器 */
-			 GtcHttpServletHelper.getResponse().addCookie(cookie);
+			 GirHttpServletHelper.getResponse().addCookie(cookie);
 		}
 	}
 
@@ -69,7 +69,7 @@ public final class GutilCookie {
 	 */
 	public static Cookie getCookie(String cookieName) {
 		/* 获取当前浏览器中所有的Cookie */
-		HttpServletRequest httpServletRequest =  GtcHttpServletHelper.getRequest();
+		HttpServletRequest httpServletRequest =  GirHttpServletHelper.getRequest();
 		if (httpServletRequest != null) {
 			Cookie[] cookies = httpServletRequest.getCookies();
 			if (cookies != null && cookies.length > 0) {
@@ -94,7 +94,7 @@ public final class GutilCookie {
 		if (cookie != null) {
 			cookie.setPath("/");
 			cookie.setMaxAge(0); // 设置cookie立即失效
-			 GtcHttpServletHelper.getResponse().addCookie(cookie);
+			 GirHttpServletHelper.getResponse().addCookie(cookie);
 		}
 	}
 

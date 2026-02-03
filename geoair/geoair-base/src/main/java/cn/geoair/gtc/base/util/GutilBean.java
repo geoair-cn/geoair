@@ -8,24 +8,24 @@ import java.util.Locale;
 
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
-import cn.geoair.gtc.base.bean.GtcBeanException;
+import cn.geoair.gtc.base.bean.GirBeanException;
 
 public class GutilBean {
 
-    public static void copyProperties(Object source, Object target) throws GtcBeanException {
+    public static void copyProperties(Object source, Object target) throws GirBeanException {
         copyProperties(source, target, null, (String[]) null);
     }
 
-    public static void copyProperties(Object source, Object target, Class<?> editable) throws GtcBeanException {
+    public static void copyProperties(Object source, Object target, Class<?> editable) throws GirBeanException {
         copyProperties(source, target, editable, (String[]) null);
     }
 
-    public static void copyProperties(Object source, Object target, String... ignoreProperties) throws GtcBeanException {
+    public static void copyProperties(Object source, Object target, String... ignoreProperties) throws GirBeanException {
         copyProperties(source, target, null, ignoreProperties);
     }
 
     @GaMethodHandDefine(id="com.gtc.base.util.GutilBean.copyProperties",expectClassName = "org.springframework.beans.BeanUtils", expectMethodName = "copyProperties")
-    public static void copyProperties(Object source, Object target, Class<?> editable, String... ignoreProperties) throws GtcBeanException {
+    public static void copyProperties(Object source, Object target, Class<?> editable, String... ignoreProperties) throws GirBeanException {
     	GkMethodHand.invokeSelf(source, target, editable, ignoreProperties);
     }
 

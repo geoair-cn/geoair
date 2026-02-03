@@ -1,6 +1,6 @@
 package cn.geoair.gtc.orm.springjpa.impls;
 
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiCreateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.gtc.orm.springjpa.extra.BatchRepository;
@@ -40,7 +40,7 @@ public interface InsertRepository<T extends GiEntitySaveable<PK>, PK extends Ser
              BatchRepository<T,PK> dao = (BatchRepository<T,PK>) this;
             dao.batchSave(records);
         } else {
-            throw new GtcException("{} 没有实现任何批量插入接口;"
+            throw new GirException("{} 没有实现任何批量插入接口;"
                     + "请在JPA的该对象的 Repository层 继承   com.gtc.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
         }
 //

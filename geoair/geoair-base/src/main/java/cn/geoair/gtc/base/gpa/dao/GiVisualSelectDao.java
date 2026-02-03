@@ -3,7 +3,7 @@ package cn.geoair.gtc.base.gpa.dao;
 import java.io.Serializable;
 import java.util.List;
 
-import cn.geoair.gtc.base.data.model.support.GtcVisualModelKid;
+import cn.geoair.gtc.base.data.model.support.GirVisualModelKid;
 import cn.geoair.gtc.base.data.page.GiPageParam;
 import cn.geoair.gtc.base.data.page.GiPager;
 import cn.geoair.gtc.base.gpa.entity.GiEntityVisuable;
@@ -15,10 +15,10 @@ public interface GiVisualSelectDao<M extends GiEntityVisuable<PK>,PK extends Ser
 		return GiDao.getDao(GiVisualSelectDao.class, modelCls);
 	}
 	@SuppressWarnings("rawtypes")
-	List<GtcVisualModelKid>  gtcSearchVisualModel(String displayQuery, String[] containKeys);
+	List<GirVisualModelKid>  gtcSearchVisualModel(String displayQuery, String[] containKeys);
 
 	@SuppressWarnings("rawtypes")
-	GiPager<GtcVisualModelKid> gtcSearchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam);
+	GiPager<GirVisualModelKid> gtcSearchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam);
 
 
 }

@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.util;
 
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.def.GkFilter;
 
 import java.lang.reflect.*;
@@ -1082,7 +1082,7 @@ public abstract class GutilReflection {
 	 * @param obj       对象，如果static字段，此处为类
 	 * @param fieldName 字段名
 	 * @return 字段值
-	 * @throws GtcException 包装IllegalAccessException异常
+	 * @throws GirException 包装IllegalAccessException异常
 	 */
 	public static Object getFieldValue(Object obj, String fieldName) throws IllegalStateException {
 		if (null == obj || GutilStr.isBlank(fieldName)) {
@@ -1096,7 +1096,7 @@ public abstract class GutilReflection {
 	 *
 	 * @param field 字段
 	 * @return 字段值
-	 * @throws GtcException 包装IllegalAccessException异常
+	 * @throws GirException 包装IllegalAccessException异常
 	 * @since 5.1.0
 	 */
 	public static Object getStaticFieldValue(Field field) throws IllegalStateException {
@@ -1109,7 +1109,7 @@ public abstract class GutilReflection {
 	 * @param obj   对象，static字段则此字段为null
 	 * @param field 字段
 	 * @return 字段值
-	 * @throws GtcException 包装IllegalAccessException异常
+	 * @throws GirException 包装IllegalAccessException异常
 	 */
 	public static Object getFieldValue(Object obj, Field field) throws IllegalStateException {
 		if (null == field) {
@@ -1157,7 +1157,7 @@ public abstract class GutilReflection {
 	 * @param obj       对象,static字段则此处传Class
 	 * @param fieldName 字段名
 	 * @param value     值，值类型必须与字段类型匹配，不会自动转换对象类型
-	 * @throws GtcException 包装IllegalAccessException异常
+	 * @throws GirException 包装IllegalAccessException异常
 	 */
 	public static void setFieldValue(Object obj, String fieldName, Object value) throws IllegalStateException {
 		GutilAssert.notNull(obj,"");
@@ -1174,7 +1174,7 @@ public abstract class GutilReflection {
 	 * @param obj   对象，如果是static字段，此参数为null
 	 * @param field 字段
 	 * @param value 值，值类型必须与字段类型匹配，不会自动转换对象类型
-	 * @throws GtcException  gtcException 包装IllegalAccessException异常
+	 * @throws GirException  gtcException 包装IllegalAccessException异常
 	 */
 	public static void setFieldValue(Object obj, Field field, Object value) throws IllegalStateException {
 		GutilAssert.notNull(field,  GutilStr.format("Field in [{}] not exist !", obj));
@@ -1540,7 +1540,7 @@ public abstract class GutilReflection {
 	 * @param <T>   对象类型
 	 * @param clazz 类名
 	 * @return 对象
-	 * @throws GtcException 包装各类异常
+	 * @throws GirException 包装各类异常
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T newInstance(String clazz) throws IllegalStateException {
@@ -1558,7 +1558,7 @@ public abstract class GutilReflection {
 	 * @param clazz  类
 	 * @param params 构造函数参数
 	 * @return 对象
-	 * @throws GtcException 包装各类异常
+	 * @throws GirException 包装各类异常
 	 */
 	public static <T> T newInstance(Class<T> clazz, Object... params) throws IllegalStateException {
 		if (GutilArray.isEmpty(params)) {
@@ -1643,7 +1643,7 @@ public abstract class GutilReflection {
 	 * @param method 方法（对象方法或static方法都可）
 	 * @param args   参数对象
 	 * @return 结果
-	 * @throws GtcException 多种异常包装
+	 * @throws GirException 多种异常包装
 
 	public static <T> T invokeStatic(Method method, Object... args) throws  gtcException {
 		return invoke(null, method, args);
@@ -1663,7 +1663,7 @@ public abstract class GutilReflection {
 	 * @param method 方法（对象方法或static方法都可）
 	 * @param args   参数对象
 	 * @return 结果
-	 * @throws GtcException 一些列异常的包装
+	 * @throws GirException 一些列异常的包装
 
 	public static <T> T invokeWithCheck(Object obj, Method method, Object... args) throws  gtcException {
 		final Class<?>[] types = method.getParameterTypes();
@@ -1699,7 +1699,7 @@ public abstract class GutilReflection {
 	 * @param method 方法（对象方法或static方法都可）
 	 * @param args   参数对象
 	 * @return 结果
-	 * @throws GtcException 一些列异常的包装
+	 * @throws GirException 一些列异常的包装
 
 	@SuppressWarnings("unchecked")
 	public static <T> T invoke(Object obj, Method method, Object... args) throws  gtcException {
@@ -1749,7 +1749,7 @@ public abstract class GutilReflection {
 	 * @param methodName 方法名
 	 * @param args       参数列表
 	 * @return 执行结果
-	 * @throws GtcException IllegalAccessException包装
+	 * @throws GirException IllegalAccessException包装
 	 * @see NullWrapperBean
 	 * @since 3.1.2
 

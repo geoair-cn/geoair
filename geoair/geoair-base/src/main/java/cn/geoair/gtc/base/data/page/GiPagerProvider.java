@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.data.page;
 
-import cn.geoair.gtc.base.data.page.support.GtcPagerProvider;
+import cn.geoair.gtc.base.data.page.support.GirPagerProvider;
 import cn.geoair.gtc.base.sp.annotation.GkSP;
 
 /**
@@ -8,7 +8,7 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
  * @author Ray
  **/
 
-@GkSP(placeHolderClass =  GtcPagerProvider.class)
+@GkSP(placeHolderClass =  GirPagerProvider.class)
 public interface GiPagerProvider{
 
 	public <T> GiPager<T> getPager(Class<T> clazz);

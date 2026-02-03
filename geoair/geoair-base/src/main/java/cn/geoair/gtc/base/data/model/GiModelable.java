@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.util.function.Predicate;
 
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.util.GutilReflection;
 
 /**
@@ -59,7 +59,7 @@ public interface GiModelable<ID extends Serializable> extends Serializable {
 		if(field != null) {
 
 			if(!idClass().isAssignableFrom(field.getType())) {
-				throw new GtcException("模型类 {} idClass() {} 类型与标记@GaModelField(isID=true)的属性类型不匹配，复写id()方法或者idClass()方法", this.getClass().getName(),idClass().getName());
+				throw new GirException("模型类 {} idClass() {} 类型与标记@GaModelField(isID=true)的属性类型不匹配，复写id()方法或者idClass()方法", this.getClass().getName(),idClass().getName());
 			}
 
 			try {
@@ -69,7 +69,7 @@ public interface GiModelable<ID extends Serializable> extends Serializable {
 				e.printStackTrace();
 			}
 		}
-		throw new GtcException("模型类  {} 没有标记id键,在id属性上加注解@GaModelField(isID = true)或@Id 或 覆写 id()方法", this.getClass().getName());
+		throw new GirException("模型类  {} 没有标记id键,在id属性上加注解@GaModelField(isID = true)或@Id 或 覆写 id()方法", this.getClass().getName());
 	}
 
 

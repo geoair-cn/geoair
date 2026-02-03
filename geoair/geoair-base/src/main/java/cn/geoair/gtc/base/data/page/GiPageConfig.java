@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.data.page;
 
-import cn.geoair.gtc.base.data.page.support.GtcPageConfig;
+import cn.geoair.gtc.base.data.page.support.GirPageConfig;
 import cn.geoair.gtc.base.sp.annotation.GkSP;
 
 /**
@@ -9,7 +9,7 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
  *
  */
 
-@GkSP(placeHolderClass= { GtcPageConfig.class})
+@GkSP(placeHolderClass= { GirPageConfig.class})
 public interface GiPageConfig {
 
 

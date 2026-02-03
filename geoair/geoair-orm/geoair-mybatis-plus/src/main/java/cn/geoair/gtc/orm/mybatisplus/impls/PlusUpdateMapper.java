@@ -10,8 +10,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import cn.geoair.gtc.base.Gtc;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.Gir;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiUpdateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityAlterable;
 
@@ -29,11 +29,11 @@ public interface PlusUpdateMapper<T extends GiEntityAlterable<PK>, PK extends Se
             try {
                 o = field.get(t);
             } catch (IllegalAccessException e) {
-                Gtc.log.debug("不可访问的字段，不做处理{}", tableFieldInfo.getColumn());
+                Gir.log.debug("不可访问的字段，不做处理{}", tableFieldInfo.getColumn());
             }
             if (tableFieldInfo.getColumn().equals(keyColumn)) {
                 if (o == null) {
-                    throw new GtcException("主键不能为空！");
+                    throw new GirException("主键不能为空！");
                 }
                 updateWrapper.eq(tableFieldInfo.getColumn(), o);
             } else {
@@ -55,11 +55,11 @@ public interface PlusUpdateMapper<T extends GiEntityAlterable<PK>, PK extends Se
             try {
                 o = field.get(t);
             } catch (IllegalAccessException e) {
-                Gtc.log.debug("不可访问的字段，不做处理{}", tableFieldInfo.getColumn());
+                Gir.log.debug("不可访问的字段，不做处理{}", tableFieldInfo.getColumn());
             }
             if (tableFieldInfo.getColumn().equals(keyColumn)) {
                 if (o == null) {
-                    throw new GtcException("主键不能为空！");
+                    throw new GirException("主键不能为空！");
                 }
                 updateWrapper.eq(tableFieldInfo.getColumn(), o);
             } else {

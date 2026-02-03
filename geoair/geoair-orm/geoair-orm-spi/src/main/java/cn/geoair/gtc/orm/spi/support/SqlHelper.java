@@ -23,7 +23,7 @@ public class SqlHelper {
      * @return
      */
     public static String getAllColumns(Class<?> entityClass) {
-        Set<GtcEntityColumn> columnSet =  GtcEntityHelper.getColumns(entityClass);
+        Set<GtcEntityColumn> columnSet =  GirEntityHelper.getColumns(entityClass);
         StringBuilder sql = new StringBuilder();
         for ( GtcEntityColumn gtcEntityColumn : columnSet) {
             sql.append( gtcEntityColumn.getSelectColumn()).append(",");
@@ -54,7 +54,7 @@ public class SqlHelper {
     public static String selectCount(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
-        Set<GtcEntityColumn> pkColumns =  GtcEntityHelper.getPKColumns(entityClass);
+        Set<GtcEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
         if (pkColumns.size() == 1) {
             sql.append("COUNT(").append(pkColumns.iterator().next().getColumn()).append(") ");
         } else {
@@ -72,7 +72,7 @@ public class SqlHelper {
     public static String selectCountExists(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT CASE WHEN ");
-        Set<GtcEntityColumn> pkColumns =  GtcEntityHelper.getPKColumns(entityClass);
+        Set<GtcEntityColumn> pkColumns =  GirEntityHelper.getPKColumns(entityClass);
         if (pkColumns.size() == 1) {
             sql.append("COUNT(").append(pkColumns.iterator().next().getColumn()).append(") ");
         } else {
@@ -85,11 +85,11 @@ public class SqlHelper {
     /**
      * from tableName - 动态表名
      *
-     * @param  gtcExample
+     * @param  girExample
      * @param defaultTableName
      * @return
      */
-    public static String fromTable(GtcExample gtcExample, String defaultTableName) {
+    public static String fromTable(GirExample girExample, String defaultTableName) {
         StringBuilder sql = new StringBuilder();
         sql.append(" FROM ");
         sql.append(defaultTableName);
@@ -101,23 +101,23 @@ public class SqlHelper {
     /**
      * update tableName - 动态表名
      *
-     * @param  gtcExample
+     * @param  girExample
      * @param defaultTableName 默认表名
      * @return
      */
-    public static String updateTable(GtcExample gtcExample, String defaultTableName) {
+    public static String updateTable(GirExample girExample, String defaultTableName) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE ");
-        sql.append( gtcExample.tableName);
+        sql.append( girExample.tableName);
         sql.append(" ");
         return sql.toString();
     }
 
 
-    public static String deleteFromTable(GtcExample gtcExample, String defaultTableName) {
+    public static String deleteFromTable(GirExample girExample, String defaultTableName) {
         StringBuilder sql = new StringBuilder();
         sql.append("DELETE FROM ");
-        sql.append( gtcExample.tableName);
+        sql.append( girExample.tableName);
         sql.append(" ");
         return sql.toString();
     }
@@ -131,7 +131,7 @@ public class SqlHelper {
      */
     public static String orderByDefault(Class<?> entityClass) {
         StringBuilder sql = new StringBuilder();
-        String orderByClause =  GtcEntityHelper.getOrderByClause(entityClass);
+        String orderByClause =  GirEntityHelper.getOrderByClause(entityClass);
         if (orderByClause.length() > 0) {
             sql.append(" ORDER BY ");
             sql.append(orderByClause);
@@ -144,23 +144,23 @@ public class SqlHelper {
      *
      * @return
      */
-    public static String exampleSelectColumns( GtcExample gtcExample) {
+    public static String exampleSelectColumns( GirExample girExample) {
         StringBuilder sql = new StringBuilder();
 
-        if ( gtcExample.getSelectColumns() != null &&  gtcExample.getSelectColumns().size() > 0) {
-            sql.append(getSelectColumn(null,  gtcExample.getSelectColumns()));
+        if ( girExample.getSelectColumns() != null &&  girExample.getSelectColumns().size() > 0) {
+            sql.append(getSelectColumn(null,  girExample.getSelectColumns()));
         } else {
             //不支持指定列的时候查询全部列
-            sql.append(getSelectColumn( gtcExample, null));
+            sql.append(getSelectColumn(girExample, null));
 
         }
         return sql.toString();
     }
 
-    public static String getSelectColumn(GtcExample gtcExample, Set<String> selectColumns) {
+    public static String getSelectColumn(GirExample girExample, Set<String> selectColumns) {
         StringBuilder allColumn = new StringBuilder();
-        if ( gtcExample != null) {
-            Set<GtcEntityColumn> entityClassColumns =  gtcExample.table.getEntityClassColumns();
+        if ( girExample != null) {
+            Set<GtcEntityColumn> entityClassColumns =  girExample.table.getEntityClassColumns();
             for ( GtcEntityColumn entityClassColumn : entityClassColumns) {
                 allColumn.append(entityClassColumn.getSelectColumn()).append(",");
             }
@@ -182,14 +182,14 @@ public class SqlHelper {
      *
      * @return
      */
-    public static String exampleCountColumn(GtcExample gtcExample, List<Object> contidion) {
+    public static String exampleCountColumn(GirExample girExample, List<Object> contidion) {
         StringBuilder sql = new StringBuilder();
 
-        if (GutilStr.isNotEmpty( gtcExample.getCountColumn())) {
-            if ( gtcExample.distinct) {
+        if (GutilStr.isNotEmpty( girExample.getCountColumn())) {
+            if ( girExample.distinct) {
                 sql.append(" distinct ");
             }
-            sql.append( gtcExample.countColumn);
+            sql.append( girExample.countColumn);
         } else {
             sql.append("COUNT(*)");
         }
@@ -207,7 +207,7 @@ public class SqlHelper {
         sql.append("<if test=\"orderByClause != null\">");
         sql.append("order by ${orderByClause}");
         sql.append("</if>");
-        String orderByClause =  GtcEntityHelper.getOrderByClause(entityClass);
+        String orderByClause =  GirEntityHelper.getOrderByClause(entityClass);
         if (orderByClause.length() > 0) {
             sql.append("<if test=\"orderByClause == null\">");
             sql.append("ORDER BY " + orderByClause);
@@ -216,11 +216,11 @@ public class SqlHelper {
         return sql.toString();
     }
 
-    public static String exampleOrderBy( GtcExample gtcExample) {
+    public static String exampleOrderBy( GirExample girExample) {
         StringBuilder sql = new StringBuilder();
-        if ( gtcExample.orderByClause != null) {
+        if ( girExample.orderByClause != null) {
             sql.append("order by ");
-            sql.append( gtcExample.orderByClause);
+            sql.append( girExample.orderByClause);
         }
         return sql.toString();
     }
@@ -231,9 +231,9 @@ public class SqlHelper {
      *
      * @return
      */
-    public static String exampleForUpdate( GtcExample gtcExample) {
+    public static String exampleForUpdate( GirExample girExample) {
         StringBuilder sql = new StringBuilder();
-        if ( gtcExample.isForUpdate()) {
+        if ( girExample.isForUpdate()) {
             sql.append("FOR UPDATE");
         }
 
@@ -244,14 +244,14 @@ public class SqlHelper {
     /**
      * Example查询中的where结构，用于只有一个Example参数时
      *
-     * @param  gtcExample
+     * @param  girExample
      * @param contidion 查询条件
      * @return
      */
-    public static GkPair<String, List<Object>> exampleWhereClause(GtcExample gtcExample, List<Object> contidion) {
+    public static GkPair<String, List<Object>> exampleWhereClause(GirExample girExample, List<Object> contidion) {
         GkPair<String, List<Object>> returnpair = null;
         StringBuilder sql = new StringBuilder();
-        if ( gtcExample == null) {
+        if ( girExample == null) {
             returnpair = new GkPair<>(sql.toString(), contidion);
             return returnpair;
         }
@@ -259,21 +259,21 @@ public class SqlHelper {
         prefixOverrides.add("and");
         prefixOverrides.add("or");
         //  对应条件中的 子sql
-        if ( gtcExample.oredCriteria.size() > 0) {
+        if ( girExample.oredCriteria.size() > 0) {
             sql.append(" where ");
         }
 
         StringBuilder whereSql = new StringBuilder(); //// and ( and  abc = 1 and bcd = 2 ) and  ( and  abc = 1 and bcd = 2 )
 
 
-        for ( GtcExample.Criteria oredCriterion :  gtcExample.oredCriteria) {
+        for ( GirExample.Criteria oredCriterion :  girExample.oredCriteria) {
             StringBuilder oredCriterionSql = new StringBuilder();  //and ( and  abc = 1  and bcd = 2 )
             // and ( and  abc = 1 and bcd = 2 )
             if (oredCriterion.isValid()) {
                 oredCriterionSql.append(oredCriterion.getAndOr());
                 // 子查询条件拼接
                 StringBuilder criterionSql = new StringBuilder();  //// 循环走完  and  abc = 1  and bcd = 2
-                for ( GtcExample.Criterion criterion : oredCriterion.criteria) {
+                for ( GirExample.Criterion criterion : oredCriterion.criteria) {
 
                     if (criterion.isNoValue()) {
                         criterionSql.append(criterion.getAndOr()).append(" ");
@@ -328,10 +328,10 @@ public class SqlHelper {
     }
 
 
-    public static GkPair<String, List<Object>> updateByExampleWhereClause(GtcExample gtcExample, List<Object> contidion) {
+    public static GkPair<String, List<Object>> updateByExampleWhereClause(GirExample girExample, List<Object> contidion) {
         GkPair<String, List<Object>> returnpair = null;
         StringBuilder sql = new StringBuilder();
-        if ( gtcExample == null) {
+        if ( girExample == null) {
             returnpair = new GkPair<>(sql.toString(), contidion);
             return returnpair;
         }
@@ -339,21 +339,21 @@ public class SqlHelper {
         prefixOverrides.add("and");
         prefixOverrides.add("or");
         //  对应条件中的 子sql
-        if ( gtcExample.oredCriteria.size() > 0) {
+        if ( girExample.oredCriteria.size() > 0) {
             sql.append(" where ");
         }
 
         StringBuilder whereSql = new StringBuilder(); //// and ( and  abc = 1 and bcd = 2 ) and  ( and  abc = 1 and bcd = 2 )
 
 
-        for ( GtcExample.Criteria oredCriterion :  gtcExample.oredCriteria) {
+        for ( GirExample.Criteria oredCriterion :  girExample.oredCriteria) {
             StringBuilder oredCriterionSql = new StringBuilder();  //and ( and  abc = 1  and bcd = 2 )
             // and ( and  abc = 1 and bcd = 2 )
             if (oredCriterion.isValid()) {
                 oredCriterionSql.append(oredCriterion.getAndOr());
                 // 子查询条件拼接
                 StringBuilder criterionSql = new StringBuilder();  //// 循环走完  and  abc = 1  and bcd = 2
-                for ( GtcExample.Criterion criterion : oredCriterion.criteria) {
+                for ( GirExample.Criterion criterion : oredCriterion.criteria) {
 
                     if (criterion.isNoValue()) {
                         criterionSql.append(" ").append(criterion.getAndOr()).append(" ");
@@ -453,13 +453,13 @@ public class SqlHelper {
     /**
      * 检查 paremeter 对象中指定的 fields 是否全是 null，如果是则抛出异常
      *
-     * @param  gtcExample
+     * @param  girExample
      * @return
      */
-    public static boolean exampleHasAtLeastOneCriteriaCheck( GtcExample gtcExample) {
-        if ( gtcExample != null) {
+    public static boolean exampleHasAtLeastOneCriteriaCheck( GirExample girExample) {
+        if ( girExample != null) {
             try {
-                List< GtcExample.Criteria> criteriaList = ((GtcExample)  gtcExample).getOredCriteria();
+                List< GirExample.Criteria> criteriaList = ((GirExample) girExample).getOredCriteria();
                 if (criteriaList != null && criteriaList.size() > 0) {
                     return true;
                 }

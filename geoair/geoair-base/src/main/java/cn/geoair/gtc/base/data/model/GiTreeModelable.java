@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import cn.geoair.gtc.base.util.GutilReflection;
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 
 /**
  * 树形模型
@@ -33,7 +33,7 @@ public interface GiTreeModelable<ID extends Serializable> extends GiModelable<ID
 				e.printStackTrace();
 			}
 		}
-		 Gtc.log.error("树形模型类  {} 没有标记parentId键,在值属性上加注解@GaModelField(isParentId = true)或覆写 parentId()方法", this.getClass().getName());
+		 Gir.log.error("树形模型类  {} 没有标记parentId键,在值属性上加注解@GaModelField(isParentId = true)或覆写 parentId()方法", this.getClass().getName());
 		return null;
 	}
 

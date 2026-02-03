@@ -3,12 +3,12 @@ package cn.geoair.gtc.core;
 import java.util.HashMap;
 import java.util.Map;
 
-import cn.geoair.gtc.base.Gtc;
-import cn.geoair.gtc.base.gpa.id.GtcIdGenerator;
-import cn.geoair.gtc.base.json.GtcJSON;
+import cn.geoair.gtc.base.Gir;
+import cn.geoair.gtc.base.gpa.id.GirIdGenerator;
+import cn.geoair.gtc.base.json.GirJSON;
 import cn.geoair.gtc.base.tool.GkSnowflake;
 import cn.geoair.gtc.base.util.GutilBean;
-import cn.geoair.gtc.spi.log.Log4Gtc;
+import cn.geoair.gtc.spi.log.Log4Gir;
 
 /**
  * 测试用
@@ -36,7 +36,7 @@ public class Test {
 
 		//System.out.println(CallerUtil.getCallerName());
 		for(int i=0;i<100;i++) {
-        	System.out.println( GtcIdGenerator.timestampId());
+        	System.out.println( GirIdGenerator.timestampId());
         }
 
 		//if(1==1) {
@@ -102,7 +102,7 @@ public class Test {
 
 	public static void main3(String[] args) {
 
-		Log4Gtc.setLogType(Log4Gtc.LogType.HUTOOL);
+		Log4Gir.setLogType(Log4Gir.LogType.HUTOOL);
 		Map<String,Object> map = new HashMap<>();
 		map.put("a", 111);
 		map.put("b", "df");
@@ -111,14 +111,14 @@ public class Test {
 
 		map.put("d", new Student("d",12));
 
-		 GtcJSON js =  Gtc.toJson(map);
+		 GirJSON js =  Gir.toJson(map);
 		System.out.println(js.toJSONString());
-		 GtcJSON json =  GtcJSON.toJson(js.toJSONString());
+		 GirJSON json =  GirJSON.toJson(js.toJSONString());
 
 		System.out.println(json.getByPath("d", Student.class).getName());
 
 		Student st = new Student("e",14);
-		 GtcJSON jsSt =  GtcJSON.toJson(st);
+		 GirJSON jsSt =  GirJSON.toJson(st);
 		//Student stu = jsSt.getByPath("",  Student.class);
 		Student stu = jsSt.toBean(Student.class,true);
 		System.out.println(stu.getAge());

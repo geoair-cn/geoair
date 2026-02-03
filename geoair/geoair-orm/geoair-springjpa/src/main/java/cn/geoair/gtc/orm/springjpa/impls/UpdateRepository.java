@@ -1,7 +1,7 @@
 package cn.geoair.gtc.orm.springjpa.impls;
 
-import cn.geoair.gtc.base.Gtc;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.Gir;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiUpdateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityAlterable;
 import cn.geoair.gtc.base.util.GutilObject;
@@ -30,11 +30,11 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
     @Override
     default int gtcUpdateByPK(T t) {
         if (GutilObject.isNull(t.id())) {
-            throw new GtcException("更新的对象ID不存在");//如果ID为空，抛出异常，区别于保存方法。
+            throw new GirException("更新的对象ID不存在");//如果ID为空，抛出异常，区别于保存方法。
         }
         boolean b = this.existsById(t.id());
         if (!b) {
-            throw new GtcException("非更新操作! 对象: {}", Gtc.toJson(t).toJSONString());
+            throw new GirException("非更新操作! 对象: {}", Gir.toJson(t).toJSONString());
         }
         this.save(t);
         return 1;
@@ -50,12 +50,12 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
     default int gtcUpdateByPKSelective(T t) {
         PK pk = t.id();
         if (GutilObject.isNull(pk)) {
-            throw new GtcException("更新的对象ID不存在");//如果ID为空，抛出异常，区别于保存方法。
+            throw new GirException("更新的对象ID不存在");//如果ID为空，抛出异常，区别于保存方法。
         }
 
         T orig = this.findById(pk).orElse(null);
         if (GutilObject.isNull(orig)) {
-            throw new GtcException("非更新操作! 对象: {}", Gtc.toJson(t).toJSONString());
+            throw new GirException("非更新操作! 对象: {}", Gir.toJson(t).toJSONString());
         }
 
         Field[] fields = t.getClass().getDeclaredFields();
@@ -68,7 +68,7 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
                     field.set(t, field.get(orig));
                 }
             } catch (Exception e) {
-                throw new GtcException("po对象无法反射赋值，请检查对象配置", e);
+                throw new GirException("po对象无法反射赋值，请检查对象配置", e);
             }
         }
         this.saveAndFlush(t);
@@ -87,7 +87,7 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
             BatchRepository<T, PK> dao = (BatchRepository<T, PK>) this;
             dao.batchUpdate(records);
         } else {
-            throw new GtcException("{} 没有实现任何批量更新接口;"
+            throw new GirException("{} 没有实现任何批量更新接口;"
                     + "请在JPA的该对象的 Repository层 继承   com.gtc.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
         }
         return 1;
@@ -106,7 +106,7 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
             BatchRepository<T, PK> dao = (BatchRepository<T, PK>) this;
             dao.batchUpdateSelective(records);
         } else {
-            throw new GtcException("{} 没有实现任何批量更新接口;"
+            throw new GirException("{} 没有实现任何批量更新接口;"
                     + "请在JPA的该对象的 Repository层 继承   com.gtc.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
         }
         return 1;

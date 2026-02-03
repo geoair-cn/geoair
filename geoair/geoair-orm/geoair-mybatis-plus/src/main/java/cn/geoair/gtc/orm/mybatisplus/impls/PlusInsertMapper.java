@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiCreateDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.gtc.base.util.GutilCollection;
@@ -35,7 +35,7 @@ public interface PlusInsertMapper<T extends GiEntitySaveable<PK>, PK extends Ser
     @Override
     default List<PK> gtcAccess(List<T> records) {
         if (GutilCollection.isEmpty(records)) {
-            throw new GtcException("更新的记录集为空");
+            throw new GirException("更新的记录集为空");
         }
         List<PK> list = new ArrayList<>();
         for (T record : records) {

@@ -2,7 +2,7 @@ package cn.geoair.gtc.orm.tkmapper.util;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 import cn.geoair.gtc.base.tool.GkConcurrentReferenceHashMap;
 import cn.geoair.gtc.base.util.GutilReflection;
 import tk.mybatis.mapper.entity.EntityColumn;
@@ -50,7 +50,7 @@ public class TkEntityHelper {
 					}
 
 				} catch (NoSuchFieldException | SecurityException e) {
-					 Gtc.log.error(e, "tk.mybatis.mapper.entity.EntityField类无法访问 getter setter属性");
+					 Gir.log.error(e, "tk.mybatis.mapper.entity.EntityField类无法访问 getter setter属性");
 				}
 	        }
 			return null;

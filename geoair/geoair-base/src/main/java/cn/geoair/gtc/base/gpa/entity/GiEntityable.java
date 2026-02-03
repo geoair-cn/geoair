@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.util.function.Predicate;
 
 import cn.geoair.gtc.base.data.model.GiModelable;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.util.GutilReflection;
 
 /**
@@ -36,7 +36,7 @@ public interface GiEntityable<PK extends Serializable> extends GiModelable<PK> {
 		if(field != null) {
 
 			if(!idClass().isAssignableFrom(field.getType())) {
-				throw new GtcException("实体类 {} idClass() {} 类型与标记@Id的属性类型不匹配，复写id()方法或者idClass()方法", this.getClass().getName(),idClass().getName());
+				throw new GirException("实体类 {} idClass() {} 类型与标记@Id的属性类型不匹配，复写id()方法或者idClass()方法", this.getClass().getName(),idClass().getName());
 			}
 			try {
 				GutilReflection.makeAccessible(field);

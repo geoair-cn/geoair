@@ -8,7 +8,7 @@ import cn.geoair.gtc.base.convert.GiConverter;
 import cn.geoair.gtc.base.util.GutilClass;
 import cn.geoair.gtc.base.util.GutilGenericType;
 import cn.geoair.gtc.base.data.GiValuable;
-import cn.geoair.gtc.base.sp.GtcSpHelper;
+import cn.geoair.gtc.base.sp.GirSpHelper;
 
 
 /**
@@ -75,6 +75,6 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
 	 * @return 对应类型的GiPager实例
 	 */
 	public static <T> GiPager<T> ofClass(Class<T> clz){
-		return  GtcSpHelper.load(GiPageConfig.class).getPagerProvider().getPager(clz);
+		return  GirSpHelper.load(GiPageConfig.class).getPagerProvider().getPager(clz);
 	}
 }

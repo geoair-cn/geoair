@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
-import cn.geoair.gtc.base.data.model.support.GtcVisualModelKid;
+import cn.geoair.gtc.base.data.model.support.GirVisualModelKid;
 import cn.geoair.gtc.base.data.page.GiPageParam;
 import cn.geoair.gtc.base.data.page.GiPager;
 import cn.geoair.gtc.base.gpa.dao.GiVisualSelectDao;
@@ -15,12 +15,12 @@ public interface VisualSelectRepository<T extends GiEntityVisuable<PK>,PK extend
 
 
 	@SuppressWarnings("rawtypes")
-	default List<GtcVisualModelKid> searchVisualModel(String displayQuery, String[] containKeys){
+	default List<GirVisualModelKid> searchVisualModel(String displayQuery, String[] containKeys){
 		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
-	default GiPager<GtcVisualModelKid> searchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam){
+	default GiPager<GirVisualModelKid> searchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam){
 		return null;
 	}
 }

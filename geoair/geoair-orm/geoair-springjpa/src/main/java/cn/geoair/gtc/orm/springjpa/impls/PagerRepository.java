@@ -19,7 +19,7 @@ import cn.geoair.gtc.base.data.page.GiPager;
 import cn.geoair.gtc.base.gpa.dao.GiPagerDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityQueryable;
 import cn.geoair.gtc.base.util.GutilReflection;
-import cn.geoair.gtc.orm.springjpa.support.GtcSpringJpaPageHelper;
+import cn.geoair.gtc.orm.springjpa.support.GirSpringJpaPageHelper;
 
 public interface PagerRepository<T extends GiEntityQueryable<PK>, PK extends Serializable> extends JpaRepository<T, PK>, JpaSpecificationExecutor<T>,GiPagerDao<T, PK> {
 
@@ -32,7 +32,7 @@ public interface PagerRepository<T extends GiEntityQueryable<PK>, PK extends Ser
 	 * @return
 	 */
 	default Pageable toPageable(GiPageParam pageParam) {
-        return  GtcSpringJpaPageHelper.toPageable(pageParam);
+        return  GirSpringJpaPageHelper.toPageable(pageParam);
 	}
 
 	/**

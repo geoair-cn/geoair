@@ -1,7 +1,7 @@
 package cn.geoair.gtc.orm.tkmapper.impls;
 
-import cn.geoair.gtc.base.Gtc;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.Gir;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiDeleteDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityRemovable;
 import cn.geoair.gtc.base.util.GutilObject;
@@ -42,7 +42,7 @@ public interface TkDeleteMapper<T extends GiEntityRemovable<PK>,PK extends Seria
 	@Override
     default void  gtcDeleteByPK(PK pk) {
 		if (GutilObject.isEmpty(pk)) {
-			Gtc.log.error("删除的时候主键为空 ,不进行操作");
+			Gir.log.error("删除的时候主键为空 ,不进行操作");
 		} else {
 			this.deleteByPrimaryKey(pk);
 		}
@@ -59,7 +59,7 @@ public interface TkDeleteMapper<T extends GiEntityRemovable<PK>,PK extends Seria
 	@Override
     default void  gtcDeleteByPK(List<PK> pks) {
 		if (GutilObject.isEmpty(pks)) {
-			Gtc.log.error("删除的时候主键列表为空 ,可能会导致全表删除，不进行操作");
+			Gir.log.error("删除的时候主键列表为空 ,可能会导致全表删除，不进行操作");
 			return;
 		}
 		Set<EntityColumn> cs = EntityHelper.getPKColumns(this.getModelClass());
@@ -70,7 +70,7 @@ public interface TkDeleteMapper<T extends GiEntityRemovable<PK>,PK extends Seria
 				 */
 				((tk.mybatis.mapper.additional.idlist.DeleteByIdListMapper) this).deleteByIdList(pks);
 			} else {
-				throw new GtcException("根据主键批量删除如果只有一个带有@Id注解的字段，{} 需要实现tk.mybatis.mapper.additional.idlist.DeleteByIdListMapper接口", this.getClass().getName());
+				throw new GirException("根据主键批量删除如果只有一个带有@Id注解的字段，{} 需要实现tk.mybatis.mapper.additional.idlist.DeleteByIdListMapper接口", this.getClass().getName());
 			}
 		} else {
 			Set<PK> ids = new HashSet<>(pks);

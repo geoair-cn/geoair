@@ -3,7 +3,7 @@ package cn.geoair.gtc.base.bean;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 
 public class GtcBeanHelper {
 
@@ -23,7 +23,7 @@ public class GtcBeanHelper {
 
 	@GaMethodHandImpl(implClass= GtcBeanHelper.class,implMethod="getProvider",type= GaMethodHandImpl.ImplType.comity)
 	private static GiBeanFactory _getProvider() {
-		 Gtc.log.error("必须有工具提供容器，如spring");
+		 Gir.log.error("必须有工具提供容器，如spring");
 		return null;
 	}
 

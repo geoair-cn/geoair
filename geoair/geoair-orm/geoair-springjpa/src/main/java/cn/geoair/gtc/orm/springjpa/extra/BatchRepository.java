@@ -1,7 +1,7 @@
 package cn.geoair.gtc.orm.springjpa.extra;
 
-import cn.geoair.gtc.base.Gtc;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.Gir;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.entity.GiEntityable;
 import cn.geoair.gtc.base.util.GutilReflection;
 import cn.geoair.gtc.orm.springjpa.util.EntityManagerProvider;
@@ -40,7 +40,7 @@ public interface BatchRepository<T extends GiEntityable<PK>, PK extends Serializ
         while (iterator.hasNext()) {
             S next = iterator.next();
             if (entityManager.contains(next)) {
-                 Gtc.log.warn("该对象数据库中已经存在，不执行保存操作!：{}->{}", next.getClass().getName(),  Gtc.toJson(next).toJSONString());
+                 Gir.log.warn("该对象数据库中已经存在，不执行保存操作!：{}->{}", next.getClass().getName(),  Gir.toJson(next).toJSONString());
             } else {
                 entityManager.persist(next);
             }
@@ -77,7 +77,7 @@ public interface BatchRepository<T extends GiEntityable<PK>, PK extends Serializ
             if (contains) {
                 entityManager.merge(next);
             } else {
-                 Gtc.log.warn("数据库中不存在该对象，不执行更新操作！：{}->{}", next.getClass().getName(),  Gtc.toJson(next).toJSONString());
+                 Gir.log.warn("数据库中不存在该对象，不执行更新操作！：{}->{}", next.getClass().getName(),  Gir.toJson(next).toJSONString());
             }
             index++;
             if (index % BATCH_SIZE == 0) {
@@ -119,12 +119,12 @@ public interface BatchRepository<T extends GiEntityable<PK>, PK extends Serializ
                             field.set(next, field.get(dabaseObj));
                         }
                     } catch (Exception e) {
-                        throw new GtcException("po对象无法反射赋值，请检查对象配置", e);
+                        throw new GirException("po对象无法反射赋值，请检查对象配置", e);
                     }
                 }
                 entityManager.merge(next);
             } else {
-                 Gtc.log.warn("数据库中不存在该对象，不执行更新操作！：{}->{}", next.getClass().getName(),  Gtc.toJson(next).toJSONString());
+                 Gir.log.warn("数据库中不存在该对象，不执行更新操作！：{}->{}", next.getClass().getName(),  Gir.toJson(next).toJSONString());
             }
             index++;
             if (index % BATCH_SIZE == 0) {

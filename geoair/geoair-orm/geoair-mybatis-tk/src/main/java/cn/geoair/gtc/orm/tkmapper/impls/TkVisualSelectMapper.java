@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Id;
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
-import cn.geoair.gtc.base.data.model.support.GtcVisualModelKid;
-import cn.geoair.gtc.base.data.model.support.GtcVisualTreeModelKid;
+import cn.geoair.gtc.base.data.model.support.GirVisualModelKid;
+import cn.geoair.gtc.base.data.model.support.GirVisualTreeModelKid;
 import cn.geoair.gtc.base.data.page.GfunPageExcute;
 import cn.geoair.gtc.base.data.page.GiPageParam;
 import cn.geoair.gtc.base.data.page.GiPager;
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.gpa.dao.GiPagerDao;
 import cn.geoair.gtc.base.gpa.dao.GiVisualSelectDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityVisuable;
@@ -28,7 +28,7 @@ public interface TkVisualSelectMapper<T extends GiEntityVisuable<PK>,PK extends 
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	default List<GtcVisualModelKid>  gtcSearchVisualModel(String displayQuery, String[] containKeys){
+	default List<GirVisualModelKid>  gtcSearchVisualModel(String displayQuery, String[] containKeys){
 
 		Class<?> modelClass = getModelClass();
 
@@ -73,11 +73,11 @@ public interface TkVisualSelectMapper<T extends GiEntityVisuable<PK>,PK extends 
             }
         }
         if (matchField[0] == null) {
-            throw new GtcException("配置有误，模型缺少主键标识");
+            throw new GirException("配置有误，模型缺少主键标识");
         }
 
         example2.selectProperties(strings.toArray(new String[]{}));
-        List<GtcVisualModelKid> listVoList = new ArrayList<GtcVisualModelKid>();
+        List<GirVisualModelKid> listVoList = new ArrayList<GirVisualModelKid>();
 
         if (containKeys != null && containKeys.length > 0) {
             criteria.orIn(matchField[0].getName(), Arrays.asList(containKeys));
@@ -88,16 +88,16 @@ public interface TkVisualSelectMapper<T extends GiEntityVisuable<PK>,PK extends 
 
         List<T> poList = this.selectByExample(example2);
         for (T po : poList) {
-        	 GtcVisualModelKid listVo;
+        	 GirVisualModelKid listVo;
             if (matchField[2] != null) {
-                listVo = new GtcVisualTreeModelKid();
+                listVo = new GirVisualTreeModelKid();
                 try {
-                    ((GtcVisualTreeModelKid) listVo).setPid(String.valueOf(matchField[2].get(po)));
+                    ((GirVisualTreeModelKid) listVo).setPid(String.valueOf(matchField[2].get(po)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             } else {
-                listVo = new GtcVisualModelKid();
+                listVo = new GirVisualModelKid();
             }
             listVoList.add(listVo);
             try {
@@ -118,13 +118,13 @@ public interface TkVisualSelectMapper<T extends GiEntityVisuable<PK>,PK extends 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 
 	@Override
-	default GiPager<GtcVisualModelKid>  gtcSearchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam) {
+	default GiPager<GirVisualModelKid>  gtcSearchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam) {
 		TkVisualSelectMapper me = this;
 		TkPagerMapper<T, PK> pageDao = (TkPagerMapper<T, PK>)GiPagerDao.getDao(this.getModelClass());
 
-    	return pageDao.pageExcuter().excutePage(new GfunPageExcute<GtcVisualModelKid>() {
+    	return pageDao.pageExcuter().excutePage(new GfunPageExcute<GirVisualModelKid>() {
 			@Override
-            public List<GtcVisualModelKid> excute() {
+            public List<GirVisualModelKid> excute() {
             	return me. gtcSearchVisualModel(displayQuery,containKeys);
             }
         },pageParam);

@@ -1,6 +1,6 @@
 package cn.geoair.gtc.orm.springjpa.util;
 
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -28,7 +28,7 @@ public class EntityManagerProvider {
 
     public static EntityManagerProvider getEntityManagerProvider() {
         if (weakReference == null) {
-            weakReference = new WeakReference<>( Gtc.beans.getBean(EntityManagerProvider.class));
+            weakReference = new WeakReference<>( Gir.beans.getBean(EntityManagerProvider.class));
         }
         return weakReference.get();
 

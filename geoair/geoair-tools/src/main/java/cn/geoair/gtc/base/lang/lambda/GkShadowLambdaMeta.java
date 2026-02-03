@@ -1,6 +1,6 @@
 package cn.geoair.gtc.base.lang.lambda;
 
-import cn.geoair.gtc.base.exception.GtcException;
+import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.util.GutilClass;
 
 /**
@@ -26,7 +26,7 @@ public class GkShadowLambdaMeta implements GkfLambdaMeta {
         try {
 			return GutilClass.forName(instantiatedType, lambda.getCapturingClass().getClassLoader());
 		} catch (ClassNotFoundException | LinkageError e) {
-			throw new GtcException("",e);
+			throw new GirException("",e);
 		}
     }
 

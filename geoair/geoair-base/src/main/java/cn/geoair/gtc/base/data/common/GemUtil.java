@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.geoair.gtc.base.data.support.GtcVisualValueKid;
+import cn.geoair.gtc.base.data.support.GirVisualValueKid;
 import cn.geoair.gtc.base.data.GiVisualValuable;
 
 public class GemUtil {
@@ -36,10 +36,10 @@ public class GemUtil {
      * @param enumClz 枚举类class对象
      * @return GtcVisualValueKid列表
      */
-	public static <T extends Enum<T> & GiVisualValuable<K>,K> List<GtcVisualValueKid<K>> extractEnumVisualValueKid(Class<T> enumClz) {
-        List< GtcVisualValueKid<K>> list = new ArrayList<>();
+	public static <T extends Enum<T> & GiVisualValuable<K>,K> List<GirVisualValueKid<K>> extractEnumVisualValueKid(Class<T> enumClz) {
+        List<GirVisualValueKid<K>> list = new ArrayList<>();
         for (GiVisualValuable<K> obj: (GiVisualValuable<K>[])enumClz.getEnumConstants()) {
-            list.add(new  GtcVisualValueKid<K>(obj.value(),obj.display()));
+            list.add(new GirVisualValueKid<K>(obj.value(),obj.display()));
         }
         return list;
     }

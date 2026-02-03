@@ -11,8 +11,8 @@ import cn.geoair.gtc.base.data.page.GfunPageExcute;
 import cn.geoair.gtc.base.data.page.GiPageExcuter;
 import cn.geoair.gtc.base.data.page.GiPageParam;
 import cn.geoair.gtc.base.data.page.GiPager;
-import cn.geoair.gtc.base.gpa.support.GtcOrder;
-import cn.geoair.gtc.base.gpa.support.GtcSort;
+import cn.geoair.gtc.base.gpa.support.GirOrder;
+import cn.geoair.gtc.base.gpa.support.GirSort;
 import cn.geoair.gtc.base.lang.lambda.GkfLambdaMeta;
 import cn.geoair.gtc.base.util.GutilLambda;
 
@@ -51,16 +51,16 @@ public class TkGithubPageHelper implements GiPageExcuter{
 	 * @return
 	 */
 
-	public static String orderBySqlFromGtcSort(GtcSort sort) {
+	public static String orderBySqlFromGtcSort(GirSort sort) {
 
 		if(sort != null) {
 
-        	Iterator<GtcOrder<?>> iterator = sort.iterator();
+        	Iterator<GirOrder<?>> iterator = sort.iterator();
 
         	StringBuilder orderBy = new StringBuilder();
         	while(iterator.hasNext()) {
 
-        		GtcOrder<?> order = iterator.next();
+        		GirOrder<?> order = iterator.next();
 
         		if(order.getPropertyFun() != null) {
 

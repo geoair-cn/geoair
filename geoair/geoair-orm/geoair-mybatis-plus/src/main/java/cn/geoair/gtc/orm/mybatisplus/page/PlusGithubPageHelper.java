@@ -3,12 +3,12 @@ package cn.geoair.gtc.orm.mybatisplus.page;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import cn.geoair.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 import cn.geoair.gtc.base.data.page.GfunPageExcute;
 import cn.geoair.gtc.base.data.page.GiPageExcuter;
 import cn.geoair.gtc.base.data.page.GiPageParam;
 import cn.geoair.gtc.base.data.page.GiPager;
-import cn.geoair.gtc.base.gpa.support.GtcSort;
+import cn.geoair.gtc.base.gpa.support.GirSort;
 
 
 import java.util.List;
@@ -44,8 +44,8 @@ public class PlusGithubPageHelper implements GiPageExcuter{
 	 * @return
 	 */
 
-	public static String orderBySqlFromGtcSort(GtcSort sort) {
-		Gtc.log.error("暂时不支持GtcSort生成排序。");
+	public static String orderBySqlFromGtcSort(GirSort sort) {
+		Gir.log.error("暂时不支持GtcSort生成排序。");
 //		if(sort != null) {
 //
 //        	Iterator<GtcOrder<?>> iterator = sort.iterator();

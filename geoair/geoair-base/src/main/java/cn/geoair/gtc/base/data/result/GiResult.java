@@ -1,7 +1,7 @@
 package cn.geoair.gtc.base.data.result;
 
 import cn.geoair.gtc.base.data.GiValuable;
-import cn.geoair.gtc.base.sp.GtcSpHelper;
+import cn.geoair.gtc.base.sp.GirSpHelper;
 
 /**
  *  数据结果集接口，定义了统一的结果返回格式
@@ -16,14 +16,14 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @return 状态码
 	 */
 	public int code();
-	
+
 	/**
 	 * 设置状态码
 	 * @param code 状态码
 	 * @return 当前GiResult实例
 	 */
 	public GiResult<T> andCode(int code);
-	
+
 	/**
 	 * 设置状态码
 	 * @param code GiResultCode枚举类型的状态码
@@ -44,7 +44,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @return 泛型T的数据值
 	 */
 	public T value();
-	
+
 	/**
 	 * 设置提示信息
 	 * @param msg 提示信息
@@ -70,7 +70,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @param alertTypeEnum GtcEmAlertType枚举类型的消息提示类型
 	 * @return 当前GiResult实例
 	 */
-	default public GiResult<T> andAlertTypeEnum( GtcEmAlertType alertTypeEnum){
+	default public GiResult<T> andAlertTypeEnum( GirEmAlertType alertTypeEnum){
 		return andAlertType(alertTypeEnum.value());
 	}
 
@@ -118,7 +118,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @param alertType 消息提示类型
 	 * @return 当前GiResult实例
 	 */
-	default public GiResult<T> forFailureSetCodeAndMsgAndType(int code,String msg, GtcEmAlertType alertType){
+	default public GiResult<T> forFailureSetCodeAndMsgAndType(int code,String msg, GirEmAlertType alertType){
 		return this.forFailureAlertMsg(msg).andAlertTypeEnum(alertType).andCode(code);
 	}
 
@@ -140,7 +140,7 @@ public interface GiResult<T> extends GiValuable<T> {
 		}
 		return getResult(cls).andValue(value);
 	}
-	
+
 	/**
 	 * 创建成功状态的结果对象
 	 * @param <K> 值的类型
@@ -159,7 +159,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	public static<K> GiResult<K> successMsg(String msg){
 		return GiResult.<K>success().andAlertMsg(msg);
 	}
-	
+
 	/**
 	 * 创建失败状态的结果对象
 	 * @param <K> 值的类型
@@ -186,7 +186,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @param alertType 消息提示类型
 	 * @return GiResult<K> 失败状态的结果对象
 	 */
-	public static<K> GiResult<K> failureSetMsgAndType(String msg, GtcEmAlertType alertType){
+	public static<K> GiResult<K> failureSetMsgAndType(String msg, GirEmAlertType alertType){
 		return GiResult.<K>failureMsg(msg).andAlertTypeEnum(alertType);
 	}
 
@@ -198,7 +198,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @param alertType 消息提示类型
 	 * @return GiResult<K> 失败状态的结果对象
 	 */
-	public static<K> GiResult<K> failureSetCodeAndMsgAndType(int code ,String msg, GtcEmAlertType alertType){
+	public static<K> GiResult<K> failureSetCodeAndMsgAndType(int code ,String msg, GirEmAlertType alertType){
 		return GiResult.<K>failureMsg(msg).andAlertTypeEnum(alertType).andCode(code);
 	}
 
@@ -209,7 +209,7 @@ public interface GiResult<T> extends GiValuable<T> {
 	 * @return GiResult<K> 结果对象实例
 	 */
 	public static<K> GiResult<K> getResult(Class<K> resultType){
-		return  GtcSpHelper.load(GiResultConfig.class).getResult(resultType);
+		return  GirSpHelper.load(GiResultConfig.class).getResult(resultType);
 	}
 
 }
