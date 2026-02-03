@@ -18,7 +18,7 @@ public class GirLogger {
 		return getLoger(clazz.getName());
 	}
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.log.Log4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.log.Log4Gir")
 	public static GiLogger getLoger(String name) {
 		return (GiLogger)GkMethodHand.invokeSelf(name);
 	}

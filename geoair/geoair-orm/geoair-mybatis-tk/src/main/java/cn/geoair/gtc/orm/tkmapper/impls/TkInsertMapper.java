@@ -69,7 +69,7 @@ public interface TkInsertMapper<T extends GiEntitySaveable<PK>,PK extends Serial
     		((tk.mybatis.mapper.additional.dialect.oracle.InsertListMapper)this).insertList(records);
     	}else {
     		throw new GirException("{} 没有实现任何批量插入接口;"
-    				+ "支持批量插入的数据库(MySQL,PG,H2等)没有主键策略，自建组件生成方式实现 com.gtc.orm.tkmapper.support.insert. gtcInsertListMapper;"
+    				+ "支持批量插入的数据库(MySQL,PG,H2等)没有主键策略，自建组件生成方式实现 cn.geoair.orm.tkmapper.support.insert. gtcInsertListMapper;"
     				//+ "支持批量插入的数据库(MySQL,PG,H2等)没有主键策略实现tk.mybatis.mapper.additional.insert.InsertListMapper;"
     				+ "支持批量插入的数据库(MySQL,PG,H2等)自增主键策略实现tk.mybatis.mapper.common.special.InsertListMapper;"
     				+ "Oracle数据库实现tk.mybatis.mapper.additional.dialect.oracle.InsertListMapper;",this.getClass().getName());

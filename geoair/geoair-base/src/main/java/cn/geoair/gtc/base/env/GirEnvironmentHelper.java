@@ -14,7 +14,7 @@ public class GirEnvironmentHelper {
 	*/
 
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.env.SpringEnvironment4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.env.SpringEnvironment4Gir")
 	public static GiEnvironmenter getEnvironmenter() {
 		Object o = GkMethodHand.invokeSelf();
 		return (GiEnvironmenter)o;

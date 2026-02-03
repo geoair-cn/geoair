@@ -15,7 +15,7 @@ public class GirBeanHelper {
 		GkMethodHand.implFromClass( GirBeanHelper.class);
 	}
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.bean.SpringContextBean4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.bean.SpringContextBean4Gir")
 	public static GiBeanFactory getProvider() {
 		return (GiBeanFactory)GkMethodHand.invokeSelf();
 	}

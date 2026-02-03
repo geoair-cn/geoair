@@ -24,7 +24,7 @@ public class GutilBean {
         copyProperties(source, target, null, ignoreProperties);
     }
 
-    @GaMethodHandDefine(id="com.gtc.base.util.GutilBean.copyProperties",expectClassName = "org.springframework.beans.BeanUtils", expectMethodName = "copyProperties")
+    @GaMethodHandDefine(id="cn.geoair.base.util.GutilBean.copyProperties",expectClassName = "org.springframework.beans.BeanUtils", expectMethodName = "copyProperties")
     public static void copyProperties(Object source, Object target, Class<?> editable, String... ignoreProperties) throws GirBeanException {
     	GkMethodHand.invokeSelf(source, target, editable, ignoreProperties);
     }

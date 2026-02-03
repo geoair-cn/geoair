@@ -15,17 +15,17 @@ public class GirHttpServletHelper {
 	//}
 
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.web.SpringServlet4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.web.SpringServlet4Gir")
     public static HttpServletRequest getRequest() {
 		return (HttpServletRequest)GkMethodHand.invokeSelf();
     }
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.web.SpringServlet4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.web.SpringServlet4Gir")
     public static HttpServletResponse getResponse() {
 		return (HttpServletResponse)GkMethodHand.invokeSelf();
     }
 
-	@GaMethodHandDefine(expectClassName = "com.gtc.spi.web.SpringServlet4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.web.SpringServlet4Gir")
     public static ServletContext getServletContext() {
 		return (ServletContext)GkMethodHand.invokeSelf();
     }

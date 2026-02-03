@@ -130,7 +130,7 @@ public class GirInsertProvider extends MapperTemplate {
                 SelectKeyHelper.newSelectKeyMappedStatement(ms, column, entityClass, isBEFORE(), getIDENTITY(column));
                 hasIdentityKey = true;
             } else if(column.getGenIdClass() != null){
-                sql.append("<bind name=\"").append(column.getColumn()).append("GenIdBind\" value=\"@ com.gtc.orm.tkmapper.id.GuGenId@genId(");
+                sql.append("<bind name=\"").append(column.getColumn()).append("GenIdBind\" value=\"@ cn.geoair.orm.tkmapper.id.GuGenId@genId(");
                 sql.append("_parameter").append(", '").append(column.getProperty()).append("'");
                 sql.append(", @").append(column.getGenIdClass().getCanonicalName()).append("@class");
                 sql.append(", '").append(tableName(entityClass)).append("'");

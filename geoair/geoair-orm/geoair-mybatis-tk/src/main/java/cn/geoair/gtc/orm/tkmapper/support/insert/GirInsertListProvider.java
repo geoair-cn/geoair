@@ -38,7 +38,7 @@ public class GirInsertListProvider extends MapperTemplate {
         //单独增加对 genId 方式的支持
         for (EntityColumn column : columnList) {
             if (column.getGenIdClass() != null) {
-                sql.append("<bind name=\"").append(column.getColumn()).append("GenIdBind\" value=\"@ com.gtc.orm.tkmapper.id.GuGenId@genId(");
+                sql.append("<bind name=\"").append(column.getColumn()).append("GenIdBind\" value=\"@ cn.geoair.orm.tkmapper.id.GuGenId@genId(");
                 sql.append("record").append(", '").append(column.getProperty()).append("'");
                 sql.append(", @").append(column.getGenIdClass().getCanonicalName()).append("@class");
                 sql.append(", '").append(tableName(entityClass)).append("'");

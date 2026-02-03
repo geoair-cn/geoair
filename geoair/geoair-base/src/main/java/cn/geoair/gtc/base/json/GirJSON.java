@@ -22,7 +22,7 @@ public interface GirJSON extends Cloneable, Serializable/*, Map<String, Object> 
      * @param json
      * @return
      */
-    @GaMethodHandDefine(expectClassName = "com.gtc.spi.json.Json4Gir")
+    @GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.json.Json4Gir")
     public static GirJSON toJson(Object json) {
         Object o = GkMethodHand.invokeSelf(json);
         return (GirJSON) o;

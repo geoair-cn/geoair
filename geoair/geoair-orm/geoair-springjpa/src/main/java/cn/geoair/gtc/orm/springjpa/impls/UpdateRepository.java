@@ -88,7 +88,7 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
             dao.batchUpdate(records);
         } else {
             throw new GirException("{} 没有实现任何批量更新接口;"
-                    + "请在JPA的该对象的 Repository层 继承   com.gtc.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
+                    + "请在JPA的该对象的 Repository层 继承   cn.geoair.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
         }
         return 1;
 //        this.saveAll(records);
@@ -107,7 +107,7 @@ public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Se
             dao.batchUpdateSelective(records);
         } else {
             throw new GirException("{} 没有实现任何批量更新接口;"
-                    + "请在JPA的该对象的 Repository层 继承   com.gtc.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
+                    + "请在JPA的该对象的 Repository层 继承   cn.geoair.orm.springjpa.extra.BatchRepository;", this.getClass().getName());
         }
         return 1;
     }
