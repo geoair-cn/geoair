@@ -165,6 +165,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.geotools</groupId>
+				<artifactId>gt-epsg-postgresql</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotools</groupId>
 				<artifactId>gt-api</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
@@ -279,6 +284,26 @@
 			<dependency>
 				<groupId>org.geotools</groupId>
 				<artifactId>gt-jdbc</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+			   <groupId>org.geotools.jdbc</groupId>
+				<artifactId>gt-jdbc-postgis</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotools.jdbc</groupId>
+				<artifactId>gt-jdbc-mysql</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotools.jdbc</groupId>
+				<artifactId>gt-jdbc-oracle</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-jdbc-h2</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
 			<dependency>
