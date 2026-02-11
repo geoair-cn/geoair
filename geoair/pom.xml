@@ -12,9 +12,9 @@
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair</artifactId>
 	<packaging>pom</packaging>
-	<name>gtc</name>
+	<name>Gir</name>
 
-	<description>gtc</description>
+	<description>Gir</description>
 
 	<url>https://gitee.com/geoair/geoair</url>
 
@@ -35,7 +35,7 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://gitee.com/geoair/geoair-dependencies.git</connection>
+		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
 		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
 		<url>https://gitee.com/geoair/geoair-dependencies</url>
 		<tag>HEAD</tag>
@@ -43,7 +43,7 @@
 
 
 	<properties>
-		<geoair.gtc.version>23.0.3-SNAPSHOT</geoair.gtc.version>
+		<geoair.version>23.0.3-SNAPSHOT</geoair.version>
 		<skipTests>true</skipTests>
 	</properties>
 
@@ -54,66 +54,66 @@
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-base</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-web</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-tools</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-core</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-sdk</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-mybatis</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-orm-base</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-mybatis-tk</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-mybatis-plus</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-springjpa</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>cn.geoair.orm</groupId>
 				<artifactId>geoair-orm-spi</artifactId>
-				<version>${geoair.gtc.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 			<!-- soa -->
 
@@ -149,9 +149,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<!-- 源码版本 -->
-					<source>8</source>
+					<source>11</source>
 					<!-- 目标字节码版本 -->
-					<target>8</target>
+					<target>11</target>
 					<!-- 编码（可选，避免中文乱码） -->
 					<encoding>UTF-8</encoding>
 				</configuration>

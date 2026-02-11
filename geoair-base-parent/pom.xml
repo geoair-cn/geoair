@@ -38,7 +38,7 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://gitee.com/geoair/geoair-dependencies.git</connection>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
         <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
         <url>https://gitee.com/geoair/geoair-dependencies</url>
         <tag>HEAD</tag>
@@ -100,6 +100,7 @@
                     <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
                     <!-- 发布后自动推送到远程仓库 -->
                     <pushChanges>true</pushChanges>
+                    <branchName>master</branchName>
                 </configuration>
             </plugin>
 
@@ -124,9 +125,9 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <!-- 源码版本 -->
-                    <source>8</source>
+                    <source>11</source>
                     <!-- 目标字节码版本 -->
-                    <target>8</target>
+                    <target>11</target>
                     <!-- 编码（可选，避免中文乱码） -->
                     <encoding>UTF-8</encoding>
                 </configuration>

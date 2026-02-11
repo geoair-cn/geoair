@@ -34,7 +34,7 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://gitee.com/geoair/geoair-dependencies.git</connection>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
         <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
         <url>https://gitee.com/geoair/geoair-dependencies</url>
         <tag>HEAD</tag>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-tools</artifactId>
-            <version>${geoair.gtc.version}</version>
+            <version>${geoair.version}</version>
         </dependency>
     </dependencies>
 
