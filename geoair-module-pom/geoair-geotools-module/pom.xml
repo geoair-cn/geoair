@@ -33,9 +33,10 @@
 	</developers>
 
 	<scm>
-		<connection>https://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+		<connection>scm:git:https://gitee.com/geoair/geoair-dependencies.git</connection>
+		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
 		<url>https://gitee.com/geoair/geoair-dependencies</url>
+		<tag>HEAD</tag>
 	</scm>
 
 
@@ -451,11 +452,7 @@
 				<artifactId>gt-jdbc-oracle</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.geotools.jdbc</groupId>
-				<artifactId>gt-jdbc-postgis</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
+
 			<dependency>
 				<groupId>org.geotools.jdbc</groupId>
 				<artifactId>gt-jdbc-sqlserver</artifactId>
