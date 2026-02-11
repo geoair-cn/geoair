@@ -212,11 +212,7 @@
 				<artifactId>gt-epsg-hsql</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-epsg-postgresql</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
+
 			<dependency>
 				<groupId>org.geotools</groupId>
 				<artifactId>gt-epsg-wkt</artifactId>
@@ -442,16 +438,8 @@
 				<artifactId>gt-jdbc-hana</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.geotools.jdbc</groupId>
-				<artifactId>gt-jdbc-mysql</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.geotools.jdbc</groupId>
-				<artifactId>gt-jdbc-oracle</artifactId>
-				<version>${geotools.version}</version>
-			</dependency>
+
+
 
 			<dependency>
 				<groupId>org.geotools.jdbc</groupId>
