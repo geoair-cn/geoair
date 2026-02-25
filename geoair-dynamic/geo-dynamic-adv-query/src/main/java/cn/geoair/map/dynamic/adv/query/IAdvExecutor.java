@@ -8,7 +8,7 @@ import cn.geoair.map.dynamic.ds.IDataSourceGetter;
  * @date ：Created in 2025/10/9 11:07
  * @description： 集合执行器，空接口，只继承上游接口
  */
-public interface IAdvExecutor extends IDataSourceGetter, IAdvBaseOpt, IAdvDDLOpt, IAdvGeoOpt, IAdvGeoPreOpt,IAdvSimplePageOpt, DialectTableNameProcessor {
+public interface IAdvExecutor extends IDataSourceGetter, IAdvBaseOpt, IAdvDDLOpt, IAdvGeoOpt, IAdvGeoPreOpt,IAdvSimplePageOpt, IAdvSimplePagePreOpt,DialectTableNameProcessor {
     /**
      * 获取用于SQL的Schema名（含默认值与基础校验）
      *

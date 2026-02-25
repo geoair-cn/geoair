@@ -33,21 +33,21 @@ import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何
  */
 
 public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
-    private static final GiLogger log = GirLogger.getLoger();
+    protected static final GiLogger log = GirLogger.getLoger();
     // PostgreSQL 字段转义前缀后缀（避免关键字冲突）
-    private static final String FIELD_QUOTE_PREFIX = "\"";
-    private static final String FIELD_QUOTE_SUFFIX = "\"";
+    protected static final String FIELD_QUOTE_PREFIX = "\"";
+    protected static final String FIELD_QUOTE_SUFFIX = "\"";
 
-    PgAdvGeoOpt pgAdvGeoOpt;
-    PgAdvBaseOpt baseOpt;
-    PgAdvDDLOpt pgAdvDDLOpt;
-    IDataSourceGetter dataSourceGetter;
+    protected PgAdvGeoPreOpt pgAdvGeoPreOpt;
+    protected PgAdvBaseOpt baseOpt;
+    protected PgAdvDDLOpt pgAdvDDLOpt;
+    protected IDataSourceGetter dataSourceGetter;
 
     public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         baseOpt = new PgAdvBaseOpt(dataSourceGetter);
         pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);
-        pgAdvGeoOpt = new PgAdvGeoOpt(dataSourceGetter);
+        pgAdvGeoPreOpt = new PgAdvGeoPreOpt(dataSourceGetter);
     }
 
     DialectTableNameProcessor dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
@@ -192,7 +192,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
         // 2. 查询SQL对应的字段元数据（含空间字段识别）
         DataFieldsApo dataFieldsApo = null;
         try {
-            dataFieldsApo = pgAdvGeoOpt.dGetColumnsBySQL(noPageSql);
+            dataFieldsApo = pgAdvGeoPreOpt.dGetColumnsBySQL(noPageSql);
         } catch (Exception e) {
             log.error("查询SQL字段元数据失败，SQL：{}", noPageSql, e);
             throw new RuntimeException("获取字段信息异常：" + e.getMessage(), e);
@@ -231,7 +231,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
 
 
         // 执行分页查询
-        List<GirAdvOneRow> records = pgAdvGeoOpt.eSelectList(pageSql, advEnumsGeomOpt, geomFieldNameList);
+        List<GirAdvOneRow> records = pgAdvGeoPreOpt.eSelectList(pageSql, advEnumsGeomOpt, geomFieldNameList);
 
         // 构建分页结果对象
         PageApo<GirAdvOneRow> pageApo = createPageApo(total, pageNum, pageSize, pageNumStartZero, lastPageNum, offset, records);
@@ -245,7 +245,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
     }
 
 
-    private void validateFullPageParams(String noPageSql, int pageNum, int pageSize,
+    protected void validateFullPageParams(String noPageSql, int pageNum, int pageSize,
                                         boolean pageNumStartZero, List<OrderApo> orders) {
         // 1. 基础分页参数校验
         if (StrUtil.isEmpty(noPageSql)) {
@@ -287,7 +287,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
     /**
      * 字段名转义（避免PostgreSQL关键字冲突，如 "order"、"user"）
      */
-    private String quoteFieldName(String fieldName) {
+    protected String quoteFieldName(String fieldName) {
         if (StrUtil.isEmpty(fieldName)) {
             return fieldName;
         }
@@ -302,14 +302,14 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
     /**
      * 计算偏移量
      */
-    private long calculateOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
+    protected long calculateOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
         return pageNumStartZero ? (long) pageNum * pageSize : (long) (pageNum - 1) * pageSize;
     }
 
     /**
      * 计算最后一页页码
      */
-    private int calculateLastPageNum(long total, int pageSize) {
+    protected int calculateLastPageNum(long total, int pageSize) {
         if (total <= 0 || pageSize <= 0) {
             return 0;
         }
@@ -319,7 +319,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
     /**
      * 构建分页SQL语句
      */
-    private String buildPageSql(String noPageSql, int pageSize, long offset) {
+    protected String buildPageSql(String noPageSql, int pageSize, long offset) {
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
         return StrUtil.format("{} LIMIT {} OFFSET {}", cleanSql, pageSize, offset);
     }
@@ -328,7 +328,7 @@ public class PgAdvSimplePageOpt implements IAdvSimplePageOpt {
     /**
      * 创建分页结果对象
      */
-    private PageApo<GirAdvOneRow> createPageApo(long total, int pageNum, int pageSize,
+    protected PageApo<GirAdvOneRow> createPageApo(long total, int pageNum, int pageSize,
                                                 boolean pageNumStartZero, int lastPageNum,
                                                 long startRow, List<GirAdvOneRow> records) {
         PageApo<GirAdvOneRow> pageApo = new PageApo<>();

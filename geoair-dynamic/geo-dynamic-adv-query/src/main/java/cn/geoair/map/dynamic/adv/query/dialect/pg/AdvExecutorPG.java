@@ -48,6 +48,7 @@ public class AdvExecutorPG implements IAdvExecutor {
     private PgAdvGeoOpt pgAdvGeoOptPxy;
     private PgAdvGeoPreOpt pgAdvGeoPreOptPxy;
     private PgAdvSimplePageOpt pgAdvSimplePageOptPxy;
+    private PgAdvSimplePagePreOpt pgAdvSimplePagePreOptPxy;
     DialectTableNameProcessor dialectTableNameProcessorPxy = PgDialectTableNameUtil.getInstance();
 
     public AdvExecutorPG(DataSourceApo dataSourceApo) {
@@ -74,6 +75,7 @@ public class AdvExecutorPG implements IAdvExecutor {
         this.pgAdvGeoOptPxy = new PgAdvGeoOpt(this);
         this.pgAdvGeoPreOptPxy = new PgAdvGeoPreOpt(this);
         this.pgAdvSimplePageOptPxy = new PgAdvSimplePageOpt(this);
+        this.pgAdvSimplePagePreOptPxy = new PgAdvSimplePagePreOpt(this);
     }
 
     // ==================== 数据源初始化与资源管理 ====================
@@ -1041,4 +1043,70 @@ public class AdvExecutorPG implements IAdvExecutor {
     public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam) {
         return pgAdvGeoPreOptPxy.eGetGeomColumnBySql(sqlStatement, sqlParam);
     }
+
+    @Override
+    public Long pCount(String noPageSqlStatement, SqlParamMap sqlParam) {
+        return pgAdvSimplePagePreOptPxy.pCount(noPageSqlStatement, sqlParam);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, List<OrderApo> orders) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, boolean hasFieldsInfo) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, List<OrderApo> orders) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, List<OrderApo> orders) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
+        return pgAdvSimplePagePreOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+    }
+
 }

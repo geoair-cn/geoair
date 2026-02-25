@@ -31,7 +31,7 @@ import static cn.geoair.map.dynamic.adv.query.dialect.pg.PgAdvGeoOpt.getTypeGeom
  * @description： TODO
  */
 @Slf4j
-public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
+public class PgAdvGeoPreOpt extends PgAdvGeoOpt implements IAdvGeoPreOpt {
     DialectTableNameProcessor dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
 
     PgAdvBaseOpt baseOpt;
@@ -40,6 +40,7 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     final IDataSourceGetter dataSourceGetter;
 
     public PgAdvGeoPreOpt(IDataSourceGetter dataSourceGetter) {
+        super(dataSourceGetter);
         this.dataSourceGetter = dataSourceGetter;
         baseOpt = new PgAdvBaseOpt(dataSourceGetter);
         pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);
