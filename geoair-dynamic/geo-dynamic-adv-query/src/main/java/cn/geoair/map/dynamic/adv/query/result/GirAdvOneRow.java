@@ -29,6 +29,24 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object> implements OptNu
         return new GirAdvOneRow(row);
     }
 
+    public static Map<String, Object> toMap(GirAdvOneRow oneRow) {
+        if (oneRow == null) {
+            return new LinkedHashMap<>();
+        }
+        return oneRow;
+    }
+
+    public static List<Map<String, Object>> toMapList(List<GirAdvOneRow> rowList) {
+        if (rowList == null) {
+            return new ArrayList<>();
+        }
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (GirAdvOneRow row : rowList) {
+            list.add(toMap(row));
+        }
+        return list;
+    }
+
     public static List<GirAdvOneRow> ofByEntityList(List<Entity> rows) {
         if (rows == null || rows.isEmpty()) {
             return ListUtil.empty();
