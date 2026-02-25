@@ -11,7 +11,7 @@
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-module-pom</artifactId>
-    <version>23.0.3-SNAPSHOT</version>
+    <version>23.1.0-SNAPSHOT</version>
     <name>geoair-module-parent</name>
     <packaging>pom</packaging>
     <description>用于定义各个组件的依赖管理</description>

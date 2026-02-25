@@ -1,0 +1,8 @@
+BoxReferencedEnvelope referencedEnvelope =GirAdvTools.getTileGrid4326Opt().xyzToTileBox(13,6700,2709,4326);
+Geometry geometry =GirAdvTools.getSridOpt().convertToGeom(referencedEnvelope,4326,3857);
+RangeApo rangeApo = GirAdvTools.getTileGrid3857Opt().tileRangeByGeom(13, geometry);
+
+13/6700/2709
+13/1386/6700
+
+1386？？？

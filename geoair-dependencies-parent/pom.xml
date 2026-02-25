@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies</artifactId>
-        <version>23.0.3-SNAPSHOT</version>
+        <version>23.1.0-SNAPSHOT</version>
          <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>geoair-dependencies-parent</artifactId>
     <name>geoair-dependencies-parent</name>
-    <version>23.0.3-SNAPSHOT</version>
+    <version>23.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>用于工程模块的依赖定义</description>
 

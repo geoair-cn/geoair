@@ -1,0 +1,32 @@
+/Users/will/Documents/Opt/spark-3.5.6-bin-hadoop3/bin/spark-submit \
+  --master k8s://https://10.233.0.1:443 \
+  --class com.bdhxx.pipeline.tilebuilder.spark.vectile.SparkJavaTileApp \
+  --deploy-mode cluster \
+  --name StatisticsAggregate \
+  --class application.StatisticsAggregate \
+  --conf spark.kubernetes.namespace=tenant-pro-inner \
+  --conf spark.kubernetes.container.image=harbor.host.com/bdh/tile-builder-base:v1.12.1 \
+  --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+  --conf spark.executor.instances=2 \
+  --conf spark.executor.cores=2 \
+  --conf spark.kubernetes.executor.request.cores=2 \
+  --conf spark.kubernetes.executor.limit.cores=4 \
+  --conf spark.executor.memory=12g \
+  --conf spark.driver.cores=1 \
+  --conf spark.kubernetes.driver.request.cores=1 \
+  --conf spark.kubernetes.driver.limit.cores=2 \
+  --conf spark.driver.memory=4g \
+  --conf spark.hadoop.fs.s3a.access.key=NO4RRFE5DYROFWM1IQPG \
+  --conf spark.hadoop.fs.s3a.secret.key=v4Fa0nmfAqcsKNZs3u5SOhzNE4WQPROqo2lRJrLV \
+  --conf spark.hadoop.fs.s3a.endpoint=http://10.7.10.105:30999 \
+  --conf spark.hadoop.fs.s3a.path.style.access=true \
+  --conf spark.hadoop.fs.s3a.connection.ssl.enabled=false \
+  --conf spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
+  --conf spark.sql.shuffle.partitions=200 \
+  --conf spark.default.parallelism=200 \
+
+  s3a://wh-gis-dev/bdh-tile-builder-service/spark_app/spark-tiles-0.0.1-SNAPSHOT-jar-with-dependencies.jar \
+
+
+
+

@@ -1,0 +1,42 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
+    <id>jar-with-dependencies</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>/</outputDirectory>
+            <useProjectArtifact>true</useProjectArtifact>
+            <unpack>true</unpack>
+            <scope>runtime</scope>
+            <!-- 排除签名文件，避免冲突 -->
+            <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+            </excludes>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <!-- 合并 META-INF/services 下的所有SPI文件 -->
+        <fileSet>
+            <directory>${project.build.outputDirectory}/META-INF/services</directory>
+            <outputDirectory>META-INF/services</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+            <filtered>false</filtered>
+        </fileSet>
+    </fileSets>
+    <!-- 关键：配置文件合并规则，避免SPI文件被覆盖 -->
+    <containerDescriptorHandlers>
+        <containerDescriptorHandler>
+            <handlerName>metaInf-services</handlerName>
+        </containerDescriptorHandler>
+    </containerDescriptorHandlers>
+</assembly>
