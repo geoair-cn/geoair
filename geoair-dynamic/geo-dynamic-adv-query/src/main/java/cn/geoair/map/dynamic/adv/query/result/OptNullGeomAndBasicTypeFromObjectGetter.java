@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -27,6 +28,27 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter extends OptNullBasicTyp
             return null;
         }
         return obj.getClass();
+    }
+
+
+    default Byte[] getByteArray(String key, Byte[] defaultValue) {
+        final Object obj = getObj(key);
+        if (null == obj) {
+            return defaultValue;
+        }
+        return Convert.toByteArray(obj);
+    }
+
+    default byte[] getPrimitiveByteArray(String key, byte[] defaultValue) {
+        final Object obj = getObj(key);
+        if (null == obj) {
+            return defaultValue;
+        }
+        return Convert.toPrimitiveByteArray(obj);
+    }
+
+    default byte[] getPrimitiveByteArray(String key) {
+        return getPrimitiveByteArray(key, null);
     }
 
     default JSONObject getGeoJsonObj(String key) {
