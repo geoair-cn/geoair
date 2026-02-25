@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseSelectOpt;
@@ -103,8 +104,8 @@ public class PgAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertBySql(String sqlStatement, Map<String, Object> param) {
-        return getPgAdvBaseAccessPxyOpt().bInsertBySql(sqlStatement, param);
+    public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
+        return getPgAdvBaseAccessPxyOpt().bInsertBySql(sqlStatement, sqlParam);
     }
 
     @Override
@@ -169,8 +170,8 @@ public class PgAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteBySql(String sqlStatement, Map<String, Object> param) {
-        return getPgAdvBaseDeletePxyOpt().bDeleteBySql(sqlStatement, param);
+    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
+        return getPgAdvBaseDeletePxyOpt().bDeleteBySql(sqlStatement, sqlParam);
     }
 
     @Override
@@ -260,47 +261,47 @@ public class PgAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public GirAdvOneRow bSelectOne(String sqlStatement, Map<String, Object> sqlParam) {
+    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
         return getPgAdvBaseSelectPxyOpt().bSelectOne(sqlStatement, sqlParam);
     }
 
     @Override
-    public List<GirAdvOneRow> bSelectList(String sqlStatement, Map<String, Object> sqlParam) {
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
         return getPgAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParam);
     }
 
     @Override
-    public void bSelectList(String sqlStatement, Map<String, Object> sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectList(String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         getPgAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParam, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, Map<String, Object> sqlParam) {
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
         return getPgAdvBaseSelectPxyOpt().bSelectListToValueList(sqlStatement, sqlParam);
     }
 
     @Override
-    public Number bSelectNumber(String sqlStatement, Map<String, Object> sqlParam) {
+    public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
         return getPgAdvBaseSelectPxyOpt().bSelectNumber(sqlStatement, sqlParam);
     }
 
     @Override
-    public Number bSelectRecordRowCount(String sqlStatement, Map<String, Object> sqlParam) {
+    public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
         return getPgAdvBaseSelectPxyOpt().bSelectRecordRowCount(sqlStatement, sqlParam);
     }
 
     @Override
-    public <E> E bSelectObjOne(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz) {
+    public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
         return getPgAdvBaseSelectPxyOpt().bSelectObjOne(sqlStatement, sqlParam, clazz);
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
         return getPgAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParam, clazz);
     }
 
     @Override
-    public <E> void bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         getPgAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParam, clazz, rowConsumer);
     }
 
@@ -311,8 +312,8 @@ public class PgAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpdateBySql(String sqlStatement, Map<String, Object> param) {
-        return getPgAdvBaseUpdatePxyOpt().bUpdateBySql(sqlStatement, param);
+    public Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam) {
+        return getPgAdvBaseUpdatePxyOpt().bUpdateBySql(sqlStatement, sqlParam);
     }
 
     @Override

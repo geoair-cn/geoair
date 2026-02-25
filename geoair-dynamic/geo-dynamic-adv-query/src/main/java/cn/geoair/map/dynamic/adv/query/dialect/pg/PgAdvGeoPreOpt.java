@@ -6,6 +6,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -45,19 +46,19 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameBySql = eGetGeomColumnNameListBySql(sqlStatement, param);
-        return eSelectOne(sqlStatement, param, advEnumsGeomOpt, geomFieldNameBySql);
+    public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameBySql = eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
+        return eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameBySql);
     }
 
     @Override
-    public GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return eSelectOne(sqlStatement, param, advEnumsGeomOpt, ListUtil.of(geomFieldName));
+    public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
+        return eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
     }
 
     @Override
-    public GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        GirAdvOneRow girAdvOneRow = baseOpt.bSelectOne(sqlStatement, param);
+    public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
+        GirAdvOneRow girAdvOneRow = baseOpt.bSelectOne(sqlStatement, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList)) {
             List<GirAdvOneRow> girAdvOneRows = ListUtil.of(girAdvOneRow);
             PgAdvGeoOpt.processGeometryField(girAdvOneRows, advEnumsGeomOpt, geomFieldNameList);
@@ -67,19 +68,19 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameBySql = eGetGeomColumnNameListBySql(sqlStatement, param);
-        return eSelectList(sqlStatement, param, advEnumsGeomOpt, geomFieldNameBySql);
+    public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameBySql = eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
+        return eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameBySql);
     }
 
     @Override
-    public List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return eSelectList(sqlStatement, param, advEnumsGeomOpt, ListUtil.of(geomFieldName));
+    public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
+        return eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
     }
 
     @Override
-    public List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        List<GirAdvOneRow> girAdvOneRows = baseOpt.bSelectList(sqlStatement, param);
+    public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
+        List<GirAdvOneRow> girAdvOneRows = baseOpt.bSelectList(sqlStatement, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList)) {
             PgAdvGeoOpt.processGeometryField(girAdvOneRows, advEnumsGeomOpt, geomFieldNameList);
         }
@@ -88,14 +89,14 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
 
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param) {
-        String geomField = eGetGeomColumnNameBySql(sqlStatement, param);
-        return eGetGeoTypeBySql(sqlStatement, param, geomField);
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam) {
+        String geomField = eGetGeomColumnNameBySql(sqlStatement, sqlParam);
+        return eGetGeoTypeBySql(sqlStatement, sqlParam, geomField);
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param, String geomFieldName) {
-        Map<String, AdvEnumsTypeGeom> re = eGetGeoTypeBySql(sqlStatement, param, ListUtil.of(geomFieldName));
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, String geomFieldName) {
+        Map<String, AdvEnumsTypeGeom> re = eGetGeoTypeBySql(sqlStatement, sqlParam, ListUtil.of(geomFieldName));
         if (MapUtil.isEmpty(re)) {
             return null;
         }
@@ -103,7 +104,7 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param, List<String> geomFieldNames) {
+    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames) {
         // 验证输入参数
         if (StrUtil.isEmpty(sqlStatement) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
@@ -136,7 +137,7 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
                 fieldsSql.toString(), sqlStatement, whereSql.toString());
 
         // 执行查询
-        GirAdvOneRow row = baseOpt.bSelectOne(sql, param);
+        GirAdvOneRow row = baseOpt.bSelectOne(sql, sqlParam);
         if (row == null) {
             return MapUtil.empty();
         }
@@ -154,12 +155,12 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public boolean eIsGeomBySql(String sqlStatement, Map<String, Object> param) {
-        return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(sqlStatement, param));
+    public boolean eIsGeomBySql(String sqlStatement, SqlParamMap sqlParam) {
+        return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(sqlStatement, sqlParam));
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String sqlStatement, Map<String, Object> param) {
+    public String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(sqlStatement)) {
             return null;
         }
@@ -171,7 +172,7 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
         try {
             // 构建查询元数据的SQL
             String fieldQuerySql = StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", sqlStatement, aliasTableName);
-            SqlMeta parse = SqlEngineUtil.getEngine().parse(fieldQuerySql, param);
+            SqlMeta parse = SqlEngineUtil.getEngine().parse(fieldQuerySql, sqlParam);
 
 
             connection = dataSourceGetter.getConnection();
@@ -210,22 +211,22 @@ public class PgAdvGeoPreOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String sqlStatement, Map<String, Object> param) {
-        List<FieldBySchemaApo> fieldBySchemaApos = eGetGeomColumnListBySql(sqlStatement, param);
+    public List<String> eGetGeomColumnNameListBySql(String sqlStatement, SqlParamMap sqlParam) {
+        List<FieldBySchemaApo> fieldBySchemaApos = eGetGeomColumnListBySql(sqlStatement, sqlParam);
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fieldBySchemaApos);
         return dataFieldsApo.getFieldNameList();
     }
 
     @Override
-    public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlStatement, Map<String, Object> param) {
-        DataFieldsApo dataFieldsApo = pgAdvDDLOpt.dGetColumnsBySQL(sqlStatement, param);
+    public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlStatement, SqlParamMap sqlParam) {
+        DataFieldsApo dataFieldsApo = pgAdvDDLOpt.dGetColumnsBySQL(sqlStatement, sqlParam);
         return dataFieldsApo.getGeomFields();
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, Map<String, Object> param) {
-        List<FieldBySchemaApo> fieldBySchemaApos = eGetGeomColumnListBySql(sqlStatement, param);
+    public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam) {
+        List<FieldBySchemaApo> fieldBySchemaApos = eGetGeomColumnListBySql(sqlStatement, sqlParam);
         if (ObjectUtil.isNotEmpty(fieldBySchemaApos)) {
             return fieldBySchemaApos.get(0);
         }

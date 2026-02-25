@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.util.List;
@@ -139,7 +140,7 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：{ "userId": 1001, "name": "张三", "age": 25 }
      * @return GirAdvOneRow 单行查询结果，封装了列名与对应值的映射关系
      */
-    GirAdvOneRow bSelectOne(String sqlStatement, Map<String, Object> sqlParam);
+    GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 执行查询并返回多行结果列表
@@ -157,7 +158,7 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：{ "status": 1, "createTimeStart": "2024-01-01" }
      * @return List<GirAdvOneRow> 多行查询结果列表，每个元素对应一行数据的列值映射
      */
-    List<GirAdvOneRow> bSelectList(String sqlStatement, Map<String, Object> sqlParam);
+    List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 流式查询多行结果，通过Consumer逐行处理数据（避免一次性加载大量数据占用内存）
@@ -171,7 +172,7 @@ public interface IAdvBaseSelectOpt {
      * @param rowConsumer  行数据消费器，用于逐行处理查询结果中的每一条GirAdvOneRow数据
      *                     <br>示例：row -> System.out.println("日志ID：" + row.get("id") + " 内容：" + row.get("log_content"))
      */
-    void bSelectList(String sqlStatement, Map<String, Object> sqlParam, Consumer<GirAdvOneRow> rowConsumer);
+    void bSelectList(String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer);
 
     /**
      * 执行查询并返回多行结果，结果以纯值列表形式封装（仅保留值，无列名）
@@ -185,7 +186,7 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：{ "deptId": 5 }
      * @return List<List < Object>> 纯值列表结果，例如：[[1, "张三", 25], [2, "李四", 28]]
      */
-    List<List<Object>> bSelectListToValueList(String sqlStatement, Map<String, Object> sqlParam);
+    List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 执行聚合查询并返回单个数值结果（如COUNT、SUM、AVG等）
@@ -197,7 +198,7 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：{ "deptId": 5, "position": "工程师" }
      * @return Number 聚合查询的数值结果（Integer/Long/BigDecimal等）
      */
-    Number bSelectNumber(String sqlStatement, Map<String, Object> sqlParam);
+    Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 查询SQL执行结果的总行数（适配分页场景的count查询）
@@ -211,7 +212,7 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：{ "name": "张三" }
      * @return Number 结果集的总行数（Long类型）
      */
-    Number bSelectRecordRowCount(String sqlStatement, Map<String, Object> sqlParam);
+    Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 执行查询并将单行结果映射为指定类型的Java对象
@@ -224,7 +225,7 @@ public interface IAdvBaseSelectOpt {
      * @param <E>          目标对象的泛型类型
      * @return E 映射后的单行Java对象
      */
-    <E> E bSelectObjOne(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz);
+    <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz);
 
     /**
      * 执行查询并将多行结果映射为指定类型的Java对象列表
@@ -237,7 +238,7 @@ public interface IAdvBaseSelectOpt {
      * @param <E>          目标对象的泛型类型
      * @return List<E> 映射后的多行Java对象列表
      */
-    <E> List<E> bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz);
+    <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz);
 
     /**
      * 流式查询并将结果逐行映射为指定类型的Java对象，通过Consumer处理（避免内存溢出）
@@ -251,5 +252,5 @@ public interface IAdvBaseSelectOpt {
      *                     <br>示例：emp -> System.out.println("员工姓名：" + emp.getName() + " 薪资：" + emp.getSalary())
      * @param <E>          目标对象的泛型类型
      */
-    <E> void bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz, Consumer<E> rowConsumer);
+    <E> void bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer);
 }

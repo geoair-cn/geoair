@@ -4,6 +4,7 @@ package cn.geoair.map.dynamic.adv.query;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public interface IAdvDDLOpt {
      * @param tableName    表名
      * @param operation    用于日志记录
      */
-    int dExecuteDDL(String sqlStatement, Map<String, Object> sqlParam, String tableName, String operation);
+    int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation);
 
     /**
      * 删除表中所有数据（保留表结构）
@@ -77,7 +78,7 @@ public interface IAdvDDLOpt {
      */
     DataFieldsApo dGetColumnsBySQL(String sqlView);
 
-    DataFieldsApo dGetColumnsBySQL(String sqlStatement, Map<String, Object> param);
+    DataFieldsApo dGetColumnsBySQL(String sqlStatement, SqlParamMap sqlParam);
 
 
     /**

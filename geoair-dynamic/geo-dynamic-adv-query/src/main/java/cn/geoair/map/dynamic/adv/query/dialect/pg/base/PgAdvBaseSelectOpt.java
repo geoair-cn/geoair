@@ -5,6 +5,7 @@ import cn.geoair.gtc.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
 import cn.geoair.map.dynamic.adv.query.handler.StreamRsHandler;
@@ -181,7 +182,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
     // ==================== 带参数查询方法实现 ====================
     @Override
-    public GirAdvOneRow bSelectOne(String sqlStatement, Map<String, Object> sqlParam) {
+    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -200,7 +201,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public List<GirAdvOneRow> bSelectList(String sqlStatement, Map<String, Object> sqlParam) {
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -216,7 +217,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public void bSelectList(String sqlStatement, Map<String, Object> sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectList(String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -231,7 +232,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, Map<String, Object> sqlParam) {
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -246,7 +247,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public Number bSelectNumber(String sqlStatement, Map<String, Object> sqlParam) {
+    public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -261,7 +262,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public Number bSelectRecordRowCount(String sqlStatement, Map<String, Object> sqlParam) {
+    public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         String countSql = StrUtil.format("SELECT COUNT(1) FROM ({}) AS {}{}",
                 sqlMeta.getSql(), COUNT_ALIAS_PREFIX, IdUtil.simpleUUID().substring(0, 6));
@@ -279,7 +280,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public <E> E bSelectObjOne(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz) {
+    public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -295,7 +296,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -310,7 +311,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     }
 
     @Override
-    public <E> void bSelectObjList(String sqlStatement, Map<String, Object> sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -331,7 +332,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
      * @param sqlParam     SQL参数映射
      * @return 解析后的SqlMeta对象（包含执行SQL和JDBC参数列表）
      */
-    private SqlMeta parseSqlWithParam(String sqlStatement, Map<String, Object> sqlParam) {
+    private SqlMeta parseSqlWithParam(String sqlStatement, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
@@ -356,7 +357,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
      * @param sql        执行的SQL语句
      * @param sqlParam   SQL参数
      */
-    private void logExecuteSql(String methodName, String sql, Map<String, Object> sqlParam) {
+    private void logExecuteSql(String methodName, String sql, SqlParamMap sqlParam) {
         log.info("schema:[{}] db:[{}] {}执行的SQL为：{}，参数：{}", dataSourceGetter.getSchemaName(), dataSourceGetter.getDataSourceId(), methodName, sql, sqlParam);
     }
 

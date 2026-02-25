@@ -4,6 +4,7 @@ import cn.geoair.gtc.base.log.GiLogger;
 import cn.geoair.gtc.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -42,25 +43,25 @@ public class PgAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
     // ==================== 自定义SQL删除 ====================
     @Override
     public Integer bDeleteBySql(String sqlStatement) {
-        return bDeleteBySql(sqlStatement, Collections.emptyMap());
+        return bDeleteBySql(sqlStatement, SqlParamMap.of());
     }
 
     @Override
-    public Integer bDeleteBySql(String sqlStatement, Map<String, Object> param) {
+    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
         // 参数校验
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("删除SQL语句不能为空");
         }
 
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql(sqlStatement), param);
+        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql(sqlStatement), sqlParam);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
         Connection connection = dataSourceGetter.getConnection();
         try {
             log.info("schema:[{}] db:[{}] 执行自定义删除SQL：{}，参数：{}",
-                    dataSourceGetter.getSchemaName(), dataSourceGetter.getDataSourceId(), execSql, param);
+                    dataSourceGetter.getSchemaName(), dataSourceGetter.getDataSourceId(), execSql, sqlParam);
 
             if (CollUtil.isEmpty(jdbcParams)) {
                 // 无参数SQL

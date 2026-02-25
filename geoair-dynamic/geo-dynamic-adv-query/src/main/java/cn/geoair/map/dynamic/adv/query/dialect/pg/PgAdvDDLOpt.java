@@ -10,6 +10,7 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
@@ -260,7 +261,7 @@ public class PgAdvDDLOpt implements IAdvDDLOpt {
     }
 
     @Override
-    public DataFieldsApo dGetColumnsBySQL(String sqlStatement, Map<String, Object> param) {
+    public DataFieldsApo dGetColumnsBySQL(String sqlStatement, SqlParamMap sqlParam) {
         // 参数校验
         if (sqlStatement == null || sqlStatement.trim().isEmpty()) {
             throw new IllegalArgumentException("SQL视图语句不能为空");
@@ -289,7 +290,7 @@ public class PgAdvDDLOpt implements IAdvDDLOpt {
                 throw new IllegalStateException("无法获取数据库连接");
             }
 
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(fieldQuerySql, param);
+            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(fieldQuerySql, sqlParam);
 
             statement = connection.prepareStatement(sqlMeta.getSql());
             List<Object> jdbcParamValues = sqlMeta.getJdbcParamValues();
@@ -839,7 +840,7 @@ public class PgAdvDDLOpt implements IAdvDDLOpt {
     }
 
     @Override
-    public int dExecuteDDL(String sqlStatement, Map<String, Object> sqlParam, String tableName, String operation) {
+    public int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
         // 解析SQL（支持MyBatis标签）
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);

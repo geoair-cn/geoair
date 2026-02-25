@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -32,12 +33,12 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param           SQL语句的参数映射表（key为MyBatis占位符中的参数名，value为参数值），无参数时传空Map或null
+     * sqlParam          SQL语句的参数映射表（key为MyBatis占位符中的参数名，value为参数值），无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举（如几何对象转WKT、转GeoJSON、仅保留几何ID等）
      * @return GirAdvOneRow 封装后的单行查询结果，包含所有字段（普通字段+处理后的空间字段）；无结果时返回null
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
      */
-    GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt);
+    GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
 
 
     /**
@@ -47,13 +48,13 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param           SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName   指定的空间字段名称（如 "geom"、"shape"），若字段不存在则仅处理普通字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、指定空间字段解析异常时抛出运行时异常
      */
-    GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName);
+    GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName);
 
 
     /**
@@ -63,13 +64,13 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement      待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param             SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam            SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt   空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、指定空间字段解析异常时抛出运行时异常
      */
-    GirAdvOneRow eSelectOne(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
+    GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
 
     /**
      * 执行SQL查询并返回多行结果列表，自动识别结果中的所有空间字段并按指定规则处理
@@ -78,12 +79,12 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param           SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
      */
-    List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt);
+    List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
 
     /**
      * 执行SQL查询并返回多行结果列表，指定单个空间字段并按规则处理
@@ -92,13 +93,13 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param           SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName   指定的空间字段名称，若字段不存在则仅处理普通字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、指定空间字段解析异常时抛出运行时异常
      */
-    List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName);
+    List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName);
 
     /**
      * 执行SQL查询并返回多行结果列表，指定多个空间字段并按规则处理
@@ -107,14 +108,13 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement      待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param             SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam            SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt   空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、指定空间字段解析异常时抛出运行时异常
      */
-    List<GirAdvOneRow> eSelectList(String sqlStatement, Map<String, Object> param, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
-
+    List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
 
 
     /**
@@ -124,11 +124,11 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return AdvEnumsTypeGeom 自动识别的首个空间字段类型；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param);
+    AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 解析SQL查询语句，获取指定单个空间字段的类型
@@ -137,12 +137,12 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement  待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param         SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam        SQL语句的参数映射表，无参数时传空Map或null
      * @param geomFieldName 指定的空间字段名称
      * @return AdvEnumsTypeGeom 指定空间字段的类型；字段非空间字段/不存在时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param, String geomFieldName);
+    AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, String geomFieldName);
 
     /**
      * 解析SQL查询语句，获取指定多个空间字段的类型
@@ -150,14 +150,14 @@ public interface IAdvGeoPreOpt {
      * 适用场景：批量校验SQL查询结果中多个空间字段的类型。
      * </p>
      *
-     * @param sqlStatement    待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param           SQL语句的参数映射表，无参数时传空Map或null
-     * @param geomFieldNames  指定的空间字段名称列表
+     * @param sqlStatement   待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
+     * sqlParam         SQL语句的参数映射表，无参数时传空Map或null
+     * @param geomFieldNames 指定的空间字段名称列表
      * @return Map<String, AdvEnumsTypeGeom> key为空间字段名称，value为对应的空间类型枚举；
-     *         非空间字段/不存在的字段不会出现在返回Map中；无匹配字段时返回空Map（非null）
+     * 非空间字段/不存在的字段不会出现在返回Map中；无匹配字段时返回空Map（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlStatement, Map<String, Object> param, List<String> geomFieldNames);
+    Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames);
 
     /**
      * 判断SQL查询语句的结果是否包含空间字段
@@ -166,11 +166,11 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待校验的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return boolean 包含空间字段返回true，否则返回false
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    boolean eIsGeomBySql(String sqlStatement, Map<String, Object> param);
+    boolean eIsGeomBySql(String sqlStatement, SqlParamMap sqlParam);
 
 
     /**
@@ -180,11 +180,11 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return String 首个空间字段名称；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    String eGetGeomColumnNameBySql(String sqlStatement, Map<String, Object> param);
+    String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 获取SQL查询语句结果中的所有空间字段名称列表
@@ -193,11 +193,11 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return List<String> 所有空间字段名称列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    List<String> eGetGeomColumnNameListBySql(String sqlStatement, Map<String, Object> param);
+    List<String> eGetGeomColumnNameListBySql(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 获取SQL查询语句结果中的所有空间字段的完整信息（包含schema、字段名、类型等）
@@ -206,11 +206,11 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return List<FieldBySchemaApo> 所有空间字段的元数据列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlStatement, Map<String, Object> param);
+    List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlStatement, SqlParamMap sqlParam);
 
     /**
      * 获取SQL查询语句结果中的首个空间字段的完整信息（包含schema、字段名、类型等）
@@ -219,9 +219,9 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * @param param        SQL语句的参数映射表，无参数时传空Map或null
+     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return FieldBySchemaApo 首个空间字段的元数据；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, Map<String, Object> param);
+    FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam);
 }

@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +37,11 @@ public interface IAdvBaseUpdateOpt {
      *
      * @param sqlStatement 自定义更新SQL语句（含参数占位符）
      *                     <br>示例：UPDATE user SET name = #{name} WHERE id = #{id}
-     * @param param        SQL参数映射（key为占位符名称，value为参数值）
+     *                     sqlParam       SQL参数映射（key为占位符名称，value为参数值）
      *                     <br>示例：{ "name": "张三", "id": 1001 }
      * @return Integer 受影响的行数
      */
-    Integer bUpdateBySql(String sqlStatement, Map<String, Object> param);
+    Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam);
 
     // ==================== 单条数据更新（标准化） ====================
 

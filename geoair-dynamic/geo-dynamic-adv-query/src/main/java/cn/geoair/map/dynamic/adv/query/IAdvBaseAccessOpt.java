@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +37,11 @@ public interface IAdvBaseAccessOpt {
      *
      * @param sqlStatement 自定义插入SQL语句（含参数占位符）
      *                     <br>示例：INSERT INTO user (name, age) VALUES (#{name}, #{age})
-     * @param param        SQL参数映射（key为占位符名称，value为参数值）
+     * sqlParam       SQL参数映射（key为占位符名称，value为参数值）
      *                     <br>示例：{ "name": "张三", "age": 25 }
      * @return Integer 受影响的行数
      */
-    Integer bInsertBySql(String sqlStatement, Map<String, Object> param);
+    Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam);
 
     // ==================== 单条数据插入（标准化） ====================
 

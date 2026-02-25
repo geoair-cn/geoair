@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -35,11 +37,11 @@ public interface IAdvBaseDeleteOpt {
      *
      * @param sqlStatement 自定义删除SQL语句（含参数占位符）
      *                     <br>示例：DELETE FROM user WHERE dept_id = #{deptId} AND age > #{age}
-     * @param param        SQL参数映射（key为占位符名称，value为参数值）
+     * sqlParam       SQL参数映射（key为占位符名称，value为参数值）
      *                     <br>示例：{ "deptId": 5, "age": 60 }
      * @return Integer 受影响的行数
      */
-    Integer bDeleteBySql(String sqlStatement, Map<String, Object> param);
+    Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam);
 
     // ==================== 主键删除（最常用） ====================
 
