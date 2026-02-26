@@ -39,24 +39,57 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
     }
 
 
+    private volatile IAdvBaseOpt advBaseOpt;
+    private volatile IAdvDDLOpt advDDLOpt;
+    private volatile IAdvSimplePagePreOpt simplePageOpt;
+    private volatile IAdvGeoPreOpt geoOpt;
+
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {
-        return new PgAdvBaseOpt(this);
+        if (advBaseOpt == null) {
+            synchronized (this) {
+                if (advBaseOpt == null) {
+                    advBaseOpt = new PgAdvBaseOpt(this);
+                }
+            }
+        }
+        return advBaseOpt;
     }
 
     @Override
     protected IAdvDDLOpt getAdvDDLOpt() {
-        return new PgAdvDDLOpt(this);
+        if (advDDLOpt == null) {
+            synchronized (this) {
+                if (advDDLOpt == null) {
+                    advDDLOpt = new PgAdvDDLOpt(this);
+                }
+            }
+        }
+        return advDDLOpt;
     }
 
     @Override
     protected IAdvSimplePagePreOpt getSimplePageOpt() {
-        return new PgAdvSimplePageOpt(this);
+        if (simplePageOpt == null) {
+            synchronized (this) {
+                if (simplePageOpt == null) {
+                    simplePageOpt = new PgAdvSimplePageOpt(this);
+                }
+            }
+        }
+        return simplePageOpt;
     }
 
     @Override
     protected IAdvGeoPreOpt getGeoOpt() {
-        return new PgAdvGeoOpt(this);
+        if (geoOpt == null) {
+            synchronized (this) {
+                if (geoOpt == null) {
+                    geoOpt = new PgAdvGeoOpt(this);
+                }
+            }
+        }
+        return geoOpt;
     }
 
     @Override
