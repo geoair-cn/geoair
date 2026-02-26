@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.adv.query.handler;
 
-import cn.hutool.db.Entity;
 import cn.hutool.db.handler.HandleHelper;
 import cn.hutool.db.handler.RsHandler;
 

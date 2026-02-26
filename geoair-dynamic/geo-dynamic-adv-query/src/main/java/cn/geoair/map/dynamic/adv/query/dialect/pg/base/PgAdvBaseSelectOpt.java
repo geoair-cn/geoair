@@ -99,7 +99,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     public List<List<Object>> bSelectListToValueList(String sql) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql =dialectTableNameProcessor. tbRemoveSqlSpaces(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectListToValueList", cleanSql);
 
             return SqlExecutor.query(connection, cleanSql, new ValueListHandler());
@@ -127,7 +127,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
     @Override
     public Number bSelectRecordRowCount(String sql) {
-        String cleanSql =dialectTableNameProcessor. tbRemoveSqlSpaces(sql);
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         String countSql = StrUtil.format("SELECT COUNT(1) FROM ({}) AS {}{}",
                 cleanSql, COUNT_ALIAS_PREFIX, IdUtil.simpleUUID().substring(0, 6));
         logExecuteSql("bSelectRecordRowCount", countSql);
@@ -191,7 +191,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
                     sqlMeta.getSql(), dialectTableNameProcessor.tbGetTempAliasTableName());
             logExecuteSql("bSelectOne(带参数)", execSql, sqlParam);
 
-            Entity queryResult = SqlExecutor.query(connection, execSql, new EntityHandler(), sqlMeta.getJdbcParamValues());
+            Entity queryResult = SqlExecutor.query(connection, execSql, new EntityHandler(), sqlMeta.getJdbcParamValues().toArray());
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectOne查询失败，SQL：" + sqlStatement, e);
@@ -207,7 +207,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectList(带参数)", sqlMeta.getSql(), sqlParam);
 
-            List<Entity> queryResult = SqlExecutor.query(connection, sqlMeta.getSql(), new EntityListHandler(), sqlMeta.getJdbcParamValues());
+            List<Entity> queryResult = SqlExecutor.query(connection, sqlMeta.getSql(), new EntityListHandler(), sqlMeta.getJdbcParamValues().toArray());
             return GirAdvOneRow.ofByEntityList(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectList查询失败，SQL：" + sqlStatement, e);
@@ -223,7 +223,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectList(带参数-流式)", sqlMeta.getSql(), sqlParam);
 
-            SqlExecutor.query(connection, sqlMeta.getSql(), new StreamRsHandler(rowConsumer), sqlMeta.getJdbcParamValues());
+            SqlExecutor.query(connection, sqlMeta.getSql(), new StreamRsHandler(rowConsumer), sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数流式bSelectList查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -238,7 +238,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectListToValueList(带参数)", sqlMeta.getSql(), sqlParam);
 
-            return SqlExecutor.query(connection, sqlMeta.getSql(), new ValueListHandler(), sqlMeta.getJdbcParamValues());
+            return SqlExecutor.query(connection, sqlMeta.getSql(), new ValueListHandler(), sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectListToValueList查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -253,7 +253,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectNumber(带参数)", sqlMeta.getSql(), sqlParam);
 
-            return SqlExecutor.query(connection, sqlMeta.getSql(), new NumberHandler(), sqlMeta.getJdbcParamValues());
+            return SqlExecutor.query(connection, sqlMeta.getSql(), new NumberHandler(), sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectNumber查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -286,7 +286,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectObjOne(带参数)", sqlMeta.getSql(), sqlParam);
 
-            Object queryResult = SqlExecutor.query(connection, sqlMeta.getSql(), BeanHandler.create(clazz), sqlMeta.getJdbcParamValues());
+            Object queryResult = SqlExecutor.query(connection, sqlMeta.getSql(), BeanHandler.create(clazz), sqlMeta.getJdbcParamValues().toArray());
             return (E) queryResult;
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectObjOne查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
@@ -302,7 +302,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectObjList(带参数)", sqlMeta.getSql(), sqlParam);
 
-            return SqlExecutor.query(connection, sqlMeta.getSql(), BeanListHandler.create(clazz), sqlMeta.getJdbcParamValues());
+            return SqlExecutor.query(connection, sqlMeta.getSql(), BeanListHandler.create(clazz), sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
         } finally {
@@ -317,7 +317,7 @@ public class PgAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         try {
             logExecuteSql("bSelectObjList(带参数-流式)", sqlMeta.getSql(), sqlParam);
 
-            SqlExecutor.query(connection, sqlMeta.getSql(), new StreamBeanRsHandler<>(rowConsumer, clazz), sqlMeta.getJdbcParamValues());
+            SqlExecutor.query(connection, sqlMeta.getSql(), new StreamBeanRsHandler<>(rowConsumer, clazz), sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数流式bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
         } finally {

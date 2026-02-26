@@ -125,9 +125,9 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <!-- 源码版本 -->
-                    <source>11</source>
+                    <source>8</source>
                     <!-- 目标字节码版本 -->
-                    <target>11</target>
+                    <target>8</target>
                     <!-- 编码（可选，避免中文乱码） -->
                     <encoding>UTF-8</encoding>
                 </configuration>

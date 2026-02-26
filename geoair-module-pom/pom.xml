@@ -20,7 +20,7 @@
         <skipTests>true</skipTests>
         <geoair.version>${project.version}</geoair.version>
         <geoair.comp.version>${project.version}</geoair.comp.version>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -33,7 +33,9 @@
         <spring-boot.version>2.7.18</spring-boot.version>
         <fastjson.version>2.0.9</fastjson.version>
         <druid.version>1.2.5</druid.version>
-        <geotools.version>29.5</geotools.version>
+        <!--      geotools  jdk1.8下的最新的发布版本为 28.6.1 -->
+        <geotools.version>28.6.1</geotools.version>
+        <!--        <geotools.version>29.5</geotools.version>-->
         <jts.version>1.19.0</jts.version>
     </properties>
     <url>https://gitee.com/geoair/geoair-dependencies</url>
@@ -183,11 +185,11 @@
                     <pushChanges>true</pushChanges>
                     <branchName>master</branchName>
 
-                    <threadSafe>true</threadSafe>
-                    <!-- 核心：跳过从 SCM 检出代码，直接用本地代码 -->
-                    <checkoutReleaseBranch>false</checkoutReleaseBranch>
-                    <!-- 强制指定 SCM 地址 -->
-                    <scmUrl>scm:git:git://gitee.com/geoair/geoair-dependencies.git</scmUrl>
+                    <!--                    <threadSafe>true</threadSafe>-->
+                    <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
+                    <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
+                    <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
+                    <!--                    <scmUrl>scm:git:git://gitee.com/geoair/geoair-dependencies.git</scmUrl>-->
 
                 </configuration>
             </plugin>
@@ -212,9 +214,9 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <!-- 源码版本 -->
-                    <source>11</source>
+                    <source>8</source>
                     <!-- 目标字节码版本 -->
-                    <target>11</target>
+                    <target>8</target>
                     <!-- 编码（可选，避免中文乱码） -->
                     <encoding>UTF-8</encoding>
                 </configuration>
