@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,12 @@ import java.util.function.Consumer;
  * 支持传入带MyBatis标签的SQL语句，适配动态查询场景下的各类基础查询需求
  */
 public interface IAdvBaseSelectOpt {
-
+    /**
+     * 设置数据源获取器
+     *
+     * @param dataSourceGetter 数据源获取器，用于获取数据库连接
+     */
+    void setDataSourceGetter(IDataSourceGetter dataSourceGetter);
     /**
      * 执行查询并返回单行结果（无参数版）
      * <p>

@@ -24,7 +24,7 @@ import java.util.Map;
  * @version 1.0
  * @since （可补充适配的最低版本/依赖）
  */
-public interface IAdvGeoPreOpt {
+public interface IAdvGeoPreOpt extends IAdvGeoOpt {
 
     /**
      * 执行SQL查询并返回单行结果，自动识别结果中的所有空间字段并按指定规则处理
@@ -33,7 +33,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam          SQL语句的参数映射表（key为MyBatis占位符中的参数名，value为参数值），无参数时传空Map或null
+     *                        sqlParam          SQL语句的参数映射表（key为MyBatis占位符中的参数名，value为参数值），无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举（如几何对象转WKT、转GeoJSON、仅保留几何ID等）
      * @return GirAdvOneRow 封装后的单行查询结果，包含所有字段（普通字段+处理后的空间字段）；无结果时返回null
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
@@ -48,7 +48,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
+     *                        sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName   指定的空间字段名称（如 "geom"、"shape"），若字段不存在则仅处理普通字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
@@ -64,7 +64,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement      待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam            SQL语句的参数映射表，无参数时传空Map或null
+     *                          sqlParam            SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt   空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
@@ -79,7 +79,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
+     *                        sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
@@ -93,7 +93,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement    待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam          SQL语句的参数映射表，无参数时传空Map或null
+     *                        sqlParam          SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName   指定的空间字段名称，若字段不存在则仅处理普通字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
@@ -108,7 +108,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement      待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam            SQL语句的参数映射表，无参数时传空Map或null
+     *                          sqlParam            SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt   空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
@@ -124,7 +124,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return AdvEnumsTypeGeom 自动识别的首个空间字段类型；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -137,7 +137,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement  待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam        SQL语句的参数映射表，无参数时传空Map或null
+     *                      sqlParam        SQL语句的参数映射表，无参数时传空Map或null
      * @param geomFieldName 指定的空间字段名称
      * @return AdvEnumsTypeGeom 指定空间字段的类型；字段非空间字段/不存在时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
@@ -151,7 +151,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement   待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam         SQL语句的参数映射表，无参数时传空Map或null
+     *                       sqlParam         SQL语句的参数映射表，无参数时传空Map或null
      * @param geomFieldNames 指定的空间字段名称列表
      * @return Map<String, AdvEnumsTypeGeom> key为空间字段名称，value为对应的空间类型枚举；
      * 非空间字段/不存在的字段不会出现在返回Map中；无匹配字段时返回空Map（非null）
@@ -166,7 +166,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待校验的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return boolean 包含空间字段返回true，否则返回false
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -180,7 +180,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return String 首个空间字段名称；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -193,7 +193,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return List<String> 所有空间字段名称列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -206,7 +206,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return List<FieldBySchemaApo> 所有空间字段的元数据列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -219,7 +219,7 @@ public interface IAdvGeoPreOpt {
      * </p>
      *
      * @param sqlStatement 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数
-     * sqlParam       SQL语句的参数映射表，无参数时传空Map或null
+     *                     sqlParam       SQL语句的参数映射表，无参数时传空Map或null
      * @return FieldBySchemaApo 首个空间字段的元数据；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */

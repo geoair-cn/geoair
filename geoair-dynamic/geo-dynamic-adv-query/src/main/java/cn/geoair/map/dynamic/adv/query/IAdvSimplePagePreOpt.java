@@ -15,7 +15,7 @@ import java.util.List;
  * @description： 简单分页相关操作接口
  * 约定： 以p开头
  */
-public interface IAdvSimplePagePreOpt {
+public interface IAdvSimplePagePreOpt  extends IAdvSimplePageOpt{
 
     /**
      * 统计指定SQL的查询结果总数（忽略分页，获取全量数据条数）

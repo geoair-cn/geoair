@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +17,12 @@ import java.util.Set;
  * @author 张逢吉
  */
 public interface IAdvBaseUpdateOpt {
-
+    /**
+     * 设置数据源获取器
+     *
+     * @param dataSourceGetter 数据源获取器，用于获取数据库连接
+     */
+    void setDataSourceGetter(IDataSourceGetter dataSourceGetter);
     // ==================== 自定义SQL更新  ====================
 
     /**

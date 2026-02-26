@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,12 @@ import java.util.Set;
  */
 public interface IAdvBaseAccessOpt {
 
+    /**
+     * 设置数据源获取器
+     *
+     * @param dataSourceGetter 数据源获取器，用于获取数据库连接
+     */
+    void setDataSourceGetter(IDataSourceGetter dataSourceGetter);
     // ==================== 自定义SQL插入  ====================
 
     /**
@@ -37,7 +44,7 @@ public interface IAdvBaseAccessOpt {
      *
      * @param sqlStatement 自定义插入SQL语句（含参数占位符）
      *                     <br>示例：INSERT INTO user (name, age) VALUES (#{name}, #{age})
-     * sqlParam       SQL参数映射（key为占位符名称，value为参数值）
+     *                     sqlParam       SQL参数映射（key为占位符名称，value为参数值）
      *                     <br>示例：{ "name": "张三", "age": 25 }
      * @return Integer 受影响的行数
      */

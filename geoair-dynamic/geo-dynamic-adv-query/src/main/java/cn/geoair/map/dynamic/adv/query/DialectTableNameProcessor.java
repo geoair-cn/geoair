@@ -87,6 +87,11 @@ public interface DialectTableNameProcessor {
     String tbUnquoteSchemaName(String quotedSchemaName);
 
     /**
+     * 字段名转义（PG用""，MySQL用`）
+     */
+    String tbQuoteFieldName(String fieldName);
+
+    /**
      * 判断表名是否对应SQL视图（基于SQL语句特征）
      *
      * @param tableName 表名或SQL视图语句
