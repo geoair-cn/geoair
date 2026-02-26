@@ -36,7 +36,7 @@ public class PgAdvGeoOpt extends AbstractAdvGeoOpt {
         super(dataSourceGetter);
         this.baseOpt = new PgAdvBaseOpt(dataSourceGetter);
         this.pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);
-        getPostGisVersion();
+//        getPostGisVersion();
     }
 
     @Override
