@@ -45,7 +45,6 @@ public class MysqlAdvSimplePagePreOpt extends AbstractAdvSimplePagePreOpt {
     }
 
 
-
     @Override
     protected String buildPageSql(String noPageSql, int pageSize, long offset) {
         return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);

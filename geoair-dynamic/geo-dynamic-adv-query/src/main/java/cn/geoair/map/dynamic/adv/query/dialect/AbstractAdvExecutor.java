@@ -1,8 +1,8 @@
-package cn.geoair.map.dynamic.adv.query.dialect.pgv2;
+package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
+import cn.geoair.map.dynamic.adv.query.dialect.pgv2.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -30,7 +30,7 @@ import java.util.function.Consumer;
  * @author 张逢吉
  * @date 2025/10/9 11:10
  */
-public class AdvExecutorPG implements IAdvExecutor {
+public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     // 数据源获取器（核心依赖）
     private DataSourceGetter dataSourceGetterPxy;
@@ -43,24 +43,35 @@ public class AdvExecutorPG implements IAdvExecutor {
     }
 
     // 各功能模块代理对象
-    private PgAdvBaseOpt pgAdvBaseOptPxy;
-    private PgAdvDDLOpt pgAdvDDLOptPxy;
-    private PgAdvGeoOpt pgAdvGeoOptPxy;
-    private PgAdvSimplePageOpt pgAdvSimplePageOptPxy;
+    private IAdvBaseOpt pgAdvBaseOptPxy;
+    private IAdvDDLOpt pgAdvDDLOptPxy;
+    private IAdvGeoPreOpt pgAdvGeoOptPxy;
+    private IAdvSimplePagePreOpt pgAdvSimplePageOptPxy;
     DialectTableNameProcessor dialectTableNameProcessorPxy = PgDialectTableNameUtil.getInstance();
 
-    public AdvExecutorPG(DataSourceApo dataSourceApo) {
+    protected abstract IAdvBaseOpt getAdvBaseOpt();
+
+    protected abstract IAdvDDLOpt getAdvDDLOpt();
+
+    protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
+
+    protected abstract IAdvGeoPreOpt getGeoOpt();
+
+    protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
+
+
+    public AbstractAdvExecutor(DataSourceApo dataSourceApo) {
         this.initByDataSourceApo(dataSourceApo);
     }
 
-    public AdvExecutorPG(DataSource dataSource) {
+    public AbstractAdvExecutor(DataSource dataSource) {
         this.initByDataSource(dataSource);
     }
 
-    public AdvExecutorPG() {
+    public AbstractAdvExecutor() {
     }
 
-    public AdvExecutorPG(Connection connection) {
+    public AbstractAdvExecutor(Connection connection) {
         this.initByConnection(connection);
     }
 

@@ -30,6 +30,28 @@ public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
     // 默认分批插入批次大小（通用常量）
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
+
+    /**
+     * 构建带主键返回的插入SQL
+     */
+    protected abstract String buildInsertReturnIdSql(String tableName, String fields, String placeholders);
+
+    /**
+     * 执行插入并返回主键
+     */
+    protected abstract Long executeInsertReturnId(Connection connection, String execSql, Object... params) throws SQLException;
+
+    /**
+     * 构建插入忽略的SQL（PG：ON CONFLICT DO NOTHING；MySQL：INSERT IGNORE）
+     */
+    protected abstract String buildInsertIgnoreSql(String tableName, String fields, String placeholders);
+
+    /**
+     * 构建插入或更新的SQL（PG：ON CONFLICT DO UPDATE；MySQL：ON DUPLICATE KEY UPDATE）
+     */
+    protected abstract String buildInsertOrUpdateSql(String tableName, String fields, String placeholders, Set<String> updateFields);
+
+
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
@@ -292,7 +314,6 @@ public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
         }
     }
 
-    // ========== 通用工具方法（子类无需重写） ==========
 
     /**
      * 清理SQL语句（移除末尾分号、多余空格）
@@ -400,25 +421,5 @@ public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
         }
     }
 
-    // ========== 差异化抽象方法（子类必须实现） ==========
 
-    /**
-     * 构建带主键返回的插入SQL
-     */
-    protected abstract String buildInsertReturnIdSql(String tableName, String fields, String placeholders);
-
-    /**
-     * 执行插入并返回主键
-     */
-    protected abstract Long executeInsertReturnId(Connection connection, String execSql, Object... params) throws SQLException;
-
-    /**
-     * 构建插入忽略的SQL（PG：ON CONFLICT DO NOTHING；MySQL：INSERT IGNORE）
-     */
-    protected abstract String buildInsertIgnoreSql(String tableName, String fields, String placeholders);
-
-    /**
-     * 构建插入或更新的SQL（PG：ON CONFLICT DO UPDATE；MySQL：ON DUPLICATE KEY UPDATE）
-     */
-    protected abstract String buildInsertOrUpdateSql(String tableName, String fields, String placeholders, Set<String> updateFields);
 }

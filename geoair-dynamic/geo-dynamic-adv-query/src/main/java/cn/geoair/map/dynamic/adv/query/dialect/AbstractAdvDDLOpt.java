@@ -4,6 +4,7 @@ import cn.geoair.gtc.base.log.GiLogger;
 import cn.geoair.gtc.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -27,8 +28,7 @@ import java.util.Optional;
 public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
-    // 基础查询操作器（通用）
-    protected AbstractAdvBaseOpt baseOpt;
+
     // 表名处理器（差异化）
     protected DialectTableNameProcessor dialectTableNameProcessor;
     // 日志实例
@@ -37,19 +37,19 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     // ========== 通用初始化 ==========
     public AbstractAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
-        this.baseOpt = createBaseOpt(dataSourceGetter);
-        this.dialectTableNameProcessor = createTableNameProcessor();
+        this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }
 
     /**
-     * 创建基础操作器（子类实现：绑定PG/MySQL版本）
+     * 获取抽象查询对象
      */
-    protected abstract AbstractAdvBaseOpt createBaseOpt(IDataSourceGetter dataSourceGetter);
+    protected abstract IAdvBaseOpt getAdvBaseOpt();
+
 
     /**
      * 创建表名处理器（子类实现：绑定PG/MySQL版本）
      */
-    protected abstract DialectTableNameProcessor createTableNameProcessor();
+    protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
     // ========== 通用逻辑：表操作 ==========
     @Override

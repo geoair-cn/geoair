@@ -27,20 +27,10 @@ public abstract class AbstractAdvSimplePagePreOpt extends AbstractAdvSimplePageO
         super(dataSourceGetter);
     }
 
-
-    /**
-     * 获取抽象查询对象
-     */
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
-    /**
-     * 抽象查询对象
-     */
     protected abstract IAdvDDLOpt getAdvDDLOpt();
 
-    /**
-     * 抽象查询对象
-     */
     protected abstract IAdvGeoPreOpt getAdvGeoPreOpt();
 
     // ========== 通用逻辑：带参数的总数统计 ==========

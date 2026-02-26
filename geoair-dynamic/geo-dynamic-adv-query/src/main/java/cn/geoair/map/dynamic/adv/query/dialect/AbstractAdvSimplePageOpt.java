@@ -33,7 +33,6 @@ public abstract class AbstractAdvSimplePageOpt implements IAdvSimplePageOpt {
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }
 
-    // ========== 抽象方法：子类实现差异化逻辑 ==========
     /**
      * 获取方言专属的表名处理器
      */
@@ -299,6 +298,7 @@ public abstract class AbstractAdvSimplePageOpt implements IAdvSimplePageOpt {
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders) {
         return pBuildSqlWithOrder(baseSql, orders, null);
     }
+
     protected String quoteFieldName(String fieldName) {
         return getDialectTableNameProcessor().tbQuoteFieldName(fieldName);
     }

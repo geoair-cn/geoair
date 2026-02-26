@@ -371,7 +371,7 @@ public abstract class AbstractAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
     protected String buildUpsertUpdateClause(Map<String, Object> rowData, Set<String> conflictKeys) {
         return rowData.keySet().stream()
                 .filter(field -> !conflictKeys.contains(field)) // 冲突字段不更新
-                .map(field -> buildUpsertFieldClause(field)) // 差异化：字段更新语法
+                .map(this::buildUpsertFieldClause) // 差异化：字段更新语法
                 .collect(Collectors.joining(","));
     }
 

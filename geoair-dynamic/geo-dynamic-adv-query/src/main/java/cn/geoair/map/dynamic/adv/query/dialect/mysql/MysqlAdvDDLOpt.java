@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
 
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
@@ -23,18 +24,20 @@ import java.util.List;
  * 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑
  */
 public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
+    IAdvBaseOpt baseOpt;
 
     public MysqlAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
+        baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
     }
 
     @Override
-    public AbstractAdvBaseOpt createBaseOpt(IDataSourceGetter dataSourceGetter) {
-        return new MysqlAdvBaseOpt(dataSourceGetter);
+    public IAdvBaseOpt getAdvBaseOpt() {
+        return baseOpt;
     }
 
     @Override
-    public DialectTableNameProcessor createTableNameProcessor() {
+    public DialectTableNameProcessor getDialectTableNameProcessor() {
         return MysqlDialectTableNameUtil.getInstance();
     }
 
@@ -92,16 +95,16 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
 
         // MySQL专属：字段元数据查询（INFORMATION_SCHEMA.COLUMNS）
         String sql = StrUtil.format("SELECT " +
-                        "c.*, " +
-                        "COLUMN_COMMENT AS column_comment, " +
-                        "CASE WHEN kcu.column_name IS NOT NULL THEN 't' ELSE 'f' END AS primary_key_is " +
-                        "FROM information_schema.columns c " +
-                        "LEFT JOIN information_schema.key_column_usage kcu " +
-                        "ON c.table_schema = kcu.table_schema " +
-                        "AND c.table_name = kcu.table_name " +
-                        "AND c.column_name = kcu.column_name " +
-                        "AND kcu.constraint_name = 'PRIMARY' " +
-                        "WHERE c.table_name = '{}'", notSchemaTableName);
+                "c.*, " +
+                "COLUMN_COMMENT AS column_comment, " +
+                "CASE WHEN kcu.column_name IS NOT NULL THEN 't' ELSE 'f' END AS primary_key_is " +
+                "FROM information_schema.columns c " +
+                "LEFT JOIN information_schema.key_column_usage kcu " +
+                "ON c.table_schema = kcu.table_schema " +
+                "AND c.table_name = kcu.table_name " +
+                "AND c.column_name = kcu.column_name " +
+                "AND kcu.constraint_name = 'PRIMARY' " +
+                "WHERE c.table_name = '{}'", notSchemaTableName);
         if (StrUtil.isNotEmpty(schemaName)) {
             sql += StrUtil.format(" AND c.table_schema = '{}'", schemaName);
         }
@@ -294,7 +297,7 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
 
         // MySQL专属：表大小查询（DATA_LENGTH + INDEX_LENGTH）
         String sql = StrUtil.format("SELECT (DATA_LENGTH + INDEX_LENGTH) AS table_size " +
-                "FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{}'",
+                        "FROM information_schema.TABLES WHERE TABLE_SCHEMA = '{}' AND TABLE_NAME = '{}'",
                 schemaName, notSchemaTableName);
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
         return row.getLong("table_size");

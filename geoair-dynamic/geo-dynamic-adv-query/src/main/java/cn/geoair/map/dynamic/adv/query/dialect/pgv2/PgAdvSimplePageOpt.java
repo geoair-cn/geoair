@@ -16,7 +16,7 @@ import cn.hutool.core.util.StrUtil;
 /**
  * PG 带参数分页实现类
  */
-public class PgAdvSimplePagePreOpt extends AbstractAdvSimplePagePreOpt {
+public class PgAdvSimplePageOpt extends AbstractAdvSimplePagePreOpt {
     protected static final GiLogger log = GirLogger.getLoger();
 
     // PG专属的依赖类（复用父类已初始化的）
@@ -24,7 +24,7 @@ public class PgAdvSimplePagePreOpt extends AbstractAdvSimplePagePreOpt {
     protected PgAdvBaseOpt baseOpt;
     protected PgAdvDDLOpt pgAdvDDLOpt;
 
-    public PgAdvSimplePagePreOpt(IDataSourceGetter dataSourceGetter) {
+    public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
         baseOpt = new PgAdvBaseOpt(dataSourceGetter);
         pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);

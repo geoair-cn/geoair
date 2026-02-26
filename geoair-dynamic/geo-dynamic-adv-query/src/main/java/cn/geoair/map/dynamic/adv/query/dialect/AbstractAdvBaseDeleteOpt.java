@@ -29,7 +29,7 @@ public abstract class AbstractAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
     // 默认分批删除批次大小（通用常量）
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
-
+    @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }
@@ -458,8 +458,6 @@ public abstract class AbstractAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
         }
     }
 
-    // ========== 差异化抽象方法（子类必须实现） ==========
-
     /**
      * 获取数据库IN参数最大限制（PG：1000，MySQL：65535）
      */
@@ -470,7 +468,6 @@ public abstract class AbstractAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
      */
 
     protected String buildDeleteByPrimaryKeySql(String tableName, String idKey) {
-
         return StrUtil.format("DELETE FROM {} WHERE {} = ?", tableName, idKey);
     }
 
@@ -486,12 +483,10 @@ public abstract class AbstractAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
 
 
     protected String buildDeleteBatchByConditionSql(String tableName, String whereClause, int batchSize) {
-
         return StrUtil.format("DELETE FROM {} WHERE {} LIMIT {}", tableName, whereClause, batchSize);
     }
 
     protected String buildLogicDeleteSql(String tableName, String deleteKey, String idKey) {
-
         return StrUtil.format("UPDATE {} SET {} = ? WHERE {} = ?", tableName, deleteKey, idKey);
     }
 

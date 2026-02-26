@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  * PostgreSQL DDL操作实现类
-
  */
 public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
 
@@ -32,7 +31,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
 
     // ========== 初始化差异化组件 ==========
     @Override
-    protected AbstractAdvBaseOpt createBaseOpt(IDataSourceGetter dataSourceGetter) {
+    protected AbstractAdvBaseOpt getAdvBaseOpt() {
         return new PgAdvBaseOpt(dataSourceGetter);
     }
 
