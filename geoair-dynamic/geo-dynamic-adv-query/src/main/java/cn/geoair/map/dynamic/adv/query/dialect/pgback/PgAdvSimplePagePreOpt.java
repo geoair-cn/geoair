@@ -1,4 +1,4 @@
-//package cn.geoair.map.dynamic.adv.query.dialect.pg;
+//package cn.geoair.map.dynamic.adv.query.dialect.pgback;
 //
 //import cn.geoair.gtc.base.log.GiLogger;
 //import cn.geoair.gtc.base.log.GirLogger;

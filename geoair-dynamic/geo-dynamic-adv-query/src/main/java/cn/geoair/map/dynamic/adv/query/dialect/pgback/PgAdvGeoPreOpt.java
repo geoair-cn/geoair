@@ -1,4 +1,4 @@
-//package cn.geoair.map.dynamic.adv.query.dialect.pg;
+//package cn.geoair.map.dynamic.adv.query.dialect.pgback;
 //
 //import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 //import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
@@ -22,8 +22,6 @@
 //import java.util.HashMap;
 //import java.util.List;
 //import java.util.Map;
-//
-//import static cn.geoair.map.dynamic.adv.query.dialect.pg.PgAdvGeoOpt.getTypeGeomEnum;
 //
 ///**
 // * @author ：张逢吉

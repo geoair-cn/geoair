@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
 
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
+import cn.geoair.map.dynamic.adv.query.dialect.pgback.AdvExecutorPG;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.lang.caller.CallerUtil;

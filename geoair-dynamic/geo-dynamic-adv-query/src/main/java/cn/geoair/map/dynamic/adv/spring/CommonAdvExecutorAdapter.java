@@ -4,7 +4,7 @@ package cn.geoair.map.dynamic.adv.spring;
 import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 
-import cn.geoair.map.dynamic.adv.query.dialect.pgv2.AdvExecutorPG;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.tools.GirService;
