@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 ;
 
 @Component
-@ConfigurationProperties(prefix = "gtc.gtc-apidoc")
+@ConfigurationProperties(prefix = "geoair.apidoc")
 public class GtcSwaggerProperties {
     /**
      *  是否启用swagger注解
