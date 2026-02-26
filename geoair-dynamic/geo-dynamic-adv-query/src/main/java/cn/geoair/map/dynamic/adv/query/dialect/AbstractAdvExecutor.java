@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * PostgreSQL数据库的动态高级查询执行器
+ *  数据库的动态高级查询执行器
  * <p>
  * 聚合了基础操作、DDL操作、空间几何操作、分页操作的实现，
  * 对外提供统一的执行入口，支持多构造器初始化（DataSourceApo/DataSource/Connection）
@@ -33,20 +33,15 @@ import java.util.function.Consumer;
 public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     // 数据源获取器（核心依赖）
-    private DataSourceGetter dataSourceGetterPxy;
+    protected DataSourceGetter dataSourceGetterPxy;
 
-    public DataSourceGetter getDataSourceGetterPxy() {
-        if (dataSourceGetterPxy == null) {
-            dataSourceGetterPxy = new DataSourceGetter();
-        }
-        return dataSourceGetterPxy;
-    }
+    protected abstract DataSourceGetter getDataSourceGetterPxy();
 
     // 各功能模块代理对象
-    private IAdvBaseOpt pgAdvBaseOptPxy;
-    private IAdvDDLOpt pgAdvDDLOptPxy;
-    private IAdvGeoPreOpt pgAdvGeoOptPxy;
-    private IAdvSimplePagePreOpt pgAdvSimplePageOptPxy;
+    private IAdvBaseOpt advBaseOptPxy;
+    private IAdvDDLOpt advDDLOptPxy;
+    private IAdvGeoPreOpt advGeoOptPxy;
+    private IAdvSimplePagePreOpt advSimplePageOptPxy;
     DialectTableNameProcessor dialectTableNameProcessorPxy = PgDialectTableNameUtil.getInstance();
 
     protected abstract IAdvBaseOpt getAdvBaseOpt();
@@ -79,10 +74,10 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
      * 初始化所有功能模块代理对象
      */
     private void initProxyObjects() {
-        this.pgAdvBaseOptPxy = new PgAdvBaseOpt(this);
-        this.pgAdvDDLOptPxy = new PgAdvDDLOpt(this);
-        this.pgAdvGeoOptPxy = new PgAdvGeoOpt(this);
-        this.pgAdvSimplePageOptPxy = new PgAdvSimplePageOpt(this);
+        this.advBaseOptPxy = getAdvBaseOpt();
+        this.advDDLOptPxy = getAdvDDLOpt();
+        this.advGeoOptPxy = getGeoOpt();
+        this.advSimplePageOptPxy = getSimplePageOpt();
     }
 
     // ==================== 数据源初始化与资源管理 ====================
@@ -156,118 +151,118 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     // ==================== 基础插入操作（代理调用PgAdvBaseOpt） ====================
     @Override
     public Integer bInsertBySql(String sqlStatement) {
-        return pgAdvBaseOptPxy.bInsertBySql(sqlStatement);
+        return advBaseOptPxy.bInsertBySql(sqlStatement);
     }
 
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bInsertBySql(sqlStatement, sqlParam);
+        return advBaseOptPxy.bInsertBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public Integer bInsertOne(String tableName, Map<String, Object> rowData) {
-        return pgAdvBaseOptPxy.bInsertOne(tableName, rowData);
+        return advBaseOptPxy.bInsertOne(tableName, rowData);
     }
 
     @Override
     public <T> Integer bInsertOne(String tableName, T entity) {
-        return pgAdvBaseOptPxy.bInsertOne(tableName, entity);
+        return advBaseOptPxy.bInsertOne(tableName, entity);
     }
 
     @Override
     public Long bInsertOneReturnId(String tableName, Map<String, Object> rowData) {
-        return pgAdvBaseOptPxy.bInsertOneReturnId(tableName, rowData);
+        return advBaseOptPxy.bInsertOneReturnId(tableName, rowData);
     }
 
     @Override
     public <T> Long bInsertOneReturnId(String tableName, T entity) {
-        return pgAdvBaseOptPxy.bInsertOneReturnId(tableName, entity);
+        return advBaseOptPxy.bInsertOneReturnId(tableName, entity);
     }
 
     @Override
     public Integer bInsertBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        return pgAdvBaseOptPxy.bInsertBatch(tableName, headers, rowsData);
+        return advBaseOptPxy.bInsertBatch(tableName, headers, rowsData);
     }
 
     @Override
     public <T> Integer bInsertBatch(String tableName, Collection<T> entities) {
-        return pgAdvBaseOptPxy.bInsertBatch(tableName, entities);
+        return advBaseOptPxy.bInsertBatch(tableName, entities);
     }
 
     @Override
     public Integer bInsertBatchWithBatchSize(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, int batchSize) {
-        return pgAdvBaseOptPxy.bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+        return advBaseOptPxy.bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
     }
 
     @Override
     public <T> Integer bInsertBatchWithBatchSize(String tableName, Collection<T> entities, int batchSize) {
-        return pgAdvBaseOptPxy.bInsertBatchWithBatchSize(tableName, entities, batchSize);
+        return advBaseOptPxy.bInsertBatchWithBatchSize(tableName, entities, batchSize);
     }
 
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
-        return pgAdvBaseOptPxy.bInsertIgnore(tableName, rowData);
+        return advBaseOptPxy.bInsertIgnore(tableName, rowData);
     }
 
     @Override
     public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        return pgAdvBaseOptPxy.bInsertIgnoreBatch(tableName, headers, rowsData);
+        return advBaseOptPxy.bInsertIgnoreBatch(tableName, headers, rowsData);
     }
 
     @Override
     public Integer bInsertOrUpdate(String tableName, Map<String, Object> rowData, Set<String> updateFields) {
-        return pgAdvBaseOptPxy.bInsertOrUpdate(tableName, rowData, updateFields);
+        return advBaseOptPxy.bInsertOrUpdate(tableName, rowData, updateFields);
     }
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
     @Override
     public Integer bDeleteBySql(String sqlStatement) {
-        return pgAdvBaseOptPxy.bDeleteBySql(sqlStatement);
+        return advBaseOptPxy.bDeleteBySql(sqlStatement);
     }
 
     @Override
     public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bDeleteBySql(sqlStatement, sqlParam);
+        return advBaseOptPxy.bDeleteBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id) {
-        return pgAdvBaseOptPxy.bDeleteByPrimaryKey(tableName, idKey, id);
+        return advBaseOptPxy.bDeleteByPrimaryKey(tableName, idKey, id);
     }
 
     @Override
     public Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids) {
-        return pgAdvBaseOptPxy.bDeleteBatchByPrimaryKey(tableName, idKey, ids);
+        return advBaseOptPxy.bDeleteBatchByPrimaryKey(tableName, idKey, ids);
     }
 
     @Override
     public Integer bDeleteBatchWithBatchSize(String tableName, String idKey, Set<Object> ids, int batchSize) {
-        return pgAdvBaseOptPxy.bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
+        return advBaseOptPxy.bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
     }
 
     @Override
     public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
-        return pgAdvBaseOptPxy.bDeleteByCondition(tableName, whereMap);
+        return advBaseOptPxy.bDeleteByCondition(tableName, whereMap);
     }
 
     @Override
     public Integer bDeleteBatchByCondition(String tableName, Map<String, Object> whereMap, int batchSize) {
-        return pgAdvBaseOptPxy.bDeleteBatchByCondition(tableName, whereMap, batchSize);
+        return advBaseOptPxy.bDeleteBatchByCondition(tableName, whereMap, batchSize);
     }
 
     @Override
     public Integer bLogicDelete(String tableName, String idKey, Object id, String deleteKey, Object deleteValue) {
-        return pgAdvBaseOptPxy.bLogicDelete(tableName, idKey, id, deleteKey, deleteValue);
+        return advBaseOptPxy.bLogicDelete(tableName, idKey, id, deleteKey, deleteValue);
     }
 
     @Override
     public Integer bLogicDeleteBatch(String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue) {
-        return pgAdvBaseOptPxy.bLogicDeleteBatch(tableName, idKey, ids, deleteKey, deleteValue);
+        return advBaseOptPxy.bLogicDeleteBatch(tableName, idKey, ids, deleteKey, deleteValue);
     }
 
     @Override
     public Integer bSafeDeleteByCondition(String tableName, Map<String, Object> whereMap, int maxDelete) {
-        return pgAdvBaseOptPxy.bSafeDeleteByCondition(tableName, whereMap, maxDelete);
+        return advBaseOptPxy.bSafeDeleteByCondition(tableName, whereMap, maxDelete);
     }
 
     @Override
@@ -278,626 +273,626 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     // ==================== 基础查询操作（代理调用PgAdvBaseOpt） ====================
     @Override
     public GirAdvOneRow bSelectOne(String sql) {
-        return pgAdvBaseOptPxy.bSelectOne(sql);
+        return advBaseOptPxy.bSelectOne(sql);
     }
 
     @Override
     public List<GirAdvOneRow> bSelectList(String sql) {
-        return pgAdvBaseOptPxy.bSelectList(sql);
+        return advBaseOptPxy.bSelectList(sql);
     }
 
     @Override
     public void bSelectList(String sql, Consumer<GirAdvOneRow> rowConsumer) {
-        pgAdvBaseOptPxy.bSelectList(sql, rowConsumer);
+        advBaseOptPxy.bSelectList(sql, rowConsumer);
     }
 
     @Override
     public List<List<Object>> bSelectListToValueList(String sql) {
-        return pgAdvBaseOptPxy.bSelectListToValueList(sql);
+        return advBaseOptPxy.bSelectListToValueList(sql);
     }
 
     @Override
     public Number bSelectNumber(String sql) {
-        return pgAdvBaseOptPxy.bSelectNumber(sql);
+        return advBaseOptPxy.bSelectNumber(sql);
     }
 
     @Override
     public Number bSelectRecordRowCount(String sql) {
-        return pgAdvBaseOptPxy.bSelectRecordRowCount(sql);
+        return advBaseOptPxy.bSelectRecordRowCount(sql);
     }
 
     @Override
     public <E> E bSelectObjOne(String sql, Class<E> clazz) {
-        return pgAdvBaseOptPxy.bSelectObjOne(sql, clazz);
+        return advBaseOptPxy.bSelectObjOne(sql, clazz);
     }
 
     @Override
     public <E> List<E> bSelectObjList(String sql, Class<E> clazz) {
-        return pgAdvBaseOptPxy.bSelectObjList(sql, clazz);
+        return advBaseOptPxy.bSelectObjList(sql, clazz);
     }
 
     @Override
     public <E> void bSelectObjList(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
-        pgAdvBaseOptPxy.bSelectObjList(sql, clazz, rowConsumer);
+        advBaseOptPxy.bSelectObjList(sql, clazz, rowConsumer);
     }
 
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bSelectOne(sqlStatement, sqlParam);
+        return advBaseOptPxy.bSelectOne(sqlStatement, sqlParam);
     }
 
     @Override
     public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bSelectList(sqlStatement, sqlParam);
+        return advBaseOptPxy.bSelectList(sqlStatement, sqlParam);
     }
 
     @Override
     public void bSelectList(String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        pgAdvBaseOptPxy.bSelectList(sqlStatement, sqlParam, rowConsumer);
+        advBaseOptPxy.bSelectList(sqlStatement, sqlParam, rowConsumer);
     }
 
     @Override
     public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bSelectListToValueList(sqlStatement, sqlParam);
+        return advBaseOptPxy.bSelectListToValueList(sqlStatement, sqlParam);
     }
 
     @Override
     public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bSelectNumber(sqlStatement, sqlParam);
+        return advBaseOptPxy.bSelectNumber(sqlStatement, sqlParam);
     }
 
     @Override
     public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bSelectRecordRowCount(sqlStatement, sqlParam);
+        return advBaseOptPxy.bSelectRecordRowCount(sqlStatement, sqlParam);
     }
 
     @Override
     public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return pgAdvBaseOptPxy.bSelectObjOne(sqlStatement, sqlParam, clazz);
+        return advBaseOptPxy.bSelectObjOne(sqlStatement, sqlParam, clazz);
     }
 
     @Override
     public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return pgAdvBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz);
+        return advBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz);
     }
 
     @Override
     public <E> void bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        pgAdvBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz, rowConsumer);
+        advBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz, rowConsumer);
     }
 
     // ==================== 基础更新操作（代理调用PgAdvBaseOpt） ====================
     @Override
     public Integer bUpdateBySql(String sqlStatement) {
-        return pgAdvBaseOptPxy.bUpdateBySql(sqlStatement);
+        return advBaseOptPxy.bUpdateBySql(sqlStatement);
     }
 
     @Override
     public Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvBaseOptPxy.bUpdateBySql(sqlStatement, sqlParam);
+        return advBaseOptPxy.bUpdateBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public Integer bUpdateByPrimaryKey(String tableName, String idKey, Object id, Map<String, Object> rowData) {
-        return pgAdvBaseOptPxy.bUpdateByPrimaryKey(tableName, idKey, id, rowData);
+        return advBaseOptPxy.bUpdateByPrimaryKey(tableName, idKey, id, rowData);
     }
 
     @Override
     public <T> Integer bUpdateByPrimaryKey(String tableName, String idKey, T entity) {
-        return pgAdvBaseOptPxy.bUpdateByPrimaryKey(tableName, idKey, entity);
+        return advBaseOptPxy.bUpdateByPrimaryKey(tableName, idKey, entity);
     }
 
     @Override
     public Integer bUpdateByCondition(String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
-        return pgAdvBaseOptPxy.bUpdateByCondition(tableName, rowData, whereMap);
+        return advBaseOptPxy.bUpdateByCondition(tableName, rowData, whereMap);
     }
 
     @Override
     public Integer bUpdateBatchByPrimaryKey(String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return pgAdvBaseOptPxy.bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
+        return advBaseOptPxy.bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
     }
 
     @Override
     public Integer bUpdateBatchWithBatchSize(String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
-        return pgAdvBaseOptPxy.bUpdateBatchWithBatchSize(tableName, idKey, rowsData, batchSize);
+        return advBaseOptPxy.bUpdateBatchWithBatchSize(tableName, idKey, rowsData, batchSize);
     }
 
     @Override
     public <T> Integer bUpdateBatchByPrimaryKey(String tableName, String idKey, Collection<T> entities) {
-        return pgAdvBaseOptPxy.bUpdateBatchByPrimaryKey(tableName, idKey, entities);
+        return advBaseOptPxy.bUpdateBatchByPrimaryKey(tableName, idKey, entities);
     }
 
     @Override
     public Integer bUpdateWithOptimisticLock(String tableName, String idKey, Object id, Map<String, Object> rowData, String versionKey, Integer version) {
-        return pgAdvBaseOptPxy.bUpdateWithOptimisticLock(tableName, idKey, id, rowData, versionKey, version);
+        return advBaseOptPxy.bUpdateWithOptimisticLock(tableName, idKey, id, rowData, versionKey, version);
     }
 
     @Override
     public Integer bUpdateOrInsert(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
-        return pgAdvBaseOptPxy.bUpdateOrInsert(tableName, rowData, conflictKeys);
+        return advBaseOptPxy.bUpdateOrInsert(tableName, rowData, conflictKeys);
     }
 
     // ==================== DDL操作（代理调用PgAdvDDLOpt） ====================
     @Override
     public int dExecuteDDL(String sql, String tableName, String operation) {
-        return pgAdvDDLOptPxy.dExecuteDDL(sql, tableName, operation);
+        return advDDLOptPxy.dExecuteDDL(sql, tableName, operation);
     }
 
     @Override
     public int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
-        return pgAdvDDLOptPxy.dExecuteDDL(sqlStatement, sqlParam, tableName, operation);
+        return advDDLOptPxy.dExecuteDDL(sqlStatement, sqlParam, tableName, operation);
     }
 
     @Override
     public void dDelTable(String tableName) {
-        pgAdvDDLOptPxy.dDelTable(tableName);
+        advDDLOptPxy.dDelTable(tableName);
     }
 
     @Override
     public void dTruncateTable(String tableName) {
-        pgAdvDDLOptPxy.dTruncateTable(tableName);
+        advDDLOptPxy.dTruncateTable(tableName);
     }
 
     @Override
     public void dDropTable(String tableName) {
-        pgAdvDDLOptPxy.dDropTable(tableName);
+        advDDLOptPxy.dDropTable(tableName);
     }
 
     @Override
     public List<String> dGetAllSchemas() {
-        return pgAdvDDLOptPxy.dGetAllSchemas();
+        return advDDLOptPxy.dGetAllSchemas();
     }
 
     @Override
     public DataFieldsApo dGetColumnsByTable(String tableName) {
-        return pgAdvDDLOptPxy.dGetColumnsByTable(tableName);
+        return advDDLOptPxy.dGetColumnsByTable(tableName);
     }
 
     @Override
     public DataFieldsApo dGetColumnsBySQL(String sqlView) {
-        return pgAdvDDLOptPxy.dGetColumnsBySQL(sqlView);
+        return advDDLOptPxy.dGetColumnsBySQL(sqlView);
     }
 
     @Override
     public DataFieldsApo dGetColumnsBySQL(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvDDLOptPxy.dGetColumnsBySQL(sqlStatement, sqlParam);
+        return advDDLOptPxy.dGetColumnsBySQL(sqlStatement, sqlParam);
     }
 
     @Override
     public DataFieldsApo dGetColumnsBySQLOrTable(String tbNameOrSql) {
-        return pgAdvDDLOptPxy.dGetColumnsBySQLOrTable(tbNameOrSql);
+        return advDDLOptPxy.dGetColumnsBySQLOrTable(tbNameOrSql);
     }
 
     @Override
     public void dCreateTable(String tableName, List<FieldBySchemaApo> fields, String primaryKey) {
-        pgAdvDDLOptPxy.dCreateTable(tableName, fields, primaryKey);
+        advDDLOptPxy.dCreateTable(tableName, fields, primaryKey);
     }
 
     @Override
     public void dRenameTable(String oldTableName, String newTableName) {
-        pgAdvDDLOptPxy.dRenameTable(oldTableName, newTableName);
+        advDDLOptPxy.dRenameTable(oldTableName, newTableName);
     }
 
     @Override
     public void dAddColumn(String tableName, FieldBySchemaApo field) {
-        pgAdvDDLOptPxy.dAddColumn(tableName, field);
+        advDDLOptPxy.dAddColumn(tableName, field);
     }
 
     @Override
     public void dAlterColumn(String tableName, String oldColumnName, FieldBySchemaApo newField) {
-        pgAdvDDLOptPxy.dAlterColumn(tableName, oldColumnName, newField);
+        advDDLOptPxy.dAlterColumn(tableName, oldColumnName, newField);
     }
 
     @Override
     public void dDropColumn(String tableName, String columnName) {
-        pgAdvDDLOptPxy.dDropColumn(tableName, columnName);
+        advDDLOptPxy.dDropColumn(tableName, columnName);
     }
 
     @Override
     public List<String> dGetTablesBySchema(String schemaName) {
-        return pgAdvDDLOptPxy.dGetTablesBySchema(schemaName);
+        return advDDLOptPxy.dGetTablesBySchema(schemaName);
     }
 
     @Override
     public boolean dIsTableExists(String tableName) {
-        return pgAdvDDLOptPxy.dIsTableExists(tableName);
+        return advDDLOptPxy.dIsTableExists(tableName);
     }
 
     @Override
     public boolean dIsFunctionExists(String functionName) {
-        return pgAdvDDLOptPxy.dIsFunctionExists(functionName);
+        return advDDLOptPxy.dIsFunctionExists(functionName);
     }
 
     @Override
     public void dCreateSchema(String schemaName) {
-        pgAdvDDLOptPxy.dCreateSchema(schemaName);
+        advDDLOptPxy.dCreateSchema(schemaName);
     }
 
     @Override
     public void dDropSchema(String schemaName, boolean cascade) {
-        pgAdvDDLOptPxy.dDropSchema(schemaName, cascade);
+        advDDLOptPxy.dDropSchema(schemaName, cascade);
     }
 
     @Override
     public void dAddPrimaryKey(String tableName, List<String> columnNames, String constraintName) {
-        pgAdvDDLOptPxy.dAddPrimaryKey(tableName, columnNames, constraintName);
+        advDDLOptPxy.dAddPrimaryKey(tableName, columnNames, constraintName);
     }
 
     @Override
     public void dDropPrimaryKey(String tableName, String constraintName) {
-        pgAdvDDLOptPxy.dDropPrimaryKey(tableName, constraintName);
+        advDDLOptPxy.dDropPrimaryKey(tableName, constraintName);
     }
 
     @Override
     public void dCreateIndex(String tableName, String indexName, List<String> columnNames, boolean isUnique) {
-        pgAdvDDLOptPxy.dCreateIndex(tableName, indexName, columnNames, isUnique);
+        advDDLOptPxy.dCreateIndex(tableName, indexName, columnNames, isUnique);
     }
 
     @Override
     public void dDropIndex(String tableName, String indexName) {
-        pgAdvDDLOptPxy.dDropIndex(tableName, indexName);
+        advDDLOptPxy.dDropIndex(tableName, indexName);
     }
 
     @Override
     public List<String> dGetPrimaryKeys(String tableName) {
-        return pgAdvDDLOptPxy.dGetPrimaryKeys(tableName);
+        return advDDLOptPxy.dGetPrimaryKeys(tableName);
     }
 
     @Override
     public List<IndexApo> dGetIndexes(String tableName) {
-        return pgAdvDDLOptPxy.dGetIndexes(tableName);
+        return advDDLOptPxy.dGetIndexes(tableName);
     }
 
     @Override
     public boolean dIndexesExists(String tableName, String indexName) {
-        return pgAdvDDLOptPxy.dIndexesExists(tableName, indexName);
+        return advDDLOptPxy.dIndexesExists(tableName, indexName);
     }
 
     @Override
     public String dGetTableSizeFormat(String tableName) {
-        return pgAdvDDLOptPxy.dGetTableSizeFormat(tableName);
+        return advDDLOptPxy.dGetTableSizeFormat(tableName);
     }
 
     @Override
     public Long dGetTableSize(String tableName) {
-        return pgAdvDDLOptPxy.dGetTableSize(tableName);
+        return advDDLOptPxy.dGetTableSize(tableName);
     }
 
     // ==================== 空间几何操作（代理调用PgAdvGeoOpt） ====================
     @Override
     public GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt);
+        return advGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return pgAdvGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt, geomFieldName);
+        return advGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt, geomFieldName);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return pgAdvGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt, geomFieldNameList);
+        return advGeoOptPxy.eSelectOne(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvGeoOptPxy.eSelectList(sql, advEnumsGeomOpt);
+        return advGeoOptPxy.eSelectList(sql, advEnumsGeomOpt);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sql, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return pgAdvGeoOptPxy.eSelectList(sql, advEnumsGeomOpt, geomFieldName);
+        return advGeoOptPxy.eSelectList(sql, advEnumsGeomOpt, geomFieldName);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return pgAdvGeoOptPxy.eSelectList(sql, advEnumsGeomOpt, geomFieldNameList);
+        return advGeoOptPxy.eSelectList(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public List<String> eGetAllGeoLayerName() {
-        return pgAdvGeoOptPxy.eGetAllGeoLayerName();
+        return advGeoOptPxy.eGetAllGeoLayerName();
     }
 
     @Override
     public boolean eIsGeomByTable(String tableName) {
-        return pgAdvGeoOptPxy.eIsGeomByTable(tableName);
+        return advGeoOptPxy.eIsGeomByTable(tableName);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeByTable(String tableName) {
-        return pgAdvGeoOptPxy.eGetGeoTypeByTable(tableName);
+        return advGeoOptPxy.eGetGeoTypeByTable(tableName);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeByTable(String tableName, String geomFieldName) {
-        return pgAdvGeoOptPxy.eGetGeoTypeByTable(tableName, geomFieldName);
+        return advGeoOptPxy.eGetGeoTypeByTable(tableName, geomFieldName);
     }
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeByTable(String tableName, List<String> geomFieldNames) {
-        return pgAdvGeoOptPxy.eGetGeoTypeByTable(tableName, geomFieldNames);
+        return advGeoOptPxy.eGetGeoTypeByTable(tableName, geomFieldNames);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlView);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlView);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlView, String geomFieldName) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlView, geomFieldName);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlView, geomFieldName);
     }
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlView, List<String> geomFieldNames) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlView, geomFieldNames);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlView, geomFieldNames);
     }
 
     @Override
     public boolean eIsGeomBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eIsGeomBySql(sqlView);
+        return advGeoOptPxy.eIsGeomBySql(sqlView);
     }
 
     @Override
     public String eGetGeomColumnNameByTable(String tableName) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameByTable(tableName);
+        return advGeoOptPxy.eGetGeomColumnNameByTable(tableName);
     }
 
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameListByTable(tableName);
+        return advGeoOptPxy.eGetGeomColumnNameListByTable(tableName);
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListByTable(String tableName) {
-        return pgAdvGeoOptPxy.eGetGeomColumnListByTable(tableName);
+        return advGeoOptPxy.eGetGeomColumnListByTable(tableName);
     }
 
     @Override
     public FieldBySchemaApo eGetGeomColumnByTable(String tableName) {
-        return pgAdvGeoOptPxy.eGetGeomColumnByTable(tableName);
+        return advGeoOptPxy.eGetGeomColumnByTable(tableName);
     }
 
     @Override
     public String eGetGeomColumnNameBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameBySql(sqlView);
+        return advGeoOptPxy.eGetGeomColumnNameBySql(sqlView);
     }
 
     @Override
     public List<String> eGetGeomColumnNameListBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameListBySql(sqlView);
+        return advGeoOptPxy.eGetGeomColumnNameListBySql(sqlView);
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eGetGeomColumnListBySql(sqlView);
+        return advGeoOptPxy.eGetGeomColumnListBySql(sqlView);
     }
 
     @Override
     public FieldBySchemaApo eGetGeomColumnBySql(String sqlView) {
-        return pgAdvGeoOptPxy.eGetGeomColumnBySql(sqlView);
+        return advGeoOptPxy.eGetGeomColumnBySql(sqlView);
     }
 
     @Override
     public boolean eIsPointTable(String tableName) {
-        return pgAdvGeoOptPxy.eIsPointTable(tableName);
+        return advGeoOptPxy.eIsPointTable(tableName);
     }
 
     @Override
     public boolean eIsPolygonTable(String tableName) {
-        return pgAdvGeoOptPxy.eIsPolygonTable(tableName);
+        return advGeoOptPxy.eIsPolygonTable(tableName);
     }
 
     @Override
     public boolean eIsLineStringTable(String tableName) {
-        return pgAdvGeoOptPxy.eIsLineStringTable(tableName);
+        return advGeoOptPxy.eIsLineStringTable(tableName);
     }
 
     @Override
     public void eAddGeomColumn(String tableName, String geomFieldName, AdvEnumsTypeGeom geomType, int srid) {
-        pgAdvGeoOptPxy.eAddGeomColumn(tableName, geomFieldName, geomType, srid);
+        advGeoOptPxy.eAddGeomColumn(tableName, geomFieldName, geomType, srid);
     }
 
     @Override
     public void eDropGeomColumn(String tableName, String geomFieldName) {
-        pgAdvGeoOptPxy.eDropGeomColumn(tableName, geomFieldName);
+        advGeoOptPxy.eDropGeomColumn(tableName, geomFieldName);
     }
 
     @Override
     public void eDropGeomColumn(String tableName) {
-        pgAdvGeoOptPxy.eDropGeomColumn(tableName);
+        advGeoOptPxy.eDropGeomColumn(tableName);
     }
 
     @Override
     public void eTransformSrid(String tableName, String geomFieldName, int targetSrid) {
-        pgAdvGeoOptPxy.eTransformSrid(tableName, geomFieldName, targetSrid);
+        advGeoOptPxy.eTransformSrid(tableName, geomFieldName, targetSrid);
     }
 
     @Override
     public void eTransformSrid(String tableName, int targetSrid) {
-        pgAdvGeoOptPxy.eTransformSrid(tableName, targetSrid);
+        advGeoOptPxy.eTransformSrid(tableName, targetSrid);
     }
 
     @Override
     public Integer eGetSrid(String tableNameOrSqlView, String geomFieldName) {
-        return pgAdvGeoOptPxy.eGetSrid(tableNameOrSqlView, geomFieldName);
+        return advGeoOptPxy.eGetSrid(tableNameOrSqlView, geomFieldName);
     }
 
     @Override
     public Integer eGetSrid(String tableNameOrSqlView) {
-        return pgAdvGeoOptPxy.eGetSrid(tableNameOrSqlView);
+        return advGeoOptPxy.eGetSrid(tableNameOrSqlView);
     }
 
     @Override
     public Map<String, Integer> eGetSrid(String tableNameOrSqlView, List<String> geomFieldNames) {
-        return pgAdvGeoOptPxy.eGetSrid(tableNameOrSqlView, geomFieldNames);
+        return advGeoOptPxy.eGetSrid(tableNameOrSqlView, geomFieldNames);
     }
 
     @Override
     public void eCreateSpatialIndex(String tableName, String geomFieldName, String indexName) {
-        pgAdvGeoOptPxy.eCreateSpatialIndex(tableName, geomFieldName, indexName);
+        advGeoOptPxy.eCreateSpatialIndex(tableName, geomFieldName, indexName);
     }
 
     @Override
     public void eCreateSpatialIndex(String tableName, String indexName) {
-        pgAdvGeoOptPxy.eCreateSpatialIndex(tableName, indexName);
+        advGeoOptPxy.eCreateSpatialIndex(tableName, indexName);
     }
 
     @Override
     public void eDropSpatialIndex(String tableName, String indexName) {
-        pgAdvGeoOptPxy.eDropSpatialIndex(tableName, indexName);
+        advGeoOptPxy.eDropSpatialIndex(tableName, indexName);
     }
 
     @Override
     public List<GirAdvOneRow> eQueryIntersects(String tableName, String geomFieldName, String geometry, int srid) {
-        return pgAdvGeoOptPxy.eQueryIntersects(tableName, geomFieldName, geometry, srid);
+        return advGeoOptPxy.eQueryIntersects(tableName, geomFieldName, geometry, srid);
     }
 
     @Override
     public List<GirAdvOneRow> eQueryIntersects(String tableName, String geometry, int srid) {
-        return pgAdvGeoOptPxy.eQueryIntersects(tableName, geometry, srid);
+        return advGeoOptPxy.eQueryIntersects(tableName, geometry, srid);
     }
 
     @Override
     public List<GirAdvOneRow> eQueryWithinBBox(String tableName, String geomFieldName, double[] bbox, int srid) {
-        return pgAdvGeoOptPxy.eQueryWithinBBox(tableName, geomFieldName, bbox, srid);
+        return advGeoOptPxy.eQueryWithinBBox(tableName, geomFieldName, bbox, srid);
     }
 
     @Override
     public List<GirAdvOneRow> eQueryWithinBBox(String tableName, double[] bbox, int srid) {
-        return pgAdvGeoOptPxy.eQueryWithinBBox(tableName, bbox, srid);
+        return advGeoOptPxy.eQueryWithinBBox(tableName, bbox, srid);
     }
 
     @Override
     public List<GirAdvOneRow> eCalculateDistance(String tableName, String geomFieldName, String geometry, int srid, String distanceAlias) {
-        return pgAdvGeoOptPxy.eCalculateDistance(tableName, geomFieldName, geometry, srid, distanceAlias);
+        return advGeoOptPxy.eCalculateDistance(tableName, geomFieldName, geometry, srid, distanceAlias);
     }
 
     @Override
     public List<GirAdvOneRow> eCalculateDistance(String tableName, String geometry, int srid, String distanceAlias) {
-        return pgAdvGeoOptPxy.eCalculateDistance(tableName, geometry, srid, distanceAlias);
+        return advGeoOptPxy.eCalculateDistance(tableName, geometry, srid, distanceAlias);
     }
 
     @Override
     public List<GirAdvOneRow> eGetCentroid(String tableNameOrSqlView, String geomFieldName, String centerAlias) {
-        return pgAdvGeoOptPxy.eGetCentroid(tableNameOrSqlView, geomFieldName, centerAlias);
+        return advGeoOptPxy.eGetCentroid(tableNameOrSqlView, geomFieldName, centerAlias);
     }
 
     @Override
     public List<GirAdvOneRow> eGetCentroid(String tableNameOrSqlView, String centerAlias) {
-        return pgAdvGeoOptPxy.eGetCentroid(tableNameOrSqlView, centerAlias);
+        return advGeoOptPxy.eGetCentroid(tableNameOrSqlView, centerAlias);
     }
 
     @Override
     public List<Object> eValidateGeometries(String tableName, String geomFieldName) {
-        return pgAdvGeoOptPxy.eValidateGeometries(tableName, geomFieldName);
+        return advGeoOptPxy.eValidateGeometries(tableName, geomFieldName);
     }
 
     @Override
     public List<Object> eValidateGeometries(String tableName) {
-        return pgAdvGeoOptPxy.eValidateGeometries(tableName);
+        return advGeoOptPxy.eValidateGeometries(tableName);
     }
 
     @Override
     public int eRepairGeometries(String tableName, String geomFieldName) {
-        return pgAdvGeoOptPxy.eRepairGeometries(tableName, geomFieldName);
+        return advGeoOptPxy.eRepairGeometries(tableName, geomFieldName);
     }
 
     @Override
     public int eRepairGeometries(String tableName) {
-        return pgAdvGeoOptPxy.eRepairGeometries(tableName);
+        return advGeoOptPxy.eRepairGeometries(tableName);
     }
 
     @Override
     public BBoxApo eGetExtent(String tableNameOrSqlView, String geomFieldName) {
-        return pgAdvGeoOptPxy.eGetExtent(tableNameOrSqlView, geomFieldName);
+        return advGeoOptPxy.eGetExtent(tableNameOrSqlView, geomFieldName);
     }
 
     @Override
     public BBoxApo eGetExtent(String tableNameOrSqlView) {
-        return pgAdvGeoOptPxy.eGetExtent(tableNameOrSqlView);
+        return advGeoOptPxy.eGetExtent(tableNameOrSqlView);
     }
 
     // ==================== 分页操作（代理调用PgAdvSimplePageOpt） ====================
     @Override
     public Long pCount(String noPageSql) {
-        return pgAdvSimplePageOptPxy.pCount(noPageSql);
+        return advSimplePageOptPxy.pCount(noPageSql);
     }
 
     @Override
     public String pBuildPageSql(String noPageSql, int pageSize, int pageNum, boolean pageNumStartZero) {
-        return pgAdvSimplePageOptPxy.pBuildPageSql(noPageSql, pageSize, pageNum, pageNumStartZero);
+        return advSimplePageOptPxy.pBuildPageSql(noPageSql, pageSize, pageNum, pageNumStartZero);
     }
 
     @Override
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders, String tableAlias) {
-        return pgAdvSimplePageOptPxy.pBuildSqlWithOrder(baseSql, orders, tableAlias);
+        return advSimplePageOptPxy.pBuildSqlWithOrder(baseSql, orders, tableAlias);
     }
 
     @Override
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pBuildSqlWithOrder(baseSql, orders);
+        return advSimplePageOptPxy.pBuildSqlWithOrder(baseSql, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, orders);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, orders);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return advSimplePageOptPxy.pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
     }
 
     @Override
@@ -993,137 +988,137 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     @Override
     public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt);
+        return advGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return pgAdvGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
+        return advGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return pgAdvGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+        return advGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt);
+        return advGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName) {
-        return pgAdvGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
+        return advGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return pgAdvGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+        return advGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, String geomFieldName) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldName);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldName);
     }
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames) {
-        return pgAdvGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldNames);
+        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldNames);
     }
 
     @Override
     public boolean eIsGeomBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eIsGeomBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eIsGeomBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eGetGeomColumnNameBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public List<String> eGetGeomColumnNameListBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eGetGeomColumnListBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eGetGeomColumnListBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return pgAdvGeoOptPxy.eGetGeomColumnBySql(sqlStatement, sqlParam);
+        return advGeoOptPxy.eGetGeomColumnBySql(sqlStatement, sqlParam);
     }
 
     @Override
     public Long pCount(String noPageSqlStatement, SqlParamMap sqlParam) {
-        return pgAdvSimplePageOptPxy.pCount(noPageSqlStatement, sqlParam);
+        return advSimplePageOptPxy.pCount(noPageSqlStatement, sqlParam);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, orders);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, boolean pageNumStartZero, AdvEnumsGeomOpt advEnumsGeomOpt, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt, boolean hasFieldsInfo, List<OrderApo> orders) {
-        return pgAdvSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return advSimplePageOptPxy.pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
     }
 
 }

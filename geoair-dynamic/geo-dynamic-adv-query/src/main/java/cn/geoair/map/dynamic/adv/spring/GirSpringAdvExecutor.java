@@ -1,17 +1,11 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
-import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.map.dynamic.ds.utils.JdbcUrlSplitter;
+
+import cn.geoair.map.dynamic.adv.query.dialect.pgv2.AdvExecutorPG;
 import cn.hutool.extra.spring.SpringUtil;
 
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.util.StringUtils;
-
 import javax.sql.DataSource;
-import java.util.Date;
 
 /**
  * @author ：张逢吉

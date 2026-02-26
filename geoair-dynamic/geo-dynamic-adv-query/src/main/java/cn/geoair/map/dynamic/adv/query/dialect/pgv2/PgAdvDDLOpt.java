@@ -24,19 +24,21 @@ import java.util.List;
  * PostgreSQL DDL操作实现类
  */
 public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
+    PgAdvBaseOpt baseOpt;
 
     public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
+        baseOpt = new PgAdvBaseOpt(dataSourceGetter);
     }
 
     // ========== 初始化差异化组件 ==========
     @Override
     protected AbstractAdvBaseOpt getAdvBaseOpt() {
-        return new PgAdvBaseOpt(dataSourceGetter);
+        return baseOpt;
     }
 
     @Override
-    protected DialectTableNameProcessor createTableNameProcessor() {
+    protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
     }
 
