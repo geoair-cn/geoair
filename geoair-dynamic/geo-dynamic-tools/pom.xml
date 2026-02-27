@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>geo-dynamic-tools</artifactId>
     <name>geo-dynamic-tools</name>
-    <version>23.1.0-SNAPSHOT</version>
+    <version>23.1.1-SNAPSHOT</version>
 
     <description>geo-dynamic-tools</description>
 

@@ -6,7 +6,7 @@
     <parent>
         <!--		<groupId>cn.geoair.dependencies</groupId>-->
         <!--		<artifactId>geoair-dependencies-parent</artifactId>-->
-        <!--		<version>23.1.0-SNAPSHOT </version>-->
+        <!--		<version>23.1.1-SNAPSHOT </version>-->
         <!--		<relativePath>../pom.xml</relativePath>-->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -19,7 +19,7 @@
     <description>geoair-spring-boot-starter-parent</description>
 
     <properties>
-        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-SNAPSHOT</geoair.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <resource.delimiter>@</resource.delimiter>
         <skipTests>true</skipTests>

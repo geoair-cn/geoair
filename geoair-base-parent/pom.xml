@@ -11,13 +11,13 @@
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-base-parent</artifactId>
     <name>geoair-base-parent</name>
-    <version>23.1.0-SNAPSHOT</version>
+    <version>23.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair base parent 用于Gir基础库的依赖约束</description>
 
     <properties>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-SNAPSHOT</geoair.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
