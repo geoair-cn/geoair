@@ -2,22 +2,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.18</version>
-        <relativePath/>
+        <!--        <groupId>org.springframework.boot</groupId>-->
+        <!--        <artifactId>spring-boot-dependencies</artifactId>-->
+        <!--        <version>2.7.18</version>-->
+        <groupId>cn.geoair.dependencies</groupId>
+        <artifactId>geoair-dependencies</artifactId>
+        <version>23.1.1-bata2-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-base-parent</artifactId>
     <name>geoair-base-parent</name>
-    <version>23.1.1-SNAPSHOT</version>
+    <version>23.1.1-bata2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair base parent 用于Gir基础库的依赖约束</description>
 
     <properties>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <geoair.version>23.1.1-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-bata2-SNAPSHOT</geoair.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
@@ -48,7 +51,13 @@
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-geotools-module</artifactId>
@@ -67,6 +76,14 @@
 
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-swagger-module</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-other-module</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -74,13 +91,7 @@
             </dependency>
 
 
-            <dependency>
-                <groupId>cn.geoair.dependencies</groupId>
-                <artifactId>geoair-swagger-module</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
 
 
         </dependencies>

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
 import springfox.documentation.spring.web.DescriptionResolver;
@@ -27,8 +28,9 @@ import java.util.List;
 @Primary
 public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyPropertyBuilder {
 
-    public ApiModelPropertyPropertyBuilderExt(DescriptionResolver descriptions) {
-        super(descriptions);
+
+    public ApiModelPropertyPropertyBuilderExt(DescriptionResolver descriptions, ModelSpecificationFactory modelSpecifications) {
+        super(descriptions, modelSpecifications);
     }
 
     @Override

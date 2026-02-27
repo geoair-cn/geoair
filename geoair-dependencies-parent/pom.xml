@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies</artifactId>
-        <version>23.1.1-SNAPSHOT</version>
+        <version>23.1.1-bata2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -16,8 +16,8 @@
     <description>用于工程模块的依赖定义</description>
 
     <properties>
-        <!--        <geoair.version>23.1.1-SNAPSHOT</geoair.version>-->
-        <!--        <geoair.comp.version>23.1.1-SNAPSHOT</geoair.comp.version>-->
+        <!--        <geoair.version>23.1.1-bata2-SNAPSHOT</geoair.version>-->
+        <!--        <geoair.comp.version>23.1.1-bata2-SNAPSHOT</geoair.comp.version>-->
 
         <skipTests>true</skipTests>
     </properties>

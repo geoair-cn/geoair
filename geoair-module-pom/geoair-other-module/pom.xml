@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.1-SNAPSHOT</version>
+        <version>23.1.1-bata2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -53,19 +53,7 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2-parent</artifactId>
-                <version>${fastjson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.springfox</groupId>
-                        <artifactId>springfox-spring-web</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+
 
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -303,18 +291,18 @@
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-core</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
             <!-- Sa-Token 插件：整合SSO -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-sso</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
 
 
@@ -322,27 +310,27 @@
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-spring-boot-starter</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
 
             <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc/ -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
 
             <!-- Sa-Token 整合 jwt -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-jwt</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-grpc</artifactId>
-                <version>${satokenversion}</version>
+                <version>${sa-token-version}</version>
             </dependency>
             <!-- Http请求工具 -->
             <dependency>
@@ -351,6 +339,19 @@
                 <version>1.5.26</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2-parent</artifactId>
+                <version>${fastjson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.springfox</groupId>
+                        <artifactId>springfox-spring-web</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

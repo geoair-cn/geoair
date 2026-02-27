@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.1-SNAPSHOT</version>
+        <version>23.1.1-bata2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>geo-dynamic-adv-query</artifactId>
@@ -51,12 +51,12 @@
             <scope>compile</scope>
         </dependency>
 
-<!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>io.github.freakchick</groupId>-->
-<!--            <artifactId>orange</artifactId>-->
-<!--            <version>1.0</version>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.github.freakchick</groupId>-->
+        <!--            <artifactId>orange</artifactId>-->
+        <!--            <version>1.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -96,7 +96,6 @@
         <dependency>
             <groupId>org.geotools.jdbc</groupId>
             <artifactId>gt-jdbc-postgis</artifactId>
-
             <optional>true</optional>
         </dependency>
 

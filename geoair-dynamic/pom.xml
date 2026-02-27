@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.1-SNAPSHOT</version>
+        <version>23.1.1-bata2-SNAPSHOT</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
@@ -56,7 +56,6 @@
 
 
     <dependencies>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>

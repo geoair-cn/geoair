@@ -11,14 +11,14 @@
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-module-pom</artifactId>
-    <version>23.1.1-SNAPSHOT</version>
+    <version>23.1.1-bata2-SNAPSHOT</version>
     <name>geoair-module-parent</name>
     <packaging>pom</packaging>
     <description>用于定义各个组件的依赖管理</description>
 
     <properties>
         <skipTests>true</skipTests>
-        <geoair.version>23.1.1-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-bata2-SNAPSHOT</geoair.version>
         <java.version>8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -28,7 +28,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
         <redisson.version>3.18.0</redisson.version>
-        <satokenversion>1.44.0</satokenversion>
+        <sa-token-version>1.44.0</sa-token-version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <fastjson.version>2.0.9</fastjson.version>
         <druid.version>1.2.20</druid.version>
@@ -64,6 +64,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-geotools-module</artifactId>
@@ -84,11 +85,13 @@
                 <artifactId>geoair-template-module</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-other-module</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
