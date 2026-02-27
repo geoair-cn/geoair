@@ -48,7 +48,7 @@ public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyProperty
                 .getField()
                 .getAnnotation(GaModelField.class);
         if (column != null) {
-            if (column.text() != null && column.text().length() > 0) {
+            if (column.text() != null && !column.text().isEmpty()) {
                 context.getBuilder().description(column.text());
             }
             if (column.em() != GemNull.class) {

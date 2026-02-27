@@ -1,11 +1,11 @@
 package cn.geoair.comp.knife4j.ext.utils;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
+
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.model.SpringAddtionalModel;
 import cn.geoair.comp.knife4j.ext.service.SpringAddtionalModelService;
+
 import org.springframework.util.StringUtils;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -17,6 +17,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author ：张俊
@@ -27,7 +28,7 @@ public class CreateApiUtil {
 
     public static Docket createGroup(ApiModelInfo apiModelInfo, DocketInfo docketInfo, SpringAddtionalModelService springAddtionalModelService) {
 
-    	//RequestMappingHandlerMapping
+        //RequestMappingHandlerMapping
 
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title(apiModelInfo.getTitle())
@@ -79,6 +80,21 @@ public class CreateApiUtil {
         for (int i = 0; i < regex.length; i++) {
             predicates.add(PathSelectors.regex("." + regex[i] + ".*"));
         }
-        return Predicates.or(predicates);
+        return combinePredicates(predicates);
     }
+
+    private static Predicate<String> combinePredicates(List<Predicate<String>> predicates) {
+        // 空列表则返回"不匹配任何路径"
+        if (predicates.isEmpty()) {
+            return PathSelectors.none();
+        }
+
+        // 初始值为第一个Predicate，后续依次用or()组合
+        Predicate<String> combined = predicates.get(0);
+        for (int i = 1; i < predicates.size(); i++) {
+            combined = combined.or(predicates.get(i));
+        }
+        return combined;
+    }
+
 }

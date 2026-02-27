@@ -7,20 +7,20 @@
         <!--        <version>2.7.18</version>-->
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies</artifactId>
-        <version>23.1.1-bata2-SNAPSHOT</version>
+        <version>23.1.1-bata3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-base-parent</artifactId>
     <name>geoair-base-parent</name>
-    <version>23.1.1-bata2-SNAPSHOT</version>
+    <version>23.1.1-bata3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair base parent 用于Gir基础库的依赖约束</description>
 
     <properties>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <geoair.version>23.1.1-bata2-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-bata3-SNAPSHOT</geoair.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>

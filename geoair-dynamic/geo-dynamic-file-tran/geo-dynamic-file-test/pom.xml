@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geo-dynamic-file-tran</artifactId>
-        <version>23.1.1-bata2-SNAPSHOT</version>
+        <version>23.1.1-bata3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>geo-dynamic-file-test</artifactId>
     <name>geo-dynamic-file-test</name>
-    <version>23.1.1-bata2-SNAPSHOT</version>
+    <version>23.1.1-bata3-SNAPSHOT</version>
 
     <packaging>jar</packaging>
     <description>

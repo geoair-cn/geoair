@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Set;
 
 public class Version {
-    private static final String VERSION = "23.1.0";
+    private static final String VERSION = "23.1.1-bata3-SNAPSHOT";
 
     public static String getVersion() {
         return VERSION;
@@ -15,6 +15,7 @@ public class Version {
     public static void main(String[] args) {
         System.out.println("Current version: " + VERSION);
     }
+
     public static Set<Class<?>> getAllUtils() {
         return ClassUtil.scanPackage("cn.geoair.map.dynamic.tools", (clazz) -> !clazz.isInterface() && StrUtil.endWith(clazz.getSimpleName(), "Utils"));
     }

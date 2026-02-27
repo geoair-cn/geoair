@@ -8,6 +8,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import springfox.documentation.schema.TypeNameExtractor;
+import springfox.documentation.schema.property.ModelSpecificationFactory;
+import springfox.documentation.spi.schema.EnumTypeDeterminer;
 import springfox.documentation.spi.schema.contexts.ModelContext;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger.schema.ApiModelBuilder;
@@ -24,11 +26,12 @@ public class GtcModelProvider extends ApiModelBuilder {
     private final TypeResolver typeResolver;
     private final TypeNameExtractor typeNameExtractor;
 
-    public GtcModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor) {
-        super(typeResolver, typeNameExtractor);
+    public GtcModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor, EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
+        super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
         this.typeNameExtractor = typeNameExtractor;
         this.typeResolver = typeResolver;
     }
+
 
     @Override
     public void apply(ModelContext context) {
