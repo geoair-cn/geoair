@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair.dependencies</groupId>
+        <artifactId>geoair-base-parent</artifactId>
+        <version>23.1.0-SNAPSHOT</version>
+        <relativePath>../geoair-base-parent</relativePath>
+    </parent>
+
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <artifactId>geoair-dynamic</artifactId>
+    <packaging>pom</packaging>
+    <name>geoair-dynamic</name>
+    <description>gis dynamic tile server</description>
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+
+    <url>https://gitee.com/geoair/geo-dynamic</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>https://gitee.com/geoair/geo-dynamic.git</connection>
+        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geo-dynamic.git</developerConnection>
+        <url>https://gitee.com/geoair/geo-dynamic</url>
+    </scm>
+
+
+    <modules>
+        <module>geo-dynamic-adv-query</module>
+        <module>geo-dynamic-ds</module>
+        <module>geo-dynamic-mvt</module>
+        <module>geo-dynamic-file-tran</module>
+        <module>geo-dynamic-tools</module>
+    </modules>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-ds</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-real-mvt</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-tools</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-adv-query</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-mvt-tools</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-static-mvt-spark</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <!-- GeoTools 官方仓库 -->
+        <repository>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <!-- 可选：快照仓库（如果需要开发版） -->
+        <repository>
+            <id>osgeo-snapshot</id>
+            <name>OSGeo Snapshot Repository</name>
+            <url>https://repo.osgeo.org/repository/snapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <!-- 阿里云镜像（保留其他依赖使用） -->
+        <repository>
+            <id>aliyun-mirror</id>
+            <url>https://maven.aliyun.com/repository/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- 插件仓库（如果需要GeoTools相关插件） -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <!-- 源码版本 -->
+                    <source>8</source>
+                    <!-- 目标字节码版本 -->
+                    <target>8</target>
+                    <!-- 编码（可选，避免中文乱码） -->
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!--生成源码插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--生成API文档插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>central</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <!--发布到中央SNAPSHOT仓库插件-->
+                <plugins>
+                    <!--gpg插件-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+
+        </profile>
+
+        <profile>
+            <id>group</id>
+            <distributionManagement>
+                <repository>
+                    <id>gir-release</id>
+                    <url>http://xmt.geoair.cn:32000/repository/109-release/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>gir-snapshot</id>
+                    <url>http://xmt.geoair.cn:32000/repository/109-snapshot/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+</project>

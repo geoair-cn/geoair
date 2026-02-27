@@ -5,12 +5,14 @@
 
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-dependencies</artifactId>
-    <version>23.0.3-SNAPSHOT</version>
+    <version>23.1.0-SNAPSHOT</version>
     <name>geoair-dependencies</name>
     <packaging>pom</packaging>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
+        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
@@ -52,6 +54,8 @@
         <module>geoair-dependencies-parent</module>
         <module>geoair-module-pom</module>
         <module>geoair</module>
+        <module>geoair-dynamic</module>
+        <module>geoair-comp</module>
     </modules>
 
 
@@ -72,11 +76,6 @@
 
                         <branchName>master</branchName>
 
-                        <threadSafe>true</threadSafe>
-                        <!-- 核心：跳过从 SCM 检出代码，直接用本地代码 -->
-                        <checkoutReleaseBranch>false</checkoutReleaseBranch>
-                        <!-- 强制指定 SCM 地址 -->
-                        <scmUrl>scm:git:git://gitee.com/geoair/geoair-dependencies.git</scmUrl>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -106,9 +105,9 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <!-- 源码版本 -->
-                        <source>11</source>
+                        <source>8</source>
                         <!-- 目标字节码版本 -->
-                        <target>11</target>
+                        <target>8</target>
                         <!-- 编码（可选，避免中文乱码） -->
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -165,11 +164,7 @@
                     <!-- 发布后自动推送到远程仓库 -->
                     <pushChanges>true</pushChanges>
                     <branchName>master</branchName>
-                    <threadSafe>true</threadSafe>
-                    <!-- 核心：跳过从 SCM 检出代码，直接用本地代码 -->
-                    <checkoutReleaseBranch>false</checkoutReleaseBranch>
-                    <!-- 强制指定 SCM 地址 -->
-                    <scmUrl>scm:git:git://gitee.com/geoair/geoair-dependencies.git</scmUrl>
+
 
                 </configuration>
             </plugin>
@@ -186,9 +181,9 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <!-- 源码版本 -->
-                    <source>11</source>
+                    <source>8</source>
                     <!-- 目标字节码版本 -->
-                    <target>11</target>
+                    <target>8</target>
                     <!-- 编码（可选，避免中文乱码） -->
                     <encoding>UTF-8</encoding>
                 </configuration>

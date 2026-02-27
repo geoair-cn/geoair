@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cn.geoair.comp</groupId>
+        <artifactId>geoair-comp</artifactId>
+        <version>23.1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>cn.geoair.comp.apidoc</groupId>
+    <artifactId>geoair-apidoc</artifactId>
+
+    <packaging>pom</packaging>
+    <name>geoair-apidoc</name>
+
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.geoair.comp.apidoc</groupId>
+                <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
+                <version>${geoair.version}</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.10.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <modules>
+        <module>geoair-knife4j-spring-boot-starter</module>
+    </modules>
+
+    <build>
+        <plugins>
+        </plugins>
+    </build>
+</project>
