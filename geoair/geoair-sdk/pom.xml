@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair</groupId>
         <artifactId>geoair</artifactId>
-        <version>23.1.1-bata3-SNAPSHOT<!--gtcversion--></version>
+        <version>23.1.1-bata4-SNAPSHOT </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>geoair-sdk</artifactId>
-    <version>23.1.1-bata3-SNAPSHOT</version>
+    <version>23.1.1-bata4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>geoair-sdk</name>
     <url>https://gitee.com/geoair/geoair</url>
@@ -47,6 +47,7 @@
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>

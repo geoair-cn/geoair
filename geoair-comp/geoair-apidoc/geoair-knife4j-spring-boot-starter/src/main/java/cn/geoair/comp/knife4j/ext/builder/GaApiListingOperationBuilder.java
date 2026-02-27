@@ -1,14 +1,13 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
+import cn.geoair.gtc.base.Gir;
 import cn.geoair.gtc.base.api.annotation.GaApi;
 import cn.geoair.gtc.base.api.annotation.GaApiAction;
-import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
@@ -30,6 +29,12 @@ import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGE
 
 @Order(value = SWAGGER_PLUGIN_ORDER + 1)
 public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
+
+
+
+    public GaApiListingOperationBuilder() {
+        Gir.log.info("Swagger 3.0.0 (springfox 3.x)兼容启动...");
+    }
 
     @Override
     public void apply(OperationContext context) {

@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>cn.geoair.orm</groupId>
 		<artifactId>geoair-orm</artifactId>
-		<version>23.1.1-bata3-SNAPSHOT<!--gtcversion--></version>
+		<version>23.1.1-bata4-SNAPSHOT </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<version>23.1.1-bata3-SNAPSHOT<!--gtcversion--></version>
+	<version>23.1.1-bata4-SNAPSHOT </version>
   <artifactId>geoair-orm-base</artifactId>
   <packaging>jar</packaging>
   <name>geoair-orm-base</name>

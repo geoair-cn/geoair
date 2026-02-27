@@ -3,3 +3,31 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+# GeoAir Swagger配置
+geoair:
+  apidoc:
+    # 基础开关
+    enable: true
+    # 基础文档信息
+    title: "地图服务API文档"
+    version: "2.0"
+    author: "研发团队"
+    description: "地图服务全量API文档（V2.0）"
+    # 自动组装配置
+    controller-root-package: com.gtc.gishubteam.editor.wcs.controller # 手动指定单个根包
+    # controller-root-packages: # 多根包场景（二选一）
+    #   - com.gtc.controller.web
+    #   - com.gtc.controller.base
+    exclude-packages: # 排除测试包
+      - com.gtc.gishubteam.editor.wcs.controller.test
+      - com.gtc.gishubteam.editor.wcs.controller.demo
+    fixed-order-packages: # 自定义分组顺序
+      - com.gtc.gishubteam.editor.wcs.controller.web
+      - com.gtc.gishubteam.editor.wcs.controller.base
+      - com.gtc.gishubteam.editor.wcs.controller.init
+      - com.gtc.gishubteam.editor.wcs.controller.custom
+    group-name-prefix: "业务模块-" # 分组名前缀
+    group-name-use-last-package: true # 用最后一级包名
+    enable-group-index: true # 显示序号
+    enable-scan-cache: true # 启用扫描缓存
+    scan-cache-dir: target/swagger-scan-cache # 缓存目录

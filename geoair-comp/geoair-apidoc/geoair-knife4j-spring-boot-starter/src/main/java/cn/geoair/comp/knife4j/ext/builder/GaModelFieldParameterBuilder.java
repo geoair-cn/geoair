@@ -5,8 +5,8 @@ import cn.geoair.gtc.base.data.common.GemNull;
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import io.swagger.annotations.ApiParam;
 import springfox.bean.validators.plugins.Validators;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.service.AllowableListValues;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.Example;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.ParameterBuilderPlugin;
 import springfox.documentation.spi.service.contexts.ParameterContext;
@@ -35,7 +35,7 @@ public class GaModelFieldParameterBuilder implements ParameterBuilderPlugin {
         }
 
         // 3. 解析GaModelField注解的信息并设置到参数中
-        ParameterBuilder builder = context.parameterBuilder();
+        RequestParameterBuilder builder = context.requestParameterBuilder();
         // 3.1 设置参数描述
         if (gaModelField.text() != null && !gaModelField.text().isEmpty()) {
             builder.description(gaModelField.text());
@@ -68,7 +68,7 @@ public class GaModelFieldParameterBuilder implements ParameterBuilderPlugin {
     /**
      * 解析枚举值并设置到参数中
      */
-    private void parseEnumValues(GaModelField gaModelField, ParameterBuilder builder) {
+    private void parseEnumValues(GaModelField gaModelField, RequestParameterBuilder builder) {
         Class<? extends Enum<?>> enumClass = gaModelField.em();
         Object[] enumConstants = enumClass.getEnumConstants();
         if (enumConstants == null || enumConstants.length == 0) {
@@ -86,7 +86,12 @@ public class GaModelFieldParameterBuilder implements ParameterBuilderPlugin {
                 }
             }
             if (!enumValues.isEmpty()) {
-                builder.allowableValues(new AllowableListValues(enumValues, "LIST"));
+                List<Example> examples = new ArrayList<>();
+                for (String enumValue : enumValues) {
+                    Example example = new Example(enumValue);
+                    examples.add(example);
+                }
+                builder.examples(examples);
             }
         } catch (Exception e) {
             e.printStackTrace();

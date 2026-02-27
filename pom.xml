@@ -5,13 +5,13 @@
 
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-dependencies</artifactId>
-    <version>23.1.1-bata3-SNAPSHOT</version>
+    <version>23.1.1-bata4-SNAPSHOT</version>
     <name>geoair-dependencies</name>
     <packaging>pom</packaging>
 
     <properties>
         <java.version>8</java.version>
-        <geoair.version>23.1.1-bata3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.1-bata4-SNAPSHOT</geoair.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>

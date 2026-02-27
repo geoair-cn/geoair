@@ -6,8 +6,8 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <!--		<version>23.1.1-bata3-SNAPSHOT&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
-        <version>23.1.1-bata3-SNAPSHOT<!--gtcversion--></version>
+        <!--		<version>23.1.1-bata4-SNAPSHOT&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
+        <version>23.1.1-bata4-SNAPSHOT </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -46,6 +46,7 @@
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>

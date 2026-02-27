@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import springfox.bean.validators.plugins.Validators;
 import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
@@ -17,6 +18,8 @@ import springfox.documentation.swagger.schema.ApiModelPropertyPropertyBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 
 /**
  * @author ：张俊
@@ -39,17 +42,16 @@ public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyProperty
         if (context.getAnnotatedElement().isPresent()) {
             ApiModelProperty model = AnnotationUtils.getAnnotation(context.getAnnotatedElement().get(), ApiModelProperty.class);
             if (model != null) {
+                super.apply(context);
                 return;
             }
         }
-        GaModelField column = context
-                .getBeanPropertyDefinition()
-                .get()
-                .getField()
-                .getAnnotation(GaModelField.class);
-        if (column != null) {
+        Optional<GaModelField> gaModelField = Validators.annotationFromField(context, GaModelField.class);
+        if (gaModelField.isPresent()) {
+            GaModelField column = gaModelField.get();
             if (column.text() != null && !column.text().isEmpty()) {
                 context.getBuilder().description(column.text());
+                context.getSpecificationBuilder().description(column.text());
             }
             if (column.em() != GemNull.class) {
                 Class<? extends Enum<?>> em = column.em();
@@ -67,13 +69,15 @@ public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyProperty
 
                     }
                     context.getBuilder().allowableValues(new AllowableListValues(enumValues, "LIST"));
+                    context.getSpecificationBuilder().enumerationFacet(e -> new AllowableListValues(enumValues, "LIST"));
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
             }
         }
-        super.apply(context);
+
     }
 }
 

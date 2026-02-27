@@ -1,5 +1,6 @@
 package cn.geoair.comp.knife4j.ext.config;
 
+import cn.geoair.comp.knife4j.ext.auto.AutoApiConfig;
 import org.reflections.Reflections;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.EnvironmentAware;
@@ -34,5 +35,13 @@ public class GtcKnife4JWebConfig implements WebMvcConfigurer, EnvironmentAware {
     @ConditionalOnMissingBean(Reflections.class)
     Reflections reflections() {
         return new Reflections();
+    }
+
+
+
+    @Bean
+    @ConditionalOnMissingBean(GtcSwaggerApiConfig.class)
+    AutoApiConfig autoApiConfig() {
+        return new AutoApiConfig();
     }
 }

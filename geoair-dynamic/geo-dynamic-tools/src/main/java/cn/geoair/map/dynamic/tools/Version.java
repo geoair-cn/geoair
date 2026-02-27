@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Set;
 
 public class Version {
-    private static final String VERSION = "23.1.1-bata3-SNAPSHOT";
+    private static final String VERSION = "23.1.1-bata4-SNAPSHOT";
 
     public static String getVersion() {
         return VERSION;
