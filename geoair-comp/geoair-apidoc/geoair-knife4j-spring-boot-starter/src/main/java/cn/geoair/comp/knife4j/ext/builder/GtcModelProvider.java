@@ -39,8 +39,11 @@ public class GtcModelProvider extends ApiModelBuilder {
         if (annotation != null) {
             context.getBuilder()
                     .description(annotation.text());
+            context.getModelSpecificationBuilder()
+                    .facets(f -> f.description(annotation.text()))
+            ;
+            super.apply(context);
         }
-      super.apply(context);
     }
 
     private Class<?> forClass(ModelContext context) {

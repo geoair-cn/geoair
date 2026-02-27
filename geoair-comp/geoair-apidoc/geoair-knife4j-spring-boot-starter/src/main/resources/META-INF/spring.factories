@@ -5,6 +5,7 @@ cn.geoair.comp.knife4j.ext.builder.GtcModelProvider,\
 cn.geoair.comp.knife4j.ext.aspect.GaApiListingAspect,\
 cn.geoair.comp.knife4j.ext.builder.GaApiListingOperationBuilder,\
 cn.geoair.comp.knife4j.ext.builder.GaModelFieldParameterBuilder,\
+cn.geoair.comp.knife4j.ext.builder.GaExpandedParameterBuilder,\
  cn.geoair.comp.knife4j.ext.service.SpringAddtionalModelService,\
  cn.geoair.comp.knife4j.ext.aspect.TypeResolverAspect,\
  cn.geoair.comp.knife4j.ext.config.GtcKnife4JWebConfig,\

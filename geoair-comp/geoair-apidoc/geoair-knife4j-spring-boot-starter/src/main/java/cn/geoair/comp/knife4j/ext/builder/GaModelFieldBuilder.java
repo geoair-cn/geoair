@@ -10,6 +10,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import springfox.bean.validators.plugins.Validators;
+import springfox.documentation.schema.ModelSpecification;
 import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.spi.DocumentationType;
@@ -19,11 +20,17 @@ import springfox.documentation.spring.web.DescriptionResolver;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger.schema.ApiModelPropertyPropertyBuilder;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static springfox.documentation.schema.Annotations.findPropertyAnnotation;
 import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+import static springfox.documentation.swagger.schema.ApiModelProperties.*;
 
 
 /**
@@ -33,22 +40,33 @@ import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGE
  */
 @Order(value = SWAGGER_PLUGIN_ORDER + 1)
 public class GaModelFieldBuilder implements ModelPropertyBuilderPlugin {
+    public static Optional<GaModelField> findGaModelFieldAnnotation(AnnotatedElement annotated) {
+        Optional<GaModelField> annotation = empty();
 
+        if (annotated instanceof Method) {
+            // If the annotated element is a method we can use this information to check superclasses as well
+            annotation = ofNullable(AnnotationUtils.findAnnotation(((Method) annotated), GaModelField.class));
+        }
+
+        return annotation.map(Optional::of).orElse(ofNullable(AnnotationUtils.getAnnotation(annotated,
+                GaModelField.class)));
+    }
 
     @Override
     public void apply(ModelPropertyContext context) {
+        Optional<GaModelField> annotation = empty();
         if (context.getAnnotatedElement().isPresent()) {
-            ApiModelProperty model = AnnotationUtils.getAnnotation(context.getAnnotatedElement().get(), ApiModelProperty.class);
-            if (model != null) {
-                return;
-            }
+            annotation =
+                    annotation.map(Optional::of)
+                            .orElse(findGaModelFieldAnnotation(context.getAnnotatedElement().get()));
         }
-        GaModelField column = context
-                .getBeanPropertyDefinition()
-                .get()
-                .getField()
-                .getAnnotation(GaModelField.class);
-        if (column != null) {
+        if (context.getBeanPropertyDefinition().isPresent()) {
+            annotation = annotation.map(Optional::of).orElse(findPropertyAnnotation(
+                    context.getBeanPropertyDefinition().get(),
+                    GaModelField.class));
+        }
+        if (annotation.isPresent()) {
+            GaModelField column = annotation.get();
             if (column.text() != null && !column.text().isEmpty()) {
                 context.getBuilder().description(column.text());
                 context.getSpecificationBuilder().description(column.text());
@@ -66,15 +84,12 @@ public class GaModelFieldBuilder implements ModelPropertyBuilderPlugin {
                             Object value = obj1.value();
                             enumValues.add("{name: " + display + ";code: " + value + "}");
                         }
-
                     }
                     context.getBuilder().allowableValues(new AllowableListValues(enumValues, "LIST"));
                     context.getSpecificationBuilder().enumerationFacet(e -> new AllowableListValues(enumValues, "LIST"));
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
