@@ -42,29 +42,29 @@
         <url>https://gitee.com/geoair/geo-dynamic</url>
     </scm>
 
-<modules>
-    <module>geo-dynamic-file-core</module>
-    <module>geo-dynamic-file-geojson</module>
-    <module>geo-dynamic-file-postgis</module>
-    <module>geo-dynamic-file-test</module>
-</modules>
+    <modules>
+        <module>geo-dynamic-file-core</module>
+        <module>geo-dynamic-file-geojson</module>
+        <module>geo-dynamic-file-postgis</module>
+        <module>geo-dynamic-file-test</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-file-core</artifactId>
-             <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-file-geojson</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-file-postgis</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

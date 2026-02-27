@@ -48,7 +48,7 @@
 			<dependency>
 				<groupId>cn.geoair.dependencies</groupId>
 				<artifactId>geoair-project-parent</artifactId>
-				<version>${project.version}</version>
+				<version>${geoair.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

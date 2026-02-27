@@ -11,6 +11,8 @@
 
     <properties>
         <java.version>8</java.version>
+        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>

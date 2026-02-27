@@ -17,6 +17,7 @@
 
     <properties>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
+        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
@@ -51,7 +52,7 @@
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-geotools-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -59,7 +60,7 @@
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-spring-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -67,7 +68,7 @@
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-other-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -76,7 +77,7 @@
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-swagger-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

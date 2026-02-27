@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
     <description>
         geo-dynamic-file-tran
-    核心接口声明层
+        核心接口声明层
     </description>
 
     <url>https://gitee.com/geoair/geo-dynamic</url>
@@ -46,19 +46,16 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-ds</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-tools</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-adv-query</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

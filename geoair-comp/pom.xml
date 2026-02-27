@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
-        <artifactId>geoair-project-parent</artifactId>
+        <artifactId>geoair-base-parent</artifactId>
         <version>23.1.0-SNAPSHOT</version>
-        <relativePath>../geoair-dependencies-parent/geoair-project-parent</relativePath>
+        <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
@@ -22,11 +22,10 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>cn.geoair</groupId>
                 <artifactId>geoair</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -34,7 +33,7 @@
             <dependency>
                 <groupId>cn.geoair.comp.apidoc</groupId>
                 <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
         </dependencies>

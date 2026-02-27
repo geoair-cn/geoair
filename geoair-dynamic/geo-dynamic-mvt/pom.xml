@@ -39,7 +39,6 @@
     </scm>
 
 
-
     <modules>
         <module>geo-dynamic-real-mvt</module>
         <module>geo-dynamic-static-mvt-spark</module>
@@ -52,24 +51,23 @@
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-mvt-tools</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-real-mvt</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-static-mvt-spark</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
         </dependencies>
 
 
     </dependencyManagement>
-
 
 
 </project>

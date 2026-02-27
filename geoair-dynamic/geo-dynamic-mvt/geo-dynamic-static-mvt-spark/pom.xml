@@ -52,7 +52,6 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-mvt-tools</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
 

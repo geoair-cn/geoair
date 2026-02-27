@@ -67,7 +67,7 @@ public class VectorTileV2Controller extends TileCommon {
             @RequestParam(required = false) Integer minZoom,
             HttpServletResponse response, HttpServletRequest request
     ) throws Exception {
-        HttpSession session = request.getSession(); // 别看这个代码啥也没干，但是如果删除了，就会导致 MqLogAspect 这个类里面的日志采集报异常
+        HttpSession session = request.getSession();
         if (ObjectUtil.isEmpty(paramTile)) {
             toResponse(response, "参数错误001".getBytes(StandardCharsets.UTF_8), "text/plain; charset=utf-8");
         }

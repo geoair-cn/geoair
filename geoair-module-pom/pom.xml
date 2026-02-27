@@ -18,8 +18,7 @@
 
     <properties>
         <skipTests>true</skipTests>
-        <geoair.version>${project.version}</geoair.version>
-        <geoair.comp.version>${project.version}</geoair.comp.version>
+        <geoair.version>23.1.0-SNAPSHOT</geoair.version>
         <java.version>8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -32,7 +31,7 @@
         <satokenversion>1.44.0</satokenversion>
         <spring-boot.version>2.7.18</spring-boot.version>
         <fastjson.version>2.0.9</fastjson.version>
-        <druid.version>1.2.5</druid.version>
+        <druid.version>1.2.20</druid.version>
         <!--      geotools  jdk1.8下的最新的发布版本为 28.6.1 -->
         <geotools.version>28.6.1</geotools.version>
         <!--        <geotools.version>29.5</geotools.version>-->
@@ -68,27 +67,27 @@
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-geotools-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-swagger-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-spring-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-template-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-other-module</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

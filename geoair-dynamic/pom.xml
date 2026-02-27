@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
-        <artifactId>geoair-project-parent</artifactId>
+        <artifactId>geoair-base-parent</artifactId>
         <version>23.1.0-SNAPSHOT</version>
-        <relativePath>../geoair-dependencies-parent/geoair-project-parent</relativePath>
+        <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.geo.dynamic</groupId>
@@ -64,41 +64,47 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-ds</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-real-mvt</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-tools</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-adv-query</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
 
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-mvt-tools</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
                 <artifactId>geo-dynamic-static-mvt-spark</artifactId>
-                <version>${project.version}</version>
+                <version>${geoair.version}</version>
             </dependency>
 
         </dependencies>

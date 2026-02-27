@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Set;
 
 public class Version {
-    private static final String VERSION = "23.0.3";
+    private static final String VERSION = "23.1.0";
 
     public static String getVersion() {
         return VERSION;

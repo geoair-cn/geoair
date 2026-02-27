@@ -56,12 +56,12 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-file-geojson</artifactId>
-            <version>${project.version}</version>
+
         </dependency>
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-file-postgis</artifactId>
-            <version>${project.version}</version>
+
         </dependency>
 
     </dependencies>
