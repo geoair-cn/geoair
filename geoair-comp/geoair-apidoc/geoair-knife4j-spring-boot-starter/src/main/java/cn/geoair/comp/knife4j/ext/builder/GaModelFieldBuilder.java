@@ -29,10 +29,10 @@ import java.util.Optional;
 @Component
 @Order(1)
 @Primary
-public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyPropertyBuilder {
+public class GaModelFieldBuilder extends ApiModelPropertyPropertyBuilder {
 
 
-    public ApiModelPropertyPropertyBuilderExt(DescriptionResolver descriptions, ModelSpecificationFactory modelSpecifications) {
+    public GaModelFieldBuilder(DescriptionResolver descriptions, ModelSpecificationFactory modelSpecifications) {
         super(descriptions, modelSpecifications);
     }
 
@@ -46,9 +46,12 @@ public class ApiModelPropertyPropertyBuilderExt extends ApiModelPropertyProperty
                 return;
             }
         }
-        Optional<GaModelField> gaModelField = Validators.annotationFromField(context, GaModelField.class);
-        if (gaModelField.isPresent()) {
-            GaModelField column = gaModelField.get();
+        GaModelField column = context
+                .getBeanPropertyDefinition()
+                .get()
+                .getField()
+                .getAnnotation(GaModelField.class);
+        if (column != null) {
             if (column.text() != null && !column.text().isEmpty()) {
                 context.getBuilder().description(column.text());
                 context.getSpecificationBuilder().description(column.text());

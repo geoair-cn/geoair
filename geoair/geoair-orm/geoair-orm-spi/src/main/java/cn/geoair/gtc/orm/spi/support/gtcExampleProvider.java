@@ -2,8 +2,8 @@
 //
 //
 //import com.alibaba.fastjson.JSONObject;
-//import  com.gtc.base.bean. gtcBeanHelper;
-//import  com.gtc.base.util. gtcObjectUtil;
+//import  cn.geoair.gtc.base.bean. gtcBeanHelper;
+//import  cn.geoair.gtc.base.util. gtcObjectUtil;
 //import  com.gtc.orm.spi.entity. gtcEntityColumn;
 //import javafx.util.Pair;
 //

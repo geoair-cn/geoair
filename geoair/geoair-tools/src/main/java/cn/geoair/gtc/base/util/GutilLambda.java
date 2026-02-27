@@ -58,7 +58,7 @@ public class GutilLambda {
         } catch (Throwable e) {
             // 3. 反射失败使用序列化的方式读取
         	if(lambdaObj instanceof Serializable) {
-        		return new ShadowLambdaMeta( com.gtc.base.lang.lambda.SerializedLambda.extract((Serializable)lambdaObj));
+        		return new ShadowLambdaMeta( cn.geoair.gtc.base.lang.lambda.SerializedLambda.extract((Serializable)lambdaObj));
         	}else {
         		return null;
         	}

@@ -2,7 +2,7 @@
 //
 //import java.util.Enumeration;
 //import javax.servlet.http.HttpSession;
-//import  com.gtc.base.user.session.GiUserSession;
+//import  cn.geoair.gtc.base.user.session.GiUserSession;
 //
 //public class GirWebUserSession implements GiUserSession{
 //

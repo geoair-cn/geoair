@@ -1,5 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- cn.geoair.comp.knife4j.ext.builder.ApiModelPropertyPropertyBuilderExt,\
+ cn.geoair.comp.knife4j.ext.builder.GaModelFieldBuilder,\
  cn.geoair.comp.knife4j.ext.builder.GaApiActionOperationBuilder,\
 cn.geoair.comp.knife4j.ext.builder.GtcModelProvider,\
 cn.geoair.comp.knife4j.ext.aspect.GaApiListingAspect,\

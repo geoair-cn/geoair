@@ -3,13 +3,13 @@
 //import java.io.Serializable;
 //import java.util.Collection;
 //
-//import  com.gtc.base.log.GiLoger;
-//import com.gtc.base.log.GirLoger;
-//import  com.gtc.base.user.permission.GiPermission;
-//import  com.gtc.base.user.permission.GiPermissionUser;
-//import  com.gtc.base.user.session.GiSessionUser;
-//import  com.gtc.base.user.session.GiUserSession;
-//import  com.gtc.base.user.session.GiUserSessionConfig;
+//import  cn.geoair.gtc.base.log.GiLoger;
+//import cn.geoair.gtc.base.log.GirLoger;
+//import  cn.geoair.gtc.base.user.permission.GiPermission;
+//import  cn.geoair.gtc.base.user.permission.GiPermissionUser;
+//import  cn.geoair.gtc.base.user.session.GiSessionUser;
+//import  cn.geoair.gtc.base.user.session.GiUserSession;
+//import  cn.geoair.gtc.base.user.session.GiUserSessionConfig;
 //import  com.gtc.web.user.GiWebUser;
 //
 //public interface GiWebPermissionUser<ID extends Serializable> extends GiWebUser<ID>,GiPermissionUser<ID> {
