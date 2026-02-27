@@ -37,6 +37,7 @@ public class GaModelFieldParameterBuilder implements ParameterBuilderPlugin {
         Class<?> parameterType = resolvedMethodParam.getParameterType().getErasedType();
 
 
+
         // 2. 优先检查原生@ApiParam注解（优先级最高）
         Optional<ApiParam> optionalApiParam = Validators.annotationFromParameter(context, ApiParam.class);
         if (optionalApiParam.isPresent()) {

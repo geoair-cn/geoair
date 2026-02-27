@@ -12,13 +12,18 @@ import org.springframework.stereotype.Component;
 import springfox.bean.validators.plugins.Validators;
 import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.service.AllowableListValues;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin;
 import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
 import springfox.documentation.spring.web.DescriptionResolver;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger.schema.ApiModelPropertyPropertyBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
 
 
 /**
@@ -26,23 +31,15 @@ import java.util.Optional;
  * @date ：Created in 2022/8/23 9:36
  * @description： GtcModelField 替换 ApiModelProperty 注解（jsonbody参数）
  */
-@Component
-@Order(1)
-@Primary
-public class GaModelFieldBuilder extends ApiModelPropertyPropertyBuilder {
+@Order(value = SWAGGER_PLUGIN_ORDER + 1)
+public class GaModelFieldBuilder implements ModelPropertyBuilderPlugin {
 
-
-    public GaModelFieldBuilder(DescriptionResolver descriptions, ModelSpecificationFactory modelSpecifications) {
-        super(descriptions, modelSpecifications);
-    }
 
     @Override
     public void apply(ModelPropertyContext context) {
-
         if (context.getAnnotatedElement().isPresent()) {
             ApiModelProperty model = AnnotationUtils.getAnnotation(context.getAnnotatedElement().get(), ApiModelProperty.class);
             if (model != null) {
-                super.apply(context);
                 return;
             }
         }
@@ -81,6 +78,11 @@ public class GaModelFieldBuilder extends ApiModelPropertyPropertyBuilder {
             }
         }
 
+    }
+
+    @Override
+    public boolean supports(DocumentationType documentationType) {
+        return SwaggerPluginSupport.pluginDoesApply(documentationType);
     }
 }
 
