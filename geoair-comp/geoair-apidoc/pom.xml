@@ -13,7 +13,7 @@
 
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-apidoc</artifactId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <name>geoair-apidoc</name>
 

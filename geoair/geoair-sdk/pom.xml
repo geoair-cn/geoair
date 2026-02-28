@@ -11,7 +11,7 @@
     </parent>
     <groupId>cn.geoair</groupId>
     <artifactId>geoair-sdk</artifactId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <packaging>jar</packaging>
     <name>geoair-sdk</name>
 

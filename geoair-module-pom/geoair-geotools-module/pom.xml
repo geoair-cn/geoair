@@ -9,9 +9,10 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-geotools-module</artifactId>
     <name>geoair-geotools-module</name>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <description>geoair geotools module</description>
 

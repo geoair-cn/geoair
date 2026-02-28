@@ -12,7 +12,7 @@
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-comp</artifactId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <name>geoair-comp</name>
 

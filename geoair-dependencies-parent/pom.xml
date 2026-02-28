@@ -9,9 +9,10 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-dependencies-parent</artifactId>
     <name>geoair-dependencies-parent</name>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <description>用于工程模块的依赖定义</description>
 

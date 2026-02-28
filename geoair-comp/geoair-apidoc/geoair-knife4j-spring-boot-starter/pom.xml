@@ -13,7 +13,7 @@
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <packaging>jar</packaging>
     <name>gtc-knife4j-spring-boot-starter</name>
 

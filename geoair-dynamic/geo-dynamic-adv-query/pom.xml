@@ -11,7 +11,7 @@
 
     <artifactId>geo-dynamic-adv-query</artifactId>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
 

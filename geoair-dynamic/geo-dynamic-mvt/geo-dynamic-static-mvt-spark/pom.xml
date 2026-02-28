@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <artifactId>geo-dynamic-static-mvt-spark</artifactId>
     <name>geo-dynamic-static-mvt-spark</name>
 
@@ -122,6 +122,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <dependency>

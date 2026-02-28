@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair-web</artifactId>
-	<version>${geoair.version}</version>
+	<version>23.1.1-beta4</version>
 	<name>geoair-web</name>
 
 	<description>Web库</description>

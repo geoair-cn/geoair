@@ -1,110 +1,109 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cn.geoair.dependencies</groupId>
-		<artifactId>geoair-dependencies-parent</artifactId>
-		<version>23.1.1-beta4</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>cn.geoair.dependencies</groupId>
+        <artifactId>geoair-dependencies-parent</artifactId>
+        <version>23.1.1-beta4</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>cn.geoair.dependencies</groupId>
+    <artifactId>geoair-project-parent</artifactId>
+    <name>geoair-project-parent</name>
+    <version>23.1.1-beta4</version>
+    <packaging>pom</packaging>
+    <description>geoair project parent</description>
 
-	<artifactId>geoair-project-parent</artifactId>
-	<name>geoair-project-parent</name>
-	<packaging>pom</packaging>
-	<description>geoair project parent</description>
+    <url>https://gitee.com/geoair/geoair-dependencies</url>
 
-	<url>https://gitee.com/geoair/geoair-dependencies</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <developers>
+        <developer>
+            <name>张逢吉</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<developers>
-		<developer>
-			<name>张逢吉</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<scm>
-		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-		<tag>HEAD</tag>
-	</scm>
+    <properties></properties>
 
-	<properties></properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-geotools-module</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-geotools-module</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-spring-module</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-spring-module</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-other-module</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-
-			<dependency>
-				<groupId>cn.geoair.dependencies</groupId>
-				<artifactId>geoair-swagger-module</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.comp</groupId>
-				<artifactId>geoair-comp</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.geo.dynamic</groupId>
-				<artifactId>geoair-dynamic</artifactId>
-				<version>${geoair.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-other-module</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
 
+            <dependency>
+                <groupId>cn.geoair.dependencies</groupId>
+                <artifactId>geoair-swagger-module</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.comp</groupId>
+                <artifactId>geoair-comp</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geoair-dynamic</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
 
 </project>

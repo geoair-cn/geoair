@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <artifactId>geo-dynamic-file-geojson</artifactId>
     <name>geo-dynamic-file-geojson</name>
 

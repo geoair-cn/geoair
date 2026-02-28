@@ -11,7 +11,7 @@
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
-    <version>${geoair.version}</version>
+    <version>23.1.1-beta4</version>
     <name>geoair-knife4j-spring-boot-demo</name>
     <packaging>jar</packaging>
 

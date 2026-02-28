@@ -11,7 +11,7 @@
 
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair</artifactId>
-	<version>${geoair.version}</version>
+	<version>23.1.1-beta4</version>
 	<packaging>pom</packaging>
 	<name>Gir</name>
 
