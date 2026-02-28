@@ -5,11 +5,11 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-RC5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-RC5-SNAPSHOT</version>
     <artifactId>geo-dynamic-ds</artifactId>
     <name>geo-dynamic-ds</name>
 

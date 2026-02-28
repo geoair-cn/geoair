@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-RC5-SNAPSHOT</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-comp</artifactId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-RC5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>geoair-comp</name>
 
