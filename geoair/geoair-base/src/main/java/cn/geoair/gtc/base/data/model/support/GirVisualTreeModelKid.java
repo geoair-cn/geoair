@@ -7,19 +7,19 @@ import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 @SuppressWarnings("serial")
 public class GirVisualTreeModelKid<ID extends Serializable> extends GirVisualModelKid<ID> {
 
-
-	public GirVisualTreeModelKid() {}
+	public GirVisualTreeModelKid() {
+	}
 
 	public GirVisualTreeModelKid(ID id, String name, ID pid) {
-		super(id,name);
+		super(id, name);
 		this.pid = pid;
 	}
 
 	public static <ID extends Serializable> GirVisualTreeModelKid<ID> valueWith(ID id, String name, ID pid) {
-        return new GirVisualTreeModelKid<ID>(id,name,pid);
-    }
+		return new GirVisualTreeModelKid<ID>(id, name, pid);
+	}
 
-	@GaModelField(isParentId=true)
+	@GaModelField(isParentId = true)
 	private ID pid;
 
 	public void setPid(ID parentId) {

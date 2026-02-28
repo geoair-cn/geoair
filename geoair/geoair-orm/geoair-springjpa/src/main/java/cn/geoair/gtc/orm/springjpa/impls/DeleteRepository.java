@@ -10,56 +10,54 @@ import cn.geoair.gtc.base.gpa.dao.GiDeleteDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityRemovable;
 
 @NoRepositoryBean
-public interface DeleteRepository<T extends GiEntityRemovable<PK>, PK extends Serializable> extends JpaRepository<T, PK>, GiDeleteDao<T, PK> {
+public interface DeleteRepository<T extends GiEntityRemovable<PK>, PK extends Serializable>
+		extends JpaRepository<T, PK>, GiDeleteDao<T, PK> {
 
-    /**
-     * 根据实体属性作为条件进行删除，查询条件使用等号
-     *
-     * @param t
-     * @return
-     */
+	/**
+	 * 根据实体属性作为条件进行删除，查询条件使用等号
+	 * @param t
+	 * @return
+	 */
 	@Override
-    default int  gtcDeleteBy(T t) {
+	default int gtcDeleteBy(T t) {
 		Example<T> of = Example.of(t);
-        List<T> list = this.findAll(of);
-        int len = list.size();
-        if(len > 0) {
-        	this.deleteAll(list);
-        }
-        return len;
+		List<T> list = this.findAll(of);
+		int len = list.size();
+		if (len > 0) {
+			this.deleteAll(list);
+		}
+		return len;
 	}
 
-    /**
-     * 根据主键删除记录
-     *
-     * @param key
-     * @return
-     */
+	/**
+	 * 根据主键删除记录
+	 * @param key
+	 * @return
+	 */
 	@Override
-    default void  gtcDeleteByPK(PK pk) {
+	default void gtcDeleteByPK(PK pk) {
 		Assert.notNull(pk, "The given id must not be null!");
-        this.deleteById(pk);
+		this.deleteById(pk);
 	}
 
-    /**
-     * 根据主键批量删除
-     *
-     * @param key
-     * @return
-     */
+	/**
+	 * 根据主键批量删除
+	 * @param key
+	 * @return
+	 */
 	@Override
-    default void  gtcDeleteByPK(List<PK> pks) {
+	default void gtcDeleteByPK(List<PK> pks) {
 		this.deleteAllByIdInBatch(pks);
 	}
 
-    /**
-     * 删除所有数据
-     *
-     * @param key
-     * @return
-     */
+	/**
+	 * 删除所有数据
+	 * @param key
+	 * @return
+	 */
 	@Override
-    default void  gtcDeleteAll() {
+	default void gtcDeleteAll() {
 		this.deleteAll();
 	}
+
 }

@@ -14,6 +14,7 @@ public class GirValidateException extends GirException {
 	public GirValidateException() {
 		this("验证异常");
 	}
+
 	public GirValidateException(String msg) {
 		super(msg);
 	}

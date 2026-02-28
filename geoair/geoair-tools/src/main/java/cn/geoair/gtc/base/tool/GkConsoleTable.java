@@ -14,19 +14,25 @@ import cn.geoair.gtc.base.util.GutilStr;
 public class GkConsoleTable {
 
 	private static final char ROW_LINE = '-';
+
 	private static final char COLUMN_LINE = '|';
+
 	private static final char CORNER = '+';
+
 	private static final char SPACE = '\u3000';
+
 	private static final char LF = GutilChar.LF;
 
 	/**
 	 * 表格头信息
 	 */
 	private final List<List<String>> HEADER_LIST = new ArrayList<>();
+
 	/**
 	 * 表格体信息
 	 */
 	private final List<List<String>> BODY_LIST = new ArrayList<>();
+
 	/**
 	 * 每列最大字符个数
 	 */
@@ -34,17 +40,15 @@ public class GkConsoleTable {
 
 	/**
 	 * 创建ConsoleTable对象
-	 *
 	 * @return ConsoleTable
 	 * @since 5.4.5
 	 */
-	public static GkConsoleTable create(){
+	public static GkConsoleTable create() {
 		return new GkConsoleTable();
 	}
 
 	/**
 	 * 添加头信息
-	 *
 	 * @param titles 列名
 	 * @return 自身对象
 	 */
@@ -60,7 +64,6 @@ public class GkConsoleTable {
 
 	/**
 	 * 添加体信息
-	 *
 	 * @param values 列值
 	 * @return 自身对象
 	 */
@@ -73,14 +76,13 @@ public class GkConsoleTable {
 
 	/**
 	 * 填充表格头或者体
-	 *
-	 * @param l       被填充列表
+	 * @param l 被填充列表
 	 * @param columns 填充内容
 	 */
 	private void fillColumns(List<String> l, String[] columns) {
 		for (int i = 0; i < columns.length; i++) {
 			String column = columns[i];
-			String col = column;//Convert.toSBC(column);
+			String col = column;// Convert.toSBC(column);
 			l.add(col);
 			int width = col.length();
 			if (width > columnCharNumber.get(i)) {
@@ -91,7 +93,6 @@ public class GkConsoleTable {
 
 	/**
 	 * 获取表格字符串
-	 *
 	 * @return 表格字符串
 	 */
 	@Override
@@ -107,7 +108,6 @@ public class GkConsoleTable {
 
 	/**
 	 * 填充表头或者表体信息
-	 *
 	 * @param sb 内容
 	 * @param list 表头列表或者表体列表
 	 */
@@ -136,7 +136,6 @@ public class GkConsoleTable {
 
 	/**
 	 * 拼装边框
-	 *
 	 * @param sb StringBuilder
 	 */
 	private void fillBorder(StringBuilder sb) {

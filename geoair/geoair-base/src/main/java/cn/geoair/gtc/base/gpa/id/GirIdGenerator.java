@@ -9,7 +9,7 @@ import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
 public class GirIdGenerator {
 
 	static {
-		GkMethodHand.implFromClass( GirIdGenerator.class);
+		GkMethodHand.implFromClass(GirIdGenerator.class);
 	}
 
 	/**
@@ -18,9 +18,11 @@ public class GirIdGenerator {
 	 */
 	@GaMethodHandDefine()
 	public static String randomUUID() {
-		return (String)GkMethodHand.invokeSelf();
+		return (String) GkMethodHand.invokeSelf();
 	}
-	@GaMethodHandImpl(implClass= GirIdGenerator.class,implMethod="randomUUID",type= GaMethodHandImpl.ImplType.comity)
+
+	@GaMethodHandImpl(implClass = GirIdGenerator.class, implMethod = "randomUUID",
+			type = GaMethodHandImpl.ImplType.comity)
 	private static String _randomUUID() {
 		return UUID.randomUUID().toString();
 	}
@@ -31,13 +33,14 @@ public class GirIdGenerator {
 	 */
 	@GaMethodHandDefine()
 	public static String simpleUUID() {
-		return (String)GkMethodHand.invokeSelf();
+		return (String) GkMethodHand.invokeSelf();
 	}
-	@GaMethodHandImpl(implClass= GirIdGenerator.class,implMethod="simpleUUID",type= GaMethodHandImpl.ImplType.comity)
+
+	@GaMethodHandImpl(implClass = GirIdGenerator.class, implMethod = "simpleUUID",
+			type = GaMethodHandImpl.ImplType.comity)
 	private static String _simpleUUID() {
 		return UUID.randomUUID().toString().replaceAll("-", "");
 	}
-
 
 	/**
 	 * 获取19位的时间戳id(默认雪花算法的id)
@@ -45,9 +48,8 @@ public class GirIdGenerator {
 	 */
 	@GaMethodHandDefine()
 	public static long timestampId() {
-		return (long)GkMethodHand.invokeSelf();
+		return (long) GkMethodHand.invokeSelf();
 	}
-
 
 	/**
 	 * 获取19位的时间戳id
@@ -55,87 +57,48 @@ public class GirIdGenerator {
 	 */
 	@GaMethodHandDefine()
 	public static String timestampId36() {
-		return (String)GkMethodHand.invokeSelf();
+		return (String) GkMethodHand.invokeSelf();
 	}
-
-
-
 
 	/*
-	private static int DEVICE_NUMBER = 20;
-
-
-	public static void setDeviceNumber(int dn) {
-
-		if(dn > 9 && dn < 100) {
-			DEVICE_NUMBER = dn;
-		}else {
-			throw new  gtcException("DEVICE_NUMBER 是一个10-100之间的数.");
-		}
-	}
-
-	private static String LAST_ID;
-	private static int LAST_INC = 0;
-
-	private static synchronized int getLastInc(String millStr) {
-		if(millStr.equals(LAST_ID)) {
-			LAST_INC++;
-		}else {
-			LAST_INC = 0;
-			LAST_ID = millStr;
-		}
-		return LAST_INC;
-	}
-
-
-	@MethodHandImpl(implClass= gtcIdGenerator.class,implMethod="timestampId",type=ImplType.comity)
-    private static String _timestampId(String prefix,int len){
-        StringBuilder sb = new StringBuilder();
-        sb.append(DEVICE_NUMBER);
-        Calendar calendar = Calendar.getInstance();
-        sb.append(String.valueOf(calendar.get(Calendar.YEAR)).substring(2));
-        appendTime2(sb,calendar.get(Calendar.MONTH) + 1);
-        appendTime2(sb,calendar.get(Calendar.DAY_OF_MONTH));
-        appendTime2(sb,calendar.get(Calendar.HOUR_OF_DAY));
-        appendTime2(sb,calendar.get(Calendar.MINUTE));
-        appendTime2(sb,calendar.get(Calendar.SECOND));
-        appendTime3(sb,calendar.get(Calendar.MILLISECOND));
-        appendTime3(sb,getLastInc(sb.toString()));
-
-
-        int strLen = sb.length();
-        if (prefix == null || "".equals(prefix)){
-        	if (strLen < len){
-                for (int i = 0; i < len - strLen; i++) {
-                    sb.append(0);
-                }
-            }
-        }else {
-        	strLen = strLen + prefix.length();
-        	if (strLen < len){
-                for (int i = 0; i < len - strLen; i++) {
-                    sb.insert(0,0);
-                }
-            }
-            sb.insert(0, prefix);
-        }
-        return sb.toString();
-    }
-
-    private static void appendTime2(StringBuilder sb,int time) {
-		if(time < 10) {
-			sb.append(0);
-		}
-		sb.append(time);
-	}
-    private static void appendTime3(StringBuilder sb,int time) {
-    	if(time < 10) {
-			sb.append(0).append(0);
-		}else if(time < 100) {
-			sb.append(0);
-		}
-		sb.append(time);
-	}
-    */
+	 * private static int DEVICE_NUMBER = 20;
+	 *
+	 *
+	 * public static void setDeviceNumber(int dn) {
+	 *
+	 * if(dn > 9 && dn < 100) { DEVICE_NUMBER = dn; }else { throw new
+	 * gtcException("DEVICE_NUMBER 是一个10-100之间的数."); } }
+	 *
+	 * private static String LAST_ID; private static int LAST_INC = 0;
+	 *
+	 * private static synchronized int getLastInc(String millStr) {
+	 * if(millStr.equals(LAST_ID)) { LAST_INC++; }else { LAST_INC = 0; LAST_ID = millStr;
+	 * } return LAST_INC; }
+	 *
+	 *
+	 * @MethodHandImpl(implClass=
+	 * gtcIdGenerator.class,implMethod="timestampId",type=ImplType.comity) private static
+	 * String _timestampId(String prefix,int len){ StringBuilder sb = new StringBuilder();
+	 * sb.append(DEVICE_NUMBER); Calendar calendar = Calendar.getInstance();
+	 * sb.append(String.valueOf(calendar.get(Calendar.YEAR)).substring(2));
+	 * appendTime2(sb,calendar.get(Calendar.MONTH) + 1);
+	 * appendTime2(sb,calendar.get(Calendar.DAY_OF_MONTH));
+	 * appendTime2(sb,calendar.get(Calendar.HOUR_OF_DAY));
+	 * appendTime2(sb,calendar.get(Calendar.MINUTE));
+	 * appendTime2(sb,calendar.get(Calendar.SECOND));
+	 * appendTime3(sb,calendar.get(Calendar.MILLISECOND));
+	 * appendTime3(sb,getLastInc(sb.toString()));
+	 *
+	 *
+	 * int strLen = sb.length(); if (prefix == null || "".equals(prefix)){ if (strLen <
+	 * len){ for (int i = 0; i < len - strLen; i++) { sb.append(0); } } }else { strLen =
+	 * strLen + prefix.length(); if (strLen < len){ for (int i = 0; i < len - strLen; i++)
+	 * { sb.insert(0,0); } } sb.insert(0, prefix); } return sb.toString(); }
+	 *
+	 * private static void appendTime2(StringBuilder sb,int time) { if(time < 10) {
+	 * sb.append(0); } sb.append(time); } private static void appendTime3(StringBuilder
+	 * sb,int time) { if(time < 10) { sb.append(0).append(0); }else if(time < 100) {
+	 * sb.append(0); } sb.append(time); }
+	 */
 
 }

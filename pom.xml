@@ -20,6 +20,7 @@
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <spring-javaformat.version>0.0.28</spring-javaformat.version>
     </properties>
 
     <description>geoair-dependencies</description>
@@ -265,10 +266,28 @@
                     </plugin>
                 </plugins>
             </build>
-
-
         </profile>
-
+        <profile>
+            <id>javaformat</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <version>${spring-javaformat.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>group</id>
             <distributionManagement>

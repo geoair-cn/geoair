@@ -5,27 +5,25 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * 创建人: 张俊
- * 创建时间: 2023/2/28 15:42
- * 描述:   文件包装对象
+ * 创建人: 张俊 创建时间: 2023/2/28 15:42 描述: 文件包装对象
  */
 
 public interface GiSdkMultipartFile {
 
-    String getName();
+	String getName();
 
-    String getOriginalFilename();
+	String getOriginalFilename();
 
-    String getContentType();
+	String getContentType();
 
-    boolean isEmpty();
+	boolean isEmpty();
 
-    long getSize();
+	long getSize();
 
-    byte[] getBytes() throws IOException;
+	byte[] getBytes() throws IOException;
 
-    InputStream getInputStream() throws IOException;
+	InputStream getInputStream() throws IOException;
 
+	void writeTo(OutputStream out) throws IOException;
 
-    void writeTo(OutputStream out) throws IOException;
 }

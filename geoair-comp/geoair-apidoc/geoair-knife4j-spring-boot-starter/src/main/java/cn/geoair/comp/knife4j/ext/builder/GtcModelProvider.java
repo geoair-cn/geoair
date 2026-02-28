@@ -16,37 +16,36 @@ import springfox.documentation.swagger.schema.ApiModelBuilder;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/5/13 14:43
- * @description： GtcModel 替换 apimodel注解
+ * @date ：Created in 2022/5/13 14:43 @description： GtcModel 替换 apimodel注解
  */
 @Component
 @Primary
 @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER - 1)
 public class GtcModelProvider extends ApiModelBuilder {
-    private final TypeResolver typeResolver;
-    private final TypeNameExtractor typeNameExtractor;
 
-    public GtcModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor, EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
-        super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
-        this.typeNameExtractor = typeNameExtractor;
-        this.typeResolver = typeResolver;
-    }
+	private final TypeResolver typeResolver;
 
+	private final TypeNameExtractor typeNameExtractor;
 
-    @Override
-    public void apply(ModelContext context) {
-        GaModel annotation = AnnotationUtils.findAnnotation(forClass(context), GaModel.class);
-        if (annotation != null) {
-            context.getBuilder()
-                    .description(annotation.text());
-            context.getModelSpecificationBuilder()
-                    .facets(f -> f.description(annotation.text()))
-            ;
-            super.apply(context);
-        }
-    }
+	public GtcModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor,
+			EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
+		super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
+		this.typeNameExtractor = typeNameExtractor;
+		this.typeResolver = typeResolver;
+	}
 
-    private Class<?> forClass(ModelContext context) {
-        return typeResolver.resolve(context.getType()).getErasedType();
-    }
+	@Override
+	public void apply(ModelContext context) {
+		GaModel annotation = AnnotationUtils.findAnnotation(forClass(context), GaModel.class);
+		if (annotation != null) {
+			context.getBuilder().description(annotation.text());
+			context.getModelSpecificationBuilder().facets(f -> f.description(annotation.text()));
+			super.apply(context);
+		}
+	}
+
+	private Class<?> forClass(ModelContext context) {
+		return typeResolver.resolve(context.getType()).getErasedType();
+	}
+
 }

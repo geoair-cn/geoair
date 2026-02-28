@@ -36,6 +36,7 @@
         <geotools.version>28.6.1</geotools.version>
         <!--        <geotools.version>29.5</geotools.version>-->
         <jts.version>1.19.0</jts.version>
+        <spring-javaformat.version>0.0.28</spring-javaformat.version>
     </properties>
     <url>https://gitee.com/geoair/geoair-dependencies</url>
 
@@ -299,9 +300,30 @@
                     </plugin>
                 </plugins>
             </build>
-
-
         </profile>
+
+        <profile>
+            <id>javaformat</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <version>${spring-javaformat.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
 
         <profile>
             <id>group</id>

@@ -8,11 +8,15 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface GaMethodHandDefine {
+
 	public String id() default "";
+
 	public String expectClassName() default "";
+
 	public String expectMethodName() default "";
 
-	//public boolean keepExpect() default false;
+	// public boolean keepExpect() default false;
+
 }

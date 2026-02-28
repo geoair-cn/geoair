@@ -13,14 +13,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  *
  */
-@Target({PACKAGE, TYPE, METHOD, FIELD})
+@Target({ PACKAGE, TYPE, METHOD, FIELD })
 @Retention(RUNTIME)
 @Repeatable(GaGenericGenerators.class)
 public @interface GaGenericGenerator {
+
 	/**
 	 * unique generator name.
 	 */
 	String name();
+
 	/**
 	 * Generator strategy or a fully qualified class name.
 	 */
@@ -28,5 +30,6 @@ public @interface GaGenericGenerator {
 	/**
 	 * Optional generator parameters.
 	 */
-	//Parameter[] parameters() default {};
+	// Parameter[] parameters() default {};
+
 }

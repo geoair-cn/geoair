@@ -8,27 +8,30 @@ import cn.geoair.gtc.base.util.GutilClass;
  *
  */
 public class GkShadowLambdaMeta implements GkfLambdaMeta {
-    private final GkSerializedLambda lambda;
 
-    public GkShadowLambdaMeta(GkSerializedLambda lambda) {
-        this.lambda = lambda;
-    }
+	private final GkSerializedLambda lambda;
 
-    @Override
-    public String getImplMethodName() {
-        return lambda.getImplMethodName();
-    }
+	public GkShadowLambdaMeta(GkSerializedLambda lambda) {
+		this.lambda = lambda;
+	}
 
-    @Override
-    public Class<?> getInstantiatedClass() {
-        String instantiatedMethodType = lambda.getInstantiatedMethodType();
-        String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(';')).replace('/', '.');
-        try {
+	@Override
+	public String getImplMethodName() {
+		return lambda.getImplMethodName();
+	}
+
+	@Override
+	public Class<?> getInstantiatedClass() {
+		String instantiatedMethodType = lambda.getInstantiatedMethodType();
+		String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(';')).replace('/',
+				'.');
+		try {
 			return GutilClass.forName(instantiatedType, lambda.getCapturingClass().getClassLoader());
-		} catch (ClassNotFoundException | LinkageError e) {
-			throw new GirException("",e);
 		}
-    }
+		catch (ClassNotFoundException | LinkageError e) {
+			throw new GirException("", e);
+		}
+	}
 
 	@Override
 	public Class<?> getCapturingClass() {

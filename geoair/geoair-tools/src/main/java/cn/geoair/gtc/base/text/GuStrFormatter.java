@@ -19,7 +19,6 @@ public class GuStrFormatter {
 	 * 通常使用：format("this is {} for {}", "a", "b") =》 this is a for b<br>
 	 * 转义{}： format("this is \\{} for {}", "a", "b") =》 this is \{} for a<br>
 	 * 转义\： format("this is \\\\{} for {}", "a", "b") =》 this is \a for b<br>
-	 *
 	 * @param strPattern 字符串模板
 	 * @param argArray 参数列表
 	 * @return 结果
@@ -53,14 +52,16 @@ public class GuStrFormatter {
 					sbuf.append(strPattern, handledPosition, delimIndex - 1);
 					sbuf.append(GutilStr.utf8Str(argArray[argIndex]));
 					handledPosition = delimIndex + 2;
-				} else {
+				}
+				else {
 					// 占位符被转义
 					argIndex--;
 					sbuf.append(strPattern, handledPosition, delimIndex - 1);
 					sbuf.append(GutilStr.C_DELIM_START);
 					handledPosition = delimIndex + 1;
 				}
-			} else {// 正常占位符
+			}
+			else {// 正常占位符
 				sbuf.append(strPattern, handledPosition, delimIndex);
 				sbuf.append(GutilStr.utf8Str(argArray[argIndex]));
 				handledPosition = delimIndex + 2;
@@ -73,4 +74,5 @@ public class GuStrFormatter {
 
 		return sbuf.toString();
 	}
+
 }

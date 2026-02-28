@@ -8,12 +8,13 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ ElementType.METHOD, ElementType.FIELD })
 public @interface GaType {
+
 	public static String NULL = "";
-	public String name() default  NULL;
-    public String text() default NULL;
+
+	public String name() default NULL;
+
+	public String text() default NULL;
+
 }
-
-
-

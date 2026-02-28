@@ -33,135 +33,106 @@ import static springfox.documentation.swagger.readers.parameter.Examples.example
 
 /**
  * @author ：张逢吉
- * @date ：Created in   20:05
- * @description： 展开模型
+ * @date ：Created in 20:05 @description： 展开模型
  */
 @Order(value = SWAGGER_PLUGIN_ORDER + 1)
 public class GaExpandedParameterBuilder implements ExpandedParameterBuilderPlugin {
-    private final DescriptionResolver descriptions;
-    private final EnumTypeDeterminer enumTypeDeterminer;
 
-    @Autowired
-    public GaExpandedParameterBuilder(
-            DescriptionResolver descriptions,
-            EnumTypeDeterminer enumTypeDeterminer) {
-        this.descriptions = descriptions;
-        this.enumTypeDeterminer = enumTypeDeterminer;
-    }
+	private final DescriptionResolver descriptions;
 
-    @Override
-    public void apply(ParameterExpansionContext context) {
-        Optional<GaModelField> apiModelPropertyOptional = context.findAnnotation(GaModelField.class);
-        apiModelPropertyOptional.ifPresent(apiModelProperty -> fromApiModelProperty(context, apiModelProperty));
-        Optional<ApiParam> apiParamOptional = context.findAnnotation(ApiParam.class);
-        apiParamOptional.ifPresent(apiParam -> fromApiParam(context, apiParam));
-    }
+	private final EnumTypeDeterminer enumTypeDeterminer;
 
-    @Override
-    public boolean supports(DocumentationType delimiter) {
-        return SwaggerPluginSupport.pluginDoesApply(delimiter);
-    }
+	@Autowired
+	public GaExpandedParameterBuilder(DescriptionResolver descriptions, EnumTypeDeterminer enumTypeDeterminer) {
+		this.descriptions = descriptions;
+		this.enumTypeDeterminer = enumTypeDeterminer;
+	}
 
-    private void fromApiParam(
-            ParameterExpansionContext context,
-            ApiParam apiParam) {
-        String allowableProperty =
-                ofNullable(apiParam.allowableValues())
-                        .filter(((Predicate<String>) String::isEmpty).negate())
-                        .orElse(null);
-        AllowableValues allowable = allowableValues(
-                ofNullable(allowableProperty),
-                context.getFieldType().getErasedType());
+	@Override
+	public void apply(ParameterExpansionContext context) {
+		Optional<GaModelField> apiModelPropertyOptional = context.findAnnotation(GaModelField.class);
+		apiModelPropertyOptional.ifPresent(apiModelProperty -> fromApiModelProperty(context, apiModelProperty));
+		Optional<ApiParam> apiParamOptional = context.findAnnotation(ApiParam.class);
+		apiParamOptional.ifPresent(apiParam -> fromApiParam(context, apiParam));
+	}
 
-        maybeSetParameterName(context, apiParam.name());
-        context.getParameterBuilder()
-                .description(descriptions.resolve(apiParam.value()))
-                .defaultValue(apiParam.defaultValue())
-                .required(apiParam.required())
-                .allowMultiple(apiParam.allowMultiple())
-                .allowableValues(allowable)
-                .parameterAccess(apiParam.access())
-                .hidden(apiParam.hidden())
-                .scalarExample(apiParam.example())
-                .complexExamples(examples(apiParam.examples()))
-                .order(SWAGGER_PLUGIN_ORDER)
-                .build();
+	@Override
+	public boolean supports(DocumentationType delimiter) {
+		return SwaggerPluginSupport.pluginDoesApply(delimiter);
+	}
 
-        context.getRequestParameterBuilder()
-                .description(descriptions.resolve(apiParam.value()))
-                .required(apiParam.required())
-                .hidden(apiParam.hidden())
-                .example(new ExampleBuilder().value(apiParam.example()).build())
-                .precedence(SWAGGER_PLUGIN_ORDER)
-                .query(q -> q.enumerationFacet(e -> e.allowedValues(allowable)));
-    }
+	private void fromApiParam(ParameterExpansionContext context, ApiParam apiParam) {
+		String allowableProperty = ofNullable(apiParam.allowableValues())
+				.filter(((Predicate<String>) String::isEmpty).negate()).orElse(null);
+		AllowableValues allowable = allowableValues(ofNullable(allowableProperty),
+				context.getFieldType().getErasedType());
 
-    private void fromApiModelProperty(
-            ParameterExpansionContext context,
-            GaModelField apiModelProperty) {
-        List<String> enumValues = new ArrayList<>();
-        if (apiModelProperty.em() != GemNull.class) {
-            Class<? extends Enum<?>> em = apiModelProperty.em();
-            Object[] objects = em.getEnumConstants();
-            try {
-                for (Object obj : objects) {
-                    if (obj instanceof GiVisualValuable) {
-                        GiVisualValuable obj1 = (GiVisualValuable) obj;
-                        // 3.调用对应方法，得到枚举常量中字段的值
-                        String display = obj1.display();
-                        Object value = obj1.value();
-                        enumValues.add("{name: " + display + ";code: " + value + "}");
-                    }
-                }
+		maybeSetParameterName(context, apiParam.name());
+		context.getParameterBuilder().description(descriptions.resolve(apiParam.value()))
+				.defaultValue(apiParam.defaultValue()).required(apiParam.required())
+				.allowMultiple(apiParam.allowMultiple()).allowableValues(allowable).parameterAccess(apiParam.access())
+				.hidden(apiParam.hidden()).scalarExample(apiParam.example())
+				.complexExamples(examples(apiParam.examples())).order(SWAGGER_PLUGIN_ORDER).build();
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+		context.getRequestParameterBuilder().description(descriptions.resolve(apiParam.value()))
+				.required(apiParam.required()).hidden(apiParam.hidden())
+				.example(new ExampleBuilder().value(apiParam.example()).build()).precedence(SWAGGER_PLUGIN_ORDER)
+				.query(q -> q.enumerationFacet(e -> e.allowedValues(allowable)));
+	}
 
+	private void fromApiModelProperty(ParameterExpansionContext context, GaModelField apiModelProperty) {
+		List<String> enumValues = new ArrayList<>();
+		if (apiModelProperty.em() != GemNull.class) {
+			Class<? extends Enum<?>> em = apiModelProperty.em();
+			Object[] objects = em.getEnumConstants();
+			try {
+				for (Object obj : objects) {
+					if (obj instanceof GiVisualValuable) {
+						GiVisualValuable obj1 = (GiVisualValuable) obj;
+						// 3.调用对应方法，得到枚举常量中字段的值
+						String display = obj1.display();
+						Object value = obj1.value();
+						enumValues.add("{name: " + display + ";code: " + value + "}");
+					}
+				}
 
-        AllowableValues allowable = allowableValues(
-                Optional.empty(),
-                context.getFieldType().getErasedType());
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-//        maybeSetParameterName(context, apiModelProperty.text());
-        context.getParameterBuilder()
-                .description(apiModelProperty.text())
-                .allowableValues(allowable)
-                .order(SWAGGER_PLUGIN_ORDER)
-                .build();
+		AllowableValues allowable = allowableValues(Optional.empty(), context.getFieldType().getErasedType());
 
-        context.getRequestParameterBuilder()
-                .description(apiModelProperty.text())
-                .precedence(SWAGGER_PLUGIN_ORDER)
-                .query(q -> q.enumerationFacet(e -> e.allowedValues(allowable)));
-    }
+		// maybeSetParameterName(context, apiModelProperty.text());
+		context.getParameterBuilder().description(apiModelProperty.text()).allowableValues(allowable)
+				.order(SWAGGER_PLUGIN_ORDER).build();
 
-    private void maybeSetParameterName(
-            ParameterExpansionContext context,
-            String parameterName) {
-        if (!isEmpty(parameterName)) {
-            context.getParameterBuilder().name(parameterName);
-            context.getRequestParameterBuilder().name(parameterName);
-        }
-    }
+		context.getRequestParameterBuilder().description(apiModelProperty.text()).precedence(SWAGGER_PLUGIN_ORDER)
+				.query(q -> q.enumerationFacet(e -> e.allowedValues(allowable)));
+	}
 
-    private AllowableValues allowableValues(
-            final Optional<String> optionalAllowable,
-            Class<?> fieldType) {
+	private void maybeSetParameterName(ParameterExpansionContext context, String parameterName) {
+		if (!isEmpty(parameterName)) {
+			context.getParameterBuilder().name(parameterName);
+			context.getRequestParameterBuilder().name(parameterName);
+		}
+	}
 
-        AllowableValues allowable = null;
-        if (enumTypeDeterminer.isEnum(fieldType)) {
-            allowable = new AllowableListValues(getEnumValues(fieldType), "LIST");
-        } else if (optionalAllowable.isPresent()) {
-            allowable = ApiModelProperties.allowableValueFromString(optionalAllowable.get());
-        }
-        return allowable;
-    }
+	private AllowableValues allowableValues(final Optional<String> optionalAllowable, Class<?> fieldType) {
 
-    private List<String> getEnumValues(final Class<?> subject) {
-        return Stream.of(subject.getEnumConstants())
-                .map((Function<Object, String>) Object::toString)
-                .collect(toList());
-    }
+		AllowableValues allowable = null;
+		if (enumTypeDeterminer.isEnum(fieldType)) {
+			allowable = new AllowableListValues(getEnumValues(fieldType), "LIST");
+		}
+		else if (optionalAllowable.isPresent()) {
+			allowable = ApiModelProperties.allowableValueFromString(optionalAllowable.get());
+		}
+		return allowable;
+	}
+
+	private List<String> getEnumValues(final Class<?> subject) {
+		return Stream.of(subject.getEnumConstants()).map((Function<Object, String>) Object::toString).collect(toList());
+	}
+
 }

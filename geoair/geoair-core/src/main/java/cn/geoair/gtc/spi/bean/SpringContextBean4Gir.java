@@ -28,46 +28,44 @@ import cn.geoair.gtc.base.bean.GirNoSuchBeanException;
 import cn.geoair.gtc.base.bean.GirNoUniqueBeanException;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl;
-import  cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.gtc.base.log.GiLogger;
 import cn.geoair.gtc.base.log.GirLogger;
 
 /**
  * 由spring提供bean容器
+ *
  * @author Ray
  *
  */
 @Component
 public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextAware {
 
-
 	static {
 		GkMethodHand.implFromClass(SpringContextBean4Gir.class);
 	}
 
-	protected final GiLogger logger =  GirLogger.getLoger(SpringContextBean4Gir.class);
+	protected final GiLogger logger = GirLogger.getLoger(SpringContextBean4Gir.class);
 
-	@GaMethodHandImpl(implClass= GirBeanHelper.class,implMethod="getProvider",type=ImplType.expectfirst)
+	@GaMethodHandImpl(implClass = GirBeanHelper.class, implMethod = "getProvider", type = ImplType.expectfirst)
 	private static GiBeanFactory getProvider() {
 		return beanProvider;
 	}
 
-
 	private static ApplicationContext springContext;
+
 	private static GiBeanFactory beanProvider;
 
-    @Override
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    	beanProvider = this;
-    	springContext = applicationContext;
+		beanProvider = this;
+		springContext = applicationContext;
 
 	}
 
-    public static ApplicationContext getApplicationContext() {
-    	return springContext;
-    }
-
-
+	public static ApplicationContext getApplicationContext() {
+		return springContext;
+	}
 
 	@Override
 	public boolean containsBean(String name) {
@@ -78,7 +76,8 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 	public boolean isSingleton(String name) {
 		try {
 			return getApplicationContext().isSingleton(name);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
 		}
 	}
@@ -87,7 +86,8 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 	public boolean isPrototype(String name) {
 		try {
 			return getApplicationContext().isPrototype(name);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
 		}
 	}
@@ -96,7 +96,8 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 	public boolean isTypeMatch(String name, Class<?> typeToMatch) {
 		try {
 			return getApplicationContext().isTypeMatch(name, typeToMatch);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
 		}
 	}
@@ -105,7 +106,8 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 	public Class<?> getType(String name) {
 		try {
 			return getApplicationContext().getType(name);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
 		}
 	}
@@ -115,81 +117,90 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 		return getApplicationContext().getAliases(name);
 	}
 
-
 	@Override
 	public Object getBean(String name) {
 		try {
 			return getApplicationContext().getBean(name);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
-		}catch(BeansException nex) {
+		}
+		catch (BeansException nex) {
 			throw new GirBeanException(nex);
 		}
 	}
-
 
 	@Override
 	public <T> T getBean(String name, Class<T> requiredType) {
 		try {
 			return getApplicationContext().getBean(name, requiredType);
-		}catch(BeanNotOfRequiredTypeException bne) {
+		}
+		catch (BeanNotOfRequiredTypeException bne) {
 			throw new GirBeanNotOfRequiredTypeException(bne);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
-		}catch(BeansException nex) {
+		}
+		catch (BeansException nex) {
 			throw new GirBeanException(nex);
 		}
 	}
-
 
 	@Override
 	public Object getBean(String name, Object... args) {
 		try {
 			return getApplicationContext().getBean(name, args);
-		}catch(BeanDefinitionStoreException ex) {
+		}
+		catch (BeanDefinitionStoreException ex) {
 			throw new GirBeanDefinitionStoreException(ex);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
-		}catch(BeansException nex) {
+		}
+		catch (BeansException nex) {
 			throw new GirBeanException(nex);
 		}
 	}
-
 
 	@Override
 	public <T> T getBean(Class<T> requiredType) {
 		try {
 			return getApplicationContext().getBean(requiredType);
 
-		}catch(NoUniqueBeanDefinitionException nex) {
+		}
+		catch (NoUniqueBeanDefinitionException nex) {
 			throw new GirNoUniqueBeanException(nex);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
-		}catch(BeansException nex) {
+		}
+		catch (BeansException nex) {
 			throw new GirBeanException(nex);
 		}
 	}
-
 
 	@Override
 	public <T> T getBean(Class<T> requiredType, Object... args) {
 		try {
 			return getApplicationContext().getBean(requiredType, args);
-		}catch(BeanDefinitionStoreException ex) {
+		}
+		catch (BeanDefinitionStoreException ex) {
 			throw new GirBeanDefinitionStoreException(ex);
-		}catch(NoSuchBeanDefinitionException nex) {
+		}
+		catch (NoSuchBeanDefinitionException nex) {
 			throw new GirNoSuchBeanException(nex);
-		}catch(BeansException ex) {
+		}
+		catch (BeansException ex) {
 			throw new GirBeanException(ex);
 		}
 	}
-
 
 	@Override
 	public <T> Map<String, T> getBeans(Class<T> clazz) {
 		try {
 			return getApplicationContext().getBeansOfType(clazz);
-		}catch(BeansException ex) {
+		}
+		catch (BeansException ex) {
 			throw new GirBeanException(ex);
 		}
 	}
@@ -197,12 +208,13 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 	@Override
 	public <T> Map<String, T> getBeans(Class<T> clazz, Type[] genericType) throws GirBeanException {
 		Map<String, T> map = getBeans(clazz);
-		Map<String, T> res = new HashMap<String,T>();
-		if(map.size() > 0) {
-			loop1:for(Entry<String, T> entry:map.entrySet()) {
-				ResolvableType resolvableType = ResolvableType.forClass(clazz, GutilClass.getUserClass(entry.getValue()));
-				for(int i = 0;i<genericType.length;i++) {
-					if(genericType[i] != resolvableType.getGeneric(i).resolve()) {
+		Map<String, T> res = new HashMap<String, T>();
+		if (map.size() > 0) {
+			loop1: for (Entry<String, T> entry : map.entrySet()) {
+				ResolvableType resolvableType = ResolvableType.forClass(clazz,
+						GutilClass.getUserClass(entry.getValue()));
+				for (int i = 0; i < genericType.length; i++) {
+					if (genericType[i] != resolvableType.getGeneric(i).resolve()) {
 						continue loop1;
 					}
 				}
@@ -214,14 +226,15 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 
 	@Override
 	public <T> T getBean(Class<T> requiredType, Type[] genericType) {
-		Map<String, T> map = getBeans(requiredType,genericType);
+		Map<String, T> map = getBeans(requiredType, genericType);
 
-		if(map.isEmpty()) {
+		if (map.isEmpty()) {
 			throw new GirNoSuchBeanException(new NoSuchBeanDefinitionException(requiredType));
 		}
 
-		if(map.size() > 1) {
-			throw new GirNoUniqueBeanException(new NoUniqueBeanDefinitionException(requiredType,map.size(),"找到了不只一个bean实例"));
+		if (map.size() > 1) {
+			throw new GirNoUniqueBeanException(
+					new NoUniqueBeanDefinitionException(requiredType, map.size(), "找到了不只一个bean实例"));
 		}
 
 		return map.values().iterator().next();
@@ -229,34 +242,34 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 
 	@Override
 	public void register(String name, Class<?> beanClass) throws GirBeanDefinitionStoreException {
-		register(name,beanClass,true);
+		register(name, beanClass, true);
 
 	}
+
 	@Override
-	public void register(String name, Class<?> beanClass,boolean singleton) throws GirBeanDefinitionStoreException {
-		BeanDefinitionRegistry beanRegistry = (BeanDefinitionRegistry)getApplicationContext().getAutowireCapableBeanFactory();
+	public void register(String name, Class<?> beanClass, boolean singleton) throws GirBeanDefinitionStoreException {
+		BeanDefinitionRegistry beanRegistry = (BeanDefinitionRegistry) getApplicationContext()
+				.getAutowireCapableBeanFactory();
 
 		/**
-		try {
-    		beanRegistry.getBeanDefinition(name);
-    	} catch (NoSuchBeanDefinitionException ne) {
-
-    	}
-    	*/
+		 * try { beanRegistry.getBeanDefinition(name); } catch
+		 * (NoSuchBeanDefinitionException ne) {
+		 *
+		 * }
+		 */
 		GenericBeanDefinition definition = new GenericBeanDefinition();
 		definition.setBeanClass(beanClass);
-		definition.setScope(singleton?BeanDefinition.SCOPE_SINGLETON:BeanDefinition.SCOPE_PROTOTYPE);
+		definition.setScope(singleton ? BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 
 		try {
 			beanRegistry.registerBeanDefinition(name, definition);
-		}catch(BeanDefinitionOverrideException bse) {
+		}
+		catch (BeanDefinitionOverrideException bse) {
 			throw new GirBeanDefinitionStoreException(bse);
-		}catch(BeanDefinitionStoreException bse) {
+		}
+		catch (BeanDefinitionStoreException bse) {
 			throw new GirBeanDefinitionStoreException(bse);
 		}
 	}
-
-
-
 
 }

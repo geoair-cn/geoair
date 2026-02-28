@@ -5,8 +5,8 @@ import cn.geoair.gtc.base.gpa.dao.GiUpdateDao;
 
 /**
  * 可以更新的实体接口
- * @author Ray
  *
+ * @author Ray
  * @param <PK> 主键类型
  */
 public interface GiEntityAlterable<PK extends Serializable> extends GiEntityable<PK> {
@@ -17,8 +17,8 @@ public interface GiEntityAlterable<PK extends Serializable> extends GiEntityable
 	 * @return 更新DAO实例
 	 */
 	@SuppressWarnings("unchecked")
-	default <M extends GiEntityAlterable<PK>> GiUpdateDao<M,PK> updateDao(){
-		return GiUpdateDao.getDao((Class<M>)this.getClass());
+	default <M extends GiEntityAlterable<PK>> GiUpdateDao<M, PK> updateDao() {
+		return GiUpdateDao.getDao((Class<M>) this.getClass());
 	}
 
 	/**

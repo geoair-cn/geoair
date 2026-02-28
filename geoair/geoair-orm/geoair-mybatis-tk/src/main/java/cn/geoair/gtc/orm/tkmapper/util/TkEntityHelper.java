@@ -12,11 +12,11 @@ import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 /**
  * 对 TkMapper 实体的工具类
+ *
  * @author Ray
  *
  */
 public class TkEntityHelper {
-
 
 	private static final Map<String, EntityColumn> entityTableMap = new GkConcurrentReferenceHashMap<String, EntityColumn>();
 
@@ -26,8 +26,7 @@ public class TkEntityHelper {
 	 * @param methodName
 	 * @return
 	 */
-	public static EntityColumn getEntityColumnByMethodName(Class<?> entityClass,String methodName) {
-
+	public static EntityColumn getEntityColumnByMethodName(Class<?> entityClass, String methodName) {
 
 		return entityTableMap.computeIfAbsent(methodName, key -> {
 
@@ -38,23 +37,26 @@ public class TkEntityHelper {
 					Field getter = ef.getClass().getDeclaredField("getter");
 					GutilReflection.makeAccessible(getter);
 
-					if(key.equalsIgnoreCase(getter.getName())){
+					if (key.equalsIgnoreCase(getter.getName())) {
 						return column;
-					}else {
+					}
+					else {
 						Field setter = ef.getClass().getDeclaredField("setter");
 						GutilReflection.makeAccessible(setter);
 
-						if(key.equalsIgnoreCase(setter.getName())){
+						if (key.equalsIgnoreCase(setter.getName())) {
 							return column;
 						}
 					}
 
-				} catch (NoSuchFieldException | SecurityException e) {
-					 Gir.log.error(e, "tk.mybatis.mapper.entity.EntityField类无法访问 getter setter属性");
 				}
-	        }
+				catch (NoSuchFieldException | SecurityException e) {
+					Gir.log.error(e, "tk.mybatis.mapper.entity.EntityField类无法访问 getter setter属性");
+				}
+			}
 			return null;
 		});
 
 	}
+
 }

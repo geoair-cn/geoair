@@ -21,88 +21,84 @@ import cn.geoair.gtc.base.gpa.entity.GiEntityQueryable;
 import cn.geoair.gtc.base.util.GutilReflection;
 import cn.geoair.gtc.orm.springjpa.support.GirSpringJpaPageHelper;
 
-public interface PagerRepository<T extends GiEntityQueryable<PK>, PK extends Serializable> extends JpaRepository<T, PK>, JpaSpecificationExecutor<T>,GiPagerDao<T, PK> {
-
-
-
+public interface PagerRepository<T extends GiEntityQueryable<PK>, PK extends Serializable>
+		extends JpaRepository<T, PK>, JpaSpecificationExecutor<T>, GiPagerDao<T, PK> {
 
 	/**
-	 *  gtcPageParam 转换  Pageable
+	 * gtcPageParam 转换 Pageable
 	 * @param pageParam
 	 * @return
 	 */
 	default Pageable toPageable(GiPageParam pageParam) {
-        return  GirSpringJpaPageHelper.toPageable(pageParam);
+		return GirSpringJpaPageHelper.toPageable(pageParam);
 	}
 
 	/**
-     * 分页查询单表所有记录
-     *
-     * @return
-     */
+	 * 分页查询单表所有记录
+	 * @return
+	 */
 	@Override
-    default GiPager<T>  gtcSearchPageAll(GiPageParam pageParam){
-        //int pageNum = pageParam.pageNum();
-        //int pageSize = pageParam.pageSize();
-        //PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
-        Page<T> jpapage = this.findAll((Specification<T>)null,toPageable(pageParam));
-        pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
-        return getModelPager().put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
+	default GiPager<T> gtcSearchPageAll(GiPageParam pageParam) {
+		// int pageNum = pageParam.pageNum();
+		// int pageSize = pageParam.pageSize();
+		// PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
+		Page<T> jpapage = this.findAll((Specification<T>) null, toPageable(pageParam));
+		pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
+		return getModelPager().put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
 	}
 
-    /**
-     * 根据PO条件分页查询多条记录
-     *
-     * @param t
-     * @return
-     */
-    //@SuppressWarnings("unchecked")
+	/**
+	 * 根据PO条件分页查询多条记录
+	 * @param t
+	 * @return
+	 */
+	// @SuppressWarnings("unchecked")
 	@Override
-    default GiPager<T>  gtcSearchPage(T t,GiPageParam pageParam) {
+	default GiPager<T> gtcSearchPage(T t, GiPageParam pageParam) {
 
-        Class<T> modelClass = this.getModelClass();
-        //JpaSpecificationExecutor<T> simpleJpaRepository =  gtc.beans.getBean(JpaSpecificationExecutor.class, new Type[]{modelClass});
-        Example<T> of = Example.of(t);
-        //int pageNum = pageParam.pageNum();
-        //int pageSize = pageParam.pageSize();
-        //PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
-        Page<T> jpapage = this.findAll(of, toPageable(pageParam));
-        pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
-        return GiPager.ofClass(modelClass).put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
+		Class<T> modelClass = this.getModelClass();
+		// JpaSpecificationExecutor<T> simpleJpaRepository =
+		// gtc.beans.getBean(JpaSpecificationExecutor.class, new Type[]{modelClass});
+		Example<T> of = Example.of(t);
+		// int pageNum = pageParam.pageNum();
+		// int pageSize = pageParam.pageSize();
+		// PageRequest pageRequest = PageRequest.of(pageNum, pageSize);
+		Page<T> jpapage = this.findAll(of, toPageable(pageParam));
+		pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
+		return GiPager.ofClass(modelClass).put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
 
-    }
+	}
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
-    default GiPager<T>  gtcSearchPageByPK(List<PK> pks,GiPageParam pageParam) {
+	default GiPager<T> gtcSearchPageByPK(List<PK> pks, GiPageParam pageParam) {
 
-        Class<T> modelClass = this.getModelClass();
+		Class<T> modelClass = this.getModelClass();
 
-        JpaEntityInformation<T, ?> entityInformation = (JpaEntityInformation<T, ?>)GutilReflection.getFieldValue(this,GutilReflection.findField(this.getClass(), "entityInformation", JpaEntityInformation.class));
+		JpaEntityInformation<T, ?> entityInformation = (JpaEntityInformation<T, ?>) GutilReflection.getFieldValue(this,
+				GutilReflection.findField(this.getClass(), "entityInformation", JpaEntityInformation.class));
 
-        //JpaEntityInformationSupport.getEntityInformation(modelClass, em);
+		// JpaEntityInformationSupport.getEntityInformation(modelClass, em);
 
-
-        Specification<T> specification = new Specification<T>() {
-            /**
+		Specification<T> specification = new Specification<T>() {
+			/**
 			 *
 			 */
 			private static final long serialVersionUID = -5083792737032473764L;
 
 			@Override
-            public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+			public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 
-            	Path<?> path = root.get(entityInformation.getIdAttribute());
-            	//Collection<PK> idCollection = Streamable.of(pks).toList();
-    			return path.in(pks);
-            }
-        };
+				Path<?> path = root.get(entityInformation.getIdAttribute());
+				// Collection<PK> idCollection = Streamable.of(pks).toList();
+				return path.in(pks);
+			}
+		};
 
-        Page<T> jpapage = this.findAll(specification, toPageable(pageParam));
-        pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
-        return GiPager.ofClass(modelClass).put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
+		Page<T> jpapage = this.findAll(specification, toPageable(pageParam));
+		pageParam.putParam(jpapage.getSize(), jpapage.getNumber(), null);
+		return GiPager.ofClass(modelClass).put(jpapage.getContent(), jpapage.getTotalElements(), pageParam);
 
-    }
-
+	}
 
 }

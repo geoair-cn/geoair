@@ -7,166 +7,175 @@ import java.util.*;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/6/30 15:04
- * @description： 实体表对象
+ * @date ：Created in 2022/6/30 15:04 @description： 实体表对象
  */
 public class GirEntityTable {
 
-    //属性和列对应
-    protected Map<String, GirEntityColumn> propertyMap;
-    private String name;
-    private String catalog;
-    private String schema;
-    private String orderByClause;
-    private String baseSelect;
-    //实体类 => 全部列属性
-    private Set<GirEntityColumn> entityClassColumns;
-    //实体类 => 主键信息
-    private Set<GirEntityColumn> entityClassPKColumns;
-    //useGenerator包含多列的时候需要用到
-    private List<String> keyProperties;
-    private List<String> keyColumns;
+	// 属性和列对应
+	protected Map<String, GirEntityColumn> propertyMap;
 
-    //类
-    private Class<?> entityClass;
+	private String name;
 
-    public GirEntityTable(Class<?> entityClass) {
-        this.entityClass = entityClass;
-    }
+	private String catalog;
 
-    public GirEntityTable() {
+	private String schema;
 
-    }
+	private String orderByClause;
 
-    /**
-     * 初始化 - Example 会使用
-     */
-    public void initPropertyMap() {
-        propertyMap = new HashMap<String, GirEntityColumn>(getEntityClassColumns().size());
-        for ( GirEntityColumn column : getEntityClassColumns()) {
-            propertyMap.put(column.getProperty(), column);
-        }
-    }
+	private String baseSelect;
 
+	// 实体类 => 全部列属性
+	private Set<GirEntityColumn> entityClassColumns;
 
-    public String getBaseSelect() {
-        return baseSelect;
-    }
+	// 实体类 => 主键信息
+	private Set<GirEntityColumn> entityClassPKColumns;
 
-    public void setBaseSelect(String baseSelect) {
-        this.baseSelect = baseSelect;
-    }
+	// useGenerator包含多列的时候需要用到
+	private List<String> keyProperties;
 
-    public String getCatalog() {
-        return catalog;
-    }
+	private List<String> keyColumns;
 
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
+	// 类
+	private Class<?> entityClass;
 
-    public Class<?> getEntityClass() {
-        return entityClass;
-    }
+	public GirEntityTable(Class<?> entityClass) {
+		this.entityClass = entityClass;
+	}
 
-    public Set<GirEntityColumn> getEntityClassColumns() {
-        return entityClassColumns;
-    }
+	public GirEntityTable() {
 
-    public void setEntityClassColumns(Set<GirEntityColumn> entityClassColumns) {
-        this.entityClassColumns = entityClassColumns;
-    }
+	}
 
-    public Set<GirEntityColumn> getEntityClassPKColumns() {
-        return entityClassPKColumns;
-    }
+	/**
+	 * 初始化 - Example 会使用
+	 */
+	public void initPropertyMap() {
+		propertyMap = new HashMap<String, GirEntityColumn>(getEntityClassColumns().size());
+		for (GirEntityColumn column : getEntityClassColumns()) {
+			propertyMap.put(column.getProperty(), column);
+		}
+	}
 
-    public void setEntityClassPKColumns(Set<GirEntityColumn> entityClassPKColumns) {
-        this.entityClassPKColumns = entityClassPKColumns;
-    }
+	public String getBaseSelect() {
+		return baseSelect;
+	}
 
-    public String[] getKeyColumns() {
-        if (keyColumns != null && keyColumns.size() > 0) {
-            return keyColumns.toArray(new String[]{});
-        }
-        return new String[]{};
-    }
+	public void setBaseSelect(String baseSelect) {
+		this.baseSelect = baseSelect;
+	}
 
-    public void setKeyColumns(String keyColumn) {
-        if (this.keyColumns == null) {
-            this.keyColumns = new ArrayList<String>();
-            this.keyColumns.add(keyColumn);
-        } else {
-            this.keyColumns.add(keyColumn);
-        }
-    }
+	public String getCatalog() {
+		return catalog;
+	}
 
-    public String[] getKeyProperties() {
-        if (keyProperties != null && keyProperties.size() > 0) {
-            return keyProperties.toArray(new String[]{});
-        }
-        return new String[]{};
-    }
+	public void setCatalog(String catalog) {
+		this.catalog = catalog;
+	}
 
-    public void setKeyProperties(String keyProperty) {
-        if (this.keyProperties == null) {
-            this.keyProperties = new ArrayList<String>();
-            this.keyProperties.add(keyProperty);
-        } else {
-            this.keyProperties.add(keyProperty);
-        }
-    }
+	public Class<?> getEntityClass() {
+		return entityClass;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Set<GirEntityColumn> getEntityClassColumns() {
+		return entityClassColumns;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setEntityClassColumns(Set<GirEntityColumn> entityClassColumns) {
+		this.entityClassColumns = entityClassColumns;
+	}
 
-    public String getOrderByClause() {
-        return orderByClause;
-    }
+	public Set<GirEntityColumn> getEntityClassPKColumns() {
+		return entityClassPKColumns;
+	}
 
-    public void setOrderByClause(String orderByClause) {
-        this.orderByClause = orderByClause;
-    }
+	public void setEntityClassPKColumns(Set<GirEntityColumn> entityClassPKColumns) {
+		this.entityClassPKColumns = entityClassPKColumns;
+	}
 
-    public String getPrefix() {
-        if (GutilStr.isNotEmpty(catalog)) {
-            return catalog;
-        }
-        if (GutilStr.isNotEmpty(schema)) {
-            return schema;
-        }
-        return "";
-    }
+	public String[] getKeyColumns() {
+		if (keyColumns != null && keyColumns.size() > 0) {
+			return keyColumns.toArray(new String[] {});
+		}
+		return new String[] {};
+	}
 
-    public Map<String, GirEntityColumn> getPropertyMap() {
-        return propertyMap;
-    }
+	public void setKeyColumns(String keyColumn) {
+		if (this.keyColumns == null) {
+			this.keyColumns = new ArrayList<String>();
+			this.keyColumns.add(keyColumn);
+		}
+		else {
+			this.keyColumns.add(keyColumn);
+		}
+	}
 
-    public String getSchema() {
-        return schema;
-    }
+	public String[] getKeyProperties() {
+		if (keyProperties != null && keyProperties.size() > 0) {
+			return keyProperties.toArray(new String[] {});
+		}
+		return new String[] {};
+	}
 
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
+	public void setKeyProperties(String keyProperty) {
+		if (this.keyProperties == null) {
+			this.keyProperties = new ArrayList<String>();
+			this.keyProperties.add(keyProperty);
+		}
+		else {
+			this.keyProperties.add(keyProperty);
+		}
+	}
 
-    public void setKeyColumns(List<String> keyColumns) {
-        this.keyColumns = keyColumns;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setKeyProperties(List<String> keyProperties) {
-        this.keyProperties = keyProperties;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setTable(Table table) {
-        this.name = table.name();
-        this.catalog = table.catalog();
-        this.schema = table.schema();
-    }
+	public String getOrderByClause() {
+		return orderByClause;
+	}
+
+	public void setOrderByClause(String orderByClause) {
+		this.orderByClause = orderByClause;
+	}
+
+	public String getPrefix() {
+		if (GutilStr.isNotEmpty(catalog)) {
+			return catalog;
+		}
+		if (GutilStr.isNotEmpty(schema)) {
+			return schema;
+		}
+		return "";
+	}
+
+	public Map<String, GirEntityColumn> getPropertyMap() {
+		return propertyMap;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+
+	public void setKeyColumns(List<String> keyColumns) {
+		this.keyColumns = keyColumns;
+	}
+
+	public void setKeyProperties(List<String> keyProperties) {
+		this.keyProperties = keyProperties;
+	}
+
+	public void setTable(Table table) {
+		this.name = table.name();
+		this.catalog = table.catalog();
+		this.schema = table.schema();
+	}
+
 }
-

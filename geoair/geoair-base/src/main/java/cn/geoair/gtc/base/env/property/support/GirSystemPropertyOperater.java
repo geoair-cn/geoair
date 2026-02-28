@@ -4,7 +4,7 @@ import cn.geoair.gtc.base.convert.util.GirConvertHelper;
 import cn.geoair.gtc.base.util.GutilStr;
 import cn.geoair.gtc.base.env.property.GiPropertier;
 
-public class GirSystemPropertyOperater implements GiPropertier{
+public class GirSystemPropertyOperater implements GiPropertier {
 
 	@Override
 	public boolean containsProperty(String key) {
@@ -25,8 +25,8 @@ public class GirSystemPropertyOperater implements GiPropertier{
 	@Override
 	public <T> T getProperty(String key, Class<T> targetType) {
 		String value = getProperty(key);
-		if(GutilStr.hasText(value)) {
-			return  GirConvertHelper.convert(value,targetType);
+		if (GutilStr.hasText(value)) {
+			return GirConvertHelper.convert(value, targetType);
 		}
 
 		return null;
@@ -34,8 +34,8 @@ public class GirSystemPropertyOperater implements GiPropertier{
 
 	@Override
 	public <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
-		T res = getProperty(key,targetType);
-		if(res == null) {
+		T res = getProperty(key, targetType);
+		if (res == null) {
 			res = defaultValue;
 		}
 		return res;
@@ -44,17 +44,17 @@ public class GirSystemPropertyOperater implements GiPropertier{
 	@Override
 	public String getRequiredProperty(String key) throws IllegalStateException {
 		String res = getProperty(key);
-		if(res == null) {
-			throw new IllegalStateException("找不到属性名为:<"+key+">的属性");
+		if (res == null) {
+			throw new IllegalStateException("找不到属性名为:<" + key + ">的属性");
 		}
 		return res;
 	}
 
 	@Override
 	public <T> T getRequiredProperty(String key, Class<T> targetType) throws IllegalStateException {
-		T res = getProperty(key,targetType);
-		if(res == null) {
-			throw new IllegalStateException("找不到属性名为:<"+key+">的属性");
+		T res = getProperty(key, targetType);
+		if (res == null) {
+			throw new IllegalStateException("找不到属性名为:<" + key + ">的属性");
 		}
 		return res;
 	}
@@ -70,10 +70,5 @@ public class GirSystemPropertyOperater implements GiPropertier{
 		// TODO Auto-generated method stub
 		return text;
 	}
-
-
-
-
-
 
 }

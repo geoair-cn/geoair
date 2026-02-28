@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author
  */
 public class GkSecurityManagerCaller extends SecurityManager implements GkCaller, Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	private static final int OFFSET = 1;
@@ -30,7 +31,6 @@ public class GkSecurityManagerCaller extends SecurityManager implements GkCaller
 		return null;
 	}
 
-
 	@Override
 	public Class<?> getCallerCaller() {
 		final Class<?>[] context = getClassContext();
@@ -48,7 +48,6 @@ public class GkSecurityManagerCaller extends SecurityManager implements GkCaller
 		}
 		return null;
 	}
-
 
 	@Override
 	public Class<?> getCaller(int depth) {
@@ -68,11 +67,10 @@ public class GkSecurityManagerCaller extends SecurityManager implements GkCaller
 		return null;
 	}
 
-
 	@Override
 	public boolean isCalledBy(Class<?> clazz) {
 		final Class<?>[] classes = getClassContext();
-		if((classes != null && classes.length != 0)) {
+		if ((classes != null && classes.length != 0)) {
 			for (Class<?> contextClass : classes) {
 				if (contextClass.equals(clazz)) {
 					return true;
@@ -81,4 +79,5 @@ public class GkSecurityManagerCaller extends SecurityManager implements GkCaller
 		}
 		return false;
 	}
+
 }

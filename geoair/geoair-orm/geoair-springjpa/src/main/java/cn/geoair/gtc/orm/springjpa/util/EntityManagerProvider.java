@@ -7,31 +7,28 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.lang.ref.WeakReference;
 
-
 /**
  * @author ：张俊
- * @date ：Created in 2022/7/1 14:05
- * @description： EntityManager提供者
+ * @date ：Created in 2022/7/1 14:05 @description： EntityManager提供者
  */
 @Component
 public class EntityManagerProvider {
 
-    private static WeakReference<EntityManagerProvider> weakReference = null;
+	private static WeakReference<EntityManagerProvider> weakReference = null;
 
-    @PersistenceContext
-    EntityManager entityManager;
+	@PersistenceContext
+	EntityManager entityManager;
 
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
+	public EntityManager getEntityManager() {
+		return entityManager;
+	}
 
+	public static EntityManagerProvider getEntityManagerProvider() {
+		if (weakReference == null) {
+			weakReference = new WeakReference<>(Gir.beans.getBean(EntityManagerProvider.class));
+		}
+		return weakReference.get();
 
-    public static EntityManagerProvider getEntityManagerProvider() {
-        if (weakReference == null) {
-            weakReference = new WeakReference<>( Gir.beans.getBean(EntityManagerProvider.class));
-        }
-        return weakReference.get();
-
-    }
+	}
 
 }

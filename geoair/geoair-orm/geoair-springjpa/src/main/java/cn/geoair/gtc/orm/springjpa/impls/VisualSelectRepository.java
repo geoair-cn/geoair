@@ -10,17 +10,18 @@ import cn.geoair.gtc.base.data.page.GiPager;
 import cn.geoair.gtc.base.gpa.dao.GiVisualSelectDao;
 import cn.geoair.gtc.base.gpa.entity.GiEntityVisuable;
 
-public interface VisualSelectRepository<T extends GiEntityVisuable<PK>,PK extends Serializable> extends CrudRepository<T, PK>, JpaSpecificationExecutor<T>,GiVisualSelectDao<T,PK>{
-
-
+public interface VisualSelectRepository<T extends GiEntityVisuable<PK>, PK extends Serializable>
+		extends CrudRepository<T, PK>, JpaSpecificationExecutor<T>, GiVisualSelectDao<T, PK> {
 
 	@SuppressWarnings("rawtypes")
-	default List<GirVisualModelKid> searchVisualModel(String displayQuery, String[] containKeys){
+	default List<GirVisualModelKid> searchVisualModel(String displayQuery, String[] containKeys) {
 		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
-	default GiPager<GirVisualModelKid> searchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam){
+	default GiPager<GirVisualModelKid> searchVisualPage(String displayQuery, String[] containKeys,
+			GiPageParam pageParam) {
 		return null;
 	}
+
 }

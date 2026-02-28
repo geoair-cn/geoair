@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 
 import cn.geoair.gtc.base.def.annotation.GaParameter;
 
-
 public interface GiModelFieldApplyer {
 
 	/**
@@ -17,7 +16,6 @@ public interface GiModelFieldApplyer {
 	 * @param cfg 参数配置数组
 	 * @throws Exception 处理异常，将阻断其它FieldApplyer执行
 	 */
-	void apply(String type ,Object model, Field field, Field tar, int tag , GaParameter[] cfg) throws Exception;
-
+	void apply(String type, Object model, Field field, Field tar, int tag, GaParameter[] cfg) throws Exception;
 
 }

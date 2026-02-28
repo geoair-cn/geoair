@@ -14,7 +14,6 @@ import cn.geoair.gtc.base.sp.GirSpHelper;
 
 public interface GiPageParam extends Serializable {
 
-
 	/**
 	 * 获取每页显示的记录数量
 	 * @return 每页记录数
@@ -34,15 +33,15 @@ public interface GiPageParam extends Serializable {
 	public int pageNum();
 
 	/**
-     * 是否包含count查询
-     * @return true:包含count查询,false:不包含count查询
-     */
-    public boolean countTotal();
+	 * 是否包含count查询
+	 * @return true:包含count查询,false:不包含count查询
+	 */
+	public boolean countTotal();
 
-    /**
-     * 获取排序条件
-     * @return 排序条件
-     */
+	/**
+	 * 获取排序条件
+	 * @return 排序条件
+	 */
 	public GirSort sort();
 
 	/**
@@ -52,14 +51,14 @@ public interface GiPageParam extends Serializable {
 	 * @param startRow 游标开始行号
 	 * @return 分页参数对象
 	 */
-	public GiPageParam putParam(Integer pageSize,Integer pageNum,Long startRow);
+	public GiPageParam putParam(Integer pageSize, Integer pageNum, Long startRow);
 
 	/**
 	 * 设置排序条件
 	 * @param sort 排序条件
 	 * @return 分页参数对象
 	 */
-	public GiPageParam putSort( GirSort sort);
+	public GiPageParam putSort(GirSort sort);
 
 	/**
 	 * 设置是否包含count查询
@@ -68,13 +67,12 @@ public interface GiPageParam extends Serializable {
 	 */
 	public GiPageParam putCountTotal(boolean countTotal);
 
-
 	/**
 	 * 初始化一个GiPageParam对象。
 	 * @return GiPageParam实例
 	 */
 	public static GiPageParam of() {
-		return  GirSpHelper.load(GiPageConfig.class).getPageParamProvider().getPageParam();
+		return GirSpHelper.load(GiPageConfig.class).getPageParamProvider().getPageParam();
 	}
 
 	/**
@@ -84,7 +82,7 @@ public interface GiPageParam extends Serializable {
 	 * @param startRow 游标开始行号
 	 * @return GiPageParam实例
 	 */
-	public static GiPageParam of(Integer pageSize,Integer pageNum,Long startRow) {
+	public static GiPageParam of(Integer pageSize, Integer pageNum, Long startRow) {
 		return of().putParam(pageSize, pageNum, startRow);
 	}
 

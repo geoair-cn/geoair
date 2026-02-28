@@ -12,11 +12,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Ray
  */
-@Target({PACKAGE, TYPE})
+@Target({ PACKAGE, TYPE })
 @Retention(RUNTIME)
 public @interface GaGenericGenerators {
+
 	/**
 	 * The aggregated generators.
 	 */
 	GaGenericGenerator[] value();
+
 }

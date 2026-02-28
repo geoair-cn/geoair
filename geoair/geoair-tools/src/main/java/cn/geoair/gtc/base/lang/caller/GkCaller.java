@@ -8,31 +8,27 @@ package cn.geoair.gtc.base.lang.caller;
  *
  */
 public interface GkCaller {
+
 	/**
 	 * 获得调用者
-	 *
 	 * @return 调用者
 	 */
 	Class<?> getCaller();
 
 	/**
 	 * 获得调用者类名
-	 *
 	 * @return 调用者类名
 	 */
 	String getCallerName();
 
 	/**
 	 * 获得调用者的调用者
-	 *
 	 * @return 调用者的调用者
 	 */
 	Class<?> getCallerCaller();
 
-
 	/**
 	 * 获得调用者的调用者的类名
-	 *
 	 * @return 调用者的调用者的类名
 	 */
 	String getCallerCallerName();
@@ -46,19 +42,19 @@ public interface GkCaller {
 	 * 2 调用者的调用者
 	 * ...
 	 * </pre>
-	 *
-	 * @param depth 层级。0表示{@link GkCallerUtil}本身，1表示调用{@link GkCallerUtil}的类，2表示调用者的调用者，依次类推
+	 * @param depth
+	 * 层级。0表示{@link GkCallerUtil}本身，1表示调用{@link GkCallerUtil}的类，2表示调用者的调用者，依次类推
 	 * @return 第几级调用者
 	 */
 	Class<?> getCaller(int depth);
+
 	String getCallerName(int depth);
 
 	/**
 	 * 是否被指定类调用
-	 *
 	 * @param clazz 调用者类
 	 * @return 是否被调用
 	 */
 	boolean isCalledBy(Class<?> clazz);
-}
 
+}

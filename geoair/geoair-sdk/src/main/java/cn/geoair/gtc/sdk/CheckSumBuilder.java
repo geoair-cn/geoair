@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CheckSumBuilder {
+
 	public static String getCheckSum(String appSecret, String nonce, String curTime) {
 		return encode("sha1", appSecret + nonce + curTime);
 	}
@@ -46,7 +47,8 @@ public class CheckSumBuilder {
 			MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
 			messageDigest.update(value.getBytes());
 			return getFormattedText(messageDigest.digest());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -60,7 +62,8 @@ public class CheckSumBuilder {
 			MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
 			messageDigest.update(bytes);
 			return getFormattedText(messageDigest.digest());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -77,4 +80,5 @@ public class CheckSumBuilder {
 
 	private static final char[] HEX_DIGITS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
 			'c', 'd', 'e', 'f' };
+
 }

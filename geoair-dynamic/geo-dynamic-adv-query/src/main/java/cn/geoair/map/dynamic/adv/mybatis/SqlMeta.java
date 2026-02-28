@@ -2,30 +2,31 @@ package cn.geoair.map.dynamic.adv.mybatis;
 
 import java.util.List;
 
-
 public class SqlMeta {
 
-    String sql;
-    List<Object> jdbcParamValues;
+	String sql;
 
-    public SqlMeta(String sql, List<Object> jdbcParamValues) {
-        this.sql = sql;
-        this.jdbcParamValues = jdbcParamValues;
-    }
+	List<Object> jdbcParamValues;
 
-    public String getSql() {
-        return sql;
-    }
+	public SqlMeta(String sql, List<Object> jdbcParamValues) {
+		this.sql = sql;
+		this.jdbcParamValues = jdbcParamValues;
+	}
 
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
+	public String getSql() {
+		return sql;
+	}
 
-    public List<Object> getJdbcParamValues() {
-        return jdbcParamValues;
-    }
+	public void setSql(String sql) {
+		this.sql = sql;
+	}
 
-    public void setJdbcParamValues(List<Object> jdbcParamValues) {
-        this.jdbcParamValues = jdbcParamValues;
-    }
+	public List<Object> getJdbcParamValues() {
+		return jdbcParamValues;
+	}
+
+	public void setJdbcParamValues(List<Object> jdbcParamValues) {
+		this.jdbcParamValues = jdbcParamValues;
+	}
+
 }

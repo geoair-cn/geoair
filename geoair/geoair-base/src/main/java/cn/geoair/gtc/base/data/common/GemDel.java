@@ -5,8 +5,7 @@ import cn.geoair.gtc.base.data.GiVisualValuable;
 
 public enum GemDel implements GiVisualValuable<Integer> {
 
-	已删除(1),
-	未删除(0);
+	已删除(1), 未删除(0);
 
 	@GaModelField(isID = true)
 	private Integer code;

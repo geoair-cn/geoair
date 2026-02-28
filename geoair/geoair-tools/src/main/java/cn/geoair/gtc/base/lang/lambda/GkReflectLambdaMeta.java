@@ -7,67 +7,72 @@ import cn.geoair.gtc.base.util.GutilClass;
 import cn.geoair.gtc.base.util.GutilReflection;
 
 public class GkReflectLambdaMeta implements GkfLambdaMeta {
-    private static final Field FIELD_CAPTURING_CLASS;
 
-    static {
-        Field fieldCapturingClass;
-        try {
-            Class<SerializedLambda> aClass = SerializedLambda.class;
-            fieldCapturingClass = GutilReflection.setAccessible(aClass.getDeclaredField("capturingClass"));
-        } catch (Throwable e) {
-            // 解决高版本 jdk 的问题 gitee: https://gitee.com/baomidou/mybatis-plus/issues/I4A7I5
-            e.printStackTrace();
-            fieldCapturingClass = null;
-        }
-        FIELD_CAPTURING_CLASS = fieldCapturingClass;
-    }
+	private static final Field FIELD_CAPTURING_CLASS;
 
-    private final SerializedLambda lambda;
+	static {
+		Field fieldCapturingClass;
+		try {
+			Class<SerializedLambda> aClass = SerializedLambda.class;
+			fieldCapturingClass = GutilReflection.setAccessible(aClass.getDeclaredField("capturingClass"));
+		}
+		catch (Throwable e) {
+			// 解决高版本 jdk 的问题 gitee: https://gitee.com/baomidou/mybatis-plus/issues/I4A7I5
+			e.printStackTrace();
+			fieldCapturingClass = null;
+		}
+		FIELD_CAPTURING_CLASS = fieldCapturingClass;
+	}
 
-    public GkReflectLambdaMeta(SerializedLambda lambda) {
-        this.lambda = lambda;
-    }
+	private final SerializedLambda lambda;
 
-    @Override
-    public String getImplMethodName() {
+	public GkReflectLambdaMeta(SerializedLambda lambda) {
+		this.lambda = lambda;
+	}
 
-        return lambda.getImplMethodName();
-    }
+	@Override
+	public String getImplMethodName() {
 
-    public String getImplClass(){
-    	return lambda.getImplClass();
-    }
+		return lambda.getImplMethodName();
+	}
 
+	public String getImplClass() {
+		return lambda.getImplClass();
+	}
 
-    @Override
-    public Class<?> getInstantiatedClass() {
-        String instantiatedMethodType = lambda.getInstantiatedMethodType();
-        String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(';')).replace('/', '.');
-        try {
+	@Override
+	public Class<?> getInstantiatedClass() {
+		String instantiatedMethodType = lambda.getInstantiatedMethodType();
+		String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(';')).replace('/',
+				'.');
+		try {
 			return GutilClass.forName(instantiatedType, getCapturingClassClassLoader());
-		} catch (ClassNotFoundException | LinkageError e) {
+		}
+		catch (ClassNotFoundException | LinkageError e) {
 			e.printStackTrace();
 		}
-        return null;
-    }
+		return null;
+	}
 
-    private ClassLoader getCapturingClassClassLoader() {
-        // 如果反射失败，使用默认的 classloader
-        if (FIELD_CAPTURING_CLASS == null) {
-            return null;
-        }
-        try {
-            return ((Class<?>) FIELD_CAPTURING_CLASS.get(lambda)).getClassLoader();
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+	private ClassLoader getCapturingClassClassLoader() {
+		// 如果反射失败，使用默认的 classloader
+		if (FIELD_CAPTURING_CLASS == null) {
+			return null;
+		}
+		try {
+			return ((Class<?>) FIELD_CAPTURING_CLASS.get(lambda)).getClassLoader();
+		}
+		catch (IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@Override
 	public Class<?> getCapturingClass() {
 		try {
-			return GutilClass.forName(lambda.getCapturingClass().replace('/', '.'),null);
-		} catch (ClassNotFoundException | LinkageError e) {
+			return GutilClass.forName(lambda.getCapturingClass().replace('/', '.'), null);
+		}
+		catch (ClassNotFoundException | LinkageError e) {
 			e.printStackTrace();
 		}
 		return null;

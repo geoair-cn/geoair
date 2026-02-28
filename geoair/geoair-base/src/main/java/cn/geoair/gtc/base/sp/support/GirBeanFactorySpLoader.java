@@ -11,32 +11,35 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
 public class GirBeanFactorySpLoader extends GirCacheSpLoader {
 
 	@Override
-	public <T> T load(Class<T> cls,Type[] types) {
+	public <T> T load(Class<T> cls, Type[] types) {
 
 		GkSP spiAn = cls.getAnnotation(GkSP.class);
-    	if(spiAn == null) {
-    		throw new GirException("获取sp实现的接口必须包含GkSP注解：{} ",cls.getName());
-    	}
-    	T t = null;
-		if(spiAn.singleton()) {
+		if (spiAn == null) {
+			throw new GirException("获取sp实现的接口必须包含GkSP注解：{} ", cls.getName());
+		}
+		T t = null;
+		if (spiAn.singleton()) {
 			t = super.load(cls, types);
 		}
-		if(t == null) {
-			if( GirBeanHelper.getProvider() != null) {
+		if (t == null) {
+			if (GirBeanHelper.getProvider() != null) {
 				try {
-					if(types.length > 0) {
-						t =  GirBeanHelper.getProvider().getBean(cls, types);
-					}else {
-						t =  GirBeanHelper.getProvider().getBean(cls);
+					if (types.length > 0) {
+						t = GirBeanHelper.getProvider().getBean(cls, types);
 					}
-				}catch( GirNoUniqueBeanException nex) {
+					else {
+						t = GirBeanHelper.getProvider().getBean(cls);
+					}
+				}
+				catch (GirNoUniqueBeanException nex) {
 					throw nex;
-				}catch( GirNoSuchBeanException nex) {
+				}
+				catch (GirNoSuchBeanException nex) {
 					//
 				}
 			}
 		}
-		if(spiAn.singleton() && t != null) {
+		if (spiAn.singleton() && t != null) {
 			this.setCache(cls, types, t);
 		}
 		return t;

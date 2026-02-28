@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.adv.mybatis;
 
-
 /**
  * @program: dbApi
  * @description:
@@ -9,9 +8,10 @@ package cn.geoair.map.dynamic.adv.mybatis;
  **/
 public class SqlEngineUtil {
 
-    static DynamicSqlEngine engine = new DynamicSqlEngine();
+	static DynamicSqlEngine engine = new DynamicSqlEngine();
 
-    public static DynamicSqlEngine getEngine() {
-        return engine;
-    }
+	public static DynamicSqlEngine getEngine() {
+		return engine;
+	}
+
 }

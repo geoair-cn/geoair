@@ -13,17 +13,17 @@ import java.util.Date;
  * @since 2022-04-25
  */
 public interface DateSectionModel<PK extends Serializable> extends SectionModel<PK, Date> {
-	
+
 	/**
 	 * 获取分表时间因子
 	 * <p>
 	 * 返回当前时间作为分表依据，默认实现返回系统当前时间
 	 * </p>
-	 *
 	 * @return Date 分表时间因子
 	 */
 	@Override
 	default Date factor() {
 		return new Date();
 	}
+
 }

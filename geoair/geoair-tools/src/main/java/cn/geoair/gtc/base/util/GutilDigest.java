@@ -14,9 +14,8 @@ public abstract class GutilDigest {
 
 	private static final String MD5_ALGORITHM_NAME = "MD5";
 
-	private static final char[] HEX_CHARS =
-			{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
+	private static final char[] HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
+			'f' };
 
 	/**
 	 * Calculate the MD5 digest of the given bytes.
@@ -37,8 +36,8 @@ public abstract class GutilDigest {
 	}
 
 	/**
-	 * Append a hexadecimal string representation of the MD5 digest of the given
-	 * bytes to the given {@link StringBuilder}.
+	 * Append a hexadecimal string representation of the MD5 digest of the given bytes to
+	 * the given {@link StringBuilder}.
 	 * @param bytes the bytes to calculate the digest over
 	 * @param builder the string builder to append the digest to
 	 * @return the given string builder
@@ -47,10 +46,10 @@ public abstract class GutilDigest {
 		return appendDigestAsHex(MD5_ALGORITHM_NAME, bytes, builder);
 	}
 
-
 	/**
 	 * Create a new {@link MessageDigest} with the given algorithm.
-	 * <p>Necessary because {@code MessageDigest} is not thread-safe.
+	 * <p>
+	 * Necessary because {@code MessageDigest} is not thread-safe.
 	 */
 	private static MessageDigest getDigest(String algorithm) {
 		try {
@@ -69,7 +68,6 @@ public abstract class GutilDigest {
 		char[] hexDigest = digestAsHexChars(algorithm, bytes);
 		return new String(hexDigest);
 	}
-
 
 	private static StringBuilder appendDigestAsHex(String algorithm, byte[] bytes, StringBuilder builder) {
 		char[] hexDigest = digestAsHexChars(algorithm, bytes);
@@ -91,8 +89,6 @@ public abstract class GutilDigest {
 		return chars;
 	}
 
-
-
 	public static String calFileMd5(File file) {
 		FileInputStream fileInputStream = null;
 		try {
@@ -105,14 +101,17 @@ public abstract class GutilDigest {
 			}
 
 			return new String(encodeHex(MD5.digest()));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return "";
-		} finally {
+		}
+		finally {
 			try {
 				if (fileInputStream != null)
 					fileInputStream.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -124,7 +123,8 @@ public abstract class GutilDigest {
 			MD5.update(bytes);
 
 			return new String(encodeHex(MD5.digest()));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return "";
 		}
@@ -142,11 +142,9 @@ public abstract class GutilDigest {
 		System.out.println(new BigInteger(1, tt).toString(16));
 		System.out.println(UUID.randomUUID().toString());
 
-
-		List<String> list = Arrays.asList(new String[] {"a","b","c","d","e","f","g","h"});
-		System.out.println(list.subList(0,3));
+		List<String> list = Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f", "g", "h" });
+		System.out.println(list.subList(0, 3));
 		System.out.println(list.subList(3, list.size()));
 	}
-
 
 }

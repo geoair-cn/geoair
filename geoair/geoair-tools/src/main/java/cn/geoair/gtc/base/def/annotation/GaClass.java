@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD,ElementType.FIELD})
+@Target({ ElementType.METHOD, ElementType.FIELD })
 public @interface GaClass {
-    public String name() default "";
-    public Class<?> clazz() default Object.class;
+
+	public String name() default "";
+
+	public Class<?> clazz() default Object.class;
+
 }
-
-
-

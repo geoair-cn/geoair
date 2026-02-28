@@ -10,9 +10,10 @@ import cn.geoair.gtc.base.util.GutilStr;
  * @author
  */
 public class GkStackTraceCaller implements GkCaller, Serializable {
-	private static final long serialVersionUID = 1L;
-	private static final int OFFSET = 2;
 
+	private static final long serialVersionUID = 1L;
+
+	private static final int OFFSET = 2;
 
 	@Override
 	public Class<?> getCaller() {
@@ -23,9 +24,10 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		final String className = stackTrace[OFFSET + 1].getClassName();
 		try {
 			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 
-			throw new IllegalStateException(GutilStr.format( "[{}] not found!", className),e);
+			throw new IllegalStateException(GutilStr.format("[{}] not found!", className), e);
 		}
 	}
 
@@ -38,8 +40,6 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		return stackTrace[OFFSET + 1].getClassName();
 	}
 
-
-
 	@Override
 	public Class<?> getCallerCaller() {
 		final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -49,11 +49,11 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		final String className = stackTrace[OFFSET + 2].getClassName();
 		try {
 			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException(GutilStr.format("[{}] not found!", className),e);
+		}
+		catch (ClassNotFoundException e) {
+			throw new IllegalStateException(GutilStr.format("[{}] not found!", className), e);
 		}
 	}
-
 
 	@Override
 	public String getCallerCallerName() {
@@ -64,7 +64,6 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		return stackTrace[OFFSET + 2].getClassName();
 	}
 
-
 	@Override
 	public Class<?> getCaller(int depth) {
 		final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -74,8 +73,9 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		final String className = stackTrace[OFFSET + depth].getClassName();
 		try {
 			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException(GutilStr.format("[{}] not found!", className),e);
+		}
+		catch (ClassNotFoundException e) {
+			throw new IllegalStateException(GutilStr.format("[{}] not found!", className), e);
 		}
 	}
 
@@ -88,7 +88,6 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		return stackTrace[OFFSET + depth].getClassName();
 	}
 
-
 	@Override
 	public boolean isCalledBy(Class<?> clazz) {
 		final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
@@ -99,4 +98,5 @@ public class GkStackTraceCaller implements GkCaller, Serializable {
 		}
 		return false;
 	}
+
 }

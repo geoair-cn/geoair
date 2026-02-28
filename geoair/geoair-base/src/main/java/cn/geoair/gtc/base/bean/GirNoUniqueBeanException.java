@@ -2,9 +2,9 @@ package cn.geoair.gtc.base.bean;
 
 import cn.geoair.gtc.base.util.GutilStr;
 
-
 /**
  * 不是唯一的Bean异常
+ *
  * @author Ray
  *
  */
@@ -36,7 +36,7 @@ public class GirNoUniqueBeanException extends GirNoSuchBeanException {
 	}
 
 	public GirNoUniqueBeanException(Throwable throwable, String messageTemplate, Object... params) {
-		this(GutilStr.format(messageTemplate, params),throwable);
+		this(GutilStr.format(messageTemplate, params), throwable);
 	}
 
 }

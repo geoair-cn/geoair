@@ -3,7 +3,7 @@ package cn.geoair.gtc.spi.util;
 import cn.geoair.gtc.base.gpa.id.GirIdGenerator;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl;
-import  cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.gtc.base.tool.GkSnowflake;
 
 public class GspIdGenerator4Gir {
@@ -13,16 +13,17 @@ public class GspIdGenerator4Gir {
 	}
 
 	private static GkSnowflake snowflake = null;
+
 	public static GkSnowflake getGfSnowflake() {
-		if(snowflake == null) {
-			snowflake = new GkSnowflake(1,1,false);
+		if (snowflake == null) {
+			snowflake = new GkSnowflake(1, 1, false);
 		}
 		return snowflake;
 	}
 
-	@GaMethodHandImpl(implClass= GirIdGenerator.class,implMethod="timestampId",type=ImplType.comity)
-    public static long timestampId(){
+	@GaMethodHandImpl(implClass = GirIdGenerator.class, implMethod = "timestampId", type = ImplType.comity)
+	public static long timestampId() {
 		return getGfSnowflake().nextId();
-    }
+	}
 
 }

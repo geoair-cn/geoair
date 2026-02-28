@@ -22,14 +22,14 @@ import tk.mybatis.mapper.mapperhelper.EntityHelper;
 
 /**
  * TkMapper + GitHubPager的组合工具
+ *
  * @author Ray
  *
  */
 
-public class TkGithubPageHelper implements GiPageExcuter{
+public class TkGithubPageHelper implements GiPageExcuter {
 
 	private static TkGithubPageHelper instance = new TkGithubPageHelper();
-
 
 	/**
 	 * 获取分页执行器
@@ -39,11 +39,9 @@ public class TkGithubPageHelper implements GiPageExcuter{
 		return instance;
 	}
 
-
 	private TkGithubPageHelper() {
 		super();
 	}
-
 
 	/**
 	 * 从gtcSort对象拼装 排序语句
@@ -53,92 +51,89 @@ public class TkGithubPageHelper implements GiPageExcuter{
 
 	public static String orderBySqlFromGirSort(GirSort sort) {
 
-		if(sort != null) {
+		if (sort != null) {
 
-        	Iterator<GirOrder<?>> iterator = sort.iterator();
+			Iterator<GirOrder<?>> iterator = sort.iterator();
 
-        	StringBuilder orderBy = new StringBuilder();
-        	while(iterator.hasNext()) {
+			StringBuilder orderBy = new StringBuilder();
+			while (iterator.hasNext()) {
 
-        		GirOrder<?> order = iterator.next();
+				GirOrder<?> order = iterator.next();
 
-        		if(order.getPropertyFun() != null) {
+				if (order.getPropertyFun() != null) {
 
-        			GkfLambdaMeta lm = GutilLambda.extract(order.getPropertyFun());
+					GkfLambdaMeta lm = GutilLambda.extract(order.getPropertyFun());
 
-        			String methName = lm.getImplMethodName().toUpperCase();
+					String methName = lm.getImplMethodName().toUpperCase();
 
-        			EntityColumn ec = TkEntityHelper.getEntityColumnByMethodName(order.getEntityClass(), methName);
+					EntityColumn ec = TkEntityHelper.getEntityColumnByMethodName(order.getEntityClass(), methName);
 
-        			if(ec != null) {
-                        if (orderBy.length() != 0) {
-                            orderBy.append(",");
-                        }
-                        orderBy.append(ec.getColumn()).append(" ").append(order.getDirection().value());
-        			}
-        		}else if(order.getProperty() != null) {
+					if (ec != null) {
+						if (orderBy.length() != 0) {
+							orderBy.append(",");
+						}
+						orderBy.append(ec.getColumn()).append(" ").append(order.getDirection().value());
+					}
+				}
+				else if (order.getProperty() != null) {
 
-        			EntityTable table = EntityHelper.getEntityTable(order.getEntityClass());
+					EntityTable table = EntityHelper.getEntityTable(order.getEntityClass());
 
-        			loop2:for (EntityColumn column : table.getEntityClassColumns()) {
+					loop2: for (EntityColumn column : table.getEntityClassColumns()) {
 
-        				if(order.getProperty().equalsIgnoreCase(column.getProperty())) {
-                            if (orderBy.length() != 0) {
-                                orderBy.append(",");
-                            }
-                            orderBy.append(column.getColumn()).append(" ").append(order.getDirection().value());
-                            break loop2;
-        				}
-                    }
-        		}
-        	}
+						if (order.getProperty().equalsIgnoreCase(column.getProperty())) {
+							if (orderBy.length() != 0) {
+								orderBy.append(",");
+							}
+							orderBy.append(column.getColumn()).append(" ").append(order.getDirection().value());
+							break loop2;
+						}
+					}
+				}
+			}
 
-        	if(orderBy.length() > 0) {
-        		return orderBy.toString();
-        	}
-        }
+			if (orderBy.length() > 0) {
+				return orderBy.toString();
+			}
+		}
 
 		return null;
 	}
 
-
 	@Override
-	public <F> GiPager<F> excutePage(GfunPageExcute<F> pageExcute,GiPageParam pageParam) {
+	public <F> GiPager<F> excutePage(GfunPageExcute<F> pageExcute, GiPageParam pageParam) {
 
-		//PageHelper.orderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
-        Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(), TkGithubPageHelper.orderBySqlFromGirSort(pageParam.sort()));
-        //page.setOrderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
+		// PageHelper.orderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
+		Page<F> page = PageHelper.startPage(pageParam.pageNum(), pageParam.pageSize(),
+				TkGithubPageHelper.orderBySqlFromGirSort(pageParam.sort()));
+		// page.setOrderBy(TkGithubPageHelper.orderBySqlFromgtcSort(pageParam.sort()));
 
-        Iterable<F> list = pageExcute.excute();
-        PageInfo<F> pageInfo = new PageInfo<F>((List<F>)list);
-        GiPager<F> pager = pageExcute.getgtcPager();
-        pageParam.putParam(pageInfo.getPageSize(), pageInfo.getPageNum(), pageInfo.getStartRow());
-        pager.put(pageInfo.getList(),pageInfo.getTotal(),pageParam);
-        return pager;
-        /*
-        pager.setList(list);//
-
-        pager.setPageNum(pageInfo.getPageNum());//
-        pager.setPageSize(pageInfo.getPageSize());//
-        pager.setSize(pageInfo.getSize());
-        pager.setStartRow(pageInfo.getStartRow());
-        pager.setEndRow(pageInfo.getEndRow());
-
-        pager.setPages(pageInfo.getPages());//
-        pager.setPrePage(pageInfo.getPrePage());
-        pager.setNextPage(pageInfo.getNextPage());
-        pager.setIsFirstPage(pageInfo.isIsFirstPage());
-        pager.setIsLastPage(pageInfo.isIsLastPage());
-        pager.setHasPreviousPage(pageInfo.isHasPreviousPage());
-        pager.setHasNextPage(pageInfo.isHasNextPage());
-        pager.setNavigatePages(pageInfo.getNavigatePages());
-        pager.setNavigatepageNums(pageInfo.getNavigatepageNums());
-        pager.setNavigateFirstPage(pageInfo.getNavigateFirstPage());
-        pager.setNavigateLastPage(pageInfo.getNavigateLastPage());
-        pager.setTotal(pageInfo.getTotal());//
-        return pager;
-        */
+		Iterable<F> list = pageExcute.excute();
+		PageInfo<F> pageInfo = new PageInfo<F>((List<F>) list);
+		GiPager<F> pager = pageExcute.getgtcPager();
+		pageParam.putParam(pageInfo.getPageSize(), pageInfo.getPageNum(), pageInfo.getStartRow());
+		pager.put(pageInfo.getList(), pageInfo.getTotal(), pageParam);
+		return pager;
+		/*
+		 * pager.setList(list);//
+		 *
+		 * pager.setPageNum(pageInfo.getPageNum());//
+		 * pager.setPageSize(pageInfo.getPageSize());// pager.setSize(pageInfo.getSize());
+		 * pager.setStartRow(pageInfo.getStartRow());
+		 * pager.setEndRow(pageInfo.getEndRow());
+		 *
+		 * pager.setPages(pageInfo.getPages());// pager.setPrePage(pageInfo.getPrePage());
+		 * pager.setNextPage(pageInfo.getNextPage());
+		 * pager.setIsFirstPage(pageInfo.isIsFirstPage());
+		 * pager.setIsLastPage(pageInfo.isIsLastPage());
+		 * pager.setHasPreviousPage(pageInfo.isHasPreviousPage());
+		 * pager.setHasNextPage(pageInfo.isHasNextPage());
+		 * pager.setNavigatePages(pageInfo.getNavigatePages());
+		 * pager.setNavigatepageNums(pageInfo.getNavigatepageNums());
+		 * pager.setNavigateFirstPage(pageInfo.getNavigateFirstPage());
+		 * pager.setNavigateLastPage(pageInfo.getNavigateLastPage());
+		 * pager.setTotal(pageInfo.getTotal());// return pager;
+		 */
 	}
-
 
 }

@@ -2,10 +2,10 @@ package cn.geoair.gtc.base.cache;
 
 import java.util.concurrent.Callable;
 
-
 /**
- * Cache 通用api，这里仿照spring cache而不是JSR是因为大部分缓存方案适配spring cache.
- * 简化了spring cache的ValueWrapper，加入了过期时间
+ * Cache 通用api，这里仿照spring cache而不是JSR是因为大部分缓存方案适配spring cache. 简化了spring
+ * cache的ValueWrapper，加入了过期时间
+ *
  * @author Ray
  *
  */
@@ -40,11 +40,12 @@ public interface GiCache {
 	Object getObject(Object key);
 
 	/**
-	 *  判断缓存是否存在
+	 * 判断缓存是否存在
 	 * @param key
 	 * @return
 	 */
 	boolean exists(Object key);
+
 	/**
 	 * 获取指定类型的缓存值
 	 * @param <T> 泛型类型
@@ -93,36 +94,27 @@ public interface GiCache {
 
 /*
  * spring cache
-
-public interface Cache {
-	String getName();
-	// 返回本地存储的那个。比如ConcurrentMapCache本地就是用的一个ConcurrentMap
-	Object getNativeCache();
-
-	// 就是用下面的ValueWrapper把值包装了一下而已~
-	@Nullable
-	ValueWrapper get(Object key);
-	@Nullable
-	<T> T get(Object key, @Nullable Class<T> type);
-	@Nullable
-	<T> T get(Object key, Callable<T> valueLoader);
-
-	void put(Object key, @Nullable Object value);
-	// @since 4.1
-	// 不存在旧值直接put就先去了返回null，否则返回旧值（并且不会把新值put进去）
-	@Nullable
-	ValueWrapper putIfAbsent(Object key, @Nullable Object value);
-	// 删除
-	void evict(Object key);
-	// 清空
-	void clear();
-
-
-	@FunctionalInterface
-	interface ValueWrapper {
-		@Nullable
-		Object get();
-	}
-}
-
-*/
+ *
+ * public interface Cache { String getName(); //
+ * 返回本地存储的那个。比如ConcurrentMapCache本地就是用的一个ConcurrentMap Object getNativeCache();
+ *
+ * // 就是用下面的ValueWrapper把值包装了一下而已~
+ *
+ * @Nullable ValueWrapper get(Object key);
+ *
+ * @Nullable <T> T get(Object key, @Nullable Class<T> type);
+ *
+ * @Nullable <T> T get(Object key, Callable<T> valueLoader);
+ *
+ * void put(Object key, @Nullable Object value); // @since 4.1 //
+ * 不存在旧值直接put就先去了返回null，否则返回旧值（并且不会把新值put进去）
+ *
+ * @Nullable ValueWrapper putIfAbsent(Object key, @Nullable Object value); // 删除 void
+ * evict(Object key); // 清空 void clear();
+ *
+ *
+ * @FunctionalInterface interface ValueWrapper {
+ *
+ * @Nullable Object get(); } }
+ *
+ */

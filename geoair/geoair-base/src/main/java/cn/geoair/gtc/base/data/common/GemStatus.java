@@ -1,11 +1,11 @@
 package cn.geoair.gtc.base.data.common;
+
 import cn.geoair.gtc.base.data.GiVisualValuable;
 import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 
 public enum GemStatus implements GiVisualValuable<Integer> {
 
-	启用(1),
-	禁用(0);
+	启用(1), 禁用(0);
 
 	@GaModelField(isID = true)
 	private Integer code;
