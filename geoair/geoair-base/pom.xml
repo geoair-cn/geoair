@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair</groupId>
         <artifactId>geoair</artifactId>
-        <version>23.1.1-beta5-SNAPSHOT</version>
+        <version>23.1.1-RC4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair</groupId>
     <artifactId>geoair-base</artifactId>
-    <version>23.1.1-beta5-SNAPSHOT</version>
+    <version>23.1.1-RC4</version>
     <name>geoair-base</name>
     <description>标准库</description>
 

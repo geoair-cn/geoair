@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.1-beta5-SNAPSHOT</version>
+        <version>23.1.1-RC4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-swagger-module</artifactId>
     <name>geoair-swagger-module</name>
-    <version>23.1.1-beta5-SNAPSHOT</version>
+    <version>23.1.1-RC4</version>
     <packaging>pom</packaging>
     <description>geoair swagger module</description>
 

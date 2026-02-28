@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair</groupId>
         <artifactId>geoair</artifactId>
-        <version>23.1.1-beta5-SNAPSHOT </version>
+        <version>23.1.1-RC4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-orm</artifactId>
-    <version>23.1.1-beta5-SNAPSHOT</version>
+    <version>23.1.1-RC4</version>
     <name>geoair-orm</name>
     <packaging>pom</packaging>
     <description>geoair-orm</description>

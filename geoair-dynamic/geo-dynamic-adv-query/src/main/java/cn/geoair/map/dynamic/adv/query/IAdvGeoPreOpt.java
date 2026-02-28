@@ -16,10 +16,7 @@ import java.util.Map;
  * </p>
  * 约定： 1. 所有方法名以 e 开头（规避 get 前缀的命名冲突问题）； 2. SQL 语句参数统一命名为
  * sqlStatement，使用MyBatis风格占位符（#{参数名}）； 3. 空间字段相关参数支持单字段、多字段（List）两种传入形式，适配不同业务场景。
- *
- * @author （可补充作者信息）
- * @version 1.0
- * @since （可补充适配的最低版本/依赖）
+
  */
 public interface IAdvGeoPreOpt extends IAdvGeoOpt {
 

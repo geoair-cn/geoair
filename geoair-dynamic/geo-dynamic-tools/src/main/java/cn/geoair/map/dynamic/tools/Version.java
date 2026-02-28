@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Version {
 
-	private static final String VERSION = "23.1.1-beta5-SNAPSHOT";
+	private static final String VERSION = "23.1.1-RC4";
 
 	public static String getVersion() {
 		return VERSION;

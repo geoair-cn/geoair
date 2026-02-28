@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair.comp.apidoc</groupId>
         <artifactId>geoair-apidoc</artifactId>
-        <version>23.1.1-beta5-SNAPSHOT</version>
+        <version>23.1.1-RC4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
-    <version>23.1.1-beta5-SNAPSHOT</version>
+    <version>23.1.1-RC4</version>
     <name>geoair-knife4j-spring-boot-demo</name>
     <packaging>jar</packaging>
 
