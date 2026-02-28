@@ -9,8 +9,9 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
+    <version>${geoair.version}</version>
     <name>geoair-knife4j-spring-boot-demo</name>
     <packaging>jar</packaging>
 

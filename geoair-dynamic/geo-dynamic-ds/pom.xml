@@ -8,8 +8,10 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>${geoair.version}</version>
     <artifactId>geo-dynamic-ds</artifactId>
-    <name>geo-dynamic-ds </name>
+    <name>geo-dynamic-ds</name>
 
 
     <description>geo-dynamic-ds</description>
@@ -45,14 +47,14 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
             <version>${geotools.version}</version>
-            <optional> true</optional>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.geotools.jdbc</groupId>
             <artifactId>gt-jdbc-postgis</artifactId>
             <version>${geotools.version}</version>
-            <optional> true</optional>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -72,7 +74,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <optional> true</optional>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

@@ -10,6 +10,7 @@
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-orm</artifactId>
+    <version>${geoair.version}</version>
     <name>geoair-orm</name>
     <packaging>pom</packaging>
     <description>geoair-orm</description>

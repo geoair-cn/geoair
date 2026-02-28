@@ -10,9 +10,9 @@
         <version>23.1.1-beta4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis</artifactId>
-
+    <version>${geoair.version}</version>
     <packaging>jar</packaging>
     <name>geoair-mybatis</name>
     <description>geoair-mybatis</description>

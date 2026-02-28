@@ -10,7 +10,9 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.geoair</groupId>
     <artifactId>geoair-tools</artifactId>
+    <version>${geoair.version}</version>
     <name>geoair-tools</name>
     <description>工具库</description>
 

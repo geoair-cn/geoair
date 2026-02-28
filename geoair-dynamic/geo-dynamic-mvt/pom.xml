@@ -8,6 +8,8 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>${geoair.version}</version>
     <artifactId>geo-dynamic-mvt</artifactId>
     <name>geo-dynamic-mvt</name>
 

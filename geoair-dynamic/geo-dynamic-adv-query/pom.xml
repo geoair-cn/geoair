@@ -8,7 +8,10 @@
         <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>geo-dynamic-adv-query</artifactId>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>${geoair.version}</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
 
