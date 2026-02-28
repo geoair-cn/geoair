@@ -8,12 +8,12 @@
     <parent>
         <groupId>cn.geoair.comp.apidoc</groupId>
         <artifactId>geoair-apidoc</artifactId>
-        <version>23.1.1-beta4</version>
+        <version>23.1.1-beta5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
-    <version>23.1.1-beta4</version>
+    <version>23.1.1-beta5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>gtc-knife4j-spring-boot-starter</name>
 

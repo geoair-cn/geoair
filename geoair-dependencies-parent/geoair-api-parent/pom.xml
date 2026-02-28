@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
-        <version>23.1.1-beta4</version>
+        <version>23.1.1-beta5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-api-parent</artifactId>
     <name>geoair-api-parent</name>
-    <version>23.1.1-beta4</version>
+    <version>23.1.1-beta5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair api parent</description>
 

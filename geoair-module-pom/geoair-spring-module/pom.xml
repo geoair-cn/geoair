@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.1-beta4</version>
+        <version>23.1.1-beta5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-spring-module</artifactId>
     <name>geoair-spring-module</name>
-    <version>23.1.1-beta4</version>
+    <version>23.1.1-beta5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair spring module</description>
 
