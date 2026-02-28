@@ -46,26 +46,31 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-ds</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-tools</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-adv-query</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
+            <version>${geotools.version}</version>
         </dependency>
     </dependencies>
 

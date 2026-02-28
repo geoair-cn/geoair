@@ -11,7 +11,6 @@
     </parent>
 
 
-
     <artifactId>geoair-other-module</artifactId>
     <name>geoair-other-module</name>
     <packaging>pom</packaging>
@@ -54,7 +53,6 @@
             </dependency>
 
 
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
@@ -70,7 +68,7 @@
             <dependency>
                 <groupId>tk.mybatis</groupId>
                 <artifactId>mapper-spring-boot</artifactId>
-                <version>4.2.0</version>
+                <version>${mapper-module.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -85,17 +83,16 @@
             </dependency>
 
 
-
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>3.5.2</version>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus</artifactId>
-                <version>3.5.2</version>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
 
@@ -104,7 +101,7 @@
                 <artifactId>hutool-all</artifactId>
                 <!--				<version>5.8.3</version>-->
                 <!--				<version>5.8.26</version>   &lt;!&ndash;			升级最新版本 20240219 by zhangjun&ndash;&gt;-->
-                <version>5.8.42</version>   <!--			升级最新版本 20251206 by zhangjun-->
+                <version>${hutool.version}</version>   <!--			升级最新版本 20251206 by zhangjun-->
             </dependency>
 
 
@@ -147,7 +144,7 @@
             <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
-                <version>1.6.1</version>
+                <version>${dom4j.version}</version>
             </dependency>
 
             <dependency>

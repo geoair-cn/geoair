@@ -46,20 +46,24 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-file-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
+            <version>${geotools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson-store</artifactId>
+            <version>${geotools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+            <version>${lombok.version}</version>
         </dependency>
     </dependencies>
 

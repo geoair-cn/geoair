@@ -46,6 +46,7 @@
 		<dependency>
 			<groupId>cn.geoair</groupId>
 			<artifactId>geoair-base</artifactId>
+			<version>${geoair.version}</version>
 		</dependency>
 
 		<dependency>

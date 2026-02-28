@@ -45,16 +45,19 @@
 		<dependency>
 			<groupId>cn.geoair.orm</groupId>
 			<artifactId>geoair-mybatis</artifactId>
+			<version>${geoair.version}</version>
 		</dependency>
 
 		<dependency>
 	      <groupId>com.baomidou</groupId>
 	      <artifactId>mybatis-plus</artifactId>
+			<version>${mybatis-plus.version}</version>
 	    </dependency>
 
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
+			<version>${pagehelper.version}</version>
 		</dependency>
 
 	</dependencies>
