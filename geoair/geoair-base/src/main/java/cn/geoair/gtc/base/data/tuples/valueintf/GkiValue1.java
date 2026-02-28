@@ -8,6 +8,6 @@ package cn.geoair.gtc.base.data.tuples.valueintf;
  */
 public interface GkiValue1<X> {
 
-    public X getValue1();
+	public X getValue1();
 
 }

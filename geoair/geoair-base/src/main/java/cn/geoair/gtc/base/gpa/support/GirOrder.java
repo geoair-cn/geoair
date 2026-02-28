@@ -8,33 +8,39 @@ import cn.geoair.gtc.base.lang.lambda.GkSerializableFunction;
 import cn.geoair.gtc.base.lang.lambda.GkfLambdaMeta;
 import cn.geoair.gtc.base.util.GutilLambda;
 
-
 /**
  * 排序
  */
 public class GirOrder<T> implements Serializable {
 
 	private static final long serialVersionUID = 1522511010900108987L;
+
 	private static final boolean DEFAULT_IGNORE_CASE = false;
+
 	private static final NullHandling DEFAULT_NULL_HANDLING = NullHandling.NATIVE;
+
 	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
 
 	private Direction direction = DEFAULT_DIRECTION;
+
 	private boolean ignoreCase = DEFAULT_IGNORE_CASE;
+
 	private NullHandling nullHandling = DEFAULT_NULL_HANDLING;
 
 	private Class<T> entityClass;
+
 	private String property;
+
 	private GkSerializableFunction<T, ?> propertyFun;
 
-
 	/**
-	 * Creates a new {@link  GirOrder} instance. if order is {@literal null} then order defaults to
-	 * {@link  GirSort#DEFAULT_DIRECTION}
-	 *
-	 * @param direction can be {@literal null}, will default to {@link  GirSort#DEFAULT_DIRECTION}
+	 * Creates a new {@link GirOrder} instance. if order is {@literal null} then order
+	 * defaults to {@link GirSort#DEFAULT_DIRECTION}
+	 * @param direction can be {@literal null}, will default to
+	 * {@link GirSort#DEFAULT_DIRECTION}
 	 * @param property must not be {@literal null} or empty.
-	 * @param ignoreCase true if sorting should be case insensitive. false if sorting should be case sensitive.
+	 * @param ignoreCase true if sorting should be case insensitive. false if sorting
+	 * should be case sensitive.
 	 * @param nullHandling must not be {@literal null}.
 	 */
 	private GirOrder(Class<T> typeClass) {
@@ -42,62 +48,58 @@ public class GirOrder<T> implements Serializable {
 	}
 
 	/**
-	 * Creates a new {@link  GirOrder} instance. Takes a single property. Direction is {@link Direction#ASC} and
-	 * NullHandling {@link NullHandling#NATIVE}.
-	 *
+	 * Creates a new {@link GirOrder} instance. Takes a single property. Direction is
+	 * {@link Direction#ASC} and NullHandling {@link NullHandling#NATIVE}.
 	 * @param property must not be {@literal null} or empty.
 	 */
-	public static<T> GirOrder<T> asc(String property, Class<T> typeClass) {
+	public static <T> GirOrder<T> asc(String property, Class<T> typeClass) {
 
-		 GirOrder<T> order = new GirOrder<T>(typeClass);
+		GirOrder<T> order = new GirOrder<T>(typeClass);
 		order.property = property;
 		return order.with(Direction.ASC);
 	}
 
 	/**
-	 * Creates a new {@link  GirOrder} instance. Takes a single property. Direction is {@link Direction#DESC} and
-	 * NullHandling {@link NullHandling#NATIVE}.
-	 *
+	 * Creates a new {@link GirOrder} instance. Takes a single property. Direction is
+	 * {@link Direction#DESC} and NullHandling {@link NullHandling#NATIVE}.
 	 * @param property must not be {@literal null} or empty.
 	 */
-	public static<T> GirOrder<T> desc(String property, Class<T> typeClass) {
+	public static <T> GirOrder<T> desc(String property, Class<T> typeClass) {
 
-		 GirOrder<T> order = new GirOrder<T>(typeClass);
+		GirOrder<T> order = new GirOrder<T>(typeClass);
 		order.property = property;
 		return order.with(Direction.DESC);
-//
-//		return new  gtcOrder<T>(typeClass).with(Direction.DESC);
+		//
+		// return new gtcOrder<T>(typeClass).with(Direction.DESC);
 	}
 
 	public static <T> GirOrder<T> asc(GkSerializableFunction<T, ?> propertyFunction) {
-		 GirOrder<T> order = new GirOrder<T>((Class<T>)null).with(Direction.ASC);
+		GirOrder<T> order = new GirOrder<T>((Class<T>) null).with(Direction.ASC);
 		order.propertyFun = propertyFunction;
 		return order;
 	}
 
 	public static <T> GirOrder<T> desc(GkSerializableFunction<T, ?> propertyFunction) {
-		 GirOrder<T> order =  new GirOrder<T>((Class<T>)null).with(Direction.DESC);
+		GirOrder<T> order = new GirOrder<T>((Class<T>) null).with(Direction.DESC);
 		order.propertyFun = propertyFunction;
 		return order;
 	}
 
-
 	/**
 	 * Returns the order the property shall be sorted for.
-	 *
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public Class<T> getEntityClass() {
-		if(entityClass == null) {
+		if (entityClass == null) {
 			GkfLambdaMeta lm = GutilLambda.extract(propertyFun);
-			entityClass = (Class<T>)lm.getInstantiatedClass();
+			entityClass = (Class<T>) lm.getInstantiatedClass();
 		}
 		return entityClass;
 	}
+
 	/**
 	 * Returns the order the property shall be sorted for.
-	 *
 	 * @return
 	 */
 	public Direction getDirection() {
@@ -106,7 +108,6 @@ public class GirOrder<T> implements Serializable {
 
 	/**
 	 * Returns the property to order for.
-	 *
 	 * @return
 	 */
 	public String getProperty() {
@@ -119,7 +120,6 @@ public class GirOrder<T> implements Serializable {
 
 	/**
 	 * Returns whether sorting for this property shall be ascending.
-	 *
 	 * @return
 	 */
 	public boolean isAscending() {
@@ -128,7 +128,6 @@ public class GirOrder<T> implements Serializable {
 
 	/**
 	 * Returns whether sorting for this property shall be descending.
-	 *
 	 * @return
 	 */
 	public boolean isDescending() {
@@ -137,7 +136,6 @@ public class GirOrder<T> implements Serializable {
 
 	/**
 	 * Returns whether or not the sort will be case sensitive.
-	 *
 	 * @return
 	 */
 	public boolean isIgnoreCase() {
@@ -145,8 +143,8 @@ public class GirOrder<T> implements Serializable {
 	}
 
 	/**
-	 * Returns the used {@link NullHandling} hint, which can but may not be respected by the used datastore.
-	 *
+	 * Returns the used {@link NullHandling} hint, which can but may not be respected by
+	 * the used datastore.
 	 * @return
 	 */
 	public NullHandling getNullHandling() {
@@ -154,8 +152,7 @@ public class GirOrder<T> implements Serializable {
 	}
 
 	/**
-	 * Returns a new {@link  GirOrder} with the given {@link Direction}.
-	 *
+	 * Returns a new {@link GirOrder} with the given {@link Direction}.
 	 * @param direction
 	 * @return
 	 */
@@ -164,10 +161,8 @@ public class GirOrder<T> implements Serializable {
 		return this;
 	}
 
-
 	/**
-	 * Returns a new {@link  GirOrder} with case insensitive sorting enabled.
-	 *
+	 * Returns a new {@link GirOrder} with case insensitive sorting enabled.
 	 * @return
 	 */
 	public GirOrder<T> ignoreCase() {
@@ -176,8 +171,7 @@ public class GirOrder<T> implements Serializable {
 	}
 
 	/**
-	 * Returns a {@link  GirOrder} with the given {@link NullHandling}.
-	 *
+	 * Returns a {@link GirOrder} with the given {@link NullHandling}.
 	 * @param nullHandling can be {@literal null}.
 	 * @return
 	 */
@@ -188,6 +182,7 @@ public class GirOrder<T> implements Serializable {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -205,6 +200,7 @@ public class GirOrder<T> implements Serializable {
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -218,14 +214,16 @@ public class GirOrder<T> implements Serializable {
 			return false;
 		}
 
-		 GirOrder<?> that = (GirOrder<?>) obj;
+		GirOrder<?> that = (GirOrder<?>) obj;
 
-		return this.entityClass.equals(that.entityClass) && this.direction.equals(that.direction) && this.property.equals(that.property)
-				&& this.ignoreCase == that.ignoreCase && this.nullHandling.equals(that.nullHandling);
+		return this.entityClass.equals(that.entityClass) && this.direction.equals(that.direction)
+				&& this.property.equals(that.property) && this.ignoreCase == that.ignoreCase
+				&& this.nullHandling.equals(that.nullHandling);
 	}
 
 	/*
 	 * (non-Javadoc)
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -244,9 +242,6 @@ public class GirOrder<T> implements Serializable {
 		return result;
 	}
 
-
-
-
 	/**
 	 * Enumeration for sort directions.
 	 *
@@ -257,7 +252,6 @@ public class GirOrder<T> implements Serializable {
 
 		/**
 		 * Returns whether the direction is ascending.
-		 *
 		 * @return
 		 */
 		public boolean isAscending() {
@@ -266,13 +260,11 @@ public class GirOrder<T> implements Serializable {
 
 		/**
 		 * Returns whether the direction is descending.
-		 *
 		 * @return
 		 */
 		public boolean isDescending() {
 			return this.equals(DESC);
 		}
-
 
 		public String value() {
 			return this.name();
@@ -280,25 +272,26 @@ public class GirOrder<T> implements Serializable {
 
 		/**
 		 * Returns the {@link Direction} enum for the given {@link String} value.
-		 *
 		 * @param value
-		 * @throws IllegalArgumentException in case the given value cannot be parsed into an enum value.
+		 * @throws IllegalArgumentException in case the given value cannot be parsed into
+		 * an enum value.
 		 * @return
 		 */
 		public static Direction fromString(String value) {
 
 			try {
 				return Direction.valueOf(value.toUpperCase(Locale.US));
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				throw new IllegalArgumentException(String.format(
-						"Invalid value '%s' for orders given! Has to be either 'desc' or 'asc' (case insensitive).", value), e);
+						"Invalid value '%s' for orders given! Has to be either 'desc' or 'asc' (case insensitive).",
+						value), e);
 			}
 		}
 
 		/**
-		 * Returns the {@link Direction} enum for the given {@link String} or null if it cannot be parsed into an enum
-		 * value.
-		 *
+		 * Returns the {@link Direction} enum for the given {@link String} or null if it
+		 * cannot be parsed into an enum value.
 		 * @param value
 		 * @return
 		 */
@@ -306,13 +299,17 @@ public class GirOrder<T> implements Serializable {
 
 			try {
 				return Optional.of(fromString(value));
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 				return Optional.empty();
 			}
 		}
+
 	}
+
 	/**
-	 * Enumeration for null handling hints that can be used in {@link  GirOrder} expressions.
+	 * Enumeration for null handling hints that can be used in {@link GirOrder}
+	 * expressions.
 	 *
 	 */
 	public static enum NullHandling {
@@ -323,13 +320,17 @@ public class GirOrder<T> implements Serializable {
 		NATIVE,
 
 		/**
-		 * A hint to the used data store to order entries with null values before non null entries.
+		 * A hint to the used data store to order entries with null values before non null
+		 * entries.
 		 */
 		NULLS_FIRST,
 
 		/**
-		 * A hint to the used data store to order entries with null values after non null entries.
+		 * A hint to the used data store to order entries with null values after non null
+		 * entries.
 		 */
 		NULLS_LAST;
+
 	}
+
 }

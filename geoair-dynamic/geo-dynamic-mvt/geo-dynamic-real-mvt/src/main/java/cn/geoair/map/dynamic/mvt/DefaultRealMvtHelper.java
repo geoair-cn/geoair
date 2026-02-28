@@ -8,15 +8,13 @@ import org.locationtech.jts.geom.Envelope;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 2022/2/3 10:29
- * @description： TODO
+ * @date ：Created in 2022/2/3 10:29 @description： TODO
  */
 public class DefaultRealMvtHelper implements GirRealMvtHelper {
 
-    public VectorTileBuilderConsumer getVectorTileBuilderConsumer(Envelope envelope,
-                                                                  String layerName,
-                                                                  int outGridSrid,
-                                                                  TileGlobalConfig tileGlobalConfig) {
-        return VectorTileBuilderConsumerByJts.create(envelope, layerName, outGridSrid, tileGlobalConfig);
-    }
+	public VectorTileBuilderConsumer getVectorTileBuilderConsumer(Envelope envelope, String layerName, int outGridSrid,
+			TileGlobalConfig tileGlobalConfig) {
+		return VectorTileBuilderConsumerByJts.create(envelope, layerName, outGridSrid, tileGlobalConfig);
+	}
+
 }

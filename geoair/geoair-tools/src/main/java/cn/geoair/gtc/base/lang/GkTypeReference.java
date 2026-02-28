@@ -13,11 +13,11 @@ import cn.geoair.gtc.base.util.GutilType;
  * Type t = tr.getType();
  * </pre>
  *
- * 此类无法应用于通配符泛型参数（wildcard parameters），比如：{@code Class<?>} 或者 {@code List? extends CharSequence>}
+ * 此类无法应用于通配符泛型参数（wildcard parameters），比如：{@code Class<?>} 或者
+ * {@code List? extends CharSequence>}
  *
  * <p>
  * 此类参考FastJSON的TypeReference实现
- *
  *
  * @param <T> 需要自定义的参考类型
  */
@@ -35,7 +35,6 @@ public abstract class GkTypeReference<T> implements Type {
 
 	/**
 	 * 获取用户定义的泛型参数
-	 *
 	 * @return 泛型参数
 	 */
 	public Type getType() {
@@ -46,4 +45,5 @@ public abstract class GkTypeReference<T> implements Type {
 	public String toString() {
 		return this.type.toString();
 	}
+
 }

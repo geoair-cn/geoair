@@ -5,12 +5,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.geo.dynamic</groupId>
     <artifactId>geoair-dynamic</artifactId>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <name>geoair-dynamic</name>
     <description>gis dynamic tile server</description>
@@ -56,10 +57,10 @@
 
 
     <dependencies>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -256,6 +257,29 @@
 
         </profile>
 
+
+
+        <profile>
+            <id>javaformat</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <version>${spring-javaformat.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                                <inherited>true</inherited>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>group</id>
             <distributionManagement>

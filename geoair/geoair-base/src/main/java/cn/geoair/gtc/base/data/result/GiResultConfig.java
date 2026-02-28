@@ -5,13 +5,13 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
 
 /**
  * 结果集配置
+ *
  * @author Ray
  *
  */
 
-@GkSP(placeHolderClass= GirResultConfig.class)
+@GkSP(placeHolderClass = GirResultConfig.class)
 public interface GiResultConfig {
-
 
 	/**
 	 * 获取结果集对象

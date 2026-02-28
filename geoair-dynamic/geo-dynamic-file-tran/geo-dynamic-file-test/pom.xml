@@ -5,12 +5,14 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geo-dynamic-file-tran</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>23.1.1-beta4</version>
     <artifactId>geo-dynamic-file-test</artifactId>
     <name>geo-dynamic-file-test</name>
-    <version>23.1.0-SNAPSHOT</version>
+
 
     <packaging>jar</packaging>
     <description>
@@ -47,21 +49,23 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
+            <version>${geotools.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-file-geojson</artifactId>
-
+            <version>${geoair.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-file-postgis</artifactId>
-
+            <version>${geoair.version}</version>
         </dependency>
 
     </dependencies>

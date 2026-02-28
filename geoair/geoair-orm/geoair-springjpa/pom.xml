@@ -6,15 +6,16 @@
 	<parent>
 		<groupId>cn.geoair.orm</groupId>
     	<artifactId>geoair-orm</artifactId>
-		<version>23.1.0-SNAPSHOT<!--gtcversion--></version>
+		<version>23.1.1-beta4 </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
+	<groupId>cn.geoair.orm</groupId>
 	<artifactId>geoair-springjpa</artifactId>
+	<version>23.1.1-beta4</version>
 	<packaging>jar</packaging>
 
 	<name>geoair-springjpa</name>
-
+	<description>geoair-springjpa</description>
 	<url>https://gitee.com/geoair/geoair</url>
 
 	<licenses>
@@ -46,16 +47,19 @@
 		<dependency>
 			<groupId>cn.geoair</groupId>
 			<artifactId>geoair-core</artifactId>
+			<version>${geoair.version}</version>
 		</dependency>
 
 		<dependency>
 		    <groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
+			<version>${spring-boot.version}</version>
 		</dependency>
 
 		<dependency>
 	        <groupId>org.hibernate</groupId>
 	  		<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
 	  		<optional>true</optional>
   		</dependency>
 

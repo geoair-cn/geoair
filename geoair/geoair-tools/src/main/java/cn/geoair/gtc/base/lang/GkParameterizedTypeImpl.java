@@ -13,15 +13,17 @@ import cn.geoair.gtc.base.util.GutilStr;
  * @author from hutools
  */
 public class GkParameterizedTypeImpl implements ParameterizedType, Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	private final Type[] actualTypeArguments;
+
 	private final Type ownerType;
+
 	private final Type rawType;
 
 	/**
 	 * 构造
-	 *
 	 * @param actualTypeArguments 实际的泛型参数类型
 	 * @param ownerType 拥有者类型
 	 * @param rawType 原始类型
@@ -55,10 +57,12 @@ public class GkParameterizedTypeImpl implements ParameterizedType, Serializable 
 		final Class<?> raw = (Class<?>) this.rawType;
 		if (useOwner == null) {
 			buf.append(raw.getName());
-		} else {
+		}
+		else {
 			if (useOwner instanceof Class<?>) {
 				buf.append(((Class<?>) useOwner).getName());
-			} else {
+			}
+			else {
 				buf.append(useOwner.toString());
 			}
 			buf.append('.').append(raw.getSimpleName());
@@ -70,7 +74,6 @@ public class GkParameterizedTypeImpl implements ParameterizedType, Serializable 
 
 	/**
 	 * 追加 {@code types} 到 @{code buf}，使用 {@code sep} 分隔
-	 *
 	 * @param buf 目标
 	 * @param sep 分隔符
 	 * @param types 加入的类型
@@ -82,14 +85,16 @@ public class GkParameterizedTypeImpl implements ParameterizedType, Serializable 
 			for (Type type : types) {
 				if (isFirst) {
 					isFirst = false;
-				} else {
+				}
+				else {
 					buf.append(sep);
 				}
 
 				String typeStr;
-				if(type instanceof Class) {
-					typeStr = ((Class<?>)type).getName();
-				}else {
+				if (type instanceof Class) {
+					typeStr = ((Class<?>) type).getName();
+				}
+				else {
 					typeStr = GutilStr.toString(type);
 				}
 
@@ -98,5 +103,5 @@ public class GkParameterizedTypeImpl implements ParameterizedType, Serializable 
 		}
 		return buf;
 	}
-}
 
+}

@@ -7,21 +7,20 @@ import cn.geoair.gtc.base.sp.GirSpHelper;
 
 /**
  * 分页默认配置
+ *
  * @author Ray
  *
  */
-public class GirPageConfig implements GiPageConfig{
-
+public class GirPageConfig implements GiPageConfig {
 
 	@Override
 	public GiPagerProvider getPagerProvider() {
-		return  GirSpHelper.load(GiPagerProvider.class);
+		return GirSpHelper.load(GiPagerProvider.class);
 	}
 
 	@Override
 	public GiPageParamProvider getPageParamProvider() {
-		return  GirSpHelper.load(GiPageParamProvider.class);
+		return GirSpHelper.load(GiPageParamProvider.class);
 	}
-
 
 }

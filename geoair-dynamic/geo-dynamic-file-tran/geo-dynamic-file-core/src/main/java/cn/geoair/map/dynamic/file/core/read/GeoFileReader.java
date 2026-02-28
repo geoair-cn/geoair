@@ -13,20 +13,20 @@ import java.util.List;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 2022/2/9 14:55
- * @description： 读取器
+ * @date ：Created in 2022/2/9 14:55 @description： 读取器
  */
-public interface GeoFileReader  extends Closeable {
+public interface GeoFileReader extends Closeable {
 
-    // 链接信息
-    void setLinkInfo(LinkInfo linkInfo);
+	// 链接信息
+	void setLinkInfo(LinkInfo linkInfo);
 
-    // 读取表头
-    SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
+	// 读取表头
+	SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
 
-    // 读取一行
-    GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
+	// 读取一行
+	GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
 
-    // 读取分页行数
-    GirPager<GirAdvOneRow> readRowPage(GirPageParam girPageParam, ExceptionConsumer exceptionConsumer);
+	// 读取分页行数
+	GirPager<GirAdvOneRow> readRowPage(GirPageParam girPageParam, ExceptionConsumer exceptionConsumer);
+
 }

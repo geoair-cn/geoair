@@ -6,11 +6,12 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.0-SNAPSHOT<!--gtcversion--></version>
+        <version>23.1.1-beta4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis-tk</artifactId>
+    <version>23.1.1-beta4</version>
     <packaging>jar</packaging>
 
     <url>https://gitee.com/geoair/geoair</url>
@@ -52,23 +53,27 @@
         <dependency>
             <groupId>cn.geoair.orm</groupId>
             <artifactId>geoair-mybatis</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
+            <version>${jts.version}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.postgis</groupId>
             <artifactId>postgis-jdbc</artifactId>
+            <version>${postgis.jdbc.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -76,6 +81,7 @@
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-core</artifactId>
+            <version>${mapper-module.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.persistence</groupId>
@@ -86,6 +92,7 @@
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-base</artifactId>
+            <version>${mapper-module.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.persistence</groupId>
@@ -96,14 +103,17 @@
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-weekend</artifactId>
+            <version>${mapper-module.version}</version>
         </dependency>
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-spring</artifactId>
+            <version>${mapper-module.version}</version>
         </dependency>
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-extra</artifactId>
+            <version>${mapper-module.version}</version>
         </dependency>
 
 
@@ -111,6 +121,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
     </dependencies>

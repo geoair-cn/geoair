@@ -5,7 +5,7 @@ import java.util.List;
 
 import cn.geoair.gtc.base.env.GiEnvironmenter;
 
-public class GirSystemEnvironmentOperater implements GiEnvironmenter{
+public class GirSystemEnvironmentOperater implements GiEnvironmenter {
 
 	@Override
 	public String[] getActiveProfiles() {
@@ -27,20 +27,16 @@ public class GirSystemEnvironmentOperater implements GiEnvironmenter{
 		return isDebug();
 	}
 
-
 	public static boolean isDebug() {
 		List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
 		boolean isDebug = false;
 		for (String arg : args) {
-		  if (arg.startsWith("-Xrunjdwp") || arg.startsWith("-agentlib:jdwp")) {
-			isDebug = true;
-			break;
-		  }
+			if (arg.startsWith("-Xrunjdwp") || arg.startsWith("-agentlib:jdwp")) {
+				isDebug = true;
+				break;
+			}
 		}
 		return isDebug;
 	}
-
-
-
 
 }

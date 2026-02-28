@@ -9,8 +9,8 @@ import cn.geoair.gtc.base.data.model.GiTreeModelable;
 @SuppressWarnings("serial")
 public class GirTreeModelKid<ID extends Serializable> extends GirModelKid<ID> implements GiTreeModelable<ID> {
 
-
-	public GirTreeModelKid() {}
+	public GirTreeModelKid() {
+	}
 
 	public GirTreeModelKid(ID id, ID pid) {
 		super(id);
@@ -18,10 +18,10 @@ public class GirTreeModelKid<ID extends Serializable> extends GirModelKid<ID> im
 	}
 
 	public static <ID extends Serializable> GirTreeModelKid<ID> valueWith(ID id, ID pid) {
-        return new GirTreeModelKid<ID>(id,pid);
-    }
+		return new GirTreeModelKid<ID>(id, pid);
+	}
 
-	@GaModelField(isParentId=true)
+	@GaModelField(isParentId = true)
 	private ID pid;
 
 	public void setPid(ID parentId) {
@@ -31,7 +31,6 @@ public class GirTreeModelKid<ID extends Serializable> extends GirModelKid<ID> im
 	public ID getPid() {
 		return pid;
 	}
-
 
 	public ID parentId() {
 		return pid;

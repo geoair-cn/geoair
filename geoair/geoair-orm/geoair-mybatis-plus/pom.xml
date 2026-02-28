@@ -6,15 +6,16 @@
 	<parent>
 		<groupId>cn.geoair.orm</groupId>
     	<artifactId>geoair-orm</artifactId>
-		<version>23.1.0-SNAPSHOT<!--gtcversion--></version>
+		<version>23.1.1-beta4 </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
+	<groupId>cn.geoair.orm</groupId>
 	<artifactId>geoair-mybatis-plus</artifactId>
+	<version>23.1.1-beta4</version>
 	<packaging>jar</packaging>
 
 	<url>https://gitee.com/geoair/geoair</url>
-
+	<description>geoair-mybatis-plus</description>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -45,16 +46,19 @@
 		<dependency>
 			<groupId>cn.geoair.orm</groupId>
 			<artifactId>geoair-mybatis</artifactId>
+			<version>${geoair.version}</version>
 		</dependency>
 
 		<dependency>
 	      <groupId>com.baomidou</groupId>
 	      <artifactId>mybatis-plus</artifactId>
+			<version>${mybatis-plus.version}</version>
 	    </dependency>
 
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
+			<version>${pagehelper.version}</version>
 		</dependency>
 
 	</dependencies>

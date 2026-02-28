@@ -1,93 +1,104 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cn.geoair.dependencies</groupId>
-		<artifactId>geoair-module-pom</artifactId>
-		<version>23.1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>cn.geoair.dependencies</groupId>
+        <artifactId>geoair-module-pom</artifactId>
+        <version>23.1.1-beta4</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>cn.geoair.dependencies</groupId>
+    <artifactId>geoair-swagger-module</artifactId>
+    <name>geoair-swagger-module</name>
+    <version>23.1.1-beta4</version>
+    <packaging>pom</packaging>
+    <description>geoair swagger module</description>
 
-	<artifactId>geoair-swagger-module</artifactId>
-	<name>geoair-swagger-module</name>
-	<packaging>pom</packaging>
-	<description>geoair swagger module</description>
+    <url>https://gitee.com/geoair/geoair-dependencies</url>
+    <properties>
+        <knife4j.version>3.0.3</knife4j.version>
+        <springfox.version>3.0.0</springfox.version>
+    </properties>
 
-	<url>https://gitee.com/geoair/geoair-dependencies</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <developers>
+        <developer>
+            <name>张逢吉</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<developers>
-		<developer>
-			<name>张逢吉</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
-
-	<scm>
-		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-		<tag>HEAD</tag>
-	</scm>
-
-
-
-	<dependencyManagement>
-	 <dependencies>
-
-		 <dependency>
-			 <groupId>com.github.xiaoymin</groupId>
-			 <artifactId>knife4j</artifactId>
-			 <version>2.0.5</version>
-			 <type>pom</type>
-			 <scope>import</scope>
-		 </dependency>
-		 <dependency>
-			 <groupId>org.reflections</groupId>
-			 <artifactId>reflections</artifactId>
-			 <version>0.10.2</version>
-		 </dependency>
-
-		 <dependency>
-			 <groupId>io.springfox</groupId>
-			 <artifactId>springfox-swagger2</artifactId>
-			 <version>2.9.2</version>
-		 </dependency>
-		 <dependency>
-			 <groupId>io.springfox</groupId>
-			 <artifactId>springfox-swagger-ui</artifactId>
-			 <version>2.9.2</version>
-		 </dependency>
-		 <dependency>
-			 <groupId>io.springfox</groupId>
-			 <artifactId>springfox-spring-web</artifactId>
-			 <version>2.9.2</version>
-		 </dependency>
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
 
+    <dependencyManagement>
+        <dependencies>
 
-	 </dependencies>
-	</dependencyManagement>
+            <!--            <dependency>-->
+            <!--                <groupId>com.github.xiaoymin</groupId>-->
+            <!--                <artifactId>knife4j</artifactId>-->
+            <!--                <version>2.0.5</version>-->
+            <!--                <type>pom</type>-->
+            <!--                <scope>import</scope>-->
+            <!--            </dependency>-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-dependencies</artifactId>
+                <version>${knife4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.10.2</version>
+            </dependency>
 
-	<dependencies></dependencies>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spring-web</artifactId>
+                <version>${springfox.version}</version>
+            </dependency>
 
-	<build>
-		<pluginManagement>
-			<plugins></plugins>
-		</pluginManagement>
 
-		<plugins></plugins>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies></dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins></plugins>
+        </pluginManagement>
+
+        <plugins></plugins>
 
 
-	</build>
+    </build>
 
 </project>

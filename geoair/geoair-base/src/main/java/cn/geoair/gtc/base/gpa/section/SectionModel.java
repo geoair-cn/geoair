@@ -14,12 +14,12 @@ import cn.geoair.gtc.base.data.model.GiModelable;
  * @param <PK> 主键类型，必须实现Serializable接口
  * @param <F> 分表因子类型
  */
-public interface SectionModel<PK extends Serializable,F> extends GiModelable<PK>
-{
+public interface SectionModel<PK extends Serializable, F> extends GiModelable<PK> {
+
 	/**
 	 * 获取分表因子
-	 * 
 	 * @return 分表因子值
 	 */
 	F factor();
+
 }

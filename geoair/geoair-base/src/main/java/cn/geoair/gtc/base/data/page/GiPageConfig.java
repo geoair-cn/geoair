@@ -5,13 +5,13 @@ import cn.geoair.gtc.base.sp.annotation.GkSP;
 
 /**
  * 分页配置
+ *
  * @author Ray
  *
  */
 
-@GkSP(placeHolderClass= { GirPageConfig.class})
+@GkSP(placeHolderClass = { GirPageConfig.class })
 public interface GiPageConfig {
-
 
 	public GiPagerProvider getPagerProvider();
 

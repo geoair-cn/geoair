@@ -15,31 +15,26 @@ import static com.google.common.collect.Sets.union;
 
 /**
  * @author ：张俊
- * @date ：Created in 2023/3/1 10:16
- * @description： 使用  GaApi 替换 ApiOperation
+ * @date ：Created in 2023/3/1 10:16 @description： 使用 GaApi 替换 ApiOperation
  */
 public class GaApiActionOperationBuilder implements OperationBuilderPlugin {
 
-    @Override
-    public void apply(OperationContext context) {
-        List<ApiOperation> list = context.findAllAnnotations(ApiOperation.class);
-        if (list.isEmpty()) {
-            List<GaApiAction> explainList = context.findAllAnnotations(GaApiAction.class);
-            if (!explainList.isEmpty()) {
-                GaApiAction explain = explainList.get(0);
-                context.operationBuilder().summary(explain.text());//替换默认值
-            }
-        }
+	@Override
+	public void apply(OperationContext context) {
+		List<ApiOperation> list = context.findAllAnnotations(ApiOperation.class);
+		if (list.isEmpty()) {
+			List<GaApiAction> explainList = context.findAllAnnotations(GaApiAction.class);
+			if (!explainList.isEmpty()) {
+				GaApiAction explain = explainList.get(0);
+				context.operationBuilder().summary(explain.text());// 替换默认值
+			}
+		}
 
+	}
 
-
-
-    }
-
-    @Override
-    public boolean supports(DocumentationType delimiter) {
-        return true;
-    }
-
+	@Override
+	public boolean supports(DocumentationType delimiter) {
+		return true;
+	}
 
 }

@@ -2,9 +2,9 @@ package cn.geoair.gtc.base.bean;
 
 import cn.geoair.gtc.base.util.GutilStr;
 
-
 /**
  * Bean类型不匹配的异常
+ *
  * @author Ray
  *
  */
@@ -36,7 +36,7 @@ public class GirBeanNotOfRequiredTypeException extends GirBeanException {
 	}
 
 	public GirBeanNotOfRequiredTypeException(Throwable throwable, String messageTemplate, Object... params) {
-		this(GutilStr.format(messageTemplate, params),throwable);
+		this(GutilStr.format(messageTemplate, params), throwable);
 	}
 
 }

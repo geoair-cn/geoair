@@ -1,6 +1,5 @@
 package cn.geoair.gtc.base.util;
 
-
 import cn.geoair.gtc.base.text.GuStrFormatter;
 
 import java.io.ByteArrayOutputStream;
@@ -96,7 +95,6 @@ public class GutilStr {
 	 * 字符常量：艾特 <code>'@'</code>
 	 */
 	public static final char C_AT = GutilChar.AT;
-
 
 	/**
 	 * 字符串常量：空格符 {@code " "}
@@ -202,7 +200,6 @@ public class GutilStr {
 	 */
 	public static final String AT = "@";
 
-
 	/**
 	 * 字符串常量：HTML 空格转义 {@code "&nbsp;" -> " "}
 	 */
@@ -238,35 +235,42 @@ public class GutilStr {
 	 */
 	public static final String EMPTY_JSON = "{}";
 
-
 	// ------------------------------------------------------------------------ Blank
 
 	/**
-	 * <p>字符串是否为空白，空白的定义如下：</p>
+	 * <p>
+	 * 字符串是否为空白，空白的定义如下：
+	 * </p>
 	 * <ol>
-	 *     <li>{@code null}</li>
-	 *     <li>空字符串：{@code ""}</li>
-	 *     <li>空格、全角空格、制表符、换行符，等不可见字符</li>
+	 * <li>{@code null}</li>
+	 * <li>空字符串：{@code ""}</li>
+	 * <li>空格、全角空格、制表符、换行符，等不可见字符</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isBlank(null)     // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlank("")       // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlank(" \t\n")  // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlank("abc")    // false}</li>
+	 * <li>{@code  gtcStrUtil.isBlank(null)     // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlank("")       // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlank(" \t\n")  // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlank("abc")    // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isEmpty(CharSequence)} 的区别是：
-	 * 该方法会校验空白字符，且性能相对于 {@link #isEmpty(CharSequence)} 略慢。</p>
+	 * <p>
+	 * 注意：该方法与 {@link #isEmpty(CharSequence)} 的区别是： 该方法会校验空白字符，且性能相对于
+	 * {@link #isEmpty(CharSequence)} 略慢。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>建议：</p>
+	 * <p>
+	 * 建议：
+	 * </p>
 	 * <ul>
-	 *     <li>该方法建议仅对于客户端（或第三方接口）传入的参数使用该方法。</li>
-	 *     <li>需要同时校验多个字符串时，建议采用 {@link #hasBlank(CharSequence...)} 或 {@link #isAllBlank(CharSequence...)}</li>
+	 * <li>该方法建议仅对于客户端（或第三方接口）传入的参数使用该方法。</li>
+	 * <li>需要同时校验多个字符串时，建议采用 {@link #hasBlank(CharSequence...)} 或
+	 * {@link #isAllBlank(CharSequence...)}</li>
 	 * </ul>
-	 *
 	 * @param str 被检测的字符串
 	 * @return 若为空白，则返回 true
 	 * @see #isEmpty(CharSequence)
@@ -292,24 +296,29 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>如果对象是字符串是否为空白，空白的定义如下：</p>
+	 * <p>
+	 * 如果对象是字符串是否为空白，空白的定义如下：
+	 * </p>
 	 * <ol>
-	 *     <li>{@code null}</li>
-	 *     <li>空字符串：{@code ""}</li>
-	 *     <li>空格、全角空格、制表符、换行符，等不可见字符</li>
+	 * <li>{@code null}</li>
+	 * <li>空字符串：{@code ""}</li>
+	 * <li>空格、全角空格、制表符、换行符，等不可见字符</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isBlankIfStr(null)     // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlankIfStr("")       // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlankIfStr(" \t\n")  // true}</li>
-	 *     <li>{@code  gtcStrUtil.isBlankIfStr("abc")    // false}</li>
+	 * <li>{@code  gtcStrUtil.isBlankIfStr(null)     // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlankIfStr("")       // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlankIfStr(" \t\n")  // true}</li>
+	 * <li>{@code  gtcStrUtil.isBlankIfStr("abc")    // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isEmptyIfStr(Object)} 的区别是：
-	 * 该方法会校验空白字符，且性能相对于 {@link #isEmptyIfStr(Object)} 略慢。</p>
-	 *
+	 * <p>
+	 * 注意：该方法与 {@link #isEmptyIfStr(Object)} 的区别是： 该方法会校验空白字符，且性能相对于
+	 * {@link #isEmptyIfStr(Object)} 略慢。
+	 * </p>
 	 * @param obj 对象
 	 * @return 如果为字符串是否为空串
 	 * @see GutilStr#isBlank(CharSequence)
@@ -318,32 +327,40 @@ public class GutilStr {
 	public static boolean isBlankIfStr(Object obj) {
 		if (null == obj) {
 			return true;
-		} else if (obj instanceof CharSequence) {
+		}
+		else if (obj instanceof CharSequence) {
 			return isBlank((CharSequence) obj);
 		}
 		return false;
 	}
 
 	/**
-	 * <p>字符串是否为非空白，非空白的定义如下： </p>
+	 * <p>
+	 * 字符串是否为非空白，非空白的定义如下：
+	 * </p>
 	 * <ol>
-	 *     <li>不为 {@code null}</li>
-	 *     <li>不为空字符串：{@code ""}</li>
-	 *     <li>不为空格、全角空格、制表符、换行符，等不可见字符</li>
+	 * <li>不为 {@code null}</li>
+	 * <li>不为空字符串：{@code ""}</li>
+	 * <li>不为空格、全角空格、制表符、换行符，等不可见字符</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isNotBlank(null)     // false}</li>
-	 *     <li>{@code  gtcStrUtil.isNotBlank("")       // false}</li>
-	 *     <li>{@code  gtcStrUtil.isNotBlank(" \t\n")  // false}</li>
-	 *     <li>{@code  gtcStrUtil.isNotBlank("abc")    // true}</li>
+	 * <li>{@code  gtcStrUtil.isNotBlank(null)     // false}</li>
+	 * <li>{@code  gtcStrUtil.isNotBlank("")       // false}</li>
+	 * <li>{@code  gtcStrUtil.isNotBlank(" \t\n")  // false}</li>
+	 * <li>{@code  gtcStrUtil.isNotBlank("abc")    // true}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isNotEmpty(CharSequence)} 的区别是：
-	 * 该方法会校验空白字符，且性能相对于 {@link #isNotEmpty(CharSequence)} 略慢。</p>
-	 * <p>建议：仅对于客户端（或第三方接口）传入的参数使用该方法。</p>
-	 *
+	 * <p>
+	 * 注意：该方法与 {@link #isNotEmpty(CharSequence)} 的区别是： 该方法会校验空白字符，且性能相对于
+	 * {@link #isNotEmpty(CharSequence)} 略慢。
+	 * </p>
+	 * <p>
+	 * 建议：仅对于客户端（或第三方接口）传入的参数使用该方法。
+	 * </p>
 	 * @param str 被检测的字符串
 	 * @return 是否为非空
 	 * @see GutilStr#isBlank(CharSequence)
@@ -353,24 +370,32 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>指定字符串数组中，是否包含空字符串。</p>
-	 * <p>如果指定的字符串数组的长度为 0，或者其中的任意一个元素是空字符串，则返回 true。</p>
+	 * <p>
+	 * 指定字符串数组中，是否包含空字符串。
+	 * </p>
+	 * <p>
+	 * 如果指定的字符串数组的长度为 0，或者其中的任意一个元素是空字符串，则返回 true。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.hasBlank()                  // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasBlank("", null, " ")     // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasBlank("123", " ")        // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasBlank("123", "abc")      // false}</li>
+	 * <li>{@code  gtcStrUtil.hasBlank()                  // true}</li>
+	 * <li>{@code  gtcStrUtil.hasBlank("", null, " ")     // true}</li>
+	 * <li>{@code  gtcStrUtil.hasBlank("123", " ")        // true}</li>
+	 * <li>{@code  gtcStrUtil.hasBlank("123", "abc")      // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isAllBlank(CharSequence...)} 的区别在于：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #isAllBlank(CharSequence...)} 的区别在于：
+	 * </p>
 	 * <ul>
-	 *     <li>hasBlank(CharSequence...)            等价于 {@code isBlank(...) || isBlank(...) || ...}</li>
-	 *     <li>{@link #isAllBlank(CharSequence...)} 等价于 {@code isBlank(...) && isBlank(...) && ...}</li>
+	 * <li>hasBlank(CharSequence...) 等价于 {@code isBlank(...) || isBlank(...) || ...}</li>
+	 * <li>{@link #isAllBlank(CharSequence...)} 等价于
+	 * {@code isBlank(...) && isBlank(...) && ...}</li>
 	 * </ul>
-	 *
 	 * @param strs 字符串列表
 	 * @return 是否包含空字符串
 	 */
@@ -388,24 +413,33 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>指定字符串数组中的元素，是否全部为空字符串。</p>
-	 * <p>如果指定的字符串数组的长度为 0，或者所有元素都是空字符串，则返回 true。</p>
+	 * <p>
+	 * 指定字符串数组中的元素，是否全部为空字符串。
+	 * </p>
+	 * <p>
+	 * 如果指定的字符串数组的长度为 0，或者所有元素都是空字符串，则返回 true。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isAllBlank()                  // true}</li>
-	 *     <li>{@code  gtcStrUtil.isAllBlank("", null, " ")     // true}</li>
-	 *     <li>{@code  gtcStrUtil.isAllBlank("123", " ")        // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllBlank("123", "abc")      // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllBlank()                  // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllBlank("", null, " ")     // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllBlank("123", " ")        // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllBlank("123", "abc")      // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #hasBlank(CharSequence...)} 的区别在于：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #hasBlank(CharSequence...)} 的区别在于：
+	 * </p>
 	 * <ul>
-	 *     <li>{@link #hasBlank(CharSequence...)}   等价于 {@code isBlank(...) || isBlank(...) || ...}</li>
-	 *     <li>isAllBlank(CharSequence...)          等价于 {@code isBlank(...) && isBlank(...) && ...}</li>
+	 * <li>{@link #hasBlank(CharSequence...)} 等价于
+	 * {@code isBlank(...) || isBlank(...) || ...}</li>
+	 * <li>isAllBlank(CharSequence...) 等价于
+	 * {@code isBlank(...) && isBlank(...) && ...}</li>
 	 * </ul>
-	 *
 	 * @param strs 字符串列表
 	 * @return 所有字符串是否为空白
 	 */
@@ -425,27 +459,35 @@ public class GutilStr {
 	// ------------------------------------------------------------------------ Empty
 
 	/**
-	 * <p>字符串是否为空，空的定义如下：</p>
+	 * <p>
+	 * 字符串是否为空，空的定义如下：
+	 * </p>
 	 * <ol>
-	 *     <li>{@code null}</li>
-	 *     <li>空字符串：{@code ""}</li>
+	 * <li>{@code null}</li>
+	 * <li>空字符串：{@code ""}</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isEmpty(null)     // true}</li>
-	 *     <li>{@code  gtcStrUtil.isEmpty("")       // true}</li>
-	 *     <li>{@code  gtcStrUtil.isEmpty(" \t\n")  // false}</li>
-	 *     <li>{@code  gtcStrUtil.isEmpty("abc")    // false}</li>
+	 * <li>{@code  gtcStrUtil.isEmpty(null)     // true}</li>
+	 * <li>{@code  gtcStrUtil.isEmpty("")       // true}</li>
+	 * <li>{@code  gtcStrUtil.isEmpty(" \t\n")  // false}</li>
+	 * <li>{@code  gtcStrUtil.isEmpty("abc")    // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isBlank(CharSequence)} 的区别是：该方法不校验空白字符。</p>
-	 * <p>建议：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #isBlank(CharSequence)} 的区别是：该方法不校验空白字符。
+	 * </p>
+	 * <p>
+	 * 建议：
+	 * </p>
 	 * <ul>
-	 *     <li>该方法建议用于工具类或任何可以预期的方法参数的校验中。</li>
-	 *     <li>需要同时校验多个字符串时，建议采用 {@link #hasEmpty(CharSequence...)} 或 {@link #isAllEmpty(CharSequence...)}</li>
+	 * <li>该方法建议用于工具类或任何可以预期的方法参数的校验中。</li>
+	 * <li>需要同时校验多个字符串时，建议采用 {@link #hasEmpty(CharSequence...)} 或
+	 * {@link #isAllEmpty(CharSequence...)}</li>
 	 * </ul>
-	 *
 	 * @param str 被检测的字符串
 	 * @return 是否为空
 	 * @see #isBlank(CharSequence)
@@ -455,22 +497,28 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>如果对象是字符串是否为空串，空的定义如下：</p><br>
+	 * <p>
+	 * 如果对象是字符串是否为空串，空的定义如下：
+	 * </p>
+	 * <br>
 	 * <ol>
-	 *     <li>{@code null}</li>
-	 *     <li>空字符串：{@code ""}</li>
+	 * <li>{@code null}</li>
+	 * <li>空字符串：{@code ""}</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isEmptyIfStr(null)     // true}</li>
-	 *     <li>{@code  gtcStrUtil.isEmptyIfStr("")       // true}</li>
-	 *     <li>{@code  gtcStrUtil.isEmptyIfStr(" \t\n")  // false}</li>
-	 *     <li>{@code  gtcStrUtil.isEmptyIfStr("abc")    // false}</li>
+	 * <li>{@code  gtcStrUtil.isEmptyIfStr(null)     // true}</li>
+	 * <li>{@code  gtcStrUtil.isEmptyIfStr("")       // true}</li>
+	 * <li>{@code  gtcStrUtil.isEmptyIfStr(" \t\n")  // false}</li>
+	 * <li>{@code  gtcStrUtil.isEmptyIfStr("abc")    // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isBlankIfStr(Object)} 的区别是：该方法不校验空白字符。</p>
-	 *
+	 * <p>
+	 * 注意：该方法与 {@link #isBlankIfStr(Object)} 的区别是：该方法不校验空白字符。
+	 * </p>
 	 * @param obj 对象
 	 * @return 如果为字符串是否为空串
 	 * @since 3.3.0
@@ -478,30 +526,38 @@ public class GutilStr {
 	public static boolean isEmptyIfStr(Object obj) {
 		if (null == obj) {
 			return true;
-		} else if (obj instanceof CharSequence) {
+		}
+		else if (obj instanceof CharSequence) {
 			return 0 == ((CharSequence) obj).length();
 		}
 		return false;
 	}
 
 	/**
-	 * <p>字符串是否为非空白，非空白的定义如下： </p>
+	 * <p>
+	 * 字符串是否为非空白，非空白的定义如下：
+	 * </p>
 	 * <ol>
-	 *     <li>不为 {@code null}</li>
-	 *     <li>不为空字符串：{@code ""}</li>
+	 * <li>不为 {@code null}</li>
+	 * <li>不为空字符串：{@code ""}</li>
 	 * </ol>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isNotEmpty(null)     // false}</li>
-	 *     <li>{@code  gtcStrUtil.isNotEmpty("")       // false}</li>
-	 *     <li>{@code  gtcStrUtil.isNotEmpty(" \t\n")  // true}</li>
-	 *     <li>{@code  gtcStrUtil.isNotEmpty("abc")    // true}</li>
+	 * <li>{@code  gtcStrUtil.isNotEmpty(null)     // false}</li>
+	 * <li>{@code  gtcStrUtil.isNotEmpty("")       // false}</li>
+	 * <li>{@code  gtcStrUtil.isNotEmpty(" \t\n")  // true}</li>
+	 * <li>{@code  gtcStrUtil.isNotEmpty("abc")    // true}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isNotBlank(CharSequence)} 的区别是：该方法不校验空白字符。</p>
-	 * <p>建议：该方法建议用于工具类或任何可以预期的方法参数的校验中。</p>
-	 *
+	 * <p>
+	 * 注意：该方法与 {@link #isNotBlank(CharSequence)} 的区别是：该方法不校验空白字符。
+	 * </p>
+	 * <p>
+	 * 建议：该方法建议用于工具类或任何可以预期的方法参数的校验中。
+	 * </p>
 	 * @param str 被检测的字符串
 	 * @return 是否为非空
 	 * @see GutilStr#isEmpty(CharSequence)
@@ -512,7 +568,6 @@ public class GutilStr {
 
 	/**
 	 * 当给定字符串为null时，转换为Empty
-	 *
 	 * @param str 被检查的字符串
 	 * @return 原字符串或者空串
 	 * @see #nullToEmpty(CharSequence)
@@ -524,7 +579,6 @@ public class GutilStr {
 
 	/**
 	 * 当给定字符串为null时，转换为Empty
-	 *
 	 * @param str 被转换的字符串
 	 * @return 转换后的字符串
 	 */
@@ -541,8 +595,7 @@ public class GutilStr {
 	 * nullToDefault(&quot;  &quot;, &quot;default&quot;)  = &quot;  &quot;
 	 * nullToDefault(&quot;bat&quot;, &quot;default&quot;) = &quot;bat&quot;
 	 * </pre>
-	 *
-	 * @param str        要转换的字符串
+	 * @param str 要转换的字符串
 	 * @param defaultStr 默认字符串
 	 * @return 字符串本身或指定的默认字符串
 	 */
@@ -559,8 +612,7 @@ public class GutilStr {
 	 * emptyToDefault(&quot;  &quot;, &quot;default&quot;)  = &quot;  &quot;
 	 * emptyToDefault(&quot;bat&quot;, &quot;default&quot;) = &quot;bat&quot;
 	 * </pre>
-	 *
-	 * @param str        要转换的字符串
+	 * @param str 要转换的字符串
 	 * @param defaultStr 默认字符串
 	 * @return 字符串本身或指定的默认字符串
 	 * @since 4.1.0
@@ -578,8 +630,7 @@ public class GutilStr {
 	 * emptyToDefault(&quot;  &quot;, &quot;default&quot;)  = &quot;default&quot;
 	 * emptyToDefault(&quot;bat&quot;, &quot;default&quot;) = &quot;bat&quot;
 	 * </pre>
-	 *
-	 * @param str        要转换的字符串
+	 * @param str 要转换的字符串
 	 * @param defaultStr 默认字符串
 	 * @return 字符串本身或指定的默认字符串
 	 * @since 4.1.0
@@ -590,7 +641,6 @@ public class GutilStr {
 
 	/**
 	 * 当给定字符串为空字符串时，转换为<code>null</code>
-	 *
 	 * @param str 被转换的字符串
 	 * @return 转换后的字符串
 	 */
@@ -599,25 +649,33 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>是否包含空字符串。</p>
-	 * <p>如果指定的字符串数组的长度为 0，或者其中的任意一个元素是空字符串，则返回 true。</p>
+	 * <p>
+	 * 是否包含空字符串。
+	 * </p>
+	 * <p>
+	 * 如果指定的字符串数组的长度为 0，或者其中的任意一个元素是空字符串，则返回 true。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.hasEmpty()                  // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasEmpty("", null)          // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasEmpty("123", "")         // true}</li>
-	 *     <li>{@code  gtcStrUtil.hasEmpty("123", "abc")      // false}</li>
-	 *     <li>{@code  gtcStrUtil.hasEmpty(" ", "\t", "\n")   // false}</li>
+	 * <li>{@code  gtcStrUtil.hasEmpty()                  // true}</li>
+	 * <li>{@code  gtcStrUtil.hasEmpty("", null)          // true}</li>
+	 * <li>{@code  gtcStrUtil.hasEmpty("123", "")         // true}</li>
+	 * <li>{@code  gtcStrUtil.hasEmpty("123", "abc")      // false}</li>
+	 * <li>{@code  gtcStrUtil.hasEmpty(" ", "\t", "\n")   // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isAllEmpty(CharSequence...)} 的区别在于：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #isAllEmpty(CharSequence...)} 的区别在于：
+	 * </p>
 	 * <ul>
-	 *     <li>hasEmpty(CharSequence...)            等价于 {@code isEmpty(...) || isEmpty(...) || ...}</li>
-	 *     <li>{@link #isAllEmpty(CharSequence...)} 等价于 {@code isEmpty(...) && isEmpty(...) && ...}</li>
+	 * <li>hasEmpty(CharSequence...) 等价于 {@code isEmpty(...) || isEmpty(...) || ...}</li>
+	 * <li>{@link #isAllEmpty(CharSequence...)} 等价于
+	 * {@code isEmpty(...) && isEmpty(...) && ...}</li>
 	 * </ul>
-	 *
 	 * @param strs 字符串列表
 	 * @return 是否包含空字符串
 	 */
@@ -635,25 +693,34 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>指定字符串数组中的元素，是否全部为空字符串。</p>
-	 * <p>如果指定的字符串数组的长度为 0，或者所有元素都是空字符串，则返回 true。</p>
+	 * <p>
+	 * 指定字符串数组中的元素，是否全部为空字符串。
+	 * </p>
+	 * <p>
+	 * 如果指定的字符串数组的长度为 0，或者所有元素都是空字符串，则返回 true。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isAllEmpty()                  // true}</li>
-	 *     <li>{@code  gtcStrUtil.isAllEmpty("", null)          // true}</li>
-	 *     <li>{@code  gtcStrUtil.isAllEmpty("123", "")         // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllEmpty("123", "abc")      // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllEmpty(" ", "\t", "\n")   // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllEmpty()                  // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllEmpty("", null)          // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllEmpty("123", "")         // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllEmpty("123", "abc")      // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllEmpty(" ", "\t", "\n")   // false}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #hasEmpty(CharSequence...)} 的区别在于：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #hasEmpty(CharSequence...)} 的区别在于：
+	 * </p>
 	 * <ul>
-	 *     <li>{@link #hasEmpty(CharSequence...)}   等价于 {@code isEmpty(...) || isEmpty(...) || ...}</li>
-	 *     <li>isAllEmpty(CharSequence...)          等价于 {@code isEmpty(...) && isEmpty(...) && ...}</li>
+	 * <li>{@link #hasEmpty(CharSequence...)} 等价于
+	 * {@code isEmpty(...) || isEmpty(...) || ...}</li>
+	 * <li>isAllEmpty(CharSequence...) 等价于
+	 * {@code isEmpty(...) && isEmpty(...) && ...}</li>
 	 * </ul>
-	 *
 	 * @param strs 字符串列表
 	 * @return 所有字符串是否为空白
 	 */
@@ -671,25 +738,34 @@ public class GutilStr {
 	}
 
 	/**
-	 * <p>指定字符串数组中的元素，是否都不为空字符串。</p>
-	 * <p>如果指定的字符串数组的长度不为 0，或者所有元素都不是空字符串，则返回 true。</p>
+	 * <p>
+	 * 指定字符串数组中的元素，是否都不为空字符串。
+	 * </p>
+	 * <p>
+	 * 如果指定的字符串数组的长度不为 0，或者所有元素都不是空字符串，则返回 true。
+	 * </p>
 	 * <br>
 	 *
-	 * <p>例：</p>
+	 * <p>
+	 * 例：
+	 * </p>
 	 * <ul>
-	 *     <li>{@code  gtcStrUtil.isAllNotEmpty()                  // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllNotEmpty("", null)          // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllNotEmpty("123", "")         // false}</li>
-	 *     <li>{@code  gtcStrUtil.isAllNotEmpty("123", "abc")      // true}</li>
-	 *     <li>{@code  gtcStrUtil.isAllNotEmpty(" ", "\t", "\n")   // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllNotEmpty()                  // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllNotEmpty("", null)          // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllNotEmpty("123", "")         // false}</li>
+	 * <li>{@code  gtcStrUtil.isAllNotEmpty("123", "abc")      // true}</li>
+	 * <li>{@code  gtcStrUtil.isAllNotEmpty(" ", "\t", "\n")   // true}</li>
 	 * </ul>
 	 *
-	 * <p>注意：该方法与 {@link #isAllEmpty(CharSequence...)} 的区别在于：</p>
+	 * <p>
+	 * 注意：该方法与 {@link #isAllEmpty(CharSequence...)} 的区别在于：
+	 * </p>
 	 * <ul>
-	 *     <li>{@link #isAllEmpty(CharSequence...)}    等价于 {@code isEmpty(...) && isEmpty(...) && ...}</li>
-	 *     <li>isAllNotEmpty(CharSequence...)          等价于 {@code !isEmpty(...) && !isEmpty(...) && ...}</li>
+	 * <li>{@link #isAllEmpty(CharSequence...)} 等价于
+	 * {@code isEmpty(...) && isEmpty(...) && ...}</li>
+	 * <li>isAllNotEmpty(CharSequence...) 等价于
+	 * {@code !isEmpty(...) && !isEmpty(...) && ...}</li>
 	 * </ul>
-	 *
 	 * @param args 字符串数组
 	 * @return 所有字符串是否都不为为空白
 	 * @since 5.3.6
@@ -700,7 +776,6 @@ public class GutilStr {
 
 	/**
 	 * 是否存都不为{@code null}或空对象或空白符的对象，通过{@link GutilStr#hasBlank(CharSequence...)} 判断元素
-	 *
 	 * @param args 被检查的对象,一个或者多个
 	 * @return 是否都不为空
 	 * @since 5.3.6
@@ -711,7 +786,6 @@ public class GutilStr {
 
 	/**
 	 * 检查字符串是否为null、“null”、“undefined”
-	 *
 	 * @param str 被检查的字符串
 	 * @return 是否为null、“null”、“undefined”
 	 * @since 4.0.10
@@ -725,7 +799,6 @@ public class GutilStr {
 
 	/**
 	 * 检查字符串是否为null、“”、“null”、“undefined”
-	 *
 	 * @param str 被检查的字符串
 	 * @return 是否为null、“”、“null”、“undefined”
 	 * @since 4.0.10
@@ -739,7 +812,6 @@ public class GutilStr {
 
 	/**
 	 * 检查字符串是否为null、空白串、“null”、“undefined”
-	 *
 	 * @param str 被检查的字符串
 	 * @return 是否为null、空白串、“null”、“undefined”
 	 * @since 4.0.10
@@ -753,7 +825,6 @@ public class GutilStr {
 
 	/**
 	 * 是否为“null”、“undefined”，不做空指针检查
-	 *
 	 * @param str 字符串
 	 * @return 是否为“null”、“undefined”
 	 */
@@ -768,7 +839,8 @@ public class GutilStr {
 	 * 除去字符串头尾部的空白，如果字符串是<code>null</code>，依然返回<code>null</code>。
 	 *
 	 * <p>
-	 * 注意，和<code>String.trim</code>不同，此方法使用<code>NumberUtil.isBlankChar</code> 来判定空白， 因而可以除去英文字符集之外的其它空白，如中文空格。
+	 * 注意，和<code>String.trim</code>不同，此方法使用<code>NumberUtil.isBlankChar</code> 来判定空白，
+	 * 因而可以除去英文字符集之外的其它空白，如中文空格。
 	 *
 	 * <pre>
 	 * trim(null)          = null
@@ -777,7 +849,6 @@ public class GutilStr {
 	 * trim(&quot;abc&quot;)         = &quot;abc&quot;
 	 * trim(&quot;    abc    &quot;) = &quot;abc&quot;
 	 * </pre>
-	 *
 	 * @param str 要处理的字符串
 	 * @return 除去头尾空白的字符串，如果原字串为<code>null</code>，则返回<code>null</code>
 	 */
@@ -787,7 +858,6 @@ public class GutilStr {
 
 	/**
 	 * 给定字符串数组全部做去首尾空格
-	 *
 	 * @param strs 字符串数组
 	 */
 	public static void trim(String[] strs) {
@@ -813,7 +883,6 @@ public class GutilStr {
 	 *  gtcStrUtil.trimToEmpty("abc")         = "abc"
 	 *  gtcStrUtil.trimToEmpty("    abc    ") = "abc"
 	 * </pre>
-	 *
 	 * @param str 字符串
 	 * @return 去除两边空白符后的字符串, 如果为null返回""
 	 * @since 3.1.1
@@ -832,7 +901,6 @@ public class GutilStr {
 	 *  gtcStrUtil.trimToNull("abc")         = "abc"
 	 *  gtcStrUtil.trimToEmpty("    abc    ") = "abc"
 	 * </pre>
-	 *
 	 * @param str 字符串
 	 * @return 去除两边空白符后的字符串, 如果为空返回null
 	 * @since 3.2.1
@@ -846,7 +914,8 @@ public class GutilStr {
 	 * 除去字符串头部的空白，如果字符串是<code>null</code>，则返回<code>null</code>。
 	 *
 	 * <p>
-	 * 注意，和<code>String.trim</code>不同，此方法使用<code>CharUtil.isBlankChar</code> 来判定空白， 因而可以除去英文字符集之外的其它空白，如中文空格。
+	 * 注意，和<code>String.trim</code>不同，此方法使用<code>CharUtil.isBlankChar</code> 来判定空白，
+	 * 因而可以除去英文字符集之外的其它空白，如中文空格。
 	 *
 	 * <pre>
 	 * trimStart(null)         = null
@@ -856,9 +925,9 @@ public class GutilStr {
 	 * trimStart(&quot;abc  &quot;)      = &quot;abc  &quot;
 	 * trimStart(&quot; abc &quot;)      = &quot;abc &quot;
 	 * </pre>
-	 *
 	 * @param str 要处理的字符串
-	 * @return 除去空白的字符串，如果原字串为<code>null</code>或结果字符串为<code>""</code>，则返回 <code>null</code>
+	 * @return 除去空白的字符串，如果原字串为<code>null</code>或结果字符串为<code>""</code>，则返回
+	 * <code>null</code>
 	 */
 	public static String trimStart(CharSequence str) {
 		return trim(str, -1);
@@ -868,7 +937,8 @@ public class GutilStr {
 	 * 除去字符串尾部的空白，如果字符串是<code>null</code>，则返回<code>null</code>。
 	 *
 	 * <p>
-	 * 注意，和<code>String.trim</code>不同，此方法使用<code>CharUtil.isBlankChar</code> 来判定空白， 因而可以除去英文字符集之外的其它空白，如中文空格。
+	 * 注意，和<code>String.trim</code>不同，此方法使用<code>CharUtil.isBlankChar</code> 来判定空白，
+	 * 因而可以除去英文字符集之外的其它空白，如中文空格。
 	 *
 	 * <pre>
 	 * trimEnd(null)       = null
@@ -878,9 +948,9 @@ public class GutilStr {
 	 * trimEnd(&quot;abc  &quot;)    = &quot;abc&quot;
 	 * trimEnd(&quot; abc &quot;)    = &quot; abc&quot;
 	 * </pre>
-	 *
 	 * @param str 要处理的字符串
-	 * @return 除去空白的字符串，如果原字串为<code>null</code>或结果字符串为<code>""</code>，则返回 <code>null</code>
+	 * @return 除去空白的字符串，如果原字串为<code>null</code>或结果字符串为<code>""</code>，则返回
+	 * <code>null</code>
 	 */
 	public static String trimEnd(CharSequence str) {
 		return trim(str, 1);
@@ -888,9 +958,9 @@ public class GutilStr {
 
 	/**
 	 * 除去字符串头尾部的空白符，如果字符串是<code>null</code>，依然返回<code>null</code>。
-	 *
-	 * @param str  要处理的字符串
-	 * @param mode <code>-1</code>表示trimStart，<code>0</code>表示trim全部， <code>1</code>表示trimEnd
+	 * @param str 要处理的字符串
+	 * @param mode <code>-1</code>表示trimStart，<code>0</code>表示trim全部，
+	 * <code>1</code>表示trimEnd
 	 * @return 除去指定字符后的的字符串，如果原字串为<code>null</code>，则返回<code>null</code>
 	 */
 	public static String trim(CharSequence str, int mode) {
@@ -925,9 +995,8 @@ public class GutilStr {
 
 	/**
 	 * 字符串是否以给定字符开始
-	 *
 	 * @param str 字符串
-	 * @param c   字符
+	 * @param c 字符
 	 * @return 是否开始
 	 */
 	public static boolean startWith(CharSequence str, char c) {
@@ -940,9 +1009,8 @@ public class GutilStr {
 	/**
 	 * 是否以指定字符串开头<br>
 	 * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
-	 *
-	 * @param str        被监测字符串
-	 * @param prefix     开头字符串
+	 * @param str 被监测字符串
+	 * @param prefix 开头字符串
 	 * @param ignoreCase 是否忽略大小写
 	 * @return 是否以指定字符串开头
 	 * @since 5.4.3
@@ -954,10 +1022,9 @@ public class GutilStr {
 	/**
 	 * 是否以指定字符串开头<br>
 	 * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
-	 *
-	 * @param str          被监测字符串
-	 * @param prefix       开头字符串
-	 * @param ignoreCase   是否忽略大小写
+	 * @param str 被监测字符串
+	 * @param prefix 开头字符串
+	 * @param ignoreCase 是否忽略大小写
 	 * @param ignoreEquals 是否忽略字符串相等的情况
 	 * @return 是否以指定字符串开头
 	 * @since 5.4.3
@@ -973,7 +1040,8 @@ public class GutilStr {
 		boolean isStartWith;
 		if (ignoreCase) {
 			isStartWith = str.toString().toLowerCase().startsWith(prefix.toString().toLowerCase());
-		} else {
+		}
+		else {
 			isStartWith = str.toString().startsWith(prefix.toString());
 		}
 
@@ -985,8 +1053,7 @@ public class GutilStr {
 
 	/**
 	 * 是否以指定字符串开头
-	 *
-	 * @param str    被监测字符串
+	 * @param str 被监测字符串
 	 * @param prefix 开头字符串
 	 * @return 是否以指定字符串开头
 	 */
@@ -996,8 +1063,7 @@ public class GutilStr {
 
 	/**
 	 * 是否以指定字符串开头，忽略相等字符串的情况
-	 *
-	 * @param str    被监测字符串
+	 * @param str 被监测字符串
 	 * @param prefix 开头字符串
 	 * @return 是否以指定字符串开头并且两个字符串不相等
 	 */
@@ -1007,8 +1073,7 @@ public class GutilStr {
 
 	/**
 	 * 是否以指定字符串开头，忽略大小写
-	 *
-	 * @param str    被监测字符串
+	 * @param str 被监测字符串
 	 * @param prefix 开头字符串
 	 * @return 是否以指定字符串开头
 	 */
@@ -1019,8 +1084,7 @@ public class GutilStr {
 	/**
 	 * 给定字符串是否以任何一个字符串开始<br>
 	 * 给定字符串和数组为空都返回false
-	 *
-	 * @param str      给定字符串
+	 * @param str 给定字符串
 	 * @param prefixes 需要检测的开始字符串
 	 * @return 给定字符串是否以任何一个字符串开始
 	 * @since 3.0.6
@@ -1040,9 +1104,8 @@ public class GutilStr {
 
 	/**
 	 * 字符串是否以给定字符结尾
-	 *
 	 * @param str 字符串
-	 * @param c   字符
+	 * @param c 字符
 	 * @return 是否结尾
 	 */
 	public static boolean endWith(CharSequence str, char c) {
@@ -1055,9 +1118,8 @@ public class GutilStr {
 	/**
 	 * 是否以指定字符串结尾<br>
 	 * 如果给定的字符串和开头字符串都为null则返回true，否则任意一个值为null返回false
-	 *
-	 * @param str          被监测字符串
-	 * @param suffix       结尾字符串
+	 * @param str 被监测字符串
+	 * @param suffix 结尾字符串
 	 * @param isIgnoreCase 是否忽略大小写
 	 * @return 是否以指定字符串结尾
 	 */
@@ -1068,15 +1130,15 @@ public class GutilStr {
 
 		if (isIgnoreCase) {
 			return str.toString().toLowerCase().endsWith(suffix.toString().toLowerCase());
-		} else {
+		}
+		else {
 			return str.toString().endsWith(suffix.toString());
 		}
 	}
 
 	/**
 	 * 是否以指定字符串结尾
-	 *
-	 * @param str    被监测字符串
+	 * @param str 被监测字符串
 	 * @param suffix 结尾字符串
 	 * @return 是否以指定字符串结尾
 	 */
@@ -1086,8 +1148,7 @@ public class GutilStr {
 
 	/**
 	 * 是否以指定字符串结尾，忽略大小写
-	 *
-	 * @param str    被监测字符串
+	 * @param str 被监测字符串
 	 * @param suffix 结尾字符串
 	 * @return 是否以指定字符串结尾
 	 */
@@ -1098,8 +1159,7 @@ public class GutilStr {
 	/**
 	 * 给定字符串是否以任何一个字符串结尾<br>
 	 * 给定字符串和数组为空都返回false
-	 *
-	 * @param str      给定字符串
+	 * @param str 给定字符串
 	 * @param suffixes 需要检测的结尾字符串
 	 * @return 给定字符串是否以任何一个字符串结尾
 	 * @since 3.0.6
@@ -1119,8 +1179,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符是否在字符串中出现过
-	 *
-	 * @param str        字符串
+	 * @param str 字符串
 	 * @param searchChar 被查找的字符
 	 * @return 是否包含
 	 * @since 3.1.2
@@ -1131,8 +1190,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符串是否在字符串中出现过
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param searchStr 被查找的字符串
 	 * @return 是否包含
 	 * @since 5.1.1
@@ -1146,8 +1204,7 @@ public class GutilStr {
 
 	/**
 	 * 查找指定字符串是否包含指定字符串列表中的任意一个字符串
-	 *
-	 * @param str      指定字符串
+	 * @param str 指定字符串
 	 * @param testStrs 需要检查的字符串数组
 	 * @return 是否包含任意一个字符串
 	 * @since 3.2.0
@@ -1156,13 +1213,9 @@ public class GutilStr {
 		return null != getContainsStr(str, testStrs);
 	}
 
-
-
-
 	/**
 	 * 给定字符串是否包含空白符（空白符包括空格、制表符、全角空格和不间断空格）<br>
 	 * 如果给定字符串为null或者""，则返回false
-	 *
 	 * @param str 字符串
 	 * @return 是否包含空白符
 	 * @since 4.0.8
@@ -1186,8 +1239,7 @@ public class GutilStr {
 
 	/**
 	 * 查找指定字符串是否包含指定字符串列表中的任意一个字符串，如果包含返回找到的第一个字符串
-	 *
-	 * @param str      指定字符串
+	 * @param str 指定字符串
 	 * @param testStrs 需要检查的字符串数组
 	 * @return 被包含的第一个字符串
 	 * @since 3.2.0
@@ -1206,8 +1258,7 @@ public class GutilStr {
 
 	/**
 	 * 是否包含特定字符，忽略大小写，如果给定两个参数都为<code>null</code>，返回true
-	 *
-	 * @param str     被检测字符串
+	 * @param str 被检测字符串
 	 * @param testStr 被测试是否包含的字符串
 	 * @return 是否包含
 	 */
@@ -1222,8 +1273,7 @@ public class GutilStr {
 	/**
 	 * 查找指定字符串是否包含指定字符串列表中的任意一个字符串<br>
 	 * 忽略大小写
-	 *
-	 * @param str      指定字符串
+	 * @param str 指定字符串
 	 * @param testStrs 需要检查的字符串数组
 	 * @return 是否包含任意一个字符串
 	 * @since 3.2.0
@@ -1235,8 +1285,7 @@ public class GutilStr {
 	/**
 	 * 查找指定字符串是否包含指定字符串列表中的任意一个字符串，如果包含返回找到的第一个字符串<br>
 	 * 忽略大小写
-	 *
-	 * @param str      指定字符串
+	 * @param str 指定字符串
 	 * @param testStrs 需要检查的字符串数组
 	 * @return 被包含的第一个字符串
 	 * @since 3.2.0
@@ -1262,7 +1311,6 @@ public class GutilStr {
 	 * setName =》name
 	 * isName  =》name
 	 * </pre>
-	 *
 	 * @param getOrSetMethodName Get或Set方法名
 	 * @return 如果是set或get方法名，返回field， 否则null
 	 */
@@ -1270,7 +1318,8 @@ public class GutilStr {
 		final String getOrSetMethodNameStr = getOrSetMethodName.toString();
 		if (getOrSetMethodNameStr.startsWith("get") || getOrSetMethodNameStr.startsWith("set")) {
 			return removePreAndLowerFirst(getOrSetMethodName, 3);
-		} else if (getOrSetMethodNameStr.startsWith("is")) {
+		}
+		else if (getOrSetMethodNameStr.startsWith("is")) {
 			return removePreAndLowerFirst(getOrSetMethodName, 2);
 		}
 		return null;
@@ -1279,7 +1328,6 @@ public class GutilStr {
 	/**
 	 * 生成set方法名<br>
 	 * 例如：name 返回 setName
-	 *
 	 * @param fieldName 属性名
 	 * @return setXxx
 	 */
@@ -1289,7 +1337,6 @@ public class GutilStr {
 
 	/**
 	 * 生成get方法名
-	 *
 	 * @param fieldName 属性名
 	 * @return getXxx
 	 */
@@ -1300,8 +1347,7 @@ public class GutilStr {
 	/**
 	 * 移除字符串中所有给定字符串<br>
 	 * 例：removeAll("aa-bb-cc-dd", "-") =》 aabbccdd
-	 *
-	 * @param str         字符串
+	 * @param str 字符串
 	 * @param strToRemove 被移除的字符串
 	 * @return 移除后的字符串
 	 */
@@ -1312,10 +1358,10 @@ public class GutilStr {
 		}
 		return str.toString().replace(strToRemove, EMPTY);
 	}
+
 	/**
 	 * 去除字符串中指定的多个字符，如有多个则全部去除
-	 *
-	 * @param str   字符串
+	 * @param str 字符串
 	 * @param chars 字符列表
 	 * @return 去除后的字符
 	 * @since 4.2.2
@@ -1338,11 +1384,11 @@ public class GutilStr {
 		}
 		return builder.toString();
 	}
+
 	/**
 	 * 移除字符串中所有给定字符串，当某个字符串出现多次，则全部移除<br>
 	 * 例：removeAny("aa-bb-cc-dd", "a", "b") =》 --cc-dd
-	 *
-	 * @param str          字符串
+	 * @param str 字符串
 	 * @param strsToRemove 被移除的字符串
 	 * @return 移除后的字符串
 	 * @since 5.3.8
@@ -1360,8 +1406,7 @@ public class GutilStr {
 	/**
 	 * 去掉首部指定长度的字符串并将剩余字符串首字母小写<br>
 	 * 例如：str=setName, preLength=3 =》 return name
-	 *
-	 * @param str       被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param preLength 去掉的长度
 	 * @return 处理后的字符串，不符合规范返回null
 	 */
@@ -1375,7 +1420,8 @@ public class GutilStr {
 				return first + str.toString().substring(preLength + 1);
 			}
 			return String.valueOf(first);
-		} else {
+		}
+		else {
 			return str.toString();
 		}
 	}
@@ -1383,8 +1429,7 @@ public class GutilStr {
 	/**
 	 * 去掉首部指定长度的字符串并将剩余字符串首字母小写<br>
 	 * 例如：str=setName, prefix=set =》 return name
-	 *
-	 * @param str    被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param prefix 前缀
 	 * @return 处理后的字符串，不符合规范返回null
 	 */
@@ -1394,8 +1439,7 @@ public class GutilStr {
 
 	/**
 	 * 原字符串首字母大写并在其首部添加指定字符串 例如：str=name, preString=get =》 return getName
-	 *
-	 * @param str       被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param preString 添加的首部
 	 * @return 处理后的字符串
 	 */
@@ -1409,7 +1453,6 @@ public class GutilStr {
 	/**
 	 * 大写首字母<br>
 	 * 例如：str = name, return Name
-	 *
 	 * @param str 字符串
 	 * @return 字符串
 	 */
@@ -1429,7 +1472,6 @@ public class GutilStr {
 	/**
 	 * 小写首字母<br>
 	 * 例如：str = Name, return name
-	 *
 	 * @param str 字符串
 	 * @return 字符串
 	 */
@@ -1448,8 +1490,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉指定前缀
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @return 切掉后的字符串，若前缀不是 preffix， 返回原字符串
 	 */
@@ -1467,8 +1508,7 @@ public class GutilStr {
 
 	/**
 	 * 忽略大小写去掉指定前缀
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @return 切掉后的字符串，若前缀不是 prefix， 返回原字符串
 	 */
@@ -1486,8 +1526,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉指定后缀
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param suffix 后缀
 	 * @return 切掉后的字符串，若后缀不是 suffix， 返回原字符串
 	 */
@@ -1505,8 +1544,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉指定后缀，并小写首字母
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param suffix 后缀
 	 * @return 切掉后的字符串，若后缀不是 suffix， 返回原字符串
 	 */
@@ -1516,8 +1554,7 @@ public class GutilStr {
 
 	/**
 	 * 忽略大小写去掉指定后缀
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param suffix 后缀
 	 * @return 切掉后的字符串，若后缀不是 suffix， 返回原字符串
 	 */
@@ -1535,8 +1572,7 @@ public class GutilStr {
 
 	/**
 	 * 去除两边的指定字符串
-	 *
-	 * @param str            被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param prefixOrSuffix 前缀或后缀
 	 * @return 处理后的字符串
 	 * @since 3.1.2
@@ -1551,8 +1587,7 @@ public class GutilStr {
 
 	/**
 	 * 去除两边的指定字符串
-	 *
-	 * @param str    被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 处理后的字符串
@@ -1579,8 +1614,7 @@ public class GutilStr {
 
 	/**
 	 * 去除两边的指定字符串，忽略大小写
-	 *
-	 * @param str            被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param prefixOrSuffix 前缀或后缀
 	 * @return 处理后的字符串
 	 * @since 3.1.2
@@ -1591,8 +1625,7 @@ public class GutilStr {
 
 	/**
 	 * 去除两边的指定字符串，忽略大小写
-	 *
-	 * @param str    被处理的字符串
+	 * @param str 被处理的字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 处理后的字符串
@@ -1617,8 +1650,7 @@ public class GutilStr {
 
 	/**
 	 * 如果给定字符串不是以prefix开头的，在开头补充 prefix
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @return 补充后的字符串
 	 */
@@ -1637,8 +1669,7 @@ public class GutilStr {
 
 	/**
 	 * 如果给定字符串不是以suffix结尾的，在尾部补充 suffix
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param suffix 后缀
 	 * @return 补充后的字符串
 	 */
@@ -1655,13 +1686,8 @@ public class GutilStr {
 		return str2;
 	}
 
-
-
-	// ------------------------------------------------------------------------------ Split
-
-
-
-
+	// ------------------------------------------------------------------------------
+	// Split
 
 	/**
 	 * 改进JDK subString<br>
@@ -1671,10 +1697,9 @@ public class GutilStr {
 	 * 如果经过修正的index中from大于to，则互换from和to example: <br>
 	 * abcdefgh 2 3 =》 c <br>
 	 * abcdefgh 2 -3 =》 cde <br>
-	 *
-	 * @param str       String
+	 * @param str String
 	 * @param fromIndexInclude 开始的index（包括）
-	 * @param toIndexExclude   结束的index（不包括）
+	 * @param toIndexExclude 结束的index（不包括）
 	 * @return 字串
 	 */
 	public static String sub(CharSequence str, int fromIndexInclude, int toIndexExclude) {
@@ -1688,7 +1713,8 @@ public class GutilStr {
 			if (fromIndexInclude < 0) {
 				fromIndexInclude = 0;
 			}
-		} else if (fromIndexInclude > len) {
+		}
+		else if (fromIndexInclude > len) {
 			fromIndexInclude = len;
 		}
 
@@ -1697,7 +1723,8 @@ public class GutilStr {
 			if (toIndexExclude < 0) {
 				toIndexExclude = len;
 			}
-		} else if (toIndexExclude > len) {
+		}
+		else if (toIndexExclude > len) {
 			toIndexExclude = len;
 		}
 
@@ -1716,10 +1743,9 @@ public class GutilStr {
 
 	/**
 	 * 通过CodePoint截取字符串，可以截断Emoji
-	 *
-	 * @param str       String
+	 * @param str String
 	 * @param fromIndex 开始的index（包括）
-	 * @param toIndex   结束的index（不包括）
+	 * @param toIndex 结束的index（不包括）
 	 * @return 字串
 	 */
 	public static String subByCodePoint(CharSequence str, int fromIndex, int toIndex) {
@@ -1741,13 +1767,9 @@ public class GutilStr {
 		return sb.toString();
 	}
 
-
-
-
 	/**
 	 * 切割指定位置之前部分的字符串
-	 *
-	 * @param string  字符串
+	 * @param string 字符串
 	 * @param toIndexExclude 切割到的位置（不包括）
 	 * @return 切割后的剩余的前半部分字符串
 	 */
@@ -1757,8 +1779,7 @@ public class GutilStr {
 
 	/**
 	 * 切割指定位置之后部分的字符串
-	 *
-	 * @param string    字符串
+	 * @param string 字符串
 	 * @param fromIndex 切割开始的位置（包括）
 	 * @return 切割后后剩余的后半部分字符串
 	 */
@@ -1781,7 +1802,6 @@ public class GutilStr {
 	 *  gtcStrUtil.subSufByLength("abcde", 10)     =    "abcde"
 	 *  gtcStrUtil.subSufByLength(null, 3)               =    null
 	 * </pre>
-	 *
 	 * @param string 字符串
 	 * @param length 切割长度
 	 * @return 切割后后剩余的后半部分字符串
@@ -1800,10 +1820,9 @@ public class GutilStr {
 	/**
 	 * 截取字符串,从指定位置开始,截取指定长度的字符串<br>
 	 * author weibaohui
-	 *
-	 * @param input     原始字符串
+	 * @param input 原始字符串
 	 * @param fromIndex 开始的index,包括
-	 * @param length    要截取的长度
+	 * @param length 要截取的长度
 	 * @return 截取后的字符串
 	 */
 	public static String subWithLength(String input, int fromIndex, int length) {
@@ -1825,9 +1844,8 @@ public class GutilStr {
 	 *  gtcStrUtil.subBefore("abc", "", false)    = ""
 	 *  gtcStrUtil.subBefore("abc", null, false)  = "abc"
 	 * </pre>
-	 *
-	 * @param string          被查找的字符串
-	 * @param separator       分隔字符串（不包括）
+	 * @param string 被查找的字符串
+	 * @param separator 分隔字符串（不包括）
 	 * @param isLastSeparator 是否查找最后一个分隔字符串（多次出现分隔字符串时选取最后一个），true为选取最后一个
 	 * @return 切割后的字符串
 	 * @since 3.1.1
@@ -1865,9 +1883,8 @@ public class GutilStr {
 	 *  gtcStrUtil.subBefore("abc", 'c', false)   = "ab"
 	 *  gtcStrUtil.subBefore("abc", 'd', false)   = "abc"
 	 * </pre>
-	 *
-	 * @param string          被查找的字符串
-	 * @param separator       分隔字符串（不包括）
+	 * @param string 被查找的字符串
+	 * @param separator 分隔字符串（不包括）
 	 * @param isLastSeparator 是否查找最后一个分隔字符串（多次出现分隔字符串时选取最后一个），true为选取最后一个
 	 * @return 切割后的字符串
 	 * @since 4.1.15
@@ -1903,9 +1920,8 @@ public class GutilStr {
 	 *  gtcStrUtil.subAfter("abc", "d", false)   = ""
 	 *  gtcStrUtil.subAfter("abc", "", false)    = "abc"
 	 * </pre>
-	 *
-	 * @param string          被查找的字符串
-	 * @param separator       分隔字符串（不包括）
+	 * @param string 被查找的字符串
+	 * @param separator 分隔字符串（不包括）
 	 * @param isLastSeparator 是否查找最后一个分隔字符串（多次出现分隔字符串时选取最后一个），true为选取最后一个
 	 * @return 切割后的字符串
 	 * @since 3.1.1
@@ -1939,9 +1955,8 @@ public class GutilStr {
 	 *  gtcStrUtil.subAfter("abc", 'c', false)   = ""
 	 *  gtcStrUtil.subAfter("abc", 'd', false)   = ""
 	 * </pre>
-	 *
-	 * @param string          被查找的字符串
-	 * @param separator       分隔字符串（不包括）
+	 * @param string 被查找的字符串
+	 * @param separator 分隔字符串（不包括）
 	 * @param isLastSeparator 是否查找最后一个分隔字符串（多次出现分隔字符串时选取最后一个），true为选取最后一个
 	 * @return 切割后的字符串
 	 * @since 4.1.15
@@ -1975,10 +1990,9 @@ public class GutilStr {
 	 *  gtcStrUtil.subBetween("yabcz", "y", "z")   = "abc"
 	 *  gtcStrUtil.subBetween("yabczyabcz", "y", "z")   = "abc"
 	 * </pre>
-	 *
-	 * @param str    被切割的字符串
+	 * @param str 被切割的字符串
 	 * @param before 截取开始的字符串标识
-	 * @param after  截取到的字符串标识
+	 * @param after 截取到的字符串标识
 	 * @return 截取后的字符串
 	 * @since 3.1.1
 	 */
@@ -2014,8 +2028,7 @@ public class GutilStr {
 	 *  gtcStrUtil.subBetween("tagabctag", "")    = ""
 	 *  gtcStrUtil.subBetween("tagabctag", "tag") = "abc"
 	 * </pre>
-	 *
-	 * @param str            被切割的字符串
+	 * @param str 被切割的字符串
 	 * @param beforeAndAfter 截取开始和结束的字符串标识
 	 * @return 截取后的字符串
 	 * @since 3.1.1
@@ -2026,8 +2039,7 @@ public class GutilStr {
 
 	/**
 	 * 给定字符串是否被字符包围
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 是否包围，空串不包围
@@ -2046,8 +2058,7 @@ public class GutilStr {
 
 	/**
 	 * 给定字符串是否被字符包围
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 是否包围，空串不包围
@@ -2065,8 +2076,7 @@ public class GutilStr {
 
 	/**
 	 * 重复某个字符
-	 *
-	 * @param c     被重复的字符
+	 * @param c 被重复的字符
 	 * @param count 重复的数目，如果小于等于0则返回""
 	 * @return 重复字符字符串
 	 */
@@ -2084,8 +2094,7 @@ public class GutilStr {
 
 	/**
 	 * 重复某个字符串
-	 *
-	 * @param str   被重复的字符
+	 * @param str 被重复的字符
 	 * @param count 重复的数目
 	 * @return 重复字符字符串
 	 */
@@ -2120,8 +2129,7 @@ public class GutilStr {
 
 	/**
 	 * 重复某个字符串到指定长度
-	 *
-	 * @param str    被重复的字符
+	 * @param str 被重复的字符
 	 * @param padLen 指定长度
 	 * @return 重复字符字符串
 	 * @since 4.3.2
@@ -2136,7 +2144,8 @@ public class GutilStr {
 		final int strLen = str.length();
 		if (strLen == padLen) {
 			return str.toString();
-		} else if (strLen > padLen) {
+		}
+		else if (strLen > padLen) {
 			return subPre(str, padLen);
 		}
 
@@ -2156,9 +2165,8 @@ public class GutilStr {
 	 *  gtcStrUtil.repeatAndJoin("?", 0, ",")   = ""
 	 *  gtcStrUtil.repeatAndJoin("?", 5, null) = "?????"
 	 * </pre>
-	 *
-	 * @param str         被重复的字符串
-	 * @param count       数量
+	 * @param str 被重复的字符串
+	 * @param count 数量
 	 * @param conjunction 分界符
 	 * @return 连接后的字符串
 	 * @since 4.0.1
@@ -2172,14 +2180,14 @@ public class GutilStr {
 		while (count-- > 0) {
 			if (isFirst) {
 				isFirst = false;
-			} else if (isNotEmpty(conjunction)) {
+			}
+			else if (isNotEmpty(conjunction)) {
 				builder.append(conjunction);
 			}
 			builder.append(str);
 		}
 		return builder.toString();
 	}
-
 
 	/**
 	 * 比较两个字符串（大小写敏感）。
@@ -2191,7 +2199,6 @@ public class GutilStr {
 	 * equals(&quot;abc&quot;, &quot;abc&quot;) = true
 	 * equals(&quot;abc&quot;, &quot;ABC&quot;) = false
 	 * </pre>
-	 *
 	 * @param str1 要比较的字符串1
 	 * @param str2 要比较的字符串2
 	 * @return 如果两个字符串相同，或者都是<code>null</code>，则返回<code>true</code>
@@ -2210,7 +2217,6 @@ public class GutilStr {
 	 * equalsIgnoreCase(&quot;abc&quot;, &quot;abc&quot;) = true
 	 * equalsIgnoreCase(&quot;abc&quot;, &quot;ABC&quot;) = true
 	 * </pre>
-	 *
 	 * @param str1 要比较的字符串1
 	 * @param str2 要比较的字符串2
 	 * @return 如果两个字符串相同，或者都是<code>null</code>，则返回<code>true</code>
@@ -2221,9 +2227,8 @@ public class GutilStr {
 
 	/**
 	 * 比较两个字符串是否相等。
-	 *
-	 * @param str1       要比较的字符串1
-	 * @param str2       要比较的字符串2
+	 * @param str1 要比较的字符串1
+	 * @param str2 要比较的字符串2
 	 * @param ignoreCase 是否忽略大小写
 	 * @return 如果两个字符串相同，或者都是<code>null</code>，则返回<code>true</code>
 	 * @since 3.2.0
@@ -2240,7 +2245,8 @@ public class GutilStr {
 
 		if (ignoreCase) {
 			return str1.toString().equalsIgnoreCase(str2.toString());
-		} else {
+		}
+		else {
 			return str1.toString().contentEquals(str2);
 		}
 	}
@@ -2248,7 +2254,6 @@ public class GutilStr {
 	/**
 	 * 给定字符串是否与提供的中任一字符串相同（忽略大小写），相同则返回{@code true}，没有相同的返回{@code false}<br>
 	 * 如果参与比对的字符串列表为空，返回{@code false}
-	 *
 	 * @param str1 给定需要检查的字符串
 	 * @param strs 需要参与比对的字符串列表
 	 * @return 是否相同
@@ -2261,7 +2266,6 @@ public class GutilStr {
 	/**
 	 * 给定字符串是否与提供的中任一字符串相同，相同则返回{@code true}，没有相同的返回{@code false}<br>
 	 * 如果参与比对的字符串列表为空，返回{@code false}
-	 *
 	 * @param str1 给定需要检查的字符串
 	 * @param strs 需要参与比对的字符串列表
 	 * @return 是否相同
@@ -2274,10 +2278,9 @@ public class GutilStr {
 	/**
 	 * 给定字符串是否与提供的中任一字符串相同，相同则返回{@code true}，没有相同的返回{@code false}<br>
 	 * 如果参与比对的字符串列表为空，返回{@code false}
-	 *
-	 * @param str1       给定需要检查的字符串
+	 * @param str1 给定需要检查的字符串
 	 * @param ignoreCase 是否忽略大小写
-	 * @param strs       需要参与比对的字符串列表
+	 * @param strs 需要参与比对的字符串列表
 	 * @return 是否相同
 	 * @since 4.3.2
 	 */
@@ -2302,9 +2305,8 @@ public class GutilStr {
 	 * 通常使用：format("this is {} for {}", "a", "b") =》 this is a for b<br>
 	 * 转义{}： format("this is \\{} for {}", "a", "b") =》 this is \{} for a<br>
 	 * 转义\： format("this is \\\\{} for {}", "a", "b") =》 this is \a for b<br>
-	 *
 	 * @param template 文本模板，被替换的部分用 {} 表示，如果模板为null，返回"null"
-	 * @param params   参数值
+	 * @param params 参数值
 	 * @return 格式化后的文本，如果模板为null，返回"null"
 	 */
 	public static String format(CharSequence template, Object... params) {
@@ -2320,8 +2322,7 @@ public class GutilStr {
 	/**
 	 * 有序的格式化文本，使用{number}做为占位符<br>
 	 * 通常使用：format("this is {0} for {1}", "a", "b") =》 this is a for b<br>
-	 *
-	 * @param pattern   文本格式
+	 * @param pattern 文本格式
 	 * @param arguments 参数
 	 * @return 格式化后的文本
 	 */
@@ -2332,9 +2333,8 @@ public class GutilStr {
 	/**
 	 * 格式化文本，使用 {varName} 占位<br>
 	 * map = {a: "aValue", b: "bValue"} format("{a} and {b}", map) ---=》 aValue and bValue
-	 *
 	 * @param template 文本模板，被替换的部分用 {key} 表示
-	 * @param map      参数值对
+	 * @param map 参数值对
 	 * @return 格式化后的文本
 	 */
 	public static String format(CharSequence template, Map<?, ?> map) {
@@ -2344,9 +2344,8 @@ public class GutilStr {
 	/**
 	 * 格式化文本，使用 {varName} 占位<br>
 	 * map = {a: "aValue", b: "bValue"} format("{a} and {b}", map) ---=》 aValue and bValue
-	 *
-	 * @param template   文本模板，被替换的部分用 {key} 表示
-	 * @param map        参数值对
+	 * @param template 文本模板，被替换的部分用 {key} 表示
+	 * @param map 参数值对
 	 * @param ignoreNull 是否忽略 {@code null} 值，忽略则 {@code null} 值对应的变量不被替换，否则替换为""
 	 * @return 格式化后的文本
 	 * @since 5.4.3
@@ -2371,11 +2370,9 @@ public class GutilStr {
 		return template2;
 	}
 
-
 	/**
 	 * 编码字符串<br>
 	 * 使用系统默认编码
-	 *
 	 * @param str 字符串
 	 * @return 编码后的字节码
 	 */
@@ -2385,8 +2382,7 @@ public class GutilStr {
 
 	/**
 	 * 编码字符串
-	 *
-	 * @param str     字符串
+	 * @param str 字符串
 	 * @param charset 字符集，如果此字段为空，则解码的结果取决于平台
 	 * @return 编码后的字节码
 	 */
@@ -2396,8 +2392,7 @@ public class GutilStr {
 
 	/**
 	 * 编码字符串
-	 *
-	 * @param str     字符串
+	 * @param str 字符串
 	 * @param charset 字符集，如果此字段为空，则解码的结果取决于平台
 	 * @return 编码后的字节码
 	 */
@@ -2419,8 +2414,7 @@ public class GutilStr {
 	 * 1、Byte数组和ByteBuffer会被转换为对应字符串的数组
 	 * 2、对象数组会调用Arrays.toString方法
 	 * </pre>
-	 *
-	 * @param obj         对象
+	 * @param obj 对象
 	 * @param charsetName 字符集
 	 * @return 字符串
 	 */
@@ -2429,13 +2423,11 @@ public class GutilStr {
 	}
 
 	/**
-	 * 将对象转为字符串
-	 * <pre>
+	 * 将对象转为字符串 <pre>
 	 * 	 1、Byte数组和ByteBuffer会被转换为对应字符串的数组
 	 * 	 2、对象数组会调用Arrays.toString方法
 	 * </pre>
-	 *
-	 * @param obj     对象
+	 * @param obj 对象
 	 * @param charset 字符集
 	 * @return 字符串
 	 */
@@ -2446,13 +2438,17 @@ public class GutilStr {
 
 		if (obj instanceof String) {
 			return (String) obj;
-		} else if (obj instanceof byte[]) {
+		}
+		else if (obj instanceof byte[]) {
 			return str((byte[]) obj, charset);
-		} else if (obj instanceof Byte[]) {
+		}
+		else if (obj instanceof Byte[]) {
 			return str((Byte[]) obj, charset);
-		} else if (obj instanceof ByteBuffer) {
+		}
+		else if (obj instanceof ByteBuffer) {
 			return str((ByteBuffer) obj, charset);
-		} else if (GutilArray.isArray(obj)) {
+		}
+		else if (GutilArray.isArray(obj)) {
 			return GutilArray.toString(obj);
 		}
 
@@ -2461,8 +2457,7 @@ public class GutilStr {
 
 	/**
 	 * 将byte数组转为字符串
-	 *
-	 * @param bytes   byte数组
+	 * @param bytes byte数组
 	 * @param charset 字符集
 	 * @return 字符串
 	 */
@@ -2472,8 +2467,7 @@ public class GutilStr {
 
 	/**
 	 * 解码字节码
-	 *
-	 * @param data    字符串
+	 * @param data 字符串
 	 * @param charset 字符集，如果此字段为空，则解码的结果取决于平台
 	 * @return 解码后的字符串
 	 */
@@ -2490,8 +2484,7 @@ public class GutilStr {
 
 	/**
 	 * 将Byte数组转为字符串
-	 *
-	 * @param bytes   byte数组
+	 * @param bytes byte数组
 	 * @param charset 字符集
 	 * @return 字符串
 	 */
@@ -2501,8 +2494,7 @@ public class GutilStr {
 
 	/**
 	 * 解码字节码
-	 *
-	 * @param data    字符串
+	 * @param data 字符串
 	 * @param charset 字符集，如果此字段为空，则解码的结果取决于平台
 	 * @return 解码后的字符串
 	 */
@@ -2523,8 +2515,7 @@ public class GutilStr {
 
 	/**
 	 * 将编码的byteBuffer数据转换为字符串
-	 *
-	 * @param data    数据
+	 * @param data 数据
 	 * @param charset 字符集，如果为空使用当前系统字符集
 	 * @return 字符串
 	 */
@@ -2538,8 +2529,7 @@ public class GutilStr {
 
 	/**
 	 * 将编码的byteBuffer数据转换为字符串
-	 *
-	 * @param data    数据
+	 * @param data 数据
 	 * @param charset 字符集，如果为空使用当前系统字符集
 	 * @return 字符串
 	 */
@@ -2552,7 +2542,6 @@ public class GutilStr {
 
 	/**
 	 * {@link CharSequence} 转为字符串，null安全
-	 *
 	 * @param cs {@link CharSequence}
 	 * @return 字符串
 	 */
@@ -2562,7 +2551,6 @@ public class GutilStr {
 
 	/**
 	 * 调用对象的toString方法，null会返回“null”
-	 *
 	 * @param obj 对象
 	 * @return 字符串
 	 * @since 4.1.3
@@ -2573,8 +2561,7 @@ public class GutilStr {
 
 	/**
 	 * 字符串转换为byteBuffer
-	 *
-	 * @param str     字符串
+	 * @param str 字符串
 	 * @param charset 编码
 	 * @return byteBuffer
 	 */
@@ -2584,9 +2571,8 @@ public class GutilStr {
 
 	/**
 	 * 以 conjunction 为分隔符将多个对象转换为字符串
-	 *
 	 * @param conjunction 分隔符
-	 * @param objs        数组
+	 * @param objs 数组
 	 * @return 连接后的字符串
 	 * @see GutilArray#join(Object, CharSequence)
 	 */
@@ -2594,15 +2580,13 @@ public class GutilStr {
 		return GutilArray.join(objs, conjunction);
 	}
 
-	public static String join(List<?> list,CharSequence conjunction) {
+	public static String join(List<?> list, CharSequence conjunction) {
 		return GutilArray.join(list.toArray(), conjunction);
 	}
-
 
 	/**
 	 * 将下划线方式命名的字符串转换为驼峰式。如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。<br>
 	 * 例如：hello_world=》helloWorld
-	 *
 	 * @param name 转换前的下划线大写方式命名的字符串
 	 * @return 转换后的驼峰式命名的字符串
 	 */
@@ -2620,15 +2604,18 @@ public class GutilStr {
 
 				if (c == GutilChar.UNDERLINE) {
 					upperCase = true;
-				} else if (upperCase) {
+				}
+				else if (upperCase) {
 					sb.append(Character.toUpperCase(c));
 					upperCase = false;
-				} else {
+				}
+				else {
 					sb.append(Character.toLowerCase(c));
 				}
 			}
 			return sb.toString();
-		} else {
+		}
+		else {
 			return name2;
 		}
 	}
@@ -2636,8 +2623,7 @@ public class GutilStr {
 	/**
 	 * 包装指定字符串<br>
 	 * 当前缀和后缀一致时使用此方法
-	 *
-	 * @param str             被包装的字符串
+	 * @param str 被包装的字符串
 	 * @param prefixAndSuffix 前缀和后缀
 	 * @return 包装后的字符串
 	 * @since 3.1.0
@@ -2648,8 +2634,7 @@ public class GutilStr {
 
 	/**
 	 * 包装指定字符串
-	 *
-	 * @param str    被包装的字符串
+	 * @param str 被包装的字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 包装后的字符串
@@ -2660,9 +2645,8 @@ public class GutilStr {
 
 	/**
 	 * 使用单个字符包装多个字符串
-	 *
 	 * @param prefixAndSuffix 前缀和后缀
-	 * @param strs            多个字符串
+	 * @param strs 多个字符串
 	 * @return 包装的字符串数组
 	 * @since 5.4.1
 	 */
@@ -2672,10 +2656,9 @@ public class GutilStr {
 
 	/**
 	 * 包装多个字符串
-	 *
 	 * @param prefix 前缀
 	 * @param suffix 后缀
-	 * @param strs   多个字符串
+	 * @param strs 多个字符串
 	 * @return 包装的字符串数组
 	 * @since 4.0.7
 	 */
@@ -2689,8 +2672,7 @@ public class GutilStr {
 
 	/**
 	 * 包装指定字符串，如果前缀或后缀已经包含对应的字符串，则不再包装
-	 *
-	 * @param str    被包装的字符串
+	 * @param str 被包装的字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 包装后的字符串
@@ -2721,9 +2703,8 @@ public class GutilStr {
 
 	/**
 	 * 使用成对的字符包装多个字符串，如果已经包装，则不再包装
-	 *
 	 * @param prefixAndSuffix 前缀和后缀
-	 * @param strs            多个字符串
+	 * @param strs 多个字符串
 	 * @return 包装的字符串数组
 	 * @since 5.4.1
 	 */
@@ -2733,10 +2714,9 @@ public class GutilStr {
 
 	/**
 	 * 包装多个字符串，如果已经包装，则不再包装
-	 *
 	 * @param prefix 前缀
 	 * @param suffix 后缀
-	 * @param strs   多个字符串
+	 * @param strs 多个字符串
 	 * @return 包装的字符串数组
 	 * @since 4.0.7
 	 */
@@ -2750,8 +2730,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉字符包装，如果未被包装则返回原字符串
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前置字符串
 	 * @param suffix 后置字符串
 	 * @return 去掉包装字符的字符串
@@ -2766,8 +2745,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉字符包装，如果未被包装则返回原字符串
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前置字符
 	 * @param suffix 后置字符
 	 * @return 去掉包装字符的字符串
@@ -2785,8 +2763,7 @@ public class GutilStr {
 
 	/**
 	 * 去掉字符包装，如果未被包装则返回原字符串
-	 *
-	 * @param str             字符串
+	 * @param str 字符串
 	 * @param prefixAndSuffix 前置和后置字符
 	 * @return 去掉包装字符的字符串
 	 * @since 4.0.1
@@ -2797,8 +2774,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符串是否被包装
-	 *
-	 * @param str    字符串
+	 * @param str 字符串
 	 * @param prefix 前缀
 	 * @param suffix 后缀
 	 * @return 是否被包装
@@ -2813,8 +2789,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符串是否被同一字符包装（前后都有这些字符串）
-	 *
-	 * @param str     字符串
+	 * @param str 字符串
 	 * @param wrapper 包装字符串
 	 * @return 是否被包装
 	 */
@@ -2824,8 +2799,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符串是否被同一字符包装（前后都有这些字符串）
-	 *
-	 * @param str     字符串
+	 * @param str 字符串
 	 * @param wrapper 包装字符
 	 * @return 是否被包装
 	 */
@@ -2835,8 +2809,7 @@ public class GutilStr {
 
 	/**
 	 * 指定字符串是否被包装
-	 *
-	 * @param str        字符串
+	 * @param str 字符串
 	 * @param prefixChar 前缀
 	 * @param suffixChar 后缀
 	 * @return 是否被包装
@@ -2857,10 +2830,9 @@ public class GutilStr {
 	 *  gtcStrUtil.padPre("1", 3, "ABC");//"AB1"
 	 *  gtcStrUtil.padPre("123", 2, "ABC");//"12"
 	 * </pre>
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param minLength 最小长度
-	 * @param padStr    补充的字符
+	 * @param padStr 补充的字符
 	 * @return 补充后的字符串
 	 */
 	public static String padPre(CharSequence str, int minLength, CharSequence padStr) {
@@ -2870,7 +2842,8 @@ public class GutilStr {
 		final int strLen = str.length();
 		if (strLen == minLength) {
 			return str.toString();
-		} else if (strLen > minLength) {
+		}
+		else if (strLen > minLength) {
 			return subPre(str, minLength);
 		}
 
@@ -2885,10 +2858,9 @@ public class GutilStr {
 	 *  gtcStrUtil.padPre("1", 3, '0');//"001"
 	 *  gtcStrUtil.padPre("123", 2, '0');//"12"
 	 * </pre>
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param minLength 最小长度
-	 * @param padChar   补充的字符
+	 * @param padChar 补充的字符
 	 * @return 补充后的字符串
 	 */
 	public static String padPre(CharSequence str, int minLength, char padChar) {
@@ -2898,7 +2870,8 @@ public class GutilStr {
 		final int strLen = str.length();
 		if (strLen == minLength) {
 			return str.toString();
-		} else if (strLen > minLength) {
+		}
+		else if (strLen > minLength) {
 			return subPre(str, minLength);
 		}
 
@@ -2913,10 +2886,9 @@ public class GutilStr {
 	 *  gtcStrUtil.padAfter("1", 3, '0');//"100"
 	 *  gtcStrUtil.padAfter("123", 2, '0');//"23"
 	 * </pre>
-	 *
-	 * @param str       字符串，如果为<code>null</code>，直接返回null
+	 * @param str 字符串，如果为<code>null</code>，直接返回null
 	 * @param minLength 最小长度
-	 * @param padChar   补充的字符
+	 * @param padChar 补充的字符
 	 * @return 补充后的字符串
 	 */
 	public static String padAfter(CharSequence str, int minLength, char padChar) {
@@ -2926,7 +2898,8 @@ public class GutilStr {
 		final int strLen = str.length();
 		if (strLen == minLength) {
 			return str.toString();
-		} else if (strLen > minLength) {
+		}
+		else if (strLen > minLength) {
 			return sub(str, strLen - minLength, strLen);
 		}
 
@@ -2941,10 +2914,9 @@ public class GutilStr {
 	 *  gtcStrUtil.padAfter("1", 3, "ABC");//"1AB"
 	 *  gtcStrUtil.padAfter("123", 2, "ABC");//"23"
 	 * </pre>
-	 *
-	 * @param str       字符串，如果为<code>null</code>，直接返回null
+	 * @param str 字符串，如果为<code>null</code>，直接返回null
 	 * @param minLength 最小长度
-	 * @param padStr    补充的字符
+	 * @param padStr 补充的字符
 	 * @return 补充后的字符串
 	 * @since 4.3.2
 	 */
@@ -2955,7 +2927,8 @@ public class GutilStr {
 		final int strLen = str.length();
 		if (strLen == minLength) {
 			return str.toString();
-		} else if (strLen > minLength) {
+		}
+		else if (strLen > minLength) {
 			return subSufByLength(str, minLength);
 		}
 
@@ -2973,8 +2946,7 @@ public class GutilStr {
 	 *  gtcStrUtil.center("abcd", 2) = "abcd"
 	 *  gtcStrUtil.center("a", 4)    = " a  "
 	 * </pre>
-	 *
-	 * @param str  字符串
+	 * @param str 字符串
 	 * @param size 指定长度
 	 * @return 补充后的字符串
 	 * @since 4.3.2
@@ -2996,9 +2968,8 @@ public class GutilStr {
 	 *  gtcStrUtil.center("a", 4, 'y')   = "yayy"
 	 *  gtcStrUtil.center("abc", 7, ' ')   = "  abc  "
 	 * </pre>
-	 *
-	 * @param str     字符串
-	 * @param size    指定长度
+	 * @param str 字符串
+	 * @param size 指定长度
 	 * @param padChar 两边补充的字符
 	 * @return 补充后的字符串
 	 * @since 4.3.2
@@ -3031,9 +3002,8 @@ public class GutilStr {
 	 *  gtcStrUtil.center("abc", 7, null) = "  abc  "
 	 *  gtcStrUtil.center("abc", 7, "")   = "  abc  "
 	 * </pre>
-	 *
-	 * @param str    字符串
-	 * @param size   指定长度
+	 * @param str 字符串
+	 * @param size 指定长度
 	 * @param padStr 两边补充的字符串
 	 * @return 补充后的字符串
 	 */
@@ -3056,17 +3026,14 @@ public class GutilStr {
 
 	/**
 	 * 创建StringBuilder对象
-	 *
 	 * @return StringBuilder对象
 	 */
 	public static StringBuilder builder() {
 		return new StringBuilder();
 	}
 
-
 	/**
 	 * 创建StringBuilder对象
-	 *
 	 * @param capacity 初始大小
 	 * @return StringBuilder对象
 	 */
@@ -3074,11 +3041,8 @@ public class GutilStr {
 		return new StringBuilder(capacity);
 	}
 
-
-
 	/**
 	 * 创建StringBuilder对象
-	 *
 	 * @param strs 初始字符串列表
 	 * @return StringBuilder对象
 	 */
@@ -3090,10 +3054,8 @@ public class GutilStr {
 		return sb;
 	}
 
-
 	/**
 	 * 获得StringReader
-	 *
 	 * @param str 字符串
 	 * @return StringReader
 	 */
@@ -3106,7 +3068,6 @@ public class GutilStr {
 
 	/**
 	 * 获得StringWriter
-	 *
 	 * @return StringWriter
 	 */
 	public static StringWriter getWriter() {
@@ -3126,8 +3087,7 @@ public class GutilStr {
 	 *  gtcStrUtil.count("abba", "ab")  = 1
 	 *  gtcStrUtil.count("abba", "xxx") = 0
 	 * </pre>
-	 *
-	 * @param content      被查找的字符串
+	 * @param content 被查找的字符串
 	 * @param strForSearch 需要查找的字符串
 	 * @return 查找到的个数
 	 */
@@ -3149,8 +3109,7 @@ public class GutilStr {
 
 	/**
 	 * 统计指定内容中包含指定字符的数量
-	 *
-	 * @param content       内容
+	 * @param content 内容
 	 * @param charForSearch 被统计的字符
 	 * @return 包含数量
 	 */
@@ -3168,11 +3127,9 @@ public class GutilStr {
 		return count;
 	}
 
-
 	/**
 	 * 将给定字符串，变成 "xxx...xxx" 形式的字符串
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param maxLength 最大长度
 	 * @return 截取后的字符串
 	 */
@@ -3205,9 +3162,8 @@ public class GutilStr {
 	 *  gtcStrUtil.compare("a", "B", *)       &gt; 0
 	 *  gtcStrUtil.compare("ab", "abc", *)    &lt; 0
 	 * </pre>
-	 *
-	 * @param str1       字符串1
-	 * @param str2       字符串2
+	 * @param str1 字符串1
+	 * @param str2 字符串2
 	 * @param nullIsLess {@code null} 值是否排在前（null是否小于非空值）
 	 * @return 排序值。负数：str1 &lt; str2，正数：str1 &gt; str2, 0：str1 == str2
 	 */
@@ -3241,9 +3197,8 @@ public class GutilStr {
 	 *  gtcStrUtil.compareIgnoreCase("A", "b", *)       &lt; 0
 	 *  gtcStrUtil.compareIgnoreCase("ab", "abc", *)    &lt; 0
 	 * </pre>
-	 *
-	 * @param str1       字符串1
-	 * @param str2       字符串2
+	 * @param str1 字符串1
+	 * @param str2 字符串2
 	 * @param nullIsLess {@code null} 值是否排在前（null是否小于非空值）
 	 * @return 排序值。负数：str1 &lt; str2，正数：str1 &gt; str2, 0：str1 == str2
 	 */
@@ -3262,8 +3217,7 @@ public class GutilStr {
 
 	/**
 	 * 指定范围内查找指定字符
-	 *
-	 * @param str        字符串
+	 * @param str 字符串
 	 * @param searchChar 被查找的字符
 	 * @return 位置
 	 */
@@ -3273,27 +3227,26 @@ public class GutilStr {
 
 	/**
 	 * 指定范围内查找指定字符
-	 *
-	 * @param str        字符串
+	 * @param str 字符串
 	 * @param searchChar 被查找的字符
-	 * @param start      起始位置，如果小于0，从0开始查找
+	 * @param start 起始位置，如果小于0，从0开始查找
 	 * @return 位置
 	 */
 	public static int indexOf(CharSequence str, char searchChar, int start) {
 		if (str instanceof String) {
 			return ((String) str).indexOf(searchChar, start);
-		} else {
+		}
+		else {
 			return indexOf(str, searchChar, start, -1);
 		}
 	}
 
 	/**
 	 * 指定范围内查找指定字符
-	 *
-	 * @param str        字符串
+	 * @param str 字符串
 	 * @param searchChar 被查找的字符
-	 * @param start      起始位置，如果小于0，从0开始查找
-	 * @param end        终止位置，如果超过str.length()则默认查找到字符串末尾
+	 * @param start 起始位置，如果小于0，从0开始查找
+	 * @param end 终止位置，如果超过str.length()则默认查找到字符串末尾
 	 * @return 位置
 	 */
 	public static int indexOf(final CharSequence str, char searchChar, int start, int end) {
@@ -3331,8 +3284,7 @@ public class GutilStr {
 	 *  gtcStrUtil.indexOfIgnoreCase("aabaabaa", "", 2)   = 2
 	 *  gtcStrUtil.indexOfIgnoreCase("abc", "", 9)        = -1
 	 * </pre>
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param searchStr 需要查找位置的字符串
 	 * @return 位置
 	 * @since 3.2.1
@@ -3357,8 +3309,7 @@ public class GutilStr {
 	 *  gtcStrUtil.indexOfIgnoreCase("aabaabaa", "", 2)   = 2
 	 *  gtcStrUtil.indexOfIgnoreCase("abc", "", 9)        = -1
 	 * </pre>
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param searchStr 需要查找位置的字符串
 	 * @param fromIndex 起始位置
 	 * @return 位置
@@ -3370,10 +3321,9 @@ public class GutilStr {
 
 	/**
 	 * 指定范围内查找字符串
-	 *
-	 * @param str        字符串
-	 * @param searchStr  需要查找位置的字符串
-	 * @param fromIndex  起始位置
+	 * @param str 字符串
+	 * @param searchStr 需要查找位置的字符串
+	 * @param fromIndex 起始位置
 	 * @param ignoreCase 是否忽略大小写
 	 * @return 位置
 	 * @since 3.2.1
@@ -3409,8 +3359,7 @@ public class GutilStr {
 
 	/**
 	 * 指定范围内查找字符串，忽略大小写
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param searchStr 需要查找位置的字符串
 	 * @return 位置
 	 * @since 3.2.1
@@ -3422,8 +3371,7 @@ public class GutilStr {
 	/**
 	 * 指定范围内查找字符串，忽略大小写<br>
 	 * fromIndex 为搜索起始位置，从后往前计数
-	 *
-	 * @param str       字符串
+	 * @param str 字符串
 	 * @param searchStr 需要查找位置的字符串
 	 * @param fromIndex 起始位置，从后往前计数
 	 * @return 位置
@@ -3436,15 +3384,15 @@ public class GutilStr {
 	/**
 	 * 指定范围内查找字符串<br>
 	 * fromIndex 为搜索起始位置，从后往前计数
-	 *
-	 * @param str        字符串
-	 * @param searchStr  需要查找位置的字符串
-	 * @param fromIndex  起始位置，从后往前计数
+	 * @param str 字符串
+	 * @param searchStr 需要查找位置的字符串
+	 * @param fromIndex 起始位置，从后往前计数
 	 * @param ignoreCase 是否忽略大小写
 	 * @return 位置
 	 * @since 3.2.1
 	 */
-	public static int lastIndexOf(final CharSequence str, final CharSequence searchStr, int fromIndex, boolean ignoreCase) {
+	public static int lastIndexOf(final CharSequence str, final CharSequence searchStr, int fromIndex,
+			boolean ignoreCase) {
 		if (str == null || searchStr == null) {
 			return INDEX_NOT_FOUND;
 		}
@@ -3492,10 +3440,9 @@ public class GutilStr {
 	 *  gtcStrUtil.ordinalIndexOf("aabaabaa", "", 1)   = 0
 	 *  gtcStrUtil.ordinalIndexOf("aabaabaa", "", 2)   = 0
 	 * </pre>
-	 *
-	 * @param str       被检查的字符串，可以为null
+	 * @param str 被检查的字符串，可以为null
 	 * @param searchStr 被查找的字符串，可以为null
-	 * @param ordinal   第几次出现的位置
+	 * @param ordinal 第几次出现的位置
 	 * @return 查找到的位置
 	 * @since 3.2.3
 	 */
@@ -3514,51 +3461,53 @@ public class GutilStr {
 				return index;
 			}
 			found++;
-		} while (found < ordinal);
+		}
+		while (found < ordinal);
 		return index;
 	}
 
-	// ------------------------------------------------------------------------------------------------------------------ Append and prepend
+	// ------------------------------------------------------------------------------------------------------------------
+	// Append and prepend
 
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为结尾，则在尾部添加结尾字符串<br>
 	 * 不忽略大小写
-	 *
-	 * @param str      被检查的字符串
-	 * @param suffix   需要添加到结尾的字符串
+	 * @param str 被检查的字符串
+	 * @param suffix 需要添加到结尾的字符串
 	 * @param suffixes 需要额外检查的结尾字符串，如果以这些中的一个为结尾，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String appendIfMissing(final CharSequence str, final CharSequence suffix, final CharSequence... suffixes) {
+	public static String appendIfMissing(final CharSequence str, final CharSequence suffix,
+			final CharSequence... suffixes) {
 		return appendIfMissing(str, suffix, false, suffixes);
 	}
 
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为结尾，则在尾部添加结尾字符串<br>
 	 * 忽略大小写
-	 *
-	 * @param str      被检查的字符串
-	 * @param suffix   需要添加到结尾的字符串
+	 * @param str 被检查的字符串
+	 * @param suffix 需要添加到结尾的字符串
 	 * @param suffixes 需要额外检查的结尾字符串，如果以这些中的一个为结尾，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String appendIfMissingIgnoreCase(final CharSequence str, final CharSequence suffix, final CharSequence... suffixes) {
+	public static String appendIfMissingIgnoreCase(final CharSequence str, final CharSequence suffix,
+			final CharSequence... suffixes) {
 		return appendIfMissing(str, suffix, true, suffixes);
 	}
 
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为结尾，则在尾部添加结尾字符串
-	 *
-	 * @param str        被检查的字符串
-	 * @param suffix     需要添加到结尾的字符串
+	 * @param str 被检查的字符串
+	 * @param suffix 需要添加到结尾的字符串
 	 * @param ignoreCase 检查结尾时是否忽略大小写
-	 * @param suffixes   需要额外检查的结尾字符串，如果以这些中的一个为结尾，则不再添加
+	 * @param suffixes 需要额外检查的结尾字符串，如果以这些中的一个为结尾，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String appendIfMissing(final CharSequence str, final CharSequence suffix, final boolean ignoreCase, final CharSequence... suffixes) {
+	public static String appendIfMissing(final CharSequence str, final CharSequence suffix, final boolean ignoreCase,
+			final CharSequence... suffixes) {
 		if (str == null || isEmpty(suffix) || endWith(str, suffix, ignoreCase)) {
 			return str(str);
 		}
@@ -3575,42 +3524,42 @@ public class GutilStr {
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为开头，则在首部添加起始字符串<br>
 	 * 不忽略大小写
-	 *
-	 * @param str      被检查的字符串
-	 * @param prefix   需要添加到首部的字符串
+	 * @param str 被检查的字符串
+	 * @param prefix 需要添加到首部的字符串
 	 * @param prefixes 需要额外检查的首部字符串，如果以这些中的一个为起始，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String prependIfMissing(final CharSequence str, final CharSequence prefix, final CharSequence... prefixes) {
+	public static String prependIfMissing(final CharSequence str, final CharSequence prefix,
+			final CharSequence... prefixes) {
 		return prependIfMissing(str, prefix, false, prefixes);
 	}
 
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为开头，则在首部添加起始字符串<br>
 	 * 忽略大小写
-	 *
-	 * @param str      被检查的字符串
-	 * @param prefix   需要添加到首部的字符串
+	 * @param str 被检查的字符串
+	 * @param prefix 需要添加到首部的字符串
 	 * @param prefixes 需要额外检查的首部字符串，如果以这些中的一个为起始，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String prependIfMissingIgnoreCase(final CharSequence str, final CharSequence prefix, final CharSequence... prefixes) {
+	public static String prependIfMissingIgnoreCase(final CharSequence str, final CharSequence prefix,
+			final CharSequence... prefixes) {
 		return prependIfMissing(str, prefix, true, prefixes);
 	}
 
 	/**
 	 * 如果给定字符串不是以给定的一个或多个字符串为开头，则在首部添加起始字符串
-	 *
-	 * @param str        被检查的字符串
-	 * @param prefix     需要添加到首部的字符串
+	 * @param str 被检查的字符串
+	 * @param prefix 需要添加到首部的字符串
 	 * @param ignoreCase 检查结尾时是否忽略大小写
-	 * @param prefixes   需要额外检查的首部字符串，如果以这些中的一个为起始，则不再添加
+	 * @param prefixes 需要额外检查的首部字符串，如果以这些中的一个为起始，则不再添加
 	 * @return 如果已经结尾，返回原字符串，否则返回添加结尾的字符串
 	 * @since 3.0.7
 	 */
-	public static String prependIfMissing(final CharSequence str, final CharSequence prefix, final boolean ignoreCase, final CharSequence... prefixes) {
+	public static String prependIfMissing(final CharSequence str, final CharSequence prefix, final boolean ignoreCase,
+			final CharSequence... prefixes) {
 		if (str == null || isEmpty(prefix) || startWith(str, prefix, ignoreCase)) {
 			return str(str);
 		}
@@ -3624,14 +3573,12 @@ public class GutilStr {
 		return prefix.toString().concat(str.toString());
 	}
 
-
 	/**
 	 * 将已有字符串填充为规定长度，如果已有字符串超过这个长度则返回这个字符串<br>
 	 * 字符填充于字符串前
-	 *
-	 * @param str        被填充的字符串
+	 * @param str 被填充的字符串
 	 * @param filledChar 填充的字符
-	 * @param len        填充长度
+	 * @param len 填充长度
 	 * @return 填充后的字符串
 	 * @since 3.1.2
 	 */
@@ -3642,10 +3589,9 @@ public class GutilStr {
 	/**
 	 * 将已有字符串填充为规定长度，如果已有字符串超过这个长度则返回这个字符串<br>
 	 * 字符填充于字符串后
-	 *
-	 * @param str        被填充的字符串
+	 * @param str 被填充的字符串
 	 * @param filledChar 填充的字符
-	 * @param len        填充长度
+	 * @param len 填充长度
 	 * @return 填充后的字符串
 	 * @since 3.1.2
 	 */
@@ -3655,11 +3601,10 @@ public class GutilStr {
 
 	/**
 	 * 将已有字符串填充为规定长度，如果已有字符串超过这个长度则返回这个字符串
-	 *
-	 * @param str        被填充的字符串
+	 * @param str 被填充的字符串
 	 * @param filledChar 填充的字符
-	 * @param len        填充长度
-	 * @param isPre      是否填充在前
+	 * @param len 填充长度
+	 * @param isPre 是否填充在前
 	 * @return 填充后的字符串
 	 * @since 3.1.2
 	 */
@@ -3676,17 +3621,17 @@ public class GutilStr {
 	/**
 	 * 截取两个字符串的不同部分（长度一致），判断截取的子串是否相同<br>
 	 * 任意一个字符串为null返回false
-	 *
-	 * @param str1       第一个字符串
-	 * @param start1     第一个字符串开始的位置
-	 * @param str2       第二个字符串
-	 * @param start2     第二个字符串开始的位置
-	 * @param length     截取长度
+	 * @param str1 第一个字符串
+	 * @param start1 第一个字符串开始的位置
+	 * @param str2 第二个字符串
+	 * @param start2 第二个字符串开始的位置
+	 * @param length 截取长度
 	 * @param ignoreCase 是否忽略大小写
 	 * @return 子串是否相同
 	 * @since 3.2.1
 	 */
-	public static boolean isSubEquals(CharSequence str1, int start1, CharSequence str2, int start2, int length, boolean ignoreCase) {
+	public static boolean isSubEquals(CharSequence str1, int start1, CharSequence str2, int start2, int length,
+			boolean ignoreCase) {
 		if (null == str1 || null == str2) {
 			return false;
 		}
@@ -3694,16 +3639,11 @@ public class GutilStr {
 		return str1.toString().regionMatches(ignoreCase, start1, str2.toString(), start2, length);
 	}
 
-
-
-
-
 	/**
 	 * 替换指定字符串的指定区间内字符为固定字符
-	 *
-	 * @param str          字符串
+	 * @param str 字符串
 	 * @param startInclude 开始位置（包含）
-	 * @param endExclude   结束位置（不包含）
+	 * @param endExclude 结束位置（不包含）
 	 * @param replacedChar 被替换的字符
 	 * @return 替换后的字符串
 	 * @since 3.2.1
@@ -3728,20 +3668,19 @@ public class GutilStr {
 		for (int i = 0; i < strLength; i++) {
 			if (i >= startInclude && i < endExclude) {
 				chars[i] = replacedChar;
-			} else {
+			}
+			else {
 				chars[i] = str.charAt(i);
 			}
 		}
 		return new String(chars);
 	}
 
-
 	/**
 	 * 替换指定字符串的指定区间内字符为"*"
-	 *
-	 * @param str          字符串
+	 * @param str 字符串
 	 * @param startInclude 开始位置（包含）
-	 * @param endExclude   结束位置（不包含）
+	 * @param endExclude 结束位置（不包含）
 	 * @return 替换后的字符串
 	 * @since 4.1.14
 	 */
@@ -3752,9 +3691,8 @@ public class GutilStr {
 	/**
 	 * 替换字符字符数组中所有的字符为replacedStr<br>
 	 * 提供的chars为所有需要被替换的字符，例如："\r\n"，则"\r"和"\n"都会被替换，哪怕他们单独存在
-	 *
-	 * @param str         被检查的字符串
-	 * @param chars       需要替换的字符列表，用一个字符串表示这个字符列表
+	 * @param str 被检查的字符串
+	 * @param chars 需要替换的字符列表，用一个字符串表示这个字符列表
 	 * @param replacedStr 替换成的字符串
 	 * @return 新字符串
 	 * @since 3.2.2
@@ -3768,9 +3706,8 @@ public class GutilStr {
 
 	/**
 	 * 替换字符字符数组中所有的字符为replacedStr
-	 *
-	 * @param str         被检查的字符串
-	 * @param chars       需要替换的字符列表
+	 * @param str 被检查的字符串
+	 * @param chars 需要替换的字符列表
 	 * @param replacedStr 替换成的字符串
 	 * @return 新字符串
 	 * @since 3.2.2
@@ -3794,8 +3731,6 @@ public class GutilStr {
 		return builder.toString();
 	}
 
-
-
 	/**
 	 * 将对象转为字符串<br>
 	 *
@@ -3803,7 +3738,6 @@ public class GutilStr {
 	 * 1、Byte数组和ByteBuffer会被转换为对应字符串的数组
 	 * 2、对象数组会调用Arrays.toString方法
 	 * </pre>
-	 *
 	 * @param obj 对象
 	 * @return 字符串
 	 */
@@ -3811,16 +3745,14 @@ public class GutilStr {
 		return str(obj, Charset.forName("UTF-8"));
 	}
 
-
 	/**
 	 * 字符串指定位置的字符是否与给定字符相同<br>
 	 * 如果字符串为null，返回false<br>
 	 * 如果给定的位置大于字符串长度，返回false<br>
 	 * 如果给定的位置小于0，返回false
-	 *
-	 * @param str      字符串
+	 * @param str 字符串
 	 * @param position 位置
-	 * @param c        需要对比的字符
+	 * @param c 需要对比的字符
 	 * @return 字符串指定位置的字符是否与给定字符相同
 	 * @since 3.3.1
 	 */
@@ -3834,7 +3766,6 @@ public class GutilStr {
 	/**
 	 * 给定字符串数组的总长度<br>
 	 * null字符长度定义为0
-	 *
 	 * @param strs 字符串数组
 	 * @return 总长度
 	 * @since 4.0.1
@@ -3847,7 +3778,6 @@ public class GutilStr {
 		return totalLength;
 	}
 
-
 	/**
 	 * 给定字符串中的字母是否全部为大写，判断依据如下：
 	 *
@@ -3855,7 +3785,6 @@ public class GutilStr {
 	 * 1. 大写字母包括A-Z
 	 * 2. 其它非字母的Unicode符都算作大写
 	 * </pre>
-	 *
 	 * @param str 被检查的字符串
 	 * @return 是否全部为大写
 	 * @since 4.2.2
@@ -3880,7 +3809,6 @@ public class GutilStr {
 	 * 1. 小写字母包括a-z
 	 * 2. 其它非字母的Unicode符都算作小写
 	 * </pre>
-	 *
 	 * @param str 被检查的字符串
 	 * @return 是否全部为小写
 	 * @since 4.2.2
@@ -3900,7 +3828,6 @@ public class GutilStr {
 
 	/**
 	 * 获取字符串的长度，如果为null返回0
-	 *
 	 * @param cs a 字符串
 	 * @return 字符串的长度，如果为null返回0
 	 * @since 4.3.2
@@ -3911,8 +3838,7 @@ public class GutilStr {
 
 	/**
 	 * 给定字符串转为bytes后的byte数（byte长度）
-	 *
-	 * @param cs      字符串
+	 * @param cs 字符串
 	 * @param charset 编码
 	 * @return byte长度
 	 * @since 4.5.2
@@ -3929,7 +3855,6 @@ public class GutilStr {
 	 *  gtcStrUtil.swapCase("")                   = ""
 	 *  gtcStrUtil.swapCase("The dog has a BONE") = "tHE DOG HAS A bone"
 	 * </pre>
-	 *
 	 * @param str 字符串
 	 * @return 交换后的字符串
 	 * @since 4.3.2
@@ -3945,18 +3870,19 @@ public class GutilStr {
 			final char ch = buffer[i];
 			if (Character.isUpperCase(ch)) {
 				buffer[i] = Character.toLowerCase(ch);
-			} else if (Character.isTitleCase(ch)) {
+			}
+			else if (Character.isTitleCase(ch)) {
 				buffer[i] = Character.toLowerCase(ch);
-			} else if (Character.isLowerCase(ch)) {
+			}
+			else if (Character.isLowerCase(ch)) {
 				buffer[i] = Character.toUpperCase(ch);
 			}
 		}
 		return new String(buffer);
 	}
 
-
-	//spring --------------------------------------------------------------------------------------------------------------------------
-
+	// spring
+	// --------------------------------------------------------------------------------------------------------------------------
 
 	private static final String FOLDER_SEPARATOR = "/";
 
@@ -3968,58 +3894,61 @@ public class GutilStr {
 
 	private static final char EXTENSION_SEPARATOR = '.';
 
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// self
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	private static Pattern intPattern = Pattern.compile("^[-\\+]?[\\d]*$");
 
-    public static boolean isInteger(String str) {
-        return intPattern.matcher(str).matches();
-    }
+	public static boolean isInteger(String str) {
+		return intPattern.matcher(str).matches();
+	}
 
-
-	public static String join(List<?> keys,String split,boolean isSqm) {
+	public static String join(List<?> keys, String split, boolean isSqm) {
 		return join(keys.toArray(), split, isSqm);
 	}
-	public static String join(Object[] keys,String split,boolean isSqm) {
+
+	public static String join(Object[] keys, String split, boolean isSqm) {
 		StringBuffer sb = new StringBuffer();
 		int len = keys.length;
 		boolean isNum = false;
-		for(int i = 0;i<len;i++) {
+		for (int i = 0; i < len; i++) {
 			Object item = keys[i];
 			isNum = item instanceof Number;
-			sb.append(isNum?"":(isSqm?"'":"\"")).append(item.toString()).append(isNum?"":(isSqm?"'":"\""));
-			if(i<len - 1) {
+			sb.append(isNum ? "" : (isSqm ? "'" : "\"")).append(item.toString())
+					.append(isNum ? "" : (isSqm ? "'" : "\""));
+			if (i < len - 1) {
 				sb.append(split);
 			}
 		}
 		return sb.toString();
 	}
-	public static String join(String split,boolean isSqm ,Object... keys) {
-		return join(keys,split,isSqm);
+
+	public static String join(String split, boolean isSqm, Object... keys) {
+		return join(keys, split, isSqm);
 	}
 
-	public static String ifEmpty(String str,String defaultString) {
-		if(isEmpty(str)) {
+	public static String ifEmpty(String str, String defaultString) {
+		if (isEmpty(str)) {
 			return defaultString;
 		}
 		return str;
 	}
 
-
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// General convenience methods for working with Strings
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	/**
 	 * Check whether the given {@code String} is empty.
-	 * <p>This method accepts any Object as an argument, comparing it to
-	 * {@code null} and the empty String. As a consequence, this method
-	 * will never return {@code true} for a non-null non-String object.
-	 * <p>The Object signature is useful for general attribute handling code
-	 * that commonly deals with Strings but generally has to iterate over
-	 * Objects since attributes may e.g. be primitive value objects as well.
+	 * <p>
+	 * This method accepts any Object as an argument, comparing it to {@code null} and the
+	 * empty String. As a consequence, this method will never return {@code true} for a
+	 * non-null non-String object.
+	 * <p>
+	 * The Object signature is useful for general attribute handling code that commonly
+	 * deals with Strings but generally has to iterate over Objects since attributes may
+	 * e.g. be primitive value objects as well.
 	 * @param str the candidate String
 	 * @since 3.2.1
 	 */
@@ -4028,11 +3957,12 @@ public class GutilStr {
 	}
 
 	/**
-	 * Check that the given {@code CharSequence} is neither {@code null} nor
-	 * of length 0.
-	 * <p>Note: this method returns {@code true} for a {@code CharSequence}
-	 * that purely consists of whitespace.
-	 * <p><pre class="code">
+	 * Check that the given {@code CharSequence} is neither {@code null} nor of length 0.
+	 * <p>
+	 * Note: this method returns {@code true} for a {@code CharSequence} that purely
+	 * consists of whitespace.
+	 * <p>
+	 * <pre class="code">
 	 * StringUtils.hasLength(null) = false
 	 * StringUtils.hasLength("") = false
 	 * StringUtils.hasLength(" ") = true
@@ -4048,8 +3978,9 @@ public class GutilStr {
 
 	/**
 	 * Check that the given {@code String} is neither {@code null} nor of length 0.
-	 * <p>Note: this method returns {@code true} for a {@code String} that
-	 * purely consists of whitespace.
+	 * <p>
+	 * Note: this method returns {@code true} for a {@code String} that purely consists of
+	 * whitespace.
 	 * @param str the {@code String} to check (may be {@code null})
 	 * @return {@code true} if the {@code String} is not {@code null} and has length
 	 * @see #hasLength(CharSequence)
@@ -4061,10 +3992,12 @@ public class GutilStr {
 
 	/**
 	 * Check whether the given {@code CharSequence} contains actual <em>text</em>.
-	 * <p>More specifically, this method returns {@code true} if the
-	 * {@code CharSequence} is not {@code null}, its length is greater than
-	 * 0, and it contains at least one non-whitespace character.
-	 * <p><pre class="code">
+	 * <p>
+	 * More specifically, this method returns {@code true} if the {@code CharSequence} is
+	 * not {@code null}, its length is greater than 0, and it contains at least one
+	 * non-whitespace character.
+	 * <p>
+	 * <pre class="code">
 	 * StringUtils.hasText(null) = false
 	 * StringUtils.hasText("") = false
 	 * StringUtils.hasText(" ") = false
@@ -4072,8 +4005,8 @@ public class GutilStr {
 	 * StringUtils.hasText(" 12345 ") = true
 	 * </pre>
 	 * @param str the {@code CharSequence} to check (may be {@code null})
-	 * @return {@code true} if the {@code CharSequence} is not {@code null},
-	 * its length is greater than 0, and it does not contain whitespace only
+	 * @return {@code true} if the {@code CharSequence} is not {@code null}, its length is
+	 * greater than 0, and it does not contain whitespace only
 	 * @see Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
@@ -4082,12 +4015,13 @@ public class GutilStr {
 
 	/**
 	 * Check whether the given {@code String} contains actual <em>text</em>.
-	 * <p>More specifically, this method returns {@code true} if the
-	 * {@code String} is not {@code null}, its length is greater than 0,
-	 * and it contains at least one non-whitespace character.
+	 * <p>
+	 * More specifically, this method returns {@code true} if the {@code String} is not
+	 * {@code null}, its length is greater than 0, and it contains at least one
+	 * non-whitespace character.
 	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not {@code null}, its
-	 * length is greater than 0, and it does not contain whitespace only
+	 * @return {@code true} if the {@code String} is not {@code null}, its length is
+	 * greater than 0, and it does not contain whitespace only
 	 * @see #hasText(CharSequence)
 	 */
 	public static boolean hasText(String str) {
@@ -4107,8 +4041,8 @@ public class GutilStr {
 	/**
 	 * Check whether the given {@code CharSequence} contains any whitespace characters.
 	 * @param str the {@code CharSequence} to check (may be {@code null})
-	 * @return {@code true} if the {@code CharSequence} is not empty and
-	 * contains at least 1 whitespace character
+	 * @return {@code true} if the {@code CharSequence} is not empty and contains at least
+	 * 1 whitespace character
 	 * @see Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
@@ -4128,8 +4062,8 @@ public class GutilStr {
 	/**
 	 * Check whether the given {@code String} contains any whitespace characters.
 	 * @param str the {@code String} to check (may be {@code null})
-	 * @return {@code true} if the {@code String} is not empty and
-	 * contains at least 1 whitespace character
+	 * @return {@code true} if the {@code String} is not empty and contains at least 1
+	 * whitespace character
 	 * @see #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
@@ -4162,8 +4096,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Trim <i>all</i> whitespace from the given {@code String}:
-	 * leading, trailing, and in between characters.
+	 * Trim <i>all</i> whitespace from the given {@code String}: leading, trailing, and in
+	 * between characters.
 	 * @param str the {@code String} to check
 	 * @return the trimmed {@code String}
 	 * @see java.lang.Character#isWhitespace
@@ -4221,7 +4155,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Trim all occurrences of the supplied leading character from the given {@code String}.
+	 * Trim all occurrences of the supplied leading character from the given
+	 * {@code String}.
 	 * @param str the {@code String} to check
 	 * @param leadingCharacter the leading character to be trimmed
 	 * @return the trimmed {@code String}
@@ -4239,7 +4174,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Trim all occurrences of the supplied trailing character from the given {@code String}.
+	 * Trim all occurrences of the supplied trailing character from the given
+	 * {@code String}.
 	 * @param str the {@code String} to check
 	 * @param trailingCharacter the trailing character to be trimmed
 	 * @return the trimmed {@code String}
@@ -4257,32 +4193,31 @@ public class GutilStr {
 	}
 
 	/**
-	 * Test if the given {@code String} starts with the specified prefix,
-	 * ignoring upper/lower case.
+	 * Test if the given {@code String} starts with the specified prefix, ignoring
+	 * upper/lower case.
 	 * @param str the {@code String} to check
 	 * @param prefix the prefix to look for
 	 * @see java.lang.String#startsWith
 	 */
 	public static boolean startsWithIgnoreCase(String str, String prefix) {
-		return (str != null && prefix != null && str.length() >= prefix.length() &&
-				str.regionMatches(true, 0, prefix, 0, prefix.length()));
+		return (str != null && prefix != null && str.length() >= prefix.length()
+				&& str.regionMatches(true, 0, prefix, 0, prefix.length()));
 	}
 
 	/**
-	 * Test if the given {@code String} ends with the specified suffix,
-	 * ignoring upper/lower case.
+	 * Test if the given {@code String} ends with the specified suffix, ignoring
+	 * upper/lower case.
 	 * @param str the {@code String} to check
 	 * @param suffix the suffix to look for
 	 * @see java.lang.String#endsWith
 	 */
 	public static boolean endsWithIgnoreCase(String str, String suffix) {
-		return (str != null && suffix != null && str.length() >= suffix.length() &&
-				str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
+		return (str != null && suffix != null && str.length() >= suffix.length()
+				&& str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length()));
 	}
 
 	/**
-	 * Test whether the given string matches the given substring
-	 * at the given index.
+	 * Test whether the given string matches the given substring at the given index.
 	 * @param str the original string (or StringBuilder)
 	 * @param index the index in the original string to start matching against
 	 * @param substring the substring to match at the given index
@@ -4342,7 +4277,7 @@ public class GutilStr {
 		}
 		StringBuilder sb = new StringBuilder(capacity);
 
-		int pos = 0;  // our position in the old string
+		int pos = 0; // our position in the old string
 		int patLen = oldPattern.length();
 		while (index >= 0) {
 			sb.append(inString.substring(pos, index));
@@ -4369,8 +4304,8 @@ public class GutilStr {
 	/**
 	 * Delete any character in a given {@code String}.
 	 * @param inString the original {@code String}
-	 * @param charsToDelete a set of characters to delete.
-	 * E.g. "az\n" will delete 'a's, 'z's and new lines.
+	 * @param charsToDelete a set of characters to delete. E.g. "az\n" will delete 'a's,
+	 * 'z's and new lines.
 	 * @return the resulting {@code String}
 	 */
 	public static String deleteAny(String inString, String charsToDelete) {
@@ -4388,10 +4323,9 @@ public class GutilStr {
 		return sb.toString();
 	}
 
-
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// Convenience methods for working with formatted Strings
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	/**
 	 * 字符串加 单引号
@@ -4402,11 +4336,11 @@ public class GutilStr {
 	}
 
 	/**
-	 * Turn the given Object into a {@code String} with single quotes
-	 * if it is a {@code String}; keeping the Object as-is else.
+	 * Turn the given Object into a {@code String} with single quotes if it is a
+	 * {@code String}; keeping the Object as-is else.
 	 * @param obj the input Object (e.g. "myString")
-	 * @return the quoted {@code String} (e.g. "'myString'"),
-	 * or the input object as-is if not a {@code String}
+	 * @return the quoted {@code String} (e.g. "'myString'"), or the input object as-is if
+	 * not a {@code String}
 	 */
 
 	public static Object quoteIfString(Object obj) {
@@ -4433,9 +4367,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Capitalize a {@code String}, changing the first letter to
-	 * upper case as per {@link Character#toUpperCase(char)}.
-	 * No other letters are changed.
+	 * Capitalize a {@code String}, changing the first letter to upper case as per
+	 * {@link Character#toUpperCase(char)}. No other letters are changed.
 	 * @param str the {@code String} to capitalize
 	 * @return the capitalized {@code String}
 	 */
@@ -4444,9 +4377,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Uncapitalize a {@code String}, changing the first letter to
-	 * lower case as per {@link Character#toLowerCase(char)}.
-	 * No other letters are changed.
+	 * Uncapitalize a {@code String}, changing the first letter to lower case as per
+	 * {@link Character#toLowerCase(char)}. No other letters are changed.
 	 * @param str the {@code String} to uncapitalize
 	 * @return the uncapitalized {@code String}
 	 */
@@ -4477,8 +4409,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Extract the filename from the given Java resource path,
-	 * e.g. {@code "mypath/myfile.txt" -> "myfile.txt"}.
+	 * Extract the filename from the given Java resource path, e.g.
+	 * {@code "mypath/myfile.txt" -> "myfile.txt"}.
 	 * @param path the file path (may be {@code null})
 	 * @return the extracted filename, or {@code null} if none
 	 */
@@ -4493,8 +4425,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Extract the filename extension from the given Java resource path,
-	 * e.g. "mypath/myfile.txt" -> "txt".
+	 * Extract the filename extension from the given Java resource path, e.g.
+	 * "mypath/myfile.txt" -> "txt".
 	 * @param path the file path (may be {@code null})
 	 * @return the extracted filename extension, or {@code null} if none
 	 */
@@ -4518,8 +4450,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Strip the filename extension from the given Java resource path,
-	 * e.g. "mypath/myfile.txt" -> "mypath/myfile".
+	 * Strip the filename extension from the given Java resource path, e.g.
+	 * "mypath/myfile.txt" -> "mypath/myfile".
 	 * @param path the file path
 	 * @return the path with stripped filename extension
 	 */
@@ -4538,11 +4470,11 @@ public class GutilStr {
 	}
 
 	/**
-	 * Apply the given relative path to the given Java resource path,
-	 * assuming standard Java folder separation (i.e. "/" separators).
+	 * Apply the given relative path to the given Java resource path, assuming standard
+	 * Java folder separation (i.e. "/" separators).
 	 * @param path the path to start from (usually a full file path)
-	 * @param relativePath the relative path to apply
-	 * (relative to the full file path above)
+	 * @param relativePath the relative path to apply (relative to the full file path
+	 * above)
 	 * @return the full file path that results from applying the relative path
 	 */
 	public static String applyRelativePath(String path, String relativePath) {
@@ -4560,10 +4492,10 @@ public class GutilStr {
 	}
 
 	/**
-	 * Normalize the path by suppressing sequences like "path/.." and
-	 * inner simple dots.
-	 * <p>The result is convenient for path comparison. For other uses,
-	 * notice that Windows separators ("\") are replaced by simple slashes.
+	 * Normalize the path by suppressing sequences like "path/.." and inner simple dots.
+	 * <p>
+	 * The result is convenient for path comparison. For other uses, notice that Windows
+	 * separators ("\") are replaced by simple slashes.
 	 * @param path the original path
 	 * @return the normalized path
 	 */
@@ -4643,15 +4575,18 @@ public class GutilStr {
 	/**
 	 * Decode the given encoded URI component value. Based on the following rules:
 	 * <ul>
-	 * <li>Alphanumeric characters {@code "a"} through {@code "z"}, {@code "A"} through {@code "Z"},
-	 * and {@code "0"} through {@code "9"} stay the same.</li>
-	 * <li>Special characters {@code "-"}, {@code "_"}, {@code "."}, and {@code "*"} stay the same.</li>
-	 * <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation of the character.</li>
+	 * <li>Alphanumeric characters {@code "a"} through {@code "z"}, {@code "A"} through
+	 * {@code "Z"}, and {@code "0"} through {@code "9"} stay the same.</li>
+	 * <li>Special characters {@code "-"}, {@code "_"}, {@code "."}, and {@code "*"} stay
+	 * the same.</li>
+	 * <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation
+	 * of the character.</li>
 	 * </ul>
 	 * @param source the encoded String
 	 * @param charset the character set
 	 * @return the decoded value
-	 * @throws IllegalArgumentException when the given source contains invalid encoded sequences
+	 * @throws IllegalArgumentException when the given source contains invalid encoded
+	 * sequences
 	 * @since 5.0
 	 * @see java.net.URLDecoder#decode(String, String)
 	 */
@@ -4660,7 +4595,7 @@ public class GutilStr {
 		if (length == 0) {
 			return source;
 		}
-		GutilAssert.notNull(charset, ()-> "Charset must not be null");
+		GutilAssert.notNull(charset, () -> "Charset must not be null");
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(length);
 		boolean changed = false;
@@ -4691,12 +4626,12 @@ public class GutilStr {
 	}
 
 	/**
-	 * Parse the given {@code String} value into a {@link Locale}, accepting
-	 * the {@link Locale#toString} format as well as BCP 47 language tags.
+	 * Parse the given {@code String} value into a {@link Locale}, accepting the
+	 * {@link Locale#toString} format as well as BCP 47 language tags.
 	 * @param localeValue the locale value: following either {@code Locale's}
-	 * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-	 * separators (as an alternative to underscores), or BCP 47 (e.g. "en-UK")
-	 * as specified by {@link Locale#forLanguageTag} on Java 7+
+	 * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as separators
+	 * (as an alternative to underscores), or BCP 47 (e.g. "en-UK") as specified by
+	 * {@link Locale#forLanguageTag} on Java 7+
 	 * @return a corresponding {@code Locale} instance, or {@code null} if none
 	 * @throws IllegalArgumentException in case of an invalid locale specification
 	 * @since 5.0.4
@@ -4715,15 +4650,17 @@ public class GutilStr {
 
 	/**
 	 * Parse the given {@code String} representation into a {@link Locale}.
-	 * <p>For many parsing scenarios, this is an inverse operation of
-	 * {@link Locale#toString Locale's toString}, in a lenient sense.
-	 * This method does not aim for strict {@code Locale} design compliance;
-	 * it is rather specifically tailored for typical Spring parsing needs.
-	 * <p><b>Note: This delegate does not accept the BCP 47 language tag format.
-	 * Please use {@link #parseLocale} for lenient parsing of both formats.</b>
+	 * <p>
+	 * For many parsing scenarios, this is an inverse operation of {@link Locale#toString
+	 * Locale's toString}, in a lenient sense. This method does not aim for strict
+	 * {@code Locale} design compliance; it is rather specifically tailored for typical
+	 * Spring parsing needs.
+	 * <p>
+	 * <b>Note: This delegate does not accept the BCP 47 language tag format. Please use
+	 * {@link #parseLocale} for lenient parsing of both formats.</b>
 	 * @param localeString the locale {@code String}: following {@code Locale's}
-	 * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-	 * separators (as an alternative to underscores)
+	 * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as separators
+	 * (as an alternative to underscores)
 	 * @return a corresponding {@code Locale} instance, or {@code null} if none
 	 * @throws IllegalArgumentException in case of an invalid locale specification
 	 */
@@ -4735,7 +4672,6 @@ public class GutilStr {
 	private static String[] tokenizeLocaleSource(String localeSource) {
 		return tokenizeToStringArray(localeSource, "_ ", false, false);
 	}
-
 
 	private static Locale parseLocaleTokens(String localeString, String[] tokens) {
 		String language = (tokens.length > 0 ? tokens[0] : "");
@@ -4767,16 +4703,16 @@ public class GutilStr {
 		for (int i = 0; i < localePart.length(); i++) {
 			char ch = localePart.charAt(i);
 			if (ch != ' ' && ch != '_' && ch != '#' && !Character.isLetterOrDigit(ch)) {
-				throw new IllegalArgumentException(
-						"Locale part \"" + localePart + "\" contains invalid characters");
+				throw new IllegalArgumentException("Locale part \"" + localePart + "\" contains invalid characters");
 			}
 		}
 	}
 
 	/**
 	 * Parse the given {@code timeZoneString} value into a {@link TimeZone}.
-	 * @param timeZoneString the time zone {@code String}, following {@link TimeZone#getTimeZone(String)}
-	 * but throwing {@link IllegalArgumentException} in case of an invalid time zone specification
+	 * @param timeZoneString the time zone {@code String}, following
+	 * {@link TimeZone#getTimeZone(String)} but throwing {@link IllegalArgumentException}
+	 * in case of an invalid time zone specification
 	 * @return a corresponding {@link TimeZone} instance
 	 * @throws IllegalArgumentException in case of an invalid time zone specification
 	 */
@@ -4789,22 +4725,20 @@ public class GutilStr {
 		return timeZone;
 	}
 
-
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 	// Convenience methods for working with String arrays
-	//---------------------------------------------------------------------
+	// ---------------------------------------------------------------------
 
 	/**
-	 * Append the given {@code String} to the given {@code String} array,
-	 * returning a new array consisting of the input array contents plus
-	 * the given {@code String}.
+	 * Append the given {@code String} to the given {@code String} array, returning a new
+	 * array consisting of the input array contents plus the given {@code String}.
 	 * @param array the array to append to (can be {@code null})
 	 * @param str the {@code String} to append
 	 * @return the new array (never {@code null})
 	 */
 	public static String[] addStringToArray(String[] array, String str) {
 		if (GutilObject.isEmpty(array)) {
-			return new String[] {str};
+			return new String[] { str };
 		}
 
 		String[] newArr = new String[array.length + 1];
@@ -4814,9 +4748,10 @@ public class GutilStr {
 	}
 
 	/**
-	 * Concatenate the given {@code String} arrays into one,
-	 * with overlapping array elements included twice.
-	 * <p>The order of elements in the original arrays is preserved.
+	 * Concatenate the given {@code String} arrays into one, with overlapping array
+	 * elements included twice.
+	 * <p>
+	 * The order of elements in the original arrays is preserved.
 	 * @param array1 the first array (can be {@code null})
 	 * @param array2 the second array (can be {@code null})
 	 * @return the new array ({@code null} if both given arrays were {@code null})
@@ -4837,18 +4772,18 @@ public class GutilStr {
 	}
 
 	/**
-	 * Merge the given {@code String} arrays into one, with overlapping
-	 * array elements only included once.
-	 * <p>The order of elements in the original arrays is preserved
-	 * (with the exception of overlapping elements, which are only
-	 * included on their first occurrence).
+	 * Merge the given {@code String} arrays into one, with overlapping array elements
+	 * only included once.
+	 * <p>
+	 * The order of elements in the original arrays is preserved (with the exception of
+	 * overlapping elements, which are only included on their first occurrence).
 	 * @param array1 the first array (can be {@code null})
 	 * @param array2 the second array (can be {@code null})
 	 * @return the new array ({@code null} if both given arrays were {@code null})
 	 * @deprecated as of 4.3.15, in favor of manual merging via {@link LinkedHashSet}
 	 * (with every entry included at most once, even entries within the first array)
 	 */
-	//@Deprecated
+	// @Deprecated
 
 	public static String[] mergeStringArrays(String[] array1, String[] array2) {
 		if (GutilObject.isEmpty(array1)) {
@@ -4884,7 +4819,8 @@ public class GutilStr {
 
 	/**
 	 * Copy the given {@code Collection} into a {@code String} array.
-	 * <p>The {@code Collection} must contain {@code String} elements only.
+	 * <p>
+	 * The {@code Collection} must contain {@code String} elements only.
 	 * @param collection the {@code Collection} to copy
 	 * @return the {@code String} array
 	 */
@@ -4893,8 +4829,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Copy the given Enumeration into a {@code String} array.
-	 * The Enumeration must contain {@code String} elements only.
+	 * Copy the given Enumeration into a {@code String} array. The Enumeration must
+	 * contain {@code String} elements only.
 	 * @param enumeration the Enumeration to copy
 	 * @return the {@code String} array
 	 */
@@ -4903,8 +4839,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Trim the elements of the given {@code String} array,
-	 * calling {@code String.trim()} on each of them.
+	 * Trim the elements of the given {@code String} array, calling {@code String.trim()}
+	 * on each of them.
 	 * @param array the original {@code String} array (potentially empty)
 	 * @return the resulting array (of the same size) with trimmed elements
 	 */
@@ -4923,7 +4859,8 @@ public class GutilStr {
 
 	/**
 	 * Remove duplicate strings from the given array.
-	 * <p>As of 4.2, it preserves the original order, as it uses a {@link LinkedHashSet}.
+	 * <p>
+	 * As of 4.2, it preserves the original order, as it uses a {@link LinkedHashSet}.
 	 * @param array the {@code String} array (potentially empty)
 	 * @return an array without duplicates, in natural sort order
 	 */
@@ -4937,13 +4874,13 @@ public class GutilStr {
 	}
 
 	/**
-	 * Split a {@code String} at the first occurrence of the delimiter.
-	 * Does not include the delimiter in the result.
+	 * Split a {@code String} at the first occurrence of the delimiter. Does not include
+	 * the delimiter in the result.
 	 * @param toSplit the string to split (potentially {@code null} or empty)
 	 * @param delimiter to split the string up with (potentially {@code null} or empty)
-	 * @return a two element array with index 0 being before the delimiter, and
-	 * index 1 being after the delimiter (neither element includes the delimiter);
-	 * or {@code null} if the delimiter wasn't found in the given input {@code String}
+	 * @return a two element array with index 0 being before the delimiter, and index 1
+	 * being after the delimiter (neither element includes the delimiter); or {@code null}
+	 * if the delimiter wasn't found in the given input {@code String}
 	 */
 
 	public static String[] split(String toSplit, String delimiter) {
@@ -4957,18 +4894,19 @@ public class GutilStr {
 
 		String beforeDelimiter = toSplit.substring(0, offset);
 		String afterDelimiter = toSplit.substring(offset + delimiter.length());
-		return new String[] {beforeDelimiter, afterDelimiter};
+		return new String[] { beforeDelimiter, afterDelimiter };
 	}
 
 	/**
-	 * Take an array of strings and split each element based on the given delimiter.
-	 * A {@code Properties} instance is then generated, with the left of the delimiter
+	 * Take an array of strings and split each element based on the given delimiter. A
+	 * {@code Properties} instance is then generated, with the left of the delimiter
 	 * providing the key, and the right of the delimiter providing the value.
-	 * <p>Will trim both the key and value before adding them to the {@code Properties}.
+	 * <p>
+	 * Will trim both the key and value before adding them to the {@code Properties}.
 	 * @param array the array to process
 	 * @param delimiter to split each element using (typically the equals symbol)
-	 * @return a {@code Properties} instance representing the array contents,
-	 * or {@code null} if the array to process was {@code null} or empty
+	 * @return a {@code Properties} instance representing the array contents, or
+	 * {@code null} if the array to process was {@code null} or empty
 	 */
 
 	public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
@@ -4976,22 +4914,22 @@ public class GutilStr {
 	}
 
 	/**
-	 * Take an array of strings and split each element based on the given delimiter.
-	 * A {@code Properties} instance is then generated, with the left of the
-	 * delimiter providing the key, and the right of the delimiter providing the value.
-	 * <p>Will trim both the key and value before adding them to the
-	 * {@code Properties} instance.
+	 * Take an array of strings and split each element based on the given delimiter. A
+	 * {@code Properties} instance is then generated, with the left of the delimiter
+	 * providing the key, and the right of the delimiter providing the value.
+	 * <p>
+	 * Will trim both the key and value before adding them to the {@code Properties}
+	 * instance.
 	 * @param array the array to process
 	 * @param delimiter to split each element using (typically the equals symbol)
-	 * @param charsToDelete one or more characters to remove from each element
-	 * prior to attempting the split operation (typically the quotation mark
-	 * symbol), or {@code null} if no removal should occur
-	 * @return a {@code Properties} instance representing the array contents,
-	 * or {@code null} if the array to process was {@code null} or empty
+	 * @param charsToDelete one or more characters to remove from each element prior to
+	 * attempting the split operation (typically the quotation mark symbol), or
+	 * {@code null} if no removal should occur
+	 * @return a {@code Properties} instance representing the array contents, or
+	 * {@code null} if the array to process was {@code null} or empty
 	 */
 
-	public static Properties splitArrayElementsIntoProperties(
-			String[] array, String delimiter, String charsToDelete) {
+	public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter, String charsToDelete) {
 
 		if (GutilObject.isEmpty(array)) {
 			return null;
@@ -5014,14 +4952,16 @@ public class GutilStr {
 	/**
 	 * Tokenize the given {@code String} into a {@code String} array via a
 	 * {@link StringTokenizer}.
-	 * <p>Trims tokens and omits empty tokens.
-	 * <p>The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * <p>
+	 * Trims tokens and omits empty tokens.
+	 * <p>
+	 * The given {@code delimiters} string can consist of any number of delimiter
+	 * characters. Each of those characters can be used to separate tokens. A delimiter is
+	 * always a single character; for multi-character delimiters, consider using
+	 * {@link #delimitedListToStringArray}.
 	 * @param str the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters the delimiter characters, assembled as a {@code String}
-	 * (each of the characters is individually considered as a delimiter)
+	 * @param delimiters the delimiter characters, assembled as a {@code String} (each of
+	 * the characters is individually considered as a delimiter)
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
@@ -5034,24 +4974,25 @@ public class GutilStr {
 	/**
 	 * Tokenize the given {@code String} into a {@code String} array via a
 	 * {@link StringTokenizer}.
-	 * <p>The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * <p>
+	 * The given {@code delimiters} string can consist of any number of delimiter
+	 * characters. Each of those characters can be used to separate tokens. A delimiter is
+	 * always a single character; for multi-character delimiters, consider using
+	 * {@link #delimitedListToStringArray}.
 	 * @param str the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters the delimiter characters, assembled as a {@code String}
-	 * (each of the characters is individually considered as a delimiter)
+	 * @param delimiters the delimiter characters, assembled as a {@code String} (each of
+	 * the characters is individually considered as a delimiter)
 	 * @param trimTokens trim the tokens via {@link String#trim()}
-	 * @param ignoreEmptyTokens omit empty tokens from the result array
-	 * (only applies to tokens that are empty after trimming; StringTokenizer
-	 * will not consider subsequent delimiters as token in the first place).
+	 * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to
+	 * tokens that are empty after trimming; StringTokenizer will not consider subsequent
+	 * delimiters as token in the first place).
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
 	 */
-	public static String[] tokenizeToStringArray(
-			String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
+	public static String[] tokenizeToStringArray(String str, String delimiters, boolean trimTokens,
+			boolean ignoreEmptyTokens) {
 
 		if (str == null) {
 			return new String[0];
@@ -5072,15 +5013,15 @@ public class GutilStr {
 	}
 
 	/**
-	 * Take a {@code String} that is a delimited list and convert it into a
-	 * {@code String} array.
-	 * <p>A single {@code delimiter} may consist of more than one character,
-	 * but it will still be considered as a single delimiter string, rather
-	 * than as bunch of potential delimiter characters, in contrast to
-	 * {@link #tokenizeToStringArray}.
+	 * Take a {@code String} that is a delimited list and convert it into a {@code String}
+	 * array.
+	 * <p>
+	 * A single {@code delimiter} may consist of more than one character, but it will
+	 * still be considered as a single delimiter string, rather than as bunch of potential
+	 * delimiter characters, in contrast to {@link #tokenizeToStringArray}.
 	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @param delimiter the delimiter between elements (this is a single delimiter,
-	 * rather than a bunch individual delimiter characters)
+	 * @param delimiter the delimiter between elements (this is a single delimiter, rather
+	 * than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
 	 * @see #tokenizeToStringArray
 	 */
@@ -5089,28 +5030,28 @@ public class GutilStr {
 	}
 
 	/**
-	 * Take a {@code String} that is a delimited list and convert it into
-	 * a {@code String} array.
-	 * <p>A single {@code delimiter} may consist of more than one character,
-	 * but it will still be considered as a single delimiter string, rather
-	 * than as bunch of potential delimiter characters, in contrast to
-	 * {@link #tokenizeToStringArray}.
+	 * Take a {@code String} that is a delimited list and convert it into a {@code String}
+	 * array.
+	 * <p>
+	 * A single {@code delimiter} may consist of more than one character, but it will
+	 * still be considered as a single delimiter string, rather than as bunch of potential
+	 * delimiter characters, in contrast to {@link #tokenizeToStringArray}.
 	 * @param str the input {@code String} (potentially {@code null} or empty)
-	 * @param delimiter the delimiter between elements (this is a single delimiter,
-	 * rather than a bunch individual delimiter characters)
+	 * @param delimiter the delimiter between elements (this is a single delimiter, rather
+	 * than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete; useful for deleting unwanted
-	 * line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
+	 * line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a
+	 * {@code String}
 	 * @return an array of the tokens in the list
 	 * @see #tokenizeToStringArray
 	 */
-	public static String[] delimitedListToStringArray(
-			String str, String delimiter, String charsToDelete) {
+	public static String[] delimitedListToStringArray(String str, String delimiter, String charsToDelete) {
 
 		if (str == null) {
 			return new String[0];
 		}
 		if (delimiter == null) {
-			return new String[] {str};
+			return new String[] { str };
 		}
 
 		List<String> result = new ArrayList<>();
@@ -5135,8 +5076,8 @@ public class GutilStr {
 	}
 
 	/**
-	 * Convert a comma delimited list (e.g., a row from a CSV file) into an
-	 * array of strings.
+	 * Convert a comma delimited list (e.g., a row from a CSV file) into an array of
+	 * strings.
 	 * @param str the input {@code String} (potentially {@code null} or empty)
 	 * @return an array of strings, or the empty array in case of empty input
 	 */
@@ -5146,8 +5087,9 @@ public class GutilStr {
 
 	/**
 	 * Convert a comma delimited list (e.g., a row from a CSV file) into a set.
-	 * <p>Note that this will suppress duplicates, and as of 4.2, the elements in
-	 * the returned set will preserve the original order in a {@link LinkedHashSet}.
+	 * <p>
+	 * Note that this will suppress duplicates, and as of 4.2, the elements in the
+	 * returned set will preserve the original order in a {@link LinkedHashSet}.
 	 * @param str the input {@code String} (potentially {@code null} or empty)
 	 * @return a set of {@code String} entries in the list
 	 * @see #removeDuplicateStrings(String[])
@@ -5159,15 +5101,15 @@ public class GutilStr {
 
 	/**
 	 * Convert a {@link Collection} to a delimited {@code String} (e.g. CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * <p>
+	 * Useful for {@code toString()} implementations.
 	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
 	 * @param delim the delimiter to use (typically a ",")
 	 * @param prefix the {@code String} to start each element with
 	 * @param suffix the {@code String} to end each element with
 	 * @return the delimited {@code String}
 	 */
-	public static String collectionToDelimitedString(
-			Collection<?> coll, String delim, String prefix, String suffix) {
+	public static String collectionToDelimitedString(Collection<?> coll, String delim, String prefix, String suffix) {
 
 		if (GutilCollection.isEmpty(coll)) {
 			return "";
@@ -5186,7 +5128,8 @@ public class GutilStr {
 
 	/**
 	 * Convert a {@code Collection} into a delimited {@code String} (e.g. CSV).
-	 * <p>Useful for {@code toString()} implementations.
+	 * <p>
+	 * Useful for {@code toString()} implementations.
 	 * @param coll the {@code Collection} to convert (potentially {@code null} or empty)
 	 * @param delim the delimiter to use (typically a ",")
 	 * @return the delimited {@code String}
@@ -5230,85 +5173,87 @@ public class GutilStr {
 		return arrayToDelimitedString(arr, ",");
 	}
 
-
 	public static String reverse(String str) {
-        if (str == null) {
-            return null;
-        }
-        return new StringBuffer(str).reverse().toString();
-    }
-
-
+		if (str == null) {
+			return null;
+		}
+		return new StringBuffer(str).reverse().toString();
+	}
 
 	/**
-     * <p>Removes a substring only if it is at the end of a source string,
-     * otherwise returns the source string.</p>
-     *
-     * <p>A <code>null</code> source string will return <code>null</code>.
-     * An empty ("") source string will return the empty string.
-     * A <code>null</code> search string will return the source string.</p>
-     *
-     * <pre>
-     * StringUtils.removeEnd(null, *)      = null
-     * StringUtils.removeEnd("", *)        = ""
-     * StringUtils.removeEnd(*, null)      = *
-     * StringUtils.removeEnd("www.domain.com", ".com.")  = "www.domain.com"
-     * StringUtils.removeEnd("www.domain.com", ".com")   = "www.domain"
-     * StringUtils.removeEnd("www.domain.com", "domain") = "www.domain.com"
-     * StringUtils.removeEnd("abc", "")    = "abc"
-     * </pre>
-     *
-     * @param str  the source String to search, may be null
-     * @param remove  the String to search for and remove, may be null
-     * @return the substring with the string removed if found,
-     *  <code>null</code> if null String input
-     * @since 2.1
-     */
-    public static String removeEnd(String str, String remove) {
-        if (isEmpty(str) || isEmpty(remove)) {
-            return str;
-        }
-        if (str.endsWith(remove)) {
-            return str.substring(0, str.length() - remove.length());
-        }
-        return str;
-    }
+	 * <p>
+	 * Removes a substring only if it is at the end of a source string, otherwise returns
+	 * the source string.
+	 * </p>
+	 *
+	 * <p>
+	 * A <code>null</code> source string will return <code>null</code>. An empty ("")
+	 * source string will return the empty string. A <code>null</code> search string will
+	 * return the source string.
+	 * </p>
+	 *
+	 * <pre>
+	 * StringUtils.removeEnd(null, *)      = null
+	 * StringUtils.removeEnd("", *)        = ""
+	 * StringUtils.removeEnd(*, null)      = *
+	 * StringUtils.removeEnd("www.domain.com", ".com.")  = "www.domain.com"
+	 * StringUtils.removeEnd("www.domain.com", ".com")   = "www.domain"
+	 * StringUtils.removeEnd("www.domain.com", "domain") = "www.domain.com"
+	 * StringUtils.removeEnd("abc", "")    = "abc"
+	 * </pre>
+	 * @param str the source String to search, may be null
+	 * @param remove the String to search for and remove, may be null
+	 * @return the substring with the string removed if found, <code>null</code> if null
+	 * String input
+	 * @since 2.1
+	 */
+	public static String removeEnd(String str, String remove) {
+		if (isEmpty(str) || isEmpty(remove)) {
+			return str;
+		}
+		if (str.endsWith(remove)) {
+			return str.substring(0, str.length() - remove.length());
+		}
+		return str;
+	}
 
-    /**
-     * <p>Case insensitive removal of a substring if it is at the end of a source string,
-     * otherwise returns the source string.</p>
-     *
-     * <p>A <code>null</code> source string will return <code>null</code>.
-     * An empty ("") source string will return the empty string.
-     * A <code>null</code> search string will return the source string.</p>
-     *
-     * <pre>
-     * StringUtils.removeEndIgnoreCase(null, *)      = null
-     * StringUtils.removeEndIgnoreCase("", *)        = ""
-     * StringUtils.removeEndIgnoreCase(*, null)      = *
-     * StringUtils.removeEndIgnoreCase("www.domain.com", ".com.")  = "www.domain.com"
-     * StringUtils.removeEndIgnoreCase("www.domain.com", ".com")   = "www.domain"
-     * StringUtils.removeEndIgnoreCase("www.domain.com", "domain") = "www.domain.com"
-     * StringUtils.removeEndIgnoreCase("abc", "")    = "abc"
-     * StringUtils.removeEndIgnoreCase("www.domain.com", ".COM") = "www.domain")
-     * StringUtils.removeEndIgnoreCase("www.domain.COM", ".com") = "www.domain")
-     * </pre>
-     *
-     * @param str  the source String to search, may be null
-     * @param remove  the String to search for (case insensitive) and remove, may be null
-     * @return the substring with the string removed if found,
-     *  <code>null</code> if null String input
-     * @since 2.4
-     */
-    public static String removeEndIgnoreCase(String str, String remove) {
-        if (isEmpty(str) || isEmpty(remove)) {
-            return str;
-        }
-        if (endsWithIgnoreCase(str, remove)) {
-            return str.substring(0, str.length() - remove.length());
-        }
-        return str;
-    }
+	/**
+	 * <p>
+	 * Case insensitive removal of a substring if it is at the end of a source string,
+	 * otherwise returns the source string.
+	 * </p>
+	 *
+	 * <p>
+	 * A <code>null</code> source string will return <code>null</code>. An empty ("")
+	 * source string will return the empty string. A <code>null</code> search string will
+	 * return the source string.
+	 * </p>
+	 *
+	 * <pre>
+	 * StringUtils.removeEndIgnoreCase(null, *)      = null
+	 * StringUtils.removeEndIgnoreCase("", *)        = ""
+	 * StringUtils.removeEndIgnoreCase(*, null)      = *
+	 * StringUtils.removeEndIgnoreCase("www.domain.com", ".com.")  = "www.domain.com"
+	 * StringUtils.removeEndIgnoreCase("www.domain.com", ".com")   = "www.domain"
+	 * StringUtils.removeEndIgnoreCase("www.domain.com", "domain") = "www.domain.com"
+	 * StringUtils.removeEndIgnoreCase("abc", "")    = "abc"
+	 * StringUtils.removeEndIgnoreCase("www.domain.com", ".COM") = "www.domain")
+	 * StringUtils.removeEndIgnoreCase("www.domain.COM", ".com") = "www.domain")
+	 * </pre>
+	 * @param str the source String to search, may be null
+	 * @param remove the String to search for (case insensitive) and remove, may be null
+	 * @return the substring with the string removed if found, <code>null</code> if null
+	 * String input
+	 * @since 2.4
+	 */
+	public static String removeEndIgnoreCase(String str, String remove) {
+		if (isEmpty(str) || isEmpty(remove)) {
+			return str;
+		}
+		if (endsWithIgnoreCase(str, remove)) {
+			return str.substring(0, str.length() - remove.length());
+		}
+		return str;
+	}
 
 }
-

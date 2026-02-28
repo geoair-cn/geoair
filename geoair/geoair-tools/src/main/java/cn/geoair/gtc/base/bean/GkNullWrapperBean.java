@@ -19,10 +19,10 @@ public class GkNullWrapperBean<T> {
 
 	/**
 	 * 获取null值对应的类型
-	 *
 	 * @return 类型
 	 */
 	public Class<T> getWrappedClass() {
 		return clazz;
 	}
+
 }

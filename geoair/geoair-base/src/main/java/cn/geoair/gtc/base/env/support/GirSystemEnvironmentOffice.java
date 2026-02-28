@@ -5,14 +5,11 @@ import cn.geoair.gtc.base.env.GiEnvironmenter;
 
 public class GirSystemEnvironmentOffice implements GkOffice<GiEnvironmenter> {
 
-
-
 	private GiEnvironmenter env = new GirSystemEnvironmentOperater();
 
 	@Override
 	public GiEnvironmenter getOperater() {
 		return env;
 	}
-
 
 }

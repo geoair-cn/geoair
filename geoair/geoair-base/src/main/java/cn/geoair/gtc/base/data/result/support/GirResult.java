@@ -6,31 +6,30 @@ import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import cn.geoair.gtc.base.data.result.GirEmAlertType;
 
 @SuppressWarnings("serial")
-@GaModel(text="默认返回结果")
+@GaModel(text = "默认返回结果")
 public class GirResult<T> implements GiResult<T> {
 
-	//@GaModelField(text="版本号")
-	//protected String version = PRODUCT_VERSION;//版本号
+	// @GaModelField(text="版本号")
+	// protected String version = PRODUCT_VERSION;//版本号
 
-	@GaModelField(text="状态码")
-	private int code = 200;//状态码
+	@GaModelField(text = "状态码")
+	private int code = 200;// 状态码
 
-	@GaModelField(text="提示消息类型",em =  GirEmAlertType.class)
-	private int alertType = 0;//消息类型
+	@GaModelField(text = "提示消息类型", em = GirEmAlertType.class)
+	private int alertType = 0;// 消息类型
 
-	@GaModelField(text="提示消息")
-	private String alertMsg;//提示消息
+	@GaModelField(text = "提示消息")
+	private String alertMsg;// 提示消息
 
-	@GaModelField(text="业务数据")
+	@GaModelField(text = "业务数据")
 	private T data;// 数据
 
-
-	public GirResult() {}
+	public GirResult() {
+	}
 
 	public GirResult(Class<T> cls) {
 
 	}
-
 
 	public int getCode() {
 		return code;
@@ -66,13 +65,13 @@ public class GirResult<T> implements GiResult<T> {
 
 	@Override
 	public GirResult<T> forSuccess() {
-		this.andCode(200).andAlertTypeEnum( GirEmAlertType.不弹框0);
+		this.andCode(200).andAlertTypeEnum(GirEmAlertType.不弹框0);
 		return this;
 	}
 
 	@Override
 	public GirResult<T> forFailure() {
-		this.andAlertTypeEnum( GirEmAlertType.不弹框0).andCode(999).andAlertTypeEnum( GirEmAlertType.需要关闭的提示2);
+		this.andAlertTypeEnum(GirEmAlertType.不弹框0).andCode(999).andAlertTypeEnum(GirEmAlertType.需要关闭的提示2);
 		return this;
 	}
 

@@ -23,58 +23,56 @@ import cn.geoair.map.dynamic.ds.IDataSourceGetter;
  */
 public class PgAdvBaseOpt extends AbstractAdvBaseOpt {
 
+	public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
+		super(dataSourceGetter);
+	}
 
-    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
-        super(dataSourceGetter);
-    }
+	/**
+	 * 获取插入操作代理对象（懒加载+数据源注入）
+	 */
+	@Override
+	public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
+		if (advBaseAccessPxyOpt == null) {
+			advBaseAccessPxyOpt = new PgAdvBaseAccessOpt();
+			advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
+		}
+		return advBaseAccessPxyOpt;
+	}
 
-    /**
-     * 获取插入操作代理对象（懒加载+数据源注入）
-     */
-    @Override
-    public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
-        if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt();
-            advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
-        }
-        return advBaseAccessPxyOpt;
-    }
+	/**
+	 * 获取查询操作代理对象（懒加载+数据源注入）
+	 */
+	@Override
+	public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
+		if (advBaseSelectPxyOpt == null) {
+			advBaseSelectPxyOpt = new PgAdvBaseSelectOpt();
+			advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
+		}
+		return advBaseSelectPxyOpt;
+	}
 
-    /**
-     * 获取查询操作代理对象（懒加载+数据源注入）
-     */
-    @Override
-    public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
-        if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt();
-            advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
-        }
-        return advBaseSelectPxyOpt;
-    }
+	/**
+	 * 获取更新操作代理对象（懒加载+数据源注入）
+	 */
+	@Override
+	public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
+		if (advBaseUpdatePxyOpt == null) {
+			advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt();
+			advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
+		}
+		return advBaseUpdatePxyOpt;
+	}
 
-    /**
-     * 获取更新操作代理对象（懒加载+数据源注入）
-     */
-    @Override
-    public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
-        if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt();
-            advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
-        }
-        return advBaseUpdatePxyOpt;
-    }
-
-    /**
-     * 获取删除操作代理对象（懒加载+数据源注入）
-     */
-    @Override
-    public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
-        if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt();
-            advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
-        }
-        return advBaseDeletePxyOpt;
-    }
-
+	/**
+	 * 获取删除操作代理对象（懒加载+数据源注入）
+	 */
+	@Override
+	public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
+		if (advBaseDeletePxyOpt == null) {
+			advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt();
+			advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
+		}
+		return advBaseDeletePxyOpt;
+	}
 
 }

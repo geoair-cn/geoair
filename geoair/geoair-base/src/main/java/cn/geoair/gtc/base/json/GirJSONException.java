@@ -10,8 +10,6 @@ public class GirJSONException extends GirException {
 	 */
 	private static final long serialVersionUID = -2014231003542321867L;
 
-
-
 	public GirJSONException(Throwable e) {
 		super(getMessage(e), e);
 	}
@@ -38,4 +36,5 @@ public class GirJSONException extends GirException {
 	public GirJSONException(Throwable throwable, String messageTemplate, Object... params) {
 		super(GutilStr.format(messageTemplate, params), throwable);
 	}
+
 }

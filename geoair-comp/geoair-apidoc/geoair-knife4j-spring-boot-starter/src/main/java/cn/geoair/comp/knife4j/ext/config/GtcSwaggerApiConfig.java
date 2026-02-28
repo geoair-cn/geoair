@@ -12,18 +12,17 @@ import javax.annotation.Resource;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/8/23 16:13
- * @description： 父类接口
+ * @date ：Created in 2022/8/23 16:13 @description： 父类接口
  */
 @Configuration
 @EnableSwagger2
 public class GtcSwaggerApiConfig {
-    @Resource
-    SpringAddtionalModelService springAddtionalModelService;
 
+	@Resource
+	SpringAddtionalModelService springAddtionalModelService;
 
+	public Docket createApi(ApiModelInfo apiModelInfo, DocketInfo docketInfo) {
+		return CreateApiUtil.createGroup(apiModelInfo, docketInfo, springAddtionalModelService);
+	}
 
-    public Docket createApi(ApiModelInfo apiModelInfo, DocketInfo docketInfo) {
-        return CreateApiUtil.createGroup(apiModelInfo, docketInfo, springAddtionalModelService);
-    }
 }

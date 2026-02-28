@@ -8,8 +8,9 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface GirSessionAn {
+
 	public static String NULL = "";
 
 	public String cookieKey() default NULL;//
@@ -26,9 +27,8 @@ public @interface GirSessionAn {
 
 	public boolean tokenInHeader() default false;
 
-	public String catalog() default NULL;//存储目录
-
+	public String catalog() default NULL;// 存储目录
 
 	public String cacheName() default " gtcSessionCache";
-}
 
+}

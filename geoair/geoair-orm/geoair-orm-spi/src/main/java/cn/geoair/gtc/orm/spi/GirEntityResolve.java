@@ -15,23 +15,20 @@ import cn.geoair.gtc.orm.spi.entity.GirEntityTable;
  */
 public interface GirEntityResolve {
 
-    /**
-     * 解析类为 EntityTable
-     *
-     * @param entityClass
-     * @param
-     * @return
-     */
-     GirEntityTable resolveEntity(Class<?> entityClass);
+	/**
+	 * 解析类为 EntityTable
+	 * @param entityClass
+	 * @param
+	 * @return
+	 */
+	GirEntityTable resolveEntity(Class<?> entityClass);
 
-    /**
-     * 解析类为 EntityTable
-     *
-     * @param entityidentification 实体类标识 用于拓展
-     * @param
-     * @return
-     */
-     GirEntityTable resolveEntity(Object entityidentification);
-
+	/**
+	 * 解析类为 EntityTable
+	 * @param entityidentification 实体类标识 用于拓展
+	 * @param
+	 * @return
+	 */
+	GirEntityTable resolveEntity(Object entityidentification);
 
 }

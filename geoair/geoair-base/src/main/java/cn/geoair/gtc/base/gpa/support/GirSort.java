@@ -9,14 +9,12 @@ import java.util.function.Consumer;
 
 import cn.geoair.gtc.base.util.GutilAssert;
 import cn.geoair.gtc.base.util.GutilStr;
-import  cn.geoair.gtc.base.gpa.support.GirOrder.Direction;
-
+import cn.geoair.gtc.base.gpa.support.GirOrder.Direction;
 
 /**
  * 排序条件对象，用于封装排序规则
  * <p>
- * 该类表示一组排序条件，每个条件由{@link GirOrder}定义，支持链式调用和组合排序。
- * 提供了静态方法用于创建排序实例，以及各种操作排序条件的方法。
+ * 该类表示一组排序条件，每个条件由{@link GirOrder}定义，支持链式调用和组合排序。 提供了静态方法用于创建排序实例，以及各种操作排序条件的方法。
  * </p>
  */
 public class GirSort implements Serializable {
@@ -29,7 +27,7 @@ public class GirSort implements Serializable {
 	/**
 	 * 表示未排序的实例
 	 */
-	private static final GirSort UNSORTED =  GirSort.by(new GirOrder[0]);
+	private static final GirSort UNSORTED = GirSort.by(new GirOrder[0]);
 
 	/**
 	 * 默认排序方向，升序
@@ -43,7 +41,6 @@ public class GirSort implements Serializable {
 
 	/**
 	 * 构造函数，使用指定的排序条件列表创建排序对象
-	 *
 	 * @param orders 排序条件列表，不能为空
 	 */
 	protected GirSort(List<GirOrder<?>> orders) {
@@ -55,7 +52,6 @@ public class GirSort implements Serializable {
 	 * <p>
 	 * 如果传入的列表为空，则返回未排序实例
 	 * </p>
-	 *
 	 * @param orders 排序条件列表，不能为空
 	 * @return 新创建的排序对象或未排序实例
 	 */
@@ -63,12 +59,11 @@ public class GirSort implements Serializable {
 
 		GutilAssert.notNull(orders, " gtcOrders must not be null!");
 
-		return orders.isEmpty() ?  GirSort.unsorted() : new GirSort(orders);
+		return orders.isEmpty() ? GirSort.unsorted() : new GirSort(orders);
 	}
 
 	/**
 	 * 根据给定的排序条件数组创建一个新的排序对象
-	 *
 	 * @param orders 排序条件数组，不能为空
 	 * @return 新创建的排序对象
 	 */
@@ -79,11 +74,8 @@ public class GirSort implements Serializable {
 		return new GirSort(Arrays.asList(orders));
 	}
 
-
-
 	/**
 	 * 返回表示无排序设置的排序实例
-	 *
 	 * @return 未排序的排序实例
 	 */
 	public static GirSort unsorted() {
@@ -92,7 +84,6 @@ public class GirSort implements Serializable {
 
 	/**
 	 * 检查排序条件是否为空
-	 *
 	 * @return 如果没有排序条件则返回true，否则返回false
 	 */
 	public boolean isEmpty() {
@@ -111,7 +102,6 @@ public class GirSort implements Serializable {
 	 * <p>
 	 * 新的排序对象包含当前排序的所有条件以及给定排序的条件
 	 * </p>
-	 *
 	 * @param sort 要合并的排序对象，不能为空
 	 * @return 包含合并后排序条件的新排序对象
 	 */
@@ -121,7 +111,7 @@ public class GirSort implements Serializable {
 
 		ArrayList<GirOrder<?>> these = new ArrayList<>();
 
-		for ( GirOrder<?> order : orders) {
+		for (GirOrder<?> order : orders) {
 			these.add(order);
 		}
 
@@ -130,18 +120,17 @@ public class GirSort implements Serializable {
 			these.add(order);
 		}
 
-		return  GirSort.by(these);
+		return GirSort.by(these);
 	}
 
 	/**
 	 * 根据属性名称获取对应的排序条件
-	 *
 	 * @param property 属性名称
 	 * @return 对应的排序条件，如果不存在则返回null
 	 */
 	public GirOrder<?> getOrderFor(String property) {
 
-		for ( GirOrder<?> order : orders) {
+		for (GirOrder<?> order : orders) {
 			if (order.getProperty().equals(property)) {
 				return order;
 			}
@@ -152,17 +141,14 @@ public class GirSort implements Serializable {
 
 	/**
 	 * 获取排序条件迭代器
-	 *
 	 * @return 排序条件迭代器
 	 */
 	public Iterator<GirOrder<?>> iterator() {
 		return this.orders.iterator();
 	}
 
-
 	/**
 	 * 对每个排序条件执行指定操作
-	 *
 	 * @param action 要对每个排序条件执行的操作
 	 */
 	public void forEach(Consumer<? super GirOrder> action) {
@@ -174,7 +160,6 @@ public class GirSort implements Serializable {
 	 * <p>
 	 * 如果两个排序对象包含相同的排序条件列表，则认为它们相等
 	 * </p>
-	 *
 	 * @param obj 要比较的对象
 	 * @return 如果相等返回true，否则返回false
 	 */
@@ -189,14 +174,13 @@ public class GirSort implements Serializable {
 			return false;
 		}
 
-		 GirSort that = (GirSort) obj;
+		GirSort that = (GirSort) obj;
 
 		return orders.equals(that.orders);
 	}
 
 	/**
 	 * 计算对象的哈希值
-	 *
 	 * @return 对象的哈希值
 	 */
 	@Override
@@ -212,16 +196,11 @@ public class GirSort implements Serializable {
 	 * <p>
 	 * 如果没有排序条件，返回"UNSORTED"；否则返回逗号分隔的排序条件字符串
 	 * </p>
-	 *
 	 * @return 对象的字符串表示
 	 */
 	@Override
 	public String toString() {
 		return isEmpty() ? "UNSORTED" : GutilStr.collectionToCommaDelimitedString(orders);
 	}
-
-
-
-
 
 }

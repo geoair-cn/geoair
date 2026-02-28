@@ -5,11 +5,13 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>23.1.1-beta4</version>
     <artifactId>geo-dynamic-ds</artifactId>
-    <name>geo-dynamic-ds </name>
+    <name>geo-dynamic-ds</name>
 
 
     <description>geo-dynamic-ds</description>
@@ -44,35 +46,41 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
-            <optional> true</optional>
+            <version>${geotools.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.geotools.jdbc</groupId>
             <artifactId>gt-jdbc-postgis</artifactId>
-            <optional> true</optional>
+            <version>${geotools.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional> true</optional>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${spring-boot.version}</version>
             <optional>true</optional>
             <scope>compile</scope>
         </dependency>

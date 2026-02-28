@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author hutool
  */
 public class PrimitiveArrayUtil {
+
 	/**
 	 * 数组中元素未找到的下标，值为-1
 	 */
@@ -20,7 +21,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -30,7 +30,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -40,7 +39,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -50,7 +48,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -60,7 +57,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -70,7 +66,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -80,7 +75,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -90,7 +84,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为空
-	 *
 	 * @param array 数组
 	 * @return 是否为空
 	 */
@@ -102,7 +95,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -112,7 +104,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -122,7 +113,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -132,7 +122,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -142,7 +131,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -152,7 +140,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -162,7 +149,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -172,7 +158,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组是否为非空
-	 *
 	 * @param array 数组
 	 * @return 是否为非空
 	 */
@@ -185,8 +170,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 生成一个新的重新设置大小的数组<br>
 	 * 调整大小后拷贝原数组到新数组下。扩大则占位前N个位置，其它位置补充0，缩小则截断
-	 *
-	 * @param bytes   原数组
+	 * @param bytes 原数组
 	 * @param newSize 新的数组大小
 	 * @return 调整后的新数组
 	 * @since 4.6.7
@@ -207,7 +191,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -239,7 +222,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -271,7 +253,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -303,7 +284,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -335,7 +315,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -367,7 +346,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -399,7 +377,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -431,7 +408,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 将多个数组合并在一起<br>
 	 * 忽略null的数组
-	 *
 	 * @param arrays 数组集合
 	 * @return 合并后的数组
 	 * @since 4.6.9
@@ -464,7 +440,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 生成一个从0开始的数字列表<br>
-	 *
 	 * @param excludedEnd 结束的数字（不包含）
 	 * @return 数字列表
 	 */
@@ -475,9 +450,8 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 生成一个数字列表<br>
 	 * 自动判定正序反序
-	 *
 	 * @param includedStart 开始的数字（包含）
-	 * @param excludedEnd   结束的数字（不包含）
+	 * @param excludedEnd 结束的数字（不包含）
 	 * @return 数字列表
 	 */
 	public static int[] range(int includedStart, int excludedEnd) {
@@ -487,10 +461,9 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 生成一个数字列表<br>
 	 * 自动判定正序反序
-	 *
 	 * @param includedStart 开始的数字（包含）
-	 * @param excludedEnd   结束的数字（不包含）
-	 * @param step          步进
+	 * @param excludedEnd 结束的数字（不包含）
+	 * @param step 步进
 	 * @return 数字列表
 	 */
 	public static int[] range(int includedStart, int excludedEnd, int step) {
@@ -521,9 +494,8 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 拆分byte数组为几个等份（最后一份可能小于len）
-	 *
 	 * @param array 数组
-	 * @param len   每个小节的长度
+	 * @param len 每个小节的长度
 	 * @return 拆分后的数组
 	 */
 	public static byte[][] split(byte[] array, int len) {
@@ -539,7 +511,8 @@ public class PrimitiveArrayUtil {
 			arr = new byte[len];
 			if (i == x + z - 1 && y != 0) {
 				System.arraycopy(array, i * len, arr, 0, y);
-			} else {
+			}
+			else {
 				System.arraycopy(array, i * len, arr, 0, len);
 			}
 			arrays[i] = arr;
@@ -547,11 +520,11 @@ public class PrimitiveArrayUtil {
 		return arrays;
 	}
 
-	// ---------------------------------------------------------------------- indexOf、LastIndexOf、contains
+	// ----------------------------------------------------------------------
+	// indexOf、LastIndexOf、contains
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -570,7 +543,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -589,7 +561,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -601,7 +572,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -620,7 +590,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -639,7 +608,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -651,7 +619,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -670,7 +637,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -689,7 +655,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -701,7 +666,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -720,7 +684,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -739,7 +702,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -751,7 +713,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -770,7 +731,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -789,7 +749,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -801,7 +760,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -820,7 +778,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -839,7 +796,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -851,7 +807,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -870,7 +825,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -889,7 +843,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -901,7 +854,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -920,7 +872,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 返回数组中指定元素所在最后的位置，未找到返回{@link #INDEX_NOT_FOUND}
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -939,7 +890,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 数组中是否包含元素
-	 *
 	 * @param array 数组
 	 * @param value 被检查的元素
 	 * @return 是否包含
@@ -953,7 +903,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -975,7 +924,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组，null转为0
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -997,7 +945,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1019,7 +966,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1041,7 +987,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1063,7 +1008,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1085,7 +1029,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1107,7 +1050,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1129,7 +1071,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1151,7 +1092,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1173,7 +1113,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1195,7 +1134,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1217,7 +1155,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1239,7 +1176,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1261,7 +1197,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 将原始类型数组包装为包装类型
-	 *
 	 * @param values 原始类型数组
 	 * @return 包装类型数组
 	 */
@@ -1283,7 +1218,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 包装类数组转为原始类型数组
-	 *
 	 * @param values 包装类型数组
 	 * @return 原始类型数组
 	 */
@@ -1307,10 +1241,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1342,10 +1275,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1377,10 +1309,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1412,10 +1343,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1447,10 +1377,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1482,10 +1411,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1517,10 +1445,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1552,10 +1479,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 获取子数组
-	 *
 	 * @param array 数组
 	 * @param start 开始位置（包括）
-	 * @param end   结束位置（不包括）
+	 * @param end 结束位置（不包括）
 	 * @return 新的数组
 	 * @see Arrays#copyOfRange(Object[], int, int)
 	 * @since 4.5.2
@@ -1589,8 +1515,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1604,7 +1529,8 @@ public class PrimitiveArrayUtil {
 		for (int item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1614,8 +1540,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1629,7 +1554,8 @@ public class PrimitiveArrayUtil {
 		for (short item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1639,8 +1565,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1654,7 +1579,8 @@ public class PrimitiveArrayUtil {
 		for (char item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1664,8 +1590,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1679,7 +1604,8 @@ public class PrimitiveArrayUtil {
 		for (byte item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1689,8 +1615,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1704,7 +1629,8 @@ public class PrimitiveArrayUtil {
 		for (boolean item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1714,8 +1640,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1729,7 +1654,8 @@ public class PrimitiveArrayUtil {
 		for (float item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1739,8 +1665,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 以 conjunction 为分隔符将数组转换为字符串
-	 *
-	 * @param array       数组
+	 * @param array 数组
 	 * @param conjunction 分隔符
 	 * @return 连接后的字符串
 	 */
@@ -1754,7 +1679,8 @@ public class PrimitiveArrayUtil {
 		for (double item : array) {
 			if (isFirst) {
 				isFirst = false;
-			} else {
+			}
+			else {
 				sb.append(conjunction);
 			}
 			sb.append(item);
@@ -1767,7 +1693,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1781,7 +1706,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1795,7 +1719,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1809,7 +1732,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1823,7 +1745,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1837,7 +1758,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1851,7 +1771,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1865,7 +1784,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1879,7 +1797,6 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中对应位置的元素<br>
 	 * copy from commons-lang
-	 *
 	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param index 位置，如果位置小于0或者大于长度，返回原数组
 	 * @return 去掉指定元素后的新数组或原数组
@@ -1911,8 +1828,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1925,8 +1841,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1939,8 +1854,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1953,8 +1867,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1967,8 +1880,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1981,8 +1893,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -1995,8 +1906,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -2009,8 +1919,7 @@ public class PrimitiveArrayUtil {
 	/**
 	 * 移除数组中指定的元素<br>
 	 * 只会移除匹配到的第一个元素 copy from commons-lang
-	 *
-	 * @param array   数组对象，可以是对象数组，也可以原始类型数组
+	 * @param array 数组对象，可以是对象数组，也可以原始类型数组
 	 * @param element 要移除的元素
 	 * @return 去掉指定元素后的新数组或原数组
 	 * @throws IllegalArgumentException 参数对象不为数组对象
@@ -2024,10 +1933,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2048,7 +1956,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2059,10 +1966,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2083,7 +1989,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2094,10 +1999,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2118,7 +2022,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2129,10 +2032,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2153,7 +2055,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2164,10 +2065,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2188,7 +2088,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2199,10 +2098,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2223,7 +2121,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2234,10 +2131,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2258,7 +2154,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2269,10 +2164,9 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
-	 * @param array               数组，会变更
+	 * @param array 数组，会变更
 	 * @param startIndexInclusive 其实位置（包含）
-	 * @param endIndexExclusive   结束位置（不包含）
+	 * @param endIndexExclusive 结束位置（不包含）
 	 * @return 变更后的原数组
 	 * @since 3.0.9
 	 */
@@ -2293,7 +2187,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 反转数组，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 变更后的原数组
 	 * @since 3.0.9
@@ -2302,11 +2195,11 @@ public class PrimitiveArrayUtil {
 		return reverse(array, 0, array.length);
 	}
 
-	// ------------------------------------------------------------------------------------------------------------ min and max
+	// ------------------------------------------------------------------------------------------------------------
+	// min and max
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2326,7 +2219,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2346,7 +2238,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2366,7 +2257,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2386,7 +2276,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2406,7 +2295,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2426,7 +2314,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最小值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最小值
 	 * @since 3.0.9
@@ -2446,7 +2333,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2466,7 +2352,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2486,7 +2371,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2506,7 +2390,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2526,7 +2409,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2546,7 +2428,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2566,7 +2447,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 取最大值
-	 *
 	 * @param numberArray 数字数组
 	 * @return 最大值
 	 * @since 3.0.9
@@ -2588,7 +2468,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2600,8 +2479,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2621,7 +2499,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2633,8 +2510,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2654,7 +2530,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2666,8 +2541,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2687,7 +2561,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2699,8 +2572,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2720,20 +2592,18 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
 	 * @since 5.5.2
 	 */
 	public static boolean[] shuffle(boolean[] array) {
-		return shuffle(array,ThreadLocalRandom.current());
+		return shuffle(array, ThreadLocalRandom.current());
 	}
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2753,7 +2623,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2765,8 +2634,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2786,20 +2654,18 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
 	 * @since 5.5.2
 	 */
 	public static char[] shuffle(char[] array) {
-		return shuffle(array,ThreadLocalRandom.current());
+		return shuffle(array, ThreadLocalRandom.current());
 	}
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2819,20 +2685,18 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
 	 * @param array 数组，会变更
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
 	 * @since 5.5.2
 	 */
 	public static short[] shuffle(short[] array) {
-		return shuffle(array,ThreadLocalRandom.current());
+		return shuffle(array, ThreadLocalRandom.current());
 	}
 
 	/**
 	 * 打乱数组顺序，会变更原数组
-	 *
-	 * @param array  数组，会变更
+	 * @param array 数组，会变更
 	 * @param random 随机数生成器
 	 * @return 打乱后的数组
 	 * @author FengBaoheng
@@ -2854,8 +2718,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2873,8 +2736,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2892,8 +2754,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2911,8 +2772,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2930,8 +2790,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2949,8 +2808,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2968,8 +2826,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -2987,8 +2844,7 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 交换数组中两个位置的值
-	 *
-	 * @param array  数组
+	 * @param array 数组
 	 * @param index1 位置1
 	 * @param index2 位置2
 	 * @return 交换后的数组，与传入数组为同一对象
@@ -3006,7 +2862,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3018,7 +2873,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3040,7 +2894,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3062,7 +2915,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3074,7 +2926,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3096,7 +2947,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3118,7 +2968,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3130,7 +2979,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3152,7 +3000,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3174,7 +3021,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3186,7 +3032,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3208,7 +3053,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3230,7 +3074,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3242,7 +3085,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3264,7 +3106,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3286,7 +3127,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3298,7 +3138,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3320,7 +3159,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3342,7 +3180,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3354,7 +3191,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否升序，即array[i] &lt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否升序
 	 * @author FengBaoheng
@@ -3376,7 +3212,6 @@ public class PrimitiveArrayUtil {
 
 	/**
 	 * 检查数组是否降序，即array[i] &gt;= array[i+1]，若传入空数组，则返回false
-	 *
 	 * @param array 数组
 	 * @return 数组是否降序
 	 * @author FengBaoheng
@@ -3395,5 +3230,5 @@ public class PrimitiveArrayUtil {
 
 		return true;
 	}
-}
 
+}

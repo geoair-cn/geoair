@@ -10,11 +10,10 @@ import cn.geoair.gtc.base.util.GutilGenericType;
 import cn.geoair.gtc.base.data.GiValuable;
 import cn.geoair.gtc.base.sp.GirSpHelper;
 
-
 /**
  * 分页结果集接口
- * @author Ray
  *
+ * @author Ray
  * @param <T> 分页数据的泛型类型
  */
 public interface GiPager<T> extends GiValuable<Iterable<T>> {
@@ -38,15 +37,15 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
 	 * @param pageParam 分页参数
 	 * @return 返回设置后的GiPager对象
 	 */
-	public GiPager<T> put(Iterable<T> list,long total,GiPageParam pageParam);
+	public GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam);
 
 	/**
 	 * 获取泛型类型的实际类
 	 * @return 返回GiPager泛型参数T的实际类型
 	 */
 	@SuppressWarnings("unchecked")
-	default Class<T> returnClass(){
-		return (Class<T>) GutilGenericType.resolveTypeArguments(GutilClass.getUserClass(this),GiPager.class)[0];
+	default Class<T> returnClass() {
+		return (Class<T>) GutilGenericType.resolveTypeArguments(GutilClass.getUserClass(this), GiPager.class)[0];
 	}
 
 	/**
@@ -57,7 +56,7 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
 	 * @param converter 数据转换器
 	 * @return 转换后的Pager对象
 	 */
-	default <V,K extends GiPager<V>> K convert(K pager, GiConverter<T, V> converter) {
+	default <V, K extends GiPager<V>> K convert(K pager, GiConverter<T, V> converter) {
 		Objects.requireNonNull(converter, "转换器不能为空");
 		List<V> list = new ArrayList<>();
 		this.value().forEach(t -> {
@@ -74,7 +73,8 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
 	 * @param clz Pager数据类型
 	 * @return 对应类型的GiPager实例
 	 */
-	public static <T> GiPager<T> ofClass(Class<T> clz){
-		return  GirSpHelper.load(GiPageConfig.class).getPagerProvider().getPager(clz);
+	public static <T> GiPager<T> ofClass(Class<T> clz) {
+		return GirSpHelper.load(GiPageConfig.class).getPagerProvider().getPager(clz);
 	}
+
 }

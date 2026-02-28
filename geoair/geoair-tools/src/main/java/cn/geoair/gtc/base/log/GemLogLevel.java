@@ -1,7 +1,7 @@
 package cn.geoair.gtc.base.log;
 
+public enum GemLogLevel {
 
-public enum GemLogLevel{
 	/**
 	 * 'ALL' log level.
 	 */
@@ -34,4 +34,5 @@ public enum GemLogLevel{
 	 * 'OFF' log.
 	 */
 	OFF
+
 }

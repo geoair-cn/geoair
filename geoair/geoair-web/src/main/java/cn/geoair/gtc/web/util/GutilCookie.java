@@ -18,21 +18,21 @@ import cn.geoair.gtc.base.log.GirLogger;
  */
 public final class GutilCookie {
 
-	protected static final GiLogger logger =  GirLogger.getLoger(GutilCookie.class);
+	protected static final GiLogger logger = GirLogger.getLoger(GutilCookie.class);
 
 	/**
 	 * 添加Cookie
-	 *
-	 * @param cookieName  名称
+	 * @param cookieName 名称
 	 * @param cookieValue 值
-	 * @param maxAge      存活时间(按秒算)
+	 * @param maxAge 存活时间(按秒算)
 	 */
 	public static void addCookie(String cookieName, String cookieValue, int maxAge) {
 		/** 获取Cookie */
 		Cookie cookie = getCookie(cookieName);
 		if (cookie == null) {
 			cookie = new Cookie(cookieName, cookieValue);
-		} else {
+		}
+		else {
 			cookie.setValue(cookieValue);
 		}
 		/** 设置有效时间 */
@@ -40,12 +40,11 @@ public final class GutilCookie {
 		/** http://localhost:8080/ 设置访问路径 */
 		cookie.setPath("/");
 		/** 添加cookie到用户浏览器 */
-		 GirHttpServletHelper.getResponse().addCookie(cookie);
+		GirHttpServletHelper.getResponse().addCookie(cookie);
 	}
 
 	/**
 	 * 重新设置cookie的生命周期
-	 *
 	 * @param cookieName
 	 * @param maxAge
 	 */
@@ -57,19 +56,18 @@ public final class GutilCookie {
 			/** 设置有效时间 */
 			cookie.setMaxAge(maxAge);
 			/** 添加cookie到用户浏览器 */
-			 GirHttpServletHelper.getResponse().addCookie(cookie);
+			GirHttpServletHelper.getResponse().addCookie(cookie);
 		}
 	}
 
 	/**
 	 * 获取Cookie
-	 *
 	 * @param cookieName 名称
 	 * @return Cookie
 	 */
 	public static Cookie getCookie(String cookieName) {
 		/* 获取当前浏览器中所有的Cookie */
-		HttpServletRequest httpServletRequest =  GirHttpServletHelper.getRequest();
+		HttpServletRequest httpServletRequest = GirHttpServletHelper.getRequest();
 		if (httpServletRequest != null) {
 			Cookie[] cookies = httpServletRequest.getCookies();
 			if (cookies != null && cookies.length > 0) {
@@ -85,7 +83,6 @@ public final class GutilCookie {
 
 	/**
 	 * 删除Cookie
-	 *
 	 * @param cookieName 名称
 	 */
 	public static void removeCookie(String cookieName) {
@@ -94,16 +91,12 @@ public final class GutilCookie {
 		if (cookie != null) {
 			cookie.setPath("/");
 			cookie.setMaxAge(0); // 设置cookie立即失效
-			 GirHttpServletHelper.getResponse().addCookie(cookie);
+			GirHttpServletHelper.getResponse().addCookie(cookie);
 		}
 	}
 
-
-
-
 	/**
 	 * 得到Cookie的值, 不编码
-	 *
 	 * @param request
 	 * @param cookieName
 	 * @return
@@ -114,7 +107,6 @@ public final class GutilCookie {
 
 	/**
 	 * 得到Cookie的值,
-	 *
 	 * @param request
 	 * @param cookieName
 	 * @return
@@ -130,13 +122,15 @@ public final class GutilCookie {
 				if (cookieList[i].getName().equals(cookieName)) {
 					if (isDecoder) {
 						retValue = URLDecoder.decode(cookieList[i].getValue(), "UTF-8");
-					} else {
+					}
+					else {
 						retValue = cookieList[i].getValue();
 					}
 					break;
 				}
 			}
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			logger.error("Cookie Decode Error.", e);
 		}
 		return retValue;
@@ -144,7 +138,6 @@ public final class GutilCookie {
 
 	/**
 	 * 得到Cookie的值,
-	 *
 	 * @param request
 	 * @param cookieName
 	 * @return
@@ -162,7 +155,8 @@ public final class GutilCookie {
 					break;
 				}
 			}
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			logger.error("Cookie Decode Error.", e);
 		}
 		return retValue;
@@ -217,7 +211,6 @@ public final class GutilCookie {
 
 	/**
 	 * 设置Cookie的值，并使其在指定时间内生效
-	 *
 	 * @param cookieMaxage cookie生效的最大秒数
 	 */
 	private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
@@ -225,7 +218,8 @@ public final class GutilCookie {
 		try {
 			if (cookieValue == null) {
 				cookieValue = "";
-			} else if (isEncode) {
+			}
+			else if (isEncode) {
 				cookieValue = URLEncoder.encode(cookieValue, "utf-8");
 			}
 			Cookie cookie = new Cookie(cookieName, cookieValue);
@@ -235,14 +229,14 @@ public final class GutilCookie {
 				cookie.setDomain(getDomainName(request));
 			cookie.setPath("/");
 			response.addCookie(cookie);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.error("Cookie Encode Error.", e);
 		}
 	}
 
 	/**
 	 * 设置Cookie的值，并使其在指定时间内生效
-	 *
 	 * @param cookieMaxage cookie生效的最大秒数
 	 */
 	private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
@@ -250,7 +244,8 @@ public final class GutilCookie {
 		try {
 			if (cookieValue == null) {
 				cookieValue = "";
-			} else {
+			}
+			else {
 				cookieValue = URLEncoder.encode(cookieValue, encodeString);
 			}
 			Cookie cookie = new Cookie(cookieName, cookieValue);
@@ -260,7 +255,8 @@ public final class GutilCookie {
 				cookie.setDomain(getDomainName(request));
 			cookie.setPath("/");
 			response.addCookie(cookie);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.error("Cookie Encode Error.", e);
 		}
 	}
@@ -274,7 +270,8 @@ public final class GutilCookie {
 		String serverName = request.getRequestURL().toString();
 		if (serverName == null || serverName.equals("")) {
 			domainName = "";
-		} else {
+		}
+		else {
 			serverName = serverName.toLowerCase();
 			serverName = serverName.substring(7);
 			final int end = serverName.indexOf("/");
@@ -284,10 +281,12 @@ public final class GutilCookie {
 			if (len > 3) {
 				// www.xxx.com.cn
 				domainName = "." + domains[len - 3] + "." + domains[len - 2] + "." + domains[len - 1];
-			} else if (len <= 3 && len > 1) {
+			}
+			else if (len <= 3 && len > 1) {
 				// xxx.com or xxx.cn
 				domainName = "." + domains[len - 2] + "." + domains[len - 1];
-			} else {
+			}
+			else {
 				domainName = serverName;
 			}
 		}

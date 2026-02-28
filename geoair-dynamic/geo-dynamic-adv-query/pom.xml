@@ -5,10 +5,13 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>geo-dynamic-adv-query</artifactId>
+    <groupId>cn.geoair.geo.dynamic</groupId>
+    <version>23.1.1-beta4</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
 
@@ -42,24 +45,27 @@
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${spring-boot.version}</version>
             <optional>true</optional>
             <scope>compile</scope>
         </dependency>
 
-<!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>io.github.freakchick</groupId>-->
-<!--            <artifactId>orange</artifactId>-->
-<!--            <version>1.0</version>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.github.freakchick</groupId>-->
+        <!--            <artifactId>orange</artifactId>-->
+        <!--            <version>1.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ognl</groupId>
@@ -69,45 +75,53 @@
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-ds</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.geoair.geo.dynamic</groupId>
             <artifactId>geo-dynamic-tools</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+            <version>${fastjson1x.version}</version>
         </dependency>
         <dependency>
             <groupId>net.postgis</groupId>
             <artifactId>postgis-jdbc</artifactId>
+            <version>${net.postgis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
+            <version>${geotools.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
+            <version>${geotools.version}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.geotools.jdbc</groupId>
             <artifactId>gt-jdbc-postgis</artifactId>
-
+            <version>${geotools.version}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
             <scope>compile</scope>
         </dependency>

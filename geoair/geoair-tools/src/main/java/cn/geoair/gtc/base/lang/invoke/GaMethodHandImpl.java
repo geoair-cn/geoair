@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 public @interface GaMethodHandImpl {
 
 	public String id() default "";
@@ -20,8 +20,11 @@ public @interface GaMethodHandImpl {
 	public ImplType type() default ImplType.expectfirst;
 
 	public static enum ImplType {
-		expectfirst,//期待优先
-	    cover,//覆盖
-	    comity //礼让
+
+		expectfirst, // 期待优先
+		cover, // 覆盖
+		comity // 礼让
+
 	}
+
 }

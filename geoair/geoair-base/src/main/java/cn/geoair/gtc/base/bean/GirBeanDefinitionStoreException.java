@@ -2,9 +2,9 @@ package cn.geoair.gtc.base.bean;
 
 import cn.geoair.gtc.base.util.GutilStr;
 
-
 /**
  * Bean 定义异常
+ *
  * @author Ray
  *
  */
@@ -36,7 +36,7 @@ public class GirBeanDefinitionStoreException extends GirBeanException {
 	}
 
 	public GirBeanDefinitionStoreException(Throwable throwable, String messageTemplate, Object... params) {
-		this(GutilStr.format(messageTemplate, params),throwable);
+		this(GutilStr.format(messageTemplate, params), throwable);
 	}
 
 }

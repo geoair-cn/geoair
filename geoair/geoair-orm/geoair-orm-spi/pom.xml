@@ -5,15 +5,15 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.0-SNAPSHOT<!--gtcversion--></version>
+        <version>23.1.1-beta4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-orm-spi</artifactId>
-
+    <version>23.1.1-beta4</version>
     <name>geoair-orm-spi</name>
-
+    <description>geoair-orm-spi</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>
@@ -45,12 +45,14 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
+            <version>${javax-persistence.version}</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.persistence</groupId>
@@ -62,11 +64,13 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
+            <version>${javax-annotation.version}</version>
         </dependency>
 
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-core</artifactId>
+            <version>${mapper-module.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -75,6 +79,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.persistence</groupId>
@@ -87,6 +92,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
             <optional>true</optional>
         </dependency>
 

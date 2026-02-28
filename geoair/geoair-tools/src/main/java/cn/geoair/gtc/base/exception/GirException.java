@@ -1,21 +1,17 @@
 package cn.geoair.gtc.base.exception;
 
-
 import cn.geoair.gtc.base.util.GutilStr;
 
 /**
  *
  *
  */
-public class GirException extends RuntimeException{
-
+public class GirException extends RuntimeException {
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1473955058515130479L;
-
-
 
 	public GirException() {
 		this("系统异常");
@@ -28,7 +24,6 @@ public class GirException extends RuntimeException{
 	public GirException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
-
 
 	public GirException(Throwable e) {
 		super(e);

@@ -6,16 +6,16 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <!--		<version>23.1.0-SNAPSHOT&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
-        <version>23.1.0-SNAPSHOT<!--gtcversion--></version>
+        <!--		<version>23.1.1-beta4&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
+        <version>23.1.1-beta4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis</artifactId>
-
+    <version>23.1.1-beta4</version>
     <packaging>jar</packaging>
     <name>geoair-mybatis</name>
-
+    <description>geoair-mybatis</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>
@@ -46,26 +46,31 @@
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.geoair.orm</groupId>
             <artifactId>geoair-orm-base</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
+            <version>${mybatis-spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
+            <version>${pagehelper.version}</version>
         </dependency>
     </dependencies>
 

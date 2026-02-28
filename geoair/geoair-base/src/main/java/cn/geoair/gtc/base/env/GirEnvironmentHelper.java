@@ -8,20 +8,17 @@ import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
 public class GirEnvironmentHelper {
 
 	/*
-	static {
-		MethodHand.implFromClass( gtcEnvironmentHelper.class);
-	}
-	*/
-
+	 * static { MethodHand.implFromClass( gtcEnvironmentHelper.class); }
+	 */
 
 	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.env.SpringEnvironment4Gir")
 	public static GiEnvironmenter getEnvironmenter() {
 		Object o = GkMethodHand.invokeSelf();
-		return (GiEnvironmenter)o;
+		return (GiEnvironmenter) o;
 	}
 
-
-	@GaMethodHandImpl(implClass= GirEnvironmentHelper.class,implMethod="getEnvironmenter",type= GaMethodHandImpl.ImplType.comity)
+	@GaMethodHandImpl(implClass = GirEnvironmentHelper.class, implMethod = "getEnvironmenter",
+			type = GaMethodHandImpl.ImplType.comity)
 	protected GiEnvironmenter _getEnvironmenter() {
 		return new GirSystemEnvironmentOffice().getOperater();
 	}

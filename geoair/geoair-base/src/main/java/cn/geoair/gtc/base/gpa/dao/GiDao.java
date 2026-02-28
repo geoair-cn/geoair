@@ -8,7 +8,7 @@ import cn.geoair.gtc.base.bean.GirBeanHelper;
 import cn.geoair.gtc.base.data.model.GiModelable;
 import cn.geoair.gtc.base.util.GutilClass;
 
-public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
+public interface GiDao<M extends GiModelable<PK>, PK extends Serializable> {
 
 	/**
 	 * 通过Dao类型和模型类型获取Dao实例
@@ -19,10 +19,10 @@ public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
 	 * @param modelCls 模型类的Class对象
 	 * @return 指定类型的Dao实例
 	 */
-	public static <DAO extends GiDao<M,PK>,M extends GiModelable<PK>,PK extends Serializable> DAO getDao(Class<DAO> daoCls,Class<M> modelCls) {
-		return  GirBeanHelper.getProvider().getBean(daoCls, new Type[] {modelCls,GiModelable.getIDClass(modelCls)});
+	public static <DAO extends GiDao<M, PK>, M extends GiModelable<PK>, PK extends Serializable> DAO getDao(
+			Class<DAO> daoCls, Class<M> modelCls) {
+		return GirBeanHelper.getProvider().getBean(daoCls, new Type[] { modelCls, GiModelable.getIDClass(modelCls) });
 	}
-
 
 	/**
 	 * 获取Dao接口的泛型参数类型数组
@@ -32,23 +32,24 @@ public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
 	public static Type[] getDaoGenericTypes(Class<?> daoClass) {
 
 		Type[] genericInterfaces = daoClass.getGenericInterfaces();
-		for(Type type:genericInterfaces) {
+		for (Type type : genericInterfaces) {
 			if (type instanceof ParameterizedType) {
 				ParameterizedType pType = (ParameterizedType) type;
 
-				if(GiDao.class.isAssignableFrom((Class<?>)pType.getRawType())) {
+				if (GiDao.class.isAssignableFrom((Class<?>) pType.getRawType())) {
 
 					Type[] ts = pType.getActualTypeArguments();
 
-					if(ts.length == 2) {
-						if(GiModelable.class.isAssignableFrom((Class<?>)ts[0]) && Serializable.class.isAssignableFrom((Class<?>)ts[1])) {
+					if (ts.length == 2) {
+						if (GiModelable.class.isAssignableFrom((Class<?>) ts[0])
+								&& Serializable.class.isAssignableFrom((Class<?>) ts[1])) {
 							return ts;
 						}
 					}
 				}
 			}
-			if(type instanceof Class && GiDao.class.isAssignableFrom((Class<?>)type)) {
-				return getDaoGenericTypes((Class<?>)type);
+			if (type instanceof Class && GiDao.class.isAssignableFrom((Class<?>) type)) {
+				return getDaoGenericTypes((Class<?>) type);
 			}
 		}
 		return null;
@@ -59,9 +60,9 @@ public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
 	 * @return 模型类的Class对象
 	 */
 	@SuppressWarnings("unchecked")
-	default Class<M> getModelClass(){
-        return (Class<M>)getDaoGenericTypes(GutilClass.getUserClass(this.getClass()))[0];
-    }
+	default Class<M> getModelClass() {
+		return (Class<M>) getDaoGenericTypes(GutilClass.getUserClass(this.getClass()))[0];
+	}
 
 	/**
 	 * 获取当前Dao关联的主键类Class对象
@@ -69,7 +70,7 @@ public interface GiDao<M extends GiModelable<PK>,PK extends Serializable>{
 	 */
 	@SuppressWarnings("unchecked")
 	default Class<PK> getPKClass() {
-        return (Class<PK>)getDaoGenericTypes(GutilClass.getUserClass(this.getClass()))[1];
-    }
+		return (Class<PK>) getDaoGenericTypes(GutilClass.getUserClass(this.getClass()))[1];
+	}
 
 }

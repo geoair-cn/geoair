@@ -2,125 +2,106 @@ package cn.geoair.comp.knife4j.ext.aspect;
 
 import cn.geoair.gtc.base.api.annotation.GaApi;
 import cn.geoair.gtc.base.util.GutilStr;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
-
 import io.swagger.annotations.Api;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.annotation.AnnotationUtils;
 import springfox.documentation.spi.service.contexts.ApiListingContext;
 
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Strings.emptyToNull;
-import static com.google.common.collect.FluentIterable.from;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newTreeSet;
 import static com.google.common.collect.Sets.union;
-import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 import static springfox.documentation.service.Tags.emptyTags;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/12/29 16:33
- * @description：  扫描gtc库中的tags注解
+ * @date ：Created in 2022/12/29 16:33 @description： 扫描gtc库中的tags注解 修复：移除Guava
+ * Optional/Function依赖，改用JDK原生API，解决类型冲突
  */
 @Aspect
 public class GaApiListingAspect {
 
+	@Around("execution(* springfox.documentation.swagger.web.SwaggerApiListingReader.apply(..))")
+	public Object typeResolverAspect(ProceedingJoinPoint joinPoint) throws Throwable {
+		Object[] args = joinPoint.getArgs();
+		if (args[0] instanceof ApiListingContext) {
+			ApiListingContext apiListingContext = (ApiListingContext) args[0];
+			// 修复1：统一使用JDK原生Optional
+			Optional<? extends Class<?>> controller = apiListingContext.getResourceGroup().getControllerClass();
 
-    @Around("execution(* springfox.documentation.swagger.web.SwaggerApiListingReader.apply(..))")
-    public Object typeResolverAspect(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        if (args[0] instanceof ApiListingContext) {
-            ApiListingContext apiListingContext = (ApiListingContext) args[0];
-            Optional<? extends Class<?>> controller = apiListingContext.getResourceGroup().getControllerClass();
+			if (controller.isPresent()) {
+				// ========== swagger 原生@Api注解处理 ==========
+				// 修复：改用Spring AnnotationUtils + JDK Optional
+				Api apiAnnotation = AnnotationUtils.findAnnotation(controller.get(), Api.class);
+				String description = apiAnnotation != null ? apiAnnotation.description() : null;
+				// 过滤空描述（替代Guava的emptyToNull）
+				description = (description == null || description.trim().isEmpty()) ? null : description;
 
-            if (controller.isPresent()) {
+				Set<String> tagSet = apiAnnotation != null ? extractApiTags(apiAnnotation) : newTreeSet();
 
-                //  swagger 原生功能开始
+				// ========== GTC自定义@GaApi注解处理 ==========
+				GaApi gaApiAnnotation = AnnotationUtils.findAnnotation(controller.get(), GaApi.class);
+				String descriptiongtc = gaApiAnnotation != null ? gaApiAnnotation.text() : null;
+				descriptiongtc = (descriptiongtc == null || descriptiongtc.trim().isEmpty()) ? null : descriptiongtc;
 
-                Optional<Api> apiAnnotation = fromNullable(findAnnotation(controller.get(), Api.class));
-                String description = emptyToNull(apiAnnotation.transform(descriptionExtractor()).orNull());
+				Set<String> taggtcSet = gaApiAnnotation != null ? extractGaApiTags(gaApiAnnotation) : newTreeSet();
 
-                Set<String> tagSet = apiAnnotation.transform(tags()).or(Sets.<String>newTreeSet());
+				// ========== 合并tags + 设置描述 ==========
+				Set<String> uniontags = union(taggtcSet, tagSet).immutableCopy();
+				if (uniontags.isEmpty()) {
+					tagSet.add(apiListingContext.getResourceGroup().getGroupName());
+				}
+				else {
+					apiListingContext.apiListingBuilder()
+							// 描述优先使用GTC注解，保持原有逻辑
+							.description(GutilStr.isBlank(descriptiongtc) ? description : descriptiongtc)
+							.tagNames(uniontags);
+				}
+			}
+		}
+		// 修复：原代码返回null可能导致Swagger流程中断，改为执行原方法并返回结果
+		return joinPoint.proceed(args);
+	}
 
-                // swagger原生功能结束
-                // gtcApi拓展功能开始
-                Optional<GaApi> apiAnnotationgtc = fromNullable(findAnnotation(controller.get(), GaApi.class));
-                String descriptiongtc = emptyToNull(apiAnnotationgtc.transform(descriptionExtractor1()).orNull());
-                Set<String> taggtcSet = apiAnnotationgtc.transform(tags1())
-                        .or(Sets.<String>newTreeSet());
-                // gtcApi拓展功能结束
-                // 两者的tag合并
-                Sets.SetView<String> uniontags = union(taggtcSet, tagSet);
-                if (uniontags.isEmpty()) {
-                    tagSet.add(apiListingContext.getResourceGroup().getGroupName());
-                } else {
-                    apiListingContext.apiListingBuilder()
-                            .description(GutilStr.isBlank(descriptiongtc) ? description : descriptiongtc)  // ，描述信息优先使用gtc的注解
-                            .tagNames(uniontags);
-                }
-            }
+	public void apply1(ApiListingContext apiListingContext) {
+		Optional<? extends Class<?>> controller = apiListingContext.getResourceGroup().getControllerClass();
+		if (controller.isPresent()) {
+			GaApi gaApiAnnotation = AnnotationUtils.findAnnotation(controller.get(), GaApi.class);
+			String description = gaApiAnnotation != null ? gaApiAnnotation.text() : null;
+			description = (description == null || description.trim().isEmpty()) ? null : description;
 
-        }
-        return null;
-    }
+			Set<String> tagSet = gaApiAnnotation != null ? extractGaApiTags(gaApiAnnotation) : newTreeSet();
 
-    public void apply1(ApiListingContext apiListingContext) {
-        Optional<? extends Class<?>> controller = apiListingContext.getResourceGroup().getControllerClass();
-        if (controller.isPresent()) {
-            Optional<GaApi> apiAnnotation = fromNullable(findAnnotation(controller.get(), GaApi.class));
-            String description = emptyToNull(apiAnnotation.transform(descriptionExtractor1()).orNull());
+			apiListingContext.apiListingBuilder().description(description).tagNames(tagSet);
+		}
+	}
 
-            Set<String> tagSet = apiAnnotation.transform(tags1())
-                    .or(Sets.<String>newTreeSet());
-            if (tagSet.isEmpty()) {
+	// ----------------------- 提取注解信息的工具方法（替换原Guava Function） -----------------------
 
-            }
-            apiListingContext.apiListingBuilder()
-                    .description(description)
-                    .tagNames(tagSet);
-        }
-    }
+	/**
+	 * 提取@GaApi注解的tags（改用JDK Stream过滤空标签）
+	 */
+	private Set<String> extractGaApiTags(GaApi gaApi) {
+		if (gaApi.tags() == null || gaApi.tags().length == 0) {
+			return newTreeSet();
+		}
+		// 修复2：替换Guava FluentIterable为JDK Stream，解决Predicate冲突
+		return Arrays.stream(gaApi.tags()).filter(tag -> tag != null && !emptyTags().test(tag)) // 过滤空标签
+				.collect(Collectors.toCollection(TreeSet::new)); // 保持有序（newTreeSet逻辑）
+	}
 
-    private Function<GaApi, String> descriptionExtractor1() {
-        return new Function<GaApi, String>() {
-            @Override
-            public String apply(GaApi input) {
-                return input.text();
-            }
-        };
-    }
+	/**
+	 * 提取@Api注解的tags（改用JDK Stream过滤空标签）
+	 */
+	private Set<String> extractApiTags(Api api) {
+		if (api.tags() == null || api.tags().length == 0) {
+			return newTreeSet();
+		}
+		return Arrays.stream(api.tags()).filter(tag -> tag != null && !emptyTags().test(tag))
+				.collect(Collectors.toCollection(TreeSet::new));
+	}
 
-    private Function<GaApi, Set<String>> tags1() {
-        return new Function<GaApi, Set<String>>() {
-            @Override
-            public Set<String> apply(GaApi input) {
-                return newTreeSet(from(newArrayList(input.tags())).filter(emptyTags()).toSet());
-            }
-        };
-    }
-
-    private Function<Api, String> descriptionExtractor() {
-        return new Function<Api, String>() {
-            @Override
-            public String apply(Api input) {
-                return input.description();
-            }
-        };
-    }
-
-    private Function<Api, Set<String>> tags() {
-        return new Function<Api, Set<String>>() {
-            @Override
-            public Set<String> apply(Api input) {
-                return newTreeSet(from(newArrayList(input.tags())).filter(emptyTags()).toSet());
-            }
-        };
-    }
 }
-

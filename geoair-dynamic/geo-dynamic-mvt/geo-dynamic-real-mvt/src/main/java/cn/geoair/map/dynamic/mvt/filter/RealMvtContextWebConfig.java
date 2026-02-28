@@ -6,9 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 //@Configuration
 public class RealMvtContextWebConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CorsInterceptor())
-                .addPathPatterns("/**");
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new CorsInterceptor()).addPathPatterns("/**");
+	}
+
 }

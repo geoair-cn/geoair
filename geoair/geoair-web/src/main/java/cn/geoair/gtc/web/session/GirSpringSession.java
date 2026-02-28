@@ -7,18 +7,17 @@ import javax.servlet.http.HttpSessionContext;
 import cn.geoair.gtc.web.util.GirHttpServletHelper;
 
 @SuppressWarnings("deprecation")
-@GirSessionAn(catalog=" gtc:session:spring-sessions:")
+@GirSessionAn(catalog = " gtc:session:spring-sessions:")
 public class GirSpringSession extends GirHttpSession {
 
 	private static final long serialVersionUID = -7622639754610367089L;
 
-
 	protected GirSpringSession(String id, GirSessionConfig cfg) {
-		super(id,cfg);
+		super(id, cfg);
 	}
 
 	public HttpSession getHttpSession(boolean autoCreate) {
-		return  GirHttpServletHelper.getRequest().getSession(autoCreate);
+		return GirHttpServletHelper.getRequest().getSession(autoCreate);
 	}
 
 	@Override
@@ -26,42 +25,35 @@ public class GirSpringSession extends GirHttpSession {
 		return getHttpSession(true).getCreationTime();
 	}
 
-
 	@Override
 	public long getLastAccessedTime() {
 		return getHttpSession(true).getLastAccessedTime();
 	}
-
 
 	@Override
 	public ServletContext getServletContext() {
 		return getHttpSession(true).getServletContext();
 	}
 
-
 	@Override
 	public void setMaxInactiveInterval(int interval) {
 		getHttpSession(true).setMaxInactiveInterval(interval);
 	}
-
 
 	@Override
 	public int getMaxInactiveInterval() {
 		return getHttpSession(true).getMaxInactiveInterval();
 	}
 
-
 	@Override
 	public HttpSessionContext getSessionContext() {
 		return getHttpSession(true).getSessionContext();
 	}
 
-
 	@Override
 	public Enumeration<String> getAttributeNames() {
 		return getHttpSession(true).getAttributeNames();
 	}
-
 
 	@Override
 	public String[] getValueNames() {
@@ -80,11 +72,10 @@ public class GirSpringSession extends GirHttpSession {
 		getHttpSession(true).setAttribute(name, value);
 	}
 
-
 	@Override
 	public Object getAttribute(String name) {
 		HttpSession session = getHttpSession(false);
-		if(session != null) {
+		if (session != null) {
 			return session.getAttribute(name);
 		}
 		return null;
@@ -98,7 +89,7 @@ public class GirSpringSession extends GirHttpSession {
 	@Override
 	public Object getValue(String name) {
 		HttpSession session = getHttpSession(false);
-		if(session != null) {
+		if (session != null) {
 			return session.getAttribute(name);
 		}
 		return null;
@@ -107,29 +98,26 @@ public class GirSpringSession extends GirHttpSession {
 	@Override
 	public void removeAttribute(String name) {
 		HttpSession session = getHttpSession(false);
-		if(session != null) {
+		if (session != null) {
 			session.removeAttribute(name);
 		}
 	}
-
 
 	@Override
-	public void removeValue(String name){
+	public void removeValue(String name) {
 		HttpSession session = getHttpSession(false);
-		if(session != null) {
+		if (session != null) {
 			session.removeAttribute(name);
 		}
 	}
-
-
-
 
 	@Override
 	public void invalidate() {
 		super.invalidate();
 		HttpSession session = getHttpSession(false);
-		if(session != null) {
+		if (session != null) {
 			session.invalidate();
 		}
 	}
+
 }

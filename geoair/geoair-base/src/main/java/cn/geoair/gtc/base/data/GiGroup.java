@@ -1,14 +1,11 @@
 package cn.geoair.gtc.base.data;
 
-public interface GiGroup extends GiTypeable{
+public interface GiGroup extends GiTypeable {
 
+	String gtcGroupId();
 
-	String  gtcGroupId();
+	String gtcGroupName();
 
-	String  gtcGroupName();
-
-	public GiGroupType  gtcType();
-
-
+	public GiGroupType gtcType();
 
 }

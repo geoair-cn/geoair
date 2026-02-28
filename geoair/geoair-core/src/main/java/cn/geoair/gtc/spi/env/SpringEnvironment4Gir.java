@@ -1,6 +1,5 @@
 package cn.geoair.gtc.spi.env;
 
-
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -12,42 +11,43 @@ import cn.geoair.gtc.base.env.property.GiPropertier;
 import cn.geoair.gtc.base.env.support.GirSystemEnvironmentOperater;
 import cn.geoair.gtc.base.lang.invoke.GkMethodHand;
 import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl;
-import  cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.gtc.base.lang.invoke.GaMethodHandImpl.ImplType;
 
 /**
  * 读取配置文件
  */
 @Component
-public class SpringEnvironment4Gir implements GiPropertier,GiEnvironmenter, EnvironmentAware {
-
+public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, EnvironmentAware {
 
 	static {
 		GkMethodHand.implFromClass(SpringEnvironment4Gir.class);
 	}
 
-	@GaMethodHandImpl(implClass= GirPropertyHelper.class,implMethod="getPropertier",type=ImplType.expectfirst)
+	@GaMethodHandImpl(implClass = GirPropertyHelper.class, implMethod = "getPropertier", type = ImplType.expectfirst)
 	private static GiPropertier getPropertier() {
 		return me;
 	}
 
-	@GaMethodHandImpl(implClass= GirEnvironmentHelper.class,implMethod="getEnvironmenter",type=ImplType.expectfirst)
+	@GaMethodHandImpl(implClass = GirEnvironmentHelper.class, implMethod = "getEnvironmenter",
+			type = ImplType.expectfirst)
 	private static GiEnvironmenter getEnvironmenter() {
 		return me;
 	}
 
 	protected static SpringEnvironment4Gir me;
-    protected static Environment environment;
 
-    @Override
+	protected static Environment environment;
+
+	@Override
 	public void setEnvironment(Environment evn) {
-    	me = this;
-    	environment = evn;
+		me = this;
+		environment = evn;
 
 	}
 
-    public static Environment getEnvironment() {
-    	return environment;
-    }
+	public static Environment getEnvironment() {
+		return environment;
+	}
 
 	@Override
 	public boolean containsProperty(String key) {
@@ -71,7 +71,7 @@ public class SpringEnvironment4Gir implements GiPropertier,GiEnvironmenter, Envi
 
 	@Override
 	public <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
-		return getEnvironment().getProperty(key, targetType,defaultValue);
+		return getEnvironment().getProperty(key, targetType, defaultValue);
 	}
 
 	@Override
@@ -94,10 +94,7 @@ public class SpringEnvironment4Gir implements GiPropertier,GiEnvironmenter, Envi
 		return getEnvironment().resolveRequiredPlaceholders(text);
 	}
 
-
-
-
-	//env
+	// env
 	@Override
 	public String[] getActiveProfiles() {
 		return getEnvironment().getActiveProfiles();
@@ -115,7 +112,7 @@ public class SpringEnvironment4Gir implements GiPropertier,GiEnvironmenter, Envi
 
 	@Override
 	public boolean isDebugger() {
-		return  GirSystemEnvironmentOperater.isDebug();
+		return GirSystemEnvironmentOperater.isDebug();
 	}
 
 }

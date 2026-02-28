@@ -8,22 +8,23 @@ import java.io.Serializable;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 2022/1/21 17:47
- * @description： TODO
+ * @date ：Created in 2022/1/21 17:47 @description： TODO
  */
 @Data
 @Accessors(chain = true)
 public class PbfTargetInfo implements Serializable {
 
-    // 是否仅仅生成一个pbf，用于节省内存
-    private boolean isOnly = false;
-    // 生成的pbf类型
-    private PPbfType pPbfType = PPbfType.rootPbf;
-    // 是否保存要素列表
-    private boolean saveFeatureList = false;
+	// 是否仅仅生成一个pbf，用于节省内存
+	private boolean isOnly = false;
 
+	// 生成的pbf类型
+	private PPbfType pPbfType = PPbfType.rootPbf;
 
-    public static PbfTargetInfo getInstance() {
-        return new PbfTargetInfo().setSaveFeatureList(false).setPPbfType(PPbfType.rootPbf).setOnly(false);
-    }
+	// 是否保存要素列表
+	private boolean saveFeatureList = false;
+
+	public static PbfTargetInfo getInstance() {
+		return new PbfTargetInfo().setSaveFeatureList(false).setPPbfType(PPbfType.rootPbf).setOnly(false);
+	}
+
 }

@@ -15,8 +15,7 @@ import cn.geoair.gtc.base.gpa.support.GirSort;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/6/21 9:55
- * @description： spring jpa的 分页执行器
+ * @date ：Created in 2022/6/21 9:55 @description： spring jpa的 分页执行器
  */
 public class GirSpringJpaPageHelper implements GiPageExcuter {
 
@@ -27,29 +26,32 @@ public class GirSpringJpaPageHelper implements GiPageExcuter {
 	 */
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Sort sortFromgtcSort( GirSort sort) {
+	public static Sort sortFromgtcSort(GirSort sort) {
 
 		Sort jpaSort = Sort.unsorted();
-		if(sort != null) {
-        	Iterator<GirOrder<?>> iterator = sort.iterator();
-        	while(iterator.hasNext()) {
+		if (sort != null) {
+			Iterator<GirOrder<?>> iterator = sort.iterator();
+			while (iterator.hasNext()) {
 
-        		 GirOrder<?> order = iterator.next();
-        		if(order.getPropertyFun() != null) {
-        			Class<?> cls = order.getEntityClass();
+				GirOrder<?> order = iterator.next();
+				if (order.getPropertyFun() != null) {
+					Class<?> cls = order.getEntityClass();
 
-        			Sort sort1 = Sort.sort(cls).by((Function)order.getPropertyFun());
+					Sort sort1 = Sort.sort(cls).by((Function) order.getPropertyFun());
 
-        			if(order.getDirection() ==  GirOrder.Direction.DESC) {
-        				jpaSort = jpaSort.and(sort1.descending());
-        			}else {
-        				jpaSort = jpaSort.and(sort1);
-        			}
-        		}else if(order.getProperty() != null) {
-        			jpaSort = jpaSort.and(Sort.by(Direction.fromString(order.getDirection().value()), order.getProperty()));
-        		}
-        	}
-        }
+					if (order.getDirection() == GirOrder.Direction.DESC) {
+						jpaSort = jpaSort.and(sort1.descending());
+					}
+					else {
+						jpaSort = jpaSort.and(sort1);
+					}
+				}
+				else if (order.getProperty() != null) {
+					jpaSort = jpaSort
+							.and(Sort.by(Direction.fromString(order.getDirection().value()), order.getProperty()));
+				}
+			}
+		}
 
 		return jpaSort;
 	}
@@ -59,31 +61,28 @@ public class GirSpringJpaPageHelper implements GiPageExcuter {
 	 * @param pageParam
 	 * @return
 	 */
-    public static Pageable toPageable(GiPageParam pageParam) {
-		int pageNum = pageParam.pageNum()-1;
-        int pageSize = pageParam.pageSize();
-        PageRequest pageRequest = PageRequest.of(pageNum, pageSize,sortFromgtcSort(pageParam.sort()));
-        return pageRequest;
+	public static Pageable toPageable(GiPageParam pageParam) {
+		int pageNum = pageParam.pageNum() - 1;
+		int pageSize = pageParam.pageSize();
+		PageRequest pageRequest = PageRequest.of(pageNum, pageSize, sortFromgtcSort(pageParam.sort()));
+		return pageRequest;
 	}
 
+	@Override
+	public <R> GiPager<R> excutePage(GfunPageExcute<R> pageExcute, GiPageParam pageParam) {
 
-
-    @Override
-    public <R> GiPager<R> excutePage(GfunPageExcute<R> pageExcute, GiPageParam pageParam) {
-
-//        int pageNum = pageParam.pageNum();
-//        int pageSize = pageParam.pageSize();
-//
-//        PageRequest of = PageRequest.of(pageNum, pageSize);
-//
-//        Iterable<R> excute = pageExcute.excute();
-//
-//        Page pageobj = simpleJpaRepository.findAll(of);
-//        pageParam.putParam(pageobj.getSize(), pageobj.getNumber(), null);
-//         gtcPager<R> pager = pageExcute.get gtcPager();
-//        pager.put(pageobj.toList(), pageobj.getTotalElements(), pageParam);
-        return null;
-    }
-
+		// int pageNum = pageParam.pageNum();
+		// int pageSize = pageParam.pageSize();
+		//
+		// PageRequest of = PageRequest.of(pageNum, pageSize);
+		//
+		// Iterable<R> excute = pageExcute.excute();
+		//
+		// Page pageobj = simpleJpaRepository.findAll(of);
+		// pageParam.putParam(pageobj.getSize(), pageobj.getNumber(), null);
+		// gtcPager<R> pager = pageExcute.get gtcPager();
+		// pager.put(pageobj.toList(), pageobj.getTotalElements(), pageParam);
+		return null;
+	}
 
 }

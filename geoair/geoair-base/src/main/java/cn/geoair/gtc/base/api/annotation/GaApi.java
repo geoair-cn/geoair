@@ -10,25 +10,23 @@ import cn.geoair.gtc.base.def.annotation.GaParameter;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 public @interface GaApi {
-    static final String NULL = "";
 
-    String name() default NULL;//名称唯一键
+	static final String NULL = "";
 
-    String text() default NULL;//文本标题
+	String name() default NULL;// 名称唯一键
 
-    String alias() default NULL;//别名
+	String text() default NULL;// 文本标题
 
-    String describe() default NULL;//一段描述，大白话
+	String alias() default NULL;// 别名
 
-    String[] tags() default NULL;//标签分组
+	String describe() default NULL;// 一段描述，大白话
 
-    boolean hidden() default false;//是否隐藏
+	String[] tags() default NULL;// 标签分组
 
-    GaParameter[] cfg() default {};//参数
+	boolean hidden() default false;// 是否隐藏
+
+	GaParameter[] cfg() default {};// 参数
 
 }
-
-
-

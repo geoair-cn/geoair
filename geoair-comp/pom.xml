@@ -6,14 +6,42 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.0-SNAPSHOT</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-comp</artifactId>
+    <version>23.1.1-beta4</version>
     <packaging>pom</packaging>
     <name>geoair-comp</name>
+
+    <description>geoair-comp</description>
+
+    <url>https://gitee.com/geoair/geoair</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
 
     <properties>

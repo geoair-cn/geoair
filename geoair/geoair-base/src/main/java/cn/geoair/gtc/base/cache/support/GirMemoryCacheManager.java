@@ -10,10 +10,11 @@ import cn.geoair.gtc.base.cache.GiCache;
 
 /**
  * 一个内存缓冲管理器，补位sping cache不存在的情况
+ *
  * @author Ray
  *
  */
-public class GirMemoryCacheManager /*implements CacheManager*/ {
+public class GirMemoryCacheManager /* implements CacheManager */ {
 
 	private final ConcurrentMap<String, GiCache> cacheMap = new ConcurrentHashMap<>(16);
 
@@ -23,16 +24,12 @@ public class GirMemoryCacheManager /*implements CacheManager*/ {
 
 	private boolean storeByValue = false;
 
-
 	public GirMemoryCacheManager() {
 	}
-
 
 	public GirMemoryCacheManager(String... cacheNames) {
 		setCacheNames(Arrays.asList(cacheNames));
 	}
-
-
 
 	public void setCacheNames(Collection<String> cacheNames) {
 		if (cacheNames != null) {
@@ -46,14 +43,12 @@ public class GirMemoryCacheManager /*implements CacheManager*/ {
 		}
 	}
 
-
 	public void setAllowNullValues(boolean allowNullValues) {
 		if (allowNullValues != this.allowNullValues) {
 			this.allowNullValues = allowNullValues;
 			recreateCaches();
 		}
 	}
-
 
 	public boolean isAllowNullValues() {
 		return this.allowNullValues;
@@ -70,13 +65,12 @@ public class GirMemoryCacheManager /*implements CacheManager*/ {
 		return this.storeByValue;
 	}
 
-
-	//@Override
+	// @Override
 	public Collection<String> getCacheNames() {
 		return Collections.unmodifiableSet(this.cacheMap.keySet());
 	}
 
-	//@Override
+	// @Override
 	public GiCache getCache(String name) {
 		GiCache cache = this.cacheMap.get(name);
 		if (cache == null && this.dynamic) {

@@ -11,42 +11,42 @@ import cn.geoair.gtc.base.data.model.GiTypeModelable;
 @SuppressWarnings("serial")
 public class GirTypeModelKid<ID extends Serializable> extends GirModelKid<ID> implements GiTypeModelable<ID> {
 
-
-	 GirModelTypeKid gtcModelType;
+	GirModelTypeKid gtcModelType;
 
 	@Override
-	public GiModelType  gtcModelType() {
-		return  gtcModelType;
+	public GiModelType gtcModelType() {
+		return gtcModelType;
 	}
 
-	public GirTypeModelKid() {}
+	public GirTypeModelKid() {
+	}
 
 	public GirTypeModelKid(GirModelTypeKid gtcModelTypeKid, ID id) {
 		super(id);
-		this. gtcModelType =  gtcModelTypeKid;
+		this.gtcModelType = gtcModelTypeKid;
 	}
-
 
 	public static <ID extends Serializable> GirTypeModelKid<ID> valueWith(GirModelTypeKid modelTypeKid, ID id) {
-        return new GirTypeModelKid<ID>(modelTypeKid,id);
-    }
-
-	public static <ID extends Serializable> Collection<GirTypeModelKid<?>> valuesWith(GirModelTypeKid modelTypeKid, Set<ID> ids) {
-
-		List<GirTypeModelKid<?>> list = new ArrayList<>();
-		for(ID id : ids) {
-			list.add(new GirTypeModelKid<ID>(modelTypeKid,id));
-		}
-
-        return list;
-    }
-
-	public GirModelTypeKid getgtcModelType() {
-		return  gtcModelType;
+		return new GirTypeModelKid<ID>(modelTypeKid, id);
 	}
 
-	public void setgtcModelType( GirModelTypeKid gtcModelType) {
-		this. gtcModelType =  gtcModelType;
+	public static <ID extends Serializable> Collection<GirTypeModelKid<?>> valuesWith(GirModelTypeKid modelTypeKid,
+			Set<ID> ids) {
+
+		List<GirTypeModelKid<?>> list = new ArrayList<>();
+		for (ID id : ids) {
+			list.add(new GirTypeModelKid<ID>(modelTypeKid, id));
+		}
+
+		return list;
+	}
+
+	public GirModelTypeKid getgtcModelType() {
+		return gtcModelType;
+	}
+
+	public void setgtcModelType(GirModelTypeKid gtcModelType) {
+		this.gtcModelType = gtcModelType;
 	}
 
 }

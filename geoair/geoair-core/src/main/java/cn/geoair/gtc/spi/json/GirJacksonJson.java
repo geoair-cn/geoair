@@ -15,89 +15,91 @@ import java.util.List;
 
 /**
  * @author ：张俊
- * @date ：Created in 2023/8/22 17:10
- * @description： TODO
+ * @date ：Created in 2023/8/22 17:10 @description： TODO
  */
 public class GirJacksonJson implements GirJSON {
 
+	private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
+	private String jsonString = null;
 
+	private Object jsonTarget = null;
 
-    private String jsonString = null;
-    private Object jsonTarget = null;
+	private GirJacksonJson(String json) {
+		this.jsonString = json;
+	}
 
-    private GirJacksonJson(String json) {
-        this.jsonString = json;
-    }
+	private GirJacksonJson(Object object) {
+		this.jsonTarget = object;
+	}
 
-    private GirJacksonJson(Object object) {
-        this.jsonTarget = object;
-    }
+	public static GirJSON toJson(Object object) {
+		if (object instanceof String) {
+			return new GirJacksonJson((String) object);
+		}
+		else {
+			return new GirJacksonJson(object);
+		}
+	}
 
-    public static GirJSON toJson(Object object) {
-        if (object instanceof String) {
-            return new GirJacksonJson((String) object);
-        } else {
-            return new GirJacksonJson(object);
-        }
-    }
+	private ObjectMapper objectMapper;
 
+	private ObjectMapper getObjectMapper() {
+		if (objectMapper == null) {
+			try {
+				objectMapper = Gir.beans.getBean(ObjectMapper.class);
+			}
+			catch (Exception e) {
+			}
+		}
 
-    private ObjectMapper objectMapper;
+		if (objectMapper == null) {
+			objectMapper = new ObjectMapper();
+		}
+		return objectMapper;
+	}
 
-    private ObjectMapper getObjectMapper() {
-        if (objectMapper == null) {
-            try {
-                objectMapper = Gir.beans.getBean(ObjectMapper.class);
-            } catch (Exception e) {
-            }
-        }
+	@Override
+	public <T> T getByPath(String expression, Class<T> resultType) {
+		ObjectMapper mapper = getObjectMapper();
+		JsonNode jsonNode;
+		try {
+			jsonNode = mapper.readTree(toJSONString());
+			List<String> paths = GkBeanPath.create(expression).getPatternParts();
+			String path = "/" + GutilArray.join(paths.toArray(), "/");
+			return mapper.readValue(mapper.writeValueAsString(jsonNode.at(path)), resultType);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-        if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-        }
-        return objectMapper;
-    }
+	@Override
+	public <T> T toBean(Type type, boolean ignoreError) {
+		ObjectMapper mapper = getObjectMapper();
+		JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+		try {
+			return mapper.readValue(toJSONString(), javaType);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-    @Override
-    public <T> T getByPath(String expression, Class<T> resultType) {
-        ObjectMapper mapper = getObjectMapper();
-        JsonNode jsonNode;
-        try {
-            jsonNode = mapper.readTree(toJSONString());
-            List<String> paths = GkBeanPath.create(expression).getPatternParts();
-            String path = "/" + GutilArray.join(paths.toArray(), "/");
-            return mapper.readValue(mapper.writeValueAsString(jsonNode.at(path)), resultType);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public <T> T toBean(Type type, boolean ignoreError) {
-        ObjectMapper mapper = getObjectMapper();
-        JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-        try {
-            return mapper.readValue(toJSONString(), javaType);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public String toJSONString() {
-        if (jsonString == null) {
-            ObjectMapper mapper = getObjectMapper();
-            try {
-                jsonString = mapper.writeValueAsString(jsonTarget);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonString;
-    }
+	@Override
+	public String toJSONString() {
+		if (jsonString == null) {
+			ObjectMapper mapper = getObjectMapper();
+			try {
+				jsonString = mapper.writeValueAsString(jsonTarget);
+			}
+			catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		}
+		return jsonString;
+	}
 
 }

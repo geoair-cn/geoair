@@ -3,13 +3,11 @@ package cn.geoair.gtc.base.bean;
 import cn.geoair.gtc.base.exception.GirException;
 import cn.geoair.gtc.base.util.GutilStr;
 
-
 /**
  *
  *
  */
 public class GirBeanException extends GirException {
-
 
 	/**
 	 *
@@ -41,20 +39,17 @@ public class GirBeanException extends GirException {
 	}
 
 	public GirBeanException(Throwable throwable, String messageTemplate, Object... params) {
-		this(GutilStr.format(messageTemplate, params),throwable);
+		this(GutilStr.format(messageTemplate, params), throwable);
 	}
 
 	/*
-	public  gtcBeanException(Class<?> clazz,String msg) {
-		this(clazz,msg, null);
-	}
+	 * public gtcBeanException(Class<?> clazz,String msg) { this(clazz,msg, null); }
+	 *
+	 * public gtcBeanException(Class<?> clazz,String msg, Throwable cause) { super(msg,
+	 * cause); }
+	 *
+	 * public gtcBeanException(Constructor<?> ctor, String msg, Throwable ex) { super(msg,
+	 * ex); }
+	 */
 
-	public  gtcBeanException(Class<?> clazz,String msg, Throwable cause) {
-		super(msg, cause);
-	}
-
-	public  gtcBeanException(Constructor<?> ctor, String msg, Throwable ex) {
-		super(msg, ex);
-	}
-	*/
 }

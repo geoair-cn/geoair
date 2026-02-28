@@ -16,4 +16,5 @@ public class GirSdkException extends GirException {
 	public GirSdkException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
+
 }

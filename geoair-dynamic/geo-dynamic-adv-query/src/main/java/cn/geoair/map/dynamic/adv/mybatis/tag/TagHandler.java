@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface TagHandler {
 
-    void handle(Element element, List<SqlNode> contents);
+	void handle(Element element, List<SqlNode> contents);
+
 }

@@ -1,7 +1,5 @@
 
-
 package cn.geoair.gtc.orm.spi.entity;
-
 
 /**
  * 数据库表对应的列
@@ -9,223 +7,233 @@ package cn.geoair.gtc.orm.spi.entity;
  * @author zhangjun
  */
 public class GirEntityColumn {
-    //
-    protected GirEntityTable table;
-    // 字段名称
-    protected String property;
-    // 字段对应的数据库表名
-    protected String column;
-    //
-    protected Class<?> javaType;
-    //
 
-    protected boolean id = false;
-    protected boolean identity = false;
-    //    private Class<? extends GenId> genIdClass;
-    //字段是否为 blob
-    protected boolean blob;
-    protected String generator;
-    //排序
-    protected String orderBy;
-    //可插入
-    private boolean insertable = true;
-    //可更新
-    private boolean updatable = true;
-    //    private ORDER order = ORDER.DEFAULT;
-    //是否设置 javaType
-    private boolean useJavaType;
-    /**
-     * 对应的字段信息
-     *
-     * @since 3.5.0
-     */
-    private GirEntityField girEntityField;
+	//
+	protected GirEntityTable table;
 
-    public GirEntityColumn() {
-    }
+	// 字段名称
+	protected String property;
 
-    public GirEntityColumn(GirEntityTable table) {
-        this.table = table;
-    }
+	// 字段对应的数据库表名
+	protected String column;
 
+	//
+	protected Class<?> javaType;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	//
 
-         GirEntityColumn that = (GirEntityColumn) o;
+	protected boolean id = false;
 
-        if (id != that.id) return false;
-        if (identity != that.identity) return false;
-        if (table != null ? !table.equals(that.table) : that.table != null) return false;
-        if (property != null ? !property.equals(that.property) : that.property != null) return false;
-        if (column != null ? !column.equals(that.column) : that.column != null) return false;
-        if (javaType != null ? !javaType.equals(that.javaType) : that.javaType != null) return false;
+	protected boolean identity = false;
 
+	// private Class<? extends GenId> genIdClass;
+	// 字段是否为 blob
+	protected boolean blob;
 
-        if (generator != null ? !generator.equals(that.generator) : that.generator != null) return false;
-        return !(orderBy != null ? !orderBy.equals(that.orderBy) : that.orderBy != null);
+	protected String generator;
 
-    }
+	// 排序
+	protected String orderBy;
 
-    @Override
-    public int hashCode() {
-        int result = table != null ? table.hashCode() : 0;
-        result = 31 * result + (property != null ? property.hashCode() : 0);
-        result = 31 * result + (column != null ? column.hashCode() : 0);
-        result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
+	// 可插入
+	private boolean insertable = true;
 
-        result = 31 * result + (id ? 1 : 0);
-        result = 31 * result + (identity ? 1 : 0);
-        result = 31 * result + (generator != null ? generator.hashCode() : 0);
-        result = 31 * result + (orderBy != null ? orderBy.hashCode() : 0);
-        return result;
-    }
+	// 可更新
+	private boolean updatable = true;
 
-    public String getColumn() {
-        return column;
-    }
+	// private ORDER order = ORDER.DEFAULT;
+	// 是否设置 javaType
+	private boolean useJavaType;
 
-    public String getSelectColumn() {
-        return column;
-    }
-    /**
-     * 包装 插入或者 更新的 value
-     * @param value
-     * @return
-     */
-    public Object wrapColumnValue(Object value) {
-        return value;
-    }
+	/**
+	 * 对应的字段信息
+	 *
+	 * @since 3.5.0
+	 */
+	private GirEntityField girEntityField;
 
-    public void setColumn(String column) {
-        this.column = column;
-    }
+	public GirEntityColumn() {
+	}
 
+	public GirEntityColumn(GirEntityTable table) {
+		this.table = table;
+	}
 
-    public GirEntityField getEntityField() {
-        return girEntityField;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-    public void setEntityField( GirEntityField girEntityField) {
-        this.girEntityField = girEntityField;
-    }
+		GirEntityColumn that = (GirEntityColumn) o;
 
-    public String getGenerator() {
-        return generator;
-    }
+		if (id != that.id)
+			return false;
+		if (identity != that.identity)
+			return false;
+		if (table != null ? !table.equals(that.table) : that.table != null)
+			return false;
+		if (property != null ? !property.equals(that.property) : that.property != null)
+			return false;
+		if (column != null ? !column.equals(that.column) : that.column != null)
+			return false;
+		if (javaType != null ? !javaType.equals(that.javaType) : that.javaType != null)
+			return false;
 
-    public void setGenerator(String generator) {
-        this.generator = generator;
-    }
+		if (generator != null ? !generator.equals(that.generator) : that.generator != null)
+			return false;
+		return !(orderBy != null ? !orderBy.equals(that.orderBy) : that.orderBy != null);
 
-    public Class<?> getJavaType() {
-        return javaType;
-    }
+	}
 
-    public void setJavaType(Class<?> javaType) {
-        this.javaType = javaType;
-    }
+	@Override
+	public int hashCode() {
+		int result = table != null ? table.hashCode() : 0;
+		result = 31 * result + (property != null ? property.hashCode() : 0);
+		result = 31 * result + (column != null ? column.hashCode() : 0);
+		result = 31 * result + (javaType != null ? javaType.hashCode() : 0);
 
+		result = 31 * result + (id ? 1 : 0);
+		result = 31 * result + (identity ? 1 : 0);
+		result = 31 * result + (generator != null ? generator.hashCode() : 0);
+		result = 31 * result + (orderBy != null ? orderBy.hashCode() : 0);
+		return result;
+	}
 
-    public String getOrderBy() {
-        return orderBy;
-    }
+	public String getColumn() {
+		return column;
+	}
 
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-    }
+	public String getSelectColumn() {
+		return column;
+	}
 
-    public String getProperty() {
-        return property;
-    }
+	/**
+	 * 包装 插入或者 更新的 value
+	 * @param value
+	 * @return
+	 */
+	public Object wrapColumnValue(Object value) {
+		return value;
+	}
 
-    public void setProperty(String property) {
-        this.property = property;
-    }
+	public void setColumn(String column) {
+		this.column = column;
+	}
 
-    public GirEntityTable getTable() {
-        return table;
-    }
+	public GirEntityField getEntityField() {
+		return girEntityField;
+	}
 
-    public void setTable( GirEntityTable table) {
-        this.table = table;
-    }
+	public void setEntityField(GirEntityField girEntityField) {
+		this.girEntityField = girEntityField;
+	}
 
-//    public Class<? extends TypeHandler<?>> getTypeHandler() {
-//        return typeHandler;
-//    }
-//
-//    public void setTypeHandler(Class<? extends TypeHandler<?>> typeHandler) {
-//        this.typeHandler = typeHandler;
-//    }
+	public String getGenerator() {
+		return generator;
+	}
 
-    public boolean isId() {
-        return id;
-    }
+	public void setGenerator(String generator) {
+		this.generator = generator;
+	}
 
-    public void setId(boolean id) {
-        this.id = id;
-    }
+	public Class<?> getJavaType() {
+		return javaType;
+	}
 
-    public boolean isIdentity() {
-        return identity;
-    }
+	public void setJavaType(Class<?> javaType) {
+		this.javaType = javaType;
+	}
 
-    public void setIdentity(boolean identity) {
-        this.identity = identity;
-    }
+	public String getOrderBy() {
+		return orderBy;
+	}
 
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
 
-    public boolean isInsertable() {
-        return insertable;
-    }
+	public String getProperty() {
+		return property;
+	}
 
-    public void setInsertable(boolean insertable) {
-        this.insertable = insertable;
-    }
+	public void setProperty(String property) {
+		this.property = property;
+	}
 
-    public boolean isUpdatable() {
-        return updatable;
-    }
+	public GirEntityTable getTable() {
+		return table;
+	}
 
-    public void setUpdatable(boolean updatable) {
-        this.updatable = updatable;
-    }
+	public void setTable(GirEntityTable table) {
+		this.table = table;
+	}
 
+	// public Class<? extends TypeHandler<?>> getTypeHandler() {
+	// return typeHandler;
+	// }
+	//
+	// public void setTypeHandler(Class<? extends TypeHandler<?>> typeHandler) {
+	// this.typeHandler = typeHandler;
+	// }
 
-    public boolean isBlob() {
-        return blob;
-    }
+	public boolean isId() {
+		return id;
+	}
 
-    public void setBlob(boolean blob) {
-        this.blob = blob;
-    }
+	public void setId(boolean id) {
+		this.id = id;
+	}
 
-    public boolean isUseJavaType() {
-        return useJavaType;
-    }
+	public boolean isIdentity() {
+		return identity;
+	}
 
-    public void setUseJavaType(boolean useJavaType) {
-        this.useJavaType = useJavaType;
-    }
+	public void setIdentity(boolean identity) {
+		this.identity = identity;
+	}
 
-    @Override
-    public String toString() {
-        return "EntityColumn{" +
-                "table=" + table.getName() +
-                ", property='" + property + '\'' +
-                ", column='" + column + '\'' +
-                ", javaType=" + javaType +
-                ", id=" + id +
-                ", identity=" + identity +
-                ", blob=" + blob +
-                ", generator='" + generator + '\'' +
-                ", orderBy='" + orderBy + '\'' +
-                ", insertable=" + insertable +
-                ", updatable=" + updatable +
-//                ", order=" + order +
-                '}';
-    }
+	public boolean isInsertable() {
+		return insertable;
+	}
+
+	public void setInsertable(boolean insertable) {
+		this.insertable = insertable;
+	}
+
+	public boolean isUpdatable() {
+		return updatable;
+	}
+
+	public void setUpdatable(boolean updatable) {
+		this.updatable = updatable;
+	}
+
+	public boolean isBlob() {
+		return blob;
+	}
+
+	public void setBlob(boolean blob) {
+		this.blob = blob;
+	}
+
+	public boolean isUseJavaType() {
+		return useJavaType;
+	}
+
+	public void setUseJavaType(boolean useJavaType) {
+		this.useJavaType = useJavaType;
+	}
+
+	@Override
+	public String toString() {
+		return "EntityColumn{" + "table=" + table.getName() + ", property='" + property + '\'' + ", column='" + column
+				+ '\'' + ", javaType=" + javaType + ", id=" + id + ", identity=" + identity + ", blob=" + blob
+				+ ", generator='" + generator + '\'' + ", orderBy='" + orderBy + '\'' + ", insertable=" + insertable
+				+ ", updatable=" + updatable +
+				// ", order=" + order +
+				'}';
+	}
+
 }

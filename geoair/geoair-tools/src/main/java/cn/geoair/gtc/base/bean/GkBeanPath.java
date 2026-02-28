@@ -14,14 +14,15 @@ import cn.geoair.gtc.base.util.GutilClass;
 import cn.geoair.gtc.base.util.GutilReflection;
 import cn.geoair.gtc.base.util.GutilStr;
 
+public class GkBeanPath implements Serializable {
 
-public class GkBeanPath implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	/** 表达式边界符号数组 */
 	private static final char[] EXP_CHARS = { GutilChar.DOT, GutilChar.BRACKET_START, GutilChar.BRACKET_END };
 
 	private boolean isStartWith = false;
+
 	protected List<String> patternParts;
 
 	/**
@@ -42,9 +43,8 @@ public class GkBeanPath implements Serializable{
 	 * person.friends[5].name
 	 * ['person']['friends'][5]['name']
 	 * </pre>
-	 *
 	 * @param expression 表达式
-	 * @return  gtcBeanPath
+	 * @return gtcBeanPath
 	 */
 	public static GkBeanPath create(String expression) {
 		return new GkBeanPath(expression);
@@ -52,7 +52,6 @@ public class GkBeanPath implements Serializable{
 
 	/**
 	 * 构造
-	 *
 	 * @param expression 表达式
 	 */
 	public GkBeanPath(String expression) {
@@ -61,7 +60,6 @@ public class GkBeanPath implements Serializable{
 
 	/**
 	 * 获取Bean中对应表达式的值
-	 *
 	 * @param bean Bean对象或Map或List等
 	 * @return 值，如果对应值不存在，则返回null
 	 */
@@ -73,7 +71,7 @@ public class GkBeanPath implements Serializable{
 
 		List<String> parts = new ArrayList<>();
 
-		for(String item:patternParts) {
+		for (String item : patternParts) {
 			parts.add(item);
 		}
 
@@ -89,7 +87,6 @@ public class GkBeanPath implements Serializable{
 	 * 1. 如果为List，如果下标不大于List长度，则替换原有值，否则追加值
 	 * 2. 如果为数组，如果下标不大于数组长度，则替换原有值，否则追加值
 	 * </pre>
-	 *
 	 * @param bean Bean、Map或List
 	 * @param value 值
 	 */
@@ -106,25 +103,24 @@ public class GkBeanPath implements Serializable{
 	 * 1. 如果为List，如果下标不大于List长度，则替换原有值，否则追加值
 	 * 2. 如果为数组，如果下标不大于数组长度，则替换原有值，否则追加值
 	 * </pre>
-	 *
 	 * @param bean Bean、Map或List
 	 * @param patternParts 表达式块列表
 	 * @param value 值
 	 */
 	private void set(Object bean, List<String> patternParts, Object value) {
 		Object subBean = get(patternParts, bean, true);
-		if(null == subBean) {
+		if (null == subBean) {
 			set(bean, patternParts.subList(0, patternParts.size() - 1), new HashMap<>());
-			//set中有可能做过转换，因此此处重新获取bean
+			// set中有可能做过转换，因此此处重新获取bean
 			subBean = get(patternParts, bean, true);
 		}
 		GutilReflection.setFieldValue(subBean, patternParts.get(patternParts.size() - 1), value);
 	}
 
-	// ------------------------------------------------------------------------------------------------------------------------------------- Private method start
+	// -------------------------------------------------------------------------------------------------------------------------------------
+	// Private method start
 	/**
 	 * 获取Bean中对应表达式的值
-	 *
 	 * @param patternParts 表达式分段列表
 	 * @param bean Bean对象或Map或List等
 	 * @param ignoreLast 是否忽略最后一个值，忽略最后一个值则用于set，否则用于read
@@ -146,7 +142,8 @@ public class GkBeanPath implements Serializable{
 				if (isFirst && false == this.isStartWith && isMatchName(bean, patternPart, true)) {
 					subBean = bean;
 					isFirst = false;
-				} else {
+				}
+				else {
 					return null;
 				}
 			}
@@ -155,7 +152,8 @@ public class GkBeanPath implements Serializable{
 	}
 
 	private static boolean isMatchName(Object bean, String beanClassName, boolean isSimple) {
-		return GutilClass.getClassName(bean, isSimple).equals(isSimple ? GutilStr.upperFirst(beanClassName) : beanClassName);
+		return GutilClass.getClassName(bean, isSimple)
+				.equals(isSimple ? GutilStr.upperFirst(beanClassName) : beanClassName);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,7 +164,7 @@ public class GkBeanPath implements Serializable{
 
 		if (GutilStr.contains(expression, ':')) {
 			// [start:end:step] 模式
-			final String[] parts = GutilStr.split(expression,":");
+			final String[] parts = GutilStr.split(expression, ":");
 			int start = Integer.parseInt(parts[0]);
 			int end = Integer.parseInt(parts[1]);
 			int step = 1;
@@ -175,10 +173,12 @@ public class GkBeanPath implements Serializable{
 			}
 			if (bean instanceof Collection) {
 				return sub(new ArrayList<>((Collection<?>) bean), start, end, step);
-			} else if (GutilArray.isArray(bean)) {
+			}
+			else if (GutilArray.isArray(bean)) {
 				return GutilArray.sub(bean, start, end, step);
 			}
-		} else if (GutilStr.contains(expression, ',')) {
+		}
+		else if (GutilStr.contains(expression, ',')) {
 			// [num0,num1,num2...]模式或者['key0','key1']模式
 			final String[] keys = GutilStr.split(expression, ",");
 			if (bean instanceof Collection) {
@@ -188,8 +188,9 @@ public class GkBeanPath implements Serializable{
 					intKeys[i] = Integer.parseInt(keys[i]);
 				}
 
-				return getAny((Collection<?>) bean,intKeys);
-			} else if (GutilArray.isArray(bean)) {
+				return getAny((Collection<?>) bean, intKeys);
+			}
+			else if (GutilArray.isArray(bean)) {
 
 				final int[] intKeys = new int[keys.length];
 				for (int i = 0; i < intKeys.length; i++) {
@@ -197,7 +198,8 @@ public class GkBeanPath implements Serializable{
 				}
 
 				return GutilArray.getAny(bean, intKeys);
-			} else {
+			}
+			else {
 				final String[] unWrappedKeys = new String[keys.length];
 				for (int i = 0; i < unWrappedKeys.length; i++) {
 					unWrappedKeys[i] = GutilStr.unWrap(keys[i], '\'');
@@ -209,45 +211,51 @@ public class GkBeanPath implements Serializable{
 
 					Map<String, Object> map = new HashMap<String, Object>();
 
-					for (String key:keys) {
+					for (String key : keys) {
 						String keyR = GutilStr.unWrap(key, '\'');
 
-						if(ct.containsKey(keyR)) {
+						if (ct.containsKey(keyR)) {
 							map.put(keyR, ct.get(keyR));
 						}
 
 					}
 
 					return map;
-				} else {
+				}
+				else {
 					Map<String, Object> map = new HashMap<String, Object>();
 
-					for (String key:keys) {
+					for (String key : keys) {
 						String keyR = GutilStr.unWrap(key, '\'');
 
-						Object obj = GutilReflection.getFieldValue(bean,keyR);
-						if(obj != null) {
+						Object obj = GutilReflection.getFieldValue(bean, keyR);
+						if (obj != null) {
 							map.put(keyR, obj);
 						}
 					}
 					return map;
 				}
 			}
-		} else {
+		}
+		else {
 			// 数字或普通字符串
 			if (bean instanceof Map) {
 				return ((Map<?, ?>) bean).get(expression);
-			} else if (bean instanceof Collection) {
-				return getCollectionIndex((Collection<?>) bean,Integer.parseInt(expression));
-			} else if (GutilArray.isArray(bean)) {
+			}
+			else if (bean instanceof Collection) {
+				return getCollectionIndex((Collection<?>) bean, Integer.parseInt(expression));
+			}
+			else if (GutilArray.isArray(bean)) {
 				return GutilArray.get(bean, Integer.parseInt(expression));
-			} else {// 普通Bean对象
+			}
+			else {// 普通Bean对象
 				return GutilReflection.getFieldValue(bean, expression);
 			}
 		}
 
 		return null;
 	}
+
 	private static <T> T getCollectionIndex(Collection<T> collection, int index) {
 		if (null == collection) {
 			return null;
@@ -270,12 +278,14 @@ public class GkBeanPath implements Serializable{
 		if (collection instanceof List) {
 			final List<T> list = ((List<T>) collection);
 			return list.get(index);
-		} else {
+		}
+		else {
 			int i = 0;
 			for (T t : collection) {
 				if (i > index) {
 					break;
-				} else if (i == index) {
+				}
+				else if (i == index) {
 					return t;
 				}
 				i++;
@@ -328,10 +338,9 @@ public class GkBeanPath implements Serializable{
 
 	/**
 	 * 获取集合中指定多个下标的元素值，下标可以为负数，例如-1表示最后一个元素
-	 *
-	 * @param <T>        元素类型
+	 * @param <T> 元素类型
 	 * @param collection 集合
-	 * @param indexes    下标，支持负数
+	 * @param indexes 下标，支持负数
 	 * @return 元素值列表
 	 * @since 4.0.6
 	 */
@@ -347,7 +356,8 @@ public class GkBeanPath implements Serializable{
 				}
 				result.add(list.get(index));
 			}
-		} else {
+		}
+		else {
 			final Object[] array = collection.toArray();
 			for (int index : indexes) {
 				if (index < 0) {
@@ -361,7 +371,6 @@ public class GkBeanPath implements Serializable{
 
 	/**
 	 * 初始化
-	 *
 	 * @param expression 表达式
 	 */
 	private void init(String expression) {
@@ -384,15 +393,19 @@ public class GkBeanPath implements Serializable{
 				if (GutilChar.BRACKET_END == c) {
 					// 中括号（数字下标）结束
 					if (false == isNumStart) {
-						throw new IllegalArgumentException(GutilStr.format("Bad expression '{}':{}, we find ']' but no '[' !", expression, i));
+						throw new IllegalArgumentException(
+								GutilStr.format("Bad expression '{}':{}, we find ']' but no '[' !", expression, i));
 					}
 					isNumStart = false;
 					// 中括号结束加入下标
-				} else {
+				}
+				else {
 					if (isNumStart) {
 						// 非结束中括号情况下发现起始中括号报错（中括号未关闭）
-						throw new IllegalArgumentException(GutilStr.format("Bad expression '{}':{}, we find '[' but no ']' !", expression, i));
-					} else if (GutilChar.BRACKET_START == c) {
+						throw new IllegalArgumentException(
+								GutilStr.format("Bad expression '{}':{}, we find '[' but no ']' !", expression, i));
+					}
+					else if (GutilChar.BRACKET_START == c) {
 						// 数字下标开始
 						isNumStart = true;
 					}
@@ -402,7 +415,8 @@ public class GkBeanPath implements Serializable{
 					localPatternParts.add(unWrapIfPossible(builder));
 				}
 				builder.delete(0, builder.length());
-			} else {
+			}
+			else {
 				// 非边界符号，追加字符
 				builder.append(c);
 			}
@@ -410,8 +424,10 @@ public class GkBeanPath implements Serializable{
 
 		// 末尾边界符检查
 		if (isNumStart) {
-			throw new IllegalArgumentException(GutilStr.format("Bad expression '{}':{}, we find '[' but no ']' !", expression, length - 1));
-		} else {
+			throw new IllegalArgumentException(
+					GutilStr.format("Bad expression '{}':{}, we find '[' but no ']' !", expression, length - 1));
+		}
+		else {
 			if (builder.length() > 0) {
 				localPatternParts.add(unWrapIfPossible(builder));
 			}
@@ -423,7 +439,6 @@ public class GkBeanPath implements Serializable{
 
 	/**
 	 * 对于非表达式去除单引号
-	 *
 	 * @param expression 表达式
 	 * @return 表达式
 	 */
@@ -433,5 +448,7 @@ public class GkBeanPath implements Serializable{
 		}
 		return GutilStr.unWrap(expression, '\'');
 	}
-	// ------------------------------------------------------------------------------------------------------------------------------------- Private method end
+	// -------------------------------------------------------------------------------------------------------------------------------------
+	// Private method end
+
 }
