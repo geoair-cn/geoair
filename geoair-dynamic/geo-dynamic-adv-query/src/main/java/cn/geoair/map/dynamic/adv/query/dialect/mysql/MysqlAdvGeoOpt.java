@@ -5,21 +5,15 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvGeoOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +25,15 @@ import java.util.*;
  * 基于MySQL Spatial扩展实现通用空间操作接口
  * 适配MySQL 5.7+/8.0+ Spatial语法特性
  */
-public class MySqlAdvGeoOpt extends AbstractAdvGeoOpt {
-    private static final Logger log = LoggerFactory.getLogger(MySqlAdvGeoOpt.class);
+public class MysqlAdvGeoOpt extends AbstractAdvGeoOpt {
+    private static final Logger log = LoggerFactory.getLogger(MysqlAdvGeoOpt.class);
 
 
     private MysqlAdvBaseOpt baseOpt;
 
     private MysqlAdvDDLOpt ddlOpt;
 
-    public MySqlAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
+    public MysqlAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
         this.baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
         this.ddlOpt = new MysqlAdvDDLOpt(dataSourceGetter);

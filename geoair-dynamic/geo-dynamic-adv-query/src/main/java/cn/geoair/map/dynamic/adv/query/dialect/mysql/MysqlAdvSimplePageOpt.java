@@ -11,17 +11,17 @@ import cn.hutool.core.util.StrUtil;
 /**
  * MySQL 带参数分页实现类
  */
-public class MysqlAdvSimplePagePreOpt extends AbstractAdvSimplePagePreOpt {
+public class MysqlAdvSimplePageOpt extends AbstractAdvSimplePagePreOpt {
     // MySQL专属依赖
-    protected MySqlAdvGeoOpt mysqlAdvGeoPreOpt;
+    protected MysqlAdvGeoOpt mysqlAdvGeoPreOpt;
     protected MysqlAdvBaseOpt baseOpt;
     protected MysqlAdvDDLOpt mysqlAdvDDLOpt;
 
-    public MysqlAdvSimplePagePreOpt(IDataSourceGetter dataSourceGetter) {
+    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
         baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
         mysqlAdvDDLOpt = new MysqlAdvDDLOpt(dataSourceGetter);
-        mysqlAdvGeoPreOpt = new MySqlAdvGeoOpt(dataSourceGetter);
+        mysqlAdvGeoPreOpt = new MysqlAdvGeoOpt(dataSourceGetter);
     }
 
     @Override

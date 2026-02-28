@@ -46,7 +46,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setRemoveAbandonedTimeoutMillis(1800 * 1000); // 兼容不同版本的参数（部分池化框架用毫秒级参数）
 
 // 连接可用性校验（强化：避免拿到失效连接）
-            dataSourceNew.setValidationQuery("SELECT 1"); // 连接校验SQL（轻量查询，保留）
+            dataSourceNew.setValidationQuery(DataSourceApo.getValidationQuery(dataSourceApo.getDbType())); // 连接校验SQL（轻量查询，保留）
             dataSourceNew.setTestOnBorrow(false);    // 调整：获取连接时不校验（从true→false）
             // 理由：TestOnBorrow=true会每次获取连接都校验，高并发下性能损耗大；改为空闲时校验更高效
             dataSourceNew.setTestOnReturn(false);    // 保留：归还连接时不校验（减少开销）
@@ -67,17 +67,12 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setRemoveAbandoned(true);           // 保留：自动回收超时未关闭的连接
             dataSourceNew.setLogAbandoned(true);              // 保留：记录连接泄露日志
 
-
-//            DataSourceProperty dataSourceProperty = dynamicDataSourceProperties.getDatasource().get(dynamicDataSourceProperties.getPrimary());
-//            DruidConfig druid = dataSourceProperty.getDruid();
-//            BeanUtil.copyProperties(druid, dataSourceNew, CopyOptions.create().ignoreNullValue());
-//            dataSourceNew.setName("by-ds-" + dataSourceApo.getId());
 //            // 构建JDBC连接URL
-            String url = "jdbc:postgresql://" + dataSourceApo.getAddress() + ":" + dataSourceApo.getPort() + "/" + dataSourceApo.getDbName();
+            String url = dataSourceApo.getJdbcUrl();
             dataSourceNew.setUrl(url);
             dataSourceNew.setUsername(dataSourceApo.getUsername());
             dataSourceNew.setPassword(dataSourceApo.getPassword());
-            dataSourceNew.setDriverClassName(DriverNamePool.DRIVER_POSTGRESQL);
+            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
 
             // 初始化数据源
             dataSourceNew.init();
@@ -119,6 +114,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             apo.setDriver(properties.getDriverClassName());
         }
         AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(properties.getUrl());
+        apo.setJdbcUrl(properties.getUrl());
         apo.setDbName(jdbcUrlSplitter.database);
         apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));
         apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));

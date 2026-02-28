@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.ds.apo;
 
+import cn.hutool.db.dialect.DialectName;
 import cn.hutool.db.dialect.DriverNamePool;
 import lombok.Data;
 
@@ -29,6 +30,11 @@ public class DataSourceApo implements Serializable {
      * 默认使用PostgreSQL驱动，取值于Hutool工具类的DriverNamePool
      */
     private String driver = DriverNamePool.DRIVER_POSTGRESQL;
+
+    /**
+     * 数据库连接URL
+     */
+    private String jdbcUrl;
 
     /**
      * 数据源名称（通常用于显示和标识）
@@ -76,6 +82,13 @@ public class DataSourceApo implements Serializable {
     private Date updateTime;
 
 
+    public String getJdbcUrl() {
+        if (jdbcUrl == null) {
+            jdbcUrl = buildJdbcUrl(this);
+        }
+
+        return jdbcUrl;
+    }
 
     /**
      * 判断当前数据源与传入的连接参数是否匹配
@@ -93,4 +106,146 @@ public class DataSourceApo implements Serializable {
     public boolean equals(String address, Integer port, String dbName, String user) {
         return this.address.equals(address) && this.port.equals(port) && this.dbName.equals(dbName) && this.username.equals(user);
     }
+
+    /**
+     * 根据驱动类名获取对应的数据库类型（DialectName枚举）
+     * 核心逻辑：通过驱动类名匹配对应的数据库方言类型
+     *
+     * @return 数据库类型枚举值，默认返回POSTGRESQL
+     */
+    public DialectName getDbType() {
+        if (driver == null) {
+            return DialectName.POSTGRESQL;
+        }
+        // 按驱动类名匹配数据库类型
+        if (driver.contains(DriverNamePool.DRIVER_MYSQL)) {
+            return DialectName.MYSQL;
+        } else if (driver.contains(DriverNamePool.DRIVER_ORACLE)) {
+            return DialectName.ORACLE;
+        } else if (driver.contains(DriverNamePool.DRIVER_POSTGRESQL)) {
+            return DialectName.POSTGRESQL;
+        } else if (driver.contains(DriverNamePool.DRIVER_SQLSERVER)) {
+            return DialectName.SQLSERVER;
+        } else if (driver.contains(DriverNamePool.DRIVER_SQLLITE3)) {
+            return DialectName.SQLITE3;
+        } else if (driver.contains(DriverNamePool.DRIVER_H2)) {
+            return DialectName.H2;
+        } else if (driver.contains(DriverNamePool.DRIVER_DM7)) {
+            return DialectName.DM;
+        } else if (driver.contains(DriverNamePool.DRIVER_HANA)) {
+            return DialectName.HANA;
+        } else if (driver.contains(DriverNamePool.DRIVER_PHOENIX)) {
+            return DialectName.PHOENIX;
+        } else {
+            // 默认返回PostgreSQL
+            return DialectName.POSTGRESQL;
+        }
+    }
+
+
+    /**
+     * 根据数据库类型动态构建JDBC URL
+     * @param dataSourceApo 数据源配置
+     * @return 对应数据库的JDBC URL
+     */
+    /**
+     * 根据数据库类型动态构建JDBC URL（兼容Java 8）
+     *
+     * @param dataSourceApo 数据源配置
+     * @return 对应数据库的JDBC URL
+     */
+    public static String buildJdbcUrl(DataSourceApo dataSourceApo) {
+        DialectName dbType = dataSourceApo.getDbType();
+        String address = dataSourceApo.getAddress();
+        Integer port = dataSourceApo.getPort();
+        String dbName = dataSourceApo.getDbName();
+        String schemaName = dataSourceApo.getSchemaName();
+
+        // Java 8兼容的switch语句（替换Switch表达式）
+        String jdbcUrl;
+        switch (dbType) {
+            case MYSQL:
+                jdbcUrl = String.format("jdbc:mysql://%s:%d/%s?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC",
+                        address, port, dbName);
+                break;
+            case ORACLE:
+                jdbcUrl = String.format("jdbc:oracle:thin:@%s:%d:%s", address, port, dbName);
+                break;
+            case POSTGRESQL:
+                jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s%s",
+                        address, port, dbName,
+                        schemaName != null ? "?currentSchema=" + schemaName : "");
+                break;
+            case SQLSERVER:
+                jdbcUrl = String.format("jdbc:sqlserver://%s:%d;databaseName=%s", address, port, dbName);
+                break;
+            case SQLITE3:
+                jdbcUrl = String.format("jdbc:sqlite:%s", dbName); // SQLite无需地址端口，dbName为文件路径
+                break;
+            case H2:
+                jdbcUrl = String.format("jdbc:h2:%s/%s", address, dbName); // H2支持多种模式，此处为文件模式示例
+                break;
+            case DM:
+                jdbcUrl = String.format("jdbc:dm://%s:%d/%s", address, port, dbName); // 达梦数据库
+                break;
+            case HANA:
+                jdbcUrl = String.format("jdbc:sap://%s:%d/?databaseName=%s", address, port, dbName); // 华为HANA
+                break;
+            case PHOENIX:
+                jdbcUrl = String.format("jdbc:phoenix:%s:%d", address, port); // Phoenix无dbName，端口默认2181
+                break;
+            default:
+                jdbcUrl = String.format("jdbc:postgresql://%s:%d/%s", address, port, dbName); // 默认PostgreSQL
+                break;
+        }
+        return jdbcUrl;
+    }
+
+    /**
+     * 根据数据库类型获取对应的连接校验SQL
+     * 不同数据库的校验SQL不同，避免校验失败
+     * @param dbType 数据库类型
+     * @return 对应数据库的校验SQL
+     */
+    /**
+     * 根据数据库类型获取对应的连接校验SQL（兼容Java 8）
+     * 不同数据库的校验SQL不同，避免校验失败
+     *
+     * @param dbType 数据库类型
+     * @return 对应数据库的校验SQL
+     */
+    public static String getValidationQuery(DialectName dbType) {
+        String validationQuery;
+        switch (dbType) {
+            case MYSQL:
+            case POSTGRESQL:
+            case H2:
+                validationQuery = "SELECT 1";
+                break;
+            case ORACLE:
+                validationQuery = "SELECT 1 FROM DUAL";
+                break;
+            case SQLSERVER:
+                validationQuery = "SELECT 1";
+                break;
+            case SQLITE3:
+                validationQuery = "SELECT 1";
+                break;
+            case DM:
+                validationQuery = "SELECT 1 FROM DUAL";
+                break;
+            case HANA:
+                validationQuery = "SELECT 1 FROM DUMMY";
+                break;
+            case PHOENIX:
+                validationQuery = "SELECT 1 FROM SYSTEM.CATALOG LIMIT 1";
+                break;
+            default:
+                validationQuery = "SELECT 1";
+                break;
+        }
+        return validationQuery;
+    }
+
+
 }

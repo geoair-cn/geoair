@@ -2,22 +2,11 @@ package com.gtc.comp.knife4j.demo.controller.group1;
 
 import cn.geoair.gtc.base.api.annotation.GaApi;
 import cn.geoair.gtc.base.api.annotation.GaApiAction;
-import cn.geoair.gtc.base.data.page.GiPager;
-import cn.geoair.gtc.base.data.page.support.GirPager;
-import cn.geoair.gtc.base.data.result.GiResult;
-import com.gtc.comp.knife4j.demo.model.DemoVo;
 import com.gtc.comp.knife4j.demo.model.DemoVo1;
-import com.gtc.comp.knife4j.demo.model.DemoVo3;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 /**
  * @author ：张俊

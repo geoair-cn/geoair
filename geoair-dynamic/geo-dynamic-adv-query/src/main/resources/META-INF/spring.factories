@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.geoair.map.dynamic.adv.spring.AdvAutoConfiguration

@@ -1,7 +1,8 @@
-package cn.geoair.map.dynamic.adv.query.dialect.pg;
+package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import cn.geoair.map.dynamic.ds.DataSourceGetter;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
@@ -14,20 +15,20 @@ import java.sql.Connection;
  * @date ：Created in   15:36
  * @description： PostgreSQL数据库的动态高级查询执行器
  */
-public class AdvExecutorPG extends AbstractAdvExecutor {
+public class AdvExecutorMysql extends AbstractAdvExecutor {
 
-    public AdvExecutorPG(DataSourceApo dataSourceApo) {
+    public AdvExecutorMysql(DataSourceApo dataSourceApo) {
         super(dataSourceApo);
     }
 
-    public AdvExecutorPG(DataSource dataSource) {
+    public AdvExecutorMysql(DataSource dataSource) {
         super(dataSource);
     }
 
-    public AdvExecutorPG() {
+    public AdvExecutorMysql() {
     }
 
-    public AdvExecutorPG(Connection connection) {
+    public AdvExecutorMysql(Connection connection) {
         super(connection);
     }
 
@@ -50,7 +51,7 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(this);
+                    advBaseOpt = new MysqlAdvBaseOpt(this);
                 }
             }
         }
@@ -62,7 +63,7 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
         if (advDDLOpt == null) {
             synchronized (this) {
                 if (advDDLOpt == null) {
-                    advDDLOpt = new PgAdvDDLOpt(this);
+                    advDDLOpt = new MysqlAdvDDLOpt(this);
                 }
             }
         }
@@ -74,7 +75,7 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
-                    simplePageOpt = new PgAdvSimplePageOpt(this);
+                    simplePageOpt = new MysqlAdvSimplePageOpt(this);
                 }
             }
         }
@@ -86,7 +87,7 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new PgAdvGeoOpt(this);
+                    geoOpt = new MysqlAdvGeoOpt(this);
                 }
             }
         }

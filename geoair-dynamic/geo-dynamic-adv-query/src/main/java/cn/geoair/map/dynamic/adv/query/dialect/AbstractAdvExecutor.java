@@ -6,7 +6,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.ds.DataSourceGetter;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
 import org.geotools.data.DataStore;
@@ -33,9 +32,9 @@ import java.util.function.Consumer;
 public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     // 数据源获取器（核心依赖）
-    protected DataSourceGetter dataSourceGetterPxy;
+    protected IDataSourceGetter dataSourceGetterPxy;
 
-    protected abstract DataSourceGetter getDataSourceGetterPxy();
+    protected abstract IDataSourceGetter getDataSourceGetterPxy();
 
     // 各功能模块代理对象
     private IAdvBaseOpt advBaseOptPxy;
