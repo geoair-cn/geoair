@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies</artifactId>
-        <version>23.1.1-bata4-SNAPSHOT</version>
+        <version>23.1.1-bata4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -15,9 +15,34 @@
     <packaging>pom</packaging>
     <description>用于工程模块的依赖定义</description>
 
+    <url>https://gitee.com/geoair/geoair-dependencies</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>张逢吉</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <properties>
-        <!--        <geoair.version>23.1.1-bata4-SNAPSHOT</geoair.version>-->
-        <!--        <geoair.comp.version>23.1.1-bata4-SNAPSHOT</geoair.comp.version>-->
+        <!--        <geoair.version>23.1.1-bata4</geoair.version>-->
+        <!--        <geoair.comp.version>23.1.1-bata4</geoair.comp.version>-->
 
         <skipTests>true</skipTests>
     </properties>

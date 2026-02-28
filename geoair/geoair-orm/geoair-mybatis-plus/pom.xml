@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cn.geoair.orm</groupId>
     	<artifactId>geoair-orm</artifactId>
-		<version>23.1.1-bata4-SNAPSHOT </version>
+		<version>23.1.1-bata4 </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -14,7 +14,7 @@
 	<packaging>jar</packaging>
 
 	<url>https://gitee.com/geoair/geoair</url>
-
+	<description>geoair-mybatis-plus</description>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.1-bata4-SNAPSHOT </version>
+        <version>23.1.1-bata4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
     <artifactId>geoair-orm-spi</artifactId>
 
     <name>geoair-orm-spi</name>
-
+    <description>geoair-orm-spi</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>

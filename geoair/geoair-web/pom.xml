@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cn.geoair</groupId>
 		<artifactId>geoair</artifactId>
-		<version>23.1.1-bata4-SNAPSHOT </version>
+		<version>23.1.1-bata4 </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -51,6 +51,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 

@@ -5,14 +5,14 @@
     <parent>
         <groupId>cn.geoair</groupId>
         <artifactId>geoair</artifactId>
-        <version>23.1.1-bata4-SNAPSHOT </version>
+        <version>23.1.1-bata4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-orm</artifactId>
     <name>geoair-orm</name>
     <packaging>pom</packaging>
-
+    <description>geoair-orm</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>

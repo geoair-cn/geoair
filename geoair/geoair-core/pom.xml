@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cn.geoair</groupId>
 		<artifactId>geoair</artifactId>
-		<version>23.1.1-bata4-SNAPSHOT</version>
+		<version>23.1.1-bata4</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -45,11 +45,13 @@
 		<dependency>
 			<groupId>cn.geoair</groupId>
 			<artifactId>geoair-base</artifactId>
+			<version>${geoair.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>cn.geoair</groupId>
 			<artifactId>geoair-web</artifactId>
+			<version>${geoair.version}</version>
 			<optional>true</optional>
 		</dependency>
 

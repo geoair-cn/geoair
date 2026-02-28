@@ -6,8 +6,8 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <!--		<version>23.1.1-bata4-SNAPSHOT&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
-        <version>23.1.1-bata4-SNAPSHOT </version>
+        <!--		<version>23.1.1-bata4&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
+        <version>23.1.1-bata4 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -15,7 +15,7 @@
 
     <packaging>jar</packaging>
     <name>geoair-mybatis</name>
-
+    <description>geoair-mybatis</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>
@@ -52,6 +52,7 @@
         <dependency>
             <groupId>cn.geoair.orm</groupId>
             <artifactId>geoair-orm-base</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
