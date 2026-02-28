@@ -8,7 +8,7 @@
     <parent>
         <groupId>cn.geoair.comp.apidoc</groupId>
         <artifactId>geoair-apidoc</artifactId>
-        <version>23.1.1-bata4</version>
+        <version>23.1.1-beta4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
