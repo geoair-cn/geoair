@@ -10,12 +10,12 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp</groupId>
-    <artifactId>geoair-code-geo-demo</artifactId>
+    <artifactId>geoair-code-gen-demo</artifactId>
     <version>23.1.1-RC5-SNAPSHOT</version>
-    <name>geoair-code-geo-demo</name>
+    <name>geoair-code-gen-demo</name>
     <packaging>jar</packaging>
 
-    <description>geoair-code-geo-demo</description>
+    <description>geoair-code-gen-demo</description>
 
     <url>https://gitee.com/geoair/geoair</url>
 
