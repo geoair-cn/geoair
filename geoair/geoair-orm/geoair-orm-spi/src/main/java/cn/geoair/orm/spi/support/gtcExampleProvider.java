@@ -1,10 +1,10 @@
-// package cn.geoair.gtc.orm.spi.support;
+// package cn.geoair..orm.spi.support;
 //
 //
 // import com.alibaba.fastjson.JSONObject;
-// import cn.geoair.gtc.base.bean. gtcBeanHelper;
-// import cn.geoair.gtc.base.util. gtcObjectUtil;
-// import cn.geoair.gtc.orm.spi.entity. gtcEntityColumn;
+// import cn.geoair..base.bean. gtcBeanHelper;
+// import cn.geoair..base.util. gtcObjectUtil;
+// import cn.geoair..orm.spi.entity. gtcEntityColumn;
 // import javafx.util.Pair;
 //
 // import java.util.*;

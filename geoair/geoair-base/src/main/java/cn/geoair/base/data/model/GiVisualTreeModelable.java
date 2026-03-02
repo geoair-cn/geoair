@@ -1,8 +1,8 @@
-// package cn.geoair.gtc.base.data.model;
+// package cn.geoair..base.data.model;
 //
 // import java.io.Serializable;
-// import cn.geoair.gtc.base.data.GiVisuable;
-// import cn.geoair.gtc.base.data.model.support.GirVisualTreeModelKid;
+// import cn.geoair..base.data.GiVisuable;
+// import cn.geoair..base.data.model.support.GirVisualTreeModelKid;
 //
 // public interface GiVisualTreeModelable<ID extends Serializable> extends
 // GiTreeModelable<ID>,GiVisuable {

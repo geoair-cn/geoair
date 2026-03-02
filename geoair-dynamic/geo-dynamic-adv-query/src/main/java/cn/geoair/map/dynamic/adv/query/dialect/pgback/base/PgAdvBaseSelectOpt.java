@@ -1,7 +1,7 @@
 // package cn.geoair.map.dynamic.adv.query.dialect.pgback.base;
 //
-// import cn.geoair.gtc.base.log.GiLogger;
-// import cn.geoair.gtc.base.log.GirLogger;
+// import cn.geoair..base.log.GiLogger;
+// import cn.geoair..base.log.GirLogger;
 // import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 // import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 // import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;

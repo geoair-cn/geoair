@@ -20,7 +20,7 @@ public class GutilGenericType {
 	 * @return 泛型数组 找不到为null
 	 */
 
-	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.util.GenericTypeUtil4Gir",
+	@GaMethodHandDefine(expectClassName = "cn.geoair..spi.util.GenericTypeUtil4Gir",
 			expectMethodName = "resolveTypeArguments")
 	public static Type[] resolveTypeArguments(final Class<?> clazz, final Class<?> genericIfc) {
 		return (Type[]) GkMethodHand.invokeSelf(clazz, genericIfc);

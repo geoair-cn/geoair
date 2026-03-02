@@ -1,4 +1,4 @@
-// package cn.geoair.gtc.base.data.support;
+// package cn.geoair..base.data.support;
 //
 /// **
 // * Json 字符串数据

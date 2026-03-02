@@ -1,7 +1,7 @@
 // package cn.geoair.map.dynamic.adv.query.dialect.pgback;
 //
-// import cn.geoair.gtc.base.log.GiLogger;
-// import cn.geoair.gtc.base.log.GirLogger;
+// import cn.geoair..base.log.GiLogger;
+// import cn.geoair..base.log.GirLogger;
 // import cn.geoair.map.dynamic.adv.query.IAdvGeoOpt;
 // import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 // import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;

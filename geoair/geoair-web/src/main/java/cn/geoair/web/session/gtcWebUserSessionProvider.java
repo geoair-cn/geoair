@@ -1,8 +1,8 @@
 // package com.gtc.web.session;
 //
 //
-// import cn.geoair.gtc.base.user.session.GiUserSession;
-// import cn.geoair.gtc.base.user.session.GiUserSessionProvider;
+// import cn.geoair..base.user.session.GiUserSession;
+// import cn.geoair..base.user.session.GiUserSessionProvider;
 //
 //
 //

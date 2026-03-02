@@ -5,8 +5,8 @@ import java.util.Map;
 import cn.geoair.base.data.GirValidateException;
 import cn.geoair.base.data.result.GiResult;
 import cn.geoair.base.data.result.GirEmAlertType;
-//import  cn.geoair.gtc.base.user. gtcNoLoginException;
-//import  cn.geoair.gtc.base.user.permission. gtcPermissionException;
+//import  cn.geoair..base.user. gtcNoLoginException;
+//import  cn.geoair..base.user.permission. gtcPermissionException;
 
 public abstract class GirExceptionResultConverter {
 

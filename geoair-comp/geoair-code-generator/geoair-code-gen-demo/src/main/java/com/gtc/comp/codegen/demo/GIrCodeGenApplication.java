@@ -10,6 +10,4 @@ public class GIrCodeGenApplication {
     public static void main(String[] args) {
         SpringApplication.run(GIrCodeGenApplication.class, args);
     }
-
-
 }

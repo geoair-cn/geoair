@@ -17,7 +17,7 @@ import javax.persistence.Table;
     #end
 #end
 
-##import cn.geoair.gtc.base.gpa.id.GwIdGenerator;
+##import cn.geoair..base.gpa.id.GwIdGenerator;
 import java.util.UUID;
 #foreach ($column in $columns)
     #if($column.javaTypeOther == 'Geometry')

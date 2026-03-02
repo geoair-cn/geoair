@@ -1,7 +1,7 @@
-// package cn.geoair.gtc.orm.spi.dynamictable;
+// package cn.geoair..orm.spi.dynamictable;
 //
-// import cn.geoair.gtc.orm.spi. gtcEntityResolve;
-// import cn.geoair.gtc.orm.spi.entity. gtcEntityTable;
+// import cn.geoair..orm.spi. gtcEntityResolve;
+// import cn.geoair..orm.spi.entity. gtcEntityTable;
 //
 /// **
 // * @author ：张俊

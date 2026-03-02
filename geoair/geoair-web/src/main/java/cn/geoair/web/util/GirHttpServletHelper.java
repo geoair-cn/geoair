@@ -22,7 +22,7 @@ public class GirHttpServletHelper {
 		return (HttpServletResponse) GkMethodHand.invokeSelf();
 	}
 
-	@GaMethodHandDefine(expectClassName = "cn.geoair.gtc.spi.web.SpringServlet4Gir")
+	@GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringServlet4Gir")
 	public static ServletContext getServletContext() {
 		return (ServletContext) GkMethodHand.invokeSelf();
 	}
