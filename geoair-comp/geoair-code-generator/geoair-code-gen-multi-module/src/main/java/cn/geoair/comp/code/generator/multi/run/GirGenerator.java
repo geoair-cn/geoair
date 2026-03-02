@@ -53,6 +53,7 @@ public class GirGenerator {
                 GenUtils.initColumnField(column, table);
             }
             table.setColumns(genTableColumns);
+            table.setProjectName(globalConfig.getProjectName());
             generatorCode(table);
         }
         Gir.log.info("代码生成成功" );
@@ -65,15 +66,39 @@ public class GirGenerator {
     private void generatorCode(GenTable table) {
         // 设置主键列信息
         setPkColumn(table);
+        Template tpl = null;
+        VelocityContext context = null;
+        StringWriter sw = new StringWriter();
         // 获取模板列表
         List<String> templates = VelocityUtils.getTemplateList(table.getColumns());
         // 遍历模板生成代码
         for (String template : templates) {
-            // 只处理枚举模板
-            if (template.contains("rx-enum.java.vm" ) || template.contains("rx-apienum.java.vm" )) {
-                generateEnumCode(table, template);
+            try {
+                // 只处理枚举模板
+                if (template.contains("rx-enum.java.vm" ) || template.contains("rx-apienum.java.vm" )) {
+                    generateEnumCode(table, template);
+                } else {
+                    // 渲染模板
+                    context = VelocityUtils.prepareContext(table);
+                    sw = new StringWriter();
+                    tpl = Velocity.getTemplate(template, "UTF-8" );
+                    tpl.merge(context, sw);
+                    String path = getGenPath(table, template);
+                    FileUtils.writeStringToFile(new File(path), sw.toString(), "UTF-8" );
+                }
+            } catch (Exception e) {
+                Gir.log.error(e, "代码生成异常" );
             }
+
         }
+    }
+
+    public static String getGenPath(GenTable table, String template) {
+        String genPath = table.getGenPath();
+        if (StringUtils.equals(genPath, "/" )) {
+            return System.getProperty("user.dir" ) + File.separator + VelocityUtils.getFileName(template, table);
+        }
+        return genPath + File.separator + VelocityUtils.getFileName(template, table);
     }
 
     /**

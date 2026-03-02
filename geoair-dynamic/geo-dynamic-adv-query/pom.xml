@@ -102,7 +102,6 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
             <version>${geotools.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>

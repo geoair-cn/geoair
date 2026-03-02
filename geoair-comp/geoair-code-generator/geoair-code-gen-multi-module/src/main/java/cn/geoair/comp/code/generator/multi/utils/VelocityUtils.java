@@ -3,6 +3,7 @@ package cn.geoair.comp.code.generator.multi.utils;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 
+import cn.hutool.core.date.DateUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
@@ -41,6 +42,42 @@ public class VelocityUtils {
         velocityContext.put("packageName" , packageName);
         velocityContext.put("column" , genTableColumn);
         velocityContext.put("moduleName" , genTable.getModuleName());
+        return velocityContext;
+    }
+
+    public static VelocityContext prepareContext(GenTable genTable) {
+        String moduleName = genTable.getModuleName();
+        String businessName = genTable.getBusinessName();
+        String packageName = genTable.getPackageName();
+
+        String functionName = genTable.getFunctionName();
+
+        VelocityContext velocityContext = new VelocityContext();
+
+        velocityContext.put("tableName" , genTable.getTableName());
+        velocityContext.put("functionName" , StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】" );
+        velocityContext.put("ClassName" , genTable.getClassName());
+        velocityContext.put("className" , StringUtils.uncapitalize(genTable.getClassName()));
+        //velocityContext.put("classname", StringUtils.replace(genTable.getTableName(),"_",""));
+
+        velocityContext.put("classname" , StringUtils.replace(StringUtils.split(genTable.getTableName(), "_" , 2)[1], "_" , "" ));
+
+        velocityContext.put("moduleName" , genTable.getModuleName());
+        velocityContext.put("BusinessName" , StringUtils.capitalize(genTable.getBusinessName()));
+        velocityContext.put("businessName" , genTable.getBusinessName());
+        velocityContext.put("basePackage" , getPackagePrefix(packageName));
+        velocityContext.put("packageName" , packageName);
+        velocityContext.put("author" , genTable.getFunctionAuthor());
+        velocityContext.put("datetime" , DateUtil.now());
+        velocityContext.put("pkColumn" , genTable.getPkColumn());
+        velocityContext.put("importList" , getImportList(genTable));
+        velocityContext.put("permissionPrefix" , getPermissionPrefix(moduleName, businessName));
+        velocityContext.put("columns" , genTable.getColumns());
+        velocityContext.put("table" , genTable);
+        velocityContext.put("dicts" , getDicts(genTable));
+        velocityContext.put("tableComment" , genTable.getTableComment());
+        velocityContext.put("time" , new Date().getTime());
+
         return velocityContext;
     }
 

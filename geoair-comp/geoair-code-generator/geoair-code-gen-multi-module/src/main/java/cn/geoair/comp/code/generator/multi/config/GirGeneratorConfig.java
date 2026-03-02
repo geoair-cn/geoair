@@ -1,5 +1,6 @@
 package cn.geoair.comp.code.generator.multi.config;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -18,7 +19,14 @@ public class GirGeneratorConfig {
     /**
      * 源代码生成路径
      */
-    String sourceRootPath = "" ;
+    String sourceRootPath = "/" ;
+
+    public String getSourceRootPath() {
+        if(StrUtil.isEmpty(sourceRootPath)){
+            return "/" ;
+        }
+        return sourceRootPath;
+    }
 
     /**
      * 代码的包名的根

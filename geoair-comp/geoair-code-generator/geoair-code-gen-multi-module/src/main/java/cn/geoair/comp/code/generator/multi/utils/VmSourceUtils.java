@@ -31,21 +31,21 @@ public class VmSourceUtils {
      * 添加基础模板（抽离方法，提升可读性）
      */
     private static void addBaseTemplates(List<String> templates) {
-        templates.add("vm/rx/java/model/rx-po.java.vm" );
-        templates.add("vm/rx/java/api/rx-apo.java.vm" );
-        templates.add("vm/rx/java/model/rx-dto.java.vm" );
-        templates.add("vm/rx/java/model/rx-seo.java.vm" );
-        templates.add("vm/rx/java/rx-controller.java.vm" );
-        templates.add("vm/rx/java/rx-dao.java.vm" );
-        templates.add("vm/rx/java/rx-mapper.java.vm" );
-        templates.add("vm/rx/java/rx-servface.java.vm" );
-        templates.add("vm/rx/java/rx-event.java.vm" );
-        templates.add("vm/rx/java/rx-serviceImpl.java.vm" );
-        templates.add("vm/rx/java/vo/rx-addvo.java.vm" );
-        templates.add("vm/rx/java/vo/rx-detailvo.java.vm" );
-        templates.add("vm/rx/java/vo/rx-searchvo.java.vm" );
-        templates.add("vm/rx/java/vo/rx-updatevo.java.vm" );
-        templates.add("vm/rx/xml/rx-mapper.xml.vm" );
+        templates.add("vm/java/model/rx-po.java.vm" );
+
+        templates.add("vm/java/model/rx-dto.java.vm" );
+        templates.add("vm/java/model/rx-seo.java.vm" );
+        templates.add("vm/java/rx-controller.java.vm" );
+        templates.add("vm/java/rx-dao.java.vm" );
+        templates.add("vm/java/rx-mapper.java.vm" );
+        templates.add("vm/java/rx-servface.java.vm" );
+        templates.add("vm/java/rx-event.java.vm" );
+        templates.add("vm/java/rx-serviceImpl.java.vm" );
+        templates.add("vm/java/vo/rx-addvo.java.vm" );
+        templates.add("vm/java/vo/rx-detailvo.java.vm" );
+        templates.add("vm/java/vo/rx-searchvo.java.vm" );
+        templates.add("vm/java/vo/rx-updatevo.java.vm" );
+        templates.add("vm/xml/rx-mapper.xml.vm" );
     }
 
     /**
@@ -88,8 +88,6 @@ public class VmSourceUtils {
             fileName = StringUtils.format("{}-boot/{}-wcs/src/{}/{}/controller/{}/{}SearchVo.java" , projectName, projectName, PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
         } else if (template.contains("rx-updatevo.java.vm" )) {
             fileName = StringUtils.format("{}-boot/{}-wcs/src/{}/{}/controller/{}/{}UpdateVo.java" , projectName, projectName, PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
-        } else if (template.contains("rx-apo.java.vm" )) {
-            fileName = StringUtils.format("{}-api/src/{}/{}/api/{}/apo/{}Apo.java" , projectName, PROJECT_PATH, packagePath, moduleName, className);
         } else if (template.contains("rx-mapper.xml.vm" )) {
             fileName = StringUtils.format("{}-mapper-tk/src/{}/{}/mapper/{}/impl/{}Mapper.xml" , projectName, PROJECT_PATH, packagePath, moduleName, className);
         }
