@@ -50,6 +50,8 @@
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-project-parent</artifactId>
                 <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
