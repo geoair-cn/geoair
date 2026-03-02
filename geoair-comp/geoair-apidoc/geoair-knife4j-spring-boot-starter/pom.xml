@@ -6,7 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.geoair.comp.apidoc</groupId>
+        <groupId>cn.geoair.comp</groupId>
         <artifactId>geoair-apidoc</artifactId>
         <version>23.1.1-RC5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>

@@ -5,17 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.geoair.comp</groupId>
-        <artifactId>geoair-apidoc</artifactId>
+        <artifactId>geoair-code-generator</artifactId>
         <version>23.1.1-RC5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>cn.geoair.comp.apidoc</groupId>
-    <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
+    <groupId>cn.geoair.comp</groupId>
+    <artifactId>geoair-code-geo-demo</artifactId>
     <version>23.1.1-RC5-SNAPSHOT</version>
-    <name>geoair-knife4j-spring-boot-demo</name>
+    <name>geoair-code-geo-demo</name>
     <packaging>jar</packaging>
 
-    <description>geoair-knife4j-spring-boot-demo</description>
+    <description>geoair-code-geo-demo</description>
 
     <url>https://gitee.com/geoair/geoair</url>
 
@@ -47,8 +47,8 @@
     <dependencies>
 
         <dependency>
-            <groupId>cn.geoair.comp.apidoc</groupId>
-            <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
+            <groupId>cn.geoair.comp</groupId>
+            <artifactId>geoair-code-gen-multi-module</artifactId>
             <version>${geoair.version}</version>
         </dependency>
 

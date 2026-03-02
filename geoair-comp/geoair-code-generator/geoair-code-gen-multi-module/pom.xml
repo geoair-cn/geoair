@@ -3,21 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>cn.geoair.comp</groupId>
-        <artifactId>geoair-comp</artifactId>
+        <artifactId>geoair-code-generator</artifactId>
         <version>23.1.1-RC5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <groupId>cn.geoair.comp</groupId>
-    <artifactId>geoair-apidoc</artifactId>
+    <artifactId>geoair-code-gen-multi-module</artifactId>
     <version>23.1.1-RC5-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>geoair-apidoc</name>
+    <packaging>jar</packaging>
+    <name>geoair-code-gen-multi-module</name>
 
-    <description>geoair-apidoc</description>
+    <description>geoair多模块的代码生成器</description>
 
     <url>https://gitee.com/geoair/geoair</url>
 
@@ -45,33 +43,21 @@
     </scm>
 
     <properties>
-        <skipTests>true</skipTests>
+
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair</groupId>
+            <artifactId>geoair-web</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>cn.geoair.comp.apidoc</groupId>
-                <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflections.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+        <dependency>
+            <groupId>cn.geoair</groupId>
+            <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
+    </dependencies>
 
-    <modules>
-        <module>geoair-knife4j-spring-boot-starter</module>
-        <module>geoair-knife4j-spring-boot-demo</module>
-    </modules>
-
-    <build>
-        <plugins>
-        </plugins>
-    </build>
 </project>

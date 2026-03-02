@@ -12,12 +12,12 @@
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
-    <artifactId>geoair-apidoc</artifactId>
+    <artifactId>geoair-code-generator</artifactId>
     <version>23.1.1-RC5-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>geoair-apidoc</name>
+    <name>geoair-code-generator</name>
 
-    <description>geoair-apidoc</description>
+    <description>代码生成器模块</description>
 
     <url>https://gitee.com/geoair/geoair</url>
 
@@ -50,24 +50,14 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>cn.geoair.comp.apidoc</groupId>
-                <artifactId>geoair-knife4j-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflections.version}</version>
-            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
 
     <modules>
-        <module>geoair-knife4j-spring-boot-starter</module>
-        <module>geoair-knife4j-spring-boot-demo</module>
+        <module>geoair-code-gen-multi-module</module>
+        <module>geoair-code-gen-demo</module>
     </modules>
 
     <build>
