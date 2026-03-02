@@ -5,12 +5,12 @@ import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.db.CommonRuner;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
+import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
 import cn.geoair.base.exception.GirException;
 import cn.hutool.core.map.MapUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+
 public class GirGenerator {
+
+
 
     private GirGeneratorConfig globalConfig;
     private CommonRuner commonRuner;
@@ -76,15 +79,16 @@ public class GirGenerator {
             try {
                 // 只处理枚举模板
                 if (template.contains("rx-enum.java.vm" ) || template.contains("rx-apienum.java.vm" )) {
-                    generateEnumCode(table, template);
+                    generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
                     context = VelocityUtils.prepareContext(table);
                     sw = new StringWriter();
                     tpl = Velocity.getTemplate(template, "UTF-8" );
                     tpl.merge(context, sw);
-                    String path = getGenPath(table, template);
+                    String path = GenPathUtils.getGenPath(table, template, this.globalConfig.getMutiIs());
                     FileUtils.writeStringToFile(new File(path), sw.toString(), "UTF-8" );
+                    Gir.log.info("生成文件：" + path);
                 }
             } catch (Exception e) {
                 Gir.log.error(e, "代码生成异常" );
@@ -93,18 +97,11 @@ public class GirGenerator {
         }
     }
 
-    public static String getGenPath(GenTable table, String template) {
-        String genPath = table.getGenPath();
-        if (StringUtils.equals(genPath, "/" )) {
-            return System.getProperty("user.dir" ) + File.separator + VelocityUtils.getFileName(template, table);
-        }
-        return genPath + File.separator + VelocityUtils.getFileName(template, table);
-    }
 
     /**
      * 生成枚举代码
      */
-    private void generateEnumCode(GenTable table, String template) {
+    private void generateEnumCode(GenTable table, String template, Boolean mutiIs) {
         Template tpl = null;
         try {
             tpl = Velocity.getTemplate(template, "UTF-8" );
@@ -120,7 +117,7 @@ public class GirGenerator {
                 try (StringWriter sw = new StringWriter()) { // 自动关闭资源
                     tpl.merge(context, sw);
                     // 获取枚举文件生成路径
-                    String enumPath = getEnumGenPath(table, column, template);
+                    String enumPath = GenPathUtils.getEnumGenPath(table, column, template, mutiIs);
                     // 创建目录（如果不存在）
                     File enumFile = new File(enumPath);
                     File parentDir = enumFile.getParentFile();
@@ -136,16 +133,6 @@ public class GirGenerator {
         }
     }
 
-    /**
-     * 获取枚举生成地址
-     */
-    private String getEnumGenPath(GenTable table, GenTableColumn column, String template) {
-        String genPath = table.getGenPath();
-        if (StringUtils.equals(genPath, "/" )) {
-            return System.getProperty("user.dir" ) + File.separator + "src" + File.separator + VelocityUtils.getFileName(template, table);
-        }
-        return genPath + File.separator + VelocityUtils.getEnumFileName(template, table, column);
-    }
 
     /**
      * 设置主键列信息（修复空指针）

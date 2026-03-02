@@ -7,7 +7,6 @@ import cn.hutool.core.date.DateUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -16,20 +15,6 @@ import java.util.*;
  * @author ray
  */
 public class VelocityUtils {
-    /**
-     * 项目空间路径
-     */
-    private static final String PROJECT_PATH = "main/java" ;
-
-    /**
-     * mybatis空间路径
-     */
-    private static final String MYBATIS_PATH = "main/resources/mapper" ;
-
-    /**
-     * 默认上级菜单，系统工具
-     */
-    private static final String DEFAULT_PARENT_MENU_ID = "3" ;
 
     /**
      * 设置枚举模板变量信息
@@ -46,8 +31,7 @@ public class VelocityUtils {
     }
 
     public static VelocityContext prepareContext(GenTable genTable) {
-        String moduleName = genTable.getModuleName();
-        String businessName = genTable.getBusinessName();
+
         String packageName = genTable.getPackageName();
 
         String functionName = genTable.getFunctionName();
@@ -71,7 +55,6 @@ public class VelocityUtils {
         velocityContext.put("datetime" , DateUtil.now());
         velocityContext.put("pkColumn" , genTable.getPkColumn());
         velocityContext.put("importList" , getImportList(genTable));
-        velocityContext.put("permissionPrefix" , getPermissionPrefix(moduleName, businessName));
         velocityContext.put("columns" , genTable.getColumns());
         velocityContext.put("table" , genTable);
         velocityContext.put("dicts" , getDicts(genTable));
@@ -96,52 +79,47 @@ public class VelocityUtils {
 
         List<String> templates = new ArrayList<String>();
 
-        templates = VmSourceUtils.getKLF(isEnum);
+        templates = getKLF(isEnum);
 
         return templates;
     }
 
     /**
-     * 获取文件名
+     * 获取模板列表（KLF规范）
+     *
+     * @param isEnum 是否包含枚举模板
+     * @return 模板路径列表
      */
-    public static String getFileName(String template, GenTable genTable) {
-        // 文件名称
-        String fileName = "" ;
-        // 包路径
-        String packageName = genTable.getPackageName();
-        // 模块名
-        String moduleName = genTable.getModuleName();
-        // 大写类名
-        String className = genTable.getClassName();
-
-        String projectName = genTable.getProjectName();
-
-        String classname = StringUtils.replace(StringUtils.split(genTable.getTableName(), "_" , 2)[1], "_" , "" );
-
-        fileName = VmSourceUtils.getFileNameKLF(template, moduleName, className, classname, packageName, projectName);
-
-
-        return fileName;
+    public static List<String> getKLF(boolean isEnum) {
+        List<String> templates = new ArrayList<>();
+        addBaseTemplates(templates);
+        if (isEnum) {
+            templates.add("vm/rx/java/rx-enum.java.vm" );
+        }
+        return templates;
     }
-
 
     /**
-     * 获取文件名
+     * 添加基础模板（抽离方法，提升可读性）
      */
-    public static String getEnumFileName(String template, GenTable genTable, GenTableColumn column) {
-        // 文件名称
-        String fileName = "" ;
-        // 包路径
-        String packageName = genTable.getPackageName();
-        // 模块名
-        String moduleName = genTable.getModuleName();
-        // 枚举类名
-        String enumsName = column.getEnumsName();
+    private static void addBaseTemplates(List<String> templates) {
+        templates.add("vm/java/model/rx-po.java.vm" );
 
-
-        fileName = VmSourceUtils.getEnumFileNameKLF(template, moduleName, enumsName, packageName);
-        return fileName;
+        templates.add("vm/java/model/rx-dto.java.vm" );
+        templates.add("vm/java/model/rx-seo.java.vm" );
+        templates.add("vm/java/rx-controller.java.vm" );
+        templates.add("vm/java/rx-dao.java.vm" );
+        templates.add("vm/java/rx-mapper.java.vm" );
+        templates.add("vm/java/rx-servface.java.vm" );
+        templates.add("vm/java/rx-event.java.vm" );
+        templates.add("vm/java/rx-serviceImpl.java.vm" );
+        templates.add("vm/java/vo/rx-addvo.java.vm" );
+        templates.add("vm/java/vo/rx-detailvo.java.vm" );
+        templates.add("vm/java/vo/rx-searchvo.java.vm" );
+        templates.add("vm/java/vo/rx-updatevo.java.vm" );
+        templates.add("vm/xml/rx-mapper.xml.vm" );
     }
+
 
     /**
      * 获取包前缀
@@ -189,16 +167,6 @@ public class VelocityUtils {
         return StringUtils.join(dicts, ", " );
     }
 
-    /**
-     * 获取权限前缀
-     *
-     * @param moduleName   模块名称
-     * @param businessName 业务名称
-     * @return 返回权限前缀
-     */
-    public static String getPermissionPrefix(String moduleName, String businessName) {
-        return StringUtils.format("{}:{}" , moduleName, businessName);
-    }
 
     /**
      * 初始化vm方法
@@ -217,4 +185,6 @@ public class VelocityUtils {
             throw new RuntimeException(e);
         }
     }
+
+
 }

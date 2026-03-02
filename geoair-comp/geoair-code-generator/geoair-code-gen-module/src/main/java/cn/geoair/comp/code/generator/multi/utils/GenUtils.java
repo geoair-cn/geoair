@@ -154,23 +154,5 @@ public class GenUtils {
         }
     }
 
-    /**
-     * 获取字段长度（修复空指针）
-     */
-    public static Integer getColumnLength(String columnType) {
-        if (StringUtils.isEmpty(columnType)) {
-            return 0;
-        }
-        int index = StringUtils.indexOf(columnType, "(" );
-        if (index > 0) {
-            String length = StringUtils.substringBetween(columnType, "(" , ")" );
-            try {
-                return Integer.valueOf(length);
-            } catch (NumberFormatException e) {
-                return 0;
-            }
-        } else {
-            return 0;
-        }
-    }
+
 }

@@ -4,8 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.sql.DataSource;
-
 /**
  * @author ：张逢吉
  * @date ：Created in   13:07
@@ -22,7 +20,7 @@ public class GirGeneratorConfig {
     String sourceRootPath = "/" ;
 
     public String getSourceRootPath() {
-        if(StrUtil.isEmpty(sourceRootPath)){
+        if (StrUtil.isEmpty(sourceRootPath)) {
             return "/" ;
         }
         return sourceRootPath;
@@ -59,5 +57,11 @@ public class GirGeneratorConfig {
      * 表前缀(类名不会包含表前缀)
      */
     public String tablePrefix;
+
+
+    /**
+     * 是否多模块
+     */
+    private Boolean mutiIs = true;
 
 }

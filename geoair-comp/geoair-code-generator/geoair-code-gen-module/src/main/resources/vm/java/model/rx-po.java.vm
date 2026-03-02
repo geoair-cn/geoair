@@ -1,4 +1,5 @@
 package ${packageName}.model.${moduleName}.entity;
+
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,8 +27,6 @@ import java.util.UUID;
     #end
 #end
 
-
-
 /**
  * ${tableComment}(${ClassName})实体类
  *
@@ -38,21 +37,22 @@ import java.util.UUID;
 @Table(name = "${tableName}")
     #foreach ($column in $columns)
         #if($column.isPk==1)
-        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>,GiEntityIdGenerator<$column.javaType>
+        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>,GiEntityIdGenerator<$column.javaType> {
             #break
         #end
     #end
-{
     private static final long serialVersionUID = ${time}L;
+
     #foreach ($column in $columns)
         #if($column.isPk==1)
             @Id
             @Column(name = "$column.columnName")
             @GaModelField(text = "$column.columnComment",isID=true)
             private $column.javaType $column.javaField;
-            ###break
+            #break
         #end
     #end
+
     #foreach ($column in $columns)
         #if($column.isPk != 1)
             #if($column.javaType == 'Date')
@@ -76,8 +76,8 @@ import java.util.UUID;
                 private $column.javaType $column.javaField;
             #end
         #end
-
     #end
+
     public ${ClassName}Po() {
     }
 
@@ -101,25 +101,21 @@ import java.util.UUID;
                 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
             #end
             #if($column.javaTypeOther == 'Geometry')
-                public void set${AttrName}($column.javaTypeOther $column.javaField)
-                {
+                public void set${AttrName}($column.javaTypeOther $column.javaField) {
                     this.$column.javaField = $column.javaField;
                 }
-                public $column.javaTypeOther get${AttrName}()
-                {
+
+                public $column.javaTypeOther get${AttrName}() {
                     return $column.javaField;
                 }
-
             #else
-                public void set${AttrName}($column.javaType $column.javaField)
-                {
+                public void set${AttrName}($column.javaType $column.javaField) {
                     this.$column.javaField = $column.javaField;
                 }
-                public $column.javaType get${AttrName}()
-                {
+
+                public $column.javaType get${AttrName}() {
                     return $column.javaField;
                 }
-
             #end
         #end
     #end
@@ -129,12 +125,14 @@ import java.util.UUID;
             public $column.javaType id() {
                 return $column.javaField;
             }
+
             public $column.javaType generatorId() {
                 return  UUID.randomUUID().toString();
             }
             #break
         #end
     #end
+
     public void setNotDel() {
     }
 
@@ -150,12 +148,13 @@ import java.util.UUID;
         setNotDel();
         // setTimeUpdate(new Date());
     }
+
     public static ${ClassName}Po empty() {
         return new ${ClassName}Po();
     }
 
-    public   ${ClassName}Po copy() {
-            ${ClassName}Po copy =   new ${ClassName}Po();
+    public ${ClassName}Po copy() {
+            ${ClassName}Po copy = new ${ClassName}Po();
         BeanUtil.copyProperties(this, copy);
         return copy;
     }

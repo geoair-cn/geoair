@@ -66,7 +66,7 @@
 
             <dependency>
                 <groupId>cn.geoair.comp</groupId>
-                <artifactId>geoair-code-gen-multi-module</artifactId>
+                <artifactId>geoair-code-gen-module</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
         </dependencies>
