@@ -11,7 +11,7 @@ import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import lombok.Data;
 import java.util.List;
 
 #foreach ($column in $columns)
@@ -26,6 +26,7 @@ import java.util.List;
  * @author ${author}
  * @date ${datetime}
  */
+@Data
 @GaModel(text = "删除${tableComment}")
 public class ${ClassName}DetailVo {
 
@@ -54,16 +55,6 @@ public class ${ClassName}DetailVo {
     private ${column.javaType} ${column.javaField};
     #end
 
-    #foreach($column in $columns)
-        #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-        public ${column.javaType} get${AttrName}() {
-            return ${column.javaField};
-        }
-
-        public void set${AttrName}(${column.javaType} ${column.javaField}) {
-            this.${column.javaField} = ${column.javaField};
-        }
-    #end
 
     public static ${ClassName}DetailVo fromDto(${ClassName}Dto dto) {
             ${ClassName}DetailVo vo = new ${ClassName}DetailVo();

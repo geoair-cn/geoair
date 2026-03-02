@@ -1,5 +1,5 @@
 package ${packageName}.model.${moduleName}.seo;
-
+import lombok.Data;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
@@ -12,10 +12,9 @@ import cn.hutool.core.bean.BeanUtil;
  * @date ${datetime}
  */
 @GaModel(text = "${tableComment}SearchDto")
-public class ${ClassName}Seo extends ${ClassName}Po
-{
+@Data
+public class ${ClassName}Seo extends ${ClassName}Po {
     private static final long serialVersionUID = ${time}L;
-
     public static ${ClassName}Seo emptySeo() {
         return new ${ClassName}Seo();
     }
@@ -47,61 +46,4 @@ public class ${ClassName}Seo extends ${ClassName}Po
 #end
 #end
 
-    public String[] getAndQueryContentIn() {
-        return andQueryContentIn;
-    }
-
-    public void setAndQueryContentIn(String[] andQueryContentIn) {
-        this.andQueryContentIn = andQueryContentIn;
-    }
-
-#foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
-#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
-#set($AttrName=$column.javaField)
-#else
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#end
-#if($column.isPk == 1)
-    public void setAndIdsIn(String[] andIdsIn)
-    {
-        this.andIdsIn = andIdsIn;
-    }
-
-    public String[] getAndIdsIn()
-    {
-        return this.andIdsIn;
-    }
-
-    public void setAndIdsNotIn(String[] andIdsNotIn) {
-        this.andIdsNotIn = andIdsNotIn;
-    }
-
-    public String[] getAndIdsNotIn() {
-        return andIdsNotIn;
-    }
-#else
-#if($column.javaType == 'Date')
-    public void set${AttrName}Start($column.javaType ${column.javaField}Start)
-    {
-        this.${column.javaField}Start = ${column.javaField}Start;
-    }
-
-    public $column.javaType get${AttrName}Start()
-    {
-        return ${column.javaField}Start;
-    }
-
-    public void set${AttrName}End($column.javaType ${column.javaField}End)
-    {
-        this.${column.javaField}End = ${column.javaField}End;
-    }
-    public $column.javaType get${AttrName}End()
-    {
-        return ${column.javaField}End;
-    }
-#end
-#end
-#end
-#end
 }

@@ -5,7 +5,7 @@ import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 #foreach ($column in $columns)
@@ -20,6 +20,7 @@ import javax.validation.constraints.NotBlank;
  * @author ${author}
  * @date ${datetime}
  */
+@Data
 @GaModel(text = "新增${tableComment}")
 public class ${ClassName}AddVo {
 
@@ -48,17 +49,4 @@ public class ${ClassName}AddVo {
     private ${column.javaType} ${column.javaField};
     #end
 
-    #foreach($column in $columns)
-        #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-        #* 非主键列生成get/set方法 *#
-        #if($column.isPk!=1)
-            public ${column.javaType} get${AttrName}() {
-                return ${column.javaField};
-            }
-
-            public void set${AttrName}(${column.javaType} ${column.javaField}) {
-                this.${column.javaField} = ${column.javaField};
-            }
-        #end
-    #end
 }

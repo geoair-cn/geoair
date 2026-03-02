@@ -140,15 +140,15 @@ public class GenPathUtils {
             } else if (template.contains("rx-serviceImpl.java.vm" )) {
                 fileName = StringUtils.format("src/{}/{}/service/{}/{}ServiceImpl.java" , PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-controller.java.vm" )) {
-                fileName = StringUtils.format("src/{}/{}/controller/{}/{}Controller.java" , PROJECT_PATH, packagePath, moduleName, className);
+                fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}Controller.java" , PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-addvo.java.vm" )) {
-                fileName = StringUtils.format("src/{}/{}/controller/{}/{}AddVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
+                fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}AddVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
             } else if (template.contains("rx-detailvo.java.vm" )) {
-                fileName = StringUtils.format("src/{}/{}/controller/{}/{}DetailVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
+                fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}DetailVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
             } else if (template.contains("rx-searchvo.java.vm" )) {
-                fileName = StringUtils.format("src/{}/{}/controller/{}/{}SearchVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
+                fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}SearchVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
             } else if (template.contains("rx-updatevo.java.vm" )) {
-                fileName = StringUtils.format("src/{}/{}/controller/{}/{}UpdateVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
+                fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}UpdateVo.java" , PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
             } else if (template.contains("rx-mapper.xml.vm" )) {
                 fileName = StringUtils.format("src/{}/{}/mapper/{}/impl/{}Mapper.xml" , PROJECT_PATH, packagePath, moduleName, className);
             }

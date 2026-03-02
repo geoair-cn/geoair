@@ -1,5 +1,5 @@
 package ${packageName}.controller.${moduleName}.${classname};
-
+import lombok.Data;
 import com.alibaba.fastjson.annotation.JSONField;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
@@ -21,6 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
  * @date ${datetime}
  */
 @GaModel(text = "修改${tableComment}")
+@Data
 public class ${ClassName}UpdateVo {
     public static ${ClassName}UpdateVo empty() {
         return new ${ClassName}UpdateVo();
@@ -53,14 +54,5 @@ public class ${ClassName}UpdateVo {
     private $column.javaType $column.javaField;
     #end
 
-    #foreach($column in $columns)
-        #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-        public $column.javaType get${AttrName}() {
-            return $column.javaField;
-        }
 
-        public void set${AttrName}($column.javaType $column.javaField) {
-            this.$column.javaField = $column.javaField;
-        }
-    #end
 }

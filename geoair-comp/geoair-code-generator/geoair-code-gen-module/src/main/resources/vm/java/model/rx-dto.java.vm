@@ -3,7 +3,7 @@ package ${packageName}.model.${moduleName}.dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.hutool.core.bean.BeanUtil;
-
+import lombok.Data;
 
 /**
  * ${tableComment}(${ClassName})DTO
@@ -12,6 +12,7 @@ import cn.hutool.core.bean.BeanUtil;
  * @date ${datetime}
  */
 @GaModel(text = "${tableComment}DTO" )
+@Data
 public class ${ClassName}Dto extends ${ClassName}Po {
     private static final long serialVersionUID = ${time}L;
 

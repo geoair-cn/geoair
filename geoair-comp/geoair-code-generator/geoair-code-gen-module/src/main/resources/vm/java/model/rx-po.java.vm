@@ -1,6 +1,7 @@
 package ${packageName}.model.${moduleName}.entity;
 
 import cn.hutool.core.bean.BeanUtil;
+import lombok.Data;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import cn.geoair.base.data.common.GemDatePattern;
@@ -34,6 +35,7 @@ import java.util.UUID;
  * @date ${datetime}
  */
 @GaModel(text = "${tableComment}")
+@Data
 @Table(name = "${tableName}")
     #foreach ($column in $columns)
         #if($column.isPk==1)
@@ -93,32 +95,7 @@ import java.util.UUID;
         #end
     }
 
-    #foreach ($column in $columns)
-        #if(!$table.isSuperColumn($column.javaField))
-            #if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
-                #set($AttrName=$column.javaField)
-            #else
-                #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-            #end
-            #if($column.javaTypeOther == 'Geometry')
-                public void set${AttrName}($column.javaTypeOther $column.javaField) {
-                    this.$column.javaField = $column.javaField;
-                }
 
-                public $column.javaTypeOther get${AttrName}() {
-                    return $column.javaField;
-                }
-            #else
-                public void set${AttrName}($column.javaType $column.javaField) {
-                    this.$column.javaField = $column.javaField;
-                }
-
-                public $column.javaType get${AttrName}() {
-                    return $column.javaField;
-                }
-            #end
-        #end
-    #end
 
     #foreach ($column in $columns)
         #if($column.isPk == 1)
