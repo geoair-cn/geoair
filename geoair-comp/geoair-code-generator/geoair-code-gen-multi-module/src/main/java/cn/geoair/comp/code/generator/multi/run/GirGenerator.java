@@ -1,5 +1,6 @@
 package cn.geoair.comp.code.generator.multi.run;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.db.CommonRuner;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
@@ -33,7 +34,7 @@ public class GirGenerator {
         VelocityUtils.initVelocity();
     }
 
-    public void genCode(String[] tables, String packageName) {
+    public void genCode(String[] tables) {
         if (tables == null || tables.length == 0) {
             throw new GirException("生成表名列表不能为空" );
         }
@@ -41,7 +42,7 @@ public class GirGenerator {
         List<GenTable> tableList = commonRuner.selectDbTableListByNames(tables);
         for (GenTable table : tableList) {
             GenUtils.initTable(table, this.globalConfig);
-            table.setPackageName(packageName);
+            table.setPackageName(globalConfig.getSourceRootPackage());
             table.setGenPath(globalConfig.getSourceRootPath());
             // 查询列信息
             List<GenTableColumn> genTableColumns = commonRuner.getTableColumnsByTableName(table.getTableName());
@@ -54,6 +55,11 @@ public class GirGenerator {
             table.setColumns(genTableColumns);
             generatorCode(table);
         }
+        Gir.log.info("代码生成成功" );
+    }
+
+    public void genCode(String table) {
+        genCode(new String[]{table});
     }
 
     private void generatorCode(GenTable table) {

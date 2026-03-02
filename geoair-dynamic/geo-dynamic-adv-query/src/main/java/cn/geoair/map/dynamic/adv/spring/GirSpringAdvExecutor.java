@@ -2,12 +2,8 @@ package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-import cn.geoair.map.dynamic.ds.DataSourceGetter;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.hutool.extra.spring.SpringUtil;
-
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉

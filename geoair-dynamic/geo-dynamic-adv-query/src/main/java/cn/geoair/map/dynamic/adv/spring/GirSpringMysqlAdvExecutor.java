@@ -13,17 +13,22 @@ import javax.sql.DataSource;
  */
 public class GirSpringMysqlAdvExecutor extends AdvExecutorMysql implements IAdvExecutor {
 
-	public static GirSpringMysqlAdvExecutor newInstance() {
-		GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
-		advExecutor.initByDataSource(getDataSourceBySpring());
-		return advExecutor;
-	}
+    public static GirSpringMysqlAdvExecutor newInstanceBySpring() {
+        DataSource dataSourceBySpring = getDataSourceBySpring();
+        return newInstance(dataSourceBySpring);
+    }
 
-	public static DataSource getDataSourceBySpring() {
-		return SpringUtil.getBean(DataSource.class);
-	}
+    public static GirSpringMysqlAdvExecutor newInstance(DataSource dataSource) {
+        GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
+        advExecutor.initByDataSource(dataSource);
+        return advExecutor;
+    }
 
-	public GirSpringMysqlAdvExecutor() {
-	}
+    public static DataSource getDataSourceBySpring() {
+        return SpringUtil.getBean(DataSource.class);
+    }
+
+    public GirSpringMysqlAdvExecutor() {
+    }
 
 }

@@ -1,6 +1,7 @@
 package cn.geoair.comp.code.generator.multi.config;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.sql.DataSource;
 
@@ -10,9 +11,8 @@ import javax.sql.DataSource;
  * @description： TODO
  */
 @Data
+@Accessors(chain = true)
 public class GirGeneratorConfig {
-
-
 
 
     /**

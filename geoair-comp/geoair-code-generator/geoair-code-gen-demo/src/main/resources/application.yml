@@ -9,6 +9,3 @@ gtc:
     enable: true
 server:
   port: 8080
-#server:
-#  servlet:
-#    context-path: /demo_context

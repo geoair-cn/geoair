@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.tools.GirService;
+import com.alibaba.druid.pool.DruidDataSource;
 
 /**
  * @author ：张逢吉
@@ -14,23 +15,22 @@ import cn.geoair.map.dynamic.tools.GirService;
  */
 public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
 
-	@Override
-	public IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
-		IAdvDataSourceHelper pxyBeanC = GirService.getPxyBeanC(IAdvDataSourceHelper.class);
-		if (pxyBeanC == null) {
-			throw new RuntimeException("无法找到AdvDataSourceHelper的实现");
-		}
-		DataSourceApo dataSourceApoById = pxyBeanC.getDataSourceApoById(dataSourceId);
-		dataSourceApoById.setSchemaName(schema);
+    @Override
+    public IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
+        IAdvDataSourceHelper pxyBeanC = GirService.getPxyBeanC(IAdvDataSourceHelper.class);
+        if (pxyBeanC == null) {
+            throw new RuntimeException("无法找到AdvDataSourceHelper的实现" );
+        }
+        DataSourceApo dataSourceApoById = pxyBeanC.getDataSourceApoById(dataSourceId);
+        dataSourceApoById.setSchemaName(schema);
+        // 这里进行区分数据库执行器
+        DruidDataSource dbDataSourceByApo = pxyBeanC.getDbDataSourceByApo(dataSourceApoById);
+        return AdvExecutorFactory.getAdvExecutorByDataSource(dbDataSourceByApo);
+    }
 
-		// 这里进行区分数据库执行器
-
-		return new AdvExecutorPG(dataSourceApoById);
-	}
-
-	@Override
-	public <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz) {
-		return (T) getIAdvExecutor(dataSourceId, schema);
-	}
+    @Override
+    public <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz) {
+        return (T) getIAdvExecutor(dataSourceId, schema);
+    }
 
 }

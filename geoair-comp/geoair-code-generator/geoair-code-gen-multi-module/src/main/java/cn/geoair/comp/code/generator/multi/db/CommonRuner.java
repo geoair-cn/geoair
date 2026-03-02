@@ -96,7 +96,7 @@ public class CommonRuner {
                 "\t\t<foreach collection=\"array\" item=\"name\" open=\"(\" separator=\",\" close=\")\">\n" +
                 "\t\t\t#{name}\n" +
                 "\t\t</foreach>" ;
-        return executor.bSelectObjList(sql, SqlParamMap.of().addOne("name" , tableNames), GenTable.class);
+        return executor.bSelectObjList(sql, SqlParamMap.of().addOne("array" , tableNames), GenTable.class);
     }
 
 

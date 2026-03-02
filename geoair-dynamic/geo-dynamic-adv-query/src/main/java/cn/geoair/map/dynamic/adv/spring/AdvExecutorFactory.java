@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -34,10 +34,10 @@ public class AdvExecutorFactory {
         switch (dbType) {
             case MYSQL:
                 log.info("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器" );
-                return GirSpringMysqlAdvExecutor.newInstance();
+                return GirSpringMysqlAdvExecutor.newInstance(dataSource);
             case POSTGRESQL:
                 log.info("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器" );
-                return GirSpringPGAdvExecutor.newInstance();
+                return GirSpringPGAdvExecutor.newInstance(dataSource);
             default:
                 throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
         }
@@ -53,7 +53,7 @@ public class AdvExecutorFactory {
         Connection conn = null;
         try {
             // 获取数据库连接（Spring工具类，自动处理事务）
-            conn = DataSourceUtils.getConnection(dataSource);
+            conn = dataSource.getConnection();
             DatabaseMetaData metaData = conn.getMetaData();
             // 获取数据库产品名称（标准化）
             String dbProductName = metaData.getDatabaseProductName().toUpperCase();
@@ -72,7 +72,7 @@ public class AdvExecutorFactory {
         } finally {
             // 释放连接（Spring工具类，避免连接泄露）
             if (conn != null) {
-                DataSourceUtils.releaseConnection(conn, dataSource);
+                IoUtil.close(conn);
             }
         }
     }
