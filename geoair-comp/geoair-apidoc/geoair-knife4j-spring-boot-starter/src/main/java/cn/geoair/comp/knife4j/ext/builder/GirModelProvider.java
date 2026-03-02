@@ -16,7 +16,7 @@ import springfox.documentation.swagger.schema.ApiModelBuilder;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/5/13 14:43 @description： GtcModel 替换 apimodel注解
+ * @date ：Created in 2022/5/13 14:43 @description： GirModel 替换 apimodel注解
  */
 @Component
 @Primary

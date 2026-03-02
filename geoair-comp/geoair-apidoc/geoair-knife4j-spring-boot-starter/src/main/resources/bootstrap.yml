@@ -14,18 +14,18 @@ geoair:
     author: "研发团队"
     description: "地图服务全量API文档（V2.0）"
     # 自动组装配置
-    controller-root-package: com.gtc.gishubteam.editor.wcs.controller # 手动指定单个根包
+    controller-root-package: cn.geoair.editor.wcs.controller # 手动指定单个根包
     # controller-root-packages: # 多根包场景（二选一）
     #   - com.gtc.controller.web
     #   - com.gtc.controller.base
     exclude-packages: # 排除测试包
-      - com.gtc.gishubteam.editor.wcs.controller.test
-      - com.gtc.gishubteam.editor.wcs.controller.demo
+      - cn.geoair.editor.wcs.controller.test
+      - cn.geoair.editor.wcs.controller.demo
     fixed-order-packages: # 自定义分组顺序
-      - com.gtc.gishubteam.editor.wcs.controller.web
-      - com.gtc.gishubteam.editor.wcs.controller.base
-      - com.gtc.gishubteam.editor.wcs.controller.init
-      - com.gtc.gishubteam.editor.wcs.controller.custom
+      - cn.geoair.editor.wcs.controller.web
+      - cn.geoair.editor.wcs.controller.base
+      - cn.geoair.editor.wcs.controller.init
+      - cn.geoair.editor.wcs.controller.custom
     group-name-prefix: "业务模块-" # 分组名前缀
     group-name-use-last-package: true # 用最后一级包名
     enable-group-index: true # 显示序号

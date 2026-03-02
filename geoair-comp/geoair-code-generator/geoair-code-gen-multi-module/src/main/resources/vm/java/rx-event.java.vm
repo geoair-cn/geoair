@@ -1,5 +1,5 @@
 package ${packageName}.servface.event.${moduleName}.event;
-import com.gtc.base.Gtc;
+import cn.geoair.gtc.base.Gir;
 import cn.hutool.core.map.MapUtil;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import java.util.*;
@@ -15,7 +15,7 @@ public interface ${ClassName}Event {
 
     static List<${ClassName}Event> getInstances() {
         List<${ClassName}Event> events = new ArrayList<>();
-        Map<String, ${ClassName}Event> beans = Gtc.beans.getBeans(${ClassName}Event.class);
+        Map<String, ${ClassName}Event> beans = Gir.beans.getBeans(${ClassName}Event.class);
         for (Map.Entry<String, ${ClassName}Event> event : beans.entrySet()) {
             events.add(event.getValue());
         }

@@ -1,4 +1,4 @@
-package com.gtc.comp.knife4j.demo;
+package cn.geoair.comp.knife4j.demo;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

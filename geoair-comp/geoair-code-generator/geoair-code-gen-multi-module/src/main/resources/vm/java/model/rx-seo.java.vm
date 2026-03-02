@@ -1,8 +1,8 @@
 package ${packageName}.model.${moduleName}.seo;
 
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
-import com.gtc.base.data.model.annotation.GaModel;
-import com.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.gtc.base.data.model.annotation.GaModel;
+import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import java.util.Date;
 import cn.hutool.core.bean.BeanUtil;
 /**

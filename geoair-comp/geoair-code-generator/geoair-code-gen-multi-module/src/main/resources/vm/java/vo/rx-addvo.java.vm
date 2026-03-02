@@ -1,10 +1,10 @@
 package ${packageName}.controller.${moduleName}.${classname};
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.gtc.base.data.model.annotation.GaModel;
-import com.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.gtc.base.data.model.annotation.GaModel;
+import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gtc.base.data.common.GemDatePattern;
+import cn.geoair.gtc.base.data.common.GemDatePattern;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,9 +12,9 @@ import java.util.Map;
 import javax.validation.constraints.NotBlank;
 
 #foreach ($column in $columns)
-#if("$!{column.enumsName}" != "")
-import ${packageName}.model.${moduleName}.enm.${column.enumsName};
-#end
+    #if("$!{column.enumsName}" != "")
+    import ${packageName}.model.${moduleName}.enm.${column.enumsName};
+    #end
 #end
 
 /**
@@ -26,44 +26,42 @@ import ${packageName}.model.${moduleName}.enm.${column.enumsName};
 @GaModel(text = "新增${tableComment}")
 public class ${ClassName}AddVo {
 
-#foreach($column in $columns)
+    #foreach($column in $columns)
+        #* 主键列：必填 + ID注解 *#
+        #if($column.isPk==1)
+        @NotBlank(message = "${column.columnComment} 不能为空")
+        @GaModelField(text = "${column.columnComment}",isID=true)
+        #else
+            #* 日期类型：格式化注解 + 基础字段注解 *#
+            #if($column.javaType=='Date')
+            @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+            @GaModelField(text = "${column.columnComment}")
+            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            #else
+                #* 枚举列：枚举注解 *#
+                #if("$!{column.enumsName}" != "")
+                @GaModelField(text = "${column.columnComment}",em = ${column.enumsName}.class)
+                #else
+                    #* 普通列：基础字段注解 *#
+                @GaModelField(text = "${column.columnComment}")
+                #end
+            #end
+        #end
+    private ${column.javaType} ${column.javaField};
+    #end
 
-#if($column.isPk==1)
-    @NotBlank(message = "$column.columnComment 不能为空")
-    @GaModelField(text = "$column.columnComment",isID=true)
-#else
-#if($column.javaType=='Date')
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @GaModelField(text = "$column.columnComment")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-#else
-#if("$!{column.fkName}" != "")
-    @GaModelField(text = "$column.columnComment",fk = ${column.fkName}.class)
-#else
-#if("$!{column.enumsName}" != "")
-    @GaModelField(text = "$column.columnComment",em = ${column.enumsName}.class)
-#else
-    @GaModelField(text = "$column.columnComment")
-#end
-#end
-#end
-#end
-    private $column.javaType $column.javaField;
-
-#end
-
-#foreach($column in $columns)
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#if($column.isPk!=1)
-    public $column.javaType get${AttrName}() {
-                return $column.javaField;
+    #foreach($column in $columns)
+        #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #* 非主键列生成get/set方法 *#
+        #if($column.isPk!=1)
+            public ${column.javaType} get${AttrName}() {
+                return ${column.javaField};
             }
 
-    public void set${AttrName}($column.javaType $column.javaField) {
-                this.$column.javaField = $column.javaField;
+            public void set${AttrName}(${column.javaType} ${column.javaField}) {
+                this.${column.javaField} = ${column.javaField};
             }
-
-#end
-#end
+        #end
+    #end
 }

@@ -1,4 +1,4 @@
-package com.gtc.comp.knife4j.demo.model;
+package cn.geoair.comp.knife4j.demo.model;
 
 import cn.geoair.gtc.base.data.common.GemDel;
 import cn.geoair.gtc.base.data.model.annotation.GaModel;

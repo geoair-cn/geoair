@@ -4,11 +4,11 @@ import ${packageName}.dao.${moduleName}.${ClassName}Dao;
 import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
-import com.gtc.orm.tkmapper.impls.TkEntityMapper;
+import cn.geoair.gtc.orm.tkmapper.impls.TkEntityMapper;
 import org.apache.ibatis.annotations.Param;
-import com.gtc.base.data.page.GfunPageExcute;
-import com.gtc.base.data.page.GiPageParam;
-import com.gtc.base.data.page.GiPager;
+import cn.geoair.gtc.base.data.page.GfunPageExcute;
+import cn.geoair.gtc.base.data.page.GiPageParam;
+import cn.geoair.gtc.base.data.page.GiPager;
 
 import java.util.List;
 

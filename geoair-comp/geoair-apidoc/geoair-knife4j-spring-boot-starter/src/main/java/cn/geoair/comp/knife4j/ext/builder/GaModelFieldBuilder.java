@@ -33,7 +33,7 @@ import static springfox.documentation.swagger.schema.ApiModelProperties.*;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/8/23 9:36 @description： GtcModelField 替换 ApiModelProperty
+ * @date ：Created in 2022/8/23 9:36 @description： GirModelField 替换 ApiModelProperty
  * 注解（jsonbody参数）
  */
 @Order(value = SWAGGER_PLUGIN_ORDER + 1)

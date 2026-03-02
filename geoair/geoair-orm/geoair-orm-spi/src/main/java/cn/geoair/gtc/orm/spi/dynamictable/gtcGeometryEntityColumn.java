@@ -1,6 +1,6 @@
-// package com.gtc.orm.spi.dynamictable;
+// package cn.geoair.gtc.orm.spi.dynamictable;
 //
-// import com.gtc.orm.spi.entity. gtcEntityColumn;
+// import cn.geoair.gtc.orm.spi.entity. gtcEntityColumn;
 //
 /// **
 // * 空间数据类型的 EntityColumn

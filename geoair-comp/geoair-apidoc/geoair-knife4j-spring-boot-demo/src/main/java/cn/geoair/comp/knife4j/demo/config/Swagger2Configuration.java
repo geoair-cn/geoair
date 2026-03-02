@@ -1,4 +1,4 @@
-package com.gtc.comp.knife4j.demo.config;
+package cn.geoair.comp.knife4j.demo.config;
 
 import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
 import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
@@ -20,7 +20,7 @@ public class Swagger2Configuration extends GirSwaggerApiConfig {
 
 	@Bean
 	public Docket createdemo1ApiServer() {
-		DocketInfo docketInfo = new DocketInfo("demo1分组", "com.gtc.comp.knife4j.demo.controller.group1");
+		DocketInfo docketInfo = new DocketInfo("demo1分组", "cn.geoair.comp.knife4j.demo.controller.group1");
 		return createApi(apiModelInfo, docketInfo).enable(girSwaggerProperties.isEnable());
 	}
 

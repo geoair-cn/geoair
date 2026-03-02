@@ -3,14 +3,14 @@ package ${packageName}.controller.${moduleName};
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.gtc.base.util.GutilObject;
+import cn.geoair.gtc.base.util.GutilObject;
 
 import java.util.List;
 
-import com.gtc.base.exception.GtcException;
-import com.gtc.base.api.annotation.GaApi;
-import com.gtc.base.api.annotation.GaApiAction;
-import com.gtc.base.data.page.support.GtcPager;
+import cn.geoair.gtc.base.exception.GirException;
+import cn.geoair.gtc.base.api.annotation.GaApi;
+import cn.geoair.gtc.base.api.annotation.GaApiAction;
+import cn.geoair.gtc.base.data.page.support.GtcPager;
 import ${packageName}.dao.${moduleName}.${ClassName}Dao;
 import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
@@ -20,11 +20,11 @@ import ${packageName}.controller .${moduleName}.${classname}.${ClassName}AddVo;
 import ${packageName}.controller .${moduleName}.${classname}.${ClassName}UpdateVo;
 import ${packageName}.controller .${moduleName}.${classname}.${ClassName}SearchVo;
 import ${packageName}.controller .${moduleName}.${classname}.${ClassName}DetailVo;
-import com.gtc.base.data.page.GiPager;
-import com.gtc.base.data.result.GiResult;
-import com.gtc.base.data.result.GtcEmAlertType;
-import com.gtc.base.data.GtcValidateException;
-import com.gtc.base.data.page.GiPageParam;
+import cn.geoair.gtc.base.data.page.GiPager;
+import cn.geoair.gtc.base.data.result.GiResult;
+import cn.geoair.gtc.base.data.result.GirEmAlertType;
+import cn.geoair.gtc.base.data.GtcValidateException;
+import cn.geoair.gtc.base.data.page.GiPageParam;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +36,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import com.gtc.base.log.GiLoger;
-import com.gtc.base.log.GtcLoger;
+import cn.geoair.gtc.base.log.GiLoger;
+import cn.geoair.gtc.base.log.GtcLoger;
 
 /**
  * ${tableComment}Controller
@@ -61,9 +61,6 @@ public class ${ClassName}Controller {
             @GaApiAction(text = "新增${tableComment}" )
             @RequestMapping(value = "/add${ClassName}" , method = {RequestMethod.POST})
             @ResponseBody
-                #if($packageName == 'com.gtc.gishubteam.onemap')
-                @RepeatSubmit
-                #end
             public GiResult<?> add${ClassName}(@Validated @RequestBody  ${ClassName}AddVo param) {
                     ${ClassName}Po record = new ${ClassName}Po();
                 BeanUtils.copyProperties(param, record);
@@ -72,7 +69,6 @@ public class ${ClassName}Controller {
                     throw new GtcException("${tableComment}已存在" );
                 }
                 record.setId("${ClassName}_" .toLowerCase() + IdUtil.getSnowflakeNextIdStr());
-                ##        ${className}Dao.gtcAccessSelective(record);
                     ${className}Service.add${ClassName}(record);
                 return GiResult.successValue(record).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
             }
@@ -80,19 +76,14 @@ public class ${ClassName}Controller {
             @GaApiAction(text = "修改${tableComment}" )
             @RequestMapping(value = "/update${ClassName}" , method = {RequestMethod.POST})
             @ResponseBody
-                #if($packageName == 'com.gtc.gishubteam.onemap')
-                @RepeatSubmit
-                #end
             public GiResult<?> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
                     ${ClassName}Po old = ${className}Dao.gtcSearchByPK(param.get${AttrName}());
                 if (old == null) {
                     throw new GtcValidateException("${tableComment}不存在" );
                 }
                     ${ClassName}Po record = new ${ClassName}Po();
-                BeanUtils.copyProperties(param, record);
-
+                    BeanUtils.copyProperties(param, record);
                     ${className}Service.update${ClassName}(record);
-                ##        ${className}Dao.gtcUpdateByPKSelective(record);
                 return GiResult.successValue(record).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
             }
 
@@ -118,7 +109,7 @@ public class ${ClassName}Controller {
                         throw new GtcValidateException("${tableComment}不存在" );
                     }
                         ${className}Service.del${ClassName}(po);
-                    ##            ${className}Dao.gtcDeleteByPK(id);
+
                     return GiResult.getResult(null).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
                 } else {
                     return GiResult.getResult(null).andAlertMsg("确定要删除${tableComment}吗?" ).andAlertTypeEnum(GtcEmAlertType.弹出确认警告5);

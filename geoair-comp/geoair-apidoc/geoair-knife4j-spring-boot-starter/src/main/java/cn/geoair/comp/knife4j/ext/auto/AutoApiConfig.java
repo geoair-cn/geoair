@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 基于配置自动生成Swagger Docket，支持手动指定包、排除包、自定义分组规则 整合GtcSwaggerProperties配置项，零配置/手动配置双兼容
+ * 基于配置自动生成Swagger Docket，支持手动指定包、排除包、自定义分组规则 整合GirSwaggerProperties配置项，零配置/手动配置双兼容
  */
 
 public class AutoApiConfig extends GirSwaggerApiConfig implements ApplicationContextAware {

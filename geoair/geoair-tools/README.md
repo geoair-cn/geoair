@@ -6,15 +6,15 @@
 
 ### bean - 容器Bean管理
 - 提供容器获取Bean的方法，使用者无需关心具体实现是由Spring容器还是其他容器提供Bean服务；
-- 调用常用方法获取Bean：`gtcBeanHelper.getBean(...);`
+- 调用常用方法获取Bean：`girBeanHelper.getBean(...);`
 
 ### cache - 缓存管理
 - 提供对缓存的统一使用接口，使用者无需关心具体实现是使用的何种缓存组件，由动态适配去实现；
-- 调用常用方法：`gtcCacheHelper.xxx(...);`
+- 调用常用方法：`girCacheHelper.xxx(...);`
 
 ### env - 环境与属性读取
 - 提供对环境访问的API，由动态适配去实现；
-- 调用常用方法：`gtcPropertyHelper.xxx(...);`
+- 调用常用方法：`girPropertyHelper.xxx(...);`
 
 ### convert - 数据转换
 - 提供通用数据转换接口，支持多种数据格式之间的转换；
