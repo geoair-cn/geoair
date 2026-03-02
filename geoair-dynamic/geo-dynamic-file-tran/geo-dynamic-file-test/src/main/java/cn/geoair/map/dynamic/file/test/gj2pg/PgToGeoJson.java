@@ -9,14 +9,13 @@ import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import cn.geoair.map.dynamic.file.geojson.GeoJsonGeoFileReader;
 import cn.geoair.map.dynamic.file.geojson.GeoJsonGeoFileWriter;
 import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.*;
 
 import java.io.IOException;
 
-import static cn.geoair.gtc.base.Gir.log;
+import static cn.geoair.base.Gir.log;
 
 public class PgToGeoJson {
 

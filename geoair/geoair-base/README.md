@@ -7,13 +7,13 @@
 
 * bean  容器Bean 提供从容器获取bean的工具
     * 提供容器获取bean方法，使用者不用关心具体实现是由spring容器还是其他容器提供bean服务;
-    * 调用常用方法获取Bean   gtcBeanHelper.getBean(...);
+    * 调用常用方法获取Bean   GirBeanHelper.getBean(...);
 * cache 缓存
     * 提供对缓存的使用。使用者不用关心具体实现是使用的何种缓存组件，由动态适配去实现。
-    * 调用常用方法   gtcCacheHelper.xxx(...);
+    * 调用常用方法   GirCacheHelper.xxx(...);
 * env  提供环境和属性的读取
     * 提供对环境访问的api，由动态适配去实现。
-    * 调用常用方法   gtcPropertyHelper.xxx(...);
+    * 调用常用方法   GirPropertyHelper.xxx(...);
 * convert   数据转换
     * 提供通用数据转换接口
 * data  数据 提供模型数据规范
@@ -28,7 +28,7 @@
 
 * util   常用静态工具类
 
-*  gtc   提供常用工具方法
+*  gir   提供常用工具方法
 
 ## 其他：
 

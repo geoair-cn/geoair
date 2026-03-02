@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.demo.controller.group1;
 
-import cn.geoair.gtc.base.api.annotation.GaApi;
-import cn.geoair.gtc.base.api.annotation.GaApiAction;
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.comp.knife4j.demo.model.DemoVo1;
 import io.swagger.annotations.Api;
 import org.springframework.stereotype.Controller;

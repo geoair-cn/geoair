@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.spring;
 
-import cn.geoair.gtc.base.Gir;
+import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

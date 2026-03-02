@@ -4,7 +4,7 @@ import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
 import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
-import cn.geoair.gtc.base.Gir;
+import cn.geoair.base.Gir;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;

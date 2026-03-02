@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.ext.aspect;
 
-import cn.geoair.gtc.base.api.annotation.GaApi;
-import cn.geoair.gtc.base.util.GutilStr;
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.util.GutilStr;
 import io.swagger.annotations.Api;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -1,6 +1,5 @@
 package ${packageName}.servface.event.${moduleName}.event;
-import cn.geoair.gtc.base.Gir;
-import cn.hutool.core.map.MapUtil;
+import cn.geoair.base.Gir;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import java.util.*;
 import cn.hutool.core.collection.ListUtil;

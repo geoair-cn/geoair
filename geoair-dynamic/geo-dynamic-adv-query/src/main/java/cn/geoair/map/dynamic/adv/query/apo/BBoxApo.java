@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.geoair.gtc.base.Gir;
+import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 
 import org.locationtech.jts.geom.*;

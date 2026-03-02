@@ -1,8 +1,8 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
-import cn.geoair.gtc.base.Gir;
-import cn.geoair.gtc.base.api.annotation.GaApi;
-import cn.geoair.gtc.base.api.annotation.GaApiAction;
+import cn.geoair.base.Gir;
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;

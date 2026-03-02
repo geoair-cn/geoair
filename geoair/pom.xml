@@ -51,7 +51,7 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- gtc版本约束 -->
+			<!-- gir版本约束 -->
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-base</artifactId>

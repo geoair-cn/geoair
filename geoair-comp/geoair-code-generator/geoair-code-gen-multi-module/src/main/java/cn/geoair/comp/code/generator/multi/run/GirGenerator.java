@@ -6,7 +6,7 @@ import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
-import cn.geoair.gtc.base.exception.GirException;
+import cn.geoair.base.exception.GirException;
 import cn.hutool.core.map.MapUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;

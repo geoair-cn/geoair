@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
-import cn.geoair.gtc.base.log.GiLogger;
-import cn.geoair.gtc.base.log.GirLogger;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;

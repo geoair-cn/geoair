@@ -1,14 +1,13 @@
 package cn.geoair.map.dynamic.ds;
 
-import cn.geoair.gtc.base.log.GiLogger;
-import cn.geoair.gtc.base.log.GirLogger;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 
-import lombok.Getter;
 import org.geotools.data.DataStore;
 
 import javax.sql.DataSource;

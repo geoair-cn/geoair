@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.geojson;
 
-import cn.geoair.gtc.base.data.page.support.GirPageParam;
-import cn.geoair.gtc.base.data.page.support.GirPager;
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;

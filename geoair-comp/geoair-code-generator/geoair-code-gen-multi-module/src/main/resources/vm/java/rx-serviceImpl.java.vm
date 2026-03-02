@@ -1,12 +1,10 @@
 package ${packageName}.service.${moduleName};
 
-import cn.geoair.gtc.base.util.GutilObject;
-import cn.hutool.core.collection.ListUtil;
+import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.util.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import cn.geoair.gtc.base.util.GutilObject;
 import cn.hutool.core.util.ReflectUtil;
 import ${packageName}.dao.${moduleName}.${ClassName}Dao;
 import ${packageName}.servface.${moduleName}.${ClassName}Service;
@@ -27,7 +25,6 @@ import cn.geoair.gtc.base.log.GiLoger;
 import cn.geoair.gtc.base.log.GtcLoger;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Method;
 
 /**
  * ${tableComment}Service业务层处理

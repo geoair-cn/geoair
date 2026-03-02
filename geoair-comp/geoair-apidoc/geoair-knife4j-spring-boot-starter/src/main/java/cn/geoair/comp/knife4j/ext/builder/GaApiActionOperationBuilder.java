@@ -1,7 +1,6 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
-import cn.geoair.gtc.base.api.annotation.GaApiAction;
-import com.google.common.collect.Sets;
+import cn.geoair.base.api.annotation.GaApiAction;
 
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.spi.DocumentationType;
@@ -9,9 +8,6 @@ import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
 
 import java.util.List;
-import java.util.Set;
-
-import static com.google.common.collect.Sets.union;
 
 /**
  * @author ：张俊

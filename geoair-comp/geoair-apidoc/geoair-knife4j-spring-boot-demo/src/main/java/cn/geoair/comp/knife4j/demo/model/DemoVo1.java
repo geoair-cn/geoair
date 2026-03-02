@@ -1,8 +1,8 @@
 package cn.geoair.comp.knife4j.demo.model;
 
-import cn.geoair.gtc.base.data.common.GemDel;
-import cn.geoair.gtc.base.data.model.annotation.GaModel;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.base.data.common.GemDel;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
 
 import java.util.List;
 

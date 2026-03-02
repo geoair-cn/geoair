@@ -1,14 +1,11 @@
 package ${packageName}.controller.${moduleName}.${classname};
 
 import com.alibaba.fastjson.annotation.JSONField;
-import cn.geoair.gtc.base.data.model.annotation.GaModel;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import cn.geoair.gtc.base.data.common.GemDatePattern;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 import javax.validation.constraints.NotBlank;
 
 #foreach ($column in $columns)

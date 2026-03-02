@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.file.geojson;
 
-import cn.geoair.gtc.base.log.GiLogger;
-import cn.geoair.gtc.base.log.GirLogger;
-import cn.geoair.gtc.base.util.GutilReflection;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilReflection;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
@@ -13,8 +13,6 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import org.geotools.data.geojson.GeoJSONWriter;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

@@ -1,6 +1,6 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
-import cn.geoair.gtc.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModel;
 import com.fasterxml.classmate.TypeResolver;
 
 import org.springframework.context.annotation.Primary;

@@ -1,12 +1,10 @@
 package ${packageName}.controller.${moduleName}.${classname};
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.annotation.JSONField;
-import cn.geoair.gtc.base.data.model.annotation.GaModel;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import cn.geoair.gtc.base.data.common.GemDatePattern;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 #foreach ($column in $columns)
 #if("$!{column.enumsName}" != "")

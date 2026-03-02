@@ -1,9 +1,8 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
-import cn.geoair.gtc.base.data.GiVisualValuable;
-import cn.geoair.gtc.base.data.common.GemNull;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
-import io.swagger.annotations.ApiModelProperty;
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemNull;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;

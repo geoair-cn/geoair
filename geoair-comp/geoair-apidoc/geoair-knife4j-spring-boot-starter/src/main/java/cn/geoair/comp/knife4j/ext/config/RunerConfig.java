@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.ext.config;
 
-import cn.geoair.gtc.base.Gir;
-import cn.geoair.gtc.base.util.GutilStr;
+import cn.geoair.base.Gir;
+import cn.geoair.base.util.GutilStr;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;

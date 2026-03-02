@@ -1,12 +1,7 @@
 package cn.geoair.comp.knife4j.demo.model;
 
-import cn.geoair.gtc.base.data.common.GemDel;
-import cn.geoair.gtc.base.data.model.annotation.GaModel;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.List;
 
 /**
  * 演示模型

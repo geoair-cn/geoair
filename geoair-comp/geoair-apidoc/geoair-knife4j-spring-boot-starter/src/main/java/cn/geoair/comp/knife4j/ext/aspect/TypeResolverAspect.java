@@ -1,12 +1,12 @@
 package cn.geoair.comp.knife4j.ext.aspect;
 
-import cn.geoair.gtc.base.data.page.GiPageParam;
-import cn.geoair.gtc.base.data.page.GiPager;
-import cn.geoair.gtc.base.data.page.support.GirPageParam;
-import cn.geoair.gtc.base.data.result.GiResult;
-import cn.geoair.gtc.base.util.GutilClass;
-import cn.geoair.gtc.web.data.result.GiWebResult;
-import cn.geoair.gtc.web.data.result.GirWebResult;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.result.GiResult;
+import cn.geoair.base.util.GutilClass;
+import cn.geoair.web.data.result.GiWebResult;
+import cn.geoair.web.data.result.GirWebResult;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeBindings;
 import com.fasterxml.classmate.TypeResolver;

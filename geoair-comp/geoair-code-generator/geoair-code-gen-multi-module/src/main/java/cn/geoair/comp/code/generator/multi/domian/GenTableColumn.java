@@ -1,7 +1,7 @@
 package cn.geoair.comp.code.generator.multi.domian;
 
 
-import cn.geoair.gtc.base.util.GutilStr;
+import cn.geoair.base.util.GutilStr;
 import lombok.Data;
 
 import java.util.Map;

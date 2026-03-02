@@ -6,9 +6,9 @@ import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
 import cn.geoair.gtc.orm.tkmapper.impls.TkEntityMapper;
 import org.apache.ibatis.annotations.Param;
-import cn.geoair.gtc.base.data.page.GfunPageExcute;
-import cn.geoair.gtc.base.data.page.GiPageParam;
-import cn.geoair.gtc.base.data.page.GiPager;
+import cn.geoair.base.data.page.GfunPageExcute;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
 
 import java.util.List;
 
