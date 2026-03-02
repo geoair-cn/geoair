@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Component
 @ConfigurationProperties(prefix = "geoair.apidoc")
-public class GtcSwaggerProperties {
+public class GirSwaggerProperties {
 
 	/**
 	 * 是否启用swagger注解（全局开关）

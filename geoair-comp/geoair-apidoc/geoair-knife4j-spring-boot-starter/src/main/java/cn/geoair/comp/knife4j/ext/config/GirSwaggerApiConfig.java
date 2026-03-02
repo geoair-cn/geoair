@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  */
 @Configuration
 @EnableSwagger2
-public class GtcSwaggerApiConfig {
+public class GirSwaggerApiConfig {
 
 	@Resource
 	SpringAddtionalModelService springAddtionalModelService;

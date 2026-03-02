@@ -110,7 +110,7 @@ public class DocketInfo {
 	}
 
 	static {
-		DEFAULT = new DocketInfo("geoway", "com.gtc.apidoc.controller", "");
+		DEFAULT = new DocketInfo("geoair", "cn.geoair.apidoc.controller", "");
 	}
 
 }

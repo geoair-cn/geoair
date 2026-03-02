@@ -21,14 +21,14 @@ import springfox.documentation.swagger.schema.ApiModelBuilder;
 @Component
 @Primary
 @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER - 1)
-public class GtcModelProvider extends ApiModelBuilder {
+public class GirModelProvider extends ApiModelBuilder {
 
 	private final TypeResolver typeResolver;
 
 	private final TypeNameExtractor typeNameExtractor;
 
-	public GtcModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor,
-			EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
+	public GirModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor,
+							EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
 		super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
 		this.typeNameExtractor = typeNameExtractor;
 		this.typeResolver = typeResolver;

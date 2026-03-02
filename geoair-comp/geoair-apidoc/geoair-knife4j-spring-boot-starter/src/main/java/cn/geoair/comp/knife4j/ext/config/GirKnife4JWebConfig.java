@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 
 @Configuration
-public class GtcKnife4JWebConfig implements WebMvcConfigurer, EnvironmentAware {
+public class GirKnife4JWebConfig implements WebMvcConfigurer, EnvironmentAware {
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
@@ -37,7 +37,7 @@ public class GtcKnife4JWebConfig implements WebMvcConfigurer, EnvironmentAware {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(GtcSwaggerApiConfig.class)
+	@ConditionalOnMissingBean(GirSwaggerApiConfig.class)
 	AutoApiConfig autoApiConfig() {
 		return new AutoApiConfig();
 	}
