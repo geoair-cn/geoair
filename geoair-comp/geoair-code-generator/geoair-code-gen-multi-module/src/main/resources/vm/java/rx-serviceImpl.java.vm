@@ -1,0 +1,138 @@
+package ${packageName}.service.${moduleName};
+
+import com.gtc.base.util.GutilObject;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.gtc.base.util.GutilObject;
+import cn.hutool.core.util.ReflectUtil;
+import ${packageName}.dao.${moduleName}.${ClassName}Dao;
+import ${packageName}.servface.${moduleName}.${ClassName}Service;
+import ${packageName}.servface.${moduleName}.event.${ClassName}Event;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
+
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.context.annotation.Bean;
+
+import java.util.*;
+
+import com.gtc.base.log.GiLoger;
+import com.gtc.base.log.GtcLoger;
+
+import javax.annotation.Resource;
+import java.lang.reflect.Method;
+
+/**
+ * ${tableComment}Service业务层处理
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class ${ClassName}ServiceImpl implements ${ClassName}Service {
+    private static final GiLoger loger = GtcLoger.getLoger(${ClassName}ServiceImpl.class);
+
+    @Resource
+    private ${ClassName}Dao ${className}Dao;
+
+    @Override
+    public    ${ClassName}Po add${ClassName}(${ClassName}Po insertPo) {
+        insertPo.initCreateMeta();
+            ${className}Dao.gtcAccessSelective(insertPo);
+        List< ${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            event.add${ClassName}Event(insertPo);
+        }
+        return insertPo;
+    }
+
+
+    @Override
+    public    ${ClassName}Po update${ClassName}(${ClassName}Po updatePo) {
+        String id = updatePo.getId();
+            ${ClassName}Po poObj = ${className}Dao.gtcSearchByPK(id);
+        updatePo.initUpdateMeta();
+        List< ${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            event.update${ClassName}Event(poObj, updatePo);
+        }
+            ${className}Dao.gtcUpdateByPKSelective(updatePo);
+        return updatePo;
+    }
+
+    @Override
+    public  ${ClassName}Po del${ClassName}(${ClassName}Po delPo) {
+        List< ${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            event.del${ClassName}Event(delPo);
+        }
+            ${className}Dao.gtcDeleteByPK(delPo.id());
+        return delPo;
+    }
+
+    @Override
+    public ${ClassName}Po logicDel${ClassName}(${ClassName}Po logicDelPo) {
+        List< ${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            event.del${ClassName}Event(logicDelPo);
+        }
+        logicDelPo.setDel();
+            ${className}Dao.gtcUpdateByPKSelective(logicDelPo);
+        return logicDelPo;
+    }
+
+    @Override
+    public   ${ClassName}Dto get${ClassName}DtoById(String id) {
+            ${ClassName}Po poObj = ${className}Dao.gtcSearchByPK(id);
+        if (GutilObject.isNotEmpty(poObj)) {
+            return ${ClassName}Dto.of${ClassName}Po(poObj);
+        }
+        return null;
+    }
+
+    @Override
+    public List<${ClassName}Dto> get${ClassName}ListBySeo(${ClassName}Seo seo) {
+        return ${className}Dao.searchList(seo);
+    }
+
+    @Override
+    public <T> Map<String, ${ClassName}Dto> getDtosByBeansInvoke(List<T> beanList, String ... fieldName) {
+        Map<String, ${ClassName}Dto> re = new HashMap<>();
+        Set<String> ids = new HashSet<>();
+        for (String f : fieldName) {
+            for (T t : beanList) {
+                Object fieldValue = ReflectUtil.getFieldValue(t, f);
+                if (GutilObject.isNotEmpty(fieldValue) && fieldValue instanceof String) {
+                    ids.add((String) fieldValue);
+                }
+            }
+        }
+            ${ClassName}Seo seo = new ${ClassName}Seo();
+        if (GutilObject.isEmpty(ids)) {
+            seo.setId("~~~插槽" );
+        }
+        seo.setNotDel();
+        seo.setAndIdsIn(ArrayUtil.toArray(ids, String.class));
+        List<${ClassName}Dto> dtos = ${className}Dao.searchList(seo);
+        for (${ClassName}Dto dto : dtos) {
+            re.put(dto.getId(), dto);
+        }
+        return re;
+    }
+
+
+    @Override
+    public void refreshCache() {
+
+    }
+
+
+}

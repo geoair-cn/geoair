@@ -1,0 +1,49 @@
+package ${packageName}.model.${moduleName}.enm;
+
+import com.gtc.base.data.GiVisualValuable;
+import com.gtc.base.data.common.GemUtil;
+import com.gtc.base.data.model.annotation.GaModelField;
+
+public enum $column.enumsName implements GiVisualValuable
+
+<$column.javaType> {
+    #foreach($item in $column.enums.entrySet())
+        #if($column.javaType=="Integer")
+            $!{item.key}($!{item.value}),
+        #end
+        #if($column.javaType=="String")
+            $!{item.key}("$!{item.value}" ),
+        #end
+        #if($column.javaType=="Long")
+            $!{item.key}($!{item.value}l),
+        #end
+    #end
+    ;
+
+    @GaModelField(isID = true)
+    private $column.javaType code ;
+
+    ${column.enumsName}($column.javaType code) {
+            this.code = code;
+}
+
+public $column.javaType getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String display () {
+        return this.name();
+    }
+
+@Override
+public $column.javaType value() {
+        return this.code;
+    }
+
+
+        public static $column.enumsName valueOf($column.javaType value,$column.enumsName ifNull) {
+
+        return GemUtil.valueOf(${column.enumsName}. class,value, ifNull);
+    }
+}

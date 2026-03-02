@@ -1,0 +1,65 @@
+package ${packageName}.servface.event.${moduleName}.event;
+import com.gtc.base.Gtc;
+import cn.hutool.core.map.MapUtil;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import java.util.*;
+import cn.hutool.core.collection.ListUtil;
+import java.util.Map;
+/**
+ * ${tableComment}事件接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Event {
+
+    static List<${ClassName}Event> getInstances() {
+        List<${ClassName}Event> events = new ArrayList<>();
+        Map<String, ${ClassName}Event> beans = Gtc.beans.getBeans(${ClassName}Event.class);
+        for (Map.Entry<String, ${ClassName}Event> event : beans.entrySet()) {
+            events.add(event.getValue());
+        }
+        return   ListUtil.sort(events, new Comparator<${ClassName}Event>() {
+            @Override
+            public int compare(${ClassName}Event o1, ${ClassName}Event o2) {
+                return o1.getOrder() - o2.getOrder();
+            }
+        });
+    }
+
+    /**
+ * 获取排序,bean的顺序根据 1->无穷大排列
+ *
+ * @return
+ */
+    default   Integer getOrder() {
+        return 10;
+    }
+    /**
+* 新增事件
+*
+* @param ${className}Po
+*/
+    default void add${ClassName}Event(${ClassName}Po ${className}Po) {
+    }
+
+    /**
+ * 删除事件
+ *
+     * @param ${className}Po
+ */
+    void del${ClassName}Event(${ClassName}Po ${className}Po);
+
+
+
+    /**
+     * 更新事件
+     *
+     * @param oldPo 旧的对象
+     * @param newPo 新的对象
+     */
+    default void update${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo) {
+    }
+
+    void get${ClassName}RelationEvent(${ClassName}Po po,Map<String, Object> relationObj) ;
+}

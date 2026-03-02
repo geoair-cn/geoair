@@ -1,0 +1,167 @@
+package ${packageName}.model.${moduleName}.entity;
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gtc.base.data.common.GemDatePattern;
+import com.gtc.base.data.model.annotation.GaModel;
+import com.gtc.base.data.model.annotation.GaModelField;
+import com.gtc.base.gpa.entity.GiCrudEntity;
+import com.gtc.base.gpa.id.GiEntityIdGenerator;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Date;
+#foreach ($column in $columns)
+    #if("$!{column.enumsName}" != "")
+    import ${packageName}.model.${moduleName}.enm.${column.enumsName};
+    #end
+#end
+
+##import com.gtc.base.gpa.id.GwIdGenerator;
+import java.util.UUID;
+#foreach ($column in $columns)
+    #if($column.javaTypeOther == 'Geometry')
+    import org.locationtech.jts.geom.Geometry;
+    import com.fasterxml.jackson.annotation.JsonIgnore;
+    #end
+#end
+
+
+
+/**
+ * ${tableComment}(${ClassName})实体类
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@GaModel(text = "${tableComment}" )
+@Table(name = "${tableName}" )
+    #foreach ($column in $columns)
+        #if($column.isPk==1)
+        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>, GiEntityIdGenerator<$column.javaType>
+            #break
+        #end
+    #end
+{
+    private static final long serialVersionUID = ${time}L;
+    #foreach ($column in $columns)
+        #if($column.isPk==1)
+            @Id
+            @Column(name = "$column.columnName" )
+            @GaModelField(text = "$column.columnComment" , isID = true)
+            private $column.javaType $column.javaField;
+            ###break
+        #end
+    #end
+    #foreach ($column in $columns)
+        #if($column.isPk != 1)
+            #if($column.javaType == 'Date')
+            @Column(name = "$column.columnName" )
+            @GaModelField(text = "$column.columnComment" , datePattern = GemDatePattern.ISO8601Long)
+            @JSONField(format = "yyyy-MM-dd HH:mm:ss" )
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Shanghai" )
+            #else
+            @Column(name = "$column.columnName" )
+                #if("$!{column.fkName}" != "")
+                @GaModelField(text = "$column.columnComment" , fk = ${column.fkName}.class)
+                #else
+                    #if("$!{column.enumsName}" != "")
+                    @GaModelField(text = "$column.columnComment" , em = ${column.enumsName}.class)
+                    #else
+                    @GaModelField(text = "$column.columnComment" )
+                    #end
+                #end
+            #end
+            #if($column.javaTypeOther == 'Geometry')
+            @JsonIgnore
+            @JSONField(serialize = false)
+            private $column.javaTypeOther $column.javaField;
+            #else
+                private $column.javaType $column.javaField;
+            #end
+        #end
+
+    #end
+    public ${ClassName}Po() {
+    }
+
+    public ${ClassName}Po(String id) {
+        if (id == null) {
+            id = this.generatorId();
+        }
+        #foreach ($column in $columns)
+            #if($column.isPk == 1)
+                this.$column.javaField = id;
+                #break
+            #end
+        #end
+    }
+
+    #foreach ($column in $columns)
+        #if(!$table.isSuperColumn($column.javaField))
+            #if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
+                #set($AttrName=$column.javaField)
+            #else
+                #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            #end
+            #if($column.javaTypeOther == 'Geometry')
+                public void set${AttrName}($column.javaTypeOther $column.javaField) {
+                    this.$column.javaField = $column.javaField;
+                }
+
+                public $column.javaTypeOther get${AttrName}() {
+                    return $column.javaField;
+                }
+
+            #else
+                public void set${AttrName}($column.javaType $column.javaField) {
+                    this.$column.javaField = $column.javaField;
+                }
+
+                public $column.javaType get${AttrName}() {
+                    return $column.javaField;
+                }
+
+            #end
+        #end
+    #end
+
+    #foreach ($column in $columns)
+        #if($column.isPk == 1)
+            public $column.javaType id() {
+                return $column.javaField;
+            }
+
+            public $column.javaType generatorId() {
+                return UUID.randomUUID().toString();
+            }
+            #break
+        #end
+    #end
+    public void setNotDel() {
+    }
+
+    public void setDel() {
+    }
+
+    public void initCreateMeta() {
+        setNotDel();
+        // setTimeCreate(new Date());
+    }
+
+    public void initUpdateMeta() {
+        setNotDel();
+        // setTimeUpdate(new Date());
+    }
+
+    public static ${ClassName}Po empty() {
+        return new ${ClassName}Po();
+    }
+
+    public   ${ClassName}Po copy() {
+            ${ClassName}Po copy = new ${ClassName}Po();
+        BeanUtil.copyProperties(this, copy);
+        return copy;
+    }
+}

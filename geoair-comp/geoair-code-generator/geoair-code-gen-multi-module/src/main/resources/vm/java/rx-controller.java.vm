@@ -1,0 +1,173 @@
+package ${packageName}.controller.${moduleName};
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.gtc.base.util.GutilObject;
+
+import java.util.List;
+
+import com.gtc.base.exception.GtcException;
+import com.gtc.base.api.annotation.GaApi;
+import com.gtc.base.api.annotation.GaApiAction;
+import com.gtc.base.data.page.support.GtcPager;
+import ${packageName}.dao.${moduleName}.${ClassName}Dao;
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
+import ${packageName}.servface.${moduleName}.${ClassName}Service;
+import ${packageName}.controller .${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.controller .${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.controller .${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.controller .${moduleName}.${classname}.${ClassName}DetailVo;
+import com.gtc.base.data.page.GiPager;
+import com.gtc.base.data.result.GiResult;
+import com.gtc.base.data.result.GtcEmAlertType;
+import com.gtc.base.data.GtcValidateException;
+import com.gtc.base.data.page.GiPageParam;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+import com.gtc.base.log.GiLoger;
+import com.gtc.base.log.GtcLoger;
+
+/**
+ * ${tableComment}Controller
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/${moduleName}/${businessName}" )
+@GaApi(tags = "${tableComment}" )
+public class ${ClassName}Controller {
+    private static final GiLoger logger = GtcLoger.getLoger(${ClassName}Controller.class);
+
+    @Resource
+    private ${ClassName}Service ${className}Service;
+    @Resource
+    private ${ClassName}Dao ${className}Dao;
+    #foreach ($column in $columns)
+        #if($column.isPk == 1)
+            #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+            @GaApiAction(text = "新增${tableComment}" )
+            @RequestMapping(value = "/add${ClassName}" , method = {RequestMethod.POST})
+            @ResponseBody
+                #if($packageName == 'com.gtc.gishubteam.onemap')
+                @RepeatSubmit
+                #end
+            public GiResult<?> add${ClassName}(@Validated @RequestBody  ${ClassName}AddVo param) {
+                    ${ClassName}Po record = new ${ClassName}Po();
+                BeanUtils.copyProperties(param, record);
+                long l = ${className}Dao.gtcSearchCount(record);
+                if (l > 0) {
+                    throw new GtcException("${tableComment}已存在" );
+                }
+                record.setId("${ClassName}_" .toLowerCase() + IdUtil.getSnowflakeNextIdStr());
+                ##        ${className}Dao.gtcAccessSelective(record);
+                    ${className}Service.add${ClassName}(record);
+                return GiResult.successValue(record).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
+            }
+
+            @GaApiAction(text = "修改${tableComment}" )
+            @RequestMapping(value = "/update${ClassName}" , method = {RequestMethod.POST})
+            @ResponseBody
+                #if($packageName == 'com.gtc.gishubteam.onemap')
+                @RepeatSubmit
+                #end
+            public GiResult<?> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
+                    ${ClassName}Po old = ${className}Dao.gtcSearchByPK(param.get${AttrName}());
+                if (old == null) {
+                    throw new GtcValidateException("${tableComment}不存在" );
+                }
+                    ${ClassName}Po record = new ${ClassName}Po();
+                BeanUtils.copyProperties(param, record);
+
+                    ${className}Service.update${ClassName}(record);
+                ##        ${className}Dao.gtcUpdateByPKSelective(record);
+                return GiResult.successValue(record).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
+            }
+
+
+            @GaApiAction(text = "${tableComment}详情" )
+            @RequestMapping(value = "/load${ClassName}" , method = {RequestMethod.POST})
+            @ResponseBody
+            public GiResult<${ClassName}Po> load${ClassName}(String id) {
+                    ${ClassName}Dto dto = ${className}Service.get${ClassName}DtoById(id);
+                if (dto == null) {
+                    throw new GtcValidateException("展示专题不存在" );
+                }
+                return GiResult.successValue(dto);
+            }
+
+            @GaApiAction(text = "删除${tableComment}" )
+            @RequestMapping(value = "/del${ClassName}" , method = {RequestMethod.POST})
+            @ResponseBody
+            public GiResult<?> del${ClassName}(String id, boolean confirmed) {
+                if (confirmed) {
+                        ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
+                    if (po == null) {
+                        throw new GtcValidateException("${tableComment}不存在" );
+                    }
+                        ${className}Service.del${ClassName}(po);
+                    ##            ${className}Dao.gtcDeleteByPK(id);
+                    return GiResult.getResult(null).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
+                } else {
+                    return GiResult.getResult(null).andAlertMsg("确定要删除${tableComment}吗?" ).andAlertTypeEnum(GtcEmAlertType.弹出确认警告5);
+                }
+            }
+
+
+            @GaApiAction(text = "逻辑删除${tableComment}" )
+            @RequestMapping(value = "/logicDel${ClassName}/{ids}" , method = {RequestMethod.POST})
+            @ResponseBody
+            public GiResult<?> logicDel${ClassName}(@PathVariable String[] ids, boolean confirmed) {
+                if (confirmed) {
+                    if (GutilObject.isEmpty(ids)) {
+                        throw new GtcException("ids为空!" );
+                    }
+                        ${ClassName}Seo seo = new ${ClassName}Seo();
+                    seo.setAndIdsIn(ids);
+                    List<${ClassName}Dto> dtos = ${className}Dao.searchList(seo);
+                    if (GutilObject.isEmpty(dtos)) {
+                        throw new GtcException("删除内容为空!" );
+                    }
+                    for (${ClassName}Dto dto : dtos) {
+                            ${className}Service.logicDel${ClassName}(dto);
+                    }
+                    return GiResult.getResult(null).andAlertMsg("操作成功" ).andAlertTypeEnum(GtcEmAlertType.无需关闭的提示1);
+                } else {
+                    return GiResult.getResult(null).andAlertMsg("确定要删除${tableComment}吗?" ).andAlertTypeEnum(GtcEmAlertType.弹出确认警告5);
+                }
+            }
+
+
+            @GaApiAction(text = "分页列出${tableComment}" )
+            @RequestMapping(value = "/list${ClassName}Page" , method = {RequestMethod.POST})
+            @ResponseBody
+            public GiResult<GiPager<${ClassName}DetailVo>> list${ClassName}Page(@Validated @RequestBody ${ClassName}SearchVo param) {
+                    ${ClassName}Seo seo = new ${ClassName}Seo();
+                BeanUtils.copyProperties(param, seo);
+                seo.setNotDel();
+                if (GutilObject.isNotEmpty(param.getQueryContent())) {
+                    seo.setAndQueryContentIn(ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
+                }
+                GiPager<${ClassName}Dto> giPager =
+                            ${className}Dao.searchListPage(seo, GiPageParam.of());
+                Iterable<${ClassName}Dto> value = giPager.value();
+                GtcPager<${ClassName}DetailVo> reg = new GtcPager<>();
+                List<${ClassName}DetailVo> vdvos = ${ClassName}DetailVo.fromDtos(value);
+                reg.put(vdvos, giPager.total(), giPager.pageParam());
+                return GiResult.successValue(reg);
+            }
+        #end
+    #end
+}

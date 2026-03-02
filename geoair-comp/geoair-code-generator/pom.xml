@@ -21,6 +21,15 @@
 
     <url>https://gitee.com/geoair/geoair</url>
 
+    <properties>
+        <skipTests>true</skipTests>
+        <velocity.version>1.7</velocity.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
+        <commons.io.version>2.11.0</commons.io.version>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
+    </properties>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -44,13 +53,26 @@
         <tag>HEAD</tag>
     </scm>
 
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
+
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>${velocity.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-collections</groupId>
+                        <artifactId>commons-collections</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons.collections.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -1,0 +1,43 @@
+package ${packageName}.servface.${moduleName};
+
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import java.util.*;
+
+/**
+ * ${tableComment}Servface接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Service {
+
+
+        ${ClassName}Po add${ClassName}(${ClassName}Po insertPo);
+
+
+        ${ClassName}Po update${ClassName}(${ClassName}Po updatePo);
+
+
+        ${ClassName}Po del${ClassName}(${ClassName}Po delPo);
+
+        ${ClassName}Po logicDel${ClassName}(${ClassName}Po logicDelPo);
+
+    /**
+     *  根据id查询数据库对象
+     *    @return  ${ClassName}Po
+     */
+        ${ClassName}Dto get${ClassName}DtoById(String id);
+
+    /**
+     *  根据Seo查询数据库对象
+     *    @return List<${ClassName}Dto>
+     */
+    List<${ClassName}Dto> get${ClassName}ListBySeo(${ClassName}Seo seo);
+
+    <T> Map<String,${ClassName}Dto> getDtosByBeansInvoke(List<T> beanList, String ... fieldName);
+
+    void refreshCache();
+}

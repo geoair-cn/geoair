@@ -46,6 +46,22 @@
 
     </properties>
     <dependencies>
+        <!--velocity代码生成使用模板 -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>${velocity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons.collections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
         <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-web</artifactId>
@@ -53,9 +69,22 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.geoair.geo.dynamic</groupId>
+            <artifactId>geo-dynamic-adv-query</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
             <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>
