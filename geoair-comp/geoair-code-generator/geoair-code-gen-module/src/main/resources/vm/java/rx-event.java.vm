@@ -1,4 +1,4 @@
-package ${packageName}.servface.event.${moduleName}.event;
+package ${packageName}.servface.${moduleName}.event;
 import cn.geoair.base.Gir;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import java.util.*;

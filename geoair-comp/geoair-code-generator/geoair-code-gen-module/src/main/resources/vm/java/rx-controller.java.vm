@@ -4,9 +4,9 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.geoair.base.util.GutilObject;
-
+import cn.geoair.base.data.result.GirEmAlertType;
 import java.util.List;
-
+import cn.geoair.base.exception.GirException;
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.base.data.page.support.GirPager;
@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-import cn.geoair.base.log.GiLoger;
-import cn.geoair..base.log.GirLoger;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 
 /**
  * ${tableComment}Controller
@@ -47,7 +47,7 @@ import cn.geoair..base.log.GirLoger;
 @RequestMapping("/${moduleName}/${businessName}" )
 @GaApi(tags = "${tableComment}" )
 public class ${ClassName}Controller {
-    private static final GiLoger logger = GirLoger.getLoger(${ClassName}Controller.class);
+    private static final GiLogger logger = GirLogger.getLoger(${ClassName}Controller.class);
 
     @Resource
     private ${ClassName}Service ${className}Service;

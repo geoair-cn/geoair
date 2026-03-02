@@ -3,8 +3,8 @@
 // import java.io.Serializable;
 // import java.util.Collection;
 //
-// import cn.geoair..base.log.GiLoger;
-// import cn.geoair..base.log.GirLoger;
+// import cn.geoair..base.log.GiLogger;
+// import cn.geoair..base.log.GirLogger;
 // import cn.geoair..base.user.permission.GiPermission;
 // import cn.geoair..base.user.permission.GiPermissionUser;
 // import cn.geoair..base.user.session.GiSessionUser;
@@ -17,7 +17,7 @@
 //
 //
 //
-// public static GiLoger logger = GirLoger.getLoger(GiWebPermissionUser.class);
+// public static GiLogger logger = GirLogger.getLoger(GiWebPermissionUser.class);
 //
 //
 // /**
