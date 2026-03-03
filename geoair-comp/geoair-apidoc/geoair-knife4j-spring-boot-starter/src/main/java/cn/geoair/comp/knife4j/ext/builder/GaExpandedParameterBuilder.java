@@ -6,6 +6,7 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import springfox.documentation.builders.ExampleBuilder;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.service.AllowableValues;
@@ -34,7 +35,8 @@ import static springfox.documentation.swagger.readers.parameter.Examples.example
  * @author ：张逢吉
  * @date ：Created in 20:05 @description： 展开模型
  */
-@Order(value = SWAGGER_PLUGIN_ORDER + 1)
+@Component
+@Order(value = SWAGGER_PLUGIN_ORDER)
 public class GaExpandedParameterBuilder implements ExpandedParameterBuilderPlugin {
 
 	private final DescriptionResolver descriptions;

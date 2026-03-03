@@ -5,6 +5,7 @@ import cn.geoair.base.data.common.GemNull;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin;
@@ -27,7 +28,8 @@ import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGE
  * @date ：Created in 2022/8/23 9:36 @description： GirModelField 替换 ApiModelProperty
  * 注解（jsonbody参数）
  */
-@Order(value = SWAGGER_PLUGIN_ORDER + 1)
+@Component
+@Order(value = SWAGGER_PLUGIN_ORDER)
 public class GaModelFieldBuilder implements ModelPropertyBuilderPlugin {
 
 	public static Optional<GaModelField> findGaModelFieldAnnotation(AnnotatedElement annotated) {
