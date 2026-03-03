@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair.comp</groupId>
         <artifactId>geoair-code-generator</artifactId>
-        <version>23.1.1-RC5-SNAPSHOT</version>
+        <version>23.1.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-code-gen-demo</artifactId>
-    <version>23.1.1-RC5-SNAPSHOT</version>
+    <version>23.1.1-M1</version>
     <name>geoair-code-gen-demo</name>
     <packaging>jar</packaging>
 

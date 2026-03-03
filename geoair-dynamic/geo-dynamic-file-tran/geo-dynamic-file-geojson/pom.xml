@@ -5,11 +5,11 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geo-dynamic-file-tran</artifactId>
-        <version>23.1.1-RC5-SNAPSHOT</version>
+        <version>23.1.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.1-RC5-SNAPSHOT</version>
+    <version>23.1.1-M1</version>
     <artifactId>geo-dynamic-file-geojson</artifactId>
     <name>geo-dynamic-file-geojson</name>
 
