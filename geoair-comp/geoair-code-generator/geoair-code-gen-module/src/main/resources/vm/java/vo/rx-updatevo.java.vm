@@ -1,4 +1,4 @@
-package ${packageName}.controller.${moduleName}.${classname};
+package ${packageName}.wcs.controller.${moduleName}.${classname};
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -26,23 +26,22 @@ import java.util.Date;
 @GaModel(text = "修改${tableComment}")
 public class ${ClassName}UpdateVo {
 
-    #foreach($column in $columns)
-        #if($column.isPk==1)
-        @NotBlank(message = "${column.columnComment}不能为空")
-        @GaModelField(text = "$column.columnComment", isID = true)
-        #elseif($column.javaType == 'Date')
-        @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        @GaModelField(text = "$column.columnComment")
-        #elseif("$!{column.enumsName}" != "")
-        @GaModelField(text = "$column.columnComment", em = ${column.enumsName}.class)
-        #else
-        @GaModelField(text = "$column.columnComment")
-        #end
-    private $column.javaType $column.javaField;
-
-    #end
+#foreach($column in $columns)
+#if($column.isPk==1)
+@NotBlank(message = "${column.columnComment}不能为空")
+@GaModelField(text = "$column.columnComment", isID = true)
+#elseif($column.javaType == 'Date')
+@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@GaModelField(text = "$column.columnComment")
+#elseif("$!{column.enumsName}" != "")
+@GaModelField(text = "$column.columnComment", em = ${column.enumsName}.class)
+#else
+@GaModelField(text = "$column.columnComment")
+#end
+private $column.javaType $column.javaField;
+ #end
 
     public static ${ClassName}UpdateVo empty() {
         return new ${ClassName}UpdateVo();

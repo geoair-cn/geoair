@@ -1,7 +1,9 @@
 package ${packageName}.service.${moduleName};
 
-import cn.geoair.base.data.page.PageInfo;
-import cn.geoair.base.data.page.PageResult;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -11,11 +13,11 @@ import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
 import ${packageName}.servface.${moduleName}.${ClassName}Service;
 import ${packageName}.servface.${moduleName}.event.${ClassName}Event;
-    #if($enableCache)
-    import org.springframework.cache.annotation.CacheConfig;
-    import org.springframework.cache.annotation.CacheEvict;
-    import org.springframework.cache.annotation.Cacheable;
-    #end
+#if($enableCache)
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+#end
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,98 +31,87 @@ import java.util.*;
  * @date ${datetime}
  */
 @Service
-    #if($enableCache)
-    @CacheConfig(cacheNames = "${className}")
-    #end
+#if($enableCache)
+@CacheConfig(cacheNames = "${className}")
+#end
 @Transactional(rollbackFor = Exception.class)
 public class ${ClassName}ServiceImpl implements ${ClassName}Service {
-
+    private static final GiLogger log = GirLogger.getLoger(${ClassName}ServiceImpl.class);
     @Resource
     private ${ClassName}Dao ${className}Dao;
 
     @Override
-        #if($enableCache)
-        @CacheEvict(key = "'list'", allEntries = true)
-        #end
+    #if($enableCache)
+    @CacheEvict(key = "'list'", allEntries = true)
+    #end
     public ${ClassName}Po add(${ClassName}Po po) {
         // 初始化创建元数据
         po.initCreateMeta();
-
         // 插入数据
-            ${className}Dao.gtcAccessSelective(po);
-
+        ${className}Dao.gtcAccessSelective(po);
         // 触发新增事件
         triggerAddEvent(po);
-
         return po;
     }
 
     @Override
-        #if($enableCache)
-        @CacheEvict(key = "#po.id()")
-        #end
+    #if($enableCache)
+    @CacheEvict(key = "#po.id()")
+    #end
     public ${ClassName}Po update(${ClassName}Po po) {
         // 获取原对象
             ${ClassName}Po oldPo = ${className}Dao.gtcSearchByPK(po.id());
         if (oldPo == null) {
             throw new RuntimeException("数据不存在，ID：" + po.id());
         }
-
         // 初始化更新元数据
         po.initUpdateMeta();
-
         // 触发更新事件
         triggerUpdateEvent(oldPo, po);
-
         // 更新数据
-            ${className}Dao.gtcUpdateByPKSelective(po);
-
+        ${className}Dao.gtcUpdateByPKSelective(po);
         return po;
     }
 
     @Override
-        #if($enableCache)
-        @CacheEvict(key = "#id")
-        #end
+     #if($enableCache)
+     @CacheEvict(key = "#id")
+     #end
     public void deleteById(String id) {
         // 获取原对象
-            ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
+        ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
         if (po == null) {
             return;
         }
-
         // 触发删除事件
         triggerDeleteEvent(po);
-
         // 物理删除
-            ${className}Dao.gtcDeleteByPK(id);
+         ${className}Dao.gtcDeleteByPK(id);
     }
 
     @Override
-        #if($enableCache)
-        @CacheEvict(key = "#id")
-        #end
+    #if($enableCache)
+    @CacheEvict(key = "#id")
+    #end
     public void logicDeleteById(String id) {
         // 获取原对象
-            ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
+         ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
         if (po == null) {
             return;
         }
-
         // 触发删除事件
         triggerDeleteEvent(po);
-
         // 逻辑删除
         po.setDel();
-            ${className}Dao.gtcUpdateByPKSelective(po);
+          ${className}Dao.gtcUpdateByPKSelective(po);
     }
 
     @Override
-        #if($enableCache)
-        @Cacheable(key = "#id", unless = "#result == null")
-        #end
+     #if($enableCache)
+     @Cacheable(key = "#id", unless = "#result == null")
+     #end
     public ${ClassName}Dto getDtoById(String id) {
-            ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
+         ${ClassName}Po po = ${className}Dao.gtcSearchByPK(id);
         return po != null ? ${ClassName}Dto.of${ClassName}Po(po) : null;
     }
 
@@ -131,50 +122,27 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
 
     @Override
     public List<${ClassName}Dto> getDtoListBySeo(${ClassName}Seo seo) {
-        // 默认只查询未删除的数据
-        if (seo.getDel() == null) {
-            seo.setNotDel();
-        }
+         seo.setNotDel();
         return ${className}Dao.searchList(seo);
     }
 
     @Override
-    public PageResult<${ClassName}Dto> getDtoPageBySeo(${ClassName}Seo seo, PageInfo pageInfo) {
-        // 默认只查询未删除的数据
-        if (seo.getDel() == null) {
-            seo.setNotDel();
-        }
-
-        // 查询总数
-        long total = ${className}Dao.searchCount(seo);
-
-        // 查询列表
-        List<${ClassName}Dto> list = Collections.emptyList();
-        if (total > 0) {
-            seo.setPageInfo(pageInfo);
-            list = ${className}Dao.searchList(seo);
-        }
-
-        return PageResult.of(list, total, pageInfo);
+    public GiPager<DeviceDbtableInfoDto> getDtoPageBySeo(DeviceDbtableInfoSeo seo, GiPageParam pageParam) {
+        seo.setNotDel();
+        return deviceDbtableInfoDao.searchListPage(seo, pageParam);
     }
-
     @Override
     public List<${ClassName}Po> getPoListBySeo(${ClassName}Seo seo) {
-        // 默认只查询未删除的数据
-        if (seo.getDel() == null) {
-            seo.setNotDel();
-        }
-        return ${className}Dao.searchPoList(seo);
+        seo.setNotDel();
+        return deviceDbtableInfoDao.gtcSearch(seo);
     }
 
     @Override
     public <T> Map<String, ${ClassName}Dto> getDtoMapByField(List<T> beanList, String fieldName) {
         Map<String, ${ClassName}Dto> resultMap = new HashMap<>();
-
         if (GutilObject.isEmpty(beanList)) {
             return resultMap;
         }
-
         // 收集字段值
         Set<String> fieldValues = new HashSet<>();
         for (T bean : beanList) {
@@ -183,35 +151,31 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
                 fieldValues.add((String) value);
             }
         }
-
         if (fieldValues.isEmpty()) {
             return resultMap;
         }
-
         // 查询数据
-            ${ClassName}Seo seo = new ${ClassName}Seo();
+        ${ClassName}Seo seo = new ${ClassName}Seo();
         seo.setNotDel();
         seo.setAndIdsIn(ArrayUtil.toArray(fieldValues, String.class));
-
         List<${ClassName}Dto> dtos = ${className}Dao.searchList(seo);
         for (${ClassName}Dto dto : dtos) {
             resultMap.put(dto.getId(), dto);
         }
-
         return resultMap;
     }
 
     @Override
-        #if($enableCache)
-        @CacheEvict(allEntries = true)
-        #end
+     #if($enableCache)
+     @CacheEvict(allEntries = true)
+     #end
     public void refreshCache() {
-        #if($enableCache)
-            loger.info("刷新缓存：{}", "${className}");
-        #else
-            // 缓存已禁用，无需刷新
-            loger.debug("缓存已禁用，跳过刷新：{}", "${className}");
-        #end
+     #if($enableCache)
+         log.info("刷新缓存：{}", "${className}");
+     #else
+         // 缓存已禁用，无需刷新
+         log.debug("缓存已禁用，跳过刷新：{}", "${className}");
+     #end
     }
 
 
@@ -224,7 +188,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
             try {
                 event.add${ClassName}Event(po);
             } catch (Exception e) {
-                loger.error("触发新增事件失败", e);
+                log.error("触发新增事件失败", e);
             }
         }
     }
@@ -238,7 +202,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
             try {
                 event.update${ClassName}Event(oldPo, newPo);
             } catch (Exception e) {
-                loger.error("触发更新事件失败", e);
+                log.error("触发更新事件失败", e);
             }
         }
     }
@@ -252,7 +216,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
             try {
                 event.del${ClassName}Event(po);
             } catch (Exception e) {
-                loger.error("触发删除事件失败", e);
+                log.error("触发删除事件失败", e);
             }
         }
     }
