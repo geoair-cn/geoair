@@ -1,0 +1,44 @@
+package ${packageName}.wcs.controller.${moduleName}.${classname};
+
+import com.alibaba.fastjson.annotation.JSONField;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
+import javax.validation.constraints.NotBlank;
+
+#foreach ($column in $columns)
+    #if("$!{column.enumsName}" != "")
+    import ${packageName}.model.${moduleName}.enm.${column.enumsName};
+    #end
+#end
+
+/**
+ * 新增${tableComment}(${ClassName})
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@GaModel(text = "新增${tableComment}")
+public class ${ClassName}AddVo {
+
+#foreach($column in $columns)
+#if($column.isPk==1)
+@NotBlank(message = "${column.columnComment}不能为空")
+@GaModelField(text = "${column.columnComment}", isID = true)
+#elseif($column.javaType=='Date')
+@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+@GaModelField(text = "${column.columnComment}")
+@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+#elseif("$!{column.enumsName}" != "")
+@GaModelField(text = "${column.columnComment}", em = ${column.enumsName}.class)
+#else
+@GaModelField(text = "${column.columnComment}")
+#end
+private ${column.javaType} ${column.javaField};
+
+#end
+}

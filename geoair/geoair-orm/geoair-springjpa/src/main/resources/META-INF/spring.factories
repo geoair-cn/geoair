@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- cn.geoair.gtc.orm.springjpa.util.EntityManagerProvider
+ cn.geoair.orm.springjpa.util.EntityManagerProvider

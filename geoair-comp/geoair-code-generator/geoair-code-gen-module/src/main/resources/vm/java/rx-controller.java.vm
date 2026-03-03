@@ -1,0 +1,206 @@
+package ${packageName}.wcs.controller.${moduleName};
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.geoair.base.util.GutilObject;
+import cn.geoair.base.data.result.GirEmAlertType;
+import java.util.List;
+import cn.geoair.base.exception.GirException;
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.data.page.support.GirPager;
+import ${packageName}.dao.${moduleName}.${ClassName}Dao;
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
+import ${packageName}.servface.${moduleName}.${ClassName}Service;
+import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+import cn.geoair.base.data.page.GiPager;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.result.GiResult;
+import cn.geoair.base.data.GirValidateException;
+import org.springframework.beans.BeanUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
+
+/**
+ * ${tableComment}Controller
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/${moduleName}/${businessName}")
+@GaApi(tags = "${tableComment}")
+public class ${ClassName}Controller {
+    private static final GiLogger logger = GirLogger.getLoger(${ClassName}Controller.class);
+    @Resource
+    private ${ClassName}Dao ${className}Dao;
+    @Resource
+    private ${ClassName}Service ${className}Service;
+
+    #foreach ($column in $columns)
+        #if($column.isPk == 1)
+            #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+
+            /**
+             * 新增${tableComment}
+             */
+            @GaApiAction(text = "新增${tableComment}")
+            @PostMapping("/add${ClassName}")
+            public GiResult<${ClassName}Po> add${ClassName}(@Validated @RequestBody ${ClassName}AddVo param) {
+                // 转换为PO
+                    ${ClassName}Po record = new ${ClassName}Po();
+                BeanUtils.copyProperties(param, record);
+
+                // 生成ID
+                record.setId("${ClassName}_".toLowerCase() + IdUtil.getSnowflakeNextIdStr());
+
+                // 调用Service
+                    ${ClassName}Po result = ${className}Service.add(record);
+
+                return GiResult.successValue(result)
+                        .andAlertMsg("操作成功")
+                        .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
+            }
+
+            /**
+             * 修改${tableComment}
+             */
+            @GaApiAction(text = "修改${tableComment}")
+            @PostMapping("/update${ClassName}")
+            public GiResult<${ClassName}Po> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
+                // 转换为PO
+                    ${ClassName}Po record = new ${ClassName}Po();
+                BeanUtils.copyProperties(param, record);
+
+                // 调用Service
+                    ${ClassName}Po result = ${className}Service.update(record);
+
+                return GiResult.successValue(result)
+                        .andAlertMsg("操作成功")
+                        .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
+            }
+
+            /**
+             * ${tableComment}详情
+             */
+            @GaApiAction(text = "${tableComment}详情")
+            @GetMapping("/load${ClassName}")
+            public GiResult<${ClassName}DetailVo> load${ClassName}(String id) {
+                    ${ClassName}Dto dto = ${className}Service.getDtoById(id);
+                if (dto == null) {
+                    throw new GirValidateException("${tableComment}不存在");
+                }
+
+                // 转换为VO
+                    ${ClassName}DetailVo vo = ${ClassName}DetailVo.fromDto(dto);
+                return GiResult.successValue(vo);
+            }
+
+            /**
+             * 删除${tableComment}
+             */
+            @GaApiAction(text = "删除${tableComment}")
+            @PostMapping("/del${ClassName}")
+            public GiResult<?> del${ClassName}(String id, boolean confirmed) {
+                if (confirmed) {
+                        ${ClassName}Po po = ${className}Service.getPoById(id);
+                    if (po == null) {
+                        throw new GirValidateException("${tableComment}不存在");
+                    }
+                        ${className}Service.deleteById(po.id());
+
+                    return GiResult.getResult(null)
+                            .andAlertMsg("操作成功")
+                            .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
+                } else {
+                    return GiResult.getResult(null)
+                            .andAlertMsg("确定要删除${tableComment}吗?")
+                            .andAlertTypeEnum(GirEmAlertType.弹出确认警告5);
+                }
+            }
+
+            /**
+             * 逻辑删除${tableComment}
+             */
+            @GaApiAction(text = "逻辑删除${tableComment}")
+            @PostMapping("/logicDel${ClassName}/{ids}")
+            public GiResult<?> logicDel${ClassName}(@PathVariable String[] ids, boolean confirmed) {
+                if (confirmed) {
+                    if (GutilObject.isEmpty(ids)) {
+                        throw new GirException("ids为空!");
+                    }
+
+                        ${ClassName}Seo seo = new ${ClassName}Seo();
+                    seo.setAndIdsIn(ids);
+                    List<${ClassName}Dto> dtos = ${className}Service.getDtoListBySeo(seo);
+
+                    if (GutilObject.isEmpty(dtos)) {
+                        throw new GirException("删除内容为空!");
+                    }
+
+                    for (${ClassName}Dto dto : dtos) {
+                            ${ClassName}Po po = ${className}Service.getPoById(dto.getId());
+                            ${className}Service.logicDeleteById(po.id());
+                    }
+
+                    return GiResult.getResult(null)
+                            .andAlertMsg("操作成功")
+                            .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
+                } else {
+                    return GiResult.getResult(null)
+                            .andAlertMsg("确定要删除${tableComment}吗?")
+                            .andAlertTypeEnum(GirEmAlertType.弹出确认警告5);
+                }
+            }
+
+            /**
+             * 分页列出${tableComment}
+             */
+            @GaApiAction(text = "分页列出${tableComment}")
+            @PostMapping("/list${ClassName}Page")
+            public GiResult<GirPager<${ClassName}DetailVo>> list${ClassName}Page(@Validated @RequestBody ${ClassName}SearchVo param) {
+                // 构建查询条件
+                    ${ClassName}Seo seo = new ${ClassName}Seo();
+                BeanUtils.copyProperties(param, seo);
+                seo.setNotDel();
+
+                if (GutilObject.isNotEmpty(param.getQueryContent())) {
+                    seo.setAndQueryContentIn(ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
+                }
+
+                // 分页查询
+                GiPager<${ClassName}Dto> giPager = ${className}Service.getDtoPageBySeo(seo, GiPageParam.of());
+
+                // 转换为VO
+                List<${ClassName}DetailVo> voList = ${ClassName}DetailVo.fromDtos(giPager.value());
+
+                // 封装分页结果
+                GirPager<${ClassName}DetailVo> result = new GirPager<>();
+                result.put(voList, giPager.total(), giPager.pageParam());
+
+                return GiResult.successValue(result);
+            }
+
+            /**
+             * 刷新缓存
+             */
+            @GaApiAction(text = "刷新缓存")
+            @PostMapping("/refreshCache")
+            public GiResult<?> refreshCache() {
+                    ${className}Service.refreshCache();
+                return GiResult.successValue(null).andAlertMsg("缓存刷新成功");
+            }
+        #end
+    #end
+}

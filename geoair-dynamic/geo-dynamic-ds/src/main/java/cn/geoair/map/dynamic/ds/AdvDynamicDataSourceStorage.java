@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.ds;
 
-import cn.geoair.gtc.base.Gir;
+import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.hutool.core.util.ObjectUtil;

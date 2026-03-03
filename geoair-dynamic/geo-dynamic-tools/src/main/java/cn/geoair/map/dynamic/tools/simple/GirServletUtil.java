@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.tools.simple;
 
-import cn.geoair.gtc.base.Gir;
-import cn.geoair.gtc.base.util.GutilObject;
-import cn.geoair.gtc.web.util.GirHttpServletHelper;
+import cn.geoair.base.Gir;
+import cn.geoair.base.util.GutilObject;
+import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;

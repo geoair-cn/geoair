@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
 		<artifactId>geoair-base-parent</artifactId>
-		<version>23.1.1-RC4</version>
+		<version>23.1.1-M1</version>
 		<relativePath>../geoair-base-parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair</artifactId>
-	<version>23.1.1-RC4</version>
+	<version>23.1.1-M1</version>
 	<packaging>pom</packaging>
 	<name>Gir</name>
 
@@ -44,14 +44,14 @@
 
 
 	<properties>
-		<geoair.version>23.1.1-RC4</geoair.version>
+		<geoair.version>23.1.1-M1</geoair.version>
 		<skipTests>true</skipTests>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- gtc版本约束 -->
+			<!-- gir版本约束 -->
 			<dependency>
 				<groupId>cn.geoair</groupId>
 				<artifactId>geoair-base</artifactId>

@@ -11,14 +11,14 @@
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-module-pom</artifactId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <name>geoair-module-parent</name>
     <packaging>pom</packaging>
     <description>用于定义各个组件的依赖管理</description>
 
     <properties>
         <skipTests>true</skipTests>
-        <geoair.version>23.1.1-RC4</geoair.version>
+        <geoair.version>23.1.1-M1</geoair.version>
         <java.version>8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

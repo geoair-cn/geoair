@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.mvt.controller;
 
-import cn.geoair.gtc.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;

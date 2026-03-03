@@ -1,11 +1,10 @@
 package cn.geoair.comp.knife4j.ext.auto;
 
-import cn.geoair.comp.knife4j.ext.config.GtcSwaggerApiConfig;
-import cn.geoair.comp.knife4j.ext.config.GtcSwaggerProperties;
+import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
-import cn.geoair.gtc.base.Gir;
-import cn.geoair.gtc.base.bean.GirBeanHelper;
+import cn.geoair.base.Gir;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
@@ -24,10 +23,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 基于配置自动生成Swagger Docket，支持手动指定包、排除包、自定义分组规则 整合GtcSwaggerProperties配置项，零配置/手动配置双兼容
+ * 基于配置自动生成Swagger Docket，支持手动指定包、排除包、自定义分组规则 整合GirSwaggerProperties配置项，零配置/手动配置双兼容
  */
 
-public class AutoApiConfig extends GtcSwaggerApiConfig implements ApplicationContextAware {
+public class AutoApiConfig extends GirSwaggerApiConfig implements ApplicationContextAware {
 
 	public AutoApiConfig() {
 
@@ -38,7 +37,7 @@ public class AutoApiConfig extends GtcSwaggerApiConfig implements ApplicationCon
 	private ApplicationContext applicationContext;
 
 	// Swagger配置属性（通过GirBeanHelper获取）
-	private GtcSwaggerProperties swaggerProperties;
+	private GirSwaggerProperties swaggerProperties;
 
 	/**
 	 * Spring自动注入ApplicationContext，并初始化配置属性
@@ -47,7 +46,7 @@ public class AutoApiConfig extends GtcSwaggerApiConfig implements ApplicationCon
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 		// 初始化配置属性
-		this.swaggerProperties = applicationContext.getBean(GtcSwaggerProperties.class);
+		this.swaggerProperties = applicationContext.getBean(GirSwaggerProperties.class);
 	}
 
 	/**

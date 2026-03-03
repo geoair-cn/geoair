@@ -14,7 +14,7 @@ import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
 
 import java.io.IOException;
 
-import static cn.geoair.gtc.base.Gir.log;
+import static cn.geoair.base.Gir.log;
 
 public class GeoJsonToPg {
 

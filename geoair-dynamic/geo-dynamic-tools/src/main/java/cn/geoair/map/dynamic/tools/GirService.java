@@ -1,8 +1,7 @@
 package cn.geoair.map.dynamic.tools;
 
-import cn.geoair.gtc.base.Gir;
+import cn.geoair.base.Gir;
 import cn.hutool.core.lang.Singleton;
-import cn.hutool.extra.spring.SpringUtil;
 
 /**
  * @author ：张逢吉

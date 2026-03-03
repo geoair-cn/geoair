@@ -1,0 +1,39 @@
+package ${packageName}.mapper.${moduleName};
+
+import ${packageName}.dao.${moduleName}.${ClassName}Dao;
+import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
+import cn.geoair.orm.tkmapper.impls.TkEntityMapper;
+import org.apache.ibatis.annotations.Param;
+import cn.geoair.base.data.page.GfunPageExcute;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
+
+import java.util.List;
+
+/**
+ * ${tableComment}Mapper接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface ${ClassName}Mapper extends ${ClassName}Dao, TkEntityMapper<${ClassName}Po, String> {
+    @Override
+    List<${ClassName}Dto> searchList(@Param("param" ) ${ClassName}Seo ${className}Seo);
+
+
+    @Override
+    default GiPager<${ClassName}Dto> searchListPage(@Param("param" ) ${ClassName}Seo ${className}Seo, GiPageParam pageParam) {
+
+        GfunPageExcute<${ClassName}Dto> exec = new GfunPageExcute<${ClassName}Dto>() {
+            @Override
+            public Iterable<${ClassName}Dto> excute() {
+                return searchList(${className}Seo);
+            }
+        };
+
+        return pageExcuter().excutePage(exec, pageParam);
+
+    }
+}

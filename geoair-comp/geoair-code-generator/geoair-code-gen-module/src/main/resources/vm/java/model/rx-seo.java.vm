@@ -1,0 +1,49 @@
+package ${packageName}.model.${moduleName}.seo;
+import lombok.Data;
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
+import java.util.Date;
+import cn.hutool.core.bean.BeanUtil;
+/**
+ * ${tableComment}(${ClassName})Seo
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@GaModel(text = "${tableComment}SearchDto")
+@Data
+public class ${ClassName}Seo extends ${ClassName}Po {
+    private static final long serialVersionUID = ${time}L;
+    public static ${ClassName}Seo emptySeo() {
+        return new ${ClassName}Seo();
+    }
+
+    public   ${ClassName}Seo copy() {
+         ${ClassName}Seo copy =   new ${ClassName}Seo();
+        BeanUtil.copyProperties(this, copy);
+        return copy;
+    }
+
+    @GaModelField(text = "模糊查询")
+    private String[] andQueryContentIn;
+
+#foreach ($column in $columns)
+#if($column.isPk == 1)
+    @GaModelField(text = "查询多个主键数据")
+    private $column.javaType [] andIdsIn;
+
+    @GaModelField(text = "查询排除多个主键数据")
+    private $column.javaType [] andIdsNotIn;
+#end
+
+#if($column.javaType == 'Date')
+    @GaModelField(text = "${column.columnComment}始")
+    private Date ${column.javaField}Start;
+
+    @GaModelField(text = "${column.columnComment}止")
+    private Date ${column.javaField}End;
+#end
+#end
+
+}

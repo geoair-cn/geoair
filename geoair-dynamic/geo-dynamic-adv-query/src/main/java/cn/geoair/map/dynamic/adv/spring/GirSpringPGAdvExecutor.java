@@ -14,17 +14,22 @@ import javax.sql.DataSource;
  */
 public class GirSpringPGAdvExecutor extends AdvExecutorPG implements IAdvExecutor {
 
-	public static GirSpringPGAdvExecutor newInstance() {
-		GirSpringPGAdvExecutor advExecutor = new GirSpringPGAdvExecutor();
-		advExecutor.initByDataSource(getDataSourceBySpring());
-		return advExecutor;
-	}
+    public static GirSpringPGAdvExecutor newInstanceBySpring() {
+        DataSource dataSourceBySpring = getDataSourceBySpring();
+        return newInstance(dataSourceBySpring);
+    }
 
-	public static DataSource getDataSourceBySpring() {
-		return SpringUtil.getBean(DataSource.class);
-	}
+    public static GirSpringPGAdvExecutor newInstance(DataSource dataSource) {
+        GirSpringPGAdvExecutor advExecutor = new GirSpringPGAdvExecutor();
+        advExecutor.initByDataSource(dataSource);
+        return advExecutor;
+    }
 
-	public GirSpringPGAdvExecutor() {
-	}
+    public static DataSource getDataSourceBySpring() {
+        return SpringUtil.getBean(DataSource.class);
+    }
+
+    public GirSpringPGAdvExecutor() {
+    }
 
 }

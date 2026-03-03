@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
 import cn.hutool.core.util.ObjectUtil;

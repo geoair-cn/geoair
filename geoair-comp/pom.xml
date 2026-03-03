@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-M1</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-comp</artifactId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <packaging>pom</packaging>
     <name>geoair-comp</name>
 
@@ -64,11 +64,17 @@
                 <version>${geoair.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>cn.geoair.comp</groupId>
+                <artifactId>geoair-code-gen-module</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
         <module>geoair-apidoc</module>
+        <module>geoair-code-generator</module>
 
     </modules>
 

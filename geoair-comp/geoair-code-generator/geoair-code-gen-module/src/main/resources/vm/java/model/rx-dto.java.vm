@@ -1,0 +1,40 @@
+package ${packageName}.model.${moduleName}.dto;
+
+import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.hutool.core.bean.BeanUtil;
+import lombok.Data;
+
+/**
+ * ${tableComment}(${ClassName})DTO
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@GaModel(text = "${tableComment}DTO" )
+@Data
+public class ${ClassName}Dto extends ${ClassName}Po {
+    private static final long serialVersionUID = ${time}L;
+
+    public static ${ClassName}Dto empty() {
+        return new ${ClassName}Dto();
+    }
+
+    public   ${ClassName}Dto copy() {
+        ${ClassName}Dto copy = new ${ClassName}Dto();
+        BeanUtil.copyProperties(this, copy);
+        return copy;
+    }
+
+    public static ${ClassName}Dto of${ClassName}Po(${ClassName}Po source) {
+         ${ClassName}Dto target = new ${ClassName}Dto();
+        BeanUtil.copyProperties(source, target);
+        return target;
+    }
+
+    public static ${ClassName}Po toPo(${ClassName}Dto source) {
+         ${ClassName}Po target = new ${ClassName}Po();
+        BeanUtil.copyProperties(source, target);
+        return target;
+    }
+}

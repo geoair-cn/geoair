@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-comp-parent</artifactId>
     <name>geoair-comp-parent</name>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <packaging>pom</packaging>
     <description>geoair-component-parent</description>
 
@@ -50,6 +50,8 @@
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-project-parent</artifactId>
                 <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

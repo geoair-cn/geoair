@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair.comp</groupId>
+        <artifactId>geoair-code-generator</artifactId>
+        <version>23.1.1-M1</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>cn.geoair.comp</groupId>
+    <artifactId>geoair-code-gen-module</artifactId>
+    <version>23.1.1-M1</version>
+    <packaging>jar</packaging>
+    <name>geoair-code-gen-multi-module</name>
+
+    <description>geoair多模块的代码生成器</description>
+
+    <url>https://gitee.com/geoair/geoair</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+
+    </properties>
+    <dependencies>
+        <!--velocity代码生成使用模板 -->
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>${velocity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons.collections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.geoair</groupId>
+            <artifactId>geoair-web</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.geoair.geo.dynamic</groupId>
+            <artifactId>geo-dynamic-adv-query</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.geoair</groupId>
+            <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+</project>

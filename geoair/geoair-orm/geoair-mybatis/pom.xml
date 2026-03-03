@@ -6,13 +6,12 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <!--		<version>23.1.1-RC4&lt;!&ndash;gtcversion&ndash;&gt;</version>-->
-        <version>23.1.1-RC4 </version>
+        <version>23.1.1-M1 </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis</artifactId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <packaging>jar</packaging>
     <name>geoair-mybatis</name>
     <description>geoair-mybatis</description>

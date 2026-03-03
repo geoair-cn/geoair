@@ -2,12 +2,8 @@ package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-import cn.geoair.map.dynamic.ds.DataSourceGetter;
 import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 import cn.hutool.extra.spring.SpringUtil;
-
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -16,44 +12,46 @@ import javax.sql.DataSource;
  */
 public class GirSpringAdvExecutor extends AbstractAdvExecutor implements IAdvExecutor {
 
-	IAdvExecutor iAdvExecutorPxy;
+    IAdvExecutor iAdvExecutorPxy;
 
-	public static GirSpringAdvExecutor getInstance() {
-		return SpringUtil.getBean(GirSpringAdvExecutor.class);
-	}
+    public static GirSpringAdvExecutor getInstance() {
+        return SpringUtil.getBean(GirSpringAdvExecutor.class);
+    }
 
-	@Override
-	protected IDataSourceGetter getDataSourceGetterPxy() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IDataSourceGetter getDataSourceGetterPxy() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvBaseOpt getAdvBaseOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvBaseOpt getAdvBaseOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvDDLOpt getAdvDDLOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvDDLOpt getAdvDDLOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvSimplePagePreOpt getSimplePageOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvGeoPreOpt getGeoOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvGeoPreOpt getGeoOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected DialectTableNameProcessor getDialectTableNameProcessor() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected DialectTableNameProcessor getDialectTableNameProcessor() {
+        return iAdvExecutorPxy;
+    }
 
-	public GirSpringAdvExecutor(IAdvExecutor iAdvExecutorPxy) {
-		this.iAdvExecutorPxy = iAdvExecutorPxy;
-	}
+    public GirSpringAdvExecutor(IAdvExecutor iAdvExecutorPxy) {
+        this.iAdvExecutorPxy = iAdvExecutorPxy;
+        this.initProxyObjects();
+    }
+
 
 }

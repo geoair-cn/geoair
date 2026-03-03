@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>cn.geoair</groupId>
 		<artifactId>geoair</artifactId>
-		<version>23.1.1-RC4 </version>
+		<version>23.1.1-M1 </version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair-web</artifactId>
-	<version>23.1.1-RC4</version>
+	<version>23.1.1-M1</version>
 	<name>geoair-web</name>
 
 	<description>Web库</description>

@@ -1,23 +1,16 @@
 package cn.geoair.comp.knife4j.ext.builder;
 
-import cn.geoair.gtc.base.data.GiVisualValuable;
-import cn.geoair.gtc.base.data.common.GemNull;
-import cn.geoair.gtc.base.data.model.annotation.GaModelField;
-import io.swagger.annotations.ApiModelProperty;
-import org.springframework.context.annotation.Primary;
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemNull;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import springfox.bean.validators.plugins.Validators;
-import springfox.documentation.schema.ModelSpecification;
-import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin;
 import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
-import springfox.documentation.spring.web.DescriptionResolver;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
-import springfox.documentation.swagger.schema.ApiModelPropertyPropertyBuilder;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -29,14 +22,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static springfox.documentation.schema.Annotations.findPropertyAnnotation;
 import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
-import static springfox.documentation.swagger.schema.ApiModelProperties.*;
 
 /**
  * @author ：张俊
- * @date ：Created in 2022/8/23 9:36 @description： GtcModelField 替换 ApiModelProperty
+ * @date ：Created in 2022/8/23 9:36 @description： GirModelField 替换 ApiModelProperty
  * 注解（jsonbody参数）
  */
-@Order(value = SWAGGER_PLUGIN_ORDER + 1)
+@Component
+@Order(value = SWAGGER_PLUGIN_ORDER)
 public class GaModelFieldBuilder implements ModelPropertyBuilderPlugin {
 
 	public static Optional<GaModelField> findGaModelFieldAnnotation(AnnotatedElement annotated) {

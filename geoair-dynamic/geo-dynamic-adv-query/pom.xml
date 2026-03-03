@@ -5,13 +5,13 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>geo-dynamic-adv-query</artifactId>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
 
@@ -102,7 +102,6 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-main</artifactId>
             <version>${geotools.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>

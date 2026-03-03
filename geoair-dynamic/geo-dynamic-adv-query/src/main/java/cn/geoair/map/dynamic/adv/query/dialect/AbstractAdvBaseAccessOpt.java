@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.gtc.base.log.GiLogger;
-import cn.geoair.gtc.base.log.GirLogger;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -11,7 +11,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
-import com.alibaba.fastjson.annotation.JSONType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

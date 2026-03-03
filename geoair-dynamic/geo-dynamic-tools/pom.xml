@@ -5,11 +5,11 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.1-RC4</version>
+        <version>23.1.1-M1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.1-RC4</version>
+    <version>23.1.1-M1</version>
     <artifactId>geo-dynamic-tools</artifactId>
     <name>geo-dynamic-tools</name>
 
@@ -132,7 +132,6 @@
             <groupId>org.locationtech.jts</groupId>
             <artifactId>jts-core</artifactId>
             <version>${jts.version}</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 

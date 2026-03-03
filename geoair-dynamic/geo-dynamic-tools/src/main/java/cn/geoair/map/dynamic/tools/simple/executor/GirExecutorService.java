@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple.executor;
 
-import cn.geoair.gtc.base.log.GiLogger;
-import cn.geoair.gtc.base.log.GirLogger;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 
 import java.util.Collection;
 import java.util.List;

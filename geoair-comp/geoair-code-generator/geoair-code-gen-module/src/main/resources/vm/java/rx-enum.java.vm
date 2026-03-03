@@ -1,0 +1,71 @@
+package ${packageName}.model.${moduleName}.enm;
+
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemUtil;
+import cn.geoair.base.data.model.annotation.GaModelField;
+
+public enum $column.enumsName implements GiVisualValuable<$column.javaType> {
+
+#foreach($item in $column.enums.entrySet())
+ #if($column.javaType=="Integer")
+$!{item.key}($!{item.value}),
+ #end
+ #if($column.javaType=="String")
+$!{item.key}("$!{item.value}" ),
+ #end
+ #if($column.javaType=="Long")
+$!{item.key}($!{item.value}l),
+ #end
+#end
+    ;
+
+    @GaModelField(isID = true)
+    private $column.javaType code ;
+    ${column.enumsName}($column.javaType code) {
+            this.code = code;
+}
+
+    public $column.javaType getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String display () {
+        return this.name();
+    }
+
+@Override
+public $column.javaType value() {
+        return this.code;
+    }
+    public static String getDisplayByValue($column.javaType value) {
+        $column.enumsName enumsByCode = getEnumsByValue(value);
+        return enumsByCode != null ? enumsByCode.display() : null;
+    }
+
+    public static $column.enumsName getEnumsByValue($column.javaType value)  {
+        for ($column.enumsName f : ${column.enumsName}.values()) {
+            if (f.value().equals(value)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    public static String getCodeByDisplay(String display) {
+        $column.enumsName enumsByCode = getEnumsByDisplay(display);
+        return enumsByCode != null ? enumsByCode.getCode() : null;
+    }
+
+    public static $column.enumsName getEnumsByDisplay(String display) {
+        for ($column.enumsName f : ${column.enumsName}.values()) {
+            if (f.display().equals(display)) {
+                return f;
+            }
+        }
+        return null;
+    }
+    public static $column.enumsName valueOf($column.javaType value,$column.enumsName ifNull) {
+    return GemUtil.valueOf(${column.enumsName}. class,value, ifNull);
+    }
+}
