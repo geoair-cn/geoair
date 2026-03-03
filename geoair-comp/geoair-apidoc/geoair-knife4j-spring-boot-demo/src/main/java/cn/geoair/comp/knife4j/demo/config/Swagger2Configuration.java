@@ -24,11 +24,10 @@ public class Swagger2Configuration extends GirSwaggerApiConfig {
 		return createApi(apiModelInfo, docketInfo).enable(girSwaggerProperties.isEnable());
 	}
 
-	// @Bean
-	// public Docket createdemo2ApiServer() {
-	// DocketInfo docketInfo = new DocketInfo("demo2分组",
-	// "com.gtc.comp.knife4j.demo.controller.group2");
-	// return createApi(apiModelInfo, docketInfo).enable(girSwaggerProperties.isEnable());
-	// }
+	 @Bean
+	 public Docket createdemo2ApiServer() {
+	 DocketInfo docketInfo = new DocketInfo("demo2分组", "cn.geoair.comp.knife4j.demo.controller.group2");
+	 return createApi(apiModelInfo, docketInfo).enable(girSwaggerProperties.isEnable());
+	 }
 
 }
