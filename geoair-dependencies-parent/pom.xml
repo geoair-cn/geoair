@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies</artifactId>
-        <version>23.1.1-M1</version>
+        <version>23.1.2-RC1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-dependencies-parent</artifactId>
     <name>geoair-dependencies-parent</name>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>用于工程模块的依赖定义</description>
 
@@ -42,8 +42,8 @@
     </scm>
 
     <properties>
-        <!--        <geoair.version>23.1.1-M1</geoair.version>-->
-        <!--        <geoair.comp.version>23.1.1-M1</geoair.comp.version>-->
+        <!--        <geoair.version>23.1.2-RC1-SNAPSHOT</geoair.version>-->
+        <!--        <geoair.comp.version>23.1.2-RC1-SNAPSHOT</geoair.comp.version>-->
 
         <skipTests>true</skipTests>
     </properties>

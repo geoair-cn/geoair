@@ -6,7 +6,7 @@
     <parent>
         <!--		<groupId>cn.geoair.dependencies</groupId>-->
         <!--		<artifactId>geoair-dependencies-parent</artifactId>-->
-        <!--		<version>23.1.1-M1 </version>-->
+        <!--		<version>23.1.2-RC1-SNAPSHOT </version>-->
         <!--		<relativePath>../pom.xml</relativePath>-->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -15,12 +15,12 @@
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-spring-boot-starter-parent</artifactId>
     <name>geoair-spring-boot-starter-parent</name>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair-spring-boot-starter-parent</description>
 
     <properties>
-        <geoair.version>23.1.1-M1</geoair.version>
+        <geoair.version>23.1.2-RC1-SNAPSHOT</geoair.version>
         <spring-javaformat.version>0.0.28</spring-javaformat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <resource.delimiter>@</resource.delimiter>
