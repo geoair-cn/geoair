@@ -6,17 +6,16 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 
 public enum $column.enumsName implements GiVisualValuable<$column.javaType> {
 
-
 #foreach($item in $column.enums.entrySet())
-    #if($column.javaType=="Integer")
-        $!{item.key}($!{item.value}),
-    #end
-    #if($column.javaType=="String")
-        $!{item.key}("$!{item.value}" ),
-    #end
-    #if($column.javaType=="Long")
-        $!{item.key}($!{item.value}l),
-    #end
+ #if($column.javaType=="Integer")
+$!{item.key}($!{item.value}),
+ #end
+ #if($column.javaType=="String")
+$!{item.key}("$!{item.value}" ),
+ #end
+ #if($column.javaType=="Long")
+$!{item.key}($!{item.value}l),
+ #end
 #end
     ;
 
@@ -26,7 +25,7 @@ public enum $column.enumsName implements GiVisualValuable<$column.javaType> {
             this.code = code;
 }
 
-public $column.javaType getCode() {
+    public $column.javaType getCode() {
         return this.code;
     }
 
@@ -45,7 +44,7 @@ public $column.javaType value() {
     }
 
     public static $column.enumsName getEnumsByValue($column.javaType value)  {
-        for ($column.enumsName f : $column.enumsName.values()) {
+        for ($column.enumsName f : ${column.enumsName}.values()) {
             if (f.value().equals(value)) {
                 return f;
             }
@@ -59,7 +58,7 @@ public $column.javaType value() {
     }
 
     public static $column.enumsName getEnumsByDisplay(String display) {
-        for ($column.enumsName f : $column.enumsName.values()) {
+        for ($column.enumsName f : ${column.enumsName}.values()) {
             if (f.display().equals(display)) {
                 return f;
             }
