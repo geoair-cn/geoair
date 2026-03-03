@@ -75,7 +75,7 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     /**
      * 初始化所有功能模块代理对象
      */
-    private void initProxyObjects() {
+    public void initProxyObjects() {
         this.advBaseOptPxy = getAdvBaseOpt();
         this.advDDLOptPxy = getAdvDDLOpt();
         this.advGeoOptPxy = getGeoOpt();
