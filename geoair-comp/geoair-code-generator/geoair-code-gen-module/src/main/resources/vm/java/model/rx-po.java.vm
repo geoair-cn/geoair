@@ -18,8 +18,6 @@ import java.util.Date;
     import ${packageName}.model.${moduleName}.enm.${column.enumsName};
     #end
 #end
-
-##import cn.geoair.base.gpa.id.GwIdGenerator;
 import java.util.UUID;
 #foreach ($column in $columns)
     #if($column.javaTypeOther == 'Geometry')
@@ -39,18 +37,20 @@ import java.util.UUID;
 @Table(name = "${tableName}")
     #foreach ($column in $columns)
         #if($column.isPk==1)
-        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>,GiEntityIdGenerator<$column.javaType> {
+        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>, GiEntityIdGenerator<$column.javaType> {
             #break
         #end
     #end
+
     private static final long serialVersionUID = ${time}L;
 
     #foreach ($column in $columns)
         #if($column.isPk==1)
             @Id
             @Column(name = "$column.columnName")
-            @GaModelField(text = "$column.columnComment",isID=true)
+            @GaModelField(text = "$column.columnComment", isID = true)
             private $column.javaType $column.javaField;
+
             #break
         #end
     #end
@@ -65,7 +65,7 @@ import java.util.UUID;
             #else
             @Column(name = "$column.columnName")
                 #if("$!{column.enumsName}" != "")
-                @GaModelField(text = "$column.columnComment",em = ${column.enumsName}.class)
+                @GaModelField(text = "$column.columnComment", em = ${column.enumsName}.class)
                 #else
                 @GaModelField(text = "$column.columnComment")
                 #end
@@ -77,6 +77,7 @@ import java.util.UUID;
             #else
                 private $column.javaType $column.javaField;
             #end
+
         #end
     #end
 
@@ -95,16 +96,16 @@ import java.util.UUID;
         #end
     }
 
-
-
     #foreach ($column in $columns)
         #if($column.isPk == 1)
+            @Override
             public $column.javaType id() {
                 return $column.javaField;
             }
 
+            @Override
             public $column.javaType generatorId() {
-                return  UUID.randomUUID().toString();
+                return UUID.randomUUID().toString();
             }
             #break
         #end

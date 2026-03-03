@@ -60,6 +60,12 @@ public class GirGeneratorConfig {
 
 
     /**
+     * 是否使用springCache生成代码
+     */
+    public Boolean springCacheUse = true;
+
+
+    /**
      * 是否多模块
      */
     private Boolean mutiIs = true;

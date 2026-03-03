@@ -82,7 +82,7 @@ public class GirGenerator {
                     generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
-                    context = VelocityUtils.prepareContext(table);
+                    context = VelocityUtils.prepareContext(table,this.globalConfig);
                     sw = new StringWriter();
                     tpl = Velocity.getTemplate(template, "UTF-8" );
                     tpl.merge(context, sw);

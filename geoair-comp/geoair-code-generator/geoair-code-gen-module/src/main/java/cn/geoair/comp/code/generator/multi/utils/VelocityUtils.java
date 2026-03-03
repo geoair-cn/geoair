@@ -1,5 +1,6 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
+import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 
@@ -30,7 +31,7 @@ public class VelocityUtils {
         return velocityContext;
     }
 
-    public static VelocityContext prepareContext(GenTable genTable) {
+    public static VelocityContext prepareContext(GenTable genTable, GirGeneratorConfig globalConfig) {
 
         String packageName = genTable.getPackageName();
 
@@ -42,6 +43,7 @@ public class VelocityUtils {
         velocityContext.put("functionName" , StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】" );
         velocityContext.put("ClassName" , genTable.getClassName());
         velocityContext.put("className" , StringUtils.uncapitalize(genTable.getClassName()));
+        velocityContext.put("enableCache" , globalConfig.springCacheUse);
         //velocityContext.put("classname", StringUtils.replace(genTable.getTableName(),"_",""));
 
         velocityContext.put("classname" , StringUtils.replace(StringUtils.split(genTable.getTableName(), "_" , 2)[1], "_" , "" ));

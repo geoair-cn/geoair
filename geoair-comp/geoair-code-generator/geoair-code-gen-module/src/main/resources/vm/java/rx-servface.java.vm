@@ -1,43 +1,105 @@
-package ${packageName}.servface.${moduleName};
+package ${packageName}.servface.${moduleName}.${classname};
 
 import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
-import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
-import java.util.*;
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * ${tableComment}Servface接口
+ * ${tableComment}服务接口
  *
  * @author ${author}
  * @date ${datetime}
  */
 public interface ${ClassName}Service {
 
-
-        ${ClassName}Po add${ClassName}(${ClassName}Po insertPo);
-
-
-        ${ClassName}Po update${ClassName}(${ClassName}Po updatePo);
-
-
-        ${ClassName}Po del${ClassName}(${ClassName}Po delPo);
-
-        ${ClassName}Po logicDel${ClassName}(${ClassName}Po logicDelPo);
+    /**
+     * 新增${tableComment}
+     *
+     * @param po 实体对象
+     * @return 新增后的实体对象
+     */
+        ${ClassName}Po add(${ClassName}Po po);
 
     /**
-     *  根据id查询数据库对象
-     *    @return  ${ClassName}Po
+     * 修改${tableComment}
+     *
+     * @param po 实体对象
+     * @return 修改后的实体对象
      */
-        ${ClassName}Dto get${ClassName}DtoById(String id);
+        ${ClassName}Po update(${ClassName}Po po);
 
     /**
-     *  根据Seo查询数据库对象
-     *    @return List<${ClassName}Dto>
+     * 根据ID删除${tableComment}
+     *
+     * @param id 主键ID
      */
-    List<${ClassName}Dto> get${ClassName}ListBySeo(${ClassName}Seo seo);
+    void deleteById(String id);
 
-    <T> Map<String,${ClassName}Dto> getDtosByBeansInvoke(List<T> beanList, String ... fieldName);
+    /**
+     * 根据ID逻辑删除${tableComment}
+     *
+     * @param id 主键ID
+     */
+    void logicDeleteById(String id);
 
+    /**
+     * 根据ID查询${tableComment}
+     *
+     * @param id 主键ID
+     * @return DTO对象
+     */
+        ${ClassName}Dto getDtoById(String id);
+
+    /**
+     * 根据ID查询${tableComment}实体
+     *
+     * @param id 主键ID
+     * @return 实体对象
+     */
+        ${ClassName}Po getPoById(String id);
+
+    /**
+     * 根据条件查询${tableComment}列表
+     *
+     * @param seo 查询条件
+     * @return DTO对象列表
+     */
+    List<${ClassName}Dto> getDtoListBySeo(${ClassName}Seo seo);
+
+    /**
+     * 根据条件查询${tableComment}列表（带分页）
+     *
+     * @param seo 查询条件
+     * @param pageParam 分页信息
+     * @return 分页结果
+     */
+    GiPager<${ClassName}Dto> getDtoPageBySeo(${ClassName}Seo seo,GiPageParam pageParam);
+
+    /**
+     * 根据条件查询${tableComment}实体列表
+     *
+     * @param seo 查询条件
+     * @return 实体对象列表
+     */
+    List<${ClassName}Po> getPoListBySeo(${ClassName}Seo seo);
+
+    /**
+     * 批量获取DTO映射（按指定字段映射）
+     *
+     * @param beanList Bean列表
+     * @param fieldName 字段名（支持多级字段，如：user.id）
+     * @param <T> Bean类型
+     * @return 字段值到DTO的映射
+     */
+    <T> Map<String, ${ClassName}Dto> getDtoMapByField(List<T> beanList, String fieldName);
+
+    /**
+     * 刷新缓存
+     */
     void refreshCache();
 }
