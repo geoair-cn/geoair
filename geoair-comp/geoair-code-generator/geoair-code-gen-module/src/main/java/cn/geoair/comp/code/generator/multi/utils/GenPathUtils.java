@@ -23,8 +23,8 @@ public class GenPathUtils {
      */
     public static String getEnumGenPath(GenTable table, GenTableColumn column, String template, Boolean mutiIs) {
         String genPath = table.getGenPath();
-        if (org.apache.commons.lang3.StringUtils.equals(genPath, "/" )) {
-            return System.getProperty("user.dir" ) + File.separator + getFileName(template, table, mutiIs);
+        if (StringUtils.equals(genPath, "/" )) {
+            return System.getProperty("user.dir" ) + File.separator + GenPathUtils.getEnumFileName(template, table, column, mutiIs);
         }
         return genPath + File.separator + GenPathUtils.getEnumFileName(template, table, column, mutiIs);
     }

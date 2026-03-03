@@ -96,7 +96,7 @@ public class VelocityUtils {
         List<String> templates = new ArrayList<>();
         addBaseTemplates(templates);
         if (isEnum) {
-            templates.add("vm/rx/java/rx-enum.java.vm" );
+            templates.add("vm/java/rx-enum.java.vm" );
         }
         return templates;
     }

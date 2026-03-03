@@ -25,7 +25,6 @@ import java.util.List;
 public class GirGenerator {
 
 
-
     private GirGeneratorConfig globalConfig;
     private CommonRuner commonRuner;
 
@@ -82,7 +81,7 @@ public class GirGenerator {
                     generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
-                    context = VelocityUtils.prepareContext(table,this.globalConfig);
+                    context = VelocityUtils.prepareContext(table, this.globalConfig);
                     sw = new StringWriter();
                     tpl = Velocity.getTemplate(template, "UTF-8" );
                     tpl.merge(context, sw);
@@ -126,6 +125,7 @@ public class GirGenerator {
                     }
                     // 写入文件
                     FileUtils.writeStringToFile(enumFile, sw.toString(), "UTF-8" );
+                    Gir.log.info("生成文件：" + enumPath);
                 } catch (IOException e) {
                     throw new GirException("渲染枚举模板失败，表名：" + table.getTableName() + "，列名：" + column.getColumnName(), e);
                 }
