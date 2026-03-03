@@ -127,14 +127,14 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     }
 
     @Override
-    public GiPager<DeviceDbtableInfoDto> getDtoPageBySeo(DeviceDbtableInfoSeo seo, GiPageParam pageParam) {
+    public GiPager<${ClassName}Dto> getDtoPageBySeo(${ClassName}Seo seo, GiPageParam pageParam) {
         seo.setNotDel();
-        return deviceDbtableInfoDao.searchListPage(seo, pageParam);
+        return ${className}Dao.searchListPage(seo, pageParam);
     }
     @Override
     public List<${ClassName}Po> getPoListBySeo(${ClassName}Seo seo) {
         seo.setNotDel();
-        return deviceDbtableInfoDao.gtcSearch(seo);
+        return ${className}Dao.gtcSearch(seo);
     }
 
     @Override
