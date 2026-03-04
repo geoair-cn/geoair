@@ -1,0 +1,14 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ cn.geoair.comp.knife4j.ext.springfox.builder.GaModelFieldBuilder,\
+cn.geoair.comp.knife4j.ext.springfox.builder.GirModelProvider,\
+cn.geoair.comp.knife4j.ext.springfox.aspect.GaApiListingAspect,\
+cn.geoair.comp.knife4j.ext.springfox.builder.GaApiActionOperationBuilder,\
+cn.geoair.comp.knife4j.ext.springfox.builder.GaModelFieldParameterBuilder,\
+cn.geoair.comp.knife4j.ext.springfox.builder.GaExpandedParameterBuilder,\
+ cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelService,\
+ cn.geoair.comp.knife4j.ext.springfox.config.SwaggerSpring6Compatible,\
+ cn.geoair.comp.knife4j.ext.springfox.aspect.TypeResolverAspect,\
+cn.geoair.comp.knife4j.ext.springfox.auto.AutoApiConfig,\
+cn.geoair.comp.knife4j.ext.springfox.auto.ApiRunner
+
+
