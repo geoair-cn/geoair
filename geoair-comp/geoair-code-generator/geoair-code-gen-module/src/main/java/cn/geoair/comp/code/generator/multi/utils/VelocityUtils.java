@@ -109,16 +109,15 @@ public class VelocityUtils {
     private static void addBaseTemplates(List<String> templates,GirGeneratorConfig globalConfig) {
         if(globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)){
             templates.add("vm/java/model/rx-po-mplus.java.vm" );
+            templates.add("vm/java/rx-mapper-plus.java.vm" );
         }else{
             templates.add("vm/java/model/rx-po.java.vm" );
+            templates.add("vm/java/rx-mapper.java.vm" );
         }
-
-
         templates.add("vm/java/model/rx-dto.java.vm" );
         templates.add("vm/java/model/rx-seo.java.vm" );
         templates.add("vm/java/rx-controller.java.vm" );
         templates.add("vm/java/rx-dao.java.vm" );
-        templates.add("vm/java/rx-mapper.java.vm" );
         templates.add("vm/java/rx-servface.java.vm" );
         templates.add("vm/java/rx-event.java.vm" );
         templates.add("vm/java/rx-serviceImpl.java.vm" );

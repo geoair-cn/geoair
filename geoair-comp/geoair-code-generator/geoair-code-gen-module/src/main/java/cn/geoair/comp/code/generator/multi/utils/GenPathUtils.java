@@ -90,7 +90,7 @@ public class GenPathUtils {
      * @param packageName 包名
      * @return 完整文件路径（null表示未匹配到模板）
      */
-    public static String getFileNameKLF(String template, String moduleName, String className, String classname, String packageName, String projectName,  GirGeneratorConfig globalConfig) {
+    public static String getFileNameKLF(String template, String moduleName, String className, String classname, String packageName, String projectName, GirGeneratorConfig globalConfig) {
         String packagePath = StringUtils.replace(packageName, ".", "/");
 
         String fileName = null;
@@ -105,21 +105,17 @@ public class GenPathUtils {
                 fileName = StringUtils.format("{}-model/src/{}/{}/model/{}/seo/{}Seo.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-dao.java.vm")) {
                 fileName = StringUtils.format("{}-dao/src/{}/{}/dao/{}/{}Dao.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
-            }
-            else if (template.contains("rx-mapper.java.vm")) {
-                if (globalConfig.getOrmType().equals(OrmType.TKMAPPER)) {
-                    fileName = StringUtils.format("{}-mapper-tk/src/{}/{}/mapper/{}/{}Mapper.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
-                }else if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
-                    fileName = StringUtils.format("{}-mybatis-plus/src/{}/{}/mp/{}/{}Mapper.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
-                }
-            }else if (template.contains("rx-mapper.xml.vm")) {
+            } else if (template.contains("rx-mapper.java.vm")) {
+                fileName = StringUtils.format("{}-mapper-tk/src/{}/{}/mapper/{}/{}Mapper.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
+            } else if (template.contains("rx-mapper-plus.java.vm")) {
+                fileName = StringUtils.format("{}-mybatis-plus/src/{}/{}/mp/{}/{}Mapper.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
+            } else if (template.contains("rx-mapper.xml.vm")) {
                 if (globalConfig.getOrmType().equals(OrmType.TKMAPPER)) {
                     fileName = StringUtils.format("{}-mapper-tk/src/{}/{}/mapper/{}/impl/{}Mapper.xml", projectName, PROJECT_PATH, packagePath, moduleName, className);
-                }else if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
+                } else if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
                     fileName = StringUtils.format("{}-mybatis-plus/src/{}/{}/mp/{}/impl/{}Mapper.xml", projectName, PROJECT_PATH, packagePath, moduleName, className);
                 }
-            }
-            else if (template.contains("rx-servface.java.vm")) {
+            } else if (template.contains("rx-servface.java.vm")) {
                 fileName = StringUtils.format("{}-servface/src/{}/{}/servface/{}/{}Service.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-event.java.vm")) {
                 fileName = StringUtils.format("{}-servface/src/{}/{}/servface/{}/event/{}Event.java", projectName, PROJECT_PATH, packagePath, moduleName, className);
@@ -149,7 +145,16 @@ public class GenPathUtils {
                 fileName = StringUtils.format("src/{}/{}/dao/{}/{}Dao.java", PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-mapper.java.vm")) {
                 fileName = StringUtils.format("src/{}/{}/mapper/{}/{}Mapper.java", PROJECT_PATH, packagePath, moduleName, className);
-            } else if (template.contains("rx-servface.java.vm")) {
+            }else if (template.contains("rx-mapper-plus.java.vm")) {
+                fileName = StringUtils.format("src/{}/{}/mp/{}/{}Mapper.java", PROJECT_PATH, packagePath, moduleName, className);
+            }
+            else if (template.contains("rx-mapper.xml.vm")) {
+                if (globalConfig.getOrmType().equals(OrmType.TKMAPPER)) {
+                    fileName = StringUtils.format("src/{}/{}/mapper/{}/impl/{}Mapper.xml", PROJECT_PATH, packagePath, moduleName, className);
+                } else if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
+                    fileName = StringUtils.format("src/{}/{}/mp/{}/impl/{}Mapper.xml", PROJECT_PATH, packagePath, moduleName, className);
+                }
+            }else if (template.contains("rx-servface.java.vm")) {
                 fileName = StringUtils.format("src/{}/{}/servface/{}/{}Service.java", PROJECT_PATH, packagePath, moduleName, className);
             } else if (template.contains("rx-event.java.vm")) {
                 fileName = StringUtils.format("src/{}/{}/servface/{}/event/{}Event.java", PROJECT_PATH, packagePath, moduleName, className);
@@ -165,8 +170,6 @@ public class GenPathUtils {
                 fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}SearchVo.java", PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
             } else if (template.contains("rx-updatevo.java.vm")) {
                 fileName = StringUtils.format("src/{}/{}/wcs/controller/{}/{}UpdateVo.java", PROJECT_PATH, packagePath, moduleName, classname + "/" + className);
-            } else if (template.contains("rx-mapper.xml.vm")) {
-                fileName = StringUtils.format("src/{}/{}/mapper/{}/impl/{}Mapper.xml", PROJECT_PATH, packagePath, moduleName, className);
             }
         }
 
