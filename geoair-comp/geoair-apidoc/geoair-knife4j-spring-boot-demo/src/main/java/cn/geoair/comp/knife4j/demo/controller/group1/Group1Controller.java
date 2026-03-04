@@ -3,7 +3,7 @@ package cn.geoair.comp.knife4j.demo.controller.group1;
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.comp.knife4j.demo.model.DemoVo1;
-import io.swagger.annotations.Api;
+//import io.swagger.annotations.Api;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @GaApi(tags = "分组1第一个 22控制器")
-@Api(tags = "分组1第一个 控制器")
+//@Api(tags = "分组1第一个 控制器")
 public class Group1Controller {
 
 	// @PostMapping("/demo3post")

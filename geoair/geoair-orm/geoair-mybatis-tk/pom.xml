@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.1-M1 </version>
+        <version>23.1.2-RC3-SNAPSHOT </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis-tk</artifactId>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <url>https://gitee.com/geoair/geoair</url>
@@ -71,9 +71,18 @@
         </dependency>
 
         <dependency>
-            <groupId>org.postgis</groupId>
+<!--            <groupId>org.postgis</groupId>-->
+<!--            <artifactId>postgis-jdbc</artifactId>-->
+<!--            <version>${postgis.jdbc.version}</version>-->
+            <groupId>net.postgis</groupId>
             <artifactId>postgis-jdbc</artifactId>
-            <version>${postgis.jdbc.version}</version>
+            <version>${net.postgis.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>net.postgis</groupId>
+            <artifactId>postgis-geometry</artifactId>
+            <version>${net.postgis.version}</version>
             <optional>true</optional>
         </dependency>
 

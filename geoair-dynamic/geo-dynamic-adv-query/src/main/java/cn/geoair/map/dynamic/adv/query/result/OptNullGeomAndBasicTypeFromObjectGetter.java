@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import org.locationtech.jts.geom.*;
-import org.postgis.PGgeometry;
+import net.postgis.jdbc.PGgeometry;
 import org.postgresql.util.PGobject;
 
 import java.util.Map;

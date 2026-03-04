@@ -17,35 +17,39 @@ public class GirGeneratorConfig {
     /**
      * 源代码生成路径
      */
-    String sourceRootPath = "/" ;
+    String sourceRootPath = "/";
 
     public String getSourceRootPath() {
         if (StrUtil.isEmpty(sourceRootPath)) {
-            return "/" ;
+            return "/";
         }
         return sourceRootPath;
     }
 
+
+    OrmType ormType = OrmType.TKMAPPER;
+
+
     /**
      * 代码的包名的根
      */
-    String sourceRootPackage = "" ;
+    String sourceRootPackage = "";
 
     /**
      * 模块名称
      */
-    String moduleName = "" ;
+    String moduleName = "";
 
 
     /**
      * 项目名称
      */
-    String projectName = "" ;
+    String projectName = "";
 
     /**
      * 生成作者
      */
-    private String author = "geoair" ;
+    private String author = "geoair";
 
 
     /**

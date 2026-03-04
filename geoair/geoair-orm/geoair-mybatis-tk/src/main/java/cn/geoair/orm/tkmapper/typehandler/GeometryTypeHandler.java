@@ -1,11 +1,13 @@
 package cn.geoair.orm.tkmapper.typehandler;
 
+import net.postgis.jdbc.PGgeometry;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
-import org.postgis.PGgeometry;
+
+
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -70,11 +72,11 @@ public class GeometryTypeHandler extends BaseTypeHandler<Geometry> {
 
 	private Geometry toGeometry(String geomStr) throws Exception {
 		PGgeometry pgGeometry = new PGgeometry(geomStr);
-		org.postgis.Geometry pgGeom = pgGeometry.getGeometry();
+		net.postgis.jdbc.geometry.Geometry geometry = pgGeometry.getGeometry();
 		WKTReader wktReader = new WKTReader();
 		wktReader.setIsOldJtsCoordinateSyntaxAllowed(false);
-		Geometry jtsGeom = wktReader.read(pgGeom.getTypeString() + pgGeom.getValue());
-		jtsGeom.setSRID(pgGeom.getSrid());
+		Geometry jtsGeom = wktReader.read(geometry.getTypeString() + geometry.getValue());
+		jtsGeom.setSRID(geometry.getSrid());
 		return jtsGeom;
 	}
 

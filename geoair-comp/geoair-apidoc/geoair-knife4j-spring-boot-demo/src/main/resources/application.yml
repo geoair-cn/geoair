@@ -4,11 +4,13 @@ spring:
       matching-strategy: ant_path_matcher
   profiles:
     default: pro
-gtc:
-  gtc-apidoc:
+geoair:
+  apidoc:
     enable: true
+
 server:
   port: 8080
 #server:
 #  servlet:
 #    context-path: /demo_context
+

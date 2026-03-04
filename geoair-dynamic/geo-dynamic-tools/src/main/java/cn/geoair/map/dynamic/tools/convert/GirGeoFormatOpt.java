@@ -5,7 +5,8 @@ import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
-import org.postgis.PGgeometry;
+import net.postgis.jdbc.PGgeometry;
+import net.postgis.jdbc.PGgeometry;
 
 /**
  * 空间类型转换核心接口 定义GeoJSON/WKT/WKB/JTS/PGGeometry等空间类型的互转规范

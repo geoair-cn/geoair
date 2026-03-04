@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
-        <version>23.1.1-M1</version>
+        <version>23.1.2-RC3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-api-parent</artifactId>
     <name>geoair-api-parent</name>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair api parent</description>
 
@@ -57,6 +57,15 @@
         </dependencies>
     </dependencyManagement>
 
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair.dependencies</groupId>
+            <artifactId>geoair-project-parent</artifactId>
+            <version>${geoair.version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
 
     <build>
 

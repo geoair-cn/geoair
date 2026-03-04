@@ -1,8 +1,8 @@
 package cn.geoair.comp.knife4j.demo.controller.group2;
 
 
-import io.swagger.annotations.Api;
- import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.PostMapping;
  import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +16,7 @@ import io.swagger.annotations.Api;
 
 
  @Controller
- @Api(tags = "分组2 第一个 控制器")
+// @Api(tags = "分组2 第一个 控制器")
  public class Group2Controller {
 
 // @PostMapping("/demo2post")
@@ -29,7 +29,7 @@ import io.swagger.annotations.Api;
 
  @PostMapping("/demo2Get")
  @ResponseBody
- @ApiOperation(value = "demo2Get 控制器")
+// @ApiOperation(value = "demo2Get 控制器")
  public String demo1Get() {
  return "demo2Get返回成功";
  }

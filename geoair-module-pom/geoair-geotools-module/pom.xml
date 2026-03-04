@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.1-M1</version>
+        <version>23.1.2-RC3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-geotools-module</artifactId>
     <name>geoair-geotools-module</name>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair geotools module</description>
 
@@ -64,10 +64,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.postgis</groupId>-->
+<!--                <artifactId>postgis-jdbc</artifactId>-->
+<!--                <version>${postgis.jdbc.version}</version>-->
+<!--            </dependency>-->
             <dependency>
-                <groupId>org.postgis</groupId>
+                <groupId>net.postgis</groupId>
                 <artifactId>postgis-jdbc</artifactId>
-                <version>${postgis.jdbc.version}</version>
+                <version>${net.postgis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.locationtech.jts</groupId>

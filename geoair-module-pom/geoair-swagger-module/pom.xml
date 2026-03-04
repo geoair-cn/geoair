@@ -6,20 +6,22 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.1-M1</version>
+        <version>23.1.2-RC3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-swagger-module</artifactId>
     <name>geoair-swagger-module</name>
-    <version>23.1.1-M1</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair swagger module</description>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
     <properties>
-        <knife4j.version>3.0.3</knife4j.version>
+        <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
+        <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
         <springfox.version>3.0.0</springfox.version>
+        <springdoc.version>1.7.0</springdoc.version>
     </properties>
 
     <licenses>
@@ -49,20 +51,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!--            <dependency>-->
-            <!--                <groupId>com.github.xiaoymin</groupId>-->
-            <!--                <artifactId>knife4j</artifactId>-->
-            <!--                <version>2.0.5</version>-->
-            <!--                <type>pom</type>-->
-            <!--                <scope>import</scope>-->
-            <!--            </dependency>-->
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-dependencies</artifactId>
-                <version>${knife4j.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
@@ -85,7 +74,17 @@
                 <version>${springfox.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+                <version>${knife4j-openapi3.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

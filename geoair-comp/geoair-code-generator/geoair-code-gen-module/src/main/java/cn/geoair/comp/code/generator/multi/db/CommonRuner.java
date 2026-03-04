@@ -52,7 +52,14 @@ public class CommonRuner {
             // 列名称
             genTableColumn.setColumnName(fieldBySchemaApo.getColumnName());
             // 列描述
-            genTableColumn.setColumnComment(fieldBySchemaApo.getColumnComment());
+            String columnComment = fieldBySchemaApo.getColumnComment();
+            if(StrUtil.isEmpty(columnComment)){
+                columnComment = "";
+            }else{
+                columnComment= StrUtil.trim(columnComment);
+                columnComment= StrUtil.removeAllLineBreaks(columnComment);
+            }
+            genTableColumn.setColumnComment(columnComment);
             // 列类型（使用PG的dataType）
             genTableColumn.setColumnType(fieldBySchemaApo.getDataType());
 
