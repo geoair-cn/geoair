@@ -58,9 +58,16 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair.dependencies</groupId>
+            <artifactId>geoair-base-parent</artifactId>
+            <version>${geoair.version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
 
     <modules>
         <module>geoair-api-parent</module>

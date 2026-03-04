@@ -11,6 +11,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
         <version>2.7.18</version>
+        <relativePath/>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-spring-boot-starter-parent</artifactId>
@@ -75,6 +76,17 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair.dependencies</groupId>
+            <artifactId>geoair-project-parent</artifactId>
+            <version>${geoair.version}</version>
+            <type>pom</type>
+        </dependency>
+
+    </dependencies>
+
     <build>
 
         <pluginManagement>
