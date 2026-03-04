@@ -40,7 +40,7 @@ public class ApiModelInfo {
 	}
 
 	static {
-		DEFAULT = new ApiModelInfo("ApiDoc Documentation", "ApiDoc Documentation 1.0", "geoway", "1.0");
+		DEFAULT = new ApiModelInfo("ApiDoc Documentation", "ApiDoc Documentation 1.0", "geoair", "1.0");
 	}
 
 }

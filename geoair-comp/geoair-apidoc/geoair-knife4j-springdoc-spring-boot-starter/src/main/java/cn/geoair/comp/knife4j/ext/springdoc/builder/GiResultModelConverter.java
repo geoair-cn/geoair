@@ -35,7 +35,7 @@ public class GiResultModelConverter implements ModelConverter {
             // 替换ReflectionUtil.getRawClass：原生反射获取原始类
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Class<?> rawClass = getRawClass(parameterizedType);
-            if (rawClass == null || !(rawClass == GiResult.class)) {
+            if (!(rawClass == GiResult.class)) {
                 return schema; // 非GirWebResult类型，返回默认解析结果
             }
 

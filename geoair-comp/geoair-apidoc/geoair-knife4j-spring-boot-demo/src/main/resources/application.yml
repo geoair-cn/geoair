@@ -13,3 +13,15 @@ server:
 #server:
 #  servlet:
 #    context-path: /demo_context
+springdoc:
+  # 启用分组文档端点（关键：每个分组对应一个端点）
+  api-docs:
+    path: /v3/api-docs
+    groups:
+      enabled: true  # 启用分组API文档
+
+  # 配置Swagger UI显示所有分组
+  swagger-ui:
+    groups-order: asc  # 分组排序
+    operationsSorter: method  # 接口按方法排序
+    tagsSorter: alpha  # Tag按字母排序

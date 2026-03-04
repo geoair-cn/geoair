@@ -8,17 +8,14 @@ import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.oas.models.media.Schema;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * 处理GaModel和GaModelField注解的自定义Model转换器
- * 使用Hutool的TypeUtil简化类型解析，代码更简洁、健壮
+ *
  */
 
 public class GaModelFieldConverter implements ModelConverter {
@@ -30,8 +27,7 @@ public class GaModelFieldConverter implements ModelConverter {
         if (schema == null) {
             return null;
         }
-//        ParameterizedType parameterizedType = (ParameterizedType) returnType;
-        // ========== 1. 处理类级别@GaModel注解（使用Hutool TypeUtil） ==========
+
         Type type = annotatedType.getType();
         Class<?> clazz = TypeUtil.getClass(type); // 核心：Hutool一键解析类型
         if (clazz != null) {
