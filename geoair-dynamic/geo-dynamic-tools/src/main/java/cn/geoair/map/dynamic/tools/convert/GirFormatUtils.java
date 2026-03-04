@@ -11,7 +11,7 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
-import org.postgis.PGgeometry;
+import net.postgis.jdbc.PGgeometry;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -190,10 +190,10 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 		if (ObjectUtil.isNull(pgGeometry)) {
 			return ifExceptionValueReturnNull ? null : throwEmptyParamException("pgGeometry");
 		}
-		org.postgis.Geometry pgGeom = pgGeometry.getGeometry();
+		net.postgis.jdbc.geometry.Geometry geometry = pgGeometry.getGeometry();
 		try {
-			Geometry jtsGeom = getWKTReader().read(pgGeom.getTypeString() + pgGeom.getValue());
-			jtsGeom.setSRID(pgGeom.getSrid());
+			Geometry jtsGeom = getWKTReader().read(geometry.getTypeString() + geometry.getValue());
+			jtsGeom.setSRID(geometry.getSrid());
 			return jtsGeom;
 		}
 		catch (ParseException e) {

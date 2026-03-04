@@ -1,6 +1,7 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
+import cn.geoair.comp.code.generator.multi.config.OrmType;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 
@@ -40,6 +41,7 @@ public class VelocityUtils {
         VelocityContext velocityContext = new VelocityContext();
 
         velocityContext.put("tableName" , genTable.getTableName());
+        velocityContext.put("ormPackge" , globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)?"mp":"mapper");
         velocityContext.put("functionName" , StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】" );
         velocityContext.put("ClassName" , genTable.getClassName());
         velocityContext.put("className" , StringUtils.uncapitalize(genTable.getClassName()));
@@ -71,7 +73,7 @@ public class VelocityUtils {
      *
      * @return 模板列表
      */
-    public static List<String> getTemplateList(List<GenTableColumn> columns) {
+    public static List<String> getTemplateList(List<GenTableColumn> columns,GirGeneratorConfig globalConfig) {
         boolean isEnum = false;
         for (GenTableColumn column : columns) {
             if (StringUtils.isNotEmpty(column.getEnumsName())) {
@@ -81,7 +83,7 @@ public class VelocityUtils {
 
         List<String> templates = new ArrayList<String>();
 
-        templates = getKLF(isEnum);
+        templates = getKLF(isEnum,globalConfig);
 
         return templates;
     }
@@ -92,9 +94,9 @@ public class VelocityUtils {
      * @param isEnum 是否包含枚举模板
      * @return 模板路径列表
      */
-    public static List<String> getKLF(boolean isEnum) {
+    public static List<String> getKLF(boolean isEnum,GirGeneratorConfig globalConfig) {
         List<String> templates = new ArrayList<>();
-        addBaseTemplates(templates);
+        addBaseTemplates(templates,globalConfig);
         if (isEnum) {
             templates.add("vm/java/rx-enum.java.vm" );
         }
@@ -104,8 +106,13 @@ public class VelocityUtils {
     /**
      * 添加基础模板（抽离方法，提升可读性）
      */
-    private static void addBaseTemplates(List<String> templates) {
-        templates.add("vm/java/model/rx-po.java.vm" );
+    private static void addBaseTemplates(List<String> templates,GirGeneratorConfig globalConfig) {
+        if(globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)){
+            templates.add("vm/java/model/rx-po-mplus.java.vm" );
+        }else{
+            templates.add("vm/java/model/rx-po.java.vm" );
+        }
+
 
         templates.add("vm/java/model/rx-dto.java.vm" );
         templates.add("vm/java/model/rx-seo.java.vm" );

@@ -64,10 +64,15 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.postgis</groupId>-->
+<!--                <artifactId>postgis-jdbc</artifactId>-->
+<!--                <version>${postgis.jdbc.version}</version>-->
+<!--            </dependency>-->
             <dependency>
-                <groupId>org.postgis</groupId>
+                <groupId>net.postgis</groupId>
                 <artifactId>postgis-jdbc</artifactId>
-                <version>${postgis.jdbc.version}</version>
+                <version>${net.postgis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.locationtech.jts</groupId>

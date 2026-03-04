@@ -38,7 +38,7 @@ public class GirGenerator {
 
     public void genCode(String[] tables) {
         if (tables == null || tables.length == 0) {
-            throw new GirException("生成表名列表不能为空" );
+            throw new GirException("生成表名列表不能为空");
         }
         // 查询表信息
         List<GenTable> tableList = commonRuner.selectDbTableListByNames(tables);
@@ -49,48 +49,48 @@ public class GirGenerator {
             // 查询列信息
             List<GenTableColumn> genTableColumns = commonRuner.getTableColumnsByTableName(table.getTableName());
             if (genTableColumns.isEmpty()) {
-                throw new GirException("表[" + table.getTableName() + "]无列信息，无法生成代码" );
+                throw new GirException("表[" + table.getTableName() + "]无列信息，无法生成代码");
             }
             for (GenTableColumn column : genTableColumns) {
                 GenUtils.initColumnField(column, table);
             }
             table.setColumns(genTableColumns);
             table.setProjectName(globalConfig.getProjectName());
-            generatorCode(table);
+            generatorCode(table, globalConfig);
         }
-        Gir.log.info("代码生成成功" );
+        Gir.log.info("代码生成成功");
     }
 
     public void genCode(String table) {
         genCode(new String[]{table});
     }
 
-    private void generatorCode(GenTable table) {
+    private void generatorCode(GenTable table, GirGeneratorConfig globalConfig) {
         // 设置主键列信息
         setPkColumn(table);
         Template tpl = null;
         VelocityContext context = null;
         StringWriter sw = new StringWriter();
         // 获取模板列表
-        List<String> templates = VelocityUtils.getTemplateList(table.getColumns());
+        List<String> templates = VelocityUtils.getTemplateList(table.getColumns(), globalConfig);
         // 遍历模板生成代码
         for (String template : templates) {
             try {
                 // 只处理枚举模板
-                if (template.contains("rx-enum.java.vm" ) || template.contains("rx-apienum.java.vm" )) {
+                if (template.contains("rx-enum.java.vm") || template.contains("rx-apienum.java.vm")) {
                     generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
                     context = VelocityUtils.prepareContext(table, this.globalConfig);
                     sw = new StringWriter();
-                    tpl = Velocity.getTemplate(template, "UTF-8" );
+                    tpl = Velocity.getTemplate(template, "UTF-8");
                     tpl.merge(context, sw);
-                    String path = GenPathUtils.getGenPath(table, template, this.globalConfig.getMutiIs());
-                    FileUtils.writeStringToFile(new File(path), sw.toString(), "UTF-8" );
+                    String path = GenPathUtils.getGenPath(table, template, this.globalConfig);
+                    FileUtils.writeStringToFile(new File(path), sw.toString(), "UTF-8");
                     Gir.log.info("生成文件：" + path);
                 }
             } catch (Exception e) {
-                Gir.log.error(e, "代码生成异常" );
+                Gir.log.error(e, "代码生成异常");
             }
 
         }
@@ -103,7 +103,7 @@ public class GirGenerator {
     private void generateEnumCode(GenTable table, String template, Boolean mutiIs) {
         Template tpl = null;
         try {
-            tpl = Velocity.getTemplate(template, "UTF-8" );
+            tpl = Velocity.getTemplate(template, "UTF-8");
         } catch (Exception e) {
             throw new GirException("加载模板失败：" + template, e);
         }
@@ -124,7 +124,7 @@ public class GirGenerator {
                         FileUtils.forceMkdir(parentDir);
                     }
                     // 写入文件
-                    FileUtils.writeStringToFile(enumFile, sw.toString(), "UTF-8" );
+                    FileUtils.writeStringToFile(enumFile, sw.toString(), "UTF-8");
                     Gir.log.info("生成文件：" + enumPath);
                 } catch (IOException e) {
                     throw new GirException("渲染枚举模板失败，表名：" + table.getTableName() + "，列名：" + column.getColumnName(), e);
@@ -140,7 +140,7 @@ public class GirGenerator {
     private void setPkColumn(GenTable table) {
         List<GenTableColumn> columns = table.getColumns();
         if (columns.isEmpty()) {
-            throw new GirException("表[" + table.getTableName() + "]无列信息，无法设置主键" );
+            throw new GirException("表[" + table.getTableName() + "]无列信息，无法设置主键");
         }
         // 查找主键列
         for (GenTableColumn column : columns) {
