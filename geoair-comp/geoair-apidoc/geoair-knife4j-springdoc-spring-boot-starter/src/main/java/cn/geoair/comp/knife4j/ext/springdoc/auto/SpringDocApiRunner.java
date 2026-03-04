@@ -1,8 +1,8 @@
 package cn.geoair.comp.knife4j.ext.springdoc.auto;
 
-import cn.geoair.base.Gir;
 import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
 
+import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -32,10 +32,12 @@ public class SpringDocApiRunner implements ApplicationContextAware {
 
     // 你的ApiConfig配置类（保持原有注入）
     private final GirSwaggerApiConfig apiConfig;
+    private final GirSwaggerProperties girSwaggerProperties;
 
     // 构造器注入ApiConfig（推荐，替代@Resource）
-    public SpringDocApiRunner(GirSwaggerApiConfig apiConfig) {
+    public SpringDocApiRunner(GirSwaggerApiConfig apiConfig, GirSwaggerProperties girSwaggerProperties) {
         this.apiConfig = apiConfig;
+        this.girSwaggerProperties = girSwaggerProperties;
     }
 
     @PostConstruct
@@ -87,7 +89,6 @@ public class SpringDocApiRunner implements ApplicationContextAware {
     }
 
 
-
     /**
      * 基础OpenAPI配置
      */
@@ -120,13 +121,41 @@ public class SpringDocApiRunner implements ApplicationContextAware {
         apiDocs.setGroups(new SpringDocConfigProperties.Groups());
         apiDocs.getGroups().setEnabled(true); // 关键：启用分组
         properties.setApiDocs(apiDocs);
+        properties.setDefaultSupportFormData(true);
+        properties.setModelAndViewAllowed(true);
 
+        List<SpringDocConfigProperties.GroupConfig> groupConfigs = properties.getGroupConfigs();
+        List<DocketInfo> docketInfos = apiConfig.getDocketInfos();
+        if (docketInfos != null && !docketInfos.isEmpty()) {
+            for (DocketInfo docketInfo : docketInfos) {
+                SpringDocConfigProperties.GroupConfig groupConfig = new SpringDocConfigProperties.GroupConfig();
+                groupConfig.setGroup(docketInfo.getGroupName());
+                groupConfig.setDisplayName(docketInfo.getGroupName());
+                groupConfig.setPackagesToScan(docketInfo.getBasePackages());
+                groupConfigs.add(groupConfig);
+            }
+        }
         return properties;
     }
 
+    @Bean
+    @Primary // 核心修复：标记为优先Bean，解决冲突
+    public SwaggerUiConfigProperties swaggerUiConfigProperties() {
+        SwaggerUiConfigProperties uiProperties = new SwaggerUiConfigProperties();
 
 
-
-
+        // 接口排序：按方法名（对应springdoc.swagger-ui.operationsSorter: method）
+        uiProperties.setOperationsSorter("method");
+        // Tag排序：按字母（对应springdoc.swagger-ui.tagsSorter: alpha）
+        uiProperties.setTagsSorter("alpha");
+        // 启用Swagger UI分组下拉框
+        uiProperties.setDisplayRequestDuration(true);
+        uiProperties.setDefaultModelExpandDepth(5);
+        uiProperties.setDefaultModelsExpandDepth(5);
+        uiProperties.setShowExtensions(true);
+        uiProperties.setDisplayOperationId(true);
+        uiProperties.setEnabled(girSwaggerProperties.isEnable());
+        return uiProperties;
+    }
 
 }

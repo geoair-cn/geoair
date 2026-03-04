@@ -16,8 +16,8 @@ public class Swagger2Configuration implements GirSwaggerApiConfig {
     @Override
     public List<DocketInfo> getDocketInfos() {
         return ListUtil.of(
-                new DocketInfo("demo2分组", "cn.geoair.comp.knife4j.demo.controller.group2"),
-                new DocketInfo("demo1分组", "cn.geoair.comp.knife4j.demo.controller.group1")
+                new DocketInfo("demo2", "cn.geoair.comp.knife4j.demo.controller.group2"),
+                new DocketInfo("demo1", "cn.geoair.comp.knife4j.demo.controller.group1")
         );
     }
 

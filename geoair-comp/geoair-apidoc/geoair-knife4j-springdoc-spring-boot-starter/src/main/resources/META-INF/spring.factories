@@ -3,6 +3,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
  cn.geoair.comp.knife4j.ext.springdoc.builder.SpringDocCustomConfig,\
  cn.geoair.comp.knife4j.ext.springdoc.builder.GiResultOperationConfig,\
  cn.geoair.comp.knife4j.ext.springdoc.builder.GiResultModelConverter,\
+ cn.geoair.comp.knife4j.ext.springdoc.controller.GroupedApiDocsController,\
  cn.geoair.comp.knife4j.ext.springdoc.auto.SpringDocApiRunner,\
  cn.geoair.comp.knife4j.ext.config.RunerConfig
 
