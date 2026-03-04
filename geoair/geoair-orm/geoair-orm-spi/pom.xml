@@ -5,13 +5,13 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.2-RC1-SNAPSHOT </version>
+        <version>23.1.2-RC3-SNAPSHOT </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-orm-spi</artifactId>
-    <version>23.1.2-RC1-SNAPSHOT</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <name>geoair-orm-spi</name>
     <description>geoair-orm-spi</description>
     <url>https://gitee.com/geoair/geoair</url>

@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>cn.geoair.dependencies</groupId>
 		<artifactId>geoair-base-parent</artifactId>
-		<version>23.1.2-RC1-SNAPSHOT</version>
+		<version>23.1.2-RC3-SNAPSHOT</version>
 		<relativePath>../geoair-base-parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>cn.geoair</groupId>
 	<artifactId>geoair</artifactId>
-	<version>23.1.2-RC1-SNAPSHOT</version>
+	<version>23.1.2-RC3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Gir</name>
 
@@ -44,7 +44,7 @@
 
 
 	<properties>
-		<geoair.version>23.1.2-RC1-SNAPSHOT</geoair.version>
+		<geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
 		<skipTests>true</skipTests>
 	</properties>
 

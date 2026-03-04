@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair.orm</groupId>
         <artifactId>geoair-orm</artifactId>
-        <version>23.1.2-RC1-SNAPSHOT </version>
+        <version>23.1.2-RC3-SNAPSHOT </version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.orm</groupId>
     <artifactId>geoair-mybatis-tk</artifactId>
-    <version>23.1.2-RC1-SNAPSHOT</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <url>https://gitee.com/geoair/geoair</url>

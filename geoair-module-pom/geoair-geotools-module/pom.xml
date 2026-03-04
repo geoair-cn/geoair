@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.2-RC1-SNAPSHOT</version>
+        <version>23.1.2-RC3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-geotools-module</artifactId>
     <name>geoair-geotools-module</name>
-    <version>23.1.2-RC1-SNAPSHOT</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>geoair geotools module</description>
 

@@ -7,13 +7,13 @@
     <parent>
         <groupId>cn.geoair.comp</groupId>
         <artifactId>geoair-comp</artifactId>
-        <version>23.1.2-RC1-SNAPSHOT</version>
+        <version>23.1.2-RC3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-code-generator</artifactId>
-    <version>23.1.2-RC1-SNAPSHOT</version>
+    <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>geoair-code-generator</name>
 
