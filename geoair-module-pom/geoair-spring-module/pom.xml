@@ -16,6 +16,14 @@
     <packaging>pom</packaging>
     <description>geoair spring module</description>
 
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <redisson.version>3.23.5</redisson.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <url>https://gitee.com/geoair/geoair-dependencies</url>
 
     <licenses>
@@ -82,7 +90,19 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies></dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>

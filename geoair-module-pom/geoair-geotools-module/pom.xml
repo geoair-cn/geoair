@@ -17,7 +17,12 @@
     <description>geoair geotools module</description>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>
-
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>

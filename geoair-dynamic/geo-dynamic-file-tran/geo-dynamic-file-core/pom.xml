@@ -13,7 +13,12 @@
     <artifactId>geo-dynamic-file-core</artifactId>
     <name>geo-dynamic-file-core</name>
 
-
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <packaging>jar</packaging>
     <description>
         geo-dynamic-file-tran
