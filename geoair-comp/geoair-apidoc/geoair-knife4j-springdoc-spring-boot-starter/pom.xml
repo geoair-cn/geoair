@@ -72,6 +72,10 @@
             <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
             <version>${knife4j-openapi3.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>

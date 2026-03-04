@@ -16,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.util.*;
 
 @EnableSwagger2
-public class ApiRunner implements ApplicationContextAware {
+public class SpringFoxApiRunner implements ApplicationContextAware {
     @Bean
     @ConditionalOnMissingBean(Reflections.class)
     Reflections reflections() {
