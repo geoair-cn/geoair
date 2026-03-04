@@ -12,7 +12,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
-
      <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
     <version>23.1.2-RC1-SNAPSHOT</version>
     <packaging>jar</packaging>
