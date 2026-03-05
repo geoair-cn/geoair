@@ -6,7 +6,6 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
 
 #foreach ($column in $columns)
     #if("$!{column.enumsName}" != "")
@@ -26,7 +25,6 @@ public class ${ClassName}AddVo {
 
 #foreach($column in $columns)
 #if($column.isPk==1)
-@NotBlank(message = "${column.columnComment}不能为空")
 @GaModelField(text = "${column.columnComment}", isID = true)
 #elseif($column.javaType=='Date')
 @JSONField(format = "yyyy-MM-dd HH:mm:ss")
