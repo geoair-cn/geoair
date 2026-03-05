@@ -10,50 +10,56 @@ public class GenConstants {
     /**
      * 数据库时间类型
      */
-    public static final String[] COLUMNTYPE_TIME = {"datetime" , "time" , "date" , "timestamp"};
+    public static final String[] COLUMNTYPE_TIME = {"datetime", "time", "date", "timestamp"};
 
     /**
      * 数据库数字类型
      */
-    public static final String[] COLUMNTYPE_NUMBER = {"tinyint" ,
-            "smallint" , "mediumint" , "int" , "number" , "integer" , "int4" , "int8" ,
-            "bit" , "bigint" , "float" , "double" , "decimal"};
+    public static final String[] COLUMNTYPE_NUMBER = {"tinyint", "numeric",
+            "smallint", "mediumint", "int", "number", "integer", "int4", "int8",
+            "bit", "bigint", "float",
+            "double",
+            "serial",
+            "bigserial",
+            "decimal",
+            "float8",
+            "float4"};
 
 
     /**
      * 字符串类型
      */
-    public static final String TYPE_STRING = "String" ;
+    public static final String TYPE_STRING = "String";
 
     /**
      * 整型
      */
-    public static final String TYPE_INTEGER = "Integer" ;
+    public static final String TYPE_INTEGER = "Integer";
 
     /**
      * 整型
      */
-    public static final String TYPE_BYTE = "byte[]" ;
+    public static final String TYPE_BYTE = "byte[]";
 
     /**
      * 长整型
      */
-    public static final String TYPE_LONG = "Long" ;
+    public static final String TYPE_LONG = "Long";
 
     /**
      * 浮点型
      */
-    public static final String TYPE_DOUBLE = "Double" ;
+    public static final String TYPE_DOUBLE = "Double";
 
     /**
      * 高精度计算类型
      */
-    public static final String TYPE_BIGDECIMAL = "BigDecimal" ;
+    public static final String TYPE_BIGDECIMAL = "BigDecimal";
 
     /**
      * 时间类型
      */
-    public static final String TYPE_DATE = "Date" ;
+    public static final String TYPE_DATE = "Date";
 
 
 }
