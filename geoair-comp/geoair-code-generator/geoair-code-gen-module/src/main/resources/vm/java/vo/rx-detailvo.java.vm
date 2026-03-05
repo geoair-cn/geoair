@@ -49,9 +49,7 @@ private ${column.javaType} ${column.javaField};
 #end
 
     public static ${ClassName}DetailVo fromDto(${ClassName}Dto dto) {
-            ${ClassName}DetailVo vo = new ${ClassName}DetailVo();
-        BeanUtils.copyProperties(dto, vo);
-        return vo;
+        return fromPo(dto);
     }
 
     public static ${ClassName}DetailVo fromPo(${ClassName}Po po) {

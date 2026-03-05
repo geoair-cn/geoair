@@ -530,6 +530,36 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public void dAddPrimaryKey(String tableName, String pkColumnName, String constraintName, PrimaryKeyType pkType, Integer pkColumnLength, String pkValuePrefix) {
+        advDDLOptPxy.dAddPrimaryKey(tableName, pkColumnName, constraintName, pkType, pkColumnLength, pkValuePrefix);
+    }
+
+    @Override
+    public void dAddStringPrimaryKey(String tableName, String pkColumnName, int pkColumnLength, String constraintName, String pkValuePrefix) {
+        advDDLOptPxy.dAddStringPrimaryKey(tableName, pkColumnName, pkColumnLength, constraintName, pkValuePrefix);
+    }
+
+    @Override
+    public void dAddIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+        advDDLOptPxy.dAddIntAutoPrimaryKey(tableName, pkColumnName, constraintName);
+    }
+
+    @Override
+    public void dAddBigIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+        advDDLOptPxy.dAddBigIntAutoPrimaryKey(tableName, pkColumnName, constraintName);
+    }
+
+    @Override
+    public void dAddIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+        advDDLOptPxy.dAddIntNormalPrimaryKey(tableName, pkColumnName, constraintName);
+    }
+
+    @Override
+    public void dAddBigIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+        advDDLOptPxy.dAddBigIntNormalPrimaryKey(tableName, pkColumnName, constraintName);
+    }
+
+    @Override
     public void dDropPrimaryKey(String tableName, String constraintName) {
         advDDLOptPxy.dDropPrimaryKey(tableName, constraintName);
     }
