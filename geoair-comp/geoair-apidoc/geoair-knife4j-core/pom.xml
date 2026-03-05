@@ -57,8 +57,9 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <version>${spring-boot.version}</version>
+            <optional>false</optional>
         </dependency>
 
 

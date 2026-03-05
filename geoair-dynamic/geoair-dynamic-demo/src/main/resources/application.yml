@@ -1,0 +1,15 @@
+spring:
+  main:
+    allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    default: pro
+
+server:
+  port: 8080
+
+geoair:
+  gs:
+    dataDir: E:\\测试数据\\geoserver

@@ -69,11 +69,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.postgis</groupId>-->
-<!--                <artifactId>postgis-jdbc</artifactId>-->
-<!--                <version>${postgis.jdbc.version}</version>-->
-<!--            </dependency>-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.postgis</groupId>-->
+            <!--                <artifactId>postgis-jdbc</artifactId>-->
+            <!--                <version>${postgis.jdbc.version}</version>-->
+            <!--            </dependency>-->
             <dependency>
                 <groupId>net.postgis</groupId>
                 <artifactId>postgis-jdbc</artifactId>
@@ -175,7 +175,16 @@
                 <version>${geotools.version}</version>
             </dependency>
 
-
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-geojson-core</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-svg</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-geojson</artifactId>
@@ -304,6 +313,12 @@
                 <version>${geotools.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-image</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.geotools.jdbc</groupId>
                 <artifactId>gt-jdbc-postgis</artifactId>
                 <version>${geotools.version}</version>
@@ -341,6 +356,22 @@
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-metadata</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-arcgrid</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-geotiff</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-image</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
             <!--			<dependency>-->
@@ -381,6 +412,27 @@
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-referencing</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-transform</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-wms</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-imagemosaic</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-xml</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
             <dependency>

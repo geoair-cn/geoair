@@ -97,11 +97,6 @@
             <version>${spring-boot.version}</version>
             <type>pom</type>
         </dependency>
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>${redisson.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

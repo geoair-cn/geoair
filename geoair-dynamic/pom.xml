@@ -55,6 +55,7 @@
         <module>geo-dynamic-file-tran</module>
         <module>geo-dynamic-tools</module>
         <module>geo-dynamic-geoserver</module>
+        <module>geoair-dynamic-demo</module>
     </modules>
 
 
