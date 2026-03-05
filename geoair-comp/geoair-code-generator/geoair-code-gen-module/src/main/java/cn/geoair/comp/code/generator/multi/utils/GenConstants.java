@@ -7,51 +7,33 @@ package cn.geoair.comp.code.generator.multi.utils;
  */
 public class GenConstants {
 
-	/**
-	 * 数据库时间类型
-	 */
+	/** 数据库时间类型 */
 	public static final String[] COLUMNTYPE_TIME = { "datetime", "time", "date", "timestamp" };
 
-	/**
-	 * 数据库数字类型
-	 */
+	/** 数据库数字类型 */
 	public static final String[] COLUMNTYPE_NUMBER = { "tinyint", "numeric", "smallint", "mediumint", "int", "number",
 			"integer", "int4", "int8", "bit", "bigint", "float", "double", "serial", "bigserial", "decimal", "float8",
 			"float4" };
 
-	/**
-	 * 字符串类型
-	 */
+	/** 字符串类型 */
 	public static final String TYPE_STRING = "String";
 
-	/**
-	 * 整型
-	 */
+	/** 整型 */
 	public static final String TYPE_INTEGER = "Integer";
 
-	/**
-	 * 整型
-	 */
+	/** 整型 */
 	public static final String TYPE_BYTE = "byte[]";
 
-	/**
-	 * 长整型
-	 */
+	/** 长整型 */
 	public static final String TYPE_LONG = "Long";
 
-	/**
-	 * 浮点型
-	 */
+	/** 浮点型 */
 	public static final String TYPE_DOUBLE = "Double";
 
-	/**
-	 * 高精度计算类型
-	 */
+	/** 高精度计算类型 */
 	public static final String TYPE_BIGDECIMAL = "BigDecimal";
 
-	/**
-	 * 时间类型
-	 */
+	/** 时间类型 */
 	public static final String TYPE_DATE = "Date";
 
 }
