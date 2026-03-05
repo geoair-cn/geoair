@@ -164,7 +164,33 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
     }
 
+    @Override
+    public void dAddPrimaryKey(String tableName, List<String> columnNames, String constraintName) {
+        // 通用参数校验
+        if (StrUtil.isEmpty(tableName) || ObjectUtil.isEmpty(columnNames)) {
+            throw new IllegalArgumentException("表名和列名列表不能为空");
+        }
+        if (!dIsTableExists(tableName)) {
+            throw new RuntimeException(StrUtil.format("表[{}]不存在，无法添加主键", tableName));
+        }
 
+        // 通用：生成约束名（如果未指定）
+        String pkConstraintName = StrUtil.isEmpty(constraintName)
+                ? StrUtil.format("pk_{}_{}", tableName, System.currentTimeMillis()) : constraintName;
+
+        // 通用检查：是否已存在主键
+        List<String> existingPk = dGetPrimaryKeys(tableName);
+        if (ObjectUtil.isNotEmpty(existingPk)) {
+            throw new RuntimeException(StrUtil.format("表[{}]已存在主键，无法重复添加", tableName));
+        }
+
+        // 差异化：构建添加主键SQL
+        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String columns = String.join(", ", columnNames);
+        String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
+
+        dExecuteDDL(sql, tableName, "添加主键约束[" + pkConstraintName + "]");
+    }
 
 
     public void dAddStringPrimaryKey(String tableName, String pkColumnName, int pkColumnLength,
