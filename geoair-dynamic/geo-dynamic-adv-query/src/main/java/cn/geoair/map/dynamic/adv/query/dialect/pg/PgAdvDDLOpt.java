@@ -211,6 +211,130 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
     }
 
     @Override
+    public void dAddPrimaryKey(String tableName, String pkColumnName, String constraintName,
+                               PrimaryKeyType pkType, Integer pkColumnLength, String pkValuePrefix) {
+        // 1. 基础参数校验
+        if (StrUtil.isEmpty(tableName) || StrUtil.isEmpty(pkColumnName) || pkType == null) {
+            throw new IllegalArgumentException("表名、主键列名、主键类型不能为空");
+        }
+        if (!dIsTableExists(tableName)) {
+            throw new RuntimeException(StrUtil.format("表[{}]不存在，无法添加主键", tableName));
+        }
+        // 检查是否已存在主键
+        List<String> existingPk = dGetPrimaryKeys(tableName);
+        if (ObjectUtil.isNotEmpty(existingPk)) {
+            throw new RuntimeException(StrUtil.format("表[{}]已存在主键[{}]，无法重复添加", tableName, String.join(",", existingPk)));
+        }
+
+        // 2. 生成约束名
+        String pkConstraintName = StrUtil.isEmpty(constraintName)
+                ? StrUtil.format("pk_{}_{}", tableName, System.currentTimeMillis()) : constraintName;
+        // 获取带schema的表名
+        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+
+        try {
+            // ========== 分支1：字符串类型主键 ==========
+            if (PrimaryKeyType.STRING.equals(pkType)) {
+                // 字符串类型必须指定长度
+                if (pkColumnLength == null) {
+                    throw new IllegalArgumentException("字符串主键必须指定列长度");
+                }
+                // 新增字符串列
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} VARCHAR({})  ",
+                        qualifiedTableName, pkColumnName, pkColumnLength
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
+
+                // 填充唯一值（自定义前缀/时间戳）
+                String valuePrefix = StrUtil.isEmpty(pkValuePrefix)
+                        ? "to_char(now(), 'YYYYMMDDHH24MISS') || '_'"
+                        : "'" + pkValuePrefix + "' || ";
+                String updateSql = StrUtil.format(
+                        "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) " +
+                                "UPDATE {} f1 SET {} = {} f1.rn " +
+                                "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                        qualifiedTableName, qualifiedTableName, pkColumnName, valuePrefix
+                );
+                dExecuteDDL(updateSql, tableName, "填充字符串主键值[" + pkColumnName + "]");
+
+                // 添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加字符串主键约束[" + pkConstraintName + "]");
+            }
+
+            // ========== 分支2：整数自增主键（SERIAL） ==========
+            else if (PrimaryKeyType.INT_AUTO.equals(pkType)) {
+                // PostgreSQL中SERIAL本身就是自增+主键的简化写法（自动创建序列）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} SERIAL PRIMARY KEY",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增整数自增主键列[" + pkColumnName + "]");
+            }
+
+            // ========== 分支3：长整数自增主键（PostgreSQL 12+ 推荐） ==========
+            else if (PrimaryKeyType.BIGINT_AUTO.equals(pkType)) {
+                // PostgreSQL 12+ 推荐用 GENERATED ALWAYS AS IDENTITY（替代BIGSERIAL）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增长整数自增主键列[" + pkColumnName + "]");
+            }
+
+            // ========== 分支4：普通整数主键（非自增） ==========
+            else if (PrimaryKeyType.INT_NORMAL.equals(pkType)) {
+                // 步骤1：新增普通INT列（非空）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} INT  ",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增普通整数列[" + pkColumnName + "]");
+
+                // 步骤2：填充唯一整数值（从1开始连续序号）
+                String updateSql = StrUtil.format(
+                        "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) " +
+                                "UPDATE {} f1 SET {} = nr.rn " +
+                                "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                        qualifiedTableName, qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(updateSql, tableName, "填充普通整数主键值[" + pkColumnName + "]");
+
+                // 步骤3：添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加普通整数主键约束[" + pkConstraintName + "]");
+            }
+
+            // ========== 分支5：普通长整数主键（非自增） ==========
+            else if (PrimaryKeyType.BIGINT_NORMAL.equals(pkType)) {
+                // 步骤1：新增普通BIGINT列（非空）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} BIGINT  ",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增普通长整数列[" + pkColumnName + "]");
+
+                // 步骤2：填充唯一长整数值（从1开始连续序号）
+                String updateSql = StrUtil.format(
+                        "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) " +
+                                "UPDATE {} f1 SET {} = nr.rn " +
+                                "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                        qualifiedTableName, qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(updateSql, tableName, "填充普通长整数主键值[" + pkColumnName + "]");
+
+                // 步骤3：添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加普通长整数主键约束[" + pkConstraintName + "]");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(StrUtil.format("给表[{}]添加主键失败：{}", tableName, e.getMessage()), e);
+        }
+    }
+
+    @Override
     protected String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns) {
         return StrUtil.format("ALTER TABLE {} ADD CONSTRAINT {} PRIMARY KEY ({})" , qualifiedTableName, constraintName,
                 columns);

@@ -171,13 +171,76 @@ public interface IAdvDDLOpt {
     void dDropSchema(String schemaName, boolean cascade);
 
     /**
-     * 添加主键
+     * 添加主键，针对已有的列添加
      *
      * @param tableName      表名
      * @param columnNames    主键字段列表
      * @param constraintName 约束名称，为null则自动生成
      */
     void dAddPrimaryKey(String tableName, List<String> columnNames, String constraintName);
+
+    enum PrimaryKeyType {
+        /**
+         * 字符串类型主键（自定义前缀/时间戳+序号）
+         */
+        STRING,
+        /**
+         * 整数自增主键（SERIAL，PostgreSQL 10-）
+         */
+        INT_AUTO,
+        /**
+         * 长整数自增主键（BIGSERIAL/IDENTITY，PostgreSQL 12+ 推荐）
+         */
+        BIGINT_AUTO,
+        /**
+         * 普通整数主键（非自增，仅INT类型，需手动填充唯一值）
+         */
+        INT_NORMAL,
+        /**
+         * 普通长整数主键（非自增，仅BIGINT类型，需手动填充唯一值）
+         */
+        BIGINT_NORMAL
+
+    }
+
+    /**
+     * 给表添加主键（支持字符串/数值自增类型）
+     *
+     * @param tableName      表名（不含schema）
+     * @param pkColumnName   主键列名（如id）
+     * @param constraintName 主键约束名（可为空，为空自动生成）
+     * @param pkType         主键类型（STRING/INT_AUTO/BIGINT_AUTO）
+     * @param pkColumnLength 字符串主键列长度（仅STRING类型需要，如50）
+     * @param pkValuePrefix  字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
+     */
+    void dAddPrimaryKey(String tableName, String pkColumnName, String constraintName,
+                        PrimaryKeyType pkType, Integer pkColumnLength, String pkValuePrefix);
+
+    /**
+     * 简化调用：添加字符串类型主键
+     */
+    void dAddStringPrimaryKey(String tableName, String pkColumnName, int pkColumnLength,
+                              String constraintName, String pkValuePrefix);
+
+    /**
+     * 简化调用：添加整数自增主键
+     */
+    void dAddIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName);
+
+    /**
+     * 简化调用：添加长整数自增主键（推荐）
+     */
+    void dAddBigIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName);
+
+    /**
+     * 简化调用：添加普通整数主键（非自增）
+     */
+    void dAddIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName);
+
+    /**
+     * 简化调用：添加普通长整数主键（非自增）
+     */
+    void dAddBigIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName);
 
     /**
      * 删除主键约束

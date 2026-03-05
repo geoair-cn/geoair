@@ -195,12 +195,154 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
         return ObjectUtil.isNotEmpty(baseOpt.bSelectList(sql));
     }
 
+    /**
+     * MySQL 版本：给表添加主键（支持字符串/数值自增/数值非自增）
+     * @param tableName 表名（不含库名）
+     * @param pkColumnName 主键列名（如id）
+     * @param constraintName 主键约束名（MySQL 中主键约束名可省略，为空自动生成）
+     * @param pkType 主键类型（STRING/INT_AUTO/BIGINT_AUTO/INT_NORMAL/BIGINT_NORMAL）
+     * @param pkColumnLength 字符串主键列长度（仅STRING类型需要，如50）
+     * @param pkValuePrefix 字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
+     */
+    @Override
+    public void dAddPrimaryKey(String tableName, String pkColumnName, String constraintName,
+                               PrimaryKeyType pkType, Integer pkColumnLength, String pkValuePrefix) {
+        // 1. 基础参数校验
+        if (StrUtil.isEmpty(tableName) || StrUtil.isEmpty(pkColumnName) || pkType == null) {
+            throw new IllegalArgumentException("表名、主键列名、主键类型不能为空");
+        }
+        if (!dIsTableExists(tableName)) {
+            throw new RuntimeException(StrUtil.format("表[{}]不存在，无法添加主键", tableName));
+        }
+        // 检查是否已存在主键
+        List<String> existingPk = dGetPrimaryKeys(tableName);
+        if (ObjectUtil.isNotEmpty(existingPk)) {
+            throw new RuntimeException(StrUtil.format("表[{}]已存在主键[{}]，无法重复添加", tableName, String.join(",", existingPk)));
+        }
+
+        // 2. 生成约束名（MySQL 主键约束名可选，建议统一命名）
+        String pkConstraintName = StrUtil.isEmpty(constraintName)
+                ? StrUtil.format("pk_{}_{}", tableName, System.currentTimeMillis()) : constraintName;
+        // 获取带库名的表名（适配MySQL多库场景，如db_name.table_name）
+        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+
+        try {
+            // ========== 分支1：字符串类型主键 ==========
+            if (PrimaryKeyType.STRING.equals(pkType)) {
+                if (pkColumnLength == null) {
+                    throw new IllegalArgumentException("字符串主键必须指定列长度");
+                }
+                // 步骤1：新增字符串列（VARCHAR，非空）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} VARCHAR({}) NOT NULL",
+                        qualifiedTableName, pkColumnName, pkColumnLength
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
+
+                // 步骤2：填充唯一值（MySQL 用@变量替代ctid，生成连续序号）
+                // 初始化序号变量
+                String initVarSql = "SET @row_num = 0;";
+                dExecuteDDL(initVarSql, tableName, "初始化序号变量");
+                // 拼接值前缀（MySQL 用CONCAT替代||）
+                String valuePrefix = StrUtil.isEmpty(pkValuePrefix)
+                        ? "CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'), '_')" // 时间戳前缀
+                        : "CONCAT('" + pkValuePrefix + "', '')";            // 自定义前缀
+                // 填充值SQL
+                String updateSql = StrUtil.format(
+                        "UPDATE {} SET {} = CONCAT({}, (@row_num := @row_num + 1))",
+                        qualifiedTableName, pkColumnName, valuePrefix
+                );
+                dExecuteDDL(updateSql, tableName, "填充字符串主键值[" + pkColumnName + "]");
+
+                // 步骤3：添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加字符串主键约束[" + pkConstraintName + "]");
+            }
+
+            // ========== 分支2：整数自增主键（MySQL 核心：AUTO_INCREMENT） ==========
+            else if (PrimaryKeyType.INT_AUTO.equals(pkType)) {
+                // MySQL 自增主键：INT + AUTO_INCREMENT + 主键（一步到位）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} INT NOT NULL AUTO_INCREMENT PRIMARY KEY",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增整数自增主键列[" + pkColumnName + "]");
+            }
+
+            // ========== 分支3：长整数自增主键（MySQL 推荐） ==========
+            else if (PrimaryKeyType.BIGINT_AUTO.equals(pkType)) {
+                // MySQL 长整数自增：BIGINT + AUTO_INCREMENT + 主键
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增长整数自增主键列[" + pkColumnName + "]");
+            }
+
+            // ========== 分支4：普通整数主键（非自增） ==========
+            else if (PrimaryKeyType.INT_NORMAL.equals(pkType)) {
+                // 步骤1：新增普通INT列（非空）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} INT NOT NULL",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增普通整数列[" + pkColumnName + "]");
+
+                // 步骤2：填充连续唯一值（MySQL @变量方式）
+                String initVarSql = "SET @row_num = 0;";
+                dExecuteDDL(initVarSql, tableName, "初始化序号变量");
+                String updateSql = StrUtil.format(
+                        "UPDATE {} SET {} = (@row_num := @row_num + 1)",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(updateSql, tableName, "填充普通整数主键值[" + pkColumnName + "]");
+
+                // 步骤3：添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加普通整数主键约束[" + pkConstraintName + "]");
+            }
+
+            // ========== 分支5：普通长整数主键（非自增） ==========
+            else if (PrimaryKeyType.BIGINT_NORMAL.equals(pkType)) {
+                // 步骤1：新增普通BIGINT列（非空）
+                String addColumnSql = StrUtil.format(
+                        "ALTER TABLE {} ADD COLUMN {} BIGINT NOT NULL",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(addColumnSql, tableName, "新增普通长整数列[" + pkColumnName + "]");
+
+                // 步骤2：填充连续唯一值
+                String initVarSql = "SET @row_num = 0;";
+                dExecuteDDL(initVarSql, tableName, "初始化序号变量");
+                String updateSql = StrUtil.format(
+                        "UPDATE {} SET {} = (@row_num := @row_num + 1)",
+                        qualifiedTableName, pkColumnName
+                );
+                dExecuteDDL(updateSql, tableName, "填充普通长整数主键值[" + pkColumnName + "]");
+
+                // 步骤3：添加主键约束
+                String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
+                dExecuteDDL(addPkSql, tableName, "添加普通长整数主键约束[" + pkConstraintName + "]");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(StrUtil.format("给MySQL表[{}]添加主键失败：{}", tableName, e.getMessage()), e);
+        }
+    }
+
+
+
+
     @Override
     public String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns) {
         // MySQL专属：添加主键（约束名可选）
         return StrUtil.format("ALTER TABLE {} ADD CONSTRAINT {} PRIMARY KEY ({})" , qualifiedTableName, constraintName,
                 columns);
     }
+
+
+
+
 
     @Override
     public String buildDropPrimaryKeySql(String qualifiedTableName, String constraintName) {
