@@ -1,6 +1,5 @@
 package cn.geoair.comp.code.generator.multi.domian;
 
-
 import cn.geoair.base.util.GutilStr;
 import lombok.Data;
 
@@ -13,122 +12,114 @@ import java.util.Map;
  */
 @Data
 public class GenTableColumn {
-    private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
 
+	private String tableName;
 
-    private String tableName;
+	/**
+	 * 列名称
+	 */
+	private String columnName;
 
-    /**
-     * 列名称
-     */
-    private String columnName;
+	/**
+	 * 列描述
+	 */
+	private String columnComment;
 
-    /**
-     * 列描述
-     */
-    private String columnComment;
+	/**
+	 * 列类型
+	 */
+	private String columnType;
 
-    /**
-     * 列类型
-     */
-    private String columnType;
+	/**
+	 * JAVA类型
+	 */
+	private String javaType;
 
-    /**
-     * JAVA类型
-     */
-    private String javaType;
+	/**
+	 * JAVA类型 拓展
+	 */
+	private String javaTypeOther;
 
-    /**
-     * JAVA类型  拓展
-     */
-    private String javaTypeOther;
+	private String javaField;
 
+	/**
+	 * 是否主键（1是）
+	 */
+	private String isPk;
 
-    private String javaField;
+	/**
+	 * 是否自增（1是）
+	 */
+	private String isIncrement;
 
-    /**
-     * 是否主键（1是）
-     */
-    private String isPk;
+	/**
+	 * 是否必填（1是）
+	 */
+	private String isRequired;
 
-    /**
-     * 是否自增（1是）
-     */
-    private String isIncrement;
+	/**
+	 * 枚举
+	 */
+	private Map enums;
 
-    /**
-     * 是否必填（1是）
-     */
-    private String isRequired;
+	/**
+	 * 枚举类名
+	 */
+	private String enumsName;
 
-    /**
-     * 枚举
-     */
-    private Map enums;
+	public boolean isPk() {
+		return isPk(this.isPk);
+	}
 
+	public boolean isPk(String isPk) {
+		return isPk != null && GutilStr.equals("1", isPk);
+	}
 
-    /**
-     * 枚举类名
-     */
-    private String enumsName;
+	public boolean isIncrement() {
+		return isIncrement(this.isIncrement);
+	}
 
+	public boolean isIncrement(String isIncrement) {
+		return isIncrement != null && GutilStr.equals("1", isIncrement);
+	}
 
-    public boolean isPk() {
-        return isPk(this.isPk);
-    }
+	public boolean isRequired() {
+		return isRequired(this.isRequired);
+	}
 
-    public boolean isPk(String isPk) {
-        return isPk != null && GutilStr.equals("1" , isPk);
-    }
+	public boolean isRequired(String isRequired) {
+		return isRequired != null && GutilStr.equals("1", isRequired);
+	}
 
+	public boolean isEdit(String isEdit) {
+		return isEdit != null && GutilStr.equals("1", isEdit);
+	}
 
-    public boolean isIncrement() {
-        return isIncrement(this.isIncrement);
-    }
+	public boolean isQuery(String isQuery) {
+		return isQuery != null && GutilStr.equals("1", isQuery);
+	}
 
-    public boolean isIncrement(String isIncrement) {
-        return isIncrement != null && GutilStr.equals("1" , isIncrement);
-    }
+	public boolean isSuperColumn() {
+		return isSuperColumn(this.javaField);
+	}
 
+	public static boolean isSuperColumn(String javaField) {
+		return GutilStr.equalsAnyIgnoreCase(javaField,
+				// BaseEntity
+				"createBy", "createTime", "updateBy", "updateTime", "remark",
+				// TreeEntity
+				"parentName", "parentId", "orderNum", "ancestors");
+	}
 
-    public boolean isRequired() {
-        return isRequired(this.isRequired);
-    }
+	public boolean isUsableColumn() {
+		return isUsableColumn(javaField);
+	}
 
-    public boolean isRequired(String isRequired) {
-        return isRequired != null && GutilStr.equals("1" , isRequired);
-    }
-
-    public boolean isEdit(String isEdit) {
-        return isEdit != null && GutilStr.equals("1" , isEdit);
-    }
-
-
-    public boolean isQuery(String isQuery) {
-        return isQuery != null && GutilStr.equals("1" , isQuery);
-    }
-
-
-    public boolean isSuperColumn() {
-        return isSuperColumn(this.javaField);
-    }
-
-    public static boolean isSuperColumn(String javaField) {
-        return GutilStr.equalsAnyIgnoreCase(javaField,
-                // BaseEntity
-                "createBy" , "createTime" , "updateBy" , "updateTime" , "remark" ,
-                // TreeEntity
-                "parentName" , "parentId" , "orderNum" , "ancestors" );
-    }
-
-    public boolean isUsableColumn() {
-        return isUsableColumn(javaField);
-    }
-
-    public static boolean isUsableColumn(String javaField) {
-        // isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
-        return GutilStr.equalsAnyIgnoreCase(javaField, "parentId" , "orderNum" , "remark" );
-    }
+	public static boolean isUsableColumn(String javaField) {
+		// isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
+		return GutilStr.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
+	}
 
 }

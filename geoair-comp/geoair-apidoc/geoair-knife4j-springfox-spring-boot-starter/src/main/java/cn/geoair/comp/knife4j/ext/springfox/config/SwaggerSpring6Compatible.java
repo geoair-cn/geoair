@@ -26,10 +26,6 @@ import java.util.List;
 @Configuration
 public class SwaggerSpring6Compatible {
 
-
-
-
-
 	/**
 	 * 增加如下配置可解决Spring Boot 6.x 与Swagger 3.0.0 不兼容问题
 	 **/

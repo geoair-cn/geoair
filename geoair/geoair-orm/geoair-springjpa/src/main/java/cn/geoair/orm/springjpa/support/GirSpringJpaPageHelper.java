@@ -20,70 +20,70 @@ import cn.geoair.base.gpa.support.GirSort;
  */
 public class GirSpringJpaPageHelper implements GiPageExcuter {
 
-    /**
-     * 从 girSort对象拼装 Spring Data Jpa Sort
-     *
-     * @param sort
-     * @return
-     */
+	/**
+	 * 从 girSort对象拼装 Spring Data Jpa Sort
+	 * @param sort
+	 * @return
+	 */
 
-    @SuppressWarnings({"unchecked" , "rawtypes"})
-    public static Sort sortFromGirSort(GirSort sort) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static Sort sortFromGirSort(GirSort sort) {
 
-        Sort jpaSort = Sort.unsorted();
-        if (sort != null) {
-            Iterator<GirOrder<?>> iterator = sort.iterator();
-            while (iterator.hasNext()) {
+		Sort jpaSort = Sort.unsorted();
+		if (sort != null) {
+			Iterator<GirOrder<?>> iterator = sort.iterator();
+			while (iterator.hasNext()) {
 
-                GirOrder<?> order = iterator.next();
-                if (order.getPropertyFun() != null) {
-                    Class<?> cls = order.getEntityClass();
+				GirOrder<?> order = iterator.next();
+				if (order.getPropertyFun() != null) {
+					Class<?> cls = order.getEntityClass();
 
-                    Sort sort1 = Sort.sort(cls).by((Function) order.getPropertyFun());
+					Sort sort1 = Sort.sort(cls).by((Function) order.getPropertyFun());
 
-                    if (order.getDirection() == GirOrder.Direction.DESC) {
-                        jpaSort = jpaSort.and(sort1.descending());
-                    } else {
-                        jpaSort = jpaSort.and(sort1);
-                    }
-                } else if (order.getProperty() != null) {
-                    jpaSort = jpaSort
-                            .and(Sort.by(Direction.fromString(order.getDirection().value()), order.getProperty()));
-                }
-            }
-        }
+					if (order.getDirection() == GirOrder.Direction.DESC) {
+						jpaSort = jpaSort.and(sort1.descending());
+					}
+					else {
+						jpaSort = jpaSort.and(sort1);
+					}
+				}
+				else if (order.getProperty() != null) {
+					jpaSort = jpaSort
+							.and(Sort.by(Direction.fromString(order.getDirection().value()), order.getProperty()));
+				}
+			}
+		}
 
-        return jpaSort;
-    }
+		return jpaSort;
+	}
 
-    /**
-     * 从 girPageParam 转换 Spring Data Jpa Pageable (spring data jpa 的页码从0开始)
-     *
-     * @param pageParam
-     * @return
-     */
-    public static Pageable toPageable(GiPageParam pageParam) {
-        int pageNum = pageParam.pageNum() - 1;
-        int pageSize = pageParam.pageSize();
-        PageRequest pageRequest = PageRequest.of(pageNum, pageSize, sortFromGirSort(pageParam.sort()));
-        return pageRequest;
-    }
+	/**
+	 * 从 girPageParam 转换 Spring Data Jpa Pageable (spring data jpa 的页码从0开始)
+	 * @param pageParam
+	 * @return
+	 */
+	public static Pageable toPageable(GiPageParam pageParam) {
+		int pageNum = pageParam.pageNum() - 1;
+		int pageSize = pageParam.pageSize();
+		PageRequest pageRequest = PageRequest.of(pageNum, pageSize, sortFromGirSort(pageParam.sort()));
+		return pageRequest;
+	}
 
-    @Override
-    public <R> GiPager<R> excutePage(GfunPageExcute<R> pageExcute, GiPageParam pageParam) {
+	@Override
+	public <R> GiPager<R> excutePage(GfunPageExcute<R> pageExcute, GiPageParam pageParam) {
 
-        // int pageNum = pageParam.pageNum();
-        // int pageSize = pageParam.pageSize();
-        //
-        // PageRequest of = PageRequest.of(pageNum, pageSize);
-        //
-        // Iterable<R> excute = pageExcute.excute();
-        //
-        // Page pageobj = simpleJpaRepository.findAll(of);
-        // pageParam.putParam(pageobj.getSize(), pageobj.getNumber(), null);
-        // gtcPager<R> pager = pageExcute.get gtcPager();
-        // pager.put(pageobj.toList(), pageobj.getTotalElements(), pageParam);
-        return null;
-    }
+		// int pageNum = pageParam.pageNum();
+		// int pageSize = pageParam.pageSize();
+		//
+		// PageRequest of = PageRequest.of(pageNum, pageSize);
+		//
+		// Iterable<R> excute = pageExcute.excute();
+		//
+		// Page pageobj = simpleJpaRepository.findAll(of);
+		// pageParam.putParam(pageobj.getSize(), pageobj.getNumber(), null);
+		// gtcPager<R> pager = pageExcute.get gtcPager();
+		// pager.put(pageobj.toList(), pageobj.getTotalElements(), pageParam);
+		return null;
+	}
 
 }

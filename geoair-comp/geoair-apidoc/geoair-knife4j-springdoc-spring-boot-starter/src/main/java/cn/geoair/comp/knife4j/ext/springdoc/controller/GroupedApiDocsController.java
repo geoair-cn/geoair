@@ -10,38 +10,36 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-
 @RestController
 @RequestMapping("/v3/api-docs")
 public class GroupedApiDocsController {
 
-    private final RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
 
+	public GroupedApiDocsController() {
+		this.restTemplate = new RestTemplate();
+	}
 
-    public GroupedApiDocsController() {
-        this.restTemplate = new RestTemplate();
-    }
+	/**
+	 * 映射 /v3/api-docs/{group} → /v3/api-docs?group={group}
+	 */
+	@GetMapping("/{group}")
+	@Operation(hidden = true) // 隐藏该接口，避免出现在Swagger文档中
+	public ResponseEntity<String> getGroupedApiDocs(@PathVariable String group) {
+		// 1. 构建目标URL（查询参数形式）
+		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/v3/api-docs")
+				.queryParam("group", group).toUriString();
 
-    /**
-     * 映射 /v3/api-docs/{group} → /v3/api-docs?group={group}
-     */
-    @GetMapping("/{group}")
-    @Operation(hidden = true) // 隐藏该接口，避免出现在Swagger文档中
-    public ResponseEntity<String> getGroupedApiDocs(@PathVariable String group) {
-        // 1. 构建目标URL（查询参数形式）
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/v3/api-docs")
-                .queryParam("group", group)
-                .toUriString();
+		try {
+			// 2. 转发请求到查询参数形式的端点
+			String apiDocs = restTemplate.getForObject(baseUrl, String.class);
+			// 3. 返回分组文档内容
+			return ResponseEntity.ok(apiDocs);
+		}
+		catch (Exception e) {
+			// 4. 分组不存在时返回404
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group " + group + " not found");
+		}
+	}
 
-        try {
-            // 2. 转发请求到查询参数形式的端点
-            String apiDocs = restTemplate.getForObject(baseUrl, String.class);
-            // 3. 返回分组文档内容
-            return ResponseEntity.ok(apiDocs);
-        } catch (Exception e) {
-            // 4. 分组不存在时返回404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Group " + group + " not found");
-        }
-    }
 }

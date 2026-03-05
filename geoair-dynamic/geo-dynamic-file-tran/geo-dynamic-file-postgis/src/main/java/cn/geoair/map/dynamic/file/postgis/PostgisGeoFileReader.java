@@ -27,9 +27,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 改造后的 PostGIS 读取器
- * 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑
- * 基于 GeoTools 实现，统一要素类型标准
+ * 改造后的 PostGIS 读取器 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑 基于 GeoTools 实现，统一要素类型标准
  */
 @Slf4j
 public class PostgisGeoFileReader implements GeoFileReader {
@@ -79,7 +77,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				throw new RuntimeException("初始化 GeoTools PostGIS DataStore 失败");
 			}
 			log.info("PostGIS DataStore 初始化成功，查询SQL：{}", linkInfo.getQuerySqlByOutPut());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException("初始化 PostGIS 连接失败", e);
 		}
 	}
@@ -94,7 +93,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 			((JDBCDataStore) postgisDataStore).createVirtualTable(virtualTable);
 			this.featureSource = postgisDataStore.getFeatureSource(viewName);
 			this.featureIterator = featureSource.getFeatures().features();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException("初始化 PostGIS 要素源失败", e);
 		}
 	}
@@ -109,7 +109,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				features.close();
 				featureType = feature.getFeatureType();
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException("初始化 PostGIS 要素类型失败", e);
 		}
 	}
@@ -122,7 +123,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 			Query countQuery = new Query();
 			this.totalCount = featureSource.getCount(countQuery);
 			log.info("PostGIS 查询语句 {} 总记录数：{}", linkInfo.getQuerySqlByOutPut(), totalCount);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			log.warn("计算 PostGIS 总记录数失败，将返回 0", e);
 			this.totalCount = 0;
 		}
@@ -144,7 +146,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 			this.featureSource = postgisDataStore.getFeatureSource(viewName);
 			// 重新初始化迭代器
 			this.featureIterator = featureSource.getFeatures().features();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException("重置PostGIS要素迭代器失败", e);
 		}
 	}
@@ -164,11 +167,13 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				this.featureType = typeBuilder.buildFeatureType();
 			}
 			return this.featureType;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (exceptionConsumer != null) {
 				exceptionConsumer.accept(e);
 				return null;
-			} else {
+			}
+			else {
 				throw new RuntimeException("读取 PostGIS 表头（SimpleFeatureType）失败", e);
 			}
 		}
@@ -194,18 +199,21 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				// 几何字段转换为 JTS Geometry（GeoTools 原生支持）
 				if (propValue instanceof Geometry) {
 					attributes.put(propName, propValue);
-				} else {
+				}
+				else {
 					attributes.put(propName, propValue);
 				}
 			}
 
 			// 转换为 GirAdvOneRow
 			return GirAdvOneRow.ofByMap(attributes);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (exceptionConsumer != null) {
 				exceptionConsumer.accept(e);
 				return null;
-			} else {
+			}
+			else {
 				throw new RuntimeException("读取 PostGIS 单行数据失败", e);
 			}
 		}
@@ -230,10 +238,12 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				}
 				try {
 					return featureIterator != null && featureIterator.hasNext();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					if (exceptionConsumer != null) {
 						exceptionConsumer.accept(e);
-					} else {
+					}
+					else {
 						throw new RuntimeException("检查PostGIS是否有下一条数据失败", e);
 					}
 					return false;
@@ -253,15 +263,18 @@ public class PostgisGeoFileReader implements GeoFileReader {
 						throw new NoSuchElementException("已无更多PostGIS数据");
 					}
 					return oneRow;
-				} catch (NoSuchElementException e) {
+				}
+				catch (NoSuchElementException e) {
 					// 正常的无数据异常直接抛出
 					throw e;
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					if (exceptionConsumer != null) {
 						exceptionConsumer.accept(e);
 						closeIterator();
 						return null;
-					} else {
+					}
+					else {
 						closeIterator();
 						throw new RuntimeException("读取PostGIS下一条数据失败", e);
 					}
@@ -338,13 +351,14 @@ public class PostgisGeoFileReader implements GeoFileReader {
 
 			// 设置分页结果
 			pager.put(rowList, totalCount, girPageParam);
-			log.info("读取 PostGIS 分页数据：第{}页，每页{}条，本次返回{}条，总记录数{}",
-					pageNum, pageSize, rowList.size(), totalCount);
+			log.info("读取 PostGIS 分页数据：第{}页，每页{}条，本次返回{}条，总记录数{}", pageNum, pageSize, rowList.size(), totalCount);
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (exceptionConsumer != null) {
 				exceptionConsumer.accept(e);
-			} else {
+			}
+			else {
 				throw new RuntimeException("读取 PostGIS 分页数据失败", e);
 			}
 		}
@@ -364,7 +378,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
 				postgisDataStore.dispose();
 			}
 			log.info("PostGIS 读取器资源已释放");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			log.error("关闭 PostGIS 读取器资源失败", e);
 		}
 	}
@@ -380,4 +395,5 @@ public class PostgisGeoFileReader implements GeoFileReader {
 	private String extractDbNameFromJdbcUrl(String jdbcUrl) {
 		return AdvJdbcUrlUtil.splitter(jdbcUrl).database;
 	}
+
 }
