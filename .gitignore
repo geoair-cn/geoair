@@ -3,7 +3,7 @@
 *.iws
 *.iml
 *.ipr
-
+styles
 # 编译输出目录
 out/
 build/
