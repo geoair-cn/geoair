@@ -234,7 +234,7 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
                 }
                 // 步骤1：新增字符串列（VARCHAR，非空）
                 String addColumnSql = StrUtil.format(
-                        "ALTER TABLE {} ADD COLUMN {} VARCHAR({}) NOT NULL",
+                        "ALTER TABLE {} ADD COLUMN {} VARCHAR({})  ",
                         qualifiedTableName, pkColumnName, pkColumnLength
                 );
                 dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
@@ -283,7 +283,7 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
             else if (PrimaryKeyType.INT_NORMAL.equals(pkType)) {
                 // 步骤1：新增普通INT列（非空）
                 String addColumnSql = StrUtil.format(
-                        "ALTER TABLE {} ADD COLUMN {} INT NOT NULL",
+                        "ALTER TABLE {} ADD COLUMN {} INT  ",
                         qualifiedTableName, pkColumnName
                 );
                 dExecuteDDL(addColumnSql, tableName, "新增普通整数列[" + pkColumnName + "]");
@@ -306,7 +306,7 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
             else if (PrimaryKeyType.BIGINT_NORMAL.equals(pkType)) {
                 // 步骤1：新增普通BIGINT列（非空）
                 String addColumnSql = StrUtil.format(
-                        "ALTER TABLE {} ADD COLUMN {} BIGINT NOT NULL",
+                        "ALTER TABLE {} ADD COLUMN {} BIGINT  ",
                         qualifiedTableName, pkColumnName
                 );
                 dExecuteDDL(addColumnSql, tableName, "新增普通长整数列[" + pkColumnName + "]");
