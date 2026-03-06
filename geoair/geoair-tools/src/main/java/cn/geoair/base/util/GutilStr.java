@@ -570,7 +570,7 @@ public class GutilStr {
 	 * 当给定字符串为null时，转换为Empty
 	 * @param str 被检查的字符串
 	 * @return 原字符串或者空串
-	 * @see #nullToEmpty(CharSequence)
+	 * @see #ToEmpty(CharSequence)
 	 * @since 4.6.3
 	 */
 	public static String emptyIfNull(CharSequence str) {

@@ -1,12 +1,15 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 
 @ImportResource(
@@ -16,30 +19,14 @@ import org.springframework.context.annotation.ImportResource;
 public class GeoServerConfig
         implements BeanPostProcessor, ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
     ApplicationContext applicationContext;
+    @Autowired GirGeoServerProperties girGeoServerProperties;
 
-    //    // 初始化 GeoServer 核心 Bean
-
-    //    @Bean
-    //    @Primary
-    //    public GeoServerResourceLoader geoServerResourceLoader(
-    //            GirGeoServerProperties girGeoServerProperties) throws Exception {
-    //        // 1. 初始化数据目录
-    //        File dataDir = new File(girGeoServerProperties.getDataDir());
-    //        if (!dataDir.exists()) {
-    //            boolean mkdirs = dataDir.mkdirs();
-    //            Assert.isTrue(mkdirs, "GeoServer 数据目录创建失败！");
-    //        }
-    //        return new GeoServerResourceLoader(dataDir);
-    //    }
-
-    //    @Bean
-    //    public GeoServerLoaderProxy geoServerLoaderProxy(GeoServerResourceLoader resourceLoader)
-    //            throws Exception {
-    //        GeoServerLoaderProxy loaderProxy = new GeoServerLoaderProxy(resourceLoader);
-    //        // 确保 loaderProxy 关联到 GeoServer 实例（如需）
-    //        loaderProxy.setApplicationContext(applicationContext);
-    //        return loaderProxy;
-    //    }
+    @Bean
+    public ServletContextInitializer geoserverContextInitializer() {
+        return servletContext ->
+                servletContext.setInitParameter(
+                        "GEOSERVER_DATA_DIR", girGeoServerProperties.getDataDir());
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
