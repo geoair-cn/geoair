@@ -14,7 +14,7 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
-
+    <packaging>jar</packaging>
     <properties>
         <java.version>8</java.version>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>

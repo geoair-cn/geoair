@@ -15,7 +15,7 @@
     <name>geoair-orm-spi</name>
     <description>geoair-orm-spi</description>
     <url>https://gitee.com/geoair/geoair</url>
-
+    <packaging>jar</packaging>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>

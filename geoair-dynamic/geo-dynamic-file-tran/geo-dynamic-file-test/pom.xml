@@ -12,6 +12,7 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <artifactId>geo-dynamic-file-test</artifactId>
     <name>geo-dynamic-file-test</name>
+    <packaging>jar</packaging>
     <properties>
         <java.version>8</java.version>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
@@ -19,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-    <packaging>jar</packaging>
+
     <description>
         geo-dynamic-file-tran
         转换测试模块

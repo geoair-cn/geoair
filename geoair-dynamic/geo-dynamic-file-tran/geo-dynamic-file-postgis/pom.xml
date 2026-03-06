@@ -12,14 +12,14 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <artifactId>geo-dynamic-file-postgis</artifactId>
     <name>geo-dynamic-file-postgis</name>
-
+    <packaging>jar</packaging>
     <properties>
         <java.version>8</java.version>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-    <packaging>jar</packaging>
+
     <description>
         geo-dynamic-file-postgis postgis的实现类
         核心接口声明层

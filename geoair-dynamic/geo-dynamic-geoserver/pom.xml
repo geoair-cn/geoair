@@ -21,7 +21,7 @@
         <geotools.version>28.6.1</geotools.version>
         <geoserver.version>2.22.6</geoserver.version>
     </properties>
-
+    <packaging>jar</packaging>
     <description>geo-dynamic-geoserver</description>
 
     <url>https://gitee.com/geoair/geo-dynamic</url>

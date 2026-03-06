@@ -13,7 +13,7 @@
     <artifactId>geoair-web</artifactId>
     <version>23.1.2-RC3-SNAPSHOT</version>
     <name>geoair-web</name>
-
+    <packaging>jar</packaging>
     <description>Web库</description>
     <url>https://gitee.com/geoair/geoair</url>
 

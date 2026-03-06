@@ -12,7 +12,7 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <artifactId>geo-dynamic-tools</artifactId>
     <name>geo-dynamic-tools</name>
-
+    <packaging>jar</packaging>
     <properties>
         <java.version>8</java.version>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
