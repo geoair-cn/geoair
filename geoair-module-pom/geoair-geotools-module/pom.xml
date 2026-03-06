@@ -19,6 +19,7 @@
     <url>https://gitee.com/geoair/geoair-dependencies</url>
     <properties>
         <java.version>8</java.version>
+        <geotools.version>28.6.1</geotools.version>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -69,16 +70,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>org.postgis</groupId>-->
-            <!--                <artifactId>postgis-jdbc</artifactId>-->
-            <!--                <version>${postgis.jdbc.version}</version>-->
-            <!--            </dependency>-->
-            <dependency>
-                <groupId>net.postgis</groupId>
-                <artifactId>postgis-jdbc</artifactId>
-                <version>${net.postgis.version}</version>
-            </dependency>
+
+
             <dependency>
                 <groupId>org.locationtech.jts</groupId>
                 <artifactId>jts-core</artifactId>
@@ -109,69 +102,15 @@
                 <version>${net.postgis.version}</version>
             </dependency>
 
-
-            <!--            这是30以后版本的geotools的依赖声明-->
-            <!--			            <dependency>-->
-            <!--			                <groupId>org.geotools</groupId>-->
-            <!--			                <artifactId>gt-platform-dependencies</artifactId>-->
-            <!--			                <version>${geotools.version}</version>-->
-            <!--			                <type>pom</type>-->
-            <!--			                <scope>import</scope>-->
-            <!--			            </dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-app-schema-resolver</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-app-schema</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-arcgrid</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-brewer</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-charts</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-complex</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-cql-json</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-coverage-api</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-grib</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-netcdf</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-coverage</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-grid</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
 
@@ -191,11 +130,6 @@
                 <version>${geotools.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.geotools</groupId>
-                <artifactId>gt-http</artifactId>
-                <version>${geotools.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.geotools</groupId>
@@ -272,26 +206,7 @@
                 <artifactId>gt-http</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-image</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-imageio-ext-gdal</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-imagemosaic</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-imagepyramid</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
+
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-jdbc</artifactId>
@@ -326,36 +241,13 @@
 
             </dependency>
 
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-mysql</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-oracle</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-jdbc-h2</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-jp2k</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
+
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-main</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-mbstyle</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
+
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-metadata</artifactId>
