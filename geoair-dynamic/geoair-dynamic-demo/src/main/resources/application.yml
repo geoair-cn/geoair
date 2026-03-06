@@ -1,6 +1,7 @@
 spring:
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -18,6 +19,5 @@ logging:
     org.geoserver: debug
     org.springframework.security: debug  # 打印Security核心流程日志
     org.springframework.security.web: debug  # 打印Web层（过滤器链）日志
-    # 可选：如果需要更细粒度的日志，可添加以下配置
-    org.springframework.security.authentication: trace  # 认证细节（更详细）
-    org.springframework.security.authorization: trace  # 授权细节（更详细）
+    org.springframework.security.authentication: trace  # 认证细节
+    org.springframework.security.authorization: trace  # 授权细节

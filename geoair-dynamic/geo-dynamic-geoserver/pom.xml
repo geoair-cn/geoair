@@ -83,6 +83,19 @@
                     <groupId>org.geoserver</groupId>
                     <artifactId>gs-main</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <!-- 排除反向适配的 log4j-slf4j-impl -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -94,19 +107,45 @@
                     <groupId>org.geoserver</groupId>
                     <artifactId>gs-main</artifactId>
                 </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.geoserver.web</groupId>
-            <artifactId>gs-web-gwc</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
                 <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <!-- 排除反向适配的 log4j-slf4j-impl -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.geoserver.web</groupId>-->
+        <!--            <artifactId>gs-web-gwc</artifactId>-->
+        <!--            <version>${geoserver.version}</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.geoserver</groupId>-->
+        <!--                    <artifactId>gs-main</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>javax.servlet</groupId>-->
+        <!--                    <artifactId>servlet-api</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.springframework</groupId>-->
+        <!--                    <artifactId>spring-core</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                &lt;!&ndash; 排除反向适配的 log4j-slf4j-impl &ndash;&gt;-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.apache.logging.log4j</groupId>-->
+        <!--                    <artifactId>log4j-slf4j-impl</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.geoserver.web</groupId>
             <artifactId>gs-web-wfs</artifactId>
@@ -115,6 +154,19 @@
                 <exclusion>
                     <groupId>org.geoserver</groupId>
                     <artifactId>gs-main</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <!-- 排除反向适配的 log4j-slf4j-impl -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -126,7 +178,24 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.geoserver</groupId>
+                    <artifactId>gs-restconfig</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
                     <artifactId>gs-main</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <!-- 排除反向适配的 log4j-slf4j-impl -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -141,14 +210,7 @@
                     <groupId>org.geotools</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
-                <!--                <exclusion>-->
-                <!--                    <groupId>org.springframework.security</groupId>-->
-                <!--                    <artifactId>*</artifactId>-->
-                <!--                </exclusion>-->
-                <exclusion>
-                    <groupId>org.jasypt</groupId>
-                    <artifactId>jasypt-springsecurity3</artifactId>
-                </exclusion>
+
                 <!-- 排除与 Spring Boot 冲突的依赖 -->
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -183,21 +245,21 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>gs-gwc</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.geoserver</groupId>-->
+        <!--            <artifactId>gs-gwc</artifactId>-->
+        <!--            <version>${geoserver.version}</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.geotools</groupId>-->
+        <!--                    <artifactId>*</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.geoserver</groupId>-->
+        <!--                    <artifactId>gs-main</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.geoserver</groupId>
@@ -215,21 +277,21 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.geoserver.community</groupId>
-            <artifactId>gs-wmts-styles</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.geoserver.community</groupId>-->
+        <!--            <artifactId>gs-wmts-styles</artifactId>-->
+        <!--            <version>${geoserver.version}</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.geotools</groupId>-->
+        <!--                    <artifactId>*</artifactId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <groupId>org.geoserver</groupId>-->
+        <!--                    <artifactId>gs-main</artifactId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
 
 
         <dependency>

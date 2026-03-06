@@ -1,11 +1,11 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.geoair.map.dynamic.geoserver.config.GirGeoServerProperties,\
+cn.geoair.map.dynamic.geoserver.config.GeoServerConfig,\
 cn.geoair.map.dynamic.geoserver.config.GeoServerSecurityConfig,\
 cn.geoair.map.dynamic.geoserver.gss.GeoServerSecurityBeanConfig,\
 cn.geoair.map.dynamic.geoserver.config.GeoServerCycleDependencyDetector,\
 cn.geoair.map.dynamic.geoserver.config.Log4jDependencyDetector,\
 cn.geoair.map.dynamic.geoserver.config.GeoServerCycleDependencyPostProcessor,\
-cn.geoair.map.dynamic.geoserver.config.GeoServerConfig,\
 cn.geoair.map.dynamic.geoserver.config.PasswordEncoderPrimaryResolver,\
 cn.geoair.map.dynamic.geoserver.impl.WorkspaceManagerImpl,\
 cn.geoair.map.dynamic.geoserver.impl.PostgisLayerPublisher,\

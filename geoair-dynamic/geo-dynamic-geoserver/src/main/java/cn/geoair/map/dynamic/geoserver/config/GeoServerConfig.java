@@ -1,5 +1,9 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
+import cn.hutool.core.io.FileUtil;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -10,22 +14,42 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
+import java.io.File;
+
+import javax.servlet.ServletContext;
+
+@Slf4j
 @ImportResource(
         locations = {"classpath*:/applicationContext.xml"
-            //                ,"classpath*:/applicationSecurityContext.xml"
+            //                , "classpath*:/applicationContext.xml"
         })
+@Configuration
 public class GeoServerConfig
         implements BeanPostProcessor, ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
+
     ApplicationContext applicationContext;
+
     @Autowired GirGeoServerProperties girGeoServerProperties;
 
     @Bean
     public ServletContextInitializer geoserverContextInitializer() {
-        return servletContext ->
-                servletContext.setInitParameter(
-                        "GEOSERVER_DATA_DIR", girGeoServerProperties.getDataDir());
+        return servletContext -> {
+            String dataDir = null;
+            try {
+                dataDir = applicationContext.getEnvironment().getProperty("geoair.gs.dataDir");
+                if (dataDir == null) dataDir = FileUtil.getTmpDirPath();
+                File dataDirFile = new File(dataDir);
+                File mkdir = FileUtil.mkdir(dataDirFile + File.separator + "geoserverdir");
+                dataDir = mkdir.getAbsolutePath();
+                servletContext.setInitParameter("GEOSERVER_DATA_DIR", dataDir);
+                log.info("=== GEOSERVER_DATA_DIR 已设置: " + dataDir);
+            } catch (Exception e) {
+                log.info("无法创建 GEOSERVER_DATA_DIR 目录: " + dataDir);
+            }
+        };
     }
 
     @Override
@@ -35,23 +59,23 @@ public class GeoServerConfig
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory registry)
-            throws BeansException {
-        //                // 要排除的引发循环依赖的 Bean 名称
-        //                String[] cycleBeans = {"loggingFilter", "loggingInitializer"};
-        //
-        //                for (String beanName : cycleBeans) {
-        //                    // 正确判断并移除 Bean 定义：registry 是 BeanDefinitionRegistry 实例，拥有该方法
-        //                    if (registry.containsBeanDefinition(beanName)) {
-        //
-        // ((org.springframework.beans.factory.support.DefaultListableBeanFactory)
-        //         registry)
-        //                                .removeBeanDefinition(beanName);
-        //                        System.out.println("成功移除循环依赖 Bean：" + beanName);
-        //                    }
-        //                }
-    }
+            throws BeansException {}
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry)
             throws BeansException {}
+
+    /** 可选：添加 Bean 后置处理器，验证参数是否生效 */
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName)
+            throws BeansException {
+        // 调试：查看 GWC 相关 Bean 初始化时的参数
+        if (beanName.contains("gwcXmlConfigResourceProvider")
+                || beanName.contains("GeoSeverTileLayerCatalog")) {
+            ServletContext servletContext = applicationContext.getBean(ServletContext.class);
+            String dataDir = servletContext.getInitParameter("GEOSERVER_DATA_DIR");
+            System.out.println("=== " + beanName + " 初始化时，GEOSERVER_DATA_DIR: " + dataDir);
+        }
+        return bean;
+    }
 }
