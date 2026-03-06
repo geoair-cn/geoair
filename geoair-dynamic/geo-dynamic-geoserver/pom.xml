@@ -73,15 +73,81 @@
             <version>${spring-boot.version}</version>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>gs-web-core</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>gs-web-wms</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>gs-web-gwc</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>gs-web-wfs</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>gs-web-rest</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
         <dependency>
             <groupId>org.geoserver</groupId>
             <artifactId>gs-main</artifactId>
             <version>${geoserver.version}</version>
             <exclusions>
-                <!-- 强制排除 GeoServer 内置的 GeoTools，使用项目锁定的 28.6 -->
                 <exclusion>
                     <groupId>org.geotools</groupId>
                     <artifactId>*</artifactId>
+                </exclusion>
+                <!--                <exclusion>-->
+                <!--                    <groupId>org.springframework.security</groupId>-->
+                <!--                    <artifactId>*</artifactId>-->
+                <!--                </exclusion>-->
+                <exclusion>
+                    <groupId>org.jasypt</groupId>
+                    <artifactId>jasypt-springsecurity3</artifactId>
                 </exclusion>
                 <!-- 排除与 Spring Boot 冲突的依赖 -->
                 <exclusion>
@@ -116,6 +182,56 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.geoserver</groupId>
+            <artifactId>gs-gwc</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geotools</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geoserver</groupId>
+            <artifactId>gs-kml</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geotools</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geoserver.community</groupId>
+            <artifactId>gs-wmts-styles</artifactId>
+            <version>${geoserver.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.geotools</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geoserver</groupId>
+                    <artifactId>gs-main</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
         <dependency>
             <groupId>org.geoserver</groupId>
             <artifactId>gs-wfs</artifactId>
@@ -133,117 +249,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-main</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-shapefile</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs-ng</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-metadata</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-arcgrid</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geotiff</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson-core</artifactId>
-            <version>${geotools.version}</version>
+            <groupId>cn.geoair.geo.dynamic</groupId>
+            <artifactId>geo-dynamic-jts-all</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-svg</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-image</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-coverage</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-render</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-referencing</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-transform</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-wms</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-xml</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-jdbc</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools.jdbc</groupId>
-            <artifactId>gt-jdbc-postgis</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools.jdbc</groupId>
-            <artifactId>gt-jdbc-sqlserver</artifactId>
-            <version>${geotools.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools.jdbc</groupId>
-            <artifactId>gt-jdbc-oracle</artifactId>
-            <version>${geotools.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools.jdbc</groupId>
-            <artifactId>gt-jdbc-mysql</artifactId>
-            <version>${geotools.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

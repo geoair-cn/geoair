@@ -6,11 +6,8 @@ import org.geoserver.security.*;
 import org.geoserver.security.filter.*;
 import org.geoserver.security.impl.*;
 import org.geoserver.security.password.*;
-import org.geoserver.security.rememberme.RememberMeServicesFactoryBean;
-import org.geoserver.security.xml.XMLSecurityProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 import java.io.IOException;
 
@@ -18,28 +15,30 @@ import java.io.IOException;
 @Configuration
 public class GeoServerSecurityBeanConfig {
 
-    @Bean
-    @DependsOn("extensions") // 保证 extensions 先初始化
-    public GeoServerSecurityManager authenticationManager(GeoServerDataDirectory dataDirectory)
-            throws Exception {
-        GeoServerSecurityManager securityManager = new GeoServerSecurityManager(dataDirectory);
-
-        return securityManager;
-    }
+    //    @Bean
+    //    @DependsOn("extensions") // 保证 extensions 先初始化
+    //    public GeoServerSecurityManager authenticationManager(GeoServerDataDirectory
+    // dataDirectory)
+    //            throws Exception {
+    //        GeoServerSecurityManager securityManager = new
+    // GeoServerSecurityManager(dataDirectory);
+    //
+    //        return securityManager;
+    //    }
 
     // 别名：对应 XML 中的 <alias name="authenticationManager" alias="geoServerSecurityManager"/>
-    @Bean
-    public GeoServerSecurityManager geoServerSecurityManager(
-            GeoServerSecurityManager authenticationManager) {
-        return authenticationManager;
-    }
+    //    @Bean
+    //    public GeoServerSecurityManager geoServerSecurityManager(
+    //            GeoServerSecurityManager authenticationManager) {
+    //        return authenticationManager;
+    //    }
 
     // ===================== 过滤链代理 =====================
-    @Bean
-    public GeoServerSecurityFilterChainProxy filterChainProxy(
-            GeoServerSecurityManager authenticationManager) {
-        return new GeoServerSecurityFilterChainProxy(authenticationManager);
-    }
+    //    @Bean
+    //    public GeoServerSecurityFilterChainProxy filterChainProxy(
+    //            GeoServerSecurityManager authenticationManager) {
+    //        return new GeoServerSecurityFilterChainProxy(authenticationManager);
+    //    }
 
     //    // ===================== 密码编码器 =====================
     //    @Bean
@@ -103,49 +102,49 @@ public class GeoServerSecurityBeanConfig {
     }
 
     // ===================== 安全提供者 =====================
-    @Bean
-    public XMLSecurityProvider xmlSecurityProvider() {
-        return new XMLSecurityProvider();
-    }
+    //    @Bean
+    //    public XMLSecurityProvider xmlSecurityProvider() {
+    //        return new XMLSecurityProvider();
+    //    }
 
-    @Bean
-    public J2eeSecurityProvider j2eeSecurityProvider() {
-        return new J2eeSecurityProvider();
-    }
+    //    @Bean
+    //    public J2eeSecurityProvider j2eeSecurityProvider() {
+    //        return new J2eeSecurityProvider();
+    //    }
 
-    @Bean
-    public GeoServerBasicAuthenticationProvider basicAuthSecurityProvider() {
-        return new GeoServerBasicAuthenticationProvider();
-    }
+    //    @Bean
+    //    public GeoServerBasicAuthenticationProvider basicAuthSecurityProvider() {
+    //        return new GeoServerBasicAuthenticationProvider();
+    //    }
 
-    @Bean
-    public GeoServerDigestAuthenticationProvider digestAuthSecurityProvider() {
-        return new GeoServerDigestAuthenticationProvider();
-    }
+    //    @Bean
+    //    public GeoServerDigestAuthenticationProvider digestAuthSecurityProvider() {
+    //        return new GeoServerDigestAuthenticationProvider();
+    //    }
 
     // 其他 Provider 按此方式定义...
 
     // ===================== 辅助 Bean =====================
-    @Bean
-    public GeoServerRoleConverterImpl roleConverter() {
-        GeoServerRoleConverterImpl converter = new GeoServerRoleConverterImpl();
-        converter.setRoleDelimiterString(";");
-        converter.setRoleParameterDelimiterString(",");
-        converter.setRoleParameterStartString("(");
-        converter.setRoleParameterEndString(")");
-        converter.setRoleParameterAssignmentString("=");
-        return converter;
-    }
+    //    @Bean
+    //    public GeoServerRoleConverterImpl roleConverter() {
+    //        GeoServerRoleConverterImpl converter = new GeoServerRoleConverterImpl();
+    //        converter.setRoleDelimiterString(";");
+    //        converter.setRoleParameterDelimiterString(",");
+    //        converter.setRoleParameterStartString("(");
+    //        converter.setRoleParameterEndString(")");
+    //        converter.setRoleParameterAssignmentString("=");
+    //        return converter;
+    //    }
 
-    @Bean
-    public BruteForceListener bruteForceListener(
-            GeoServerSecurityManager geoServerSecurityManager) {
-        return new BruteForceListener(geoServerSecurityManager);
-    }
+    //    @Bean
+    //    public BruteForceListener bruteForceListener(
+    //            GeoServerSecurityManager geoServerSecurityManager) {
+    //        return new BruteForceListener(geoServerSecurityManager);
+    //    }
 
-    @Bean
-    public RememberMeServicesFactoryBean rememberMeServices(
-            GeoServerSecurityManager geoServerSecurityManager) {
-        return new RememberMeServicesFactoryBean(geoServerSecurityManager);
-    }
+    //    @Bean
+    //    public RememberMeServicesFactoryBean rememberMeServices(
+    //            GeoServerSecurityManager geoServerSecurityManager) {
+    //        return new RememberMeServicesFactoryBean(geoServerSecurityManager);
+    //    }
 }

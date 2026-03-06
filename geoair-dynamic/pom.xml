@@ -55,6 +55,7 @@
         <module>geo-dynamic-file-tran</module>
         <module>geo-dynamic-tools</module>
         <module>geo-dynamic-geoserver</module>
+        <module>geo-dynamic-jts-all</module>
         <module>geoair-dynamic-demo</module>
     </modules>
 
@@ -80,6 +81,13 @@
                 <artifactId>geo-dynamic-ds</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-jts-all</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
