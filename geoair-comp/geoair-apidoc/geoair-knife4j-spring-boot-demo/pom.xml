@@ -48,7 +48,7 @@
 
         <dependency>
             <groupId>cn.geoair.comp.apidoc</groupId>
-             <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
+            <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
             <version>${geoair.version}</version>
         </dependency>
         <dependency>

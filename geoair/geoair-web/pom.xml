@@ -1,71 +1,71 @@
 ﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cn.geoair</groupId>
-		<artifactId>geoair</artifactId>
-		<version>23.1.2-RC3-SNAPSHOT </version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-	<groupId>cn.geoair</groupId>
-	<artifactId>geoair-web</artifactId>
-	<version>23.1.2-RC3-SNAPSHOT</version>
-	<name>geoair-web</name>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair</groupId>
+        <artifactId>geoair</artifactId>
+        <version>23.1.2-RC3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>cn.geoair</groupId>
+    <artifactId>geoair-web</artifactId>
+    <version>23.1.2-RC3-SNAPSHOT</version>
+    <name>geoair-web</name>
 
-	<description>Web库</description>
-	<url>https://gitee.com/geoair/geoair</url>
+    <description>Web库</description>
+    <url>https://gitee.com/geoair/geoair</url>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<name>zhangfengji</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<properties>
-	</properties>
-	<dependencies>
+    <properties>
+    </properties>
+    <dependencies>
 
-		<dependency>
-			<groupId>cn.geoair</groupId>
-			<artifactId>geoair-base</artifactId>
-			<version>${geoair.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>cn.geoair</groupId>
+            <artifactId>geoair-base</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${servlet-api.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-source-plugin</artifactId>-->
-<!--			</plugin>-->
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <!--			<plugin>-->
+            <!--				<groupId>org.apache.maven.plugins</groupId>-->
+            <!--				<artifactId>maven-source-plugin</artifactId>-->
+            <!--			</plugin>-->
+        </plugins>
+    </build>
 
 </project>

@@ -52,7 +52,7 @@
         <dependencies>
             <dependency>
                 <groupId>cn.geoair.comp.apidoc</groupId>
-                 <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
+                <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
                 <type>jar</type>
             </dependency>

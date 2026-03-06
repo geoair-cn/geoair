@@ -1,195 +1,194 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cn.geoair.dependencies</groupId>
-		<artifactId>geoair-base-parent</artifactId>
-		<version>23.1.2-RC3-SNAPSHOT</version>
-		<relativePath>../geoair-base-parent/pom.xml</relativePath>
-	</parent>
+    <parent>
+        <groupId>cn.geoair.dependencies</groupId>
+        <artifactId>geoair-base-parent</artifactId>
+        <version>23.1.2-RC3-SNAPSHOT</version>
+        <relativePath>../geoair-base-parent/pom.xml</relativePath>
+    </parent>
 
-	<groupId>cn.geoair</groupId>
-	<artifactId>geoair</artifactId>
-	<version>23.1.2-RC3-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Gir</name>
+    <groupId>cn.geoair</groupId>
+    <artifactId>geoair</artifactId>
+    <version>23.1.2-RC3-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Gir</name>
 
-	<description>Gir</description>
+    <description>Gir</description>
 
-	<url>https://gitee.com/geoair/geoair</url>
+    <url>https://gitee.com/geoair/geoair</url>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<name>zhangfengji</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-		<tag>HEAD</tag>
-	</scm>
-
-
-	<properties>
-		<geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
-		<skipTests>true</skipTests>
-	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-
-			<!-- gir版本约束 -->
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair-base</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair-web</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair-tools</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
 
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair-core</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
+    <properties>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <skipTests>true</skipTests>
+    </properties>
 
-			<dependency>
-				<groupId>cn.geoair</groupId>
-				<artifactId>geoair-sdk</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
 
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-mybatis</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-orm-base</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-mybatis-tk</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
+            <!-- gir版本约束 -->
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-base</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-mybatis-plus</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-web</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
 
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-springjpa</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>cn.geoair.orm</groupId>
-				<artifactId>geoair-orm-spi</artifactId>
-				<version>${geoair.version}</version>
-			</dependency>
-			<!-- soa -->
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-tools</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
 
 
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-core</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-sdk</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-mybatis</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-orm-base</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-mybatis-tk</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-mybatis-plus</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-springjpa</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.orm</groupId>
+                <artifactId>geoair-orm-spi</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <!-- soa -->
 
 
-		</dependencies>
-	</dependencyManagement>
-	<dependencies></dependencies>
-	<modules>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies></dependencies>
+    <modules>
 
-		<module>geoair-tools</module>
-		<module>geoair-base</module>
-		<module>geoair-web</module>
-		<module>geoair-core</module>
-		<module>geoair-orm</module>
-		<module>geoair-sdk</module>
+        <module>geoair-tools</module>
+        <module>geoair-base</module>
+        <module>geoair-web</module>
+        <module>geoair-core</module>
+        <module>geoair-orm</module>
+        <module>geoair-sdk</module>
 
-	</modules>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${maven-jar-plugin.version}</version>
-				<configuration>
-<!--					<classifier>bak</classifier>-->
-				</configuration>
-			</plugin>
+    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <!--					<classifier>bak</classifier>-->
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<!-- 源码版本 -->
-					<source>8</source>
-					<!-- 目标字节码版本 -->
-					<target>8</target>
-					<!-- 编码（可选，避免中文乱码） -->
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 源码版本 -->
+                    <source>8</source>
+                    <!-- 目标字节码版本 -->
+                    <target>8</target>
+                    <!-- 编码（可选，避免中文乱码） -->
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
 
-			<!--生成源码插件-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <!--生成源码插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!--生成API文档插件-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            <!--生成API文档插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

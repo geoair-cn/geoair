@@ -14,51 +14,49 @@ import java.util.regex.Pattern;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 18:59
- * @description： TODO
+ * @date ：Created in 18:59 @description： TODO
  */
 public class GssDataRuleDAO extends DataAccessRuleDAO {
 
-    CatalogMode catalogMode = CatalogMode.HIDE;
+	CatalogMode catalogMode = CatalogMode.HIDE;
 
-    private static Pattern DOT = Pattern.compile("\\.");
+	private static Pattern DOT = Pattern.compile("\\.");
 
-    /**
-     * Builds a new dao
-     *
-     * @param dd
-     * @param rawCatalog
-     */
-    public GssDataRuleDAO(GeoServerDataDirectory dd, Catalog rawCatalog) throws IOException {
-        super(dd, rawCatalog);
-    }
+	/**
+	 * Builds a new dao
+	 * @param dd
+	 * @param rawCatalog
+	 */
+	public GssDataRuleDAO(GeoServerDataDirectory dd, Catalog rawCatalog) throws IOException {
+		super(dd, rawCatalog);
+	}
 
-    @Override
-    protected void loadRules(Properties props) {
-        SortedSet<DataAccessRule> result = new ConcurrentSkipListSet<>();
-        CatalogMode catalogMode = CatalogMode.HIDE;
-        if (result.isEmpty()) {
-            result.add(new DataAccessRule(DataAccessRule.READ_ALL));
-            result.add(new DataAccessRule(DataAccessRule.WRITE_ALL));
-        }
+	@Override
+	protected void loadRules(Properties props) {
+		SortedSet<DataAccessRule> result = new ConcurrentSkipListSet<>();
+		CatalogMode catalogMode = CatalogMode.HIDE;
+		if (result.isEmpty()) {
+			result.add(new DataAccessRule(DataAccessRule.READ_ALL));
+			result.add(new DataAccessRule(DataAccessRule.WRITE_ALL));
+		}
 
-        this.catalogMode = catalogMode;
-        this.rules = result;
-    }
+		this.catalogMode = catalogMode;
+		this.rules = result;
+	}
 
-    @Override
-    protected Properties toProperties() {
-        Properties props = new Properties();
-        props.put("mode", catalogMode.toString());
-        for (DataAccessRule rule : rules) {
-            StringBuilder sbKey =
-                    new StringBuilder(DOT.matcher(rule.getRoot()).replaceAll("\\\\."));
-            if (!rule.isGlobalGroupRule()) {
-                sbKey.append(".").append(DOT.matcher(rule.getLayer()).replaceAll("\\\\."));
-            }
-            sbKey.append(".").append(rule.getAccessMode().getAlias());
-            props.put(sbKey.toString(), rule.getValue());
-        }
-        return props;
-    }
+	@Override
+	protected Properties toProperties() {
+		Properties props = new Properties();
+		props.put("mode", catalogMode.toString());
+		for (DataAccessRule rule : rules) {
+			StringBuilder sbKey = new StringBuilder(DOT.matcher(rule.getRoot()).replaceAll("\\\\."));
+			if (!rule.isGlobalGroupRule()) {
+				sbKey.append(".").append(DOT.matcher(rule.getLayer()).replaceAll("\\\\."));
+			}
+			sbKey.append(".").append(rule.getAccessMode().getAlias());
+			props.put(sbKey.toString(), rule.getValue());
+		}
+		return props;
+	}
+
 }

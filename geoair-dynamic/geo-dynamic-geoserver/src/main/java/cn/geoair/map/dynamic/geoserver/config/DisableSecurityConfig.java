@@ -6,4 +6,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 @EnableAutoConfiguration(exclude = SecurityAutoConfiguration.class)
 @ConditionalOnClass(SecurityAutoConfiguration.class)
-public class DisableSecurityConfig {}
+public class DisableSecurityConfig {
+
+}

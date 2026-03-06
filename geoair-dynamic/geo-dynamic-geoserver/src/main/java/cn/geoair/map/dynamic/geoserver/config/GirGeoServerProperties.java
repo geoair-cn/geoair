@@ -9,8 +9,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class GirGeoServerProperties {
 
-  /** GeoServer 数据目录路径 */
-  private String dataDir;
+	/** GeoServer 数据目录路径 */
+	private String dataDir;
 
-  private GsWorkspace gsWorkspace = new GsWorkspace();
+	private GsWorkspace gsWorkspace = new GsWorkspace();
+
 }

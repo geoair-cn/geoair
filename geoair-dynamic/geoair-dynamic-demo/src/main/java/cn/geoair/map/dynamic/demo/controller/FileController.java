@@ -13,10 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 @GaApi(tags = "文件")
 public class FileController {
 
-    @PostMapping("/file")
-    @ResponseBody
-    @GaApiAction(text = "文件 控制器")
-    public GiResult<?> demo1post(MultipartFile file) {
-        return GiResult.success();
-    }
+	@PostMapping("/file")
+	@ResponseBody
+	@GaApiAction(text = "文件 控制器")
+	public GiResult<?> demo1post(MultipartFile file) {
+		return GiResult.success();
+	}
+
 }
