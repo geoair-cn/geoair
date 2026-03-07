@@ -1,11 +1,16 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
+import cn.geoair.base.util.GutilReflection;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.db.Entity;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +32,11 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
 			return new GirAdvOneRow(new LinkedHashMap<>());
 		}
 		return new GirAdvOneRow(row);
+	}
+
+	public <T> T toBeanObj(Class<T> clazz) {
+		T bean = BeanUtil.toBean(this, clazz);
+		return bean;
 	}
 
 	public static Map<String, Object> toMap(GirAdvOneRow oneRow) {

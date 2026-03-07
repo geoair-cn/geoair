@@ -35,6 +35,3 @@ public @interface GaApiAction {
 	GaParameter[] cfg() default {};// 参数
 
 }
-
-
-

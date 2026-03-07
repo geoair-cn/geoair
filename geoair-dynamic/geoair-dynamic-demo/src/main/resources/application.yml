@@ -1,0 +1,23 @@
+spring:
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    default: pro
+
+server:
+  port: 8080
+geoair:
+  gs:
+    dataDir: E:\\测试数据\\geoserver
+logging:
+  level:
+    root: info
+    org.geoserver: debug
+    org.springframework.security: debug  # 打印Security核心流程日志
+    org.springframework.security.web: debug  # 打印Web层（过滤器链）日志
+    org.springframework.security.authentication: trace  # 认证细节
+    org.springframework.security.authorization: trace  # 授权细节

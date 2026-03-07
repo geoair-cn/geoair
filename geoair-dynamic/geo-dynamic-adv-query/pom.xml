@@ -14,6 +14,20 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <name>geo-dynamic-adv-query</name>
     <description>动态查询器</description>
+    <packaging>jar</packaging>
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <geotools.version>28.6.1</geotools.version>
+        <lombok.version>1.18.30</lombok.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <druid.version>1.2.23</druid.version>
+        <net.postgis.version>2025.1.1</net.postgis.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
+        <fastjson1x.version>1.2.83</fastjson1x.version>
+    </properties>
 
     <url>https://gitee.com/geoair/geo-dynamic</url>
 

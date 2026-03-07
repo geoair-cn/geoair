@@ -1,66 +1,66 @@
 ﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cn.geoair.orm</groupId>
-    	<artifactId>geoair-orm</artifactId>
-		<version>23.1.2-RC3-SNAPSHOT </version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-	<groupId>cn.geoair.orm</groupId>
-	<artifactId>geoair-mybatis-plus</artifactId>
-	<version>23.1.2-RC3-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair.orm</groupId>
+        <artifactId>geoair-orm</artifactId>
+        <version>23.1.2-RC3-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>cn.geoair.orm</groupId>
+    <artifactId>geoair-mybatis-plus</artifactId>
+    <version>23.1.2-RC3-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-	<url>https://gitee.com/geoair/geoair</url>
-	<description>geoair-mybatis-plus</description>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
+    <url>https://gitee.com/geoair/geoair</url>
+    <description>geoair-mybatis-plus</description>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-	<developers>
-		<developer>
-			<name>zhangfengji</name>
-			<email>1159856928@qq.com</email>
-			<organization>geoair</organization>
-			<organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-	<scm>
-		<connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
-		<developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
-		<url>https://gitee.com/geoair/geoair-dependencies</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <connection>scm:git:git://gitee.com/geoair/geoair-dependencies.git</connection>
+        <developerConnection>scm:git:git@gitee.com:geoair/geoair-dependencies.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair-dependencies</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<name>geoair-mybatis-plus</name>
+    <name>geoair-mybatis-plus</name>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>cn.geoair.orm</groupId>
-			<artifactId>geoair-mybatis</artifactId>
-			<version>${geoair.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>cn.geoair.orm</groupId>
+            <artifactId>geoair-mybatis</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
-		<dependency>
-	      <groupId>com.baomidou</groupId>
-	      <artifactId>mybatis-plus</artifactId>
-			<version>${mybatis-plus.version}</version>
-	    </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper</artifactId>
-			<version>${pagehelper.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>${pagehelper.version}</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>

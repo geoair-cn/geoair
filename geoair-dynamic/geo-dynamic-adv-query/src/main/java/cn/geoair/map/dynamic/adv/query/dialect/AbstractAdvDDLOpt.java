@@ -164,7 +164,6 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 		dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
 	}
 
-	// ========== 通用逻辑：主键/索引操作 ==========
 	@Override
 	public void dAddPrimaryKey(String tableName, List<String> columnNames, String constraintName) {
 		// 通用参数校验
@@ -191,6 +190,27 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 		String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
 
 		dExecuteDDL(sql, tableName, "添加主键约束[" + pkConstraintName + "]");
+	}
+
+	public void dAddStringPrimaryKey(String tableName, String pkColumnName, int pkColumnLength, String constraintName,
+			String pkValuePrefix) {
+		dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.STRING, pkColumnLength, pkValuePrefix);
+	}
+
+	public void dAddIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+		dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.INT_AUTO, null, null);
+	}
+
+	public void dAddBigIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+		dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_AUTO, null, null);
+	}
+
+	public void dAddIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+		dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.INT_NORMAL, null, null);
+	}
+
+	public void dAddBigIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
+		dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_NORMAL, null, null);
 	}
 
 	@Override

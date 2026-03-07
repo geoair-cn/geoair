@@ -14,7 +14,12 @@
     <name>geo-dynamic-mvt-tools</name>
 
     <packaging>jar</packaging>
-
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <description>mvt的相关工具类</description>
 
     <url>https://gitee.com/geoair/geo-dynamic</url>
@@ -41,9 +46,6 @@
         <url>https://gitee.com/geoair/geo-dynamic</url>
     </scm>
 
-    <properties>
-
-    </properties>
 
     <dependencies>
 

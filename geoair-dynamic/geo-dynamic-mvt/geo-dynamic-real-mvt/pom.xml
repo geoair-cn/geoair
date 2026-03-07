@@ -12,7 +12,13 @@
     <version>23.1.2-RC3-SNAPSHOT</version>
     <artifactId>geo-dynamic-real-mvt</artifactId>
     <name>geo-dynamic-real-mvt</name>
-
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geotrellis.version>3.7.1</geotrellis.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <packaging>jar</packaging>
 
     <description>实时矢量瓦片服务</description>
@@ -41,9 +47,6 @@
         <url>https://gitee.com/geoair/geo-dynamic</url>
     </scm>
 
-    <properties>
-        <geotrellis.version>3.7.1</geotrellis.version>
-    </properties>
 
     <dependencies>
 

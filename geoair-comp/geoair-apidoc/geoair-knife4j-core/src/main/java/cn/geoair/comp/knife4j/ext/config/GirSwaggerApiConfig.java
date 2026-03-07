@@ -1,6 +1,5 @@
 package cn.geoair.comp.knife4j.ext.config;
 
-
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
 
@@ -13,8 +12,8 @@ import java.util.List;
 
 public interface GirSwaggerApiConfig {
 
-    List<DocketInfo> getDocketInfos();
+	List<DocketInfo> getDocketInfos();
 
-    ApiModelInfo getApiModelInfo();
+	ApiModelInfo getApiModelInfo();
 
 }

@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import java.io.Closeable;
+import java.util.Iterator;
 
 /**
  * @author ：张逢吉
@@ -23,6 +24,8 @@ public interface GeoFileReader extends Closeable {
 
 	// 读取一行
 	GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
+
+	Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer);
 
 	// 读取分页行数
 	GirPager<GirAdvOneRow> readRowPage(GirPageParam girPageParam, ExceptionConsumer exceptionConsumer);

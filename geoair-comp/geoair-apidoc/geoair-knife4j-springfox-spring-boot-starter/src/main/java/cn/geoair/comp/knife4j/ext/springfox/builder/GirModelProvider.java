@@ -28,7 +28,7 @@ public class GirModelProvider extends ApiModelBuilder {
 	private final TypeNameExtractor typeNameExtractor;
 
 	public GirModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor,
-							EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
+			EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
 		super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
 		this.typeNameExtractor = typeNameExtractor;
 		this.typeResolver = typeResolver;

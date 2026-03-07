@@ -15,7 +15,6 @@ import java.util.function.Supplier;
  * 对象工具 来自 spring ObjectUtil + hutool ObjectUtil
  *
  * @author
- *
  */
 public abstract class GutilObject {
 
@@ -89,15 +88,18 @@ public abstract class GutilObject {
 
 	/**
 	 * Determine whether the given object is empty.
+	 *
 	 * <p>
 	 * This method supports the following object types.
+	 *
 	 * <ul>
-	 * <li>{@code Optional}: considered empty if {@link Optional#empty()}</li>
-	 * <li>{@code Array}: considered empty if its length is zero</li>
-	 * <li>{@link CharSequence}: considered empty if its length is zero</li>
-	 * <li>{@link Collection}: delegates to {@link Collection#isEmpty()}</li>
-	 * <li>{@link Map}: delegates to {@link Map#isEmpty()}</li>
+	 * <li>{@code Optional}: considered empty if {@link Optional#empty()}
+	 * <li>{@code Array}: considered empty if its length is zero
+	 * <li>{@link CharSequence}: considered empty if its length is zero
+	 * <li>{@link Collection}: delegates to {@link Collection#isEmpty()}
+	 * <li>{@link Map}: delegates to {@link Map#isEmpty()}
 	 * </ul>
+	 *
 	 * <p>
 	 * If the given object is non-null and not one of the aforementioned supported types,
 	 * this method returns {@code false}.
@@ -142,10 +144,10 @@ public abstract class GutilObject {
 	 * Unwrap the given object which is potentially a {@link java.util.Optional}.
 	 * @param obj the candidate object
 	 * @return either the value held within the {@code Optional}, {@code null} if the
-	 * {@code Optional} is empty, or simply the given object as-is
+	 * {@code
+	 *     Optional} is empty, or simply the given object as-is
 	 * @since 5.0
 	 */
-
 	public static Object unwrapOptional(Object obj) {
 		if (obj instanceof Optional) {
 			Optional<?> optional = (Optional<?>) obj;
@@ -212,8 +214,8 @@ public abstract class GutilObject {
 	/**
 	 * Case insensitive alternative to {@link Enum#valueOf(Class, String)}.
 	 * @param <E> the concrete Enum type
-	 * @param enumValues the array of all Enum constants in question, usually per
-	 * {@code Enum.values()}
+	 * @param enumValues the array of all Enum constants in question, usually per {@code
+	 *     Enum.values()}
 	 * @param constant the constant to get the enum value of
 	 * @throws IllegalArgumentException if the given constant is not found in the given
 	 * array of enum values. Use {@link #containsConstant(Enum[], String)} as a guard to
@@ -257,6 +259,7 @@ public abstract class GutilObject {
 	/**
 	 * Convert the given array (which may be a primitive array) to an object array (if
 	 * necessary of primitive wrapper objects).
+	 *
 	 * <p>
 	 * A {@code null} source value will be converted to an empty Object array.
 	 * @param source the (potentially primitive) array
@@ -292,6 +295,7 @@ public abstract class GutilObject {
 	/**
 	 * Determine if the given objects are equal, returning {@code true} if both are
 	 * {@code null} or {@code false} if only one is {@code null}.
+	 *
 	 * <p>
 	 * Compares arrays with {@code Arrays.equals}, performing an equality check based on
 	 * the array elements rather than the array reference.
@@ -323,7 +327,7 @@ public abstract class GutilObject {
 	 * @param o1 first array to compare
 	 * @param o2 second array to compare
 	 * @return whether the given objects are equal
-	 * @see #nullSafeEquals(Object, Object)
+	 * @see # SafeEquals(Object, Object)
 	 * @see java.util.Arrays#equals
 	 */
 	private static boolean arrayEquals(Object o1, Object o2) {
@@ -362,16 +366,17 @@ public abstract class GutilObject {
 	 * {@code Object#hashCode()}}. If the object is an array, this method will delegate to
 	 * any of the {@code nullSafeHashCode} methods for arrays in this class. If the object
 	 * is {@code null}, this method returns 0.
+	 *
 	 * @see Object#hashCode()
-	 * @see #nullSafeHashCode(Object[])
-	 * @see #nullSafeHashCode(boolean[])
-	 * @see #nullSafeHashCode(byte[])
-	 * @see #nullSafeHashCode(char[])
-	 * @see #nullSafeHashCode(double[])
-	 * @see #nullSafeHashCode(float[])
-	 * @see #nullSafeHashCode(int[])
-	 * @see #nullSafeHashCode(long[])
-	 * @see #nullSafeHashCode(short[])
+	 * @see # SafeHashCode(Object[])
+	 * @see # SafeHashCode(boolean[])
+	 * @see # SafeHashCode(byte[])
+	 * @see # SafeHashCode(char[])
+	 * @see # SafeHashCode(double[])
+	 * @see # SafeHashCode(float[])
+	 * @see # SafeHashCode(int[])
+	 * @see # SafeHashCode(long[])
+	 * @see # SafeHashCode(short[])
 	 */
 	public static int nullSafeHashCode(Object obj) {
 		if (obj == null) {
@@ -411,7 +416,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(Object[] array) {
 		if (array == null) {
@@ -426,7 +432,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(boolean[] array) {
 		if (array == null) {
@@ -441,7 +448,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(byte[] array) {
 		if (array == null) {
@@ -456,7 +464,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(char[] array) {
 		if (array == null) {
@@ -471,7 +480,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(double[] array) {
 		if (array == null) {
@@ -486,7 +496,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(float[] array) {
 		if (array == null) {
@@ -501,7 +512,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(int[] array) {
 		if (array == null) {
@@ -516,7 +528,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(long[] array) {
 		if (array == null) {
@@ -531,7 +544,8 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a hash code based on the contents of the specified array. If {@code array}
-	 * is {@code null}, this method returns 0.
+	 * is {@code
+	 * null}, this method returns 0.
 	 */
 	public static int nullSafeHashCode(short[] array) {
 		if (array == null) {
@@ -609,12 +623,13 @@ public abstract class GutilObject {
 	/**
 	 * Return a content-based String representation if {@code obj} is not {@code null};
 	 * otherwise returns an empty String.
+	 *
 	 * <p>
-	 * Differs from {@link #nullSafeToString(Object)} in that it returns an empty String
+	 * Differs from {@link #SafeToString(Object)} in that it returns an empty String
 	 * rather than "null" for a {@code null} value.
 	 * @param obj the object to build a display String for
 	 * @return a display String representation of {@code obj}
-	 * @see #nullSafeToString(Object)
+	 * @see #SafeToString(Object)
 	 */
 	public static String getDisplayString(Object obj) {
 		if (obj == null) {
@@ -625,6 +640,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Determine the class name for the given object.
+	 *
 	 * <p>
 	 * Returns {@code "null"} if {@code obj} is {@code null}.
 	 * @param obj the object to introspect (may be {@code null})
@@ -636,6 +652,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the specified Object.
+	 *
 	 * <p>
 	 * Builds a String representation of the contents in case of an array. Returns
 	 * {@code "null"} if {@code obj} is {@code null}.
@@ -682,6 +699,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -714,6 +732,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -747,6 +766,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -779,6 +799,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -811,6 +832,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -844,6 +866,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -877,6 +900,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -909,6 +933,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -941,6 +966,7 @@ public abstract class GutilObject {
 
 	/**
 	 * Return a String representation of the contents of the specified array.
+	 *
 	 * <p>
 	 * The String representation consists of a list of the array's elements, enclosed in
 	 * curly braces ({@code "{}"}). Adjacent elements are separated by the characters
@@ -974,10 +1000,11 @@ public abstract class GutilObject {
 	/**
 	 * 比较两个对象是否相等，此方法是 {@link #equal(Object, Object)}的别名方法。<br>
 	 * 相同的条件有两个，满足其一即可：<br>
+	 *
 	 * <ol>
-	 * <li>obj1 == null &amp;&amp; obj2 == null</li>
-	 * <li>obj1.equals(obj2)</li>
-	 * <li>如果是BigDecimal比较，0 == obj1.compareTo(obj2)</li>
+	 * <li>obj1 == null &amp;&amp; obj2 == null
+	 * <li>obj1.equals(obj2)
+	 * <li>如果是BigDecimal比较，0 == obj1.compareTo(obj2)
 	 * </ol>
 	 * @param obj1 对象1
 	 * @param obj2 对象2
@@ -992,10 +1019,11 @@ public abstract class GutilObject {
 	/**
 	 * 比较两个对象是否相等。<br>
 	 * 相同的条件有两个，满足其一即可：<br>
+	 *
 	 * <ol>
-	 * <li>obj1 == null &amp;&amp; obj2 == null</li>
-	 * <li>obj1.equals(obj2)</li>
-	 * <li>如果是BigDecimal比较，0 == obj1.compareTo(obj2)</li>
+	 * <li>obj1 == null &amp;&amp; obj2 == null
+	 * <li>obj1.equals(obj2)
+	 * <li>如果是BigDecimal比较，0 == obj1.compareTo(obj2)
 	 * </ol>
 	 * @param obj1 对象1
 	 * @param obj2 对象2
@@ -1023,12 +1051,13 @@ public abstract class GutilObject {
 	/**
 	 * 计算对象长度，如果是字符串调用其length函数，集合类调用其size函数，数组调用其length属性，其他可遍历对象遍历计算长度<br>
 	 * 支持的类型包括：
+	 *
 	 * <ul>
-	 * <li>CharSequence</li>
-	 * <li>Map</li>
-	 * <li>Iterator</li>
-	 * <li>Enumeration</li>
-	 * <li>Array</li>
+	 * <li>CharSequence
+	 * <li>Map
+	 * <li>Iterator
+	 * <li>Enumeration
+	 * <li>Array
 	 * </ul>
 	 * @param obj 被计算长度的对象
 	 * @return 长度
@@ -1075,13 +1104,14 @@ public abstract class GutilObject {
 	/**
 	 * 对象中是否包含元素<br>
 	 * 支持的对象类型包括：
+	 *
 	 * <ul>
-	 * <li>String</li>
-	 * <li>Collection</li>
-	 * <li>Map</li>
-	 * <li>Iterator</li>
-	 * <li>Enumeration</li>
-	 * <li>Array</li>
+	 * <li>String
+	 * <li>Collection
+	 * <li>Map
+	 * <li>Iterator
+	 * <li>Enumeration
+	 * <li>Array
 	 * </ul>
 	 * @param obj 对象
 	 * @param element 元素
@@ -1163,7 +1193,9 @@ public abstract class GutilObject {
 	}
 
 	/**
-	 * 判断指定对象是否为空，支持： 使用spring 的isEmpty <pre>
+	 * 判断指定对象是否为空，支持： 使用spring 的isEmpty
+	 *
+	 * <pre>
 	 * 1. CharSequence
 	 * 2. Map
 	 * 3. Iterable
@@ -1305,7 +1337,7 @@ public abstract class GutilObject {
 	 * @param <T> 对象类型
 	 * @param obj 被克隆对象
 	 * @return 克隆后的对象
-	 *
+	 * <p>
 	 * public static <T> T clone(T obj) { T result = gtcArrayUtil.clone(obj); if (null ==
 	 * result) { if (obj instanceof Cloneable) { result = gtcReflectUtil.invoke(obj,
 	 * "clone"); } else { result = cloneByStream(obj); } } return result; }
@@ -1315,7 +1347,7 @@ public abstract class GutilObject {
 	 * @param <T> 对象类型
 	 * @param obj 对象
 	 * @return 克隆后或原对象
-	 *
+	 * <p>
 	 * public static <T> T cloneIfPossible(final T obj) { T clone = null; try { clone =
 	 * clone(obj); } catch (Exception e) { // pass } return clone == null ? obj : clone; }
 	 */
@@ -1325,12 +1357,11 @@ public abstract class GutilObject {
 	 * @param <T> 对象类型
 	 * @param obj 被克隆对象
 	 * @return 克隆后的对象
-	 * @throws UtilException IO异常和ClassNotFoundException封装
-	 *
-	 * @SuppressWarnings("unchecked") public static <T> T cloneByStream(T obj) { if (false
-	 * == (obj instanceof Serializable)) { return null; } final FastByteArrayOutputStream
-	 * byteOut = new FastByteArrayOutputStream(); ObjectOutputStream out = null; try { out
-	 * = new ObjectOutputStream(byteOut); out.writeObject(obj); out.flush(); final
+	 * @throws UtilException IO异常和ClassNotFoundException封装 @SuppressWarnings("unchecked")
+	 * public static <T> T cloneByStream(T obj) { if (false == (obj instanceof
+	 * Serializable)) { return null; } final FastByteArrayOutputStream byteOut = new
+	 * FastByteArrayOutputStream(); ObjectOutputStream out = null; try { out = new
+	 * ObjectOutputStream(byteOut); out.writeObject(obj); out.flush(); final
 	 * ObjectInputStream in = new ObjectInputStream(new
 	 * ByteArrayInputStream(byteOut.toByteArray())); return (T) in.readObject(); } catch
 	 * (Exception e) { throw new UtilException(e); } finally { IoUtil.close(out); } }
@@ -1342,7 +1373,7 @@ public abstract class GutilObject {
 	 * @param <T> 对象类型
 	 * @param obj 要被序列化的对象
 	 * @return 序列化后的字节码
-	 *
+	 * <p>
 	 * public static <T> byte[] serialize(T obj) { if (false == (obj instanceof
 	 * Serializable)) { return null; } final FastByteArrayOutputStream byteOut = new
 	 * FastByteArrayOutputStream(); IoUtil.writeObjects(byteOut, false, (Serializable)
@@ -1355,11 +1386,10 @@ public abstract class GutilObject {
 	 *
 	 * <p>
 	 * 注意！！！ 此方法不会检查反序列化安全，可能存在反序列化漏洞风险！！！
-	 * </p>
 	 * @param <T> 对象类型
 	 * @param bytes 反序列化的字节码
 	 * @return 反序列化后的对象
-	 *
+	 * <p>
 	 * public static <T> T deserialize(byte[] bytes) { return IoUtil.readObj(new
 	 * ByteArrayInputStream(bytes)); }
 	 */
@@ -1369,7 +1399,7 @@ public abstract class GutilObject {
 	 * @param object 被检查对象
 	 * @return 是否为基本类型
 	 * @see ClassUtil#isBasicType(Class)
-	 *
+	 * <p>
 	 * public static boolean isBasicType(Object object) { return
 	 * gtcClassUtil.isBasicType(object.getClass()); }
 	 */
@@ -1396,7 +1426,7 @@ public abstract class GutilObject {
 	 * @return 比较结果，如果c1 &lt; c2，返回数小于0，c1==c2返回0，c1 &gt; c2 大于0
 	 * @see java.util.Comparator#compare(Object, Object)
 	 * @since 3.0.7
-	 *
+	 * <p>
 	 * public static <T extends Comparable<? super T>> int compare(T c1, T c2) { return
 	 * CompareUtil.compare(c1, c2); }
 	 */
@@ -1410,7 +1440,7 @@ public abstract class GutilObject {
 	 * @return 比较结果，如果c1 &lt; c2，返回数小于0，c1==c2返回0，c1 &gt; c2 大于0
 	 * @see java.util.Comparator#compare(Object, Object)
 	 * @since 3.0.7
-	 *
+	 * <p>
 	 * public static <T extends Comparable<? super T>> int compare(T c1, T c2, boolean
 	 * nullGreater) { return CompareUtil.compare(c1, c2, nullGreater); }
 	 */
@@ -1420,7 +1450,7 @@ public abstract class GutilObject {
 	 * @param obj 被检查的对象
 	 * @return {@link Class}
 	 * @since 3.0.8
-	 *
+	 * <p>
 	 * public static Class<?> getTypeArgument(Object obj) { return getTypeArgument(obj,
 	 * 0); }
 	 */
@@ -1431,23 +1461,25 @@ public abstract class GutilObject {
 	 * @param index 泛型类型的索引号，即第几个泛型类型
 	 * @return {@link Class}
 	 * @since 3.0.8
-	 *
+	 * <p>
 	 * public static Class<?> getTypeArgument(Object obj, int index) { return
 	 * gtcClassUtil.getTypeArgument(obj.getClass(), index); }
 	 */
 	/**
 	 * 将Object转为String<br>
-	 * 策略为： <pre>
+	 * 策略为：
+	 *
+	 * <pre>
 	 *  1、null转为"null"
 	 *  2、调用Convert.toStr(Object)转换
 	 * </pre>
 	 * @param obj Bean对象
 	 * @return Bean所有字段转为Map后的字符串
 	 * @since 3.2.0
-	 *
+	 * <p>
 	 * public static String toString(Object obj) { if (null == obj) { return
 	 * gtcStrUtil.NULL; } if (obj instanceof Map) { return obj.toString(); }
-	 *
+	 * <p>
 	 * return Convert.toStr(obj); }
 	 */
 
@@ -1455,14 +1487,14 @@ public abstract class GutilObject {
 	 * 存在多少个{@code null}或空对象，通过{@link ObjectUtil#isEmpty(Object)} 判断元素
 	 * @param objs 被检查的对象,一个或者多个
 	 * @return 存在{@code null}的数量
-	 *
+	 * <p>
 	 * public static int emptyCount(Object... objs) { return ArrayUtil.emptyCount(objs); }
 	 */
 	/**
 	 * 是否存在{@code null}或空对象，通过{@link ObjectUtil#isEmpty(Object)} 判断元素
 	 * @param objs 被检查对象
 	 * @return 是否存在
-	 *
+	 * <p>
 	 * public static boolean hasEmpty(Object... objs) { return
 	 * gtcArrayUtil.hasEmpty(objs); }
 	 */
@@ -1470,7 +1502,7 @@ public abstract class GutilObject {
 	 * 是否全都为{@code null}或空对象，通过{@link ObjectUtil#isEmpty(Object)} 判断元素
 	 * @param objs 被检查的对象,一个或者多个
 	 * @return 是否都为空
-	 *
+	 * <p>
 	 * public static boolean isAllEmpty(Object... objs) { return
 	 * gtcArrayUtil.isAllEmpty(objs); }
 	 */
@@ -1479,7 +1511,7 @@ public abstract class GutilObject {
 	 * 是否全都不为{@code null}或空对象，通过{@link ObjectUtil#isEmpty(Object)} 判断元素
 	 * @param objs 被检查的对象,一个或者多个
 	 * @return 是否都不为空
-	 *
+	 * <p>
 	 * public static boolean isAllNotEmpty(Object... objs) { return
 	 * gtcArrayUtil.isAllNotEmpty(objs); }
 	 */

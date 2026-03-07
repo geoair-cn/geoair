@@ -111,6 +111,92 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
 		}
 	}
 
+	@Override
+	public Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer) {
+		// 重置迭代器，确保每次获取迭代器都是从第一条数据开始
+		resetIterator();
+
+		return new Iterator<GirAdvOneRow>() {
+			// 标记迭代器是否已关闭，防止重复关闭
+			private boolean closed = false;
+
+			@Override
+			public boolean hasNext() {
+				// 已关闭则直接返回false
+				if (closed) {
+					return false;
+				}
+				try {
+					return featureIterator != null && featureIterator.hasNext();
+				}
+				catch (Exception e) {
+					if (exceptionConsumer != null) {
+						exceptionConsumer.accept(e);
+					}
+					else {
+						throw new RuntimeException("检查GeoJSON是否有下一条数据失败", e);
+					}
+					return false;
+				}
+			}
+
+			@Override
+			public GirAdvOneRow next() {
+				if (closed) {
+					throw new NoSuchElementException("迭代器已关闭，无法获取下一条数据");
+				}
+				try {
+					// 复用已有的readOneRow逻辑，保证数据处理逻辑一致
+					GirAdvOneRow oneRow = readOneRow(exceptionConsumer);
+					// 如果没有下一条数据了，自动关闭迭代器
+					if (oneRow == null) {
+						closeIterator();
+						throw new NoSuchElementException("已无更多GeoJSON数据");
+					}
+					return oneRow;
+				}
+				catch (NoSuchElementException e) {
+					// 正常的无数据异常直接抛出
+					throw e;
+				}
+				catch (Exception e) {
+					if (exceptionConsumer != null) {
+						exceptionConsumer.accept(e);
+						// 异常时关闭迭代器
+						closeIterator();
+						return null;
+					}
+					else {
+						closeIterator();
+						throw new RuntimeException("读取GeoJSON下一条数据失败", e);
+					}
+				}
+			}
+
+			// 重写remove方法，GeoJSON只读，不支持删除
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException("GeoJSON文件为只读模式，不支持删除操作");
+			}
+
+			// 迭代器结束时关闭资源
+			@Override
+			protected void finalize() throws Throwable {
+				closeIterator();
+				super.finalize();
+			}
+
+			// 关闭迭代器的私有方法
+			private void closeIterator() {
+				if (!closed && featureIterator != null) {
+					featureIterator.close();
+					closed = true;
+					currentRow.set(0);
+				}
+			}
+		};
+	}
+
 	/**
 	 * 读取分页数据（逻辑不变）
 	 */

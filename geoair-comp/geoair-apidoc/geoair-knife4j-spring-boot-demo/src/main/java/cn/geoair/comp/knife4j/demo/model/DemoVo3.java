@@ -9,10 +9,10 @@ package cn.geoair.comp.knife4j.demo.model;
  * @author zhangjun
  * @date 2022-08-17
  */
-//@ApiModel(value = "测试demoDemoVo3")
+// @ApiModel(value = "测试demoDemoVo3")
 public class DemoVo3 {
 
-//	@ApiModelProperty(value = "String 变量")
+	// @ApiModelProperty(value = "String 变量")
 	private String var1;
 
 	public String getVar1() {

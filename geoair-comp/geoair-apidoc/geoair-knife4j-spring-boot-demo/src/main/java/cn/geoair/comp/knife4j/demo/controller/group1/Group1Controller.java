@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @GaApi(tags = "分组1第一个 22控制器")
-//@Api(tags = "分组1第一个 控制器")
+// @Api(tags = "分组1第一个 控制器")
 public class Group1Controller {
 
 	// @PostMapping("/demo3post")

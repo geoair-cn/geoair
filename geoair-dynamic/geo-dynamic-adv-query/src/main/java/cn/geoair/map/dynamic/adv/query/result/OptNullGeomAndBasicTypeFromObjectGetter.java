@@ -112,6 +112,9 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter extends OptNullBasicTyp
 	default Geometry getGeometry(String key) {
 		Object value = getObj(key);
 		Geometry jtsGeom = null;
+		if (value instanceof Geometry) {
+			jtsGeom = (Geometry) value;
+		}
 		if (value instanceof String) {
 			try {
 				value = JSONObject.parseObject(key); // 判断是否为geojson字符串

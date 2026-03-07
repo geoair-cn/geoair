@@ -57,7 +57,7 @@ public class ${ClassName}Controller {
              */
             @GaApiAction(text = "新增${tableComment}")
             @PostMapping("/add${ClassName}")
-            public GiResult<${ClassName}Po> add${ClassName}(@Validated @RequestBody ${ClassName}AddVo param) {
+            public GiResult<${ClassName}DetailVo> add${ClassName}(@Validated @RequestBody ${ClassName}AddVo param) {
                 // 转换为PO
                     ${ClassName}Po record = new ${ClassName}Po();
                 BeanUtils.copyProperties(param, record);
@@ -68,7 +68,7 @@ public class ${ClassName}Controller {
                 // 调用Service
                     ${ClassName}Po result = ${className}Service.add(record);
 
-                return GiResult.successValue(result)
+                return GiResult.successValue(${ClassName}DetailVo.fromPo(result))
                         .andAlertMsg("操作成功")
                         .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
             }
@@ -78,7 +78,7 @@ public class ${ClassName}Controller {
              */
             @GaApiAction(text = "修改${tableComment}")
             @PostMapping("/update${ClassName}")
-            public GiResult<${ClassName}Po> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
+            public GiResult<${ClassName}DetailVo> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
                 // 转换为PO
                     ${ClassName}Po record = new ${ClassName}Po();
                 BeanUtils.copyProperties(param, record);
@@ -86,7 +86,7 @@ public class ${ClassName}Controller {
                 // 调用Service
                     ${ClassName}Po result = ${className}Service.update(record);
 
-                return GiResult.successValue(result)
+                return GiResult.successValue(${ClassName}DetailVo.fromPo(result))
                         .andAlertMsg("操作成功")
                         .andAlertTypeEnum(GirEmAlertType.无需关闭的提示1);
             }

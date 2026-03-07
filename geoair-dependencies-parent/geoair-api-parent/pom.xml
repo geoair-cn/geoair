@@ -18,6 +18,7 @@
 
     <properties>
         <skipTests>true</skipTests>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>

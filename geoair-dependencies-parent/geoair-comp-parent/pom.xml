@@ -16,6 +16,7 @@
     <packaging>pom</packaging>
     <description>geoair-component-parent</description>
 
+
     <url>https://gitee.com/geoair/geoair-dependencies</url>
 
     <licenses>
@@ -40,8 +41,10 @@
         <url>https://gitee.com/geoair/geoair-dependencies</url>
         <tag>HEAD</tag>
     </scm>
+
     <properties>
         <skipTests>true</skipTests>
+        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
     </properties>
 
     <dependencyManagement>
@@ -56,7 +59,14 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies></dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair.dependencies</groupId>
+            <artifactId>geoair-project-parent</artifactId>
+            <version>${geoair.version}</version>
+            <type>pom</type>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>

@@ -10,7 +10,7 @@ import java.util.Set;
  * 数据删除相关的基础操作接口
  * <p>
  * 覆盖单条删除、批量删除、自定义SQL删除、条件删除、逻辑删除、防误删保护等全场景， 适配PostgreSQL/MySQL等主流数据库，兼顾性能与数据安全
-
+ *
  */
 public interface IAdvBaseDeleteOpt {
 

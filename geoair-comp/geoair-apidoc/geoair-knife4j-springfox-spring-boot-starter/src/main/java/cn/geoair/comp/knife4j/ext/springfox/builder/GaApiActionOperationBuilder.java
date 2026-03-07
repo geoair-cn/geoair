@@ -26,27 +26,27 @@ import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGE
 @Order(value = SWAGGER_PLUGIN_ORDER)
 public class GaApiActionOperationBuilder implements OperationBuilderPlugin {
 
-    @Override
-    public void apply(OperationContext context) {
-        List<ApiOperation> list = context.findAllAnnotations(ApiOperation.class);
-        if (list.isEmpty()) {
-            List<GaApiAction> explainList = context.findAllAnnotations(GaApiAction.class);
-            if (!explainList.isEmpty()) {
-                Optional<GaApi> controllerAnnotation = context.findControllerAnnotation(GaApi.class);
-                GaApiAction explain = explainList.get(0);
-                context.operationBuilder().summary(explain.text());// 替换默认值
-                if (controllerAnnotation.isPresent()) {
-                    GaApi gaApi = controllerAnnotation.get();
-                    context.operationBuilder().tags(Arrays.asList(gaApi.tags()).stream().collect(Collectors.toSet()));
-                }
-            }
-        }
+	@Override
+	public void apply(OperationContext context) {
+		List<ApiOperation> list = context.findAllAnnotations(ApiOperation.class);
+		if (list.isEmpty()) {
+			List<GaApiAction> explainList = context.findAllAnnotations(GaApiAction.class);
+			if (!explainList.isEmpty()) {
+				Optional<GaApi> controllerAnnotation = context.findControllerAnnotation(GaApi.class);
+				GaApiAction explain = explainList.get(0);
+				context.operationBuilder().summary(explain.text());// 替换默认值
+				if (controllerAnnotation.isPresent()) {
+					GaApi gaApi = controllerAnnotation.get();
+					context.operationBuilder().tags(Arrays.asList(gaApi.tags()).stream().collect(Collectors.toSet()));
+				}
+			}
+		}
 
-    }
+	}
 
-    @Override
-    public boolean supports(DocumentationType delimiter) {
-        return true;
-    }
+	@Override
+	public boolean supports(DocumentationType delimiter) {
+		return true;
+	}
 
 }

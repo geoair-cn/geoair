@@ -34,7 +34,7 @@
         <dom4j.version>1.6.1</dom4j.version>
 
 
-<!--        <mapstruct.version>1.4.2.Final</mapstruct.version>-->
+        <!--        <mapstruct.version>1.4.2.Final</mapstruct.version>-->
         <mapstruct.version>1.5.5.Final</mapstruct.version>
 
 
@@ -42,6 +42,7 @@
         <druid.version>1.2.23</druid.version>
         <mapper-module.version>4.2.0</mapper-module.version>
         <geotools.version>28.6.1</geotools.version>
+        <geoserver.version>2.22.6</geoserver.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <hutool.version>5.8.42</hutool.version>
         <jts.version>1.19.0</jts.version>
@@ -78,7 +79,6 @@
         <hibernate.version>5.6.15.Final</hibernate.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
         <servlet-api.version>4.0.1</servlet-api.version>
-
 
 
         <springfox.version>3.0.0</springfox.version>
