@@ -1,41 +1,80 @@
-# GeoAir Dependencies 父工程
+
+
+# GeoAir API Components
 
 ## 项目简介
 
-GeoAir Dependencies 是一个用于管理 GeoAir 项目依赖的父工程。它统一定义了所有子模块的版本依赖，确保整个项目的技术栈版本一致性，简化依赖管理流程。
+GeoAir API Components 是一个用于 API 文档自动生成的组件库，提供了对 Swagger/Knife4j 的深度集成支持。该项目包含两个主要的 Starter 模块，分别支持传统的 Swagger 2 和现代的 SpringDoc OpenAPI 3 规范。
 
 ## 项目结构
 
-geoair-dependencies/
-├── pom.xml                 # 父工程 POM 文件，定义统一依赖版本
-├── README.md              # 项目说明文档
-└── src/
-    └── main/
-        └── resources/
-            └── application.yml  # 全局配置文件
+```
+geoair-comp/
+├── geoair-apidoc/
+│   ├── geoair-knife4j-core/                           # Swagger 2 + Knife4j 集成核心模块
+│   │   ├── src/main/java/cn/geoair/comp/knife4j/ext/
+│   │   │   ├── auto/AutoApiConfig.java                # 自动配置类
+│   │   │   ├── config/                                 # 配置属性类
+│   │   │   │   ├── GirSwaggerApiConfig.java           # API配置接口
+│   │   │   │   └── GirSwaggerProperties.java          # 配置属性
+│   │   │   └── model/                                  # 数据模型
+│   │   │       ├── ApiModelInfo.java                  # API模型信息
+│   │   │       └── DocketInfo.java                     # 分组配置信息
+│   │   └── pom.xml
+│   │
+│   ├── geoair-knife4j-springdoc-spring-boot-starter/  # SpringDoc OpenAPI 3 + Knife4j 集成
+│   │   ├── src/main/java/cn/geoair/comp/knife4j/ext/springdoc/
+│   │   │   ├── auto/                                   # 自动配置
+│   │   │   │   └── SpringDocApiRunner.java            # 启动运行器
+│   │   │   ├── builder/                                # 构建器
+│   │   │   │   ├── GaModelFieldConverter.java         # 模型字段转换器
+│   │   │   │   ├── GiResultModelConverter.java        # 结果模型转换器
+│   │   │   │   ├── GiResultOperationConfig.java        # 操作配置
+│   │   │   │   └── SpringDocCustomConfig.java         # 自定义配置
+│   │   │   └── controller/                             # 控制器
+│   │   │       └── GroupedApiDocsController.java       # 分组API文档控制器
+│   │   ├── src/main/resources/static/                  # 静态资源
+│   │   │   └── gtcapi/                                 # 前端资源
+│   │   └── pom.xml
+│   │
+│   └── geoair-knife4j-spring-boot-demo/               # 演示项目
+│       ├── src/main/java/cn/geoair/comp/knife4j/demo/
+│       │   ├── config/Swagger2Configuration.java       # 配置示例
+│       │   ├── controller/                              # 控制器示例
+│       │   │   ├── group1/                             # 分组1
+│       │   │   └── group2/                             # 分组2
+│       │   └── model/                                  # 模型示例
+│       └── pom.xml
+│
+└── pom.xml
+```
 
 ## 核心功能
 
-- **统一依赖管理**：集中管理所有第三方库的版本号
-- **版本锁定**：避免子模块间依赖版本冲突
-- **快速集成**：子模块只需继承即可获得完整的依赖配置
-- **环境隔离**：支持多环境配置管理
+### geoair-knife4j-core
+- **自动扫描包路径**：自动扫描 Controller 所在的根包
+- **分组支持**：支持按包路径自动分组 API 文档
+- **自定义配置**：提供灵活的配置属性自定义
+- **Spring Boot 自动装配**：支持 Spring Boot Starter 自动配置
+
+### geoair-knife4j-springdoc-spring-boot-starter
+- **SpringDoc OpenAPI 3 支持**：基于 SpringDoc 生成 OpenAPI 3 规范的文档
+- **Knife4j 前端集成**：提供 Knife4j 增强的前端界面
+- **分组 API 文档**：支持多分组文档展示
+- **自定义模型转换**：支持自定义响应模型转换
+- **操作定制**：支持自定义操作行为
 
 ## 技术栈
 
-- **构建工具**：Maven 3.6+
 - **Java 版本**：JDK 8+
-- **核心框架**：
+- **构建工具**：Maven 3.6+
+- **主要框架**：
   - Spring Boot 2.7.x
-  - Spring Cloud 2021.x
-  - MyBatis Plus 3.5.x
-- **数据库**：
-  - MySQL 8.0
-  - Redis 6.0
-- **其他组件**：
-  - Nacos 2.0（服务注册发现）
-  - Sentinel（流量控制）
-  - RocketMQ（消息队列）
+  - SpringDoc OpenAPI 3
+  - Knife4j 4.x
+- **API 规范**：
+  - OpenAPI 3 (SpringDoc)
+  - Swagger 2 (传统)
 
 ## 快速开始
 
@@ -43,138 +82,118 @@ geoair-dependencies/
 
 - JDK 8 或更高版本
 - Maven 3.6 或更高版本
-- Git
 
-### 构建项目
+### 引入依赖
 
-# 克隆项目
-git clone https://gitee.com/your-account/geoair-dependencies.git
-
-# 进入项目目录
-cd geoair-dependencies
-
-# 编译打包
-mvn clean install
-
-### 使用方式
-
-在子模块的 `pom.xml` 中继承父工程：
-
-<parent>
-    <groupId>com.geoair</groupId>
-    <artifactId>geoair-dependencies</artifactId>
+**SpringDoc 版本 (推荐)**：
+```xml
+<dependency>
+    <groupId>cn.geoair.comp</groupId>
+    <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
     <version>1.0.0</version>
-    <relativePath/>
-</parent>
+</dependency>
+```
 
-## 配置说明
+**Swagger 2 版本**：
+```xml
+<dependency>
+    <groupId>cn.geoair.comp</groupId>
+    <artifactId>geoair-knife4j-core</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
 
-### 版本管理
+### 配置说明
 
-父工程通过 `<dependencyManagement>` 统一管理所有依赖版本：
+在 `application.yml` 中添加配置：
 
-<dependencyManagement>
-    <dependencies>
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-dependencies</artifactId>
-            <version>${spring-boot.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-        
-        <!-- 自定义依赖 -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
+```yaml
+geoair:
+  apidoc:
+    enable: true
+    title: API 文档标题
+    version: 1.0.0
+    author: 作者
+    description: API 描述信息
+    controller-root-package: com.example.demo.controller
+```
 
-### 属性配置
+### 自定义配置
 
-主要版本属性定义在 `<properties>` 节点中：
+实现 `GirSwaggerApiConfig` 接口进行自定义配置：
 
-<properties>
-    <java.version>1.8</java.version>
-    <spring-boot.version>2.7.15</spring-boot.version>
-    <spring-cloud.version>2021.0.8</spring-cloud.version>
-    <mybatis-plus.version>3.5.4</mybatis-plus.version>
-</properties>
+```java
+@Configuration
+public class Swagger2Configuration implements GirSwaggerApiConfig {
+    
+    @Override
+    public List<DocketInfo> getDocketInfos() {
+        // 返回分组配置列表
+    }
+    
+    @Override
+    public ApiModelInfo getApiModelInfo() {
+        // 返回API基本信息
+    }
+}
+```
 
-## 模块依赖关系
+## 使用示例
 
-geoair-dependencies (父工程)
-├── geoair-common          # 公共工具模块
-├── geoair-gateway         # 网关服务
-├── geoair-auth            # 认证授权服务
-├── geoair-system          # 系统管理服务
-└── geoair-business        # 业务服务模块
+### 控制器注解
 
-## 开发规范
+```java
+@Controller
+@GaApi(tags = "用户管理")
+public class UserController {
+    
+    @PostMapping("/user")
+    @ResponseBody
+    @GaApiAction(text = "创建用户")
+    public GiResult<UserVo> createUser(@RequestBody UserVo user) {
+        // ...
+    }
+}
+```
 
-### 代码规范
+### 模型注解
 
-- 遵循阿里巴巴 Java 开发手册
-- 使用统一的代码格式化模板
-- 所有公共方法必须添加 JavaDoc 注释
+```java
+@GaModel(text = "用户信息")
+public class UserVo {
+    
+    @GaModelField(text = "用户名")
+    private String username;
+    
+    @GaModelField(text = "邮箱")
+    private String email;
+}
+```
 
-### 提交规范
+## 访问文档
 
-采用 conventional commit 规范：
+启动应用后，访问以下地址查看 API 文档：
 
-<type>(<scope>): <subject>
+- Knife4j 界面：`http://localhost:8080/doc.html`
+- Swagger 原始文档：`http://localhost:8080/swagger-ui.html`
+- OpenAPI 3 规范：`http://localhost:8080/v3/api-docs`
 
-<body>
+## 模块说明
 
-<footer>
-
-常用 type 类型：
-- feat: 新功能
-- fix: 修复 bug
-- docs: 文档更新
-- style: 代码格式调整
-- refactor: 重构
-- test: 测试相关
-- chore: 构建过程或辅助工具变动
-
-### 分支管理
-
-- `main`: 主分支，生产环境代码
-- `develop`: 开发分支
-- `feature/*`: 功能开发分支
-- `hotfix/*`: 紧急修复分支
-- `release/*`: 发布分支
-
-## 常见问题
-
-### Q: 如何添加新的依赖？
-
-A: 在父工程的 `pom.xml` 中的 `<dependencyManagement>` 节点添加相应依赖，子模块中直接引用即可。
-
-### Q: 版本冲突如何解决？
-
-A: 检查是否有多个版本的同一依赖，统一在父工程中指定版本号。
-
-### Q: 如何升级 Spring Boot 版本？
-
-A: 修改 `pom.xml` 中的 `spring-boot.version` 属性值，同时检查兼容性。
+| 模块 | 说明 |
+|------|------|
+| geoair-knife4j-core | Swagger 2 + Knife4j 集成核心 |
+| geoair-knife4j-springdoc-spring-boot-starter | SpringDoc OpenAPI 3 + Knife4j 集成 |
+| geoair-knife4j-spring-boot-demo | 演示项目 |
 
 ## 贡献指南
 
 1. Fork 本仓库
-2. 创建 feature 分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改
+4. 推送到分支
 5. 开启 Pull Request
 
 ## 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
- 
-
----
-*最后更新时间: 2024年*
