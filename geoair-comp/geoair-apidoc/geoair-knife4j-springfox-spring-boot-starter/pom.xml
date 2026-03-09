@@ -60,24 +60,6 @@
             <version>${geoair.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.comp.apidoc</groupId>
-            <artifactId>geoair-knife4j-core</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-
-        <dependency>
-            <artifactId>springfox-swagger2</artifactId>
-            <groupId>io.springfox</groupId>
-            <version>${springfox.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-spring-web</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
@@ -90,6 +72,26 @@
         <!--            <artifactId>spring-boot-actuator-autoconfigure</artifactId>-->
         <!--            <version>${spring-boot.version}</version>-->
         <!--        </dependency>-->
+        <dependency>
+            <groupId>cn.geoair.comp.apidoc</groupId>
+            <artifactId>geoair-knife4j-core</artifactId>
+            <version>${geoair.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <artifactId>springfox-swagger2</artifactId>
+            <groupId>io.springfox</groupId>
+            <version>${springfox.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-spring-web</artifactId>
+            <version>${springfox.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
