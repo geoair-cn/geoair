@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.geoair.map.dynamic.dbservice.mapper.dbapi.DbApiConfigMapper">
+
+    <sql id="tableName">
+        dbapi_config
+    </sql>
+    <sql id="condition">
+        <if test="param.id != null and param.id != ''">
+            AND dbapi_config.id = #{param.id}
+        </if>
+        <if test="param.name != null and param.name != ''">
+            AND dbapi_config.name = #{param.name}
+        </if>
+        <if test="param.note != null and param.note != ''">
+            AND dbapi_config.note = #{param.note}
+        </if>
+        <if test="param.path != null and param.path != ''">
+            AND dbapi_config.path = #{param.path}
+        </if>
+        <if test="param.params != null and param.params != ''">
+            AND dbapi_config.params = #{param.params}
+        </if>
+        <if test="param.jsonParam != null and param.jsonParam != ''">
+            AND dbapi_config.json_param = #{param.jsonParam}
+        </if>
+        <if test="param.status != null">
+            AND dbapi_config.status = #{param.status}
+        </if>
+        <if test="param.access != null">
+            AND dbapi_config.access = #{param.access}
+        </if>
+        <if test="param.groupId != null and param.groupId != ''">
+            AND dbapi_config.group_id = #{param.groupId}
+        </if>
+        <if test="param.contentType != null and param.contentType != ''">
+            AND dbapi_config.content_type = #{param.contentType}
+        </if>
+        <if test="param.task != null and param.task != ''">
+            AND dbapi_config.task = #{param.task}
+        </if>
+        <if test="param.createUserId != null and param.createUserId != ''">
+            AND dbapi_config.create_user_id = #{param.createUserId}
+        </if>
+        <if test="param.createTime != null and param.createTime != ''">
+            AND dbapi_config.create_time = #{param.createTime}
+        </if>
+        <if test="param.updateTime != null and param.updateTime != ''">
+            AND dbapi_config.update_time = #{param.updateTime}
+        </if>
+        <if test="param.delIs != null and param.delIs != ''">
+            AND dbapi_config.del_is = #{param.delIs}
+        </if>
+        <if test="param.timeCreate != null">
+            AND dbapi_config.time_create <![CDATA[>=]]>  #{param.timeCreate,jdbcType=TIMESTAMP}
+            AND dbapi_config.time_create <![CDATA[<=]]> date_add(#{param.timeCreate,jdbcType=TIMESTAMP},
+            date_trunc('day', current_date + interval '1 day'))
+        </if>
+        <if test="param.timeUpdate != null">
+            AND dbapi_config.time_update <![CDATA[>=]]>  #{param.timeUpdate,jdbcType=TIMESTAMP}
+            AND dbapi_config.time_update <![CDATA[<=]]> date_add(#{param.timeUpdate,jdbcType=TIMESTAMP},
+            date_trunc('day', current_date + interval '1 day'))
+        </if>
+        <if test="param.nameCreate != null and param.nameCreate != ''">
+            AND dbapi_config.name_create = #{param.nameCreate}
+        </if>
+        <if test="param.nameUpdate != null and param.nameUpdate != ''">
+            AND dbapi_config.name_update = #{param.nameUpdate}
+        </if>
+
+        <if test="param.andQueryContentIn != null and param.andQueryContentIn.length > 0">
+            AND (
+            <foreach collection="param.andQueryContentIn" item="str" index="index">
+                row_to_json(dbapi_config)||'' LIKE '%'|| #{str}||'%' or
+            </foreach>
+            1!=1 )
+        </if>
+
+        <if test="param.andIdsIn != null and param.andIdsIn.length > 0">
+            AND dbapi_config.id IN
+            <foreach collection="param.andIdsIn" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="param.andIdsNotIn != null and param.andIdsNotIn.length > 0 ">
+            AND dbapi_config.id NOT IN
+            <foreach collection="param.andIdsNotIn" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+    </sql>
+
+    <!--   留作备用，不用刻意维护-->
+    <resultMap id="BaseResultMap" type="cn.geoair.map.dynamic.dbservice.model.dbapi.dto.DbApiConfigDto">
+    </resultMap>
+    <sql id="fieldList">
+        dbapi_config
+        .
+        name
+        ,
+                dbapi_config.note,
+                dbapi_config.path,
+                dbapi_config.params,
+                dbapi_config.json_param,
+                dbapi_config.status,
+                dbapi_config.access,
+                dbapi_config.group_id,
+                dbapi_config.content_type,
+                dbapi_config.task,
+                dbapi_config.create_user_id,
+                dbapi_config.create_time,
+                dbapi_config.update_time,
+                dbapi_config.del_is,
+                dbapi_config.time_create,
+                dbapi_config.time_update,
+                dbapi_config.name_create,
+                dbapi_config.name_update,
+                dbapi_config.id
+    </sql>
+
+    <select id="searchList" resultType="cn.geoair.map.dynamic.dbservice.model.dbapi.dto.DbApiConfigDto">
+        SELECT * FROM
+        <include refid="tableName"></include>
+        <where>
+            1 = 1
+            <include refid="condition"></include>
+        </where>
+    </select>
+
+    <select id="selectByPathOnline" parameterType="String"
+            resultType="cn.geoair.map.dynamic.dbservice.model.dbapi.dto.DbApiConfigDto">
+        select *
+        from dbapi_config
+        where path = #{path}
+          and status = 1
+    </select>
+
+    <!-- 多条件搜索API配置 -->
+    <select id="search" resultType="cn.geoair.map.dynamic.dbservice.model.dbapi.dto.DbApiConfigDto">
+        select * from dbapi_config
+        <where>
+            <if test="groupId != null and groupId != ''">
+                group_id = #{groupId}
+            </if>
+            <if test="name != null and name != ''">
+                and name like #{name}
+            </if>
+            <if test="note != null and note != ''">
+                and note like #{note}
+            </if>
+            <if test="path != null and path != ''">
+                and path like #{path}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据路径查询记录数 -->
+    <select id="selectCountByPath" parameterType="String" resultType="Integer">
+        select count(1)
+        from dbapi_config
+        where path = #{path}
+    </select>
+
+    <!-- 更新时根据路径和ID查询记录数 -->
+    <select id="selectCountByPathWhenUpdate" resultType="Integer">
+        select count(1)
+        from dbapi_config
+        where path = #{path}
+          and id != #{id}
+    </select>
+
+    <!-- 根据分组ID查询记录数 -->
+    <select id="selectCountByGroup" parameterType="String" resultType="int">
+        select count(1)
+        from dbapi_config
+        where group_id = #{id}
+    </select>
+
+    <!-- 根据分组ID查询API配置列表 -->
+    <select id="selectByGroup" parameterType="String"
+            resultType="cn.geoair.map.dynamic.dbservice.model.dbapi.dto.DbApiConfigDto">
+        select *
+        from dbapi_config
+        where group_id = #{groupId}
+    </select>
+
+
+</mapper>

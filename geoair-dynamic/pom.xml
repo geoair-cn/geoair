@@ -51,6 +51,7 @@
     <modules>
         <module>geo-dynamic-adv-query</module>
         <module>geo-dynamic-ds</module>
+        <module>geo-dynamic-db-service</module>
         <module>geo-dynamic-mvt</module>
         <module>geo-dynamic-file-tran</module>
         <module>geo-dynamic-tools</module>
