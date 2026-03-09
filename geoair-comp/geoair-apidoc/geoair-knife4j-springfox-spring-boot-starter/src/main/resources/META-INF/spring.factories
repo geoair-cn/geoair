@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  cn.geoair.comp.knife4j.ext.springfox.auto.SpringFoxDocketRunner,\
 cn.geoair.comp.knife4j.ext.springfox.builder.GaModelFieldBuilder,\
 cn.geoair.comp.knife4j.ext.springfox.builder.GirModelProvider,\
 cn.geoair.comp.knife4j.ext.springfox.aspect.GaApiListingAspect,\
