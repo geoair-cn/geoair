@@ -44,9 +44,9 @@ public class Log4Gir {
 
     @GaMethodHandImpl(
             implClass = GirLogger.class,
-            implMethod = "getLogger",
+            implMethod = "getLoger",
             type = ImplType.expectfirst)
-    public static GiLogger getLogger(String name) {
+    public static GiLogger getLoger(String name) {
         switch (logType) {
             case APPACHECOMMONS:
                 return ApacheCommonsLog.createLog(name);
