@@ -153,6 +153,9 @@ public class SystemController {
         Map<String, String> config = MapUtil.newHashMap();
         config.put("baseUrl", baseUrl);
         config.put("byGirServlet", GirServletUtil.getClientIP(request));
+        config.put(
+                "byCurrentContextPath",
+                ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
         config.put("loginPage", "");
         return config;
     }
