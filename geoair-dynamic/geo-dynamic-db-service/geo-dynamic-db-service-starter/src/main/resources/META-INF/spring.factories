@@ -1,3 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 cn.geoair.map.dynamic.dbservice.starter.run.AutoGirDbServiceConfiguration,\
-cn.geoair.map.dynamic.dbservice.starter.run.AutoGirDbServiceLiqiuBaseConfiguration
+cn.geoair.map.dynamic.dbservice.starter.run.AutoGirDbServiceInitTableConfiguration

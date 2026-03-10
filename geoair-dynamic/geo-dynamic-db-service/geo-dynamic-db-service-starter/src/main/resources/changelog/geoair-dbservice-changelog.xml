@@ -8,7 +8,7 @@
 
     <changeSet id="20260310-0001" author="张俊">
         <sql>
-            CREATE TABLE "public"."dsapi_config"
+            CREATE TABLE "dsapi_config"
             (
                 "id"             text COLLATE "pg_catalog"."default" NOT NULL,
                 "name"           text COLLATE "pg_catalog"."default",
@@ -33,74 +33,74 @@
             )
             ;
 
-            ALTER TABLE "public"."dsapi_config"
+            ALTER TABLE "dsapi_config"
                 OWNER TO "postgres";
 
             COMMENT
-            ON COLUMN "public"."dsapi_config"."id" IS '主键';
+            ON COLUMN  "dsapi_config"."id" IS '主键';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."name" IS '名称';
+            ON COLUMN  "dsapi_config"."name" IS '名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."note" IS '备注';
+            ON COLUMN  "dsapi_config"."note" IS '备注';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."path" IS '接口定义的路径';
+            ON COLUMN  "dsapi_config"."path" IS '接口定义的路径';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."params" IS '参数信息';
+            ON COLUMN  "dsapi_config"."params" IS '参数信息';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."json_param" IS '入参信息';
+            ON COLUMN  "dsapi_config"."json_param" IS '入参信息';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."status" IS '状态，停用与否';
+            ON COLUMN  "dsapi_config"."status" IS '状态，停用与否';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."access" IS 'api类型';
+            ON COLUMN  "dsapi_config"."access" IS 'api类型';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."group_id" IS '分组Id';
+            ON COLUMN  "dsapi_config"."group_id" IS '分组Id';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."content_type" IS '请求头';
+            ON COLUMN  "dsapi_config"."content_type" IS '请求头';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."task" IS '该任务信息';
+            ON COLUMN  "dsapi_config"."task" IS '该任务信息';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."create_user_id" IS '创建人Id';
+            ON COLUMN  "dsapi_config"."create_user_id" IS '创建人Id';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."create_time" IS '创建时间';
+            ON COLUMN  "dsapi_config"."create_time" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."update_time" IS '更新时间';
+            ON COLUMN  "dsapi_config"."update_time" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."del_is" IS '是否删除标识';
+            ON COLUMN  "dsapi_config"."del_is" IS '是否删除标识';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."time_create" IS '创建时间';
+            ON COLUMN  "dsapi_config"."time_create" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."time_update" IS '更新时间';
+            ON COLUMN  "dsapi_config"."time_update" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."name_create" IS '创建人名称';
+            ON COLUMN  "dsapi_config"."name_create" IS '创建人名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_config"."name_update" IS '更新人名称';
+            ON COLUMN  "dsapi_config"."name_update" IS '更新人名称';
 
 COMMENT
-            ON TABLE "public"."dsapi_config" IS 'api配置信息';
+            ON TABLE  "dsapi_config" IS 'api配置信息';
         </sql>
     </changeSet>
 
     <changeSet id="20260310-0002" author="张俊">
         <sql>
-            CREATE TABLE "public"."dsapi_datasource"
+            CREATE TABLE "dsapi_datasource"
             (
                 "id"             text COLLATE "pg_catalog"."default" NOT NULL,
                 "name"           text COLLATE "pg_catalog"."default",
@@ -123,68 +123,68 @@ COMMENT
             )
             ;
 
-            ALTER TABLE "public"."dsapi_datasource"
+            ALTER TABLE "dsapi_datasource"
                 OWNER TO "postgres";
 
             COMMENT
-            ON COLUMN "public"."dsapi_datasource"."id" IS '名称';
+            ON COLUMN  "dsapi_datasource"."id" IS '名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."name" IS '名称';
+            ON COLUMN  "dsapi_datasource"."name" IS '名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."note" IS '备注信息';
+            ON COLUMN  "dsapi_datasource"."note" IS '备注信息';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."type" IS '类型';
+            ON COLUMN  "dsapi_datasource"."type" IS '类型';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."url" IS 'jdbcUrl';
+            ON COLUMN  "dsapi_datasource"."url" IS 'jdbcUrl';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."username" IS '用户名';
+            ON COLUMN  "dsapi_datasource"."username" IS '用户名';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."password" IS '密码';
+            ON COLUMN  "dsapi_datasource"."password" IS '密码';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."driver" IS '驱动名称';
+            ON COLUMN  "dsapi_datasource"."driver" IS '驱动名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."table_sql" IS '创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称';
+            ON COLUMN  "dsapi_datasource"."table_sql" IS '创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."create_user_id" IS '创建人';
+            ON COLUMN  "dsapi_datasource"."create_user_id" IS '创建人';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."create_time" IS '创建时间';
+            ON COLUMN  "dsapi_datasource"."create_time" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."update_time" IS '更新时间';
+            ON COLUMN  "dsapi_datasource"."update_time" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."del_is" IS '是否删除标识';
+            ON COLUMN  "dsapi_datasource"."del_is" IS '是否删除标识';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."time_create" IS '创建时间';
+            ON COLUMN  "dsapi_datasource"."time_create" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."time_update" IS '更新时间';
+            ON COLUMN  "dsapi_datasource"."time_update" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."name_create" IS '创建人名称';
+            ON COLUMN  "dsapi_datasource"."name_create" IS '创建人名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_datasource"."name_update" IS '更新人名称';
+            ON COLUMN  "dsapi_datasource"."name_update" IS '更新人名称';
 
 COMMENT
-            ON TABLE "public"."dsapi_datasource" IS '数据源信息';
+            ON TABLE  "dsapi_datasource" IS '数据源信息';
         </sql>
     </changeSet>
 
     <changeSet id="20260310-0003" author="张俊">
         <sql>
-            CREATE TABLE "public"."dsapi_group"
+            CREATE TABLE "dsapi_group"
             (
                 "id"             text COLLATE "pg_catalog"."default" NOT NULL,
                 "name"           text COLLATE "pg_catalog"."default" NOT NULL,
@@ -199,38 +199,38 @@ COMMENT
             )
             ;
 
-            ALTER TABLE "public"."dsapi_group"
+            ALTER TABLE "dsapi_group"
                 OWNER TO "postgres";
 
             COMMENT
-            ON COLUMN "public"."dsapi_group"."id" IS '主键';
+            ON COLUMN  "dsapi_group"."id" IS '主键';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."name" IS '分组名称';
+            ON COLUMN  "dsapi_group"."name" IS '分组名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."create_user_id" IS '创建人Id';
+            ON COLUMN  "dsapi_group"."create_user_id" IS '创建人Id';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."create_time" IS '创建时间';
+            ON COLUMN  "dsapi_group"."create_time" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."update_time" IS '更新时间';
+            ON COLUMN  "dsapi_group"."update_time" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."time_create" IS '创建时间';
+            ON COLUMN  "dsapi_group"."time_create" IS '创建时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."time_update" IS '更新时间';
+            ON COLUMN  "dsapi_group"."time_update" IS '更新时间';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."name_create" IS '创建人名称';
+            ON COLUMN  "dsapi_group"."name_create" IS '创建人名称';
 
 COMMENT
-            ON COLUMN "public"."dsapi_group"."name_update" IS '更新人名称';
+            ON COLUMN  "dsapi_group"."name_update" IS '更新人名称';
 
 COMMENT
-            ON TABLE "public"."dsapi_group" IS 'api分组信息';
+            ON TABLE  "dsapi_group" IS 'api分组信息';
         </sql>
     </changeSet>
 

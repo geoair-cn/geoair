@@ -4,7 +4,7 @@ import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.map.dynamic.dbservice.core.DsApiUserInfoHelper;
 import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
-import cn.geoair.map.dynamic.dbservice.core.basic.service.DataSourceService;
+import cn.geoair.map.dynamic.dbservice.core.basic.service.DsDataSourceService;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.JdbcUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
 import cn.hutool.core.io.IoUtil;
@@ -41,106 +41,100 @@ import javax.servlet.http.HttpServletResponse;
 @GaApi(tags = "数据源相关")
 public class DataSourceController {
 
-	@Autowired
-	DataSourceService dataSourceService;
+    @Autowired DsDataSourceService dsDataSourceService;
 
-	@Resource
-	DsApiUserInfoHelper dsApiUserInfoHelper;
+    @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
-	@RequestMapping("/add")
-	@GaApiAction(text = "新增数据源")
-	public void add(DataSourceApo dataSourceApo) {
-		dataSourceApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
-		dataSourceService.add(dataSourceApo);
-	}
+    @RequestMapping("/add")
+    @GaApiAction(text = "新增数据源")
+    public void add(DataSourceApo dataSourceApo) {
+        dataSourceApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
+        dsDataSourceService.add(dataSourceApo);
+    }
 
-	@PostMapping("/getAll")
-	@GaApiAction(text = "获取所有数据源")
-	public List<DataSourceApo> getAll() {
-		return dataSourceService.getAll();
-	}
+    @PostMapping("/getAll")
+    @GaApiAction(text = "获取所有数据源")
+    public List<DataSourceApo> getAll() {
+        return dsDataSourceService.getAll();
+    }
 
-	@GetMapping("/detail/{id}")
-	@GaApiAction(text = "更新API分组信息")
-	public DataSourceApo detail(@PathVariable String id) {
-		return dataSourceService.detail(id);
-	}
+    @GetMapping("/detail/{id}")
+    @GaApiAction(text = "更新API分组信息")
+    public DataSourceApo detail(@PathVariable String id) {
+        return dsDataSourceService.detail(id);
+    }
 
-	@PostMapping("/delete/{id}")
-	@GaApiAction(text = "删除数据源")
-	public ResponseDto delete(@PathVariable String id) {
-		return dataSourceService.delete(id);
-	}
+    @PostMapping("/delete/{id}")
+    @GaApiAction(text = "删除数据源")
+    public ResponseDto delete(@PathVariable String id) {
+        return dsDataSourceService.delete(id);
+    }
 
-	@PostMapping("/update")
-	@GaApiAction(text = "更新数据源")
-	public DataSourceApo update(DataSourceApo dataSourceApo) {
-		dataSourceService.update(dataSourceApo);
-		return null;
-	}
+    @PostMapping("/update")
+    @GaApiAction(text = "更新数据源")
+    public DataSourceApo update(DataSourceApo dataSourceApo) {
+        dsDataSourceService.update(dataSourceApo);
+        return null;
+    }
 
-	@PostMapping("/connect")
-	@GaApiAction(text = "测试连接")
-	public ResponseDto connect(DataSourceApo dataSourceApo) {
-		Connection connection = null;
-		try {
-			connection = JdbcUtil.getConnection(dataSourceApo);
-			return ResponseDto.apiSuccess(null);
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return ResponseDto.fail(e.getMessage());
-		}
-		finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				}
-				catch (SQLException e) {
-					log.error(e.getMessage());
-				}
-			}
-		}
-	}
+    @PostMapping("/connect")
+    @GaApiAction(text = "测试连接")
+    public ResponseDto connect(DataSourceApo dataSourceApo) {
+        Connection connection = null;
+        try {
+            connection = JdbcUtil.getConnection(dataSourceApo);
+            return ResponseDto.apiSuccess(null);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return ResponseDto.fail(e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+    }
 
-	@PostMapping("/export")
-	@GaApiAction(text = "导出数据源")
-	public void export(String ids, HttpServletResponse response) {
-		List<String> collect = Arrays.asList(ids.split(","));
-		List<DataSourceApo> list = dataSourceService.selectBatch(collect);
-		String s = JSON.toJSONString(list);
-		response.setContentType("application/x-msdownload;charset=utf-8");
-		response.setHeader("Content-Disposition", "attachment; filename=datasource.json");
-		OutputStream os = null;
-		try {
-			os = response.getOutputStream();
-			os.write(s.getBytes("utf-8"));
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
-			try {
-				if (os != null)
-					os.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    @PostMapping("/export")
+    @GaApiAction(text = "导出数据源")
+    public void export(String ids, HttpServletResponse response) {
+        List<String> collect = Arrays.asList(ids.split(","));
+        List<DataSourceApo> list = dsDataSourceService.selectBatch(collect);
+        String s = JSON.toJSONString(list);
+        response.setContentType("application/x-msdownload;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=datasource.json");
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            os.write(s.getBytes("utf-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (os != null) os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	@RequestMapping(value = "/import", produces = "application/json;charset=UTF-8")
-	@GaApiAction(text = "导入数据源")
-	public void importDatasource(@RequestParam("file") MultipartFile file) throws IOException {
-		String s = IoUtil.read(file.getInputStream(), "utf-8");
-		List<DataSourceApo> list = JSON.parseArray(s, DataSourceApo.class);
-		list.stream().forEach(t -> {
-			t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
-			t.setCreateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-			t.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-		});
-		dataSourceService.insertBatch(list);
-	}
-
+    @RequestMapping(value = "/import", produces = "application/json;charset=UTF-8")
+    @GaApiAction(text = "导入数据源")
+    public void importDatasource(@RequestParam("file") MultipartFile file) throws IOException {
+        String s = IoUtil.read(file.getInputStream(), "utf-8");
+        List<DataSourceApo> list = JSON.parseArray(s, DataSourceApo.class);
+        list.stream()
+                .forEach(
+                        t -> {
+                            t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
+                            t.setCreateTime(
+                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+                            t.setUpdateTime(
+                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+                        });
+        dsDataSourceService.insertBatch(list);
+    }
 }

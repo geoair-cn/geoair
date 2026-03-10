@@ -126,6 +126,16 @@
                 <version>${geoair.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-db-service-core</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-db-service-starter</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
