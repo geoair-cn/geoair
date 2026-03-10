@@ -16,21 +16,23 @@ import java.util.List;
  * @date 2025-07-31
  */
 public interface DbApiConfigDao extends GiEntityDao<DbApiConfigPo, String> {
-    List<DbApiConfigDto> searchList(DbApiConfigSeo dbapiConfigSeo);
 
-    List<DbApiConfigPo> selectBatchIds(List<String> ids);
+	List<DbApiConfigDto> searchList(DbApiConfigSeo dbapiConfigSeo);
 
-    DbApiConfigDto selectByPathOnline(String path);
+	List<DbApiConfigPo> selectBatchIds(List<String> ids);
 
-    List<DbApiConfigDto> search(String name, String note, String path, String groupId);
+	DbApiConfigDto selectByPathOnline(String path);
 
-    Integer selectCountByPath(String path);
+	List<DbApiConfigDto> search(String name, String note, String path, String groupId);
 
-    Integer selectCountByPathWhenUpdate(String path, String id);
+	Integer selectCountByPath(String path);
 
-    int selectCountByGroup(String id);
+	Integer selectCountByPathWhenUpdate(String path, String id);
 
-    List<DbApiConfigDto> selectByGroup(String groupId);
+	int selectCountByGroup(String id);
 
-    GiPager<DbApiConfigDto> searchListPage(DbApiConfigSeo dbapiConfigSeo, GiPageParam pageParam);
+	List<DbApiConfigDto> selectByGroup(String groupId);
+
+	GiPager<DbApiConfigDto> searchListPage(DbApiConfigSeo dbapiConfigSeo, GiPageParam pageParam);
+
 }

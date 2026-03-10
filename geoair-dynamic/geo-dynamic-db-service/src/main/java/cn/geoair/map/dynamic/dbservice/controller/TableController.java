@@ -34,47 +34,41 @@ import javax.annotation.Resource;
 @GaApi(tags = "表相关的接口")
 public class TableController {
 
-    @Resource DbApiDataSourceDao dbApiDataSourceDao;
+	@Resource
+	DbApiDataSourceDao dbApiDataSourceDao;
 
-    @RequestMapping("/getAllTables")
-    @GaApiAction(text = "获取所有的表")
-    public List<JSONObject> getAllTables(String sourceId) throws SQLException {
-        DbApiDataSourcePo dbApiDataSourcePo = dbApiDataSourceDao.gtcSearchByPK(sourceId);
-        DataSource dataSource = DataSource.fromPo(dbApiDataSourcePo);
-        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSource);
-        List<String> tables = JdbcUtil.getAllTables(connection, dataSource.getTableSql());
-        List<JSONObject> list =
-                tables.stream()
-                        .map(
-                                t -> {
-                                    JSONObject jo = new JSONObject();
-                                    jo.put("label", t);
-                                    try {
-                                        DruidPooledConnection conn =
-                                                PoolManager.getPooledConnection(dataSource);
-                                        jo.put(
-                                                "columns",
-                                                JdbcUtil.getRDBMSColumnProperties(
-                                                        conn, dataSource.getType(), t));
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-                                    //            jo.put("columns",);
-                                    jo.put("showColumns", false);
-                                    return jo;
-                                })
-                        .collect(Collectors.toList());
-        return list;
-    }
+	@RequestMapping("/getAllTables")
+	@GaApiAction(text = "获取所有的表")
+	public List<JSONObject> getAllTables(String sourceId) throws SQLException {
+		DbApiDataSourcePo dbApiDataSourcePo = dbApiDataSourceDao.gtcSearchByPK(sourceId);
+		DataSource dataSource = DataSource.fromPo(dbApiDataSourcePo);
+		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSource);
+		List<String> tables = JdbcUtil.getAllTables(connection, dataSource.getTableSql());
+		List<JSONObject> list = tables.stream().map(t -> {
+			JSONObject jo = new JSONObject();
+			jo.put("label", t);
+			try {
+				DruidPooledConnection conn = PoolManager.getPooledConnection(dataSource);
+				jo.put("columns", JdbcUtil.getRDBMSColumnProperties(conn, dataSource.getType(), t));
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+			// jo.put("columns",);
+			jo.put("showColumns", false);
+			return jo;
+		}).collect(Collectors.toList());
+		return list;
+	}
 
-    @RequestMapping("/getAllColumns")
-    @GaApiAction(text = "获取表的所有列")
-    public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
-        DbApiDataSourcePo dbApiDataSourcePo = dbApiDataSourceDao.gtcSearchByPK(sourceId);
-        DataSource dataSource = DataSource.fromPo(dbApiDataSourcePo);
-        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSource);
-        List<JSONObject> columns =
-                JdbcUtil.getRDBMSColumnProperties(connection, dataSource.getType(), table);
-        return columns;
-    }
+	@RequestMapping("/getAllColumns")
+	@GaApiAction(text = "获取表的所有列")
+	public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
+		DbApiDataSourcePo dbApiDataSourcePo = dbApiDataSourceDao.gtcSearchByPK(sourceId);
+		DataSource dataSource = DataSource.fromPo(dbApiDataSourcePo);
+		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSource);
+		List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSource.getType(), table);
+		return columns;
+	}
+
 }

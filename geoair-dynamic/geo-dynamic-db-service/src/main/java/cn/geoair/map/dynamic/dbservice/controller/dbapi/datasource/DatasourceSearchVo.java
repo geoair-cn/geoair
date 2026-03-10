@@ -19,211 +19,213 @@ import java.util.Date;
  * @date 2025-07-31
  */
 @GaModel(text = "查询数据源信息")
-@JsonPropertyOrder(value = {"queryContent"})
+@JsonPropertyOrder(value = { "queryContent" })
 public class DatasourceSearchVo {
-    public static DatasourceSearchVo empty() {
-        return new DatasourceSearchVo();
-    }
 
-    public DatasourceSearchVo copy() {
-        DatasourceSearchVo copy = new DatasourceSearchVo();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static DatasourceSearchVo empty() {
+		return new DatasourceSearchVo();
+	}
 
-    @GaModelField(text = "查询的字符串")
-    private String queryContent;
+	public DatasourceSearchVo copy() {
+		DatasourceSearchVo copy = new DatasourceSearchVo();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    public String getQueryContent() {
-        return queryContent;
-    }
+	@GaModelField(text = "查询的字符串")
+	private String queryContent;
 
-    public void setQueryContent(String queryContent) {
-        this.queryContent = queryContent;
-    }
+	public String getQueryContent() {
+		return queryContent;
+	}
 
-    @GaModelField(text = "名称")
-    private String id;
+	public void setQueryContent(String queryContent) {
+		this.queryContent = queryContent;
+	}
 
-    @GaModelField(text = "名称")
-    private String name;
+	@GaModelField(text = "名称")
+	private String id;
 
-    @GaModelField(text = "备注信息")
-    private String note;
+	@GaModelField(text = "名称")
+	private String name;
 
-    @GaModelField(text = "类型")
-    private String type;
+	@GaModelField(text = "备注信息")
+	private String note;
 
-    @GaModelField(text = "jdbcUrl")
-    private String url;
+	@GaModelField(text = "类型")
+	private String type;
 
-    @GaModelField(text = "用户名")
-    private String username;
+	@GaModelField(text = "jdbcUrl")
+	private String url;
 
-    @GaModelField(text = "密码")
-    private String password;
+	@GaModelField(text = "用户名")
+	private String username;
 
-    @GaModelField(text = "驱动名称")
-    private String driver;
+	@GaModelField(text = "密码")
+	private String password;
 
-    @GaModelField(text = "创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称")
-    private String tableSql;
+	@GaModelField(text = "驱动名称")
+	private String driver;
 
-    @GaModelField(text = "创建人")
-    private Integer createUserId;
+	@GaModelField(text = "创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称")
+	private String tableSql;
 
-    @GaModelField(text = "创建时间")
-    private String createTime;
+	@GaModelField(text = "创建人")
+	private Integer createUserId;
 
-    @GaModelField(text = "更新时间")
-    private String updateTime;
+	@GaModelField(text = "创建时间")
+	private String createTime;
 
-    @GaModelField(text = "是否删除标识")
-    private String delIs;
+	@GaModelField(text = "更新时间")
+	private String updateTime;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @GaModelField(text = "创建时间")
-    private Date timeCreate;
+	@GaModelField(text = "是否删除标识")
+	private String delIs;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @GaModelField(text = "更新时间")
-    private Date timeUpdate;
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@GaModelField(text = "创建时间")
+	private Date timeCreate;
 
-    @GaModelField(text = "创建人名称")
-    private String nameCreate;
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@GaModelField(text = "更新时间")
+	private Date timeUpdate;
 
-    @GaModelField(text = "更新人名称")
-    private String nameUpdate;
+	@GaModelField(text = "创建人名称")
+	private String nameCreate;
 
-    public String getName() {
-        return name;
-    }
+	@GaModelField(text = "更新人名称")
+	private String nameUpdate;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getNote() {
-        return note;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setNote(String note) {
-        this.note = note;
-    }
+	public String getNote() {
+		return note;
+	}
 
-    public String getType() {
-        return type;
-    }
+	public void setNote(String note) {
+		this.note = note;
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	public String getType() {
+		return type;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public void setType(String type) {
+		this.type = type;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public String getDriver() {
-        return driver;
-    }
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
+	public String getDriver() {
+		return driver;
+	}
 
-    public String getTableSql() {
-        return tableSql;
-    }
+	public void setDriver(String driver) {
+		this.driver = driver;
+	}
 
-    public void setTableSql(String tableSql) {
-        this.tableSql = tableSql;
-    }
+	public String getTableSql() {
+		return tableSql;
+	}
 
-    public Integer getCreateUserId() {
-        return createUserId;
-    }
+	public void setTableSql(String tableSql) {
+		this.tableSql = tableSql;
+	}
 
-    public void setCreateUserId(Integer createUserId) {
-        this.createUserId = createUserId;
-    }
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
 
-    public String getCreateTime() {
-        return createTime;
-    }
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
+	public String getCreateTime() {
+		return createTime;
+	}
 
-    public String getUpdateTime() {
-        return updateTime;
-    }
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
+	public String getUpdateTime() {
+		return updateTime;
+	}
 
-    public String getDelIs() {
-        return delIs;
-    }
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
 
-    public void setDelIs(String delIs) {
-        this.delIs = delIs;
-    }
+	public String getDelIs() {
+		return delIs;
+	}
 
-    public Date getTimeCreate() {
-        return timeCreate;
-    }
+	public void setDelIs(String delIs) {
+		this.delIs = delIs;
+	}
 
-    public void setTimeCreate(Date timeCreate) {
-        this.timeCreate = timeCreate;
-    }
+	public Date getTimeCreate() {
+		return timeCreate;
+	}
 
-    public Date getTimeUpdate() {
-        return timeUpdate;
-    }
+	public void setTimeCreate(Date timeCreate) {
+		this.timeCreate = timeCreate;
+	}
 
-    public void setTimeUpdate(Date timeUpdate) {
-        this.timeUpdate = timeUpdate;
-    }
+	public Date getTimeUpdate() {
+		return timeUpdate;
+	}
 
-    public String getNameCreate() {
-        return nameCreate;
-    }
+	public void setTimeUpdate(Date timeUpdate) {
+		this.timeUpdate = timeUpdate;
+	}
 
-    public void setNameCreate(String nameCreate) {
-        this.nameCreate = nameCreate;
-    }
+	public String getNameCreate() {
+		return nameCreate;
+	}
 
-    public String getNameUpdate() {
-        return nameUpdate;
-    }
+	public void setNameCreate(String nameCreate) {
+		this.nameCreate = nameCreate;
+	}
 
-    public void setNameUpdate(String nameUpdate) {
-        this.nameUpdate = nameUpdate;
-    }
+	public String getNameUpdate() {
+		return nameUpdate;
+	}
+
+	public void setNameUpdate(String nameUpdate) {
+		this.nameUpdate = nameUpdate;
+	}
+
 }

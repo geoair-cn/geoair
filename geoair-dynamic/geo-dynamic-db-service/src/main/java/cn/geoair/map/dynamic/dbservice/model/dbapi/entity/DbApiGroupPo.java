@@ -26,159 +26,164 @@ import javax.persistence.Table;
 @GaModel(text = "api分组信息")
 @Table(name = "dbapi_group")
 public class DbApiGroupPo implements GiCrudEntity<String>, GiEntityIdGenerator<String> {
-    private static final long serialVersionUID = 1753953245114L;
 
-    @Id
-    @Column(name = "id")
-    @GaModelField(text = "主键", isID = true)
-    private String id;
+	private static final long serialVersionUID = 1753953245114L;
 
-    @Column(name = "name")
-    @GaModelField(text = "分组名称")
-    private String name;
+	@Id
+	@Column(name = "id")
+	@GaModelField(text = "主键", isID = true)
+	private String id;
 
-    @Column(name = "create_user_id")
-    @GaModelField(text = "创建人Id")
-    private Integer createUserId;
+	@Column(name = "name")
+	@GaModelField(text = "分组名称")
+	private String name;
 
-    @Column(name = "create_time")
-    @GaModelField(text = "创建时间")
-    private String createTime;
+	@Column(name = "create_user_id")
+	@GaModelField(text = "创建人Id")
+	private Integer createUserId;
 
-    @Column(name = "update_time")
-    @GaModelField(text = "更新时间")
-    private String updateTime;
+	@Column(name = "create_time")
+	@GaModelField(text = "创建时间")
+	private String createTime;
 
-    @Column(name = "time_create")
-    @GaModelField(text = "创建时间", datePattern = GemDatePattern.ISO8601Long)
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private Date timeCreate;
+	@Column(name = "update_time")
+	@GaModelField(text = "更新时间")
+	private String updateTime;
 
-    @Column(name = "time_update")
-    @GaModelField(text = "更新时间", datePattern = GemDatePattern.ISO8601Long)
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private Date timeUpdate;
+	@Column(name = "time_create")
+	@GaModelField(text = "创建时间", datePattern = GemDatePattern.ISO8601Long)
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+	private Date timeCreate;
 
-    @Column(name = "name_create")
-    @GaModelField(text = "创建人名称")
-    private String nameCreate;
+	@Column(name = "time_update")
+	@GaModelField(text = "更新时间", datePattern = GemDatePattern.ISO8601Long)
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+	private Date timeUpdate;
 
-    @Column(name = "name_update")
-    @GaModelField(text = "更新人名称")
-    private String nameUpdate;
+	@Column(name = "name_create")
+	@GaModelField(text = "创建人名称")
+	private String nameCreate;
 
-    public DbApiGroupPo() {}
+	@Column(name = "name_update")
+	@GaModelField(text = "更新人名称")
+	private String nameUpdate;
 
-    public DbApiGroupPo(String id) {
-        if (id == null) {
-            id = this.generatorId();
-        }
-        this.id = id;
-    }
+	public DbApiGroupPo() {
+	}
 
-    public String getCreateTime() {
-        return createTime;
-    }
+	public DbApiGroupPo(String id) {
+		if (id == null) {
+			id = this.generatorId();
+		}
+		this.id = id;
+	}
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
+	public String getCreateTime() {
+		return createTime;
+	}
 
-    public String getUpdateTime() {
-        return updateTime;
-    }
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
+	public String getUpdateTime() {
+		return updateTime;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setCreateUserId(Integer createUserId) {
-        this.createUserId = createUserId;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Integer getCreateUserId() {
-        return createUserId;
-    }
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
 
-    public void setTimeCreate(Date timeCreate) {
-        this.timeCreate = timeCreate;
-    }
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
 
-    public Date getTimeCreate() {
-        return timeCreate;
-    }
+	public void setTimeCreate(Date timeCreate) {
+		this.timeCreate = timeCreate;
+	}
 
-    public void setTimeUpdate(Date timeUpdate) {
-        this.timeUpdate = timeUpdate;
-    }
+	public Date getTimeCreate() {
+		return timeCreate;
+	}
 
-    public Date getTimeUpdate() {
-        return timeUpdate;
-    }
+	public void setTimeUpdate(Date timeUpdate) {
+		this.timeUpdate = timeUpdate;
+	}
 
-    public void setNameCreate(String nameCreate) {
-        this.nameCreate = nameCreate;
-    }
+	public Date getTimeUpdate() {
+		return timeUpdate;
+	}
 
-    public String getNameCreate() {
-        return nameCreate;
-    }
+	public void setNameCreate(String nameCreate) {
+		this.nameCreate = nameCreate;
+	}
 
-    public void setNameUpdate(String nameUpdate) {
-        this.nameUpdate = nameUpdate;
-    }
+	public String getNameCreate() {
+		return nameCreate;
+	}
 
-    public String getNameUpdate() {
-        return nameUpdate;
-    }
+	public void setNameUpdate(String nameUpdate) {
+		this.nameUpdate = nameUpdate;
+	}
 
-    public String id() {
-        return id;
-    }
+	public String getNameUpdate() {
+		return nameUpdate;
+	}
 
-    public String generatorId() {
-        return UUID.randomUUID().toString();
-    }
+	public String id() {
+		return id;
+	}
 
-    public void setNotDel() {}
+	public String generatorId() {
+		return UUID.randomUUID().toString();
+	}
 
-    public void setDel() {}
+	public void setNotDel() {
+	}
 
-    public void initCreateMeta() {
-        setNotDel();
-        // setTimeCreate(new Date());
-    }
+	public void setDel() {
+	}
 
-    public void initUpdateMeta() {
-        setNotDel();
-        // setTimeUpdate(new Date());
-    }
+	public void initCreateMeta() {
+		setNotDel();
+		// setTimeCreate(new Date());
+	}
 
-    public static DbApiGroupPo empty() {
-        return new DbApiGroupPo();
-    }
+	public void initUpdateMeta() {
+		setNotDel();
+		// setTimeUpdate(new Date());
+	}
 
-    public DbApiGroupPo copy() {
-        DbApiGroupPo copy = new DbApiGroupPo();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static DbApiGroupPo empty() {
+		return new DbApiGroupPo();
+	}
+
+	public DbApiGroupPo copy() {
+		DbApiGroupPo copy = new DbApiGroupPo();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
+
 }

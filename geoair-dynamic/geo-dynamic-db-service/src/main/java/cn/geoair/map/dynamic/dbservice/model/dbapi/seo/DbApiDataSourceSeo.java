@@ -15,92 +15,94 @@ import java.util.Date;
  */
 @GaModel(text = "数据源信息SearchDto")
 public class DbApiDataSourceSeo extends DbApiDataSourcePo {
-    private static final long serialVersionUID = 1753953250862L;
 
-    public static DbApiDataSourceSeo emptySeo() {
-        return new DbApiDataSourceSeo();
-    }
+	private static final long serialVersionUID = 1753953250862L;
 
-    public DbApiDataSourceSeo copy() {
-        DbApiDataSourceSeo copy = new DbApiDataSourceSeo();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static DbApiDataSourceSeo emptySeo() {
+		return new DbApiDataSourceSeo();
+	}
 
-    @GaModelField(text = "模糊查询")
-    private String[] andQueryContentIn;
+	public DbApiDataSourceSeo copy() {
+		DbApiDataSourceSeo copy = new DbApiDataSourceSeo();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    @GaModelField(text = "查询多个主键数据")
-    private String[] andIdsIn;
+	@GaModelField(text = "模糊查询")
+	private String[] andQueryContentIn;
 
-    @GaModelField(text = "查询排除多个主键数据")
-    private String[] andIdsNotIn;
+	@GaModelField(text = "查询多个主键数据")
+	private String[] andIdsIn;
 
-    @GaModelField(text = "创建时间始")
-    private Date timeCreateStart;
+	@GaModelField(text = "查询排除多个主键数据")
+	private String[] andIdsNotIn;
 
-    @GaModelField(text = "创建时间止")
-    private Date timeCreateEnd;
+	@GaModelField(text = "创建时间始")
+	private Date timeCreateStart;
 
-    @GaModelField(text = "更新时间始")
-    private Date timeUpdateStart;
+	@GaModelField(text = "创建时间止")
+	private Date timeCreateEnd;
 
-    @GaModelField(text = "更新时间止")
-    private Date timeUpdateEnd;
+	@GaModelField(text = "更新时间始")
+	private Date timeUpdateStart;
 
-    public String[] getAndQueryContentIn() {
-        return andQueryContentIn;
-    }
+	@GaModelField(text = "更新时间止")
+	private Date timeUpdateEnd;
 
-    public void setAndQueryContentIn(String[] andQueryContentIn) {
-        this.andQueryContentIn = andQueryContentIn;
-    }
+	public String[] getAndQueryContentIn() {
+		return andQueryContentIn;
+	}
 
-    public void setAndIdsIn(String[] andIdsIn) {
-        this.andIdsIn = andIdsIn;
-    }
+	public void setAndQueryContentIn(String[] andQueryContentIn) {
+		this.andQueryContentIn = andQueryContentIn;
+	}
 
-    public String[] getAndIdsIn() {
-        return this.andIdsIn;
-    }
+	public void setAndIdsIn(String[] andIdsIn) {
+		this.andIdsIn = andIdsIn;
+	}
 
-    public void setAndIdsNotIn(String[] andIdsNotIn) {
-        this.andIdsNotIn = andIdsNotIn;
-    }
+	public String[] getAndIdsIn() {
+		return this.andIdsIn;
+	}
 
-    public String[] getAndIdsNotIn() {
-        return andIdsNotIn;
-    }
+	public void setAndIdsNotIn(String[] andIdsNotIn) {
+		this.andIdsNotIn = andIdsNotIn;
+	}
 
-    public void setTimeCreateStart(Date timeCreateStart) {
-        this.timeCreateStart = timeCreateStart;
-    }
+	public String[] getAndIdsNotIn() {
+		return andIdsNotIn;
+	}
 
-    public Date getTimeCreateStart() {
-        return timeCreateStart;
-    }
+	public void setTimeCreateStart(Date timeCreateStart) {
+		this.timeCreateStart = timeCreateStart;
+	}
 
-    public void setTimeCreateEnd(Date timeCreateEnd) {
-        this.timeCreateEnd = timeCreateEnd;
-    }
+	public Date getTimeCreateStart() {
+		return timeCreateStart;
+	}
 
-    public Date getTimeCreateEnd() {
-        return timeCreateEnd;
-    }
+	public void setTimeCreateEnd(Date timeCreateEnd) {
+		this.timeCreateEnd = timeCreateEnd;
+	}
 
-    public void setTimeUpdateStart(Date timeUpdateStart) {
-        this.timeUpdateStart = timeUpdateStart;
-    }
+	public Date getTimeCreateEnd() {
+		return timeCreateEnd;
+	}
 
-    public Date getTimeUpdateStart() {
-        return timeUpdateStart;
-    }
+	public void setTimeUpdateStart(Date timeUpdateStart) {
+		this.timeUpdateStart = timeUpdateStart;
+	}
 
-    public void setTimeUpdateEnd(Date timeUpdateEnd) {
-        this.timeUpdateEnd = timeUpdateEnd;
-    }
+	public Date getTimeUpdateStart() {
+		return timeUpdateStart;
+	}
 
-    public Date getTimeUpdateEnd() {
-        return timeUpdateEnd;
-    }
+	public void setTimeUpdateEnd(Date timeUpdateEnd) {
+		this.timeUpdateEnd = timeUpdateEnd;
+	}
+
+	public Date getTimeUpdateEnd() {
+		return timeUpdateEnd;
+	}
+
 }

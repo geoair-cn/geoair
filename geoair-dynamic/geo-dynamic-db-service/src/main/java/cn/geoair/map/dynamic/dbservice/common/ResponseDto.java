@@ -12,135 +12,138 @@ import cn.geoair.base.data.result.GiResult;
  */
 public class ResponseDto<T> implements GiResult<T> {
 
-    String msg;
-    int code;
-    boolean success;
+	String msg;
 
-    @JSONField(serialzeFeatures = {SerializerFeature.WriteMapNullValue})
-    T data;
+	int code;
 
-    public int getCode() {
-        return code;
-    }
+	boolean success;
 
-    public void setCode(int code) {
-        this.code = code;
-    }
+	@JSONField(serialzeFeatures = { SerializerFeature.WriteMapNullValue })
+	T data;
 
-    public boolean isSuccess() {
-        return success;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public String getMsg() {
-        return msg;
-    }
+	public void setCode(int code) {
+		this.code = code;
+	}
 
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+	public boolean isSuccess() {
+		return success;
+	}
 
-    public Object getData() {
-        return data;
-    }
+	public String getMsg() {
+		return msg;
+	}
 
-    public void setData(T data) {
-        this.data = data;
-    }
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
 
-    public boolean getSuccess() {
-        return success;
-    }
+	public Object getData() {
+		return data;
+	}
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+	public void setData(T data) {
+		this.data = data;
+	}
 
-    public static ResponseDto apiSuccess(Object data) {
-        return successWithData(data);
-    }
+	public boolean getSuccess() {
+		return success;
+	}
 
-    public static ResponseDto successWithMsg(String msg) {
-        ResponseDto dto = new ResponseDto();
-        dto.setData(null);
-        dto.setSuccess(true);
-        dto.setMsg(msg);
-        return dto;
-    }
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
 
-    public static ResponseDto successWithData(Object data) {
-        ResponseDto dto = new ResponseDto();
-        dto.setData(data);
-        dto.setSuccess(true);
-        return dto;
-    }
+	public static ResponseDto apiSuccess(Object data) {
+		return successWithData(data);
+	}
 
-    public static ResponseDto fail(String msg) {
-        ResponseDto dto = new ResponseDto();
-        dto.setSuccess(false);
-        dto.setMsg(msg);
-        return dto;
-    }
+	public static ResponseDto successWithMsg(String msg) {
+		ResponseDto dto = new ResponseDto();
+		dto.setData(null);
+		dto.setSuccess(true);
+		dto.setMsg(msg);
+		return dto;
+	}
 
-    public static ResponseDto failWithData(String msg, Object data) {
-        ResponseDto dto = new ResponseDto();
-        dto.setSuccess(false);
-        dto.setMsg(msg);
-        dto.setData(data);
-        return dto;
-    }
+	public static ResponseDto successWithData(Object data) {
+		ResponseDto dto = new ResponseDto();
+		dto.setData(data);
+		dto.setSuccess(true);
+		return dto;
+	}
 
-    @Override
-    public int code() {
-        return code;
-    }
+	public static ResponseDto fail(String msg) {
+		ResponseDto dto = new ResponseDto();
+		dto.setSuccess(false);
+		dto.setMsg(msg);
+		return dto;
+	}
 
-    @Override
-    public GiResult andCode(int code) {
-        this.code = code;
-        return this;
-    }
+	public static ResponseDto failWithData(String msg, Object data) {
+		ResponseDto dto = new ResponseDto();
+		dto.setSuccess(false);
+		dto.setMsg(msg);
+		dto.setData(data);
+		return dto;
+	}
 
-    @Override
-    public String alertMsg() {
-        return msg;
-    }
+	@Override
+	public int code() {
+		return code;
+	}
 
-    @Override
-    public T value() {
-        return data;
-    }
+	@Override
+	public GiResult andCode(int code) {
+		this.code = code;
+		return this;
+	}
 
-    @Override
-    public GiResult andAlertMsg(String msg) {
-        this.msg = msg;
-        return this;
-    }
+	@Override
+	public String alertMsg() {
+		return msg;
+	}
 
-    @Override
-    public int alertType() {
-        return 0;
-    }
+	@Override
+	public T value() {
+		return data;
+	}
 
-    @Override
-    public GiResult andAlertType(int alertType) {
-        return null;
-    }
+	@Override
+	public GiResult andAlertMsg(String msg) {
+		this.msg = msg;
+		return this;
+	}
 
-    @Override
-    public GiResult andValue(T value) {
-        this.data = value;
-        return this;
-    }
+	@Override
+	public int alertType() {
+		return 0;
+	}
 
-    @Override
-    public GiResult forSuccess() {
-        return successWithData("调用成功，无结果集");
-    }
+	@Override
+	public GiResult andAlertType(int alertType) {
+		return null;
+	}
 
-    @Override
-    public GiResult forFailure() {
-        this.success = false;
+	@Override
+	public GiResult andValue(T value) {
+		this.data = value;
+		return this;
+	}
 
-        return fail("系统异常");
-    }
+	@Override
+	public GiResult forSuccess() {
+		return successWithData("调用成功，无结果集");
+	}
+
+	@Override
+	public GiResult forFailure() {
+		this.success = false;
+
+		return fail("系统异常");
+	}
+
 }

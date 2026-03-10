@@ -22,29 +22,29 @@ import java.util.List;
  * @author zhangjun
  * @date 2025-07-31
  */
-public interface DbApiDataSourceMapper
-        extends DbApiDataSourceDao, TkEntityMapper<DbApiDataSourcePo, String> {
-    @Override
-    List<DbApiDataSourceDto> searchList(@Param("param") DbApiDataSourceSeo dbapiDatasourceSeo);
+public interface DbApiDataSourceMapper extends DbApiDataSourceDao, TkEntityMapper<DbApiDataSourcePo, String> {
 
-    default List<DbApiDataSourcePo> selectBatchIds(List<String> ids) {
-        Example example = new Example(Group.class);
-        example.and().andIn("id", ids);
-        return selectByExample(example);
-    }
+	@Override
+	List<DbApiDataSourceDto> searchList(@Param("param") DbApiDataSourceSeo dbapiDatasourceSeo);
 
-    @Override
-    default GiPager<DbApiDataSourceDto> searchListPage(
-            @Param("param") DbApiDataSourceSeo dbapiDatasourceSeo, GiPageParam pageParam) {
+	default List<DbApiDataSourcePo> selectBatchIds(List<String> ids) {
+		Example example = new Example(Group.class);
+		example.and().andIn("id", ids);
+		return selectByExample(example);
+	}
 
-        GfunPageExcute<DbApiDataSourceDto> exec =
-                new GfunPageExcute<DbApiDataSourceDto>() {
-                    @Override
-                    public Iterable<DbApiDataSourceDto> excute() {
-                        return searchList(dbapiDatasourceSeo);
-                    }
-                };
+	@Override
+	default GiPager<DbApiDataSourceDto> searchListPage(@Param("param") DbApiDataSourceSeo dbapiDatasourceSeo,
+			GiPageParam pageParam) {
 
-        return pageExcuter().excutePage(exec, pageParam);
-    }
+		GfunPageExcute<DbApiDataSourceDto> exec = new GfunPageExcute<DbApiDataSourceDto>() {
+			@Override
+			public Iterable<DbApiDataSourceDto> excute() {
+				return searchList(dbapiDatasourceSeo);
+			}
+		};
+
+		return pageExcuter().excutePage(exec, pageParam);
+	}
+
 }

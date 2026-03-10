@@ -2,31 +2,34 @@ package cn.geoair.map.dynamic.dbservice.basic.dto;
 
 public class ApiSqlDto {
 
-    String sqlText;
-    String transformPlugin;
-    String transformPluginParam;
+	String sqlText;
 
-    public String getSqlText() {
-        return sqlText;
-    }
+	String transformPlugin;
 
-    public void setSqlText(String sqlText) {
-        this.sqlText = sqlText;
-    }
+	String transformPluginParam;
 
-    public String getTransformPlugin() {
-        return transformPlugin;
-    }
+	public String getSqlText() {
+		return sqlText;
+	}
 
-    public void setTransformPlugin(String transformPlugin) {
-        this.transformPlugin = transformPlugin;
-    }
+	public void setSqlText(String sqlText) {
+		this.sqlText = sqlText;
+	}
 
-    public String getTransformPluginParam() {
-        return transformPluginParam;
-    }
+	public String getTransformPlugin() {
+		return transformPlugin;
+	}
 
-    public void setTransformPluginParam(String transformPluginParam) {
-        this.transformPluginParam = transformPluginParam;
-    }
+	public void setTransformPlugin(String transformPlugin) {
+		this.transformPlugin = transformPlugin;
+	}
+
+	public String getTransformPluginParam() {
+		return transformPluginParam;
+	}
+
+	public void setTransformPluginParam(String transformPluginParam) {
+		this.transformPluginParam = transformPluginParam;
+	}
+
 }

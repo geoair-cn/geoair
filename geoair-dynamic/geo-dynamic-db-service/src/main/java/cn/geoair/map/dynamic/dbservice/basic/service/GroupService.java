@@ -21,59 +21,65 @@ import javax.annotation.Resource;
 
 @Service
 public class GroupService {
-    @Autowired DbApiGroupDao dbApiGroupDao;
-    @Autowired ApiConfigMapper apiConfigMapper;
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
 
-    public void insert(Group group) {
-        group.setId(UUIDUtil.id());
-        group.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        group.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        DbApiGroupPo po = group.toPo();
-        po.initCreateMeta();
-        po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-        dbApiGroupDao.gtcAccessSelective(po);
-    }
+	@Autowired
+	DbApiGroupDao dbApiGroupDao;
 
-    @Transactional
-    public ResponseDto deleteById(String id) {
-        int size = apiConfigMapper.selectCountByGroup(id);
-        if (size > 0) {
-            return ResponseDto.fail("Group is not empty, can not delete");
-        } else {
-            dbApiGroupDao.gtcDeleteByPK(id);
-            return ResponseDto.successWithMsg("Group delete success");
-        }
-    }
+	@Autowired
+	ApiConfigMapper apiConfigMapper;
 
-    public List<Group> getAll() {
-        List<DbApiGroupPo> dbApiGroupPos = dbApiGroupDao.gtcSearchAll();
-        List<Group> groups = Group.fromPos(dbApiGroupPos);
-        return groups;
-    }
+	@Resource
+	DbApiUserInfoHelper dbApiUserInfoHelper;
 
-    public List<Group> selectBatch(List<String> ids) {
-        return Group.fromPos(dbApiGroupDao.selectBatchIds(ids));
-    }
+	public void insert(Group group) {
+		group.setId(UUIDUtil.id());
+		group.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		group.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		DbApiGroupPo po = group.toPo();
+		po.initCreateMeta();
+		po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+		dbApiGroupDao.gtcAccessSelective(po);
+	}
 
-    @Transactional
-    public void insertBatch(List<Group> configs) {
-        configs.stream()
-                .forEach(
-                        t -> {
-                            DbApiGroupPo po = t.toPo();
-                            po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-                            po.initCreateMeta();
-                            dbApiGroupDao.gtcAccessSelective(po);
-                        });
-    }
+	@Transactional
+	public ResponseDto deleteById(String id) {
+		int size = apiConfigMapper.selectCountByGroup(id);
+		if (size > 0) {
+			return ResponseDto.fail("Group is not empty, can not delete");
+		}
+		else {
+			dbApiGroupDao.gtcDeleteByPK(id);
+			return ResponseDto.successWithMsg("Group delete success");
+		}
+	}
 
-    @Transactional
-    public void update(Group group) {
-        group.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-        DbApiGroupPo po = group.toPo();
-        po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
-        po.initUpdateMeta();
-        dbApiGroupDao.gtcUpdateByPKSelective(po);
-    }
+	public List<Group> getAll() {
+		List<DbApiGroupPo> dbApiGroupPos = dbApiGroupDao.gtcSearchAll();
+		List<Group> groups = Group.fromPos(dbApiGroupPos);
+		return groups;
+	}
+
+	public List<Group> selectBatch(List<String> ids) {
+		return Group.fromPos(dbApiGroupDao.selectBatchIds(ids));
+	}
+
+	@Transactional
+	public void insertBatch(List<Group> configs) {
+		configs.stream().forEach(t -> {
+			DbApiGroupPo po = t.toPo();
+			po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+			po.initCreateMeta();
+			dbApiGroupDao.gtcAccessSelective(po);
+		});
+	}
+
+	@Transactional
+	public void update(Group group) {
+		group.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+		DbApiGroupPo po = group.toPo();
+		po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
+		po.initUpdateMeta();
+		dbApiGroupDao.gtcUpdateByPKSelective(po);
+	}
+
 }

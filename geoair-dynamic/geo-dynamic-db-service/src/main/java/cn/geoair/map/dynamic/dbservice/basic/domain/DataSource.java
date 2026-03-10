@@ -19,66 +19,68 @@ import java.util.List;
  */
 @Data
 public class DataSource implements Serializable {
-    public DbApiDataSourcePo toPo() {
-        DbApiDataSourcePo thisPo = new DbApiDataSourcePo();
-        BeanUtils.copyProperties(this, thisPo);
-        return thisPo;
-    }
 
-    public static DataSource fromPo(DbApiDataSourcePo po) {
-        DataSource thisVo = new DataSource();
-        BeanUtils.copyProperties(po, thisVo);
-        return thisVo;
-    }
+	public DbApiDataSourcePo toPo() {
+		DbApiDataSourcePo thisPo = new DbApiDataSourcePo();
+		BeanUtils.copyProperties(this, thisPo);
+		return thisPo;
+	}
 
-    public static List<DataSource> fromPos(List<DbApiDataSourcePo> pos) {
-        List<DataSource> list = new ArrayList<>();
-        for (DbApiDataSourcePo po : pos) {
-            DataSource thisVo = fromPo(po);
-            list.add(thisVo);
-        }
-        return list;
-    }
+	public static DataSource fromPo(DbApiDataSourcePo po) {
+		DataSource thisVo = new DataSource();
+		BeanUtils.copyProperties(po, thisVo);
+		return thisVo;
+	}
 
-    public static DataSource fromDto(DbApiDataSourceDto dto) {
-        DataSource thisVo = new DataSource();
-        BeanUtils.copyProperties(dto, thisVo);
-        return thisVo;
-    }
+	public static List<DataSource> fromPos(List<DbApiDataSourcePo> pos) {
+		List<DataSource> list = new ArrayList<>();
+		for (DbApiDataSourcePo po : pos) {
+			DataSource thisVo = fromPo(po);
+			list.add(thisVo);
+		}
+		return list;
+	}
 
-    public static List<DataSource> fromDtos(List<DbApiDataSourceDto> dtos) {
-        List<DataSource> list = new ArrayList<>();
-        for (DbApiDataSourceDto dto : dtos) {
-            DataSource thisVo = fromDto(dto);
-            list.add(thisVo);
-        }
-        return list;
-    }
+	public static DataSource fromDto(DbApiDataSourceDto dto) {
+		DataSource thisVo = new DataSource();
+		BeanUtils.copyProperties(dto, thisVo);
+		return thisVo;
+	}
 
-    String id;
+	public static List<DataSource> fromDtos(List<DbApiDataSourceDto> dtos) {
+		List<DataSource> list = new ArrayList<>();
+		for (DbApiDataSourceDto dto : dtos) {
+			DataSource thisVo = fromDto(dto);
+			list.add(thisVo);
+		}
+		return list;
+	}
 
-    String name;
+	String id;
 
-    String note;
+	String name;
 
-    String url;
+	String note;
 
-    String username;
+	String url;
 
-    String password;
+	String username;
 
-    /** true 修改密码 false不修改 */
-    boolean edit_password;
+	String password;
 
-    String type;
+	/** true 修改密码 false不修改 */
+	boolean edit_password;
 
-    String driver;
+	String type;
 
-    String tableSql;
+	String driver;
 
-    String createUserId;
+	String tableSql;
 
-    String createTime;
+	String createUserId;
 
-    String updateTime;
+	String createTime;
+
+	String updateTime;
+
 }

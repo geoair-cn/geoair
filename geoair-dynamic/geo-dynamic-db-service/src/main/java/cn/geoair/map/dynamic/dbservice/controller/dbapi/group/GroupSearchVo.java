@@ -19,123 +19,125 @@ import java.util.Date;
  * @date 2025-07-31
  */
 @GaModel(text = "查询api分组信息")
-@JsonPropertyOrder(value = {"queryContent"})
+@JsonPropertyOrder(value = { "queryContent" })
 public class GroupSearchVo {
-    public static GroupSearchVo empty() {
-        return new GroupSearchVo();
-    }
 
-    public GroupSearchVo copy() {
-        GroupSearchVo copy = new GroupSearchVo();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static GroupSearchVo empty() {
+		return new GroupSearchVo();
+	}
 
-    @GaModelField(text = "查询的字符串")
-    private String queryContent;
+	public GroupSearchVo copy() {
+		GroupSearchVo copy = new GroupSearchVo();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    public String getQueryContent() {
-        return queryContent;
-    }
+	@GaModelField(text = "查询的字符串")
+	private String queryContent;
 
-    public void setQueryContent(String queryContent) {
-        this.queryContent = queryContent;
-    }
+	public String getQueryContent() {
+		return queryContent;
+	}
 
-    @GaModelField(text = "主键")
-    private String id;
+	public void setQueryContent(String queryContent) {
+		this.queryContent = queryContent;
+	}
 
-    @GaModelField(text = "分组名称")
-    private String name;
+	@GaModelField(text = "主键")
+	private String id;
 
-    @GaModelField(text = "创建人Id")
-    private Integer createUserId;
+	@GaModelField(text = "分组名称")
+	private String name;
 
-    @GaModelField(text = "创建时间")
-    private String createTime;
+	@GaModelField(text = "创建人Id")
+	private Integer createUserId;
 
-    @GaModelField(text = "更新时间")
-    private String updateTime;
+	@GaModelField(text = "创建时间")
+	private String createTime;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @GaModelField(text = "创建时间")
-    private Date timeCreate;
+	@GaModelField(text = "更新时间")
+	private String updateTime;
 
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @GaModelField(text = "更新时间")
-    private Date timeUpdate;
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@GaModelField(text = "创建时间")
+	private Date timeCreate;
 
-    @GaModelField(text = "创建人名称")
-    private String nameCreate;
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@GaModelField(text = "更新时间")
+	private Date timeUpdate;
 
-    @GaModelField(text = "更新人名称")
-    private String nameUpdate;
+	@GaModelField(text = "创建人名称")
+	private String nameCreate;
 
-    public String getName() {
-        return name;
-    }
+	@GaModelField(text = "更新人名称")
+	private String nameUpdate;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public Integer getCreateUserId() {
-        return createUserId;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setCreateUserId(Integer createUserId) {
-        this.createUserId = createUserId;
-    }
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
 
-    public String getCreateTime() {
-        return createTime;
-    }
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
+	public String getCreateTime() {
+		return createTime;
+	}
 
-    public String getUpdateTime() {
-        return updateTime;
-    }
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 
-    public void setUpdateTime(String updateTime) {
-        this.updateTime = updateTime;
-    }
+	public String getUpdateTime() {
+		return updateTime;
+	}
 
-    public Date getTimeCreate() {
-        return timeCreate;
-    }
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
 
-    public void setTimeCreate(Date timeCreate) {
-        this.timeCreate = timeCreate;
-    }
+	public Date getTimeCreate() {
+		return timeCreate;
+	}
 
-    public Date getTimeUpdate() {
-        return timeUpdate;
-    }
+	public void setTimeCreate(Date timeCreate) {
+		this.timeCreate = timeCreate;
+	}
 
-    public void setTimeUpdate(Date timeUpdate) {
-        this.timeUpdate = timeUpdate;
-    }
+	public Date getTimeUpdate() {
+		return timeUpdate;
+	}
 
-    public String getNameCreate() {
-        return nameCreate;
-    }
+	public void setTimeUpdate(Date timeUpdate) {
+		this.timeUpdate = timeUpdate;
+	}
 
-    public void setNameCreate(String nameCreate) {
-        this.nameCreate = nameCreate;
-    }
+	public String getNameCreate() {
+		return nameCreate;
+	}
 
-    public String getNameUpdate() {
-        return nameUpdate;
-    }
+	public void setNameCreate(String nameCreate) {
+		this.nameCreate = nameCreate;
+	}
 
-    public void setNameUpdate(String nameUpdate) {
-        this.nameUpdate = nameUpdate;
-    }
+	public String getNameUpdate() {
+		return nameUpdate;
+	}
+
+	public void setNameUpdate(String nameUpdate) {
+		this.nameUpdate = nameUpdate;
+	}
+
 }

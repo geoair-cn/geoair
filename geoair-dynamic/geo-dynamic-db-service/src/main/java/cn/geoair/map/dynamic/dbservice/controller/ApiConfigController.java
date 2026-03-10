@@ -61,325 +61,334 @@ import javax.servlet.http.HttpServletResponse;
 @GaApi(tags = "api配置")
 public class ApiConfigController {
 
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
-    @Autowired ApiConfigService apiConfigService;
-    @Resource private DbApiConfigDao dbapiConfigDao;
-    @Autowired DataSourceService dataSourceService;
+	@Resource
+	DbApiUserInfoHelper dbApiUserInfoHelper;
 
-    @Autowired GroupService groupService;
+	@Autowired
+	ApiConfigService apiConfigService;
 
-    @Value("${server.servlet.context-path:}")
-    String apiContext;
+	@Resource
+	private DbApiConfigDao dbapiConfigDao;
 
-    @PostMapping("/context")
-    public String getContext() {
-        String s = StrUtil.replaceFirst(apiContext, "/", "");
-        return s;
-    }
+	@Autowired
+	DataSourceService dataSourceService;
 
-    @PostMapping("/add")
-    @GaApiAction(text = "新增API")
-    public ResponseDto add(@RequestBody JSONObject jo) {
-        ApiConfig config = new ApiConfig();
-        config.setName(jo.getString("name"));
-        config.setPath(jo.getString("path"));
-        config.setNote(jo.getString("note"));
-        config.setGroupId(jo.getString("groupId"));
-        config.setContentType(jo.getString("contentType"));
-        config.setJsonParam(jo.getString("jsonParam"));
-        config.setParams(jo.getJSONArray("paramsJson").toString());
-        config.setAccess(jo.getInteger("access"));
-        config.setTask(jo.getJSONArray("taskJson").toString());
-        config.setStatus(Constants.API_STATUS_OFFLINE);
-        String id = UUIDUtil.id();
-        config.setId(id);
-        config.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
-        return apiConfigService.add(config);
-    }
+	@Autowired
+	GroupService groupService;
 
-    @Deprecated
-    @PostMapping("/parseParam")
-    @GaApiAction(text = "转换参数")
-    public ResponseDto parseParam(String sql) {
-        try {
-            Set<String> set = SqlEngineUtil.getEngine().parseParameter(sql);
-            // 转化成前端需要的格式
-            List<JSONObject> list =
-                    set.stream()
-                            .map(
-                                    t -> {
-                                        JSONObject object = new JSONObject();
-                                        object.put("value", t);
-                                        return object;
-                                    })
-                            .collect(Collectors.toList());
-            return ResponseDto.successWithData(list);
-        } catch (Exception e) {
-            return ResponseDto.fail(e.getMessage());
-        }
-    }
+	@Value("${server.servlet.context-path:}")
+	String apiContext;
 
-    @GetMapping("/getAll")
-    @GaApiAction(text = "查询所有的API")
-    public List<ApiConfig> getAll() {
-        return apiConfigService.getAll();
-    }
+	@PostMapping("/context")
+	public String getContext() {
+		String s = StrUtil.replaceFirst(apiContext, "/", "");
+		return s;
+	}
 
-    // 给前端使用的数据结构
-    @PostMapping("/getApiTree")
-    @GaApiAction(text = "获取Api树")
-    public List<JSONObject> getAllApiTree() {
-        return apiConfigService.getAllApiTree();
-    }
+	@PostMapping("/add")
+	@GaApiAction(text = "新增API")
+	public ResponseDto add(@RequestBody JSONObject jo) {
+		ApiConfig config = new ApiConfig();
+		config.setName(jo.getString("name"));
+		config.setPath(jo.getString("path"));
+		config.setNote(jo.getString("note"));
+		config.setGroupId(jo.getString("groupId"));
+		config.setContentType(jo.getString("contentType"));
+		config.setJsonParam(jo.getString("jsonParam"));
+		config.setParams(jo.getJSONArray("paramsJson").toString());
+		config.setAccess(jo.getInteger("access"));
+		config.setTask(jo.getJSONArray("taskJson").toString());
+		config.setStatus(Constants.API_STATUS_OFFLINE);
+		String id = UUIDUtil.id();
+		config.setId(id);
+		config.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+		return apiConfigService.add(config);
+	}
 
-    @PostMapping("/search")
-    @GaApiAction(text = "查询")
-    public List<ApiConfig> search(String name, String note, String path, String groupId) {
-        return apiConfigService.search(name, note, path, groupId);
-    }
+	@Deprecated
+	@PostMapping("/parseParam")
+	@GaApiAction(text = "转换参数")
+	public ResponseDto parseParam(String sql) {
+		try {
+			Set<String> set = SqlEngineUtil.getEngine().parseParameter(sql);
+			// 转化成前端需要的格式
+			List<JSONObject> list = set.stream().map(t -> {
+				JSONObject object = new JSONObject();
+				object.put("value", t);
+				return object;
+			}).collect(Collectors.toList());
+			return ResponseDto.successWithData(list);
+		}
+		catch (Exception e) {
+			return ResponseDto.fail(e.getMessage());
+		}
+	}
 
-    @PostMapping("/detail/{id}")
-    @GaApiAction(text = "详情")
-    public ApiConfig detail(@PathVariable String id) {
-        return apiConfigService.detail(id);
-    }
+	@GetMapping("/getAll")
+	@GaApiAction(text = "查询所有的API")
+	public List<ApiConfig> getAll() {
+		return apiConfigService.getAll();
+	}
 
-    @PostMapping("/copy/{id}")
-    @GaApiAction(text = "复制")
-    public ApiConfig copy(@PathVariable String id) {
-        return apiConfigService.copy(id);
-    }
+	// 给前端使用的数据结构
+	@PostMapping("/getApiTree")
+	@GaApiAction(text = "获取Api树")
+	public List<JSONObject> getAllApiTree() {
+		return apiConfigService.getAllApiTree();
+	}
 
-    @PostMapping("/delete/{id}")
-    @GaApiAction(text = "删除API")
-    public void delete(@PathVariable String id) {
-        apiConfigService.delete(id);
-    }
+	@PostMapping("/search")
+	@GaApiAction(text = "查询")
+	public List<ApiConfig> search(String name, String note, String path, String groupId) {
+		return apiConfigService.search(name, note, path, groupId);
+	}
 
-    @PostMapping("/update")
-    @GaApiAction(text = "更新API")
-    public ResponseDto update(@RequestBody JSONObject jo) {
-        ApiConfig config = new ApiConfig();
-        config.setId(jo.getString("id"));
-        config.setName(jo.getString("name"));
-        config.setPath(jo.getString("path"));
-        config.setNote(jo.getString("note"));
-        config.setGroupId(jo.getString("groupId"));
-        config.setContentType(jo.getString("contentType"));
-        config.setJsonParam(jo.getString("jsonParam"));
-        config.setParams(jo.getJSONArray("paramsJson").toString());
-        config.setAccess(jo.getInteger("access"));
-        config.setTask(jo.getJSONArray("taskJson").toString());
-        //        config.setStatus(Constants.API_STATUS_OFFLINE);   // 更新后不更新状态
+	@PostMapping("/detail/{id}")
+	@GaApiAction(text = "详情")
+	public ApiConfig detail(@PathVariable String id) {
+		return apiConfigService.detail(id);
+	}
 
-        return apiConfigService.update(config);
-    }
+	@PostMapping("/copy/{id}")
+	@GaApiAction(text = "复制")
+	public ApiConfig copy(@PathVariable String id) {
+		return apiConfigService.copy(id);
+	}
 
-    @GetMapping("/online/{id}")
-    @GaApiAction(text = "上线")
-    public void online(@PathVariable String id) {
-        apiConfigService.online(id);
-    }
+	@PostMapping("/delete/{id}")
+	@GaApiAction(text = "删除API")
+	public void delete(@PathVariable String id) {
+		apiConfigService.delete(id);
+	}
 
-    @GetMapping("/offline/{id}")
-    @GaApiAction(text = "下线")
-    public void offline(@PathVariable String id) {
-        apiConfigService.offline(id);
-    }
+	@PostMapping("/update")
+	@GaApiAction(text = "更新API")
+	public ResponseDto update(@RequestBody JSONObject jo) {
+		ApiConfig config = new ApiConfig();
+		config.setId(jo.getString("id"));
+		config.setName(jo.getString("name"));
+		config.setPath(jo.getString("path"));
+		config.setNote(jo.getString("note"));
+		config.setGroupId(jo.getString("groupId"));
+		config.setContentType(jo.getString("contentType"));
+		config.setJsonParam(jo.getString("jsonParam"));
+		config.setParams(jo.getJSONArray("paramsJson").toString());
+		config.setAccess(jo.getInteger("access"));
+		config.setTask(jo.getJSONArray("taskJson").toString());
+		// config.setStatus(Constants.API_STATUS_OFFLINE); // 更新后不更新状态
 
-    @GetMapping("/apiDocs")
-    @GaApiAction(text = "api文档")
-    public void apiDocs(String ids, HttpServletResponse response) {
-        List<String> collect = Arrays.asList(ids.split(","));
-        String docs = apiConfigService.apiDocs(collect);
-        response.setContentType("application/x-msdownload;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=API docs.md");
-        OutputStream os = null; // 输出流
-        try {
-            os = response.getOutputStream();
-            os.write(docs.getBytes("utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		return apiConfigService.update(config);
+	}
 
-    /**
-     * 导出API 配置
-     *
-     * @param ids
-     * @param response
-     */
-    @PostMapping("/downloadConfig")
-    @GaApiAction(text = "下载API配置")
-    public void downloadConfig(String ids, HttpServletResponse response) {
-        List<String> collect = Arrays.asList(ids.split(","));
-        JSONObject jo = apiConfigService.exportAPI(collect);
-        String s = jo.toString();
-        response.setContentType("application/x-msdownload;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=api_config.json");
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            os.write(s.getBytes("utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	@GetMapping("/online/{id}")
+	@GaApiAction(text = "上线")
+	public void online(@PathVariable String id) {
+		apiConfigService.online(id);
+	}
 
-    @PostMapping("/downloadGroupConfig")
-    @GaApiAction(text = "下载API组配置")
-    public void downloadGroupConfig(String ids, HttpServletResponse response) {
-        List<String> collect = Arrays.asList(ids.split(","));
-        List<Group> list = groupService.selectBatch(collect);
-        String s = JSON.toJSONString(list);
-        response.setContentType("application/x-msdownload;charset=utf-8");
-        // response.setHeader("Content-Disposition", "attachment; filename=api配置.json");
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            os.write(s.getBytes("utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	@GetMapping("/offline/{id}")
+	@GaApiAction(text = "下线")
+	public void offline(@PathVariable String id) {
+		apiConfigService.offline(id);
+	}
 
-    /**
-     * 导入API配置
-     *
-     * @param file
-     * @throws IOException
-     */
-    @PostMapping(value = "/import", produces = "application/json;charset=UTF-8")
-    public void importAPI(@RequestParam("file") MultipartFile file) throws IOException {
-        String s = IoUtil.read(file.getInputStream(), "utf-8");
-        JSONObject jsonObject = JSON.parseObject(s);
-        List<ApiConfig> apis = jsonObject.getJSONArray("api").toJavaList(ApiConfig.class);
-        apis.stream()
-                .forEach(
-                        t -> {
-                            t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
-                            t.setCreateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                            t.setUpdateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                        });
+	@GetMapping("/apiDocs")
+	@GaApiAction(text = "api文档")
+	public void apiDocs(String ids, HttpServletResponse response) {
+		List<String> collect = Arrays.asList(ids.split(","));
+		String docs = apiConfigService.apiDocs(collect);
+		response.setContentType("application/x-msdownload;charset=utf-8");
+		response.setHeader("Content-Disposition", "attachment; filename=API docs.md");
+		OutputStream os = null; // 输出流
+		try {
+			os = response.getOutputStream();
+			os.write(docs.getBytes("utf-8"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (os != null)
+					os.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-        apiConfigService.importAPI(apis);
-    }
+	/**
+	 * 导出API 配置
+	 * @param ids
+	 * @param response
+	 */
+	@PostMapping("/downloadConfig")
+	@GaApiAction(text = "下载API配置")
+	public void downloadConfig(String ids, HttpServletResponse response) {
+		List<String> collect = Arrays.asList(ids.split(","));
+		JSONObject jo = apiConfigService.exportAPI(collect);
+		String s = jo.toString();
+		response.setContentType("application/x-msdownload;charset=utf-8");
+		response.setHeader("Content-Disposition", "attachment; filename=api_config.json");
+		OutputStream os = null;
+		try {
+			os = response.getOutputStream();
+			os.write(s.getBytes("utf-8"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (os != null)
+					os.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    @PostMapping(value = "/importGroup", produces = "application/json;charset=UTF-8")
-    public void importGroup(@RequestParam("file") MultipartFile file) throws IOException {
-        String s = IoUtil.read(file.getInputStream(), "utf-8");
-        List<Group> configs = JSON.parseArray(s, Group.class);
-        configs.stream()
-                .forEach(
-                        t -> {
-                            t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
-                            t.setCreateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                            t.setUpdateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                        });
-        groupService.insertBatch(configs);
-    }
+	@PostMapping("/downloadGroupConfig")
+	@GaApiAction(text = "下载API组配置")
+	public void downloadGroupConfig(String ids, HttpServletResponse response) {
+		List<String> collect = Arrays.asList(ids.split(","));
+		List<Group> list = groupService.selectBatch(collect);
+		String s = JSON.toJSONString(list);
+		response.setContentType("application/x-msdownload;charset=utf-8");
+		// response.setHeader("Content-Disposition", "attachment; filename=api配置.json");
+		OutputStream os = null;
+		try {
+			os = response.getOutputStream();
+			os.write(s.getBytes("utf-8"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (os != null)
+					os.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    @PostMapping("/sql/execute")
-    public ResponseDto executeSql(String datasourceId, String sql, String params) {
-        DruidPooledConnection connection = null;
-        try {
-            DataSource dataSource = dataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSource);
-            Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
-        } catch (Exception e) {
-            return ResponseDto.fail(e.getMessage());
-        } finally {
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	/**
+	 * 导入API配置
+	 * @param file
+	 * @throws IOException
+	 */
+	@PostMapping(value = "/import", produces = "application/json;charset=UTF-8")
+	public void importAPI(@RequestParam("file") MultipartFile file) throws IOException {
+		String s = IoUtil.read(file.getInputStream(), "utf-8");
+		JSONObject jsonObject = JSON.parseObject(s);
+		List<ApiConfig> apis = jsonObject.getJSONArray("api").toJavaList(ApiConfig.class);
+		apis.stream().forEach(t -> {
+			t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+			t.setCreateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+			t.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+		});
 
-    @PostMapping("/sql/executeV2")
-    public ResponseDto executeSql(@RequestBody JSONObject jo) {
-        String datasourceId = jo.getString("datasourceId");
-        String params = jo.getString("params");
-        String sql = jo.getString("sql");
-        DruidPooledConnection connection = null;
-        try {
-            DataSource dataSource = dataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSource);
-            Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
-        } catch (Exception e) {
-            return ResponseDto.fail(e.getMessage());
-        } finally {
-            try {
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		apiConfigService.importAPI(apis);
+	}
 
-    @PostMapping("/parseDynamicSql")
-    public ResponseDto parseDynamicSql(String sql, String params) {
-        try {
-            Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            return ResponseDto.successWithData(sqlMeta);
-        } catch (Exception e) {
-            return ResponseDto.fail(e.getMessage());
-        }
-    }
+	@PostMapping(value = "/importGroup", produces = "application/json;charset=UTF-8")
+	public void importGroup(@RequestParam("file") MultipartFile file) throws IOException {
+		String s = IoUtil.read(file.getInputStream(), "utf-8");
+		List<Group> configs = JSON.parseArray(s, Group.class);
+		configs.stream().forEach(t -> {
+			t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+			t.setCreateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+			t.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+		});
+		groupService.insertBatch(configs);
+	}
 
-    @GaApiAction(text = "分页列出api配置信息")
-    @RequestMapping(
-            value = "/listDbApiConfigPage",
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public GiResult<GiPager<ApiConfig>> listDbApiConfigPage(
-            @Validated @RequestBody ConfigSearchVo param) {
-        DbApiConfigSeo seo = new DbApiConfigSeo();
-        BeanUtils.copyProperties(param, seo);
-        seo.setNotDel();
-        if (GutilObject.isNotEmpty(param.getQueryContent())) {
-            seo.setAndQueryContentIn(
-                    ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
-        }
-        GiPager<DbApiConfigDto> giPager = dbapiConfigDao.searchListPage(seo, GiPageParam.of());
-        Iterable<DbApiConfigDto> value = giPager.value();
-        GirPager<ApiConfig> reg = new GirPager();
-        List<ApiConfig> vdvos = ApiConfig.fromDtos(ListUtil.toList(value));
-        reg.put(vdvos, giPager.total(), giPager.pageParam());
-        return GiResult.successValue(reg);
-    }
+	@PostMapping("/sql/execute")
+	public ResponseDto executeSql(String datasourceId, String sql, String params) {
+		DruidPooledConnection connection = null;
+		try {
+			DataSource dataSource = dataSourceService.detail(datasourceId);
+			connection = PoolManager.getPooledConnection(dataSource);
+			Map<String, Object> map = JSON.parseObject(params, Map.class);
+			SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
+			Object data = JdbcUtil.executeSql(connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
+			return ResponseDto.successWithData(data);
+		}
+		catch (Exception e) {
+			return ResponseDto.fail(e.getMessage());
+		}
+		finally {
+			try {
+				if (connection != null)
+					connection.close();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@PostMapping("/sql/executeV2")
+	public ResponseDto executeSql(@RequestBody JSONObject jo) {
+		String datasourceId = jo.getString("datasourceId");
+		String params = jo.getString("params");
+		String sql = jo.getString("sql");
+		DruidPooledConnection connection = null;
+		try {
+			DataSource dataSource = dataSourceService.detail(datasourceId);
+			connection = PoolManager.getPooledConnection(dataSource);
+			Map<String, Object> map = JSON.parseObject(params, Map.class);
+			SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
+			Object data = JdbcUtil.executeSql(connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
+			return ResponseDto.successWithData(data);
+		}
+		catch (Exception e) {
+			return ResponseDto.fail(e.getMessage());
+		}
+		finally {
+			try {
+				if (connection != null)
+					connection.close();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@PostMapping("/parseDynamicSql")
+	public ResponseDto parseDynamicSql(String sql, String params) {
+		try {
+			Map<String, Object> map = JSON.parseObject(params, Map.class);
+			SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
+			return ResponseDto.successWithData(sqlMeta);
+		}
+		catch (Exception e) {
+			return ResponseDto.fail(e.getMessage());
+		}
+	}
+
+	@GaApiAction(text = "分页列出api配置信息")
+	@RequestMapping(value = "/listDbApiConfigPage", method = { RequestMethod.POST })
+	@ResponseBody
+	public GiResult<GiPager<ApiConfig>> listDbApiConfigPage(@Validated @RequestBody ConfigSearchVo param) {
+		DbApiConfigSeo seo = new DbApiConfigSeo();
+		BeanUtils.copyProperties(param, seo);
+		seo.setNotDel();
+		if (GutilObject.isNotEmpty(param.getQueryContent())) {
+			seo.setAndQueryContentIn(ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
+		}
+		GiPager<DbApiConfigDto> giPager = dbapiConfigDao.searchListPage(seo, GiPageParam.of());
+		Iterable<DbApiConfigDto> value = giPager.value();
+		GirPager<ApiConfig> reg = new GirPager();
+		List<ApiConfig> vdvos = ApiConfig.fromDtos(ListUtil.toList(value));
+		reg.put(vdvos, giPager.total(), giPager.pageParam());
+		return GiResult.successValue(reg);
+	}
+
 }

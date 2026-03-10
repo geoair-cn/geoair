@@ -16,9 +16,11 @@ import java.util.List;
  * @date 2025-07-31
  */
 public interface DbApiGroupDao extends GiEntityDao<DbApiGroupPo, String> {
-    List<DbApiGroupDto> searchList(DbApiGroupSeo dbapiGroupSeo);
 
-    List<DbApiGroupPo> selectBatchIds(List<String> ids);
+	List<DbApiGroupDto> searchList(DbApiGroupSeo dbapiGroupSeo);
 
-    GiPager<DbApiGroupDto> searchListPage(DbApiGroupSeo dbapiGroupSeo, GiPageParam pageParam);
+	List<DbApiGroupPo> selectBatchIds(List<String> ids);
+
+	GiPager<DbApiGroupDto> searchListPage(DbApiGroupSeo dbapiGroupSeo, GiPageParam pageParam);
+
 }

@@ -54,123 +54,127 @@ import javax.servlet.http.HttpServletResponse;
 @GaApi(tags = "数据源相关")
 public class DataSourceController {
 
-    @Autowired DataSourceService dataSourceService;
-    @Resource private DbApiDataSourceDao dbApiDataSourceDao;
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
+	@Autowired
+	DataSourceService dataSourceService;
 
-    @RequestMapping("/add")
-    @GaApiAction(text = "新增数据源")
-    public void add(DataSource dataSource) {
-        dataSource.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
-        dataSourceService.add(dataSource);
-    }
+	@Resource
+	private DbApiDataSourceDao dbApiDataSourceDao;
 
-    @PostMapping("/getAll")
-    @GaApiAction(text = "获取所有数据源")
-    public List<DataSource> getAll() {
-        return dataSourceService.getAll();
-    }
+	@Resource
+	DbApiUserInfoHelper dbApiUserInfoHelper;
 
-    @GetMapping("/detail/{id}")
-    @GaApiAction(text = "更新API分组信息")
-    public DataSource detail(@PathVariable String id) {
-        return dataSourceService.detail(id);
-    }
+	@RequestMapping("/add")
+	@GaApiAction(text = "新增数据源")
+	public void add(DataSource dataSource) {
+		dataSource.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+		dataSourceService.add(dataSource);
+	}
 
-    @PostMapping("/delete/{id}")
-    @GaApiAction(text = "删除数据源")
-    public ResponseDto delete(@PathVariable String id) {
-        return dataSourceService.delete(id);
-    }
+	@PostMapping("/getAll")
+	@GaApiAction(text = "获取所有数据源")
+	public List<DataSource> getAll() {
+		return dataSourceService.getAll();
+	}
 
-    @PostMapping("/update")
-    @GaApiAction(text = "更新数据源")
-    public DataSource update(DataSource dataSource) {
-        dataSourceService.update(dataSource);
-        return null;
-    }
+	@GetMapping("/detail/{id}")
+	@GaApiAction(text = "更新API分组信息")
+	public DataSource detail(@PathVariable String id) {
+		return dataSourceService.detail(id);
+	}
 
-    @PostMapping("/connect")
-    @GaApiAction(text = "测试连接")
-    public ResponseDto connect(DataSource dataSource) {
-        Connection connection = null;
-        try {
-            connection = JdbcUtil.getConnection(dataSource);
-            return ResponseDto.apiSuccess(null);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return ResponseDto.fail(e.getMessage());
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    log.error(e.getMessage());
-                }
-            }
-        }
-    }
+	@PostMapping("/delete/{id}")
+	@GaApiAction(text = "删除数据源")
+	public ResponseDto delete(@PathVariable String id) {
+		return dataSourceService.delete(id);
+	}
 
-    @PostMapping("/export")
-    @GaApiAction(text = "导出数据源")
-    public void export(String ids, HttpServletResponse response) {
-        List<String> collect = Arrays.asList(ids.split(","));
-        List<DataSource> list = dataSourceService.selectBatch(collect);
-        String s = JSON.toJSONString(list);
-        response.setContentType("application/x-msdownload;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment; filename=datasource.json");
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            os.write(s.getBytes("utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (os != null) os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	@PostMapping("/update")
+	@GaApiAction(text = "更新数据源")
+	public DataSource update(DataSource dataSource) {
+		dataSourceService.update(dataSource);
+		return null;
+	}
 
-    @RequestMapping(value = "/import", produces = "application/json;charset=UTF-8")
-    @GaApiAction(text = "导入数据源")
-    public void importDatasource(@RequestParam("file") MultipartFile file) throws IOException {
-        String s = IoUtil.read(file.getInputStream(), "utf-8");
-        List<DataSource> list = JSON.parseArray(s, DataSource.class);
-        list.stream()
-                .forEach(
-                        t -> {
-                            t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
-                            t.setCreateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                            t.setUpdateTime(
-                                    DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
-                        });
-        dataSourceService.insertBatch(list);
-    }
+	@PostMapping("/connect")
+	@GaApiAction(text = "测试连接")
+	public ResponseDto connect(DataSource dataSource) {
+		Connection connection = null;
+		try {
+			connection = JdbcUtil.getConnection(dataSource);
+			return ResponseDto.apiSuccess(null);
+		}
+		catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return ResponseDto.fail(e.getMessage());
+		}
+		finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				}
+				catch (SQLException e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+	}
 
-    @GaApiAction(text = "分页列出数据源信息")
-    @RequestMapping(
-            value = "/listDbApiDatasourcePage",
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public GiResult<GiPager<DataSource>> listDbApiDatasourcePage(
-            @Validated @RequestBody DatasourceSearchVo param) {
-        DbApiDataSourceSeo seo = new DbApiDataSourceSeo();
-        BeanUtils.copyProperties(param, seo);
-        seo.setNotDel();
-        if (GutilObject.isNotEmpty(param.getQueryContent())) {
-            seo.setAndQueryContentIn(
-                    ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
-        }
-        GiPager<DbApiDataSourceDto> giPager =
-                dbApiDataSourceDao.searchListPage(seo, GiPageParam.of());
-        Iterable<DbApiDataSourceDto> value = giPager.value();
-        GirPager<DataSource> reg = new GirPager<>();
-        List<DataSource> vdvos = DataSource.fromDtos(ListUtil.toList(value));
-        reg.put(vdvos, giPager.total(), giPager.pageParam());
-        return GiResult.successValue(reg);
-    }
+	@PostMapping("/export")
+	@GaApiAction(text = "导出数据源")
+	public void export(String ids, HttpServletResponse response) {
+		List<String> collect = Arrays.asList(ids.split(","));
+		List<DataSource> list = dataSourceService.selectBatch(collect);
+		String s = JSON.toJSONString(list);
+		response.setContentType("application/x-msdownload;charset=utf-8");
+		response.setHeader("Content-Disposition", "attachment; filename=datasource.json");
+		OutputStream os = null;
+		try {
+			os = response.getOutputStream();
+			os.write(s.getBytes("utf-8"));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				if (os != null)
+					os.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@RequestMapping(value = "/import", produces = "application/json;charset=UTF-8")
+	@GaApiAction(text = "导入数据源")
+	public void importDatasource(@RequestParam("file") MultipartFile file) throws IOException {
+		String s = IoUtil.read(file.getInputStream(), "utf-8");
+		List<DataSource> list = JSON.parseArray(s, DataSource.class);
+		list.stream().forEach(t -> {
+			t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+			t.setCreateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+			t.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+		});
+		dataSourceService.insertBatch(list);
+	}
+
+	@GaApiAction(text = "分页列出数据源信息")
+	@RequestMapping(value = "/listDbApiDatasourcePage", method = { RequestMethod.POST })
+	@ResponseBody
+	public GiResult<GiPager<DataSource>> listDbApiDatasourcePage(@Validated @RequestBody DatasourceSearchVo param) {
+		DbApiDataSourceSeo seo = new DbApiDataSourceSeo();
+		BeanUtils.copyProperties(param, seo);
+		seo.setNotDel();
+		if (GutilObject.isNotEmpty(param.getQueryContent())) {
+			seo.setAndQueryContentIn(ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
+		}
+		GiPager<DbApiDataSourceDto> giPager = dbApiDataSourceDao.searchListPage(seo, GiPageParam.of());
+		Iterable<DbApiDataSourceDto> value = giPager.value();
+		GirPager<DataSource> reg = new GirPager<>();
+		List<DataSource> vdvos = DataSource.fromDtos(ListUtil.toList(value));
+		reg.put(vdvos, giPager.total(), giPager.pageParam());
+		return GiResult.successValue(reg);
+	}
+
 }

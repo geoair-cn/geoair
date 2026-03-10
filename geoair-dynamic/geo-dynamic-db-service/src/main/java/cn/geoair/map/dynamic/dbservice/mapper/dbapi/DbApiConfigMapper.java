@@ -22,43 +22,41 @@ import java.util.List;
  * @date 2025-07-31
  */
 public interface DbApiConfigMapper extends DbApiConfigDao, TkEntityMapper<DbApiConfigPo, String> {
-    @Override
-    List<DbApiConfigDto> searchList(@Param("param") DbApiConfigSeo dbapiConfigSeo);
 
-    default List<DbApiConfigPo> selectBatchIds(List<String> ids) {
-        Example example = new Example(DbApiConfigPo.class);
-        example.and().andIn("id", ids);
-        return selectByExample(example);
-    }
+	@Override
+	List<DbApiConfigDto> searchList(@Param("param") DbApiConfigSeo dbapiConfigSeo);
 
-    DbApiConfigDto selectByPathOnline(String path);
+	default List<DbApiConfigPo> selectBatchIds(List<String> ids) {
+		Example example = new Example(DbApiConfigPo.class);
+		example.and().andIn("id", ids);
+		return selectByExample(example);
+	}
 
-    List<DbApiConfigDto> search(
-            @Param("name") String name,
-            @Param("note") String note,
-            @Param("path") String path,
-            @Param("groupId") String groupId);
+	DbApiConfigDto selectByPathOnline(String path);
 
-    Integer selectCountByPath(String path);
+	List<DbApiConfigDto> search(@Param("name") String name, @Param("note") String note, @Param("path") String path,
+			@Param("groupId") String groupId);
 
-    Integer selectCountByPathWhenUpdate(@Param("path") String path, @Param("id") String id);
+	Integer selectCountByPath(String path);
 
-    int selectCountByGroup(String id);
+	Integer selectCountByPathWhenUpdate(@Param("path") String path, @Param("id") String id);
 
-    List<DbApiConfigDto> selectByGroup(String groupId);
+	int selectCountByGroup(String id);
 
-    @Override
-    default GiPager<DbApiConfigDto> searchListPage(
-            @Param("param") DbApiConfigSeo dbapiConfigSeo, GiPageParam pageParam) {
+	List<DbApiConfigDto> selectByGroup(String groupId);
 
-        GfunPageExcute<DbApiConfigDto> exec =
-                new GfunPageExcute<DbApiConfigDto>() {
-                    @Override
-                    public Iterable<DbApiConfigDto> excute() {
-                        return searchList(dbapiConfigSeo);
-                    }
-                };
+	@Override
+	default GiPager<DbApiConfigDto> searchListPage(@Param("param") DbApiConfigSeo dbapiConfigSeo,
+			GiPageParam pageParam) {
 
-        return pageExcuter().excutePage(exec, pageParam);
-    }
+		GfunPageExcute<DbApiConfigDto> exec = new GfunPageExcute<DbApiConfigDto>() {
+			@Override
+			public Iterable<DbApiConfigDto> excute() {
+				return searchList(dbapiConfigSeo);
+			}
+		};
+
+		return pageExcuter().excutePage(exec, pageParam);
+	}
+
 }

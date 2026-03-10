@@ -12,34 +12,37 @@ import javax.annotation.Resource;
 
 @Component
 public class ApiConfigMapper {
-    @Resource DbApiConfigDao dbApiConfigDao;
 
-    public List<ApiConfig> selectBatchIds(List<String> ids) {
-        List<DbApiConfigPo> dbApiConfigPos = dbApiConfigDao.selectBatchIds(ids);
-        return ApiConfig.fromPos(dbApiConfigPos);
-    }
+	@Resource
+	DbApiConfigDao dbApiConfigDao;
 
-    public ApiConfig selectByPathOnline(String path) {
-        return ApiConfig.fromPo(dbApiConfigDao.selectByPathOnline(path));
-    }
+	public List<ApiConfig> selectBatchIds(List<String> ids) {
+		List<DbApiConfigPo> dbApiConfigPos = dbApiConfigDao.selectBatchIds(ids);
+		return ApiConfig.fromPos(dbApiConfigPos);
+	}
 
-    public List<ApiConfig> search(String name, String note, String path, String groupId) {
-        return ApiConfig.fromDtos(dbApiConfigDao.search(name, note, path, groupId));
-    }
+	public ApiConfig selectByPathOnline(String path) {
+		return ApiConfig.fromPo(dbApiConfigDao.selectByPathOnline(path));
+	}
 
-    public Integer selectCountByPath(String path) {
-        return dbApiConfigDao.selectCountByPath(path);
-    }
+	public List<ApiConfig> search(String name, String note, String path, String groupId) {
+		return ApiConfig.fromDtos(dbApiConfigDao.search(name, note, path, groupId));
+	}
 
-    public Integer selectCountByPathWhenUpdate(String path, String id) {
-        return dbApiConfigDao.selectCountByPathWhenUpdate(path, id);
-    }
+	public Integer selectCountByPath(String path) {
+		return dbApiConfigDao.selectCountByPath(path);
+	}
 
-    public int selectCountByGroup(String id) {
-        return dbApiConfigDao.selectCountByGroup(id);
-    }
+	public Integer selectCountByPathWhenUpdate(String path, String id) {
+		return dbApiConfigDao.selectCountByPathWhenUpdate(path, id);
+	}
 
-    public List<ApiConfig> selectByGroup(String groupId) {
-        return ApiConfig.fromDtos(dbApiConfigDao.selectByGroup(groupId));
-    }
+	public int selectCountByGroup(String id) {
+		return dbApiConfigDao.selectCountByGroup(id);
+	}
+
+	public List<ApiConfig> selectByGroup(String groupId) {
+		return ApiConfig.fromDtos(dbApiConfigDao.selectByGroup(groupId));
+	}
+
 }

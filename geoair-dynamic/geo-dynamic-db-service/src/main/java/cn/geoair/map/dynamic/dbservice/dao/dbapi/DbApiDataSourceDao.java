@@ -17,10 +17,10 @@ import java.util.List;
  */
 public interface DbApiDataSourceDao extends GiEntityDao<DbApiDataSourcePo, String> {
 
-    List<DbApiDataSourceDto> searchList(DbApiDataSourceSeo dbapiDatasourceSeo);
+	List<DbApiDataSourceDto> searchList(DbApiDataSourceSeo dbapiDatasourceSeo);
 
-    List<DbApiDataSourcePo> selectBatchIds(List<String> ids);
+	List<DbApiDataSourcePo> selectBatchIds(List<String> ids);
 
-    GiPager<DbApiDataSourceDto> searchListPage(
-            DbApiDataSourceSeo dbapiDatasourceSeo, GiPageParam pageParam);
+	GiPager<DbApiDataSourceDto> searchListPage(DbApiDataSourceSeo dbapiDatasourceSeo, GiPageParam pageParam);
+
 }

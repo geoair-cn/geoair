@@ -18,33 +18,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServletConfig {
 
-    @Autowired private APIServlet apiServlet;
+	@Autowired
+	private APIServlet apiServlet;
 
-    @Bean
-    public FilterRegistrationBean apiHeaderFilter() {
-        // issues/I51LOI
-        int apiHeaderFilterOrder = 1;
-        String realApiContext = "apiServer";
-        String format = String.format("/%s/*", realApiContext);
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setFilter(new ApiHeaderFilter());
-        registrationBean.addUrlPatterns(format); // API Servlet 跨域
-        registrationBean.setOrder(apiHeaderFilterOrder);
-        registrationBean.setEnabled(true);
-        log.info(
-                "regist apiHeaderFilter for {} UrlPatterns, and order is {}",
-                format,
-                apiHeaderFilterOrder);
-        return registrationBean;
-    }
+	@Bean
+	public FilterRegistrationBean apiHeaderFilter() {
+		// issues/I51LOI
+		int apiHeaderFilterOrder = 1;
+		String realApiContext = "apiServer";
+		String format = String.format("/%s/*", realApiContext);
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+		registrationBean.setFilter(new ApiHeaderFilter());
+		registrationBean.addUrlPatterns(format); // API Servlet 跨域
+		registrationBean.setOrder(apiHeaderFilterOrder);
+		registrationBean.setEnabled(true);
+		log.info("regist apiHeaderFilter for {} UrlPatterns, and order is {}", format, apiHeaderFilterOrder);
+		return registrationBean;
+	}
 
-    @Bean
-    public ServletRegistrationBean getServletRegistrationBean() {
-        String realApiContext = "apiServer";
-        String format = String.format("/%s/*", realApiContext);
-        ServletRegistrationBean bean = new ServletRegistrationBean(apiServlet);
-        bean.addUrlMappings(format);
-        log.info("regist APIServlet servelet for {} urlMappings", format);
-        return bean;
-    }
+	@Bean
+	public ServletRegistrationBean getServletRegistrationBean() {
+		String realApiContext = "apiServer";
+		String format = String.format("/%s/*", realApiContext);
+		ServletRegistrationBean bean = new ServletRegistrationBean(apiServlet);
+		bean.addUrlMappings(format);
+		log.info("regist APIServlet servelet for {} urlMappings", format);
+		return bean;
+	}
+
 }

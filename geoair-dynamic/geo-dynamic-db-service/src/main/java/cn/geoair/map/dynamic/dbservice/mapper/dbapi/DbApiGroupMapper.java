@@ -22,27 +22,27 @@ import java.util.List;
  * @date 2025-07-31
  */
 public interface DbApiGroupMapper extends DbApiGroupDao, TkEntityMapper<DbApiGroupPo, String> {
-    @Override
-    List<DbApiGroupDto> searchList(@Param("param") DbApiGroupSeo dbapiGroupSeo);
 
-    default List<DbApiGroupPo> selectBatchIds(List<String> ids) {
-        Example example = new Example(DbApiGroupPo.class);
-        example.and().andIn("id", ids);
-        return selectByExample(example);
-    }
+	@Override
+	List<DbApiGroupDto> searchList(@Param("param") DbApiGroupSeo dbapiGroupSeo);
 
-    @Override
-    default GiPager<DbApiGroupDto> searchListPage(
-            @Param("param") DbApiGroupSeo dbapiGroupSeo, GiPageParam pageParam) {
+	default List<DbApiGroupPo> selectBatchIds(List<String> ids) {
+		Example example = new Example(DbApiGroupPo.class);
+		example.and().andIn("id", ids);
+		return selectByExample(example);
+	}
 
-        GfunPageExcute<DbApiGroupDto> exec =
-                new GfunPageExcute<DbApiGroupDto>() {
-                    @Override
-                    public Iterable<DbApiGroupDto> excute() {
-                        return searchList(dbapiGroupSeo);
-                    }
-                };
+	@Override
+	default GiPager<DbApiGroupDto> searchListPage(@Param("param") DbApiGroupSeo dbapiGroupSeo, GiPageParam pageParam) {
 
-        return pageExcuter().excutePage(exec, pageParam);
-    }
+		GfunPageExcute<DbApiGroupDto> exec = new GfunPageExcute<DbApiGroupDto>() {
+			@Override
+			public Iterable<DbApiGroupDto> excute() {
+				return searchList(dbapiGroupSeo);
+			}
+		};
+
+		return pageExcuter().excutePage(exec, pageParam);
+	}
+
 }

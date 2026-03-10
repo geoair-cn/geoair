@@ -12,27 +12,29 @@ import cn.hutool.core.bean.BeanUtil;
  */
 @GaModel(text = "api分组信息DTO")
 public class DbApiGroupDto extends DbApiGroupPo {
-    private static final long serialVersionUID = 1753953245128L;
 
-    public static DbApiGroupDto empty() {
-        return new DbApiGroupDto();
-    }
+	private static final long serialVersionUID = 1753953245128L;
 
-    public DbApiGroupDto copy() {
-        DbApiGroupDto copy = new DbApiGroupDto();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static DbApiGroupDto empty() {
+		return new DbApiGroupDto();
+	}
 
-    public static DbApiGroupDto ofDbapiGroupPo(DbApiGroupPo source) {
-        DbApiGroupDto target = new DbApiGroupDto();
-        BeanUtil.copyProperties(source, target);
-        return target;
-    }
+	public DbApiGroupDto copy() {
+		DbApiGroupDto copy = new DbApiGroupDto();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    public static DbApiGroupPo toPo(DbApiGroupDto source) {
-        DbApiGroupPo target = new DbApiGroupPo();
-        BeanUtil.copyProperties(source, target);
-        return target;
-    }
+	public static DbApiGroupDto ofDbapiGroupPo(DbApiGroupPo source) {
+		DbApiGroupDto target = new DbApiGroupDto();
+		BeanUtil.copyProperties(source, target);
+		return target;
+	}
+
+	public static DbApiGroupPo toPo(DbApiGroupDto source) {
+		DbApiGroupPo target = new DbApiGroupPo();
+		BeanUtil.copyProperties(source, target);
+		return target;
+	}
+
 }

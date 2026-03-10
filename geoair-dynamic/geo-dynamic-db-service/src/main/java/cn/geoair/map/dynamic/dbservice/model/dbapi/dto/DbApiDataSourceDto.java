@@ -12,27 +12,29 @@ import cn.hutool.core.bean.BeanUtil;
  */
 @GaModel(text = "数据源信息DTO")
 public class DbApiDataSourceDto extends DbApiDataSourcePo {
-    private static final long serialVersionUID = 1753953250860L;
 
-    public static DbApiDataSourceDto empty() {
-        return new DbApiDataSourceDto();
-    }
+	private static final long serialVersionUID = 1753953250860L;
 
-    public DbApiDataSourceDto copy() {
-        DbApiDataSourceDto copy = new DbApiDataSourceDto();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public static DbApiDataSourceDto empty() {
+		return new DbApiDataSourceDto();
+	}
 
-    public static DbApiDataSourceDto ofDbapiDatasourcePo(DbApiDataSourcePo source) {
-        DbApiDataSourceDto target = new DbApiDataSourceDto();
-        BeanUtil.copyProperties(source, target);
-        return target;
-    }
+	public DbApiDataSourceDto copy() {
+		DbApiDataSourceDto copy = new DbApiDataSourceDto();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    public static DbApiDataSourcePo toPo(DbApiDataSourceDto source) {
-        DbApiDataSourcePo target = new DbApiDataSourcePo();
-        BeanUtil.copyProperties(source, target);
-        return target;
-    }
+	public static DbApiDataSourceDto ofDbapiDatasourcePo(DbApiDataSourcePo source) {
+		DbApiDataSourceDto target = new DbApiDataSourceDto();
+		BeanUtil.copyProperties(source, target);
+		return target;
+	}
+
+	public static DbApiDataSourcePo toPo(DbApiDataSourceDto source) {
+		DbApiDataSourcePo target = new DbApiDataSourcePo();
+		BeanUtil.copyProperties(source, target);
+		return target;
+	}
+
 }
