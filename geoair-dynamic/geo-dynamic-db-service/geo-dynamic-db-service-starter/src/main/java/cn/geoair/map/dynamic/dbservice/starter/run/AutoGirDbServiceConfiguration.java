@@ -11,27 +11,27 @@ import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 11:38
- * @description： 自动装配模块
+ * @date ：Created in 11:38 @description： 自动装配模块
  */
 @Configuration
 @ComponentScan("cn.geoair.map.dynamic.dbservice")
 @MapperScan("cn.geoair.map.dynamic.dbservice.starter.mapper")
 public class AutoGirDbServiceConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(DsApiUserInfoHelper.class)
-    public DsApiUserInfoHelper dsApiUserInfoHelper() {
-        return new DsApiUserInfoHelper() {
-            @Override
-            public String getSubjectName() {
-                return "geoair";
-            }
+	@Bean
+	@ConditionalOnMissingBean(DsApiUserInfoHelper.class)
+	public DsApiUserInfoHelper dsApiUserInfoHelper() {
+		return new DsApiUserInfoHelper() {
+			@Override
+			public String getSubjectName() {
+				return "geoair";
+			}
 
-            @Override
-            public String getSubjectId() {
-                return "geoair";
-            }
-        };
-    }
+			@Override
+			public String getSubjectId() {
+				return "geoair";
+			}
+		};
+	}
+
 }

@@ -19,45 +19,46 @@ import java.util.List;
 @GaModel(text = "api配置信息DTO")
 public class DsApiConfigDto extends DsApiConfigPo {
 
-    private static final long serialVersionUID = 1753953255411L;
+	private static final long serialVersionUID = 1753953255411L;
 
-    public static DsApiConfigDto empty() {
-        return new DsApiConfigDto();
-    }
+	public static DsApiConfigDto empty() {
+		return new DsApiConfigDto();
+	}
 
-    public DsApiConfigDto copy() {
-        DsApiConfigDto copy = new DsApiConfigDto();
-        BeanUtil.copyProperties(this, copy);
-        return copy;
-    }
+	public DsApiConfigDto copy() {
+		DsApiConfigDto copy = new DsApiConfigDto();
+		BeanUtil.copyProperties(this, copy);
+		return copy;
+	}
 
-    public static DsApiConfigPo toPo(ApiConfigApo apiConfigApo) {
-        if (apiConfigApo == null) {
-            return null;
-        }
-        DsApiConfigPo thisPo = new DsApiConfigPo();
-        BeanUtils.copyProperties(apiConfigApo, thisPo);
-        return thisPo;
-    }
+	public static DsApiConfigPo toPo(ApiConfigApo apiConfigApo) {
+		if (apiConfigApo == null) {
+			return null;
+		}
+		DsApiConfigPo thisPo = new DsApiConfigPo();
+		BeanUtils.copyProperties(apiConfigApo, thisPo);
+		return thisPo;
+	}
 
-    public static ApiConfigApo fromPo(DsApiConfigPo po) {
-        if (po == null) {
-            return null;
-        }
-        ApiConfigApo thisVo = new ApiConfigApo();
-        BeanUtils.copyProperties(po, thisVo);
-        return thisVo;
-    }
+	public static ApiConfigApo fromPo(DsApiConfigPo po) {
+		if (po == null) {
+			return null;
+		}
+		ApiConfigApo thisVo = new ApiConfigApo();
+		BeanUtils.copyProperties(po, thisVo);
+		return thisVo;
+	}
 
-    public static List<ApiConfigApo> fromPos(List<DsApiConfigPo> pos) {
-        if (pos == null) {
-            return new ArrayList<>();
-        }
-        List<ApiConfigApo> list = new ArrayList<>();
-        for (DsApiConfigPo po : pos) {
-            ApiConfigApo thisVo = fromPo(po);
-            list.add(thisVo);
-        }
-        return list;
-    }
+	public static List<ApiConfigApo> fromPos(List<DsApiConfigPo> pos) {
+		if (pos == null) {
+			return new ArrayList<>();
+		}
+		List<ApiConfigApo> list = new ArrayList<>();
+		for (DsApiConfigPo po : pos) {
+			ApiConfigApo thisVo = fromPo(po);
+			list.add(thisVo);
+		}
+		return list;
+	}
+
 }

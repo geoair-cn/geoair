@@ -19,32 +19,35 @@ import javax.annotation.Resource;
 @GaApi(tags = "api分组信息")
 public class GroupController {
 
-    @Autowired GroupService groupService;
+	@Autowired
+	GroupService groupService;
 
-    @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
+	@Resource
+	DsApiUserInfoHelper dsApiUserInfoHelper;
 
-    @PostMapping("/create")
-    public void create(GroupApo groupApo) {
-        groupApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
-        groupService.insert(groupApo);
-    }
+	@PostMapping("/create")
+	public void create(GroupApo groupApo) {
+		groupApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
+		groupService.insert(groupApo);
+	}
 
-    @GaApiAction(text = "创建API分组")
-    @PostMapping("/delete/{id}")
-    public ResponseDto delete(@PathVariable String id) {
-        return groupService.deleteById(id);
-    }
+	@GaApiAction(text = "创建API分组")
+	@PostMapping("/delete/{id}")
+	public ResponseDto delete(@PathVariable String id) {
+		return groupService.deleteById(id);
+	}
 
-    @GaApiAction(text = "获取所有API分组")
-    @PostMapping("/getAll")
-    public List<GroupApo> getAll() {
-        List<GroupApo> list = groupService.getAll();
-        return list;
-    }
+	@GaApiAction(text = "获取所有API分组")
+	@PostMapping("/getAll")
+	public List<GroupApo> getAll() {
+		List<GroupApo> list = groupService.getAll();
+		return list;
+	}
 
-    @GaApiAction(text = "更新API分组信息")
-    @PostMapping("/update")
-    public void update(GroupApo groupApo) {
-        groupService.update(groupApo);
-    }
+	@GaApiAction(text = "更新API分组信息")
+	@PostMapping("/update")
+	public void update(GroupApo groupApo) {
+		groupService.update(groupApo);
+	}
+
 }
