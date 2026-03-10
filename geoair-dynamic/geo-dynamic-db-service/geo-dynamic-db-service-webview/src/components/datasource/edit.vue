@@ -13,7 +13,7 @@
 
 <script>
 import common from '@/components/datasource/common'
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
 
 export default {
   name: "edit",

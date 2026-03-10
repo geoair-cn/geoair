@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
 
 export default {
   name: "datasource",

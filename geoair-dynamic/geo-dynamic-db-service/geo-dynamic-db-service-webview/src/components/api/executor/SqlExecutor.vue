@@ -14,7 +14,8 @@
           <el-tabs v-model="currentActiveTabName" type="card" editable @edit="handleTabsEdit" tab-position="top">
             <el-tab-pane :key="item.name" v-for="(item, index) in editableTabs" :label="'SQL-'+item.name"
                          :name="item.name">
-              <sqlide ref="codemirror" :textareaRef="'cms'+index" :value="item.sqlText" :ds="datasourceId" :thisApiInfo="thisApiInfo"></sqlide>
+              <sqlide ref="codemirror" :textareaRef="'cms'+index" :value="item.sqlText" :ds="datasourceId"
+                      :thisApiInfo="thisApiInfo"></sqlide>
 
 
             </el-tab-pane>
@@ -56,7 +57,7 @@
 <script>
 import sqlide from "@/components/api/executor/sqlIDE.vue";
 import {EXECUTOR_TYPE} from "@/constant";
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
 
 export default {
   name: "SqlExecutor",

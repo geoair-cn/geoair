@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
 import {CONTENT_TYPE, PRIVILEGE} from "@/constant";
 import callExample from "@/components/api/common/callExample";
 import CodeMirror from "codemirror";

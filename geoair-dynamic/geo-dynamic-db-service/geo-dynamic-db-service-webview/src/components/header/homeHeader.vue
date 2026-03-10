@@ -6,13 +6,17 @@
     <!--    <div class="logo">DBApi</div>-->
     <span class="version">{{ version }}</span>
     <div class="menus">
-      <div class="menu iconfont icon-database " :class="{'activeMenu':$route.path == '/datasource'}" @click="clickMenu('/datasource')">{{ $t("m.datasource") }}</div>
-      <div class="menu iconfont icon-api" :class="{'activeMenu':$route.path.startsWith('/api')}" @click="clickMenu('/api')">API</div>
+      <div class="menu iconfont icon-database " :class="{'activeMenu':$route.path == '/datasource'}"
+           @click="clickMenu('/datasource')">{{ $t("m.datasource") }}
+      </div>
+      <div class="menu iconfont icon-api" :class="{'activeMenu':$route.path.startsWith('/api')}"
+           @click="clickMenu('/api')">API
+      </div>
     </div>
     <div class="right">
       <!--      <span class="mode">{{ this.$store.state.mode }}</span>-->
       <div style="line-height: 60px;margin: 0 5px">
-<!--        <a href="https://github.com/freakchick/DBApi" target="_blank"><i class="iconfont icon-github" style="font-size: 26px"></i></a>-->
+        <!--        <a href="https://github.com/freakchick/DBApi" target="_blank"><i class="iconfont icon-github" style="font-size: 26px"></i></a>-->
       </div>
 
       <el-dropdown @command="changeLanguage" style="margin-right: 15px">
@@ -20,7 +24,10 @@
           {{ languageName }}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item :command="item" :key="index" v-for="(item,index) in langs">{{ item.name }}</el-dropdown-item>
+          <el-dropdown-item :command="item" :key="index" v-for="(item,index) in langs">{{
+              item.name
+            }}
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
 
@@ -34,7 +41,8 @@
 
 <script>
 
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
+
 export default {
   name: "homeHeader",
 
@@ -75,11 +83,11 @@ export default {
     getVersion() {
       dbApi.getSystemVersion()
 
-        .then((response) => {
-          this.version = response.data;
-        })
-        .catch((error) => {
-        });
+          .then((response) => {
+            this.version = response.data;
+          })
+          .catch((error) => {
+          });
     },
   },
   created() {
@@ -88,7 +96,7 @@ export default {
   computed: {
     languageName() {
       const p = this.langs.filter((item) => item.value === this.currentLang)[0]
-        .name;
+          .name;
       return p;
     },
   },

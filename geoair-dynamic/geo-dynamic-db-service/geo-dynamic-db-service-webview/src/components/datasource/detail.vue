@@ -1,7 +1,8 @@
 <template>
   <div class="mycontent">
-    <el-button icon="el-icon-d-arrow-left" type="info" plain @click="$router.go(-1)" size="small">{{$t('m.back')}}</el-button>
-    <h2>{{$t('m.ds_detail')}}</h2>
+    <el-button icon="el-icon-d-arrow-left" type="info" plain @click="$router.go(-1)" size="small">{{ $t('m.back') }}
+    </el-button>
+    <h2>{{ $t('m.ds_detail') }}</h2>
     <common :id="$route.query.id"></common>
 
   </div>
@@ -9,17 +10,17 @@
 
 <script>
 import common from '@/components/datasource/common'
-import * as dbApi from '@/api/dbApi'
+
 export default {
-  data(){
+  data() {
     return {}
   },
-  methods:{
-    getDetail(){
+  methods: {
+    getDetail() {
 
     }
   },
-  created(){
+  created() {
 
   },
   components: {common}
@@ -27,8 +28,8 @@ export default {
 </script>
 
 <style scoped>
-.mycontent{
-    padding: 20px;
+.mycontent {
+  padding: 20px;
 }
 
 </style>

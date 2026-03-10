@@ -183,7 +183,7 @@
 import group from "@/components/api/group";
 import ApiTree from "@/components/api/ApiTree.vue";
 import {CONTENT_TYPE, PRIVILEGE} from "@/constant";
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
 import {MessageBox} from 'element-ui'
 
 export default {

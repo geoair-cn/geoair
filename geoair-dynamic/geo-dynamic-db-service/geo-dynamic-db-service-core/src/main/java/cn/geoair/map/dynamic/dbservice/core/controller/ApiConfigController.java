@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.dbservice.core.basic.service.DsDataSourceService;
 import cn.geoair.map.dynamic.dbservice.core.basic.service.DsGroupService;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.*;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
+import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -68,6 +69,7 @@ public class ApiConfigController {
     @PostMapping("/add")
     @GaApiAction(text = "新增API")
     public ResponseDto add(@RequestBody JSONObject jo) {
+        TokenManager.validateToken();
         ApiConfigApo config = new ApiConfigApo();
         config.setName(jo.getString("name"));
         config.setPath(jo.getString("path"));
@@ -110,6 +112,7 @@ public class ApiConfigController {
     @GetMapping("/getAll")
     @GaApiAction(text = "查询所有的API")
     public List<ApiConfigApo> getAll() {
+        TokenManager.validateToken();
         return dsApiConfigService.getAll();
     }
 
@@ -117,12 +120,14 @@ public class ApiConfigController {
     @PostMapping("/getApiTree")
     @GaApiAction(text = "获取Api树")
     public List<JSONObject> getAllApiTree() {
+        TokenManager.validateToken();
         return dsApiConfigService.getAllApiTree();
     }
 
     @PostMapping("/search")
     @GaApiAction(text = "查询")
     public List<ApiConfigApo> search(String name, String note, String path, String groupId) {
+        TokenManager.validateToken();
         return dsApiConfigService.search(name, note, path, groupId);
     }
 
@@ -135,18 +140,21 @@ public class ApiConfigController {
     @PostMapping("/copy/{id}")
     @GaApiAction(text = "复制")
     public ApiConfigApo copy(@PathVariable String id) {
+        TokenManager.validateToken();
         return dsApiConfigService.copy(id);
     }
 
     @PostMapping("/delete/{id}")
     @GaApiAction(text = "删除API")
     public void delete(@PathVariable String id) {
+        TokenManager.validateToken();
         dsApiConfigService.delete(id);
     }
 
     @PostMapping("/update")
     @GaApiAction(text = "更新API")
     public ResponseDto update(@RequestBody JSONObject jo) {
+        TokenManager.validateToken();
         ApiConfigApo config = new ApiConfigApo();
         config.setId(jo.getString("id"));
         config.setName(jo.getString("name"));
@@ -166,12 +174,14 @@ public class ApiConfigController {
     @GetMapping("/online/{id}")
     @GaApiAction(text = "上线")
     public void online(@PathVariable String id) {
+        TokenManager.validateToken();
         dsApiConfigService.online(id);
     }
 
     @GetMapping("/offline/{id}")
     @GaApiAction(text = "下线")
     public void offline(@PathVariable String id) {
+        TokenManager.validateToken();
         dsApiConfigService.offline(id);
     }
 

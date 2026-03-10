@@ -112,8 +112,8 @@
 <script>
 import sqlCode from "@/components/api/common/SqlCode";
 import SqlExecutor from "@/components/api/executor/SqlExecutor";
-import {DATA_TYPE, CONTENT_TYPE, PRIVILEGE, PLUGIN_TYPE, EXECUTOR_TYPE} from "@/constant";
-import * as dbApi from '@/api/dbApi'
+import {CONTENT_TYPE, DATA_TYPE, EXECUTOR_TYPE, PLUGIN_TYPE, PRIVILEGE} from "@/constant";
+import * as dbApi from '@/api/dsApi'
 // 导入CodeMirror相关资源
 import CodeMirror from "codemirror";
 import 'codemirror/lib/codemirror.css'
@@ -441,6 +441,7 @@ export default {
   font-weight: 100;
   cursor: pointer;
 }
+
 .my > .el-textarea__inner {
   font-family: "Consolas", Helvetica, Arial, sans-serif;
   /*font-size: 18px;*/

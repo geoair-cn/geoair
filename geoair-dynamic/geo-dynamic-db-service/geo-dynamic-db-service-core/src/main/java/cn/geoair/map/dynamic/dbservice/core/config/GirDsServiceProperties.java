@@ -19,7 +19,7 @@ public class GirDsServiceProperties {
     final String staticViewContext = "/dsApiView";
 
     /** 是否启用登录 */
-    boolean enableLogin = false;
+    boolean enableLogin = true;
 
     /** 默认用户名 */
     String defaultUser = "admin";

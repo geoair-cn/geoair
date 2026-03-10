@@ -13,7 +13,8 @@
 
 <script>
 import common from '@/components/api/common'
-import * as dbApi  from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
+
 export default {
   data() {
     return {
@@ -48,15 +49,15 @@ export default {
       }
       console.log(p)
       dbApi.addApiConfig(p)
-     .then((response) => {
-        if (response.data.success) {
-          this.$message.success(response.data.msg)
-          this.$router.push("/api")
-        } else {
-          this.$message.error(response.data.msg)
-        }
+          .then((response) => {
+            if (response.data.success) {
+              this.$message.success(response.data.msg)
+              this.$router.push("/api")
+            } else {
+              this.$message.error(response.data.msg)
+            }
 
-      }).catch((error) => {
+          }).catch((error) => {
         this.$message.error("Create API Failed")
       })
     }

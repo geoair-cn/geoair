@@ -1,16 +1,18 @@
 <template>
   <div class="mycontent">
-    <el-button icon="el-icon-d-arrow-left" type="info" plain @click="$router.go(-1)" size="small">{{$t('m.back')}}</el-button>
-    <h2>{{$t('m.create_ds')}}</h2>
+    <el-button icon="el-icon-d-arrow-left" type="info" plain @click="$router.go(-1)" size="small">{{ $t('m.back') }}
+    </el-button>
+    <h2>{{ $t('m.create_ds') }}</h2>
     <common ref="detail"></common>
 
-    <el-button type="primary" @click="save" plain>{{$t('m.save')}}</el-button>
+    <el-button type="primary" @click="save" plain>{{ $t('m.save') }}</el-button>
   </div>
 </template>
 
 <script>
 import common from '@/components/datasource/common'
-import * as dbApi from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
+
 export default {
   data() {
     return {}
@@ -18,11 +20,11 @@ export default {
   methods: {
 
     save() {
-      if(!this.$refs.detail.checkValue()){
+      if (!this.$refs.detail.checkValue()) {
         return;
       }
       const data = this.$refs.detail.detail
-      dbApi.addDataSource( {
+      dbApi.addDataSource({
         "name": data.name,
         "note": data.note,
         "url": data.url,
@@ -33,10 +35,10 @@ export default {
         "driver": data.driver,
         "tableSql": data.tableSql
       })
-      .then((response) => {
-        this.$message.success("Success")
-        this.$router.push("/datasource")
-      }).catch((error) => {
+          .then((response) => {
+            this.$message.success("Success")
+            this.$router.push("/datasource")
+          }).catch((error) => {
         this.$message.error("Failed")
       })
     }
@@ -49,7 +51,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-.mycontent{
-    padding: 20px;
+.mycontent {
+  padding: 20px;
 }
 </style>

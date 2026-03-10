@@ -10,7 +10,8 @@
           </el-option>
         </el-select>
 
-        <el-alert type="warning" show-icon v-show="detail.type == 'others'" :title="$t('m.ds_driver_tip')" style="margin-top: 10px;">
+        <el-alert type="warning" show-icon v-show="detail.type == 'others'" :title="$t('m.ds_driver_tip')"
+                  style="margin-top: 10px;">
 
         </el-alert>
       </el-form-item>
@@ -30,35 +31,44 @@
         <el-input v-model="detail.username"></el-input>
       </el-form-item>
 
-      <el-form-item :label="$t('m.password')"  prop="password" style="display: inline-block">
-        <el-input prefix-icon="el-icon-lock"  style="min-width: 400px;" :type="[flag?'text':'password']"  v-model="detail.password" :disabled="!detail.edit_password">
-          <i slot="suffix" :class="[flag?'el-icon-minus':'el-icon-view']" style="margin-top:8px;font-size:18px;" autocomplete="auto"  @click="flag=!flag" />
+      <el-form-item :label="$t('m.password')" prop="password" style="display: inline-block">
+        <el-input prefix-icon="el-icon-lock" style="min-width: 400px;" :type="[flag?'text':'password']"
+                  v-model="detail.password" :disabled="!detail.edit_password">
+          <i slot="suffix" :class="[flag?'el-icon-minus':'el-icon-view']" style="margin-top:8px;font-size:18px;"
+             autocomplete="auto" @click="flag=!flag"/>
         </el-input>
       </el-form-item>
       <el-form-item :label="$t('m.edit_password')" label-width="100%" style="margin-left:20px; display: inline-block">
         <el-checkbox v-model="detail.edit_password" @change="checked"></el-checkbox>
       </el-form-item>
-    <!--   <el-form-item :label="$t('m.sql_query_all_table_name')">
-        <el-input v-model="detail.tableSql"></el-input>
-        <el-alert type="warning" :title="$t('m.ds_sql_tip')" show-icon style="margin-top: 10px;"></el-alert>
-      </el-form-item> -->
+      <!--   <el-form-item :label="$t('m.sql_query_all_table_name')">
+          <el-input v-model="detail.tableSql"></el-input>
+          <el-alert type="warning" :title="$t('m.ds_sql_tip')" show-icon style="margin-top: 10px;"></el-alert>
+        </el-form-item> -->
     </el-form>
 
-    <el-button type="primary" @click="connect" plain style="margin: 10px 0;">{{$t('m.test_connection')}}</el-button>
+    <el-button type="primary" @click="connect" plain style="margin: 10px 0;">{{ $t('m.test_connection') }}</el-button>
   </div>
 </template>
 
 <script>
-import * as dbApi  from '@/api/dbApi'
+import * as dbApi from '@/api/dsApi'
+
 export default {
   name: "common",
   data() {
     return {
       flag: false,
-      options: [{label: 'mysql', value: 'mysql'}, {label: 'postgresql',value: 'postgresql'}, {label: 'hive',value: 'hive'},
-        {label: 'sqlserver',value: 'sqlserver'}, {label: 'clickhouse',value: 'clickhouse'}, {label: 'kylin',value: 'kylin'},
-         {label: 'oracle',value: 'oracle'}, {label: 'TDengine',value: 'TDengine'},
-        {label: 'doris',value: 'doris'},{label: 'others',value:'others'}],
+      options: [{label: 'mysql', value: 'mysql'}, {label: 'postgresql', value: 'postgresql'}, {
+        label: 'hive',
+        value: 'hive'
+      },
+        {label: 'sqlserver', value: 'sqlserver'}, {label: 'clickhouse', value: 'clickhouse'}, {
+          label: 'kylin',
+          value: 'kylin'
+        },
+        {label: 'oracle', value: 'oracle'}, {label: 'TDengine', value: 'TDengine'},
+        {label: 'doris', value: 'doris'}, {label: 'others', value: 'others'}],
       detail: {
         url: null,
         name: null,
@@ -104,12 +114,12 @@ export default {
           driver: 'oracle.jdbc.OracleDriver',
           sql: "SELECT OWNER || '.' || TABLE_NAME FROM ALL_TABLES"
         },
-        TDengine:{
+        TDengine: {
           url: 'jdbc:TAOS://localhost:6030/<db>?timezone=Asia/Beijing&charset=UTF-8',
           driver: 'com.taosdata.jdbc.rs.RestfulDriver',
           sql: ""
         },
-        doris:{
+        doris: {
           url: 'jdbc:mysql://localhost:9030/<db>',
           driver: 'com.mysql.cj.jdbc.Driver',
           sql: ""
@@ -127,34 +137,34 @@ export default {
         return false
       }
     },
-    checkValue(){
-      if(this.isNull(this.detail.name)){
+    checkValue() {
+      if (this.isNull(this.detail.name)) {
         this.$message.warning("Datasource name empty!")
         return false
       }
-      if(this.isNull(this.detail.type)){
+      if (this.isNull(this.detail.type)) {
         this.$message.warning("Datasource type empty!")
         return false
       }
-      if(this.isNull(this.detail.url)){
+      if (this.isNull(this.detail.url)) {
         this.$message.warning("Datasource url empty!")
         return false
       }
-      if(this.isNull(this.detail.driver)){
+      if (this.isNull(this.detail.driver)) {
         this.$message.warning("Datasource driver empty!")
         return false
       }
-      if(this.isNull(this.detail.username)){
+      if (this.isNull(this.detail.username)) {
         this.$message.warning("Datasource username empty!")
         return false
       }
-      if(this.isNull(this.detail.password)){
+      if (this.isNull(this.detail.password)) {
         this.$message.warning("Datasource password empty!")
         return false
       }
       return true;
     },
-    checked(){
+    checked() {
       // if (this.detail.edit_password){
       //   this.detail.password = null;
       // }

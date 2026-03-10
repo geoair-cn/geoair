@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.service.DsDataSourceService;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.JdbcUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
+import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
 import cn.hutool.core.io.IoUtil;
 
 import com.alibaba.fastjson.JSON;
@@ -48,6 +49,7 @@ public class DataSourceController {
     @RequestMapping("/add")
     @GaApiAction(text = "新增数据源")
     public void add(DataSourceApo dataSourceApo) {
+        TokenManager.validateToken();
         dataSourceApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
         dsDataSourceService.add(dataSourceApo);
     }
@@ -55,6 +57,7 @@ public class DataSourceController {
     @PostMapping("/getAll")
     @GaApiAction(text = "获取所有数据源")
     public List<DataSourceApo> getAll() {
+        TokenManager.validateToken();
         return dsDataSourceService.getAll();
     }
 
@@ -67,12 +70,14 @@ public class DataSourceController {
     @PostMapping("/delete/{id}")
     @GaApiAction(text = "删除数据源")
     public ResponseDto delete(@PathVariable String id) {
+        TokenManager.validateToken();
         return dsDataSourceService.delete(id);
     }
 
     @PostMapping("/update")
     @GaApiAction(text = "更新数据源")
     public DataSourceApo update(DataSourceApo dataSourceApo) {
+        TokenManager.validateToken();
         dsDataSourceService.update(dataSourceApo);
         return null;
     }

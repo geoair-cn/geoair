@@ -85,8 +85,7 @@ import "codemirror/addon/hint/sql-hint.js";
 import "codemirror/mode/sql/sql.js";
 import {format} from "sql-formatter";
 import LabelTip from "@/components/common/LabelTip.vue";
-import * as dbApi from '@/api/dbApi'
-import {executeSqlV2} from "@/api/dbApi";
+import * as dbApi from '@/api/dsApi'
 import {CONTENT_TYPE} from "@/constant";
 
 export default {
@@ -239,7 +238,7 @@ export default {
           let sqlParam = this.sqlParam;
           let parse = JSON.parse(sqlParam);
           // 转换为目标格式的数组
-          let hasChange= false;
+          let hasChange = false;
           Object.keys(parse).forEach(item => {
             const newItem = {
               name: item,
@@ -255,8 +254,8 @@ export default {
               this.thisApiInfo.paramsJson.push(newItem);
             }
           });
-          if(hasChange){
-            this.thisApiInfo.params= JSON.stringify(this.thisApiInfo.paramsJson)
+          if (hasChange) {
+            this.thisApiInfo.params = JSON.stringify(this.thisApiInfo.paramsJson)
           }
         } else {
           this.thisApiInfo.jsonParam = this.sqlParam;
@@ -382,7 +381,8 @@ export default {
     },
     selectTag() {
       this.coder.setValue(this.coder.getValue() +
-          `select *  from tableName`)
+          `select *
+           from tableName`)
     },
     geomAsTextTag() {
       this.coder.setValue(this.coder.getValue() +

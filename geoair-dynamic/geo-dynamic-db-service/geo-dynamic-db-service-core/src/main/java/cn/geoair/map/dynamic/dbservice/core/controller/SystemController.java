@@ -4,16 +4,16 @@ import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.IPUtil;
 import cn.geoair.map.dynamic.dbservice.core.config.GirDsServiceProperties;
+import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+
+import com.alibaba.fastjson.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Map;
@@ -44,6 +44,60 @@ public class SystemController {
     public String getVersion() {
         log.info("查询系统版本信息");
         return girDsServiceProperties.getVersion();
+    }
+
+    @GetMapping("/login")
+    @GaApiAction(text = "登录")
+    public String login(@RequestParam String username, @RequestParam String password) {
+        JSONObject result = new JSONObject();
+        boolean enableLogin = girDsServiceProperties.isEnableLogin();
+
+        if (enableLogin) {
+            if (username.equals(girDsServiceProperties.getDefaultUser())
+                    && password.equals(girDsServiceProperties.getDefaultPassword())) {
+                String token = TokenManager.generateToken(username, password);
+                // 组装返回结果
+                result.put("success", true);
+                result.put("message", "登录成功");
+                JSONObject data = new JSONObject();
+                data.put("token", token);
+                data.put("username", username);
+                result.put("data", data);
+            } else {
+                result.put("success", false);
+                result.put("message", "用户名或密码错误");
+                result.put("data", new JSONObject());
+            }
+        } else {
+            String token =
+                    TokenManager.generateToken(
+                            girDsServiceProperties.getDefaultUser(),
+                            girDsServiceProperties.getDefaultPassword());
+            result.put("success", true);
+            result.put("message", "免登录成功");
+            JSONObject data = new JSONObject();
+            data.put("token", token);
+            data.put("username", username);
+            result.put("data", data);
+        }
+        return result.toString();
+    }
+
+    @GetMapping("/validateToken")
+    @GaApiAction(text = "验证token")
+    public String validateToken(String token) {
+        JSONObject result = new JSONObject();
+        result.put("success", TokenManager.validateToken(token));
+        return result.toString();
+    }
+
+    @GetMapping("/logout")
+    @GaApiAction(text = "登出")
+    public String logout(String token) {
+        JSONObject result = new JSONObject();
+        result.put("success", true);
+        result.put("message", "登出成功");
+        return result.toString();
     }
 
     @GetMapping("/mode")

@@ -6,6 +6,7 @@ import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.JdbcUtil;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.PoolManager;
 import cn.geoair.map.dynamic.dbservice.core.dao.DataSourceDao;
+import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson.JSONObject;
@@ -38,6 +39,7 @@ public class TableController {
     @RequestMapping("/getAllTables")
     @GaApiAction(text = "获取所有的表")
     public List<JSONObject> getAllTables(String sourceId) throws SQLException {
+        TokenManager.validateToken();
         DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
         DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
         List<String> tables = JdbcUtil.getAllTables(connection, dataSourceApo.getTableSql());
@@ -68,6 +70,7 @@ public class TableController {
     @RequestMapping("/getAllColumns")
     @GaApiAction(text = "获取表的所有列")
     public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
+        TokenManager.validateToken();
         DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
         DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
         List<JSONObject> columns =
