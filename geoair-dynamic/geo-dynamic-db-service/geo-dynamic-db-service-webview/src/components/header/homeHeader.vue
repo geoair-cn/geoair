@@ -20,7 +20,7 @@
       </div>
 
       <el-dropdown @command="changeLanguage" style="margin-right: 15px">
-        <span class="el-dropdown-link" style="color: #bfcbd9">
+        <span class="el-dropdown-link">
           {{ languageName }}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -33,26 +33,22 @@
 
       <!-- 新增：退出登录下拉菜单 -->
       <el-dropdown @command="handleCommand" style="margin-right: 15px">
-        <span class="el-dropdown-link" style="color: #bfcbd9;cursor: pointer">
+        <span class="el-dropdown-link" style="cursor: pointer">
           <i class="el-icon-user"></i> 操作<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="logout" divided>{{ $t('m.logout') }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-
-
     </div>
   </div>
 </template>
 
 <script>
-
 import * as dbApi from '@/api/dsApi'
 
 export default {
   name: "homeHeader",
-
   data() {
     return {
       dialogVisible: false,
@@ -66,7 +62,6 @@ export default {
     };
   },
   methods: {
-
     handleCommand(command) {
       if (command === 'logout') {
         // 退出登录：清除本地存储的登录信息，跳转到登录页
@@ -76,7 +71,6 @@ export default {
         this.$router.push("/login");
       }
     },
-
     clickMenu(data) {
       this.$router.push(data);
     },
@@ -116,11 +110,12 @@ export default {
 <style scoped lang="less">
 .head {
   display: flex;
-  //background-color: #304156;
-  background-image: linear-gradient(15deg, #1b72de, #0e5ec2, #486180);
-  color: #bfcbd9;
+  /* 改为登录页同款渐变背景 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff; /* 文字默认白色 */
   width: 100%;
   line-height: 60px;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
 
   .logo2 {
     flex-shrink: 0;
@@ -132,6 +127,7 @@ export default {
     padding: 30px 20px 0px 0px;
     font-size: 14px;
     line-height: 20px;
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .menus {
@@ -140,11 +136,11 @@ export default {
     display: flex;
 
     .activeMenu {
-      //background-image: linear-gradient(90deg, #495f7a, #2f3d50, #495f7a);
-      //background-image: radial-gradient( #486180, #283546);
-      //opacity: 0.3;
-      color: #f9fbfd;
+      color: #fff;
       font-size: 22px;
+      /* 激活状态添加渐变背景 */
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
     }
 
     .menu {
@@ -154,6 +150,8 @@ export default {
       font-weight: 700;
       cursor: pointer;
       position: relative;
+      border-radius: 6px;
+      transition: all 0.3s ease;
 
       .submenus {
         padding: 5px 0;
@@ -162,12 +160,12 @@ export default {
         position: absolute;
         top: 60px;
         left: 0px;
-        background-color: #304156;
-        //padding: 0 10px;
+        /* 子菜单渐变背景 */
+        background: linear-gradient(135deg, #5a6edb 0%, #6b4298 100%);
         width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-        border-radius: 5px;
-        //border: 1px solid #00ff00;
         .submenu {
           font-size: 16px;
           line-height: 40px;
@@ -176,15 +174,18 @@ export default {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          border-radius: 4px;
+          margin: 0 5px;
 
           &:hover {
-            background-color: #222d3b;
+            background: rgba(255, 255, 255, 0.1);
           }
         }
       }
 
       &:hover {
-        background-color: #2a5893;
+        /*  hover 效果改为半透明背景 */
+        background: rgba(255, 255, 255, 0.1);
 
         .submenus {
           display: block;
@@ -201,13 +202,30 @@ export default {
 
     // 新增：用户名样式
     .username {
-      color: #f9fbfd;
+      color: #fff;
       font-size: 14px;
       margin-right: 15px;
-      padding: 0 5px;
-      line-height: 30px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+      padding: 0 10px;
+      line-height: 32px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    // 下拉菜单链接样式
+    .el-dropdown-link {
+      color: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #fff;
+      }
     }
 
     .mode {
@@ -215,7 +233,6 @@ export default {
       font-weight: 900;
       font-size: 15px;
       margin-right: 10px;
-
     }
 
     .langs {
@@ -223,7 +240,6 @@ export default {
 
       span {
         cursor: pointer;
-
         font-size: 18px;
       }
 
@@ -232,16 +248,20 @@ export default {
         position: absolute;
         right: 0;
         // display: none;
-        background-color: #304156;
-
+        /* 语言选项渐变背景 */
+        background: linear-gradient(135deg, #5a6edb 0%, #6b4298 100%);
         line-height: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
         .option {
           cursor: pointer;
           padding: 0 10px;
+          border-radius: 4px;
+          margin: 0 5px;
 
           &:hover {
-            background-color: #222d3b;
+            background: rgba(255, 255, 255, 0.1);
           }
         }
       }

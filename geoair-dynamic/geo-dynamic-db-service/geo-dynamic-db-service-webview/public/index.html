@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>数据服务发布</title>
+    <title>db-service-api</title>
     <!--      <link rel="stylesheet" href="//at.alicdn.com/t/font_2343121_ht9txo94qqc.css">-->
 </head>
 <body>
@@ -18,20 +18,6 @@
 <div id="app"></div>
 </body>
 <script>
-    // 等待配置Promise完成
-    window.configPromise.then(() => {
-        const script = document.createElement('script');
-        // 关键：路径要和你项目打包后的入口JS路径一致
-        script.src = '<%= BASE_URL %>js/app.js';
-        script.type = 'text/javascript';
-        document.body.appendChild(script);
-    }).catch(err => {
-        console.error('配置加载异常，仍启动应用：', err);
-        // 即使配置加载失败，也启动应用（使用默认配置）
-        const script = document.createElement('script');
-        script.src = '<%= BASE_URL %>js/app.js';
-        script.type = 'text/javascript';
-        document.body.appendChild(script);
-    });
+
 </script>
 </html>
