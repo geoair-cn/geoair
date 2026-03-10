@@ -14,9 +14,9 @@
       </div>
     </div>
     <div class="right">
-      <!--      <span class="mode">{{ this.$store.state.mode }}</span>-->
+      <!-- 新增：显示用户名 -->
+      <div class="username" v-if="username">{{ username }}</div>
       <div style="line-height: 60px;margin: 0 5px">
-        <!--        <a href="https://github.com/freakchick/DBApi" target="_blank"><i class="iconfont icon-github" style="font-size: 26px"></i></a>-->
       </div>
 
       <el-dropdown @command="changeLanguage" style="margin-right: 15px">
@@ -31,9 +31,16 @@
         </el-dropdown-menu>
       </el-dropdown>
 
-      <el-dialog :title="$t('m.change_password')" :visible.sync="dialogVisible">
-        <password></password>
-      </el-dialog>
+      <!-- 新增：退出登录下拉菜单 -->
+      <el-dropdown @command="handleCommand" style="margin-right: 15px">
+        <span class="el-dropdown-link" style="color: #bfcbd9;cursor: pointer">
+          <i class="el-icon-user"></i> 操作<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="logout" divided>{{ $t('m.logout') }}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+
 
     </div>
   </div>
@@ -55,20 +62,18 @@ export default {
       ],
       currentLang: this.$i18n.locale,
       version: null,
-      username: localStorage.getItem("username")
+      username: localStorage.getItem("username") // 从本地存储获取用户名
     };
   },
   methods: {
 
     handleCommand(command) {
-      if (command == 'logout') {
-        localStorage.removeItem("token")
+      if (command === 'logout') {
+        // 退出登录：清除本地存储的登录信息，跳转到登录页
+        localStorage.removeItem("dsToken")
         localStorage.removeItem("username")
-        localStorage.removeItem("userId")
+        this.$message.success("已成功退出登录");
         this.$router.push("/login");
-      } else if (command == 'changePassword') {
-        this.dialogVisible = true
-        console.log(this.$route.path)
       }
     },
 
@@ -82,7 +87,6 @@ export default {
     },
     getVersion() {
       dbApi.getSystemVersion()
-
           .then((response) => {
             this.version = response.data;
           })
@@ -100,6 +104,12 @@ export default {
       return p;
     },
   },
+  // 新增：监听路由变化，确保用户名刷新（比如登录后返回首页）
+  watch: {
+    '$route'() {
+      this.username = localStorage.getItem("username");
+    }
+  }
 };
 </script>
 
@@ -128,7 +138,6 @@ export default {
     flex-shrink: 0;
     flex-grow: 1;
     display: flex;
-
 
     .activeMenu {
       //background-image: linear-gradient(90deg, #495f7a, #2f3d50, #495f7a);
@@ -188,6 +197,18 @@ export default {
     margin: 0 20px;
     flex-shrink: 0;
     display: flex;
+    align-items: center; // 新增：垂直居中，适配用户名和按钮布局
+
+    // 新增：用户名样式
+    .username {
+      color: #f9fbfd;
+      font-size: 14px;
+      margin-right: 15px;
+      padding: 0 5px;
+      line-height: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
 
     .mode {
       font-family: Helvetica;
