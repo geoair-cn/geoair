@@ -140,7 +140,7 @@ public class SystemController {
     }
 
     @GetMapping("/context")
-    public Map<String, String> context(HttpServletRequest request) {
+    public Map<String, Object> context(HttpServletRequest request) {
         String baseUrl = null;
         String serviceUrl = girDsServiceProperties.getServiceUrl();
         if (StrUtil.isNotBlank(serviceUrl)) {
@@ -150,9 +150,10 @@ public class SystemController {
             baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         }
 
-        Map<String, String> config = MapUtil.newHashMap();
+        Map<String, Object> config = MapUtil.newHashMap();
         config.put("baseUrl", baseUrl);
         config.put("byGirServlet", GirServletUtil.getClientIP(request));
+        config.put("byServerInfoByRequest", GirServletUtil.getServerInfoByRequest());
         config.put(
                 "byCurrentContextPath",
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
