@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @RestController
-@RequestMapping("/datasource")
+@RequestMapping("/ds_api/datasource")
 @GaApi(tags = "数据源相关")
 public class DataSourceController {
 

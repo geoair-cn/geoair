@@ -255,14 +255,14 @@ public class DsApiConfigService {
     public void online(String id) {
         ApiConfigApo apiConfigApo = apiConfigDao.getById(id);
         apiConfigApo.setStatus(Constants.API_STATUS_ONLINE);
-        apiConfigDao.accessSelective(apiConfigApo);
+        apiConfigDao.updateSelectiveById(apiConfigApo);
     }
 
     public void offline(String id) {
         ApiConfigApo apiConfigApo = detail(id);
         cleanDataCacheAndMetaCache(apiConfigApo);
         apiConfigApo.setStatus(Constants.API_STATUS_OFFLINE);
-        apiConfigDao.accessSelective(apiConfigApo);
+        apiConfigDao.updateSelectiveById(apiConfigApo);
     }
 
     public String apiDocs(List<String> ids) {

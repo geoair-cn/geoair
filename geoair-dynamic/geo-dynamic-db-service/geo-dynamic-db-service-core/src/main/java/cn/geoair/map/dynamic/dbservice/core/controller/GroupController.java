@@ -15,7 +15,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping("/ds_api/group")
 @GaApi(tags = "api分组信息")
 public class GroupController {
 

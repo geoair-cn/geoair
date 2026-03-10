@@ -43,12 +43,14 @@
                   </el-dropdown-item>
                   <el-dropdown-item v-if="data.status == 1">
 <!--                    <el-tooltip class="item" effect="light" :content="$t('m.request_test')" placement="left">-->
-<!--                      <i class="iconfont icon-HTTPRequest"-->
-<!--                         @click="$router.push({path: '/api/request', query: {id: data.id}});"></i>-->
-<!--                    </el-tooltip>-->
+                    <!--                      <i class="iconfont icon-HTTPRequest"-->
+                    <!--                         @click="$router.push({path: '/api/request', query: {id: data.id}});"></i>-->
+                    <!--                    </el-tooltip>-->
                           <el-tooltip class="item" effect="light" :content="$t('m.request_test')" placement="left">
-                      <i class="iconfont icon-HTTPRequest"
-                         @click="$router.push({path: '/requestApi', query: {id: data.id}});"></i>
+<!--                      <i class="iconfont icon-HTTPRequest"-->
+                            <!--                         @click="$router.push({path: '/requestApi', query: {id: data.id}});"></i>-->
+                                                  <i class="iconfont icon-HTTPRequest"
+                                                     @click="openRequestNewTab(data.id)"></i>
                     </el-tooltip>
                   </el-dropdown-item>
 
@@ -209,6 +211,15 @@ export default {
           .catch((error) => {
             // this.$message.error("查询所有api失败")
           });
+    },
+    openRequestNewTab(id) {
+      const targetUrl = this.$router.resolve({
+        name: 'directRequest', // 路由名称（推荐用name，而非path）
+        query: {id: id}      // 传递id参数
+      }).href;
+
+      // 2. 新开标签页打开（_blank表示新标签页）
+      window.open(targetUrl, '_blank');
     },
   },
   created() {

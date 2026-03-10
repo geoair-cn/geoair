@@ -1,16 +1,16 @@
 <template>
   <div style="padding: 20px">
     <!-- 仅当路由历史长度 > 1 时显示返回按钮 -->
-    <el-button
-        v-if="showBackButton"
-        icon="el-icon-d-arrow-left"
-        type="info"
-        plain
-        @click="$router.go(-1)"
-        size="small"
-    >
-      {{ $t('m.back') }}
-    </el-button>
+    <!--    <el-button-->
+    <!--        v-if="showBackButton"-->
+    <!--        icon="el-icon-d-arrow-left"-->
+    <!--        type="info"-->
+    <!--        plain-->
+    <!--        @click="$router.go(-1)"-->
+    <!--        size="small"-->
+    <!--    >-->
+    <!--            {{ $t('m.back') }}-->
+    <!--    </el-button>-->
     <h2>{{ $t('m.request_test') }}</h2>
     <el-tabs tab-position="top" type="border-card" @tab-click="handleTabClick">
       <el-tab-pane :label="$t('m.request_test')">
@@ -266,7 +266,7 @@ export default {
             }
             this.contentType = response.data.contentType;
             this.jsonParam = response.data.jsonParam;
-            if(this.jsonParam){
+            if (this.jsonParam) {
               this.formatJsonParam();
             }
           })

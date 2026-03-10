@@ -29,43 +29,49 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping("/table")
+@RequestMapping("/ds_api/table")
 @GaApi(tags = "表相关的接口")
 public class TableController {
 
-	@Resource
-	DataSourceDao dataSourceDao;
+    @Resource DataSourceDao dataSourceDao;
 
-	@RequestMapping("/getAllTables")
-	@GaApiAction(text = "获取所有的表")
-	public List<JSONObject> getAllTables(String sourceId) throws SQLException {
-		DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
-		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-		List<String> tables = JdbcUtil.getAllTables(connection, dataSourceApo.getTableSql());
-		List<JSONObject> list = tables.stream().map(t -> {
-			JSONObject jo = new JSONObject();
-			jo.put("label", t);
-			try {
-				DruidPooledConnection conn = PoolManager.getPooledConnection(dataSourceApo);
-				jo.put("columns", JdbcUtil.getRDBMSColumnProperties(conn, dataSourceApo.getType(), t));
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-			}
-			// jo.put("columns",);
-			jo.put("showColumns", false);
-			return jo;
-		}).collect(Collectors.toList());
-		return list;
-	}
+    @RequestMapping("/getAllTables")
+    @GaApiAction(text = "获取所有的表")
+    public List<JSONObject> getAllTables(String sourceId) throws SQLException {
+        DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
+        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+        List<String> tables = JdbcUtil.getAllTables(connection, dataSourceApo.getTableSql());
+        List<JSONObject> list =
+                tables.stream()
+                        .map(
+                                t -> {
+                                    JSONObject jo = new JSONObject();
+                                    jo.put("label", t);
+                                    try {
+                                        DruidPooledConnection conn =
+                                                PoolManager.getPooledConnection(dataSourceApo);
+                                        jo.put(
+                                                "columns",
+                                                JdbcUtil.getRDBMSColumnProperties(
+                                                        conn, dataSourceApo.getType(), t));
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    }
+                                    // jo.put("columns",);
+                                    jo.put("showColumns", false);
+                                    return jo;
+                                })
+                        .collect(Collectors.toList());
+        return list;
+    }
 
-	@RequestMapping("/getAllColumns")
-	@GaApiAction(text = "获取表的所有列")
-	public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
-		DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
-		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-		List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
-		return columns;
-	}
-
+    @RequestMapping("/getAllColumns")
+    @GaApiAction(text = "获取表的所有列")
+    public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
+        DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
+        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+        List<JSONObject> columns =
+                JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
+        return columns;
+    }
 }

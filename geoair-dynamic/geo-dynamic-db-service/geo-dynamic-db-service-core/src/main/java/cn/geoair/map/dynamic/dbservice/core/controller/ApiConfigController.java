@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RestController
 @Slf4j
-@RequestMapping("/apiConfig")
+@RequestMapping("/ds_api/apiConfig")
 @GaApi(tags = "api配置")
 public class ApiConfigController {
 

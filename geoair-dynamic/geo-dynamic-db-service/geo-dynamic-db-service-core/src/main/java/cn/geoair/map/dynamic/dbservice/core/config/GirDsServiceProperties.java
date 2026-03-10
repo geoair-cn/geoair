@@ -10,9 +10,20 @@ import org.springframework.stereotype.Component;
 @Data
 public class GirDsServiceProperties {
 
+    String version = "23.1.2-RC3-SNAPSHOT";
+
     /** 配置API接口的访问路径 */
     String realApiContext = "/dsApiServer";
 
     /** 配置静态页面的访问路径 */
-    String staticViewContext = "/dsView";
+    final String staticViewContext = "/dsApiView";
+
+    /** 是否启用登录 */
+    boolean enableLogin = false;
+
+    /** 默认用户名 */
+    String defaultUser = "admin";
+
+    /** 默认密码 */
+    String defaultPassword = "geoair";
 }

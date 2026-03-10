@@ -58,7 +58,7 @@ public class GirDsAPIServlet extends HttpServlet {
         log.debug("servlet execute");
         String realApiContext1 = girDsServiceProperties.getRealApiContext();
         String realApiContext2 = StrUtil.removePrefix(realApiContext1, "/");
-        String realApiContext = apiContext + realApiContext2;
+        String realApiContext = apiContext + "/" + realApiContext2;
         String servletPath = request.getRequestURI();
         servletPath = servletPath.substring(realApiContext.length() + 1);
         PrintWriter out = null;

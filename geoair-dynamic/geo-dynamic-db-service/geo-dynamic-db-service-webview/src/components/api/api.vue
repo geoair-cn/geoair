@@ -185,7 +185,7 @@ import ApiTree from "@/components/api/ApiTree.vue";
 import {CONTENT_TYPE, PRIVILEGE} from "@/constant";
 import * as dbApi from '@/api/dbApi'
 import {MessageBox} from 'element-ui'
-import {copyApiConfig} from "@/api/dbApi";  // 在组件顶部导入
+
 export default {
   name: "api",
   data() {
@@ -344,7 +344,17 @@ export default {
     },
     httpTest(id) {
       // this.$router.push({path: "/api/request", query: {id: id}});
-      this.$router.push({path: "/requestApi", query: {id: id}});
+      // this.$router.push({path: "/requestApi", query: {id: id}});
+
+      const targetUrl = this.$router.resolve({
+        name: 'directRequest', // 路由名称（推荐用name，而非path）
+        query: {id: id}      // 传递id参数
+      }).href;
+
+      // 2. 新开标签页打开（_blank表示新标签页）
+      window.open(targetUrl, '_blank');
+
+
     },
     detail(id) {
       this.$router.push({path: "/api/detail", query: {id: id}});

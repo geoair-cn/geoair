@@ -21,7 +21,7 @@ export function postPxyParams(url, params) {
 // 获取上下文路径
 export function getContext() {
     return request({
-        url: '/apiConfig/context',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/context',
         method: 'post'
     });
 }
@@ -29,7 +29,7 @@ export function getContext() {
 // 新增API配置
 export function addApiConfig(formData) {
     return request({
-        url: '/apiConfig/add',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/add',
         headers: {'Content-Type': 'application/json'},
         method: 'post',
         data: formData
@@ -39,7 +39,7 @@ export function addApiConfig(formData) {
 // 解析SQL参数
 export function parseParam(sql) {
     return request({
-        url: '/apiConfig/parseParam',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/parseParam',
         method: 'get',
         params: {sql}
     });
@@ -48,7 +48,7 @@ export function parseParam(sql) {
 // 获取所有API配置
 export function getAllApiConfigs() {
     return request({
-        url: '/apiConfig/getAll',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/getAll',
         method: 'get'
     });
 }
@@ -56,7 +56,7 @@ export function getAllApiConfigs() {
 // 获取API树形结构
 export function getApiTree() {
     return request({
-        url: '/apiConfig/getApiTree',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/getApiTree',
         method: 'post'
     });
 }
@@ -64,7 +64,7 @@ export function getApiTree() {
 // 搜索API配置
 export function searchApiConfigs(params) {
     return request({
-        url: '/apiConfig/search',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/search',
         method: 'post',
         params: {
             name: params.name,
@@ -78,7 +78,7 @@ export function searchApiConfigs(params) {
 // 获取API配置详情
 export function getApiConfigDetail(id) {
     return request({
-        url: `/apiConfig/detail/${id}`,
+        url: window.Config.baseUrl + `/ds_api/apiConfig/detail/${id}`,
         method: 'post'
     });
 }
@@ -86,14 +86,15 @@ export function getApiConfigDetail(id) {
 // 删除API配置
 export function deleteApiConfig(id) {
     return request({
-        url: `/apiConfig/delete/${id}`,
+        url: window.Config.baseUrl + `/ds_api/apiConfig/delete/${id}`,
         method: 'post'
     });
 }
+
 // 删除API配置
 export function copyApiConfig(id) {
     return request({
-        url: `/apiConfig/copy/${id}`,
+        url: window.Config.baseUrl + `/ds_api/apiConfig/copy/${id}`,
         method: 'post'
     });
 }
@@ -101,7 +102,7 @@ export function copyApiConfig(id) {
 // 更新API配置
 export function updateApiConfig(formData) {
     return request({
-        url: '/apiConfig/update',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/update',
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         data: formData
@@ -111,7 +112,7 @@ export function updateApiConfig(formData) {
 // 上线API
 export function onlineApi(id) {
     return request({
-        url: `/apiConfig/online/${id}`,
+        url: window.Config.baseUrl + `/ds_api/apiConfig/online/${id}`,
         method: 'get'
     });
 }
@@ -119,7 +120,7 @@ export function onlineApi(id) {
 // 下线API
 export function offlineApi(id) {
     return request({
-        url: `/apiConfig/offline/${id}`,
+        url: window.Config.baseUrl + `/ds_api/apiConfig/offline/${id}`,
         method: 'get'
     });
 }
@@ -127,7 +128,7 @@ export function offlineApi(id) {
 // 导出API文档
 export function exportApiDocs(ids) {
     return request({
-        url: '/apiConfig/apiDocs',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/apiDocs',
         method: 'get',
         params: {ids},
         responseType: 'blob' // 用于文件下载
@@ -137,7 +138,7 @@ export function exportApiDocs(ids) {
 // 导出API配置
 export function downloadConfig(ids) {
     return request({
-        url: '/apiConfig/downloadConfig',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/downloadConfig',
         method: 'post',
         params: {ids: ids},
         responseType: 'blob' // 用于文件下载
@@ -147,7 +148,7 @@ export function downloadConfig(ids) {
 // 导出分组配置
 export function downloadGroupConfig(ids) {
     return request({
-        url: '/apiConfig/downloadGroupConfig',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/downloadGroupConfig',
         method: "post",
         params: {ids: ids},
         responseType: 'blob' // 用于文件下载
@@ -159,7 +160,7 @@ export function importAPI(file) {
     const formData = new FormData();
     formData.append('file', file);
     return request({
-        url: '/apiConfig/import',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/import',
         method: 'post',
         data: formData,
         headers: {
@@ -173,7 +174,7 @@ export function importGroup(file) {
     const formData = new FormData();
     formData.append('file', file);
     return request({
-        url: '/apiConfig/importGroup',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/importGroup',
         method: 'post',
         data: formData,
         headers: {
@@ -185,14 +186,15 @@ export function importGroup(file) {
 // 执行SQL
 export function executeSql(sql, datasourceId, sqlParam) {
     return request({
-        url: '/apiConfig/sql/execute',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/sql/execute',
         method: 'post',
         params: {sql: sql, datasourceId: datasourceId, params: sqlParam}
     });
 }
+
 export function executeSqlV2(sql, datasourceId, sqlParam) {
     return request({
-        url: '/apiConfig/sql/executeV2',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/sql/executeV2',
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         data: {sql: sql, datasourceId: datasourceId, params: sqlParam}
@@ -202,7 +204,7 @@ export function executeSqlV2(sql, datasourceId, sqlParam) {
 // 解析动态SQL
 export function parseDynamicSql(sql, params) {
     return request({
-        url: '/apiConfig/parseDynamicSql',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/parseDynamicSql',
         method: 'post',
         params: {
             sql: sql,
@@ -214,7 +216,7 @@ export function parseDynamicSql(sql, params) {
 // 分页列出API配置信息
 export function listDbApiConfigPage(param) {
     return request({
-        url: '/apiConfig/listDbApiConfigPage',
+        url: window.Config.baseUrl + '/ds_api/apiConfig/listDbApiConfigPage',
         method: 'post',
         data: param
     });
@@ -223,7 +225,7 @@ export function listDbApiConfigPage(param) {
 // 新增数据源
 export function addDataSource(dataSource) {
     return request({
-        url: '/datasource/add',
+        url: window.Config.baseUrl + '/ds_api/datasource/add',
         method: 'post',
         params: dataSource
     });
@@ -232,7 +234,7 @@ export function addDataSource(dataSource) {
 // 获取所有数据源
 export function getAllDataSources() {
     return request({
-        url: '/datasource/getAll',
+        url: window.Config.baseUrl + '/ds_api/datasource/getAll',
         method: 'post'
     });
 }
@@ -240,7 +242,7 @@ export function getAllDataSources() {
 // 获取数据源详情
 export function getDataSourceDetail(id) {
     return request({
-        url: `/datasource/detail/${id}`,
+        url: window.Config.baseUrl + `/ds_api/datasource/detail/${id}`,
         method: 'get'
     });
 }
@@ -248,7 +250,7 @@ export function getDataSourceDetail(id) {
 // 删除数据源
 export function deleteDataSource(id) {
     return request({
-        url: `/datasource/delete/${id}`,
+        url: window.Config.baseUrl + `/ds_api/datasource/delete/${id}`,
         method: 'post'
     });
 }
@@ -256,7 +258,7 @@ export function deleteDataSource(id) {
 // 更新数据源
 export function updateDataSource(dataSource) {
     return request({
-        url: '/datasource/update',
+        url: window.Config.baseUrl + '/ds_api/datasource/update',
         method: 'post',
         data: dataSource
     });
@@ -265,7 +267,7 @@ export function updateDataSource(dataSource) {
 // 测试数据源连接
 export function testDataSourceConnection(dataSource) {
     return request({
-        url: '/datasource/connect',
+        url: window.Config.baseUrl + '/ds_api/datasource/connect',
         method: 'post',
         data: dataSource
     });
@@ -274,7 +276,7 @@ export function testDataSourceConnection(dataSource) {
 // 导出数据源配置
 export function exportDataSources(ids) {
     return request({
-        url: '/datasource/export',
+        url: window.Config.baseUrl + '/ds_api/datasource/export',
         method: 'post',
         params: {ids: ids.join(",")},
         responseType: 'blob' // 用于文件下载
@@ -286,7 +288,7 @@ export function importDataSources(file) {
     const formData = new FormData();
     formData.append('file', file);
     return request({
-        url: '/datasource/import',
+        url: window.Config.baseUrl + '/ds_api/datasource/import',
         method: 'post',
         data: formData,
         headers: {
@@ -298,7 +300,7 @@ export function importDataSources(file) {
 // 分页列出数据源信息
 export function listDbapiDatasourcePage(param) {
     return request({
-        url: '/datasource/listDbapiDatasourcePage',
+        url: window.Config.baseUrl + '/ds_api/datasource/listDbapiDatasourcePage',
         method: 'post',
         data: param
     });
@@ -307,7 +309,7 @@ export function listDbapiDatasourcePage(param) {
 // 创建API分组
 export function createGroup(groupName) {
     return request({
-        url: '/group/create',
+        url: window.Config.baseUrl + '/ds_api/group/create',
         method: 'post',
         params: {name: groupName}
     });
@@ -316,7 +318,7 @@ export function createGroup(groupName) {
 // 删除API分组
 export function deleteGroup(id) {
     return request({
-        url: `/group/delete/${id}`,
+        url: window.Config.baseUrl + `/ds_api/group/delete/${id}`,
         method: 'post'
     });
 }
@@ -324,7 +326,7 @@ export function deleteGroup(id) {
 // 获取所有API分组
 export function getAllGroups() {
     return request({
-        url: '/group/getAll',
+        url: window.Config.baseUrl + '/ds_api/group/getAll',
         method: 'post'
     });
 }
@@ -332,7 +334,7 @@ export function getAllGroups() {
 // 更新API分组
 export function updateGroup(group) {
     return request({
-        url: '/group/update',
+        url: window.Config.baseUrl + '/ds_api/group/update',
         method: 'post',
         params: group
     });
@@ -341,7 +343,7 @@ export function updateGroup(group) {
 // 分页列出API分组信息
 export function listDbApiGroupPage(param) {
     return request({
-        url: '/group/listDbApiGroupPage',
+        url: window.Config.baseUrl + '/ds_api/group/listDbApiGroupPage',
         method: 'post',
         data: param
     });
@@ -350,7 +352,7 @@ export function listDbApiGroupPage(param) {
 // 获取系统版本
 export function getSystemVersion() {
     return request({
-        url: '/system/version',
+        url: window.Config.baseUrl + '/ds_api/system/version',
         method: 'get'
     });
 }
@@ -358,7 +360,7 @@ export function getSystemVersion() {
 // 获取系统模式
 export function getSystemMode() {
     return request({
-        url: '/system/mode',
+        url: window.Config.baseUrl + '/ds_api/system/mode',
         method: 'get'
     });
 }
@@ -366,7 +368,7 @@ export function getSystemMode() {
 // 获取 IP 和端口（包含上下文路径）
 export function getIPPort() {
     return request({
-        url: '/system/getIPPort',
+        url: window.Config.baseUrl + '/ds_api/system/getIPPort',
         method: 'post'
     });
 }
@@ -374,7 +376,7 @@ export function getIPPort() {
 // 获取 IP 和端口（不包含上下文路径）
 export function getIP() {
     return request({
-        url: '/system/getIP',
+        url: window.Config.baseUrl + '/ds_api/system/getIP',
         method: 'post'
     });
 }
@@ -382,7 +384,7 @@ export function getIP() {
 // 获取所有表及表结构信息
 export function getAllTables(sourceId) {
     return request({
-        url: '/table/getAllTables',
+        url: window.Config.baseUrl + '/ds_api/table/getAllTables',
         method: 'get',
         params: {
             sourceId: sourceId
@@ -393,7 +395,7 @@ export function getAllTables(sourceId) {
 // 获取指定表的所有列信息
 export function getAllColumns(sourceId, table) {
     return request({
-        url: '/table/getAllColumns',
+        url: window.Config.baseUrl + '/ds_api/table/getAllColumns',
         method: 'get',
         params: {
             sourceId: sourceId,
