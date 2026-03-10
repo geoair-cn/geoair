@@ -133,7 +133,7 @@
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-db-service-starter</artifactId>
+                <artifactId>geo-dynamic-db-service-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 

@@ -70,7 +70,7 @@
             </dependency>
             <dependency>
                 <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-db-service-starter</artifactId>
+                <artifactId>geo-dynamic-db-service-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
@@ -234,7 +234,7 @@
 
     <modules>
         <module>geo-dynamic-db-service-core</module>
-        <module>geo-dynamic-db-service-starter</module>
+        <module>geo-dynamic-db-service-spring-boot-starter</module>
         <module>geo-dynamic-db-service-webview</module>
     </modules>
 
