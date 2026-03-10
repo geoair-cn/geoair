@@ -379,7 +379,7 @@
 
 
         <profile>
-            <id>groupApo</id>
+            <id>geoair-group-repo</id>
             <distributionManagement>
                 <repository>
                     <id>gir-release</id>
