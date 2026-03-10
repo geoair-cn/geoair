@@ -5,6 +5,7 @@ import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.IPUtil;
 import cn.geoair.map.dynamic.dbservice.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
+import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -139,11 +140,19 @@ public class SystemController {
     }
 
     @GetMapping("/context")
-    public Map<String, String> context() {
-        // 动态获取上下文路径对应的完整基础URL
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+    public Map<String, String> context(HttpServletRequest request) {
+        String baseUrl = null;
+        String serviceUrl = girDsServiceProperties.getServiceUrl();
+        if (StrUtil.isNotBlank(serviceUrl)) {
+            baseUrl = serviceUrl;
+        } else {
+            // 动态获取上下文路径对应的完整基础URL
+            baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        }
+
         Map<String, String> config = MapUtil.newHashMap();
         config.put("baseUrl", baseUrl);
+        config.put("byGirServlet", GirServletUtil.getClientIP(request));
         config.put("loginPage", "");
         return config;
     }

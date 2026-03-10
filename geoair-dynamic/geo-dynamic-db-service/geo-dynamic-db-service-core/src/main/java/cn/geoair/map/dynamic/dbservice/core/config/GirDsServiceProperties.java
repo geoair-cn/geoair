@@ -15,6 +15,12 @@ public class GirDsServiceProperties {
     /** 配置API接口的访问路径 */
     String realApiContext = "/dsApiServer";
 
+    /** 告诉前端的后端代理服务的地址在哪儿，因为有时候后端经过了多从代理，request请求头已经拿不到了 */
+    String serviceUrl = "";
+
+    /** 告诉前端的后端代理服务的服务端口在哪儿 */
+    Integer servicePort = null;
+
     /** 配置静态页面的访问路径 */
     final String staticViewContext = "/dsApiView";
 
