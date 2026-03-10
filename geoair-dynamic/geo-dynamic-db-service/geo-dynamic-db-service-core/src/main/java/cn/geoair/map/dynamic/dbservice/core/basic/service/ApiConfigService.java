@@ -1,0 +1,366 @@
+package cn.geoair.map.dynamic.dbservice.core.basic.service;
+
+import cn.geoair.map.dynamic.dbservice.core.DbApiUserInfoHelper;
+import cn.geoair.map.dynamic.dbservice.core.basic.dao.ApiConfigMapper;
+import cn.geoair.map.dynamic.dbservice.core.basic.domain.ApiConfig;
+import cn.geoair.map.dynamic.dbservice.core.basic.domain.Group;
+import cn.geoair.map.dynamic.dbservice.core.basic.util.Constants;
+import cn.geoair.map.dynamic.dbservice.core.basic.util.UUIDUtil;
+import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
+import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiConfigDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiGroupDao;
+import cn.geoair.map.dynamic.dbservice.core.model.dbapi.dto.DbApiConfigDto;
+import cn.geoair.map.dynamic.dbservice.core.model.dbapi.entity.DbApiConfigPo;
+import cn.geoair.map.dynamic.dbservice.core.model.dbapi.seo.DbApiConfigSeo;
+import cn.hutool.core.collection.ListUtil;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+/**
+ * @program: dbApi
+ * @description:
+ * @author: 武汉刘德华
+ * @create: 2021-01-19 17:27
+ */
+@Slf4j
+@Service
+public class ApiConfigService {
+
+    @Autowired ApiConfigMapper apiConfigMapper;
+
+    @Resource private DbApiConfigDao dbapiConfigDao;
+
+    @Autowired DbApiGroupDao dbApiGroupDao;
+
+    @Autowired CacheManager cacheManager;
+
+    @Value("${server.servlet.context-path}")
+    String apiContext;
+
+    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
+
+    @Transactional
+    public ResponseDto add(ApiConfig apiConfig) {
+        int size = apiConfigMapper.selectCountByPath(apiConfig.getPath());
+        if (size > 0) {
+            return ResponseDto.fail("Path has been used!");
+        } else {
+
+            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfig.getContentType())) {
+                apiConfig.setParams("[]"); // 不能设置null 前端使用会报错
+            } else if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(
+                    apiConfig.getContentType())) {
+                apiConfig.setJsonParam(null);
+            }
+            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            apiConfig.setCreateTime(now);
+            apiConfig.setUpdateTime(now);
+            DbApiConfigPo insertPo = apiConfig.toPo();
+            insertPo.initCreateMeta();
+            insertPo.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+
+            dbapiConfigDao.gtcAccessSelective(insertPo);
+            return ResponseDto.successWithMsg("Create API success");
+        }
+    }
+
+    @Transactional
+    public ResponseDto update(ApiConfig apiConfig) {
+
+        int size =
+                apiConfigMapper.selectCountByPathWhenUpdate(apiConfig.getPath(), apiConfig.getId());
+        if (size > 0) {
+            return ResponseDto.fail("Path has been used");
+        } else {
+
+            // clean data cache if cache plugin configured before
+            ApiConfig oldConfig = detail(apiConfig.getId());
+            cleanDataCacheAndMetaCache(oldConfig);
+
+            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfig.getContentType())) {
+                apiConfig.setParams("[]"); // 不能设置null 前端使用会报错
+            } else if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(
+                    apiConfig.getContentType())) {
+                apiConfig.setJsonParam(null);
+            }
+            String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            apiConfig.setUpdateTime(now);
+            DbApiConfigPo updatePo = apiConfig.toPo();
+            updatePo.initUpdateMeta();
+            updatePo.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
+
+            dbapiConfigDao.gtcUpdateByPKSelective(updatePo);
+
+            return ResponseDto.successWithMsg("Update API Success");
+        }
+    }
+
+    @Transactional
+    public void delete(String id) {
+        ApiConfig oldConfig = detail(id);
+        cleanDataCacheAndMetaCache(oldConfig);
+        dbapiConfigDao.gtcDeleteByPK(id);
+    }
+
+    /**
+     * 刪除API相关的元数据缓存和 API配置的插件对应的数据缓存
+     *
+     * @param apiConfig
+     */
+    private void cleanDataCacheAndMetaCache(ApiConfig apiConfig) {
+        // 清除API相关的元数据缓存
+        cacheManager.getCache("api").evictIfPresent(apiConfig.getPath());
+    }
+
+    /**
+     * get API full detail
+     *
+     * @param id
+     * @return
+     */
+    public ApiConfig detail(String id) {
+        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
+        ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
+        enhanceApiConfig(apiConfig);
+        return apiConfig;
+    }
+
+    /**
+     * get API full detail
+     *
+     * @param id
+     * @return
+     */
+    public ApiConfig copy(String id) {
+        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
+        ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
+        enhanceApiConfig(apiConfig);
+        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        apiConfig.setCreateTime(now);
+        apiConfig.setUpdateTime(now);
+        DbApiConfigPo insertPo = apiConfig.toPo();
+        insertPo.initCreateMeta();
+        String id1 = UUIDUtil.id();
+        insertPo.setId(id1);
+        insertPo.setPath(MessageFormat.format("{0}_{1}", apiConfig.getPath(), id1));
+        insertPo.setName(MessageFormat.format("{0}_copy_{1}", apiConfig.getName(), id1));
+        insertPo.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+        dbapiConfigDao.gtcAccessSelective(insertPo);
+        return apiConfig;
+    }
+
+    private void enhanceApiConfig(ApiConfig apiConfig) {
+        if (apiConfig != null) {
+            apiConfig.setTaskJson(JSON.parseArray(apiConfig.getTask()));
+            apiConfig.setParamsJson(JSON.parseArray(apiConfig.getParams()));
+            apiConfig.setAlarmPlugins(ListUtil.empty());
+            apiConfig.setCachePlugin(null);
+            apiConfig.setGlobalTransformPlugin(null);
+        }
+    }
+
+    public List<ApiConfig> getAll() {
+        DbApiConfigSeo dbApiConfigSeo = new DbApiConfigSeo();
+        dbApiConfigSeo.setDelIs("NO");
+        List<DbApiConfigDto> dtos = dbapiConfigDao.searchList(dbApiConfigSeo);
+        List<ApiConfig> list = ApiConfig.fromDtos(dtos);
+        List<ApiConfig> collect =
+                list.stream()
+                        .sorted(Comparator.comparing(ApiConfig::getUpdateTime).reversed())
+                        .collect(Collectors.toList());
+        return collect;
+    }
+
+    /**
+     * 给前端使用的数据格式
+     *
+     * @return
+     */
+    public List<JSONObject> getAllApiTree() {
+
+        List<Group> groups =
+                dbApiGroupDao.gtcSearchAll().stream()
+                        .map(Group::fromPo)
+                        .collect(Collectors.toList());
+        List<JSONObject> list =
+                groups.stream()
+                        .sorted(Comparator.comparing(Group::getUpdateTime))
+                        .map(
+                                g -> {
+                                    List<ApiConfig> apiConfigs =
+                                            apiConfigMapper.selectByGroup(g.getId());
+                                    List<JSONObject> children =
+                                            apiConfigs.stream()
+                                                    .sorted(
+                                                            Comparator.comparing(
+                                                                    ApiConfig::getUpdateTime))
+                                                    .map(
+                                                            t -> {
+                                                                JSONObject jo = new JSONObject();
+                                                                jo.put("name", t.getName());
+                                                                jo.put("id", t.getId());
+                                                                jo.put("type", "api");
+                                                                jo.put("access", t.getAccess());
+                                                                jo.put("status", t.getStatus());
+                                                                return jo;
+                                                            })
+                                                    .collect(Collectors.toList());
+
+                                    JSONObject jsonObject = new JSONObject();
+                                    jsonObject.put("name", g.getName());
+                                    jsonObject.put("id", g.getId());
+                                    jsonObject.put("type", "group");
+                                    jsonObject.put("children", children);
+                                    return jsonObject;
+                                })
+                        .collect(Collectors.toList());
+
+        return list;
+    }
+
+    public List<ApiConfig> search(String name, String note, String path, String groupId) {
+        if (StringUtils.isNoneBlank(name)) {
+            name = "%" + name + "%";
+        }
+        if (StringUtils.isNoneBlank(note)) {
+            note = "%" + note + "%";
+        }
+        if (StringUtils.isNoneBlank(path)) {
+            path = "%" + path + "%";
+        }
+        return apiConfigMapper.search(name, note, path, groupId);
+    }
+
+    /** servlet 从这获取API元数据 */
+    @Cacheable(value = "api", key = "#path", unless = "#result == null")
+    public ApiConfig getConfig(String path) {
+        ApiConfig apiConfig = apiConfigMapper.selectByPathOnline(path);
+        enhanceApiConfig(apiConfig);
+        return apiConfig;
+    }
+
+    public void online(String id) {
+        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
+        dbApiConfigPo.setStatus(Constants.API_STATUS_ONLINE);
+        dbapiConfigDao.gtcUpdateByPKSelective(dbApiConfigPo);
+    }
+
+    public void offline(String id) {
+        ApiConfig apiConfig = detail(id);
+        cleanDataCacheAndMetaCache(apiConfig);
+        apiConfig.setStatus(Constants.API_STATUS_OFFLINE);
+        dbapiConfigDao.gtcUpdateByPKSelective(apiConfig.toPo());
+    }
+
+    public String apiDocs(List<String> ids) {
+        StringBuffer temp = new StringBuffer("# 接口文档\n---\n");
+        List<ApiConfig> list = apiConfigMapper.selectBatchIds(ids);
+        list.stream()
+                .forEach(
+                        t -> {
+                            String templ =
+                                    "## {0}\n- 接口地址： /{1}/{2}\n- 接口备注：{3}\n- Content-Type：{4}\n";
+                            temp.append(
+                                    MessageFormat.format(
+                                            templ,
+                                            t.getName(),
+                                            apiContext,
+                                            t.getPath(),
+                                            t.getNote(),
+                                            t.getContentType()));
+                            temp.append("\n- 请求参数：");
+                            if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(
+                                    t.getContentType())) {
+                                String params = t.getParams();
+                                JSONArray array = JSON.parseArray(params);
+
+                                if (array.size() > 0) {
+                                    StringBuffer buffer = new StringBuffer();
+                                    buffer.append("\n\n| 参数名称 | 参数类型 | 参数说明 |\n");
+                                    buffer.append("| :----: | :----: | :----: |\n");
+
+                                    for (int i = 0; i < array.size(); i++) {
+                                        JSONObject jsonObject = array.getJSONObject(i);
+                                        String name = jsonObject.getString("name");
+                                        String type = jsonObject.getString("type");
+                                        String note = jsonObject.getString("note");
+                                        buffer.append(
+                                                MessageFormat.format(
+                                                        "| {0} | {1} | {2} |\n", name, type, note));
+                                    }
+
+                                    temp.append(buffer);
+                                } else {
+                                    temp.append("无参数\n");
+                                }
+                            } else if (MediaType.APPLICATION_JSON_VALUE.equalsIgnoreCase(
+                                    t.getContentType())) {
+                                temp.append("\n```json\n")
+                                        .append(t.getJsonParam())
+                                        .append("\n```\n");
+                            }
+                            temp.append("\n---\n");
+                        });
+
+        temp.append("\n导出日期：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        return temp.toString();
+    }
+
+    /**
+     * 导出API配置
+     *
+     * @param ids
+     * @return
+     */
+    public JSONObject exportAPI(List<String> ids) {
+        List<ApiConfig> list = apiConfigMapper.selectBatchIds(ids);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("api", list);
+        jsonObject.put("plugins", ListUtil.empty());
+        return jsonObject;
+    }
+
+    /**
+     * 导入API配置
+     *
+     * @param configs
+     */
+    @Transactional
+    public void importAPI(List<ApiConfig> configs) {
+        configs.stream()
+                .forEach(
+                        t -> {
+                            t.setCreateTime(
+                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                            t.setUpdateTime(
+                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                            t.setStatus(Constants.API_STATUS_OFFLINE);
+                            DbApiConfigPo po = t.toPo();
+                            po.initCreateMeta();
+                            dbapiConfigDao.gtcAccessSelective(po);
+                        });
+    }
+}

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.geoair.map.dynamic.dbservice.core.mapper.dbapi.DbApiGroupMapper">
+
+    <sql id="tableName">
+        dbapi_group
+    </sql>
+    <sql id="condition">
+        <if test="param.id != null and param.id != ''">
+            AND dbapi_group.id = #{param.id}
+        </if>
+        <if test="param.name != null and param.name != ''">
+            AND dbapi_group.name = #{param.name}
+        </if>
+        <if test="param.createUserId != null">
+            AND dbapi_group.create_user_id = #{param.createUserId}
+        </if>
+        <if test="param.createTime != null and param.createTime != ''">
+            AND dbapi_group.create_time = #{param.createTime}
+        </if>
+        <if test="param.updateTime != null and param.updateTime != ''">
+            AND dbapi_group.update_time = #{param.updateTime}
+        </if>
+        <if test="param.timeCreate != null">
+            AND dbapi_group.time_create <![CDATA[>=]]>  #{param.timeCreate,jdbcType=TIMESTAMP}
+            AND dbapi_group.time_create <![CDATA[<=]]> date_add(#{param.timeCreate,jdbcType=TIMESTAMP},
+            date_trunc('day', current_date + interval '1 day'))
+        </if>
+        <if test="param.timeUpdate != null">
+            AND dbapi_group.time_update <![CDATA[>=]]>  #{param.timeUpdate,jdbcType=TIMESTAMP}
+            AND dbapi_group.time_update <![CDATA[<=]]> date_add(#{param.timeUpdate,jdbcType=TIMESTAMP},
+            date_trunc('day', current_date + interval '1 day'))
+        </if>
+        <if test="param.nameCreate != null and param.nameCreate != ''">
+            AND dbapi_group.name_create = #{param.nameCreate}
+        </if>
+        <if test="param.nameUpdate != null and param.nameUpdate != ''">
+            AND dbapi_group.name_update = #{param.nameUpdate}
+        </if>
+
+        <if test="param.andQueryContentIn != null and param.andQueryContentIn.length > 0">
+            AND (
+            <foreach collection="param.andQueryContentIn" item="str" index="index">
+                row_to_json(dbapi_group)||'' LIKE '%'|| #{str}||'%' or
+            </foreach>
+            1!=1 )
+        </if>
+
+        <if test="param.andIdsIn != null and param.andIdsIn.length > 0">
+            AND dbapi_group.id IN
+            <foreach collection="param.andIdsIn" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+        <if test="param.andIdsNotIn != null and param.andIdsNotIn.length > 0 ">
+            AND dbapi_group.id NOT IN
+            <foreach collection="param.andIdsNotIn" item="id" index="index" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+    </sql>
+
+    <!--   留作备用，不用刻意维护-->
+    <resultMap id="BaseResultMap" type="cn.geoair.map.dynamic.dbservice.core.model.dbapi.dto.DbApiGroupDto">
+    </resultMap>
+    <sql id="fieldList">
+        dbapi_group
+        .
+        name
+        ,
+                dbapi_group.create_user_id,
+                dbapi_group.create_time,
+                dbapi_group.update_time,
+                dbapi_group.time_create,
+                dbapi_group.time_update,
+                dbapi_group.name_create,
+                dbapi_group.name_update,
+                dbapi_group.id
+    </sql>
+
+    <select id="searchList" resultType="cn.geoair.map.dynamic.dbservice.core.model.dbapi.dto.DbApiGroupDto">
+        SELECT * FROM
+        <include refid="tableName"></include>
+        <where>
+            1 = 1
+            <include refid="condition"></include>
+        </where>
+    </select>
+
+</mapper>
