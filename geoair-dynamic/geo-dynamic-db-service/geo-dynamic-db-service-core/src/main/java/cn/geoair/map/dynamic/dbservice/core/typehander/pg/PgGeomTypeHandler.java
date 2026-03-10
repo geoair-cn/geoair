@@ -22,79 +22,83 @@ import java.util.Map;
  */
 public class PgGeomTypeHandler extends BaseTypeHandler<String> {
 
-    WKTReader wktReader = new WKTReader(new GeometryFactory(new PrecisionModel(), 4326));
+	WKTReader wktReader = new WKTReader(new GeometryFactory(new PrecisionModel(), 4326));
 
-    @Override
-    public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
-        return null;
-    }
+	@Override
+	public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
+		return null;
+	}
 
-    @Override
-    public String getResult(Entity entity, String columnName) {
-        Object obj = entity.getObj(columnName);
-        if (obj instanceof PGgeometry) {
-            return toWkt((PGgeometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Entity entity, String columnName) {
+		Object obj = entity.getObj(columnName);
+		if (obj instanceof PGgeometry) {
+			return toWkt((PGgeometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, String columnName) {
-        Object obj = null;
-        try {
-            obj = resultSet.getObject(columnName);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        if (obj instanceof PGgeometry) {
-            return toWkt((PGgeometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(ResultSet resultSet, String columnName) {
+		Object obj = null;
+		try {
+			obj = resultSet.getObject(columnName);
+		}
+		catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+		if (obj instanceof PGgeometry) {
+			return toWkt((PGgeometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, Integer columnIndex) {
-        Object obj = null;
-        try {
-            obj = resultSet.getObject(columnIndex);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        if (obj instanceof PGgeometry) {
-            return toWkt((PGgeometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(ResultSet resultSet, Integer columnIndex) {
+		Object obj = null;
+		try {
+			obj = resultSet.getObject(columnIndex);
+		}
+		catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+		if (obj instanceof PGgeometry) {
+			return toWkt((PGgeometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(Map<String, Object> row, String columnName) {
-        Object obj = null;
-        obj = row.get(columnName);
-        if (obj instanceof PGgeometry) {
-            return toWkt((PGgeometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Map<String, Object> row, String columnName) {
+		Object obj = null;
+		obj = row.get(columnName);
+		if (obj instanceof PGgeometry) {
+			return toWkt((PGgeometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(Object obj) {
-        if (obj instanceof PGgeometry) {
-            return toWkt((PGgeometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Object obj) {
+		if (obj instanceof PGgeometry) {
+			return toWkt((PGgeometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    String toWkt(PGgeometry value) {
-        String wkt;
-        net.postgis.jdbc.geometry.Geometry geometry = value.getGeometry();
-        wkt = geometry.getTypeString() + geometry.getValue();
-        Geometry jtsGeom;
-        try {
-            jtsGeom = wktReader.read(wkt);
-        } catch (ParseException e) {
-            jtsGeom = null;
-            return "无法解析空间数据";
-        }
-        return jtsGeom.toString();
-    }
+	String toWkt(PGgeometry value) {
+		String wkt;
+		net.postgis.jdbc.geometry.Geometry geometry = value.getGeometry();
+		wkt = geometry.getTypeString() + geometry.getValue();
+		Geometry jtsGeom;
+		try {
+			jtsGeom = wktReader.read(wkt);
+		}
+		catch (ParseException e) {
+			jtsGeom = null;
+			return "无法解析空间数据";
+		}
+		return jtsGeom.toString();
+	}
+
 }

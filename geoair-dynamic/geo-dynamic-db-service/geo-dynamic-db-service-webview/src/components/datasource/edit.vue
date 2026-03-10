@@ -1,0 +1,61 @@
+<template>
+  <div class="mycontent">
+    <el-button icon="el-icon-d-arrow-left" type="info" plain @click="$router.go(-1)" size="small">{{ $t('m.back') }}
+    </el-button>
+    <h2>{{ $t('m.update_ds') }}</h2>
+    <common :id="$route.query.id" ref="detail"></common>
+
+    <el-button type="primary" @click="save" plain>
+      {{ $t('m.save') }}
+    </el-button>
+  </div>
+</template>
+
+<script>
+import common from '@/components/datasource/common'
+import * as dbApi from '@/api/dbApi'
+
+export default {
+  name: "edit",
+  data() {
+    return {}
+  },
+  methods: {
+    save() {
+      if (!this.$refs.detail.checkValue()) {
+        return;
+      }
+      const data = this.$refs.detail.detail
+      const updateDate = {
+        "name": data.name,
+        "note": data.note,
+        "url": data.url,
+        "username": data.username,
+        "password": data.password,
+        "edit_password": data.edit_password,
+        "type": data.type,
+        "id": data.id,
+        "driver": data.driver,
+        "tableSql": data.tableSql
+      }
+      dbApi.updateDataSource(updateDate)
+          .then((response) => {
+            this.$message.success("Success")
+            this.$router.push("/datasource")
+          }).catch((error) => {
+        this.$message.error("Failed")
+      })
+    }
+  },
+  created() {
+
+  },
+  components: {common}
+}
+</script>
+
+<style scoped lang="less">
+.mycontent {
+  padding: 20px;
+}
+</style>

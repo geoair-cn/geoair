@@ -2,28 +2,17 @@ package cn.geoair.map.dynamic.dbservice.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.base.data.page.GiPageParam;
-import cn.geoair.base.data.page.GiPager;
-import cn.geoair.base.data.page.support.GirPager;
-import cn.geoair.base.data.result.GiResult;
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
-import cn.geoair.map.dynamic.dbservice.core.DbApiUserInfoHelper;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.ApiConfig;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.DataSource;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.Group;
+import cn.geoair.map.dynamic.dbservice.core.DsApiUserInfoHelper;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.ApiConfigApo;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.GroupApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.service.ApiConfigService;
 import cn.geoair.map.dynamic.dbservice.core.basic.service.DataSourceService;
 import cn.geoair.map.dynamic.dbservice.core.basic.service.GroupService;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.*;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
-import cn.geoair.map.dynamic.dbservice.core.controller.dbapi.config.ConfigSearchVo;
-import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiConfigDao;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.dto.DbApiConfigDto;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.seo.DbApiConfigSeo;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
@@ -33,10 +22,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,11 +48,9 @@ import javax.servlet.http.HttpServletResponse;
 @GaApi(tags = "api配置")
 public class ApiConfigController {
 
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
+    @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
     @Autowired ApiConfigService apiConfigService;
-
-    @Resource private DbApiConfigDao dbapiConfigDao;
 
     @Autowired DataSourceService dataSourceService;
 
@@ -83,7 +68,7 @@ public class ApiConfigController {
     @PostMapping("/add")
     @GaApiAction(text = "新增API")
     public ResponseDto add(@RequestBody JSONObject jo) {
-        ApiConfig config = new ApiConfig();
+        ApiConfigApo config = new ApiConfigApo();
         config.setName(jo.getString("name"));
         config.setPath(jo.getString("path"));
         config.setNote(jo.getString("note"));
@@ -96,7 +81,7 @@ public class ApiConfigController {
         config.setStatus(Constants.API_STATUS_OFFLINE);
         String id = UUIDUtil.id();
         config.setId(id);
-        config.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+        config.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
         return apiConfigService.add(config);
     }
 
@@ -124,7 +109,7 @@ public class ApiConfigController {
 
     @GetMapping("/getAll")
     @GaApiAction(text = "查询所有的API")
-    public List<ApiConfig> getAll() {
+    public List<ApiConfigApo> getAll() {
         return apiConfigService.getAll();
     }
 
@@ -137,19 +122,19 @@ public class ApiConfigController {
 
     @PostMapping("/search")
     @GaApiAction(text = "查询")
-    public List<ApiConfig> search(String name, String note, String path, String groupId) {
+    public List<ApiConfigApo> search(String name, String note, String path, String groupId) {
         return apiConfigService.search(name, note, path, groupId);
     }
 
     @PostMapping("/detail/{id}")
     @GaApiAction(text = "详情")
-    public ApiConfig detail(@PathVariable String id) {
+    public ApiConfigApo detail(@PathVariable String id) {
         return apiConfigService.detail(id);
     }
 
     @PostMapping("/copy/{id}")
     @GaApiAction(text = "复制")
-    public ApiConfig copy(@PathVariable String id) {
+    public ApiConfigApo copy(@PathVariable String id) {
         return apiConfigService.copy(id);
     }
 
@@ -162,7 +147,7 @@ public class ApiConfigController {
     @PostMapping("/update")
     @GaApiAction(text = "更新API")
     public ResponseDto update(@RequestBody JSONObject jo) {
-        ApiConfig config = new ApiConfig();
+        ApiConfigApo config = new ApiConfigApo();
         config.setId(jo.getString("id"));
         config.setName(jo.getString("name"));
         config.setPath(jo.getString("path"));
@@ -245,7 +230,7 @@ public class ApiConfigController {
     @GaApiAction(text = "下载API组配置")
     public void downloadGroupConfig(String ids, HttpServletResponse response) {
         List<String> collect = Arrays.asList(ids.split(","));
-        List<Group> list = groupService.selectBatch(collect);
+        List<GroupApo> list = groupService.selectBatch(collect);
         String s = JSON.toJSONString(list);
         response.setContentType("application/x-msdownload;charset=utf-8");
         // response.setHeader("Content-Disposition", "attachment; filename=api配置.json");
@@ -274,11 +259,11 @@ public class ApiConfigController {
     public void importAPI(@RequestParam("file") MultipartFile file) throws IOException {
         String s = IoUtil.read(file.getInputStream(), "utf-8");
         JSONObject jsonObject = JSON.parseObject(s);
-        List<ApiConfig> apis = jsonObject.getJSONArray("api").toJavaList(ApiConfig.class);
+        List<ApiConfigApo> apis = jsonObject.getJSONArray("api").toJavaList(ApiConfigApo.class);
         apis.stream()
                 .forEach(
                         t -> {
-                            t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+                            t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
                             t.setCreateTime(
                                     DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
                             t.setUpdateTime(
@@ -291,11 +276,11 @@ public class ApiConfigController {
     @PostMapping(value = "/importGroup", produces = "application/json;charset=UTF-8")
     public void importGroup(@RequestParam("file") MultipartFile file) throws IOException {
         String s = IoUtil.read(file.getInputStream(), "utf-8");
-        List<Group> configs = JSON.parseArray(s, Group.class);
+        List<GroupApo> configs = JSON.parseArray(s, GroupApo.class);
         configs.stream()
                 .forEach(
                         t -> {
-                            t.setCreateUserId(dbApiUserInfoHelper.getSubjectId());
+                            t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
                             t.setCreateTime(
                                     DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
                             t.setUpdateTime(
@@ -308,8 +293,8 @@ public class ApiConfigController {
     public ResponseDto executeSql(String datasourceId, String sql, String params) {
         DruidPooledConnection connection = null;
         try {
-            DataSource dataSource = dataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSource);
+            DataSourceApo dataSourceApo = dataSourceService.detail(datasourceId);
+            connection = PoolManager.getPooledConnection(dataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
             Object data =
@@ -334,8 +319,8 @@ public class ApiConfigController {
         String sql = jo.getString("sql");
         DruidPooledConnection connection = null;
         try {
-            DataSource dataSource = dataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSource);
+            DataSourceApo dataSourceApo = dataSourceService.detail(datasourceId);
+            connection = PoolManager.getPooledConnection(dataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
             Object data =
@@ -362,27 +347,5 @@ public class ApiConfigController {
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
         }
-    }
-
-    @GaApiAction(text = "分页列出api配置信息")
-    @RequestMapping(
-            value = "/listDbApiConfigPage",
-            method = {RequestMethod.POST})
-    @ResponseBody
-    public GiResult<GiPager<ApiConfig>> listDbApiConfigPage(
-            @Validated @RequestBody ConfigSearchVo param) {
-        DbApiConfigSeo seo = new DbApiConfigSeo();
-        BeanUtils.copyProperties(param, seo);
-        seo.setNotDel();
-        if (GutilObject.isNotEmpty(param.getQueryContent())) {
-            seo.setAndQueryContentIn(
-                    ArrayUtil.toArray(ListUtil.of(param.getQueryContent()), String.class));
-        }
-        GiPager<DbApiConfigDto> giPager = dbapiConfigDao.searchListPage(seo, GiPageParam.of());
-        Iterable<DbApiConfigDto> value = giPager.value();
-        GirPager<ApiConfig> reg = new GirPager();
-        List<ApiConfig> vdvos = ApiConfig.fromDtos(ListUtil.toList(value));
-        reg.put(vdvos, giPager.total(), giPager.pageParam());
-        return GiResult.successValue(reg);
     }
 }

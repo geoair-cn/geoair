@@ -379,7 +379,7 @@
 
 
         <profile>
-            <id>group</id>
+            <id>groupApo</id>
             <distributionManagement>
                 <repository>
                     <id>gir-release</id>

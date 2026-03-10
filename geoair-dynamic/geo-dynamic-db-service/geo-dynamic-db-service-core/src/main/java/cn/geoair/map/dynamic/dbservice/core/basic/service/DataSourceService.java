@@ -1,14 +1,13 @@
 package cn.geoair.map.dynamic.dbservice.core.basic.service;
 
-import cn.geoair.map.dynamic.dbservice.core.DbApiUserInfoHelper;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.ApiConfig;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.DataSource;
+import cn.geoair.map.dynamic.dbservice.core.DsApiUserInfoHelper;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.ApiConfigApo;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.DESUtils;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.PoolManager;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.UUIDUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
-import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiDataSourceDao;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.entity.DbApiDataSourcePo;
+import cn.geoair.map.dynamic.dbservice.core.dao.DataSourceDao;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,36 +48,37 @@ public class DataSourceService {
     @Autowired CacheManager cacheManager;
 
     /** 数据源DAO */
-    @Resource DbApiDataSourceDao dbApiDataSourceDao;
+    @Resource DataSourceDao dataSourceDao;
 
     /** API配置服务 */
     @Autowired ApiConfigService apiConfigService;
 
     /** 用户信息助手 */
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
+    @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
     /**
      * 新增数据源
      *
      * <p>自动生成UUID作为主键，设置创建时间和更新时间， 对密码进行DES加密后保存到数据库
      *
-     * @param dataSource 待新增的数据源对象
+     * @param dataSourceApo 待新增的数据源对象
      */
     @Transactional
-    public void add(DataSource dataSource) {
-        dataSource.setId(UUIDUtil.id());
-        dataSource.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        dataSource.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+    public void add(DataSourceApo dataSourceApo) {
+        dataSourceApo.setId(UUIDUtil.id());
+        dataSourceApo.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        dataSourceApo.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         // 新增数据源对密码加密
         try {
-            dataSource.setPassword(DESUtils.encrypt(dataSource.getPassword()));
+            dataSourceApo.setPassword(DESUtils.encrypt(dataSourceApo.getPassword()));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DbApiDataSourcePo po = dataSource.toPo();
-        po.initCreateMeta();
-        po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-        dbApiDataSourceDao.gtcAccess(po);
+        // DbApiDataSourcePo po = dataSource.toPo();
+        // po.initCreateMeta();
+        // po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+        dataSourceApo.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
+        dataSourceDao.accessSelective(dataSourceApo);
     }
 
     /**
@@ -87,26 +86,26 @@ public class DataSourceService {
      *
      * <p>设置更新时间，如果密码被修改则重新加密， 更新数据库记录并清除相关缓存
      *
-     * @param dataSource 待更新的数据源对象
+     * @param dataSourceApo 待更新的数据源对象
      */
-    @CacheEvict(value = "datasource", key = "#dataSource.id")
+    @CacheEvict(value = "datasource", key = "#dataSourceApo.id")
     @Transactional
-    public void update(DataSource dataSource) {
-        dataSource.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+    public void update(DataSourceApo dataSourceApo) {
+        dataSourceApo.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         // 如果修改了密码, 需要对密码加密
-        if (dataSource.isEdit_password()) {
+        if (dataSourceApo.isEdit_password()) {
             try {
-                dataSource.setPassword(DESUtils.encrypt(dataSource.getPassword()));
+                dataSourceApo.setPassword(DESUtils.encrypt(dataSourceApo.getPassword()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        DbApiDataSourcePo po = dataSource.toPo();
-        po.initUpdateMeta();
-        po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
-        dbApiDataSourceDao.gtcUpdateByPKSelective(po);
-        PoolManager.removeJdbcConnectionPool(dataSource.getId());
-        cacheManager.getCache("datasource").evictIfPresent(dataSource.getId());
+        // DbApiDataSourcePo po = dataSource.toPo();
+        // po.initUpdateMeta();
+        // po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
+        dataSourceDao.updateSelectiveById(dataSourceApo);
+        PoolManager.removeJdbcConnectionPool(dataSourceApo.getId());
+        cacheManager.getCache("datasource").evictIfPresent(dataSourceApo.getId());
     }
 
     /**
@@ -119,7 +118,7 @@ public class DataSourceService {
      */
     @Transactional
     public ResponseDto delete(String id) {
-        List<ApiConfig> list = apiConfigService.getAll();
+        List<ApiConfigApo> list = apiConfigService.getAll();
         List<String> str =
                 list.stream()
                         .filter(
@@ -139,7 +138,7 @@ public class DataSourceService {
                         .collect(Collectors.toList());
 
         if (str.isEmpty()) {
-            dbApiDataSourceDao.gtcDeleteByPK(id);
+            dataSourceDao.deleteByPK(id);
             PoolManager.removeJdbcConnectionPool(id);
             cacheManager.getCache("datasource").evictIfPresent(id);
 
@@ -160,9 +159,8 @@ public class DataSourceService {
      * @return 数据源对象，如果未找到则返回null
      */
     @Cacheable(value = "datasource", key = "#id", unless = "#result == null")
-    public DataSource detail(String id) {
-        DbApiDataSourcePo dbApiDataSourcePo = dbApiDataSourceDao.gtcSearchByPK(id);
-        return DataSource.fromPo(dbApiDataSourcePo);
+    public DataSourceApo detail(String id) {
+        return dataSourceDao.getById(id);
     }
 
     /**
@@ -172,13 +170,14 @@ public class DataSourceService {
      *
      * @return 数据源列表，按更新时间倒序排列
      */
-    public List<DataSource> getAll() {
-        List<DbApiDataSourcePo> dbApiDataSourcePos = dbApiDataSourceDao.gtcSearchAll();
-        List<DbApiDataSourcePo> collect =
-                dbApiDataSourcePos.stream()
-                        .sorted(Comparator.comparing(DbApiDataSourcePo::getTimeUpdate).reversed())
-                        .collect(Collectors.toList());
-        return DataSource.fromPos(collect);
+    public List<DataSourceApo> getAll() {
+        // List<DbApiDataSourcePo> dbApiDataSourcePos = dbApiDataSourceDao.gtcSearchAll();
+        // List<DbApiDataSourcePo> collect =
+        // dbApiDataSourcePos.stream()
+        //
+        // .sorted(Comparator.comparing(DbApiDataSourcePo::getTimeUpdate).reversed())
+        // .collect(Collectors.toList());
+        return dataSourceDao.searchAll();
     }
 
     /**
@@ -189,9 +188,11 @@ public class DataSourceService {
      * @param ids 数据源ID列表
      * @return 数据源列表
      */
-    public List<DataSource> selectBatch(List<String> ids) {
-        List<DbApiDataSourcePo> dbApiDataSourcePos = dbApiDataSourceDao.selectBatchIds(ids);
-        return DataSource.fromPos(dbApiDataSourcePos);
+    public List<DataSourceApo> selectBatch(List<String> ids) {
+        // List<DbApiDataSourcePo> dbApiDataSourcePos =
+        // dbApiDataSourceDao.selectBatchIds(ids);
+        // return DataSource.fromPos(dbApiDataSourcePos);
+        return dataSourceDao.selectBatchIds(ids);
     }
 
     /**
@@ -202,14 +203,14 @@ public class DataSourceService {
      * @param list 待插入的数据源列表
      */
     @Transactional
-    public void insertBatch(List<DataSource> list) {
+    public void insertBatch(List<DataSourceApo> list) {
         list.forEach(
                 t -> {
                     t.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                    DbApiDataSourcePo po = t.toPo();
-                    po.initCreateMeta();
-                    po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-                    dbApiDataSourceDao.gtcAccessSelective(po);
+                    // DbApiDataSourcePo po = t.toPo();
+                    // po.initCreateMeta();
+                    t.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
+                    dataSourceDao.accessSelective(t);
                 });
     }
 }

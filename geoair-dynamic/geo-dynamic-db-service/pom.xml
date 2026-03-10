@@ -64,6 +64,18 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-db-service-core</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair.geo.dynamic</groupId>
+                <artifactId>geo-dynamic-db-service-starter</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+
+            <dependency>
                 <groupId>cn.geoair</groupId>
                 <artifactId>geoair-core</artifactId>
                 <version>${geoair.version}</version>
@@ -223,6 +235,7 @@
     <modules>
         <module>geo-dynamic-db-service-core</module>
         <module>geo-dynamic-db-service-starter</module>
+        <module>geo-dynamic-db-service-webview</module>
     </modules>
 
     <build>

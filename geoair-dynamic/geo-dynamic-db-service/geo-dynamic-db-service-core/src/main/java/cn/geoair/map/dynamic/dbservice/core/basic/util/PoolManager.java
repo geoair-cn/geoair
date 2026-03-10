@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.dbservice.core.basic.util;
 
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.DataSource;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
@@ -19,50 +19,53 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class PoolManager {
 
-    // 所有数据源的连接池存在map里
-    static ConcurrentHashMap<String, DruidDataSource> map = new ConcurrentHashMap<>();
+	// 所有数据源的连接池存在map里
+	static ConcurrentHashMap<String, DruidDataSource> map = new ConcurrentHashMap<>();
 
-    public static DruidDataSource getJdbcConnectionPool(DataSource ds) {
-        if (map.containsKey(ds.getId())) {
-            return map.get(ds.getId());
-        } else {
-            DruidDataSource druidDataSource = new DruidDataSource();
-            druidDataSource.setName(ds.getName());
-            druidDataSource.setUrl(ds.getUrl());
-            druidDataSource.setUsername(ds.getUsername());
-            druidDataSource.setRemoveAbandoned(true);
-            druidDataSource.setRemoveAbandonedTimeout(300); // 5分钟自动回收
-            // druidDataSource.setPassword(ds.getPassword());
-            druidDataSource.setDriverClassName(ds.getDriver());
-            druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
-            druidDataSource.setBreakAfterAcquireFailure(true);
+	public static DruidDataSource getJdbcConnectionPool(DataSourceApo ds) {
+		if (map.containsKey(ds.getId())) {
+			return map.get(ds.getId());
+		}
+		else {
+			DruidDataSource druidDataSource = new DruidDataSource();
+			druidDataSource.setName(ds.getName());
+			druidDataSource.setUrl(ds.getUrl());
+			druidDataSource.setUsername(ds.getUsername());
+			druidDataSource.setRemoveAbandoned(true);
+			druidDataSource.setRemoveAbandonedTimeout(300); // 5分钟自动回收
+			// druidDataSource.setPassword(ds.getPassword());
+			druidDataSource.setDriverClassName(ds.getDriver());
+			druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
+			druidDataSource.setBreakAfterAcquireFailure(true);
 
-            try {
-                druidDataSource.setPassword(DESUtils.decrypt(ds.getPassword()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+			try {
+				druidDataSource.setPassword(DESUtils.decrypt(ds.getPassword()));
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 
-            map.put(ds.getId(), druidDataSource);
-            log.info("create druid datasource：{}", ds.getName());
-            return map.get(ds.getId());
-        }
-    }
+			map.put(ds.getId(), druidDataSource);
+			log.info("create druid datasource：{}", ds.getName());
+			return map.get(ds.getId());
+		}
+	}
 
-    // 删除数据库连接池
-    public static void removeJdbcConnectionPool(String id) {
-        if (map.containsKey(id)) {
-            DruidDataSource old = map.get(id);
-            map.remove(id);
-            old.close();
-            log.info("remove druid datasource: {}", old.getName());
-        }
-    }
+	// 删除数据库连接池
+	public static void removeJdbcConnectionPool(String id) {
+		if (map.containsKey(id)) {
+			DruidDataSource old = map.get(id);
+			map.remove(id);
+			old.close();
+			log.info("remove druid datasource: {}", old.getName());
+		}
+	}
 
-    public static DruidPooledConnection getPooledConnection(DataSource ds) throws SQLException {
-        DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
-        DruidPooledConnection connection = pool.getConnection();
-        log.info("获取连接成功");
-        return connection;
-    }
+	public static DruidPooledConnection getPooledConnection(DataSourceApo ds) throws SQLException {
+		DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
+		DruidPooledConnection connection = pool.getConnection();
+		log.info("获取连接成功");
+		return connection;
+	}
+
 }

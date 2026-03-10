@@ -10,9 +10,10 @@ import cn.geoair.map.dynamic.adv.mybatis.DynamicSqlEngine;
  */
 public class SqlEngineUtil {
 
-    static DynamicSqlEngine engine = new DynamicSqlEngine();
+	static DynamicSqlEngine engine = new DynamicSqlEngine();
 
-    public static DynamicSqlEngine getEngine() {
-        return engine;
-    }
+	public static DynamicSqlEngine getEngine() {
+		return engine;
+	}
+
 }

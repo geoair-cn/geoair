@@ -9,11 +9,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ApiPluginConfig implements Serializable {
 
-    String apiId;
+	String apiId;
 
-    Integer pluginType;
+	Integer pluginType;
 
-    String pluginName;
+	String pluginName;
 
-    String pluginParam;
+	String pluginParam;
+
 }

@@ -1,17 +1,14 @@
 package cn.geoair.map.dynamic.dbservice.core.basic.service;
 
-import cn.geoair.map.dynamic.dbservice.core.DbApiUserInfoHelper;
-import cn.geoair.map.dynamic.dbservice.core.basic.dao.ApiConfigMapper;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.ApiConfig;
-import cn.geoair.map.dynamic.dbservice.core.basic.domain.Group;
+import cn.geoair.map.dynamic.dbservice.core.DsApiUserInfoHelper;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.ApiConfigApo;
+import cn.geoair.map.dynamic.dbservice.core.basic.apo.GroupApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.Constants;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.UUIDUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
-import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiConfigDao;
-import cn.geoair.map.dynamic.dbservice.core.dao.dbapi.DbApiGroupDao;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.dto.DbApiConfigDto;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.entity.DbApiConfigPo;
-import cn.geoair.map.dynamic.dbservice.core.model.dbapi.seo.DbApiConfigSeo;
+import cn.geoair.map.dynamic.dbservice.core.dao.ApiConfigDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.ApiGroupDao;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 
 import com.alibaba.fastjson.JSON;
@@ -48,70 +45,64 @@ import javax.annotation.Resource;
 @Service
 public class ApiConfigService {
 
-    @Autowired ApiConfigMapper apiConfigMapper;
+    @Autowired ApiGroupDao apiGroupDao;
 
-    @Resource private DbApiConfigDao dbapiConfigDao;
-
-    @Autowired DbApiGroupDao dbApiGroupDao;
+    @Autowired ApiConfigDao apiConfigDao;
 
     @Autowired CacheManager cacheManager;
 
     @Value("${server.servlet.context-path}")
     String apiContext;
 
-    @Resource DbApiUserInfoHelper dbApiUserInfoHelper;
+    @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
     @Transactional
-    public ResponseDto add(ApiConfig apiConfig) {
-        int size = apiConfigMapper.selectCountByPath(apiConfig.getPath());
+    public ResponseDto add(ApiConfigApo apiConfigApo) {
+        int size = apiConfigDao.selectCountByPath(apiConfigApo.getPath());
         if (size > 0) {
             return ResponseDto.fail("Path has been used!");
         } else {
 
-            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfig.getContentType())) {
-                apiConfig.setParams("[]"); // 不能设置null 前端使用会报错
+            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfigApo.getContentType())) {
+                apiConfigApo.setParams("[]"); // 不能设置null 前端使用会报错
             } else if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(
-                    apiConfig.getContentType())) {
-                apiConfig.setJsonParam(null);
+                    apiConfigApo.getContentType())) {
+                apiConfigApo.setJsonParam(null);
             }
             String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            apiConfig.setCreateTime(now);
-            apiConfig.setUpdateTime(now);
-            DbApiConfigPo insertPo = apiConfig.toPo();
-            insertPo.initCreateMeta();
-            insertPo.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-
-            dbapiConfigDao.gtcAccessSelective(insertPo);
+            apiConfigApo.setCreateTime(now);
+            apiConfigApo.setUpdateTime(now);
+            apiConfigDao.accessSelective(apiConfigApo);
             return ResponseDto.successWithMsg("Create API success");
         }
     }
 
     @Transactional
-    public ResponseDto update(ApiConfig apiConfig) {
+    public ResponseDto update(ApiConfigApo apiConfigApo) {
 
         int size =
-                apiConfigMapper.selectCountByPathWhenUpdate(apiConfig.getPath(), apiConfig.getId());
+                apiConfigDao.selectCountByPathWhenUpdate(
+                        apiConfigApo.getPath(), apiConfigApo.getId());
         if (size > 0) {
             return ResponseDto.fail("Path has been used");
         } else {
 
             // clean data cache if cache plugin configured before
-            ApiConfig oldConfig = detail(apiConfig.getId());
+            ApiConfigApo oldConfig = detail(apiConfigApo.getId());
             cleanDataCacheAndMetaCache(oldConfig);
 
-            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfig.getContentType())) {
-                apiConfig.setParams("[]"); // 不能设置null 前端使用会报错
+            if (MediaType.APPLICATION_JSON_VALUE.equals(apiConfigApo.getContentType())) {
+                apiConfigApo.setParams("[]"); // 不能设置null 前端使用会报错
             } else if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equals(
-                    apiConfig.getContentType())) {
-                apiConfig.setJsonParam(null);
+                    apiConfigApo.getContentType())) {
+                apiConfigApo.setJsonParam(null);
             }
             String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-            apiConfig.setUpdateTime(now);
-            DbApiConfigPo updatePo = apiConfig.toPo();
-            updatePo.initUpdateMeta();
-            updatePo.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
-
-            dbapiConfigDao.gtcUpdateByPKSelective(updatePo);
+            apiConfigApo.setUpdateTime(now);
+            // DbApiConfigPo updatePo = apiConfig.toPo();
+            // updatePo.initUpdateMeta();
+            // updatePo.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
+            apiConfigDao.updateSelectiveById(apiConfigApo);
 
             return ResponseDto.successWithMsg("Update API Success");
         }
@@ -119,19 +110,19 @@ public class ApiConfigService {
 
     @Transactional
     public void delete(String id) {
-        ApiConfig oldConfig = detail(id);
+        ApiConfigApo oldConfig = detail(id);
         cleanDataCacheAndMetaCache(oldConfig);
-        dbapiConfigDao.gtcDeleteByPK(id);
+        apiConfigDao.deleteById(id);
     }
 
     /**
      * 刪除API相关的元数据缓存和 API配置的插件对应的数据缓存
      *
-     * @param apiConfig
+     * @param apiConfigApo
      */
-    private void cleanDataCacheAndMetaCache(ApiConfig apiConfig) {
+    private void cleanDataCacheAndMetaCache(ApiConfigApo apiConfigApo) {
         // 清除API相关的元数据缓存
-        cacheManager.getCache("api").evictIfPresent(apiConfig.getPath());
+        cacheManager.getCache("api").evictIfPresent(apiConfigApo.getPath());
     }
 
     /**
@@ -140,11 +131,11 @@ public class ApiConfigService {
      * @param id
      * @return
      */
-    public ApiConfig detail(String id) {
-        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
-        ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
-        enhanceApiConfig(apiConfig);
-        return apiConfig;
+    public ApiConfigApo detail(String id) {
+        ApiConfigApo apiConfigApo = apiConfigDao.getById(id);
+        // ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
+        enhanceApiConfig(apiConfigApo);
+        return apiConfigApo;
     }
 
     /**
@@ -153,44 +144,45 @@ public class ApiConfigService {
      * @param id
      * @return
      */
-    public ApiConfig copy(String id) {
-        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
-        ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
-        enhanceApiConfig(apiConfig);
+    public ApiConfigApo copy(String id) {
+        ApiConfigApo apiConfigApo = apiConfigDao.getById(id);
+        // ApiConfig apiConfig = ApiConfig.fromPo(dbApiConfigPo);
+        enhanceApiConfig(apiConfigApo);
+        ApiConfigApo copy = new ApiConfigApo();
+        BeanUtil.copyProperties(apiConfigApo, copy);
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        apiConfig.setCreateTime(now);
-        apiConfig.setUpdateTime(now);
-        DbApiConfigPo insertPo = apiConfig.toPo();
-        insertPo.initCreateMeta();
+        copy.setCreateTime(now);
+        copy.setUpdateTime(now);
+        // DbApiConfigPo insertPo = apiConfig.toPo();
+        // insertPo.initCreateMeta();
         String id1 = UUIDUtil.id();
-        insertPo.setId(id1);
-        insertPo.setPath(MessageFormat.format("{0}_{1}", apiConfig.getPath(), id1));
-        insertPo.setName(MessageFormat.format("{0}_copy_{1}", apiConfig.getName(), id1));
-        insertPo.setNameCreate(dbApiUserInfoHelper.getSubjectName());
-        dbapiConfigDao.gtcAccessSelective(insertPo);
-        return apiConfig;
+        copy.setId(id1);
+        copy.setPath(MessageFormat.format("{0}_{1}", apiConfigApo.getPath(), id1));
+        copy.setName(MessageFormat.format("{0}_copy_{1}", apiConfigApo.getName(), id1));
+        apiConfigDao.accessSelective(copy);
+        return copy;
     }
 
-    private void enhanceApiConfig(ApiConfig apiConfig) {
-        if (apiConfig != null) {
-            apiConfig.setTaskJson(JSON.parseArray(apiConfig.getTask()));
-            apiConfig.setParamsJson(JSON.parseArray(apiConfig.getParams()));
-            apiConfig.setAlarmPlugins(ListUtil.empty());
-            apiConfig.setCachePlugin(null);
-            apiConfig.setGlobalTransformPlugin(null);
+    private void enhanceApiConfig(ApiConfigApo apiConfigApo) {
+        if (apiConfigApo != null) {
+            apiConfigApo.setTaskJson(JSON.parseArray(apiConfigApo.getTask()));
+            apiConfigApo.setParamsJson(JSON.parseArray(apiConfigApo.getParams()));
+            apiConfigApo.setAlarmPlugins(ListUtil.empty());
+            apiConfigApo.setCachePlugin(null);
+            apiConfigApo.setGlobalTransformPlugin(null);
         }
     }
 
-    public List<ApiConfig> getAll() {
-        DbApiConfigSeo dbApiConfigSeo = new DbApiConfigSeo();
-        dbApiConfigSeo.setDelIs("NO");
-        List<DbApiConfigDto> dtos = dbapiConfigDao.searchList(dbApiConfigSeo);
-        List<ApiConfig> list = ApiConfig.fromDtos(dtos);
-        List<ApiConfig> collect =
-                list.stream()
-                        .sorted(Comparator.comparing(ApiConfig::getUpdateTime).reversed())
-                        .collect(Collectors.toList());
-        return collect;
+    public List<ApiConfigApo> getAll() {
+        // DbApiConfigSeo dbApiConfigSeo = new DbApiConfigSeo();
+        // dbApiConfigSeo.setDelIs("NO");
+        // List<DbApiConfigDto> dtos = apiConfigDao.searchList(dbApiConfigSeo);
+        // List<ApiConfig> list = ApiConfig.fromDtos(dtos);
+        // List<ApiConfig> collect =
+        // list.stream()
+        // .sorted(Comparator.comparing(ApiConfig::getUpdateTime).reversed())
+        // .collect(Collectors.toList());
+        return apiConfigDao.searchAll();
     }
 
     /**
@@ -200,22 +192,22 @@ public class ApiConfigService {
      */
     public List<JSONObject> getAllApiTree() {
 
-        List<Group> groups =
-                dbApiGroupDao.gtcSearchAll().stream()
-                        .map(Group::fromPo)
-                        .collect(Collectors.toList());
+        List<GroupApo> groupApos = apiGroupDao.searchAll();
+        // apiConfigDao.selectAll().stream()
+        // .filter(t -> t.getGroupId() != null)
+        // .collect(Collectors.toList());
         List<JSONObject> list =
-                groups.stream()
-                        .sorted(Comparator.comparing(Group::getUpdateTime))
+                groupApos.stream()
+                        .sorted(Comparator.comparing(GroupApo::getUpdateTime))
                         .map(
                                 g -> {
-                                    List<ApiConfig> apiConfigs =
-                                            apiConfigMapper.selectByGroup(g.getId());
+                                    List<ApiConfigApo> apiConfigApos =
+                                            apiConfigDao.selectByGroup(g.getId());
                                     List<JSONObject> children =
-                                            apiConfigs.stream()
+                                            apiConfigApos.stream()
                                                     .sorted(
                                                             Comparator.comparing(
-                                                                    ApiConfig::getUpdateTime))
+                                                                    ApiConfigApo::getUpdateTime))
                                                     .map(
                                                             t -> {
                                                                 JSONObject jo = new JSONObject();
@@ -240,7 +232,7 @@ public class ApiConfigService {
         return list;
     }
 
-    public List<ApiConfig> search(String name, String note, String path, String groupId) {
+    public List<ApiConfigApo> search(String name, String note, String path, String groupId) {
         if (StringUtils.isNoneBlank(name)) {
             name = "%" + name + "%";
         }
@@ -250,33 +242,33 @@ public class ApiConfigService {
         if (StringUtils.isNoneBlank(path)) {
             path = "%" + path + "%";
         }
-        return apiConfigMapper.search(name, note, path, groupId);
+        return apiConfigDao.search(name, note, path, groupId);
     }
 
     /** servlet 从这获取API元数据 */
     @Cacheable(value = "api", key = "#path", unless = "#result == null")
-    public ApiConfig getConfig(String path) {
-        ApiConfig apiConfig = apiConfigMapper.selectByPathOnline(path);
-        enhanceApiConfig(apiConfig);
-        return apiConfig;
+    public ApiConfigApo getConfig(String path) {
+        ApiConfigApo apiConfigApo = apiConfigDao.selectByPathOnline(path);
+        enhanceApiConfig(apiConfigApo);
+        return apiConfigApo;
     }
 
     public void online(String id) {
-        DbApiConfigPo dbApiConfigPo = dbapiConfigDao.gtcSearchByPK(id);
-        dbApiConfigPo.setStatus(Constants.API_STATUS_ONLINE);
-        dbapiConfigDao.gtcUpdateByPKSelective(dbApiConfigPo);
+        ApiConfigApo apiConfigApo = apiConfigDao.getById(id);
+        apiConfigApo.setStatus(Constants.API_STATUS_ONLINE);
+        apiConfigDao.accessSelective(apiConfigApo);
     }
 
     public void offline(String id) {
-        ApiConfig apiConfig = detail(id);
-        cleanDataCacheAndMetaCache(apiConfig);
-        apiConfig.setStatus(Constants.API_STATUS_OFFLINE);
-        dbapiConfigDao.gtcUpdateByPKSelective(apiConfig.toPo());
+        ApiConfigApo apiConfigApo = detail(id);
+        cleanDataCacheAndMetaCache(apiConfigApo);
+        apiConfigApo.setStatus(Constants.API_STATUS_OFFLINE);
+        apiConfigDao.accessSelective(apiConfigApo);
     }
 
     public String apiDocs(List<String> ids) {
         StringBuffer temp = new StringBuffer("# 接口文档\n---\n");
-        List<ApiConfig> list = apiConfigMapper.selectBatchIds(ids);
+        List<ApiConfigApo> list = apiConfigDao.selectBatchIds(ids);
         list.stream()
                 .forEach(
                         t -> {
@@ -335,7 +327,7 @@ public class ApiConfigService {
      * @return
      */
     public JSONObject exportAPI(List<String> ids) {
-        List<ApiConfig> list = apiConfigMapper.selectBatchIds(ids);
+        List<ApiConfigApo> list = apiConfigDao.selectBatchIds(ids);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("api", list);
@@ -349,7 +341,7 @@ public class ApiConfigService {
      * @param configs
      */
     @Transactional
-    public void importAPI(List<ApiConfig> configs) {
+    public void importAPI(List<ApiConfigApo> configs) {
         configs.stream()
                 .forEach(
                         t -> {
@@ -358,9 +350,7 @@ public class ApiConfigService {
                             t.setUpdateTime(
                                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                             t.setStatus(Constants.API_STATUS_OFFLINE);
-                            DbApiConfigPo po = t.toPo();
-                            po.initCreateMeta();
-                            dbapiConfigDao.gtcAccessSelective(po);
+                            apiConfigDao.accessSelective(t);
                         });
     }
 }

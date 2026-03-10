@@ -35,7 +35,7 @@
 
     </properties>
 
-    <description>geo-dynamic-db-service</description>
+    <description>geo-dynamic-db-service-core</description>
 
     <url>https://gitee.com/geoair/geo-dynamic</url>
 
@@ -81,25 +81,6 @@
 
 
         <dependency>
-            <groupId>cn.geoair.geo.dynamic</groupId>
-            <artifactId>geo-dynamic-adv-query</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>cn.geoair.orm</groupId>
-            <artifactId>geoair-mybatis-tk</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
@@ -113,6 +94,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.geoair.geo.dynamic</groupId>
+            <artifactId>geo-dynamic-adv-query</artifactId>
+            <version>${geoair.version}</version>
         </dependency>
 
         <dependency>

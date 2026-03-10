@@ -12,34 +12,35 @@ import java.util.Map;
  */
 public class BlobTypeHandler extends BaseTypeHandler<String> {
 
-    @Override
-    public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
-        return null;
-    }
+	@Override
+	public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
+		return null;
+	}
 
-    @Override
-    public String getResult(Entity entity, String columnName) {
+	@Override
+	public String getResult(Entity entity, String columnName) {
 
-        return String.valueOf("(Blob)");
-    }
+		return String.valueOf("(Blob)");
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, String columnName) {
-        return String.valueOf("(Blob)");
-    }
+	@Override
+	public String getResult(ResultSet resultSet, String columnName) {
+		return String.valueOf("(Blob)");
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, Integer columnIndex) {
-        return String.valueOf("(Blob)");
-    }
+	@Override
+	public String getResult(ResultSet resultSet, Integer columnIndex) {
+		return String.valueOf("(Blob)");
+	}
 
-    @Override
-    public String getResult(Map<String, Object> row, String columnName) {
-        return String.valueOf("(Blob)");
-    }
+	@Override
+	public String getResult(Map<String, Object> row, String columnName) {
+		return String.valueOf("(Blob)");
+	}
 
-    @Override
-    public String getResult(Object obj) {
-        return String.valueOf("(Blob)");
-    }
+	@Override
+	public String getResult(Object obj) {
+		return String.valueOf("(Blob)");
+	}
+
 }
