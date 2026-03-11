@@ -81,6 +81,12 @@
             <version>${net.postgis.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.postgis</groupId>
+            <artifactId>postgis-jdbc</artifactId>
+            <version>${org.postgis.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>net.postgis</groupId>
             <artifactId>postgis-geometry</artifactId>
             <version>${net.postgis.version}</version>

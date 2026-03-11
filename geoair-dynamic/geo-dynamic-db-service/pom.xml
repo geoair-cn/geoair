@@ -158,6 +158,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.postgis</groupId>
+                <artifactId>postgis-jdbc</artifactId>
+                <version>${org.postgis.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.oracle.ojdbc</groupId>
                 <artifactId>ojdbc8</artifactId>
                 <version>${oracle.ojdbc.version}</version>

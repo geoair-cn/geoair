@@ -1,11 +1,9 @@
 package cn.geoair.map.dynamic.dbservice.core.typehander;
 
 import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.dbservice.core.typehander.dm.DmGeomTypeHandler;
 import cn.geoair.map.dynamic.dbservice.core.typehander.oracle.OracleBlobTypeHandler;
 import cn.geoair.map.dynamic.dbservice.core.typehander.oracle.OracleGeomTypeHandler;
-import cn.geoair.map.dynamic.dbservice.core.typehander.pg.PgGeomTypeHandler;
-import cn.geoair.map.dynamic.dbservice.core.typehander.pg.PostGisGeomTypeHandler;
+import cn.geoair.map.dynamic.dbservice.core.typehander.pg.PgGeomRegister;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.db.meta.JdbcType;
 
@@ -53,12 +51,7 @@ public class TypeHandlerRegistry {
     static {
         try {
             // PostgreSQL/PostGIS相关类型处理器注册
-            TypeHandlerRegistry.register(
-                    net.postgis.jdbc.PGgeometry.class, Singleton.get(PgGeomTypeHandler.class));
-            TypeHandlerRegistry.register(
-                    net.postgis.jdbc.geometry.Geometry.class,
-                    Singleton.get(PostGisGeomTypeHandler.class));
-            TypeHandlerRegistry.register(1111, Singleton.get(PgGeomTypeHandler.class));
+            PgGeomRegister.register();
             Gir.log.info("PostGIS类型处理器注册成功");
         } catch (Throwable e) {
             System.err.println("PostGIS类型处理器注册失败: " + e.getMessage());
@@ -66,17 +59,17 @@ public class TypeHandlerRegistry {
         }
     }
 
-    static {
-        try {
-            // 达梦数据库相关类型处理器注册
-            TypeHandlerRegistry.register(
-                    dm.jdbc.driver.DmdbStruct.class, Singleton.get(DmGeomTypeHandler.class));
-            Gir.log.info("达梦数据库类型处理器注册成功");
-        } catch (Throwable e) {
-            System.err.println("达梦数据库类型处理器注册失败: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+    //    static {
+    //        try {
+    //            // 达梦数据库相关类型处理器注册
+    //            TypeHandlerRegistry.register(
+    //                    dm.jdbc.driver.DmdbStruct.class, Singleton.get(DmGeomTypeHandler.class));
+    //            Gir.log.info("达梦数据库类型处理器注册成功");
+    //        } catch (Throwable e) {
+    //            System.err.println("达梦数据库类型处理器注册失败: " + e.getMessage());
+    //            e.printStackTrace();
+    //        }
+    //    }
 
     static {
         try {

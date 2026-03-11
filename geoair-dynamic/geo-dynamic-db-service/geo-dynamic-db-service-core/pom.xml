@@ -131,7 +131,12 @@
             <artifactId>postgis-jdbc</artifactId>
             <version>${net.postgis.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.postgis</groupId>
+            <artifactId>postgis-jdbc</artifactId>
+            <version>${org.postgis.version}</version>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>com.oracle.ojdbc</groupId>
             <artifactId>ojdbc8</artifactId>
@@ -143,11 +148,13 @@
             <artifactId>sdoutl</artifactId>
             <version>${oracle.sdoutl.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.dm</groupId>
-            <artifactId>DmJdbcDriver</artifactId>
-            <version>${dm.jdbc.version}</version>
-        </dependency>
+
+
+        <!--        <dependency>-->
+        <!--            <groupId>com.dm</groupId>-->
+        <!--            <artifactId>DmJdbcDriver</artifactId>-->
+        <!--            <version>${dm.jdbc.version}</version>-->
+        <!--        </dependency>-->
         <!--达梦空间支持-->
         <dependency>
             <groupId>com.dameng</groupId>
