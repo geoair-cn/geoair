@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/ds_api/group")
-@GaApi(tags = "api分组信息")
+@GaApi(tags = "GirDs api分组信息")
 public class GirDsGroupController {
 
     @Autowired DsGroupService dsGroupService;
@@ -24,12 +24,13 @@ public class GirDsGroupController {
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
     @PostMapping("/create")
+    @GaApiAction(text = "创建API分组")
     public void create(GroupApo groupApo) {
         groupApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
         dsGroupService.insert(groupApo);
     }
 
-    @GaApiAction(text = "创建API分组")
+    @GaApiAction(text = "删除API分组")
     @PostMapping("/delete/{id}")
     public ResponseDto delete(@PathVariable String id) {
         return dsGroupService.deleteById(id);

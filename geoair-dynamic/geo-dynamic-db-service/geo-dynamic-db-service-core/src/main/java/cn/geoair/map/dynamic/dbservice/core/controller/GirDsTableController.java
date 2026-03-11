@@ -31,7 +31,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/ds_api/table")
-@GaApi(tags = "表相关的接口")
+@GaApi(tags = "GirDs表相关的接口")
 public class GirDsTableController {
 
     @Resource GirDsDataSourceDao girDsDataSourceDao;

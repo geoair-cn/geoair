@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @RestController
 @RequestMapping("/ds_api/datasource")
-@GaApi(tags = "数据源相关")
+@GaApi(tags = "GirDs 数据源相关")
 public class GirDsDataSourceController {
 
     @Autowired DsDataSourceService dsDataSourceService;

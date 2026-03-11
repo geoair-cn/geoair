@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @Slf4j
 @RequestMapping("/ds_api/apiConfig")
-@GaApi(tags = "api配置")
+@GaApi(tags = "GirDs api配置")
 public class GirDsApiConfigController {
 
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
@@ -61,6 +61,7 @@ public class GirDsApiConfigController {
     String apiContext;
 
     @PostMapping("/context")
+    @GaApiAction(text = "获取上下文")
     public String getContext() {
         String s = StrUtil.replaceFirst(apiContext, "/", "");
         return s;
@@ -266,6 +267,7 @@ public class GirDsApiConfigController {
      * @throws IOException
      */
     @PostMapping(value = "/import", produces = "application/json;charset=UTF-8")
+    @GaApiAction(text = "导入API配置")
     public void importAPI(@RequestParam("file") MultipartFile file) throws IOException {
         String s = IoUtil.read(file.getInputStream(), "utf-8");
         JSONObject jsonObject = JSON.parseObject(s);
@@ -284,6 +286,7 @@ public class GirDsApiConfigController {
     }
 
     @PostMapping(value = "/importGroup", produces = "application/json;charset=UTF-8")
+    @GaApiAction(text = "导入API配置")
     public void importGroup(@RequestParam("file") MultipartFile file) throws IOException {
         String s = IoUtil.read(file.getInputStream(), "utf-8");
         List<GroupApo> configs = JSON.parseArray(s, GroupApo.class);
@@ -300,6 +303,7 @@ public class GirDsApiConfigController {
     }
 
     @PostMapping("/sql/execute")
+    @GaApiAction(text = "sql执行")
     public ResponseDto executeSql(String datasourceId, String sql, String params) {
         DruidPooledConnection connection = null;
         try {

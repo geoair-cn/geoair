@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Slf4j
 @RequestMapping("/ds_api/system")
-@GaApi(tags = "系统相关")
+@GaApi(tags = "GirDs系统相关")
 public class GirDsSystemController {
 
     @Value("${server.servlet.context-path:}")
@@ -140,6 +140,7 @@ public class GirDsSystemController {
     }
 
     @GetMapping("/context")
+    @GaApiAction(text = "获取上下文")
     public Map<String, Object> context(HttpServletRequest request) {
         String baseUrl = null;
         String serviceUrl = girDsServiceProperties.getServiceUrl();
