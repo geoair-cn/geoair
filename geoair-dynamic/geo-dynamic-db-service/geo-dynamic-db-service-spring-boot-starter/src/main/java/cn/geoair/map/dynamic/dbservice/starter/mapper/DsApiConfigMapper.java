@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.dbservice.starter.mapper;
 
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.map.dynamic.dbservice.core.basic.apo.ApiConfigApo;
-import cn.geoair.map.dynamic.dbservice.core.dao.ApiConfigDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.GirDsApiConfigDao;
 import cn.geoair.map.dynamic.dbservice.starter.model.dto.DsApiConfigDto;
 import cn.geoair.map.dynamic.dbservice.starter.model.entity.DsApiConfigPo;
 import cn.geoair.orm.tkmapper.impls.TkEntityMapper;
@@ -15,7 +15,8 @@ import java.util.List;
  * @author zhangjun
  * @date 2025-07-31
  */
-public interface DsApiConfigMapper extends TkEntityMapper<DsApiConfigPo, String>, ApiConfigDao {
+public interface DsApiConfigMapper
+        extends TkEntityMapper<DsApiConfigPo, String>, GirDsApiConfigDao {
 
     default List<ApiConfigApo> selectBatchIds(List<String> ids) {
         List<DsApiConfigPo> dsApiConfigPos = gtcSearchByPK(ids);

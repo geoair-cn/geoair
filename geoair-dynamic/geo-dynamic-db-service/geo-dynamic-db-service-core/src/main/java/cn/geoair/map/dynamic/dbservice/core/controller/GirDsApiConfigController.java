@@ -47,7 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 @RequestMapping("/ds_api/apiConfig")
 @GaApi(tags = "api配置")
-public class ApiConfigController {
+public class GirDsApiConfigController {
 
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 

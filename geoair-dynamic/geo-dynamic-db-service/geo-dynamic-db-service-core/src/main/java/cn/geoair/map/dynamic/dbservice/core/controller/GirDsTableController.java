@@ -5,7 +5,7 @@ import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.map.dynamic.dbservice.core.basic.apo.DataSourceApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.JdbcUtil;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.PoolManager;
-import cn.geoair.map.dynamic.dbservice.core.dao.DataSourceDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.GirDsDataSourceDao;
 import cn.geoair.map.dynamic.dbservice.core.utils.TokenManager;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
@@ -32,15 +32,15 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/ds_api/table")
 @GaApi(tags = "表相关的接口")
-public class TableController {
+public class GirDsTableController {
 
-    @Resource DataSourceDao dataSourceDao;
+    @Resource GirDsDataSourceDao girDsDataSourceDao;
 
     @RequestMapping("/getAllTables")
     @GaApiAction(text = "获取所有的表")
     public List<JSONObject> getAllTables(String sourceId) throws SQLException {
         TokenManager.validateToken();
-        DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
+        DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
         DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
         List<String> tables = JdbcUtil.getAllTables(connection, dataSourceApo.getTableSql());
         List<JSONObject> list =
@@ -71,7 +71,7 @@ public class TableController {
     @GaApiAction(text = "获取表的所有列")
     public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
         TokenManager.validateToken();
-        DataSourceApo dataSourceApo = dataSourceDao.getById(sourceId);
+        DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
         DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
         List<JSONObject> columns =
                 JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);

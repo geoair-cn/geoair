@@ -4,8 +4,8 @@ import cn.geoair.map.dynamic.dbservice.core.DsApiUserInfoHelper;
 import cn.geoair.map.dynamic.dbservice.core.basic.apo.GroupApo;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.UUIDUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
-import cn.geoair.map.dynamic.dbservice.core.dao.ApiConfigDao;
-import cn.geoair.map.dynamic.dbservice.core.dao.ApiGroupDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.GirDsApiConfigDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.GirDsApiGroupDao;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,9 @@ import javax.annotation.Resource;
 @Service
 public class DsGroupService {
 
-    @Autowired ApiGroupDao apiGroupDao;
+    @Autowired GirDsApiGroupDao girDsApiGroupDao;
 
-    @Autowired ApiConfigDao apiConfigDao;
+    @Autowired GirDsApiConfigDao girDsApiConfigDao;
 
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
@@ -35,16 +35,16 @@ public class DsGroupService {
         // po.initCreateMeta();
         groupApo.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
         groupApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
-        apiGroupDao.accessSelective(groupApo);
+        girDsApiGroupDao.accessSelective(groupApo);
     }
 
     @Transactional
     public ResponseDto deleteById(String id) {
-        int size = apiConfigDao.selectCountByGroup(id);
+        int size = girDsApiConfigDao.selectCountByGroup(id);
         if (size > 0) {
             return ResponseDto.fail("Group is not empty, can not delete");
         } else {
-            apiGroupDao.deleteByPK(id);
+            girDsApiGroupDao.deleteByPK(id);
             return ResponseDto.successWithMsg("Group delete success");
         }
     }
@@ -52,12 +52,12 @@ public class DsGroupService {
     public List<GroupApo> getAll() {
         // List<DbApiGroupPo> dbApiGroupPos = apiGroupDao.searchAll();
         // List<Group> groups = Group.fromPos(dbApiGroupPos);
-        return apiGroupDao.searchAll();
+        return girDsApiGroupDao.searchAll();
     }
 
     public List<GroupApo> selectBatch(List<String> ids) {
         // return Group.fromPos();
-        return apiGroupDao.selectBatchIds(ids);
+        return girDsApiGroupDao.selectBatchIds(ids);
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class DsGroupService {
                             t.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
                             t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
                             // t.setId(UUIDUtil.id());
-                            apiGroupDao.accessSelective(t);
+                            girDsApiGroupDao.accessSelective(t);
                         });
     }
 
@@ -82,6 +82,6 @@ public class DsGroupService {
         // DbApiGroupPo po = group.toPo();
         // po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
         // po.initUpdateMeta();
-        apiGroupDao.updateSelectiveById(groupApo);
+        girDsApiGroupDao.updateSelectiveById(groupApo);
     }
 }

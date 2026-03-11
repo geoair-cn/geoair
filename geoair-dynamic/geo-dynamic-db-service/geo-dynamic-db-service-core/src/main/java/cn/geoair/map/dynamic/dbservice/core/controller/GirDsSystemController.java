@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequestMapping("/ds_api/system")
 @GaApi(tags = "系统相关")
-public class SystemController {
+public class GirDsSystemController {
 
     @Value("${server.servlet.context-path:}")
     String apiContext;

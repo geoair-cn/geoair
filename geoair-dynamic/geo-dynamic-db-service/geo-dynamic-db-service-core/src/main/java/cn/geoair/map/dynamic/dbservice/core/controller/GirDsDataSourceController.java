@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/ds_api/datasource")
 @GaApi(tags = "数据源相关")
-public class DataSourceController {
+public class GirDsDataSourceController {
 
     @Autowired DsDataSourceService dsDataSourceService;
 

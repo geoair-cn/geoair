@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/ds_api/group")
 @GaApi(tags = "api分组信息")
-public class GroupController {
+public class GirDsGroupController {
 
     @Autowired DsGroupService dsGroupService;
 

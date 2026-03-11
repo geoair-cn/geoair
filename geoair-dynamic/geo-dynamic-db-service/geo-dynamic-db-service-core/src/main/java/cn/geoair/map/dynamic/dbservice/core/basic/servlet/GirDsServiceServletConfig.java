@@ -19,20 +19,20 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-public class ServletConfig {
+public class GirDsServiceServletConfig {
 
     @Autowired private GirDsAPIServlet girDsApiServlet;
     @Autowired GirDsServiceProperties girDsServiceProperties;
 
     @Bean
-    public FilterRegistrationBean apiHeaderFilter() {
+    public FilterRegistrationBean dsApiHeaderFilter() {
         // issues/I51LOI
         int apiHeaderFilterOrder = 1;
         String realApiContext1 = girDsServiceProperties.getRealApiContext();
         String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
         String format = String.format("/%s/*", realApiContext);
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setFilter(new ApiHeaderFilter());
+        registrationBean.setFilter(new GirDsApiHeaderFilter());
         registrationBean.addUrlPatterns(format); // API Servlet 跨域
         registrationBean.setOrder(apiHeaderFilterOrder);
         registrationBean.setEnabled(true);
@@ -44,7 +44,7 @@ public class ServletConfig {
     }
 
     @Bean
-    public ServletRegistrationBean getServletRegistrationBean() {
+    public ServletRegistrationBean dsServletRegistrationBean() {
         String realApiContext1 = girDsServiceProperties.getRealApiContext();
         String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
         String format = String.format("/%s/*", realApiContext);

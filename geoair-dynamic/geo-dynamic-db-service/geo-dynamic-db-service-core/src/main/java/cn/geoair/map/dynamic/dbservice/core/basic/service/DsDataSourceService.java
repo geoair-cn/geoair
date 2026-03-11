@@ -7,7 +7,7 @@ import cn.geoair.map.dynamic.dbservice.core.basic.util.DESUtils;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.PoolManager;
 import cn.geoair.map.dynamic.dbservice.core.basic.util.UUIDUtil;
 import cn.geoair.map.dynamic.dbservice.core.common.ResponseDto;
-import cn.geoair.map.dynamic.dbservice.core.dao.DataSourceDao;
+import cn.geoair.map.dynamic.dbservice.core.dao.GirDsDataSourceDao;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -49,7 +49,7 @@ public class DsDataSourceService {
     //	CacheManager cacheManager;
 
     /** 数据源DAO */
-    @Resource DataSourceDao dataSourceDao;
+    @Resource GirDsDataSourceDao girDsDataSourceDao;
 
     /** API配置服务 */
     @Autowired DsApiConfigService dsApiConfigService;
@@ -79,7 +79,7 @@ public class DsDataSourceService {
         // po.initCreateMeta();
         // po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
         dataSourceApo.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
-        dataSourceDao.accessSelective(dataSourceApo);
+        girDsDataSourceDao.accessSelective(dataSourceApo);
     }
 
     /**
@@ -104,7 +104,7 @@ public class DsDataSourceService {
         // DbApiDataSourcePo po = dataSource.toPo();
         // po.initUpdateMeta();
         // po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
-        dataSourceDao.updateSelectiveById(dataSourceApo);
+        girDsDataSourceDao.updateSelectiveById(dataSourceApo);
         PoolManager.removeJdbcConnectionPool(dataSourceApo.getId());
         //		cacheManager.getCache("datasource").evictIfPresent(dataSourceApo.getId());
     }
@@ -139,7 +139,7 @@ public class DsDataSourceService {
                         .collect(Collectors.toList());
 
         if (str.isEmpty()) {
-            dataSourceDao.deleteByPK(id);
+            girDsDataSourceDao.deleteByPK(id);
             PoolManager.removeJdbcConnectionPool(id);
             //			cacheManager.getCache("datasource").evictIfPresent(id);
 
@@ -161,7 +161,7 @@ public class DsDataSourceService {
      */
     //	@Cacheable(value = "datasource", key = "#id", unless = "#result == null")
     public DataSourceApo detail(String id) {
-        return dataSourceDao.getById(id);
+        return girDsDataSourceDao.getById(id);
     }
 
     /**
@@ -178,7 +178,7 @@ public class DsDataSourceService {
         //
         // .sorted(Comparator.comparing(DbApiDataSourcePo::getTimeUpdate).reversed())
         // .collect(Collectors.toList());
-        return dataSourceDao.searchAll();
+        return girDsDataSourceDao.searchAll();
     }
 
     /**
@@ -193,7 +193,7 @@ public class DsDataSourceService {
         // List<DbApiDataSourcePo> dbApiDataSourcePos =
         // dbApiDataSourceDao.selectBatchIds(ids);
         // return DataSource.fromPos(dbApiDataSourcePos);
-        return dataSourceDao.selectBatchIds(ids);
+        return girDsDataSourceDao.selectBatchIds(ids);
     }
 
     /**
@@ -211,7 +211,7 @@ public class DsDataSourceService {
                     // DbApiDataSourcePo po = t.toPo();
                     // po.initCreateMeta();
                     t.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
-                    dataSourceDao.accessSelective(t);
+                    girDsDataSourceDao.accessSelective(t);
                 });
     }
 }

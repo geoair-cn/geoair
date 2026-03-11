@@ -29,7 +29,7 @@
                 "time_update"    timestamp(6),
                 "name_create"    text COLLATE "pg_catalog"."default",
                 "name_update"    text COLLATE "pg_catalog"."default",
-                CONSTRAINT "api_config_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "ds_api_config_pkey" PRIMARY KEY ("id")
             )
             ;
 
@@ -119,7 +119,7 @@ COMMENT
                 "time_update"    timestamp(6),
                 "name_create"    text COLLATE "pg_catalog"."default",
                 "name_update"    text COLLATE "pg_catalog"."default",
-                CONSTRAINT "datasource_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "ds_datasource_pkey" PRIMARY KEY ("id")
             )
             ;
 
@@ -195,7 +195,7 @@ COMMENT
                 "time_update"    timestamp(6),
                 "name_create"    text COLLATE "pg_catalog"."default",
                 "name_update"    text COLLATE "pg_catalog"."default",
-                CONSTRAINT "api_group_pkey" PRIMARY KEY ("id")
+                CONSTRAINT "ds_api_group_pkey" PRIMARY KEY ("id")
             )
             ;
 
