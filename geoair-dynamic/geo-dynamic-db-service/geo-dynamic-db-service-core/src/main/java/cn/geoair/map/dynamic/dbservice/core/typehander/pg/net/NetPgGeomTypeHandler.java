@@ -19,7 +19,7 @@ public class NetPgGeomTypeHandler extends BaseTypeHandler<String> {
 
     public static void register() {
         TypeHandlerRegistry.register(
-                org.postgis.PGgeometry.class, Singleton.get(NetPgGeomTypeHandler.class));
+                net.postgis.jdbc.PGgeometry.class, Singleton.get(NetPgGeomTypeHandler.class));
     }
 
     @Override
