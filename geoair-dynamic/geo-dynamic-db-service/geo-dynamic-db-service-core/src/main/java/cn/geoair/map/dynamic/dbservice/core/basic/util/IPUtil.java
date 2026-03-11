@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.dbservice.core.basic.util;
 
+import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.dbservice.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.tools.GirService;
 
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class IPUtil {
 
     public static void main(String[] args) {
-        System.out.println("本机IP:" + getIpAddress());
+        Gir.log.info("本机IP:" + getIpAddress());
     }
 
     public static String getIpAddress() {

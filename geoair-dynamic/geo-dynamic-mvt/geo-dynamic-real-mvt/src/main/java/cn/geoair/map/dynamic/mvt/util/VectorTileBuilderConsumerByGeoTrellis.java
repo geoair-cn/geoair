@@ -148,7 +148,7 @@
 // } else if (type.equalsIgnoreCase("multipolygon")) {
 // tempMultPolyList.add(new MVTFeature<>(Option.apply(0L), (MultiPolygon) geom, prop));
 // } else {
-// System.out.println("不识别的几何类型:" + type);
+// Gir.log.info("不识别的几何类型:" + type);
 // }
 //
 // } finally {

@@ -56,7 +56,7 @@ public class Main {
         }
         reader.close();
         connection.disconnect();
-        System.out.println(stringBuffer);
+        Gir.log.info(stringBuffer);
     }
 }`
 }

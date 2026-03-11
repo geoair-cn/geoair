@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.dbservice.core.utils;
 
+import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.dbservice.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
@@ -109,14 +110,14 @@ public class TokenManager {
     public static void main(String[] args) {
         // 测试生成Token
         String token = TokenManager.generateToken("admin", "123456");
-        System.out.println("生成的Token：" + token);
+        Gir.log.info("生成的Token：" + token);
 
         // 测试校验Token
         boolean valid = TokenManager.validateToken(token, "admin", "123456");
-        System.out.println("Token是否有效：" + valid); // 输出：true
+        Gir.log.info("Token是否有效：" + valid); // 输出：true
 
         // 错误密码校验
         boolean invalid = TokenManager.validateToken(token, "admin", "654321");
-        System.out.println("错误密码校验结果：" + invalid); // 输出：false
+        Gir.log.info("错误密码校验结果：" + invalid); // 输出：false
     }
 }

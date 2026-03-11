@@ -24,14 +24,14 @@ public class GkConsole {
 	// Log
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志
+	 * 同 Gir.log.info()方法，打印控制台日志
 	 */
 	public static void log() {
 		out.println();
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志<br>
+	 * 同 Gir.log.info()方法，打印控制台日志<br>
 	 * 如果传入打印对象为{@link Throwable}对象，那么同时打印堆栈
 	 * @param obj 要打印的对象
 	 */
@@ -46,7 +46,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志<br>
+	 * 同 Gir.log.info()方法，打印控制台日志<br>
 	 * 如果传入打印对象为{@link Throwable}对象，那么同时打印堆栈
 	 * @param obj1 第一个要打印的对象
 	 * @param otherObjs 其它要打印的对象
@@ -61,7 +61,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志<br>
+	 * 同 Gir.log.info()方法，打印控制台日志<br>
 	 * 当传入template无"{}"时，被认为非模板，直接打印多个参数以空格分隔
 	 * @param template 文本模板，被替换的部分用 {} 表示
 	 * @param values 值
@@ -76,7 +76,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志
+	 * 同 Gir.log.info()方法，打印控制台日志
 	 * @param t 异常对象
 	 * @param template 文本模板，被替换的部分用 {} 表示
 	 * @param values 值
@@ -90,7 +90,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志
+	 * 同 Gir.log.info()方法，打印控制台日志
 	 * @param template 文本模板，被替换的部分用 {} 表示
 	 * @param values 值
 	 */
@@ -118,7 +118,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志<br>
+	 * 同 Gir.log.info()方法，打印控制台日志<br>
 	 * 如果传入打印对象为{@link Throwable}对象，那么同时打印堆栈
 	 * @param obj1 第一个要打印的对象
 	 * @param otherObjs 其它要打印的对象
@@ -167,7 +167,7 @@ public class GkConsole {
 	}
 
 	/**
-	 * 同 System.out.println()方法，打印控制台日志
+	 * 同 Gir.log.info()方法，打印控制台日志
 	 * @param template 文本模板，被替换的部分用 {} 表示
 	 * @param values 值
 	 */
