@@ -43,7 +43,7 @@ public class GirDsSystemController {
     @GetMapping("/version")
     @GaApiAction(text = "获取系统版本")
     public String getVersion() {
-        log.info("查询系统版本信息");
+        log.debug("查询系统版本信息");
         return girDsServiceProperties.getVersion();
     }
 
@@ -104,7 +104,7 @@ public class GirDsSystemController {
     @GetMapping("/mode")
     @GaApiAction(text = "获取系统运行模式")
     public String mode() {
-        log.info("查询系统运行模式");
+        log.debug("查询系统运行模式");
         return activeProfile;
     }
 
@@ -117,7 +117,7 @@ public class GirDsSystemController {
             String realApiContext2 = StrUtil.removePrefix(realApiContext1, "/");
             String result =
                     request.getServerName() + ":" + originPort + apiContext + "/" + realApiContext2;
-            log.info("获取服务器地址信息: {}", result);
+            log.debug("获取服务器地址信息: {}", result);
             return result;
         } catch (Exception e) {
             log.error("获取服务器地址信息失败", e);
@@ -131,7 +131,7 @@ public class GirDsSystemController {
         try {
             int originPort = IPUtil.getOriginPort(request);
             String result = request.getServerName() + ":" + originPort;
-            log.info("获取服务器IP和端口: {}", result);
+            log.debug("获取服务器IP和端口: {}", result);
             return result;
         } catch (Exception e) {
             log.error("获取服务器IP和端口失败", e);
@@ -164,7 +164,7 @@ public class GirDsSystemController {
     @GetMapping("/health")
     @GaApiAction(text = "系统健康检查")
     public String healthCheck() {
-        log.info("系统健康检查");
+        log.debug("系统健康检查");
         return "OK";
     }
 }

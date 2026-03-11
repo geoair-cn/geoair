@@ -36,7 +36,7 @@ public class GirDsServiceServletConfig {
         registrationBean.addUrlPatterns(format); // API Servlet 跨域
         registrationBean.setOrder(apiHeaderFilterOrder);
         registrationBean.setEnabled(true);
-        log.info(
+        log.debug(
                 "注册 apiHeaderFilter for {} UrlPatterns, and order is {}",
                 format,
                 apiHeaderFilterOrder);
@@ -50,7 +50,7 @@ public class GirDsServiceServletConfig {
         String format = String.format("/%s/*", realApiContext);
         ServletRegistrationBean bean = new ServletRegistrationBean(girDsApiServlet);
         bean.addUrlMappings(format);
-        log.info("注册 APIServlet servelet for {} urlMappings", format);
+        log.debug("注册 APIServlet servelet for {} urlMappings", format);
         return bean;
     }
 }

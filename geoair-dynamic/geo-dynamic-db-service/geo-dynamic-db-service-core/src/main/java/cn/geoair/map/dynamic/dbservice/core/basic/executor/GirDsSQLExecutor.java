@@ -54,7 +54,7 @@ public class GirDsSQLExecutor implements Executor {
             Object data = dataList.get(i);
             // 如果此单条sql是查询类sql，并且配置了数据转换插件
             if (data instanceof Iterable && StringUtils.isNotBlank(apiSql.getTransformPlugin())) {
-                log.info("transform plugin execute");
+                log.debug("transform plugin execute");
                 List<JSONObject> sourceData = (List<JSONObject>) (data);
                 Object resData = sourceData;
                 dataList.set(i, resData);
