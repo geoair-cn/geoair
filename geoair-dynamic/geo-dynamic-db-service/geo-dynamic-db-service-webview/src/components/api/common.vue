@@ -3,10 +3,10 @@
     <el-tabs tab-position="left">
       <el-tab-pane :label="$t('m.basic')">
         <el-form label-width="160px">
-          <el-form-item :label="$t('m.name')">
+          <el-form-item :label="$t('m.name')" required>
             <el-input v-model="detail.name" style="max-width:600px"></el-input>
           </el-form-item>
-          <el-form-item :label="$t('m.path')">
+          <el-form-item :label="$t('m.path')" required>
             <el-input v-model="detail.path" style="max-width:600px">
               <template slot="prepend">http://{{ address }}/</template>
             </el-input>
@@ -65,14 +65,14 @@
               <el-button @click="addRow" icon="el-icon-plus" type="primary" circle size="mini"></el-button>
             </div>
             <div v-show="detail.contentType === CONTENT_TYPE.JSON" class="json-param-editor">
-              <!-- 隐藏的textarea作为CodeMirror的数据源 -->
+              <!-- 隐藏的 textarea 作为 CodeMirror 的数据源 -->
               <textarea
                   ref="jsonParamTextarea"
                   v-model="detail.jsonParam"
                   v-show="false"
               ></textarea>
 
-              <!-- CodeMirror编辑器将渲染到这里 -->
+              <!-- CodeMirror 编辑器将渲染到这里 -->
               <div class="my-codemirror json-param"></div>
 
               <!-- 格式化按钮 -->
@@ -114,14 +114,14 @@ import sqlCode from "@/components/api/common/SqlCode";
 import SqlExecutor from "@/components/api/executor/SqlExecutor";
 import {CONTENT_TYPE, DATA_TYPE, EXECUTOR_TYPE, PLUGIN_TYPE, PRIVILEGE} from "@/constant";
 import * as dbApi from '@/api/dsApi'
-// 导入CodeMirror相关资源
+// 导入 CodeMirror 相关资源
 import CodeMirror from "codemirror";
 import 'codemirror/lib/codemirror.css'
-import 'codemirror/mode/javascript/javascript.js' // JSON模式
+import 'codemirror/mode/javascript/javascript.js' // JSON 模式
 import 'codemirror/theme/dracula.css' // 主题
 import 'codemirror/addon/lint/lint.css'
 import 'codemirror/addon/lint/lint.js'
-import 'codemirror/addon/lint/json-lint.js' // JSON校验
+import 'codemirror/addon/lint/json-lint.js' // JSON 校验
 
 export default {
   components: {sqlCode, SqlExecutor},
@@ -175,7 +175,7 @@ export default {
       transformPlugins: [],
       alarmPlugins: [],
       globalTransformPlugins: [],
-      // 新增CodeMirror实例和配置
+      // 新增 CodeMirror 实例和配置
       jsonParamCoder: null,
       jsonParamOptions: {
         tabSize: 2,
@@ -197,7 +197,7 @@ export default {
   },
   props: ["id", "groupId"],
   watch: {
-    // 监听contentType变化，动态初始化编辑器
+    // 监听 contentType 变化，动态初始化编辑器
     'detail.contentType'(newVal) {
       if (newVal === CONTENT_TYPE.JSON) {
         this.$nextTick(() => {
@@ -205,7 +205,7 @@ export default {
         });
       }
     },
-    // 监听jsonParam变化，同步到编辑器
+    // 监听 jsonParam 变化，同步到编辑器
     'detail.jsonParam'(newVal) {
       if (this.jsonParamCoder && newVal !== this.jsonParamCoder.getValue()) {
         this.jsonParamCoder.setValue(newVal || '');
@@ -235,7 +235,7 @@ export default {
       }
     },
 
-    // 新增：格式化JSON参数
+    // 新增：格式化 JSON 参数
     formatJsonParam() {
       try {
         // 处理空值情况
@@ -249,11 +249,11 @@ export default {
         }
       } catch (e) {
         this.$message.error('JSON 格式错误，无法格式化');
-        console.error('JSON格式化错误:', e);
+        console.error('JSON 格式化错误:', e);
       }
     },
     isNull(item) {
-      if (typeof item == 'undefined' || item == null || item == '') {
+      if (typeof item == 'undefined' || item == null || item === '') {
         return true
       } else {
         return false
@@ -269,11 +269,19 @@ export default {
         this.$message.warning("API path empty!")
         return false
       }
+
+      // 路径校验：必须包含英文字符和下划线
+      const pathRegex = /^[a-zA-Z_]+$/;
+      if (!pathRegex.test(this.detail.path)) {
+        this.$message.warning("API path 必须是英文与下划线的组合!");
+        return false;
+      }
+
       if (this.isNull(this.detail.groupId)) {
         this.$message.warning("API group empty!")
         return false
       }
-      if (this.detail.contentType == CONTENT_TYPE.FORM_URLENCODED) {
+      if (this.detail.contentType === CONTENT_TYPE.FORM_URLENCODED) {
         for (let o of this.detail.paramsJson) {
           if (this.isNull(o.name)) {
             this.$message.warning("Request parameter name empty!")
@@ -390,12 +398,12 @@ export default {
     }
     // 新增页面
     else {
-      //从侧边栏分组上点击的创建API按钮，会默认选中对应的分组
+      //从侧边栏分组上点击的创建 API 按钮，会默认选中对应的分组
       this.detail.groupId = this.groupId
     }
     this.getAllGroups();
     this.getAllPlugin();
-    // 初始化为JSON类型时，初始化编辑器
+    // 初始化为 JSON 类型时，初始化编辑器
     if (this.detail.contentType === CONTENT_TYPE.JSON) {
       this.$nextTick(() => {
         this._initializeJsonParamCodeMirror();
@@ -407,7 +415,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-// 新增CodeMirror相关样式
+// 新增 CodeMirror 相关样式
 .json-param-editor {
   margin-bottom: 10px;
 }

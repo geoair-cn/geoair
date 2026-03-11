@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-form label-width="160px">
-      <el-form-item :label="$t('m.datasource')">
-        <el-select v-model="datasourceId">
-          <el-option :value="item.id" :label="item.name" v-for="item in datasources">{{ item.name }}</el-option>
+      <el-form-item :label="$t('m.datasource')" required :rules="[{ required: true, message: '请选择数据源', trigger: 'change' }]">
+        <el-select v-model="datasourceId" placeholder="请选择数据源" style="width: 100%;">
+          <el-option :value="item.id" :label="item.name" v-for="item in datasources" :key="item.id">{{ item.name }}</el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -34,7 +34,7 @@
       </el-form-item>
       <el-form-item>
         <div slot="label">
-          <label-tip label="分页" tip="分页传参形式&page=0&limit=10，分页从0开始"></label-tip>
+          <label-tip label="分页" tip="分页传参形式&page=0&limit=10，分页从 0 开始"></label-tip>
         </div>
         <el-radio-group v-model="pageIs">
           <el-radio :label="1">{{ $t('m.on') }}</el-radio>
@@ -43,7 +43,7 @@
       </el-form-item>
       <el-form-item>
         <div slot="label">
-          <label-tip label="结果集转驼峰" tip="数据库中字段名称会自动转驼峰，如：user_name会自动转成userName"></label-tip>
+          <label-tip label="结果集转驼峰" tip="数据库中字段名称会自动转驼峰，如：user_name 会自动转成 userName"></label-tip>
         </div>
         <el-radio-group v-model="humpIs">
           <el-radio :label="1">{{ $t('m.on') }}</el-radio>
@@ -67,8 +67,8 @@ export default {
       transaction: 0,
       pageIs: 1,
       humpIs: 1,
-      currentActiveTabName: '1', //当前选中的tab的name
-      currentActiveTabIndex: 0, // 当前选中tab的索引值
+      currentActiveTabName: '1', //当前选中的 tab 的 name
+      currentActiveTabIndex: 0, // 当前选中 tab 的索引值
       editableTabs: [{name: '1', sqlText: "", transformPlugin: null, transformPluginParam: null}],
       tabIndex: 1, //tab 总数
       datasourceId: null,
@@ -161,7 +161,7 @@ export default {
 
         this.currentActiveTabName = activeName;
         this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-        // this.$store.commit('removeCm', i) // 删除 vuex中 的cmInstance
+        // this.$store.commit('removeCm', i) // 删除 vuex 中 的 cmInstance
       }
     }
   },
@@ -169,13 +169,13 @@ export default {
     sqlide
   },
   watch: {
-    // 编辑API页面，本组件生成的时候，props还没注入进来，所以要监听
+    // 编辑 API 页面，本组件生成的时候，props 还没注入进来，所以要监听
     detail: function (newVal, oldVal) {
       //
       this.transaction = newVal.transaction
       this.datasourceId = newVal.datasourceId
 
-      // 生成子组件中的tabPane需要的数据格式
+      // 生成子组件中的 tabPane 需要的数据格式
       for (let j = 0; j < newVal.sqlList.length; j++) {
         const b = newVal.sqlList[j]
         b.name = (j + 1) + '';
@@ -211,5 +211,16 @@ export default {
 .label {
   font-weight: 700;
   margin: 0 5px 0 20px;
+}
+/* 为必填项添加红色边框提示 */
+.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before {
+  content: '*';
+  color: #f56c6c;
+  margin-right: 4px;
+}
+.el-form-item.is-error .el-input__inner,
+.el-form-item.is-error .el-textarea__inner,
+.el-form-item.is-error .el-select .el-input__inner {
+  border-color: #f56c6c;
 }
 </style>

@@ -37,8 +37,7 @@ public interface DsApiApiGroupMapper
         return DsApiGroupDto.fromPo(po);
     }
 
-    default GroupApo deleteByPK(String id) {
-        deleteByPK(id);
-        return new GroupApo();
+    default void deleteByPK(String id) {
+        gtcDeleteByPK(id);
     }
 }

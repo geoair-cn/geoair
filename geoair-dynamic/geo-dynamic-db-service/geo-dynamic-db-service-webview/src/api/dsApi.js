@@ -292,9 +292,9 @@ export function parseDynamicSql(sql, params) {
 
 // 新增数据源
 export function addDataSource(dataSource) {
-
+    const dsToken = localStorage.getItem('dsToken')
     return request({
-        url: window.Config.baseUrl + '/ds_api/datasource/add',
+        url: window.Config.baseUrl + '/ds_api/datasource/add' + "?dsToken=" + dsToken,
         method: 'post',
         params: dataSource
     });

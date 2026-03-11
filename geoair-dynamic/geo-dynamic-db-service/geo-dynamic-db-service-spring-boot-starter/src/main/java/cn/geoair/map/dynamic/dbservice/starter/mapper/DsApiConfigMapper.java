@@ -98,6 +98,10 @@ public interface DsApiConfigMapper
         gtcUpdateByPKSelective(dsApiConfigPo);
     }
 
+    default void deleteById(String id) {
+        gtcDeleteByPK(id);
+    }
+
     default ApiConfigApo getById(String id) {
         DsApiConfigPo dsApiConfigPo = gtcSearchByPK(id);
         return DsApiConfigDto.fromPo(dsApiConfigPo);

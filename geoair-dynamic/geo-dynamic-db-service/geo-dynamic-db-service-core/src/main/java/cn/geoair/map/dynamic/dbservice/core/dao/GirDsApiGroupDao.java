@@ -20,5 +20,5 @@ public interface GirDsApiGroupDao {
 
     GroupApo updateSelectiveById(GroupApo t);
 
-    GroupApo deleteByPK(String id);
+    void deleteByPK(String id);
 }
