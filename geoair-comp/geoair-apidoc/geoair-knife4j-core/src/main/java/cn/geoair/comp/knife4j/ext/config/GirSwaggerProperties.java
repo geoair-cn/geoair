@@ -1,15 +1,18 @@
 package cn.geoair.comp.knife4j.ext.config;
 
+import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "geoair.apidoc")
+@Data
 public class GirSwaggerProperties {
 
     /** 是否启用swagger注解（全局开关） */
-    private Boolean enable = false;
+    private boolean enable = false;
 
     /** API版本号，默认为空 */
     private String version = "1.0";
@@ -49,110 +52,4 @@ public class GirSwaggerProperties {
 
     /** 扫描缓存目录（默认：target/reflections-cache） */
     private String scanCacheDir = "target/reflections-cache";
-
-    // --------------------- getter/setter ---------------------
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getControllerRootPackage() {
-        return controllerRootPackage;
-    }
-
-    public void setControllerRootPackage(String controllerRootPackage) {
-        this.controllerRootPackage = controllerRootPackage;
-    }
-
-    public List<String> getControllerRootPackages() {
-        return controllerRootPackages;
-    }
-
-    public void setControllerRootPackages(List<String> controllerRootPackages) {
-        this.controllerRootPackages = controllerRootPackages;
-    }
-
-    public List<String> getExcludePackages() {
-        return excludePackages;
-    }
-
-    public void setExcludePackages(List<String> excludePackages) {
-        this.excludePackages = excludePackages;
-    }
-
-    public List<String> getFixedOrderPackages() {
-        return fixedOrderPackages;
-    }
-
-    public void setFixedOrderPackages(List<String> fixedOrderPackages) {
-        this.fixedOrderPackages = fixedOrderPackages;
-    }
-
-    public String getGroupNamePrefix() {
-        return groupNamePrefix;
-    }
-
-    public void setGroupNamePrefix(String groupNamePrefix) {
-        this.groupNamePrefix = groupNamePrefix;
-    }
-
-    public boolean isGroupNameUseLastPackage() {
-        return groupNameUseLastPackage;
-    }
-
-    public void setGroupNameUseLastPackage(boolean groupNameUseLastPackage) {
-        this.groupNameUseLastPackage = groupNameUseLastPackage;
-    }
-
-    public boolean isEnableGroupIndex() {
-        return enableGroupIndex;
-    }
-
-    public void setEnableGroupIndex(boolean enableGroupIndex) {
-        this.enableGroupIndex = enableGroupIndex;
-    }
-
-    public String getScanCacheDir() {
-        return scanCacheDir;
-    }
-
-    public void setScanCacheDir(String scanCacheDir) {
-        this.scanCacheDir = scanCacheDir;
-    }
 }

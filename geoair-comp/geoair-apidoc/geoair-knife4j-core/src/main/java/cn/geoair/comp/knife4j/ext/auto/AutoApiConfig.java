@@ -193,7 +193,7 @@ public class AutoApiConfig implements ApplicationContextAware, GirSwaggerApiConf
     @Override
     public List<DocketInfo> getDocketInfos() {
         // 1. 校验Swagger开关是否开启
-        if (!swaggerProperties.getEnable()) {
+        if (!swaggerProperties.isEnable()) {
             return new ArrayList<>();
         }
 

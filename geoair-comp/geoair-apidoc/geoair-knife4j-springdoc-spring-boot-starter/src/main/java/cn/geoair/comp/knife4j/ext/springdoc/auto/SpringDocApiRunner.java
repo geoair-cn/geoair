@@ -154,7 +154,7 @@ public class SpringDocApiRunner implements ApplicationContextAware {
         uiProperties.setDefaultModelsExpandDepth(5);
         uiProperties.setShowExtensions(true);
         uiProperties.setDisplayOperationId(true);
-        uiProperties.setEnabled(girSwaggerProperties.getEnable());
+        uiProperties.setEnabled(girSwaggerProperties.isEnable());
         return uiProperties;
     }
 }

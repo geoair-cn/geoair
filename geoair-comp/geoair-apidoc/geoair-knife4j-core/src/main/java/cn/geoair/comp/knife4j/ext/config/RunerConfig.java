@@ -37,7 +37,7 @@ public class RunerConfig implements ApplicationRunner {
                 "接口文档地址：" + path + "{} 启用状态：{}",
                 port,
                 "/doc.html",
-                girSwaggerProperties.getEnable());
+                girSwaggerProperties.isEnable());
         Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 }

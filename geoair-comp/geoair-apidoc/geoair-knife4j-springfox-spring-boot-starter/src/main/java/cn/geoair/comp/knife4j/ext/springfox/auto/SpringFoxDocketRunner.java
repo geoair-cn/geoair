@@ -29,17 +29,22 @@ public class SpringFoxDocketRunner
     private ApplicationContext applicationContext;
     private GirSwaggerProperties swaggerProperties;
 
+    public SpringFoxDocketRunner(GirSwaggerProperties swaggerProperties) {
+        this.swaggerProperties = swaggerProperties;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
         // 尝试获取配置，如果没有则使用默认配置
-        try {
-            this.swaggerProperties = applicationContext.getBean(GirSwaggerProperties.class);
-        } catch (BeansException e) {
-            // 如果没有配置GirSwaggerProperties，创建默认配置
-            this.swaggerProperties = new GirSwaggerProperties();
-            this.swaggerProperties.setEnable(true);
-        }
+        //        try {
+        //            this.swaggerProperties =
+        // applicationContext.getBean(GirSwaggerProperties.class);
+        //        } catch (BeansException e) {
+        //            // 如果没有配置GirSwaggerProperties，创建默认配置
+        //            this.swaggerProperties = new GirSwaggerProperties();
+        //            this.swaggerProperties.setEnable(true);
+        //        }
     }
 
     @Override
@@ -64,7 +69,7 @@ public class SpringFoxDocketRunner
             String configBeanName = entry.getKey();
             GirSwaggerApiConfig apiConfig = entry.getValue();
 
-            System.out.println("【SpringFox】开始处理配置: " + configBeanName);
+            //            System.out.println("【SpringFox】开始处理配置: " + configBeanName);
             registerDocketsFromConfig(apiConfig, registry);
         }
     }
@@ -128,7 +133,7 @@ public class SpringFoxDocketRunner
                             Docket docket =
                                     SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
                                             .groupName(finalGroupName)
-                                            .enable(swaggerProperties.getEnable());
+                                            .enable(swaggerProperties.isEnable());
 
                             return docket;
                         });
@@ -171,6 +176,6 @@ public class SpringFoxDocketRunner
 
     /** 获取Swagger是否启用（工具方法） */
     private boolean isSwaggerEnabled() {
-        return swaggerProperties != null && swaggerProperties.getEnable();
+        return swaggerProperties != null && swaggerProperties.isEnable();
     }
 }
