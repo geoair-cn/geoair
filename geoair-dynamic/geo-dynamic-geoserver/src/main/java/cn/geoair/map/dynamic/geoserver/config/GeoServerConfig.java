@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -28,6 +29,7 @@ import javax.servlet.ServletContext;
             // , "classpath*:/applicationContext.xml"
         })
 @Configuration
+@EnableConfigurationProperties(GirGeoServerProperties.class)
 public class GeoServerConfig
         implements BeanPostProcessor, ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
 
