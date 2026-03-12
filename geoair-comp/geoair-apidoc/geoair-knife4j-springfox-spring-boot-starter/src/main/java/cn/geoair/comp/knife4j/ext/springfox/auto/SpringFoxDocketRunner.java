@@ -2,6 +2,7 @@ package cn.geoair.comp.knife4j.ext.springfox.auto;
 
 import cn.geoair.base.Gir;
 import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
 import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelService;
@@ -29,10 +30,12 @@ public class SpringFoxDocketRunner
         implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
+    private GirSwaggerProperties swaggerProperties;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        this.swaggerProperties = applicationContext.getBean(GirSwaggerProperties.class);
         Gir.log.info("ApplicationContext已初始化，类型：" + applicationContext.getClass().getName());
     }
 
@@ -78,7 +81,7 @@ public class SpringFoxDocketRunner
                                     springAddtionalModelService
                                             .createApi(apiModelInfo, docketInfo)
                                             .groupName(finalGroupName)
-                                            .enable(true));
+                                            .enable(swaggerProperties.isEnable()));
             docketBuilder.setLazyInit(false);
         }
     }

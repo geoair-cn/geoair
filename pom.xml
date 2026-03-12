@@ -79,6 +79,7 @@
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
     </properties>
 
     <description>geoair-dependencies</description>
@@ -123,6 +124,39 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git-commit-id-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>get-the-git-infos</id>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                            <phase>initialize</phase>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                        <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
+                        </generateGitPropertiesFilename>
+
+                        <!-- 包含提交信息相关属性（关键） -->
+                        <includeOnlyProperties>
+                            <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>          <!-- 完整提交哈希 -->
+                            <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>      <!-- 提交时间 -->
+                            <includeOnlyProperty>^git.commit.message.full$</includeOnlyProperty> <!-- 完整提交信息 -->
+                            <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty> <!-- 提交标题（第一行） -->
+                            <includeOnlyProperty>^git.branch$</includeOnlyProperty> <!-- 提交标题（第一行） -->
+                        </includeOnlyProperties>
+
+                        <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+                        <dateFormatTimeZone>Asia/Shanghai</dateFormatTimeZone>
+                        <verbose>false</verbose>
+                        <skipPoms>true</skipPoms>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
