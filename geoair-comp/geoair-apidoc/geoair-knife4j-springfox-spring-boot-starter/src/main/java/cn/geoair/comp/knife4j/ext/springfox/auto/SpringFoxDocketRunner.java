@@ -1,7 +1,6 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
 import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
-import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerProperties;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
@@ -15,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import springfox.documentation.spring.web.plugins.Docket;
 
@@ -23,28 +23,23 @@ import java.util.Map;
 
 /** SpringFox Docket 动态注册器 在Spring容器启动早期扫描GirSwaggerApiConfig实现类，动态创建并注册Docket Bean */
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@Component
 public class SpringFoxDocketRunner
         implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     private ApplicationContext applicationContext;
-    private GirSwaggerProperties swaggerProperties;
 
-    public SpringFoxDocketRunner(GirSwaggerProperties swaggerProperties) {
-        this.swaggerProperties = swaggerProperties;
-    }
+    private boolean enable;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        // 尝试获取配置，如果没有则使用默认配置
-        //        try {
-        //            this.swaggerProperties =
-        // applicationContext.getBean(GirSwaggerProperties.class);
-        //        } catch (BeansException e) {
-        //            // 如果没有配置GirSwaggerProperties，创建默认配置
-        //            this.swaggerProperties = new GirSwaggerProperties();
-        //            this.swaggerProperties.setEnable(true);
-        //        }
+        enable =
+                "true"
+                        .equals(
+                                applicationContext
+                                        .getEnvironment()
+                                        .getProperty("geoair.apidoc.enable"));
     }
 
     @Override
@@ -133,7 +128,7 @@ public class SpringFoxDocketRunner
                             Docket docket =
                                     SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
                                             .groupName(finalGroupName)
-                                            .enable(swaggerProperties.isEnable());
+                                            .enable(enable);
 
                             return docket;
                         });
@@ -172,10 +167,5 @@ public class SpringFoxDocketRunner
             throws BeansException {
         // 此处不需要额外处理
         // 如果需要修改已经注册的Bean，可以在这里进行
-    }
-
-    /** 获取Swagger是否启用（工具方法） */
-    private boolean isSwaggerEnabled() {
-        return swaggerProperties != null && swaggerProperties.isEnable();
     }
 }

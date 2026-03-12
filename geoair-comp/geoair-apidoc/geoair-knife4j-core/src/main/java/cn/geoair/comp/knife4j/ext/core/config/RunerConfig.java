@@ -37,7 +37,8 @@ public class RunerConfig implements ApplicationRunner {
                 "接口文档地址：" + path + "{} 启用状态：{}",
                 port,
                 "/doc.html",
-                girSwaggerProperties.isEnable());
+                //                girSwaggerProperties.isEnable());
+                environment.getProperty("geoair.apidoc.enable"));
         Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 }

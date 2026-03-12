@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
 
 /** 基于配置自动生成Swagger Docket */
 @ConditionalOnMissingBean(GirSwaggerApiConfig.class)
+@Component
 public class AutoApiConfig implements GirSwaggerApiConfig, ApplicationContextAware {
 
     public AutoApiConfig() {
@@ -185,7 +187,9 @@ public class AutoApiConfig implements GirSwaggerApiConfig, ApplicationContextAwa
     @Override
     public List<DocketInfo> getDocketInfos() {
         // 1. 校验Swagger开关是否开启
-        if (!swaggerProperties.isEnable()) {
+
+        if (!"true"
+                .equals(applicationContext.getEnvironment().getProperty("geoair.apidoc.enable"))) {
             return new ArrayList<>();
         }
 

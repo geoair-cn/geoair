@@ -1,7 +1,5 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
-import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerProperties;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,8 +8,7 @@ public class SpringFoxAutoConfiguration {
 
     /** 注册Docket动态注册器 这个Bean会在Spring容器启动早期执行，动态创建所有的Docket */
     @Bean
-    public static SpringFoxDocketRunner springFoxDocketRunner(
-            GirSwaggerProperties swaggerProperties) {
-        return new SpringFoxDocketRunner(swaggerProperties);
+    public static SpringFoxDocketRunner springFoxDocketRunner() {
+        return new SpringFoxDocketRunner();
     }
 }

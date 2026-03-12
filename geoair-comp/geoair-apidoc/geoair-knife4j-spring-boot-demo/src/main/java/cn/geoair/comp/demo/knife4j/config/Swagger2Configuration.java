@@ -21,6 +21,6 @@ public class Swagger2Configuration implements GirSwaggerApiConfig {
 
     @Override
     public ApiModelInfo getApiModelInfo() {
-        return new ApiModelInfo("demo 在线文档", "demo在线文档", "demo", "1.0");
+        return new ApiModelInfo("demo 在线文档", "demo在线文档", "demo", "666666.0");
     }
 }
