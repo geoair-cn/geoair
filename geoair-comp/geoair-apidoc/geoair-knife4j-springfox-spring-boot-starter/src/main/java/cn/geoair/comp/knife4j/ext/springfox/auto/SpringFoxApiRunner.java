@@ -1,7 +1,5 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
-
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -24,16 +22,11 @@ public class SpringFoxApiRunner
         return new Reflections();
     }
 
-    private ApplicationContext applicationContext;
-
-    private GirSwaggerApiConfig apiConfig;
-
     //    private GirSwaggerProperties swaggerProperties;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
+    public void setApplicationContext(ApplicationContext applicationContext)
+            throws BeansException {}
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
@@ -42,13 +35,4 @@ public class SpringFoxApiRunner
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
             throws BeansException {}
-
-    private synchronized void initDependencies() {
-        if (apiConfig == null) {
-            this.apiConfig = applicationContext.getBean(GirSwaggerApiConfig.class);
-            //            this.swaggerProperties =
-            // applicationContext.getBean(GirSwaggerProperties.class);
-
-        }
-    }
 }

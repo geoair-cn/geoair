@@ -1,12 +1,12 @@
-package cn.geoair.comp.knife4j.ext.config;
+package cn.geoair.comp.knife4j.ext.core.config;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilStr;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * @author ：张俊
  * @date ：Created in 2022/8/29 9:32 @description： TODO
  */
-@Configuration
+@Component
 public class RunerConfig implements ApplicationRunner {
 
     @Resource Environment environment;

@@ -51,11 +51,7 @@
             <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
             <version>${geoair.version}</version>
         </dependency>
-        <dependency>
-            <groupId>cn.geoair.comp.apidoc</groupId>
-            <artifactId>geoair-knife4j-core</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

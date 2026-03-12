@@ -1,4 +1,4 @@
-package cn.geoair.comp.knife4j.demo.model;
+package cn.geoair.comp.demo.knife4j.model;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;

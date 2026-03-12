@@ -1,9 +1,9 @@
 package cn.geoair.comp.knife4j.ext.springdoc.auto;
 
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
-import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.model.DocketInfo;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerProperties;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;

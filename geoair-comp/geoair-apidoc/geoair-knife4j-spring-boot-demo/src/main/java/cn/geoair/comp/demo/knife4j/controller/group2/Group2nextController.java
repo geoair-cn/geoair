@@ -1,6 +1,6 @@
-// package cn.geoair.comp.knife4j.demo.controller.group2;
+// package cn.geoair.comp.demo.knife4j.controller.group2;
 //
-// import cn.geoair.comp.knife4j.demo.model.DemoVo;
+// import cn.geoair.comp.demo.knife4j.model.DemoVo;
 //// import io.swagger.annotations.Api;
 //// import io.swagger.annotations.ApiOperation;
 // import org.springframework.stereotype.Controller;

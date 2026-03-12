@@ -1,6 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
- cn.geoair.comp.knife4j.ext.auto.GirSwaggerPropertiesAutoConfiguration,\
- cn.geoair.comp.knife4j.ext.auto.AutoApiConfig,\
- cn.geoair.comp.knife4j.ext.config.RunerConfig
+ cn.geoair.comp.knife4j.ext.core.auto.GirSwaggerPropertiesAutoConfiguration
 
 

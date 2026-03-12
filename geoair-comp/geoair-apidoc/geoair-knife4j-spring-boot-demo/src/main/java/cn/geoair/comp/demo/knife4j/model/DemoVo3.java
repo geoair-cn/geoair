@@ -1,4 +1,4 @@
-package cn.geoair.comp.knife4j.demo.model;
+package cn.geoair.comp.demo.knife4j.model;
 
 //import io.swagger.annotations.ApiModel;
 //import io.swagger.annotations.ApiModelProperty;

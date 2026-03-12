@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.ext.springfox.utils;
 
-import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.model.DocketInfo;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.model.SpringAddtionalModel;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
 

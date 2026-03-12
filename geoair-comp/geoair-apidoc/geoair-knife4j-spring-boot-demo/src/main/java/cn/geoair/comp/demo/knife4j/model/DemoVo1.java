@@ -1,4 +1,4 @@
-package cn.geoair.comp.knife4j.demo.model;
+package cn.geoair.comp.demo.knife4j.model;
 
 import cn.geoair.base.data.common.GemDel;
 import cn.geoair.base.data.model.annotation.GaModel;
@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2022-08-17
  */
 @GaModel(text = "测试demo")
-public class DemoVo {
+public class DemoVo1 {
 
 	@GaModelField(text = "String 变量")
 	private String var1;

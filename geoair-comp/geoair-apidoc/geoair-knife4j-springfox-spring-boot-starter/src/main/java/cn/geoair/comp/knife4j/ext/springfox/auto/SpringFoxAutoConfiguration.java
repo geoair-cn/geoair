@@ -1,6 +1,6 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerProperties;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

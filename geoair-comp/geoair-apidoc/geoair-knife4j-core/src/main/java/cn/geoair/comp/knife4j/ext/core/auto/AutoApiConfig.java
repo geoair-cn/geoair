@@ -1,10 +1,10 @@
-package cn.geoair.comp.knife4j.ext.auto;
+package cn.geoair.comp.knife4j.ext.core.auto;
 
 import cn.geoair.base.Gir;
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerProperties;
-import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.model.DocketInfo;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerProperties;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -22,27 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 /** 基于配置自动生成Swagger Docket */
 @ConditionalOnMissingBean(GirSwaggerApiConfig.class)
-public class AutoApiConfig implements ApplicationContextAware, GirSwaggerApiConfig {
+public class AutoApiConfig implements GirSwaggerApiConfig, ApplicationContextAware {
 
     public AutoApiConfig() {
         Gir.log.info("自动扫描控制器中。。。。。");
     }
 
-    // Spring上下文对象
     private ApplicationContext applicationContext;
 
-    // Swagger配置属性（通过GirBeanHelper获取）
-    private GirSwaggerProperties swaggerProperties;
-
-    /** Spring自动注入ApplicationContext，并初始化配置属性 */
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-        // 初始化配置属性
-        this.swaggerProperties = applicationContext.getBean(GirSwaggerProperties.class);
-    }
+    @Resource private GirSwaggerProperties swaggerProperties;
 
     /** 获取控制器根包列表（优先级：手动多包 → 手动单包 → 自动提取） */
     private List<String> getControllerRootPackages() {
@@ -250,5 +242,10 @@ public class AutoApiConfig implements ApplicationContextAware, GirSwaggerApiConf
                 swaggerProperties.getDescription(),
                 swaggerProperties.getAuthor(),
                 swaggerProperties.getVersion());
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

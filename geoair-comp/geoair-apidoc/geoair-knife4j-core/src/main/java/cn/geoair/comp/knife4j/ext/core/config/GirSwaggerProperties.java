@@ -1,15 +1,18 @@
-package cn.geoair.comp.knife4j.ext.config;
+package cn.geoair.comp.knife4j.ext.core.config;
 
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "geoair.apidoc")
 @Data
+@Component
 public class GirSwaggerProperties {
+    public GirSwaggerProperties() {}
 
     /** 是否启用swagger注解（全局开关） */
     private boolean enable = false;

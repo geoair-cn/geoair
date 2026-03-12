@@ -1,8 +1,8 @@
-package cn.geoair.comp.knife4j.demo.config;
+package cn.geoair.comp.demo.knife4j.config;
 
-import cn.geoair.comp.knife4j.ext.config.GirSwaggerApiConfig;
-import cn.geoair.comp.knife4j.ext.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.model.DocketInfo;
+import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.hutool.core.collection.ListUtil;
 
 import org.springframework.stereotype.Component;
@@ -15,8 +15,8 @@ public class Swagger2Configuration implements GirSwaggerApiConfig {
     @Override
     public List<DocketInfo> getDocketInfos() {
         return ListUtil.of(
-                new DocketInfo("demo2", "cn.geoair.comp.knife4j.demo.controller.group2"),
-                new DocketInfo("demo1", "cn.geoair.comp.knife4j.demo.controller.group1"));
+                new DocketInfo("demo2", "cn.geoair.comp.demo.knife4j.controller.group2"),
+                new DocketInfo("demo1", "cn.geoair.comp.demo.knife4j.controller.group1"));
     }
 
     @Override
