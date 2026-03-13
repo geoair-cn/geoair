@@ -5,19 +5,19 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
     <groupId>cn.geoair.geo.dynamic</groupId>
     <artifactId>geoair-dynamic</artifactId>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <packaging>pom</packaging>
     <name>geoair-dynamic</name>
     <description>gis dynamic tile server</description>
     <properties>
         <java.version>8</java.version>
-        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.2-M2</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>

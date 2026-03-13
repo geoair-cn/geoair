@@ -5,17 +5,17 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geo-dynamic-db-service</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <artifactId>geo-dynamic-db-service-spring-boot-starter</artifactId>
     <name>geo-dynamic-db-service-starter</name>
     <packaging>jar</packaging>
     <properties>
         <java.version>8</java.version>
-        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.2-M2</geoair.version>
         <liquibase.version>4.9.1</liquibase.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

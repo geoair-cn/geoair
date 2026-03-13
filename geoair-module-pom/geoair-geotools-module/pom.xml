@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-geotools-module</artifactId>
     <name>geoair-geotools-module</name>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <packaging>pom</packaging>
     <description>geoair geotools module</description>
 
@@ -20,7 +20,7 @@
     <properties>
         <java.version>8</java.version>
         <geotools.version>28.6.1</geotools.version>
-        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.2-M2</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>

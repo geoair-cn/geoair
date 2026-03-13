@@ -5,11 +5,11 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geo-dynamic-mvt</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <artifactId>geo-dynamic-static-mvt-spark</artifactId>
     <name>geo-dynamic-static-mvt-spark</name>
 
@@ -44,7 +44,7 @@
 
     <properties>
         <java.version>8</java.version>
-        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.2-M2</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

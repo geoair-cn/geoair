@@ -7,13 +7,13 @@
     <parent>
         <groupId>cn.geoair.comp</groupId>
         <artifactId>geoair-message-converter</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
     <artifactId>geoair-message-jts-mybatis</artifactId>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <packaging>jar</packaging>
     <name>geoair-message-jts-mybatis</name>
 

@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair.geo.dynamic</groupId>
         <artifactId>geoair-dynamic</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.geo.dynamic</groupId>
     <artifactId>geoair-dynamic-demo</artifactId>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <name>geoair-dynamic-demo</name>
     <packaging>jar</packaging>
 

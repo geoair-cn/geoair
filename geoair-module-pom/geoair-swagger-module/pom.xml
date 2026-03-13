@@ -6,13 +6,13 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-module-pom</artifactId>
-        <version>23.1.2-RC3-SNAPSHOT</version>
+        <version>23.1.2-M2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.dependencies</groupId>
     <artifactId>geoair-swagger-module</artifactId>
     <name>geoair-swagger-module</name>
-    <version>23.1.2-RC3-SNAPSHOT</version>
+    <version>23.1.2-M2</version>
     <packaging>pom</packaging>
     <description>geoair swagger module</description>
 
@@ -22,7 +22,7 @@
         <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
         <springfox.version>3.0.0</springfox.version>
         <springdoc.version>1.7.0</springdoc.version>
-        <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <geoair.version>23.1.2-M2</geoair.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <java.version>8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
