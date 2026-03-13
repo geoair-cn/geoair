@@ -50,6 +50,7 @@
             <version>${geoair.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>

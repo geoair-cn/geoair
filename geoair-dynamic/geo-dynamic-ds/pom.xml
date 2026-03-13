@@ -21,6 +21,7 @@
         <geotools.version>28.6.1</geotools.version>
         <lombok.version>1.18.30</lombok.version>
         <druid.version>1.2.23</druid.version>
+
         <spring-boot.version>2.7.18</spring-boot.version>
     </properties>
 

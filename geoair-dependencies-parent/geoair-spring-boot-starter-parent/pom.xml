@@ -23,6 +23,7 @@
     <properties>
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
         <spring-javaformat.version>0.0.28</spring-javaformat.version>
+        <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <resource.delimiter>@</resource.delimiter>
         <skipTests>true</skipTests>

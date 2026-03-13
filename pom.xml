@@ -22,6 +22,7 @@
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
         <redisson.version>3.23.5</redisson.version>
         <sa-token-version>1.44.0</sa-token-version>
+        <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <fastjson.version>2.0.43</fastjson.version>
         <dom4j.version>1.6.1</dom4j.version>
