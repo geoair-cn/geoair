@@ -6,12 +6,12 @@
     <parent>
         <groupId>cn.geoair</groupId>
         <artifactId>geoair</artifactId>
-        <version>23.1.2-M2</version>
+        <version>23.1.3-RC1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair</groupId>
     <artifactId>geoair-core</artifactId>
-    <version>23.1.2-M2</version>
+    <version>23.1.3-RC1-SNAPSHOT</version>
     <name>geoair-core</name>
     <packaging>jar</packaging>
     <description>核心工具包</description>

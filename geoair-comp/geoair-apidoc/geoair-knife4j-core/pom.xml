@@ -8,12 +8,12 @@
     <parent>
         <groupId>cn.geoair.comp</groupId>
         <artifactId>geoair-apidoc</artifactId>
-        <version>23.1.2-M2</version>
+        <version>23.1.3-RC1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.comp.apidoc</groupId>
     <artifactId>geoair-knife4j-core</artifactId>
-    <version>23.1.2-M2</version>
+    <version>23.1.3-RC1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>geoair-knife4j-core</name>
 

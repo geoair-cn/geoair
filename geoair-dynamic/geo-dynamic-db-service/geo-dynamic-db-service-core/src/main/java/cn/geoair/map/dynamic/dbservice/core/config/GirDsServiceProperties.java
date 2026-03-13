@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class GirDsServiceProperties {
 
-    String version = "23.1.2-M2";
+    String version = "23.1.3-RC1-SNAPSHOT";
 
     /**
      * 配置API接口的访问路径
