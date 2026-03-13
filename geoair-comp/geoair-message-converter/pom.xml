@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>cn.geoair.dependencies</groupId>
-        <artifactId>geoair-base-parent</artifactId>
+        <groupId>cn.geoair.comp</groupId>
+        <artifactId>geoair-comp</artifactId>
         <version>23.1.2-RC3-SNAPSHOT</version>
-        <relativePath>../geoair-base-parent</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>cn.geoair.comp</groupId>
-    <artifactId>geoair-comp</artifactId>
+    <artifactId>geoair-message-converter</artifactId>
     <version>23.1.2-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>geoair-comp</name>
+    <name>geoair-message-converter</name>
 
-    <description>geoair 组件库</description>
+    <description>消息转换器</description>
 
     <url>https://gitee.com/geoair/geoair</url>
+
+    <properties>
+        <skipTests>true</skipTests>
+
+    </properties>
 
     <licenses>
         <license>
@@ -44,36 +50,8 @@
     </scm>
 
 
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>cn.geoair</groupId>
-                <artifactId>geoair</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.geoair.comp.apidoc</groupId>
-                <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.geoair.comp.apidoc</groupId>
-                <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.geoair.comp</groupId>
-                <artifactId>geoair-code-gen-module</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
             <dependency>
                 <groupId>cn.geoair.comp</groupId>
                 <artifactId>geoair-message-jts-jackson</artifactId>
@@ -87,20 +65,15 @@
         </dependencies>
     </dependencyManagement>
 
+
     <modules>
-        <module>geoair-apidoc</module>
-        <module>geoair-code-generator</module>
-        <module>geoair-message-converter</module>
+        <module>geoair-message-jts-jackson</module>
+        <module>geoair-message-jts-mybatis</module>
 
     </modules>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
-
 </project>

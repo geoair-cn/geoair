@@ -70,15 +70,15 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <!--            <groupId>org.postgis</groupId>-->
-            <!--            <artifactId>postgis-jdbc</artifactId>-->
-            <!--            <version>${postgis.jdbc.version}</version>-->
-            <groupId>net.postgis</groupId>
-            <artifactId>postgis-jdbc</artifactId>
-            <version>${net.postgis.version}</version>
-            <optional>true</optional>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            &lt;!&ndash;            <groupId>org.postgis</groupId>&ndash;&gt;-->
+        <!--            &lt;!&ndash;            <artifactId>postgis-jdbc</artifactId>&ndash;&gt;-->
+        <!--            &lt;!&ndash;            <version>${postgis.jdbc.version}</version>&ndash;&gt;-->
+        <!--            <groupId>net.postgis</groupId>-->
+        <!--            <artifactId>postgis-jdbc</artifactId>-->
+        <!--            <version>${net.postgis.version}</version>-->
+        <!--            <optional>true</optional>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>net.postgis</groupId>
             <artifactId>postgis-geometry</artifactId>
