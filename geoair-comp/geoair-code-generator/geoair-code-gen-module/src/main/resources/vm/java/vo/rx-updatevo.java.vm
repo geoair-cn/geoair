@@ -6,9 +6,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import lombok.Data;
-
 import org.springframework.format.annotation.DateTimeFormat;
-
+#foreach ($importone in $importList)
+import $importone;
+#end
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 #foreach ($column in $columns)

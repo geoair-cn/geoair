@@ -75,6 +75,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
             <version>${geoair.version}</version>

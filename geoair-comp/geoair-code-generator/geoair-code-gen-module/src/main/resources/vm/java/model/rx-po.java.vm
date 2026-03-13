@@ -9,21 +9,19 @@ import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.gpa.entity.GiCrudEntity;
 import cn.geoair.base.gpa.id.GiEntityIdGenerator;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 #foreach ($column in $columns)
-#if("$!{column.enumsName}" != "")
-import ${packageName}.model.${moduleName}.enm.${column.enumsName};
+    #if("$!{column.enumsName}" != "")
+    import ${packageName}.model.${moduleName}.enm.${column.enumsName};
+    #end
 #end
-#end
-#foreach ($column in $columns)
-#if($column.javaTypeOther == 'Geometry')
-import org.locationtech.jts.geom.Geometry;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-#end
+#foreach ($importone in $importList)
+import $importone;
 #end
 
 /**
@@ -32,52 +30,52 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author ${author}
  * @date ${datetime}
  */
-@GaModel(text = "${tableComment}")
+@GaModel(text = "${tableComment}" )
 @Data
-@Table(name = "${tableName}")
-#foreach ($column in $columns)
-#if($column.isPk==1)
-public class ${ClassName}Po implements GiCrudEntity<$column.javaType>, GiEntityIdGenerator<$column.javaType> {
-#break
-#end
-#end
+@Table(name = "${tableName}" )
+    #foreach ($column in $columns)
+        #if($column.isPk==1)
+        public class ${ClassName}Po implements GiCrudEntity<$column.javaType>, GiEntityIdGenerator<$column.javaType> {
+            #break
+        #end
+    #end
 
     private static final long serialVersionUID = ${time}L;
 
-  #foreach ($column in $columns)
-  #if($column.isPk==1)
-  @Id
-  @Column(name = "$column.columnName")
-  @GaModelField(text = "$column.columnComment", isID = true)
-  private $column.javaType $column.javaField;
-  #break
-  #end
-  #end
+    #foreach ($column in $columns)
+        #if($column.isPk==1)
+            @Id
+            @Column(name = "$column.columnName" )
+            @GaModelField(text = "$column.columnComment" , isID = true)
+            private $column.javaType $column.javaField;
+            #break
+        #end
+    #end
 
-  #foreach ($column in $columns)
-  #if($column.isPk != 1)
-  #if($column.javaType == 'Date')
-  @Column(name = "$column.columnName")
-  @GaModelField(text = "$column.columnComment", datePattern = GemDatePattern.ISO8601Long)
-  @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-  #else
-  @Column(name = "$column.columnName")
-  #if("$!{column.enumsName}" != "")
-  @GaModelField(text = "$column.columnComment", em = ${column.enumsName}.class)
-  #else
-  @GaModelField(text = "$column.columnComment")
-  #end
-  #end
-  #if($column.javaTypeOther == 'Geometry')
-  @JsonIgnore
-  @JSONField(serialize = false)
-  private $column.javaTypeOther $column.javaField;
-  #else
-  private $column.javaType $column.javaField;
-  #end
-  #end
-  #end
+    #foreach ($column in $columns)
+        #if($column.isPk != 1)
+            #if($column.javaType == 'Date')
+            @Column(name = "$column.columnName" )
+            @GaModelField(text = "$column.columnComment" , datePattern = GemDatePattern.ISO8601Long)
+            @JSONField(format = "yyyy-MM-dd HH:mm:ss" )
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Shanghai" )
+            #else
+            @Column(name = "$column.columnName" )
+                #if("$!{column.enumsName}" != "")
+                @GaModelField(text = "$column.columnComment" , em = ${column.enumsName}.class)
+                #else
+                @GaModelField(text = "$column.columnComment" )
+                #end
+            #end
+            #if($column.javaTypeOther == 'Geometry')
+            @JsonIgnore
+            @JSONField(serialize = false)
+            private $column.javaTypeOther $column.javaField;
+            #else
+                private $column.javaType $column.javaField;
+            #end
+        #end
+    #end
 
     public ${ClassName}Po() {
     }
@@ -86,28 +84,28 @@ public class ${ClassName}Po implements GiCrudEntity<$column.javaType>, GiEntityI
         if (id == null) {
             id = this.generatorId();
         }
-      #foreach ($column in $columns)
-      #if($column.isPk == 1)
-      this.$column.javaField = id;
-      #break
-      #end
-      #end
+        #foreach ($column in $columns)
+            #if($column.isPk == 1)
+                this.$column.javaField = id;
+                #break
+            #end
+        #end
     }
 
-#foreach ($column in $columns)
-#if($column.isPk == 1)
-    @Override
-    public $column.javaType id() {
-        return $column.javaField;
-    }
+    #foreach ($column in $columns)
+        #if($column.isPk == 1)
+            @Override
+            public $column.javaType id() {
+                return $column.javaField;
+            }
 
-    @Override
-    public $column.javaType generatorId() {
-        return UUID.randomUUID().toString();
-    }
-    #break
-#end
-#end
+            @Override
+            public $column.javaType generatorId() {
+                return UUID.randomUUID().toString();
+            }
+            #break
+        #end
+    #end
 
     public void setNotDel() {
     }

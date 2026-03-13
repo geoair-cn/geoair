@@ -22,6 +22,7 @@
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
 
         <geoair.version>23.1.2-RC3-SNAPSHOT</geoair.version>
+        <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
     <url>https://gitee.com/geoair/geoair-dependencies</url>

@@ -10,7 +10,9 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
+#foreach ($importone in $importList)
+import $importone;
+#end
 import javax.validation.constraints.NotBlank;
 #foreach ($column in $columns)
     #if("$!{column.enumsName}" != "")

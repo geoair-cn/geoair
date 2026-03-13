@@ -6,7 +6,9 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
-
+#foreach ($importone in $importList)
+import $importone;
+#end
 import java.util.Date;
 #foreach ($column in $columns)
     #if("$!{column.enumsName}" != "")

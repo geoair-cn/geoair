@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Date;
 #foreach ($column in $columns)
     #if("$!{column.enumsName}" != "")
-    import ${packageName}.model .${moduleName}.enm .${column.enumsName};
+    import ${packageName}.model.${moduleName}.enm.${column.enumsName};
     #end
 #end
-
+#foreach ($importone in $importList)
+import $importone;
+#end
 /**
  * ${tableComment}详情VO ${tableName}
  *
