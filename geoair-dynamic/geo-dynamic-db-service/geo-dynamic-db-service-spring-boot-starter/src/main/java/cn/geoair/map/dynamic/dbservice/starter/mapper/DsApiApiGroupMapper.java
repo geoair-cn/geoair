@@ -14,30 +14,30 @@ import java.util.List;
  * @author zhangjun
  * @date 2025-07-31
  */
-public interface DsApiApiGroupMapper
-        extends TkEntityMapper<DsApiGroupPo, String>, GirDsApiGroupDao {
+public interface DsApiApiGroupMapper extends TkEntityMapper<DsApiGroupPo, String>, GirDsApiGroupDao {
 
-    default List<GroupApo> searchAll() {
-        return DsApiGroupDto.fromPos(gtcSearchAll());
-    }
+	default List<GroupApo> searchAll() {
+		return DsApiGroupDto.fromPos(gtcSearchAll());
+	}
 
-    default List<GroupApo> selectBatchIds(List<String> ids) {
-        return DsApiGroupDto.fromPos(gtcSearchByPK(ids));
-    }
+	default List<GroupApo> selectBatchIds(List<String> ids) {
+		return DsApiGroupDto.fromPos(gtcSearchByPK(ids));
+	}
 
-    default GroupApo accessSelective(GroupApo t) {
-        DsApiGroupPo po = DsApiGroupDto.toPo(t);
-        gtcAccessSelective(po);
-        return DsApiGroupDto.fromPo(po);
-    }
+	default GroupApo accessSelective(GroupApo t) {
+		DsApiGroupPo po = DsApiGroupDto.toPo(t);
+		gtcAccessSelective(po);
+		return DsApiGroupDto.fromPo(po);
+	}
 
-    default GroupApo updateSelectiveById(GroupApo t) {
-        DsApiGroupPo po = DsApiGroupDto.toPo(t);
-        gtcUpdateByPKSelective(po);
-        return DsApiGroupDto.fromPo(po);
-    }
+	default GroupApo updateSelectiveById(GroupApo t) {
+		DsApiGroupPo po = DsApiGroupDto.toPo(t);
+		gtcUpdateByPKSelective(po);
+		return DsApiGroupDto.fromPo(po);
+	}
 
-    default void deleteByPK(String id) {
-        gtcDeleteByPK(id);
-    }
+	default void deleteByPK(String id) {
+		gtcDeleteByPK(id);
+	}
+
 }

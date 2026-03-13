@@ -10,8 +10,9 @@ import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
  */
 public class Test {
 
-    public static void main(String[] args) {
-        String string = StringEscape.escapeString("{};");
-        Gir.log.info(string);
-    }
+	public static void main(String[] args) {
+		String string = StringEscape.escapeString("{};");
+		Gir.log.info(string);
+	}
+
 }

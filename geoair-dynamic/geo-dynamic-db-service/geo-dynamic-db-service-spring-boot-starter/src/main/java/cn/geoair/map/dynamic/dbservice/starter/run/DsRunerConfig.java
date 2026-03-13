@@ -17,27 +17,29 @@ import javax.annotation.Resource;
  */
 @Configuration
 public class DsRunerConfig implements ApplicationRunner {
-    @Resource GirDsServiceProperties girDsServiceProperties;
-    @Resource Environment environment;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        String path = "localhost:{}";
-        String port = environment.getProperty("server.port");
-        if (port == null) {
-            port = "8080";
-        }
-        String context_path = environment.getProperty("server.servlet.context-path");
-        boolean notBlank = GutilStr.isNotBlank(context_path);
-        if (notBlank) {
-            path = path + context_path;
-        }
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        Gir.log.info(
-                "dsApi服务地址：" + path + "{}，登录启用状态：{}",
-                port,
-                "/dsView/index.html",
-                girDsServiceProperties.isEnableLogin());
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    }
+	@Resource
+	GirDsServiceProperties girDsServiceProperties;
+
+	@Resource
+	Environment environment;
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		String path = "localhost:{}";
+		String port = environment.getProperty("server.port");
+		if (port == null) {
+			port = "8080";
+		}
+		String context_path = environment.getProperty("server.servlet.context-path");
+		boolean notBlank = GutilStr.isNotBlank(context_path);
+		if (notBlank) {
+			path = path + context_path;
+		}
+		Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		Gir.log.info("dsApi服务地址：" + path + "{}，登录启用状态：{}", port, "/dsView/index.html",
+				girDsServiceProperties.isEnableLogin());
+		Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	}
+
 }

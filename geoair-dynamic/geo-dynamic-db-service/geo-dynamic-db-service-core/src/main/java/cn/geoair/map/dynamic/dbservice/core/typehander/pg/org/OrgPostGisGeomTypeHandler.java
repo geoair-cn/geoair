@@ -16,80 +16,81 @@ import java.util.Map;
  */
 public class OrgPostGisGeomTypeHandler extends BaseTypeHandler<String> {
 
-    public static void register() {
-        TypeHandlerRegistry.register(
-                org.postgis.Geometry.class, Singleton.get(OrgPostGisGeomTypeHandler.class));
-    }
+	public static void register() {
+		TypeHandlerRegistry.register(org.postgis.Geometry.class, Singleton.get(OrgPostGisGeomTypeHandler.class));
+	}
 
-    @Override
-    public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
-        return null;
-    }
+	@Override
+	public String getNonNullParameter(Object parameter, JdbcType jdbcType) {
+		return null;
+	}
 
-    @Override
-    public String getResult(Entity entity, String columnName) {
-        Object obj = entity.getObj(columnName);
-        if (obj instanceof org.postgis.Geometry) {
-            return toWkt((org.postgis.Geometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Entity entity, String columnName) {
+		Object obj = entity.getObj(columnName);
+		if (obj instanceof org.postgis.Geometry) {
+			return toWkt((org.postgis.Geometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, String columnName) {
-        Object obj = null;
-        try {
-            obj = resultSet.getObject(columnName);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        if (obj instanceof org.postgis.Geometry) {
-            return toWkt((org.postgis.Geometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(ResultSet resultSet, String columnName) {
+		Object obj = null;
+		try {
+			obj = resultSet.getObject(columnName);
+		}
+		catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+		if (obj instanceof org.postgis.Geometry) {
+			return toWkt((org.postgis.Geometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(ResultSet resultSet, Integer columnIndex) {
-        Object obj = null;
-        try {
-            obj = resultSet.getObject(columnIndex);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        if (obj instanceof org.postgis.Geometry) {
-            return toWkt((org.postgis.Geometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(ResultSet resultSet, Integer columnIndex) {
+		Object obj = null;
+		try {
+			obj = resultSet.getObject(columnIndex);
+		}
+		catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
+		if (obj instanceof org.postgis.Geometry) {
+			return toWkt((org.postgis.Geometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(Map<String, Object> row, String columnName) {
-        Object obj = null;
-        obj = row.get(columnName);
-        if (obj instanceof org.postgis.Geometry) {
-            return toWkt((org.postgis.Geometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Map<String, Object> row, String columnName) {
+		Object obj = null;
+		obj = row.get(columnName);
+		if (obj instanceof org.postgis.Geometry) {
+			return toWkt((org.postgis.Geometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    @Override
-    public String getResult(Object obj) {
-        if (obj instanceof org.postgis.Geometry) {
-            return toWkt((org.postgis.Geometry) obj);
-        }
-        return String.valueOf(obj);
-    }
+	@Override
+	public String getResult(Object obj) {
+		if (obj instanceof org.postgis.Geometry) {
+			return toWkt((org.postgis.Geometry) obj);
+		}
+		return String.valueOf(obj);
+	}
 
-    String toWkt(org.postgis.Geometry value) {
-        String wkt;
-        try {
-            wkt =
-                    ((org.postgis.Geometry) value).getTypeString()
-                            + ((org.postgis.Geometry) value).getValue();
-        } catch (Exception e) {
-            wkt = value.toString();
-        }
-        return wkt;
-    }
+	String toWkt(org.postgis.Geometry value) {
+		String wkt;
+		try {
+			wkt = ((org.postgis.Geometry) value).getTypeString() + ((org.postgis.Geometry) value).getValue();
+		}
+		catch (Exception e) {
+			wkt = value.toString();
+		}
+		return wkt;
+	}
+
 }

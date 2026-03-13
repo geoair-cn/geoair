@@ -7,23 +7,23 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirBeanHelper {
 
-    private GirBeanHelper() {}
+	private GirBeanHelper() {
+	}
 
-    static {
-        GkMethodHand.implFromClass(GirBeanHelper.class);
-    }
+	static {
+		GkMethodHand.implFromClass(GirBeanHelper.class);
+	}
 
-    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.bean.SpringContextBean4Gir")
-    public static GiBeanFactory getProvider() {
-        return (GiBeanFactory) GkMethodHand.invokeSelf();
-    }
+	@GaMethodHandDefine(expectClassName = "cn.geoair.spi.bean.SpringContextBean4Gir")
+	public static GiBeanFactory getProvider() {
+		return (GiBeanFactory) GkMethodHand.invokeSelf();
+	}
 
-    @GaMethodHandImpl(
-            implClass = GirBeanHelper.class,
-            implMethod = "getProvider",
-            type = GaMethodHandImpl.ImplType.comity)
-    private static GiBeanFactory _getProvider() {
-        Gir.log.error("必须有工具提供容器，如spring");
-        return null;
-    }
+	@GaMethodHandImpl(implClass = GirBeanHelper.class, implMethod = "getProvider",
+			type = GaMethodHandImpl.ImplType.comity)
+	private static GiBeanFactory _getProvider() {
+		Gir.log.error("必须有工具提供容器，如spring");
+		return null;
+	}
+
 }

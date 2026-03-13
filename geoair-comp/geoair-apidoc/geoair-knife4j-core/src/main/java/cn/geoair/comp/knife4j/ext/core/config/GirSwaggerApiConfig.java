@@ -11,7 +11,8 @@ import java.util.List;
  */
 public interface GirSwaggerApiConfig {
 
-    List<DocketInfo> getDocketInfos();
+	List<DocketInfo> getDocketInfos();
 
-    ApiModelInfo getApiModelInfo();
+	ApiModelInfo getApiModelInfo();
+
 }

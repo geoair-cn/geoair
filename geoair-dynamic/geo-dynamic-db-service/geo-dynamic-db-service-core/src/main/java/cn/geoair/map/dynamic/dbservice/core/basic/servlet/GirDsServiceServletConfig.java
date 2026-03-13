@@ -21,36 +21,37 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GirDsServiceServletConfig {
 
-    @Autowired private GirDsAPIServlet girDsApiServlet;
-    @Autowired GirDsServiceProperties girDsServiceProperties;
+	@Autowired
+	private GirDsAPIServlet girDsApiServlet;
 
-    @Bean
-    public FilterRegistrationBean dsApiHeaderFilter() {
-        // issues/I51LOI
-        int apiHeaderFilterOrder = 1;
-        String realApiContext1 = girDsServiceProperties.getRealApiContext();
-        String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
-        String format = String.format("/%s/*", realApiContext);
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setFilter(new GirDsApiHeaderFilter());
-        registrationBean.addUrlPatterns(format); // API Servlet 跨域
-        registrationBean.setOrder(apiHeaderFilterOrder);
-        registrationBean.setEnabled(true);
-        log.debug(
-                "注册 apiHeaderFilter for {} UrlPatterns, and order is {}",
-                format,
-                apiHeaderFilterOrder);
-        return registrationBean;
-    }
+	@Autowired
+	GirDsServiceProperties girDsServiceProperties;
 
-    @Bean
-    public ServletRegistrationBean dsServletRegistrationBean() {
-        String realApiContext1 = girDsServiceProperties.getRealApiContext();
-        String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
-        String format = String.format("/%s/*", realApiContext);
-        ServletRegistrationBean bean = new ServletRegistrationBean(girDsApiServlet);
-        bean.addUrlMappings(format);
-        log.debug("注册 APIServlet servelet for {} urlMappings", format);
-        return bean;
-    }
+	@Bean
+	public FilterRegistrationBean dsApiHeaderFilter() {
+		// issues/I51LOI
+		int apiHeaderFilterOrder = 1;
+		String realApiContext1 = girDsServiceProperties.getRealApiContext();
+		String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
+		String format = String.format("/%s/*", realApiContext);
+		FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+		registrationBean.setFilter(new GirDsApiHeaderFilter());
+		registrationBean.addUrlPatterns(format); // API Servlet 跨域
+		registrationBean.setOrder(apiHeaderFilterOrder);
+		registrationBean.setEnabled(true);
+		log.debug("注册 apiHeaderFilter for {} UrlPatterns, and order is {}", format, apiHeaderFilterOrder);
+		return registrationBean;
+	}
+
+	@Bean
+	public ServletRegistrationBean dsServletRegistrationBean() {
+		String realApiContext1 = girDsServiceProperties.getRealApiContext();
+		String realApiContext = StrUtil.removePrefix(realApiContext1, "/");
+		String format = String.format("/%s/*", realApiContext);
+		ServletRegistrationBean bean = new ServletRegistrationBean(girDsApiServlet);
+		bean.addUrlMappings(format);
+		log.debug("注册 APIServlet servelet for {} urlMappings", format);
+		return bean;
+	}
+
 }

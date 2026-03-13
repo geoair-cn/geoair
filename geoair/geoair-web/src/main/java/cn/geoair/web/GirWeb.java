@@ -8,15 +8,16 @@ import javax.servlet.http.HttpServletResponse;
 
 public class GirWeb {
 
-    public static HttpServletRequest getRequest() {
-        return GirHttpServletHelper.getRequest();
-    }
+	public static HttpServletRequest getRequest() {
+		return GirHttpServletHelper.getRequest();
+	}
 
-    public static HttpServletResponse getResponse() {
-        return GirHttpServletHelper.getResponse();
-    }
+	public static HttpServletResponse getResponse() {
+		return GirHttpServletHelper.getResponse();
+	}
 
-    public static ServletContext getServletContext() {
-        return GirHttpServletHelper.getServletContext();
-    }
+	public static ServletContext getServletContext() {
+		return GirHttpServletHelper.getServletContext();
+	}
+
 }

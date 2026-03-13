@@ -16,17 +16,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 // @Api(tags = "分组2 第一个 控制器")
 public class Group2Controller {
 
-    // @PostMapping("/demo2post")
-    // @ResponseBody
-    // @ApiOperation(value = "demo2post 控制器")
-    // public DemoVo demo1post(@RequestBody DemoVo demoVo) {
-    // return demoVo;
-    // }
+	// @PostMapping("/demo2post")
+	// @ResponseBody
+	// @ApiOperation(value = "demo2post 控制器")
+	// public DemoVo demo1post(@RequestBody DemoVo demoVo) {
+	// return demoVo;
+	// }
 
-    @PostMapping("/demo2Get")
-    @ResponseBody
-    // @ApiOperation(value = "demo2Get 控制器")
-    public String demo1Get() {
-        return "demo2Get返回成功";
-    }
+	@PostMapping("/demo2Get")
+	@ResponseBody
+	// @ApiOperation(value = "demo2Get 控制器")
+	public String demo1Get() {
+		return "demo2Get返回成功";
+	}
+
 }

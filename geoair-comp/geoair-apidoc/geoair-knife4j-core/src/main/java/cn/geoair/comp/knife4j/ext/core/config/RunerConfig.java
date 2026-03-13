@@ -17,28 +17,29 @@ import javax.annotation.Resource;
 @Component
 public class RunerConfig implements ApplicationRunner {
 
-    @Resource Environment environment;
-    @Resource GirSwaggerProperties girSwaggerProperties;
+	@Resource
+	Environment environment;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        String path = "localhost:{}";
-        String port = environment.getProperty("server.port");
-        if (port == null) {
-            port = "8080";
-        }
-        String context_path = environment.getProperty("server.servlet.context-path");
-        boolean notBlank = GutilStr.isNotBlank(context_path);
-        if (notBlank) {
-            path = path + context_path;
-        }
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        Gir.log.info(
-                "接口文档地址：" + path + "{} 启用状态：{}",
-                port,
-                "/doc.html",
-                //                girSwaggerProperties.isEnable());
-                environment.getProperty("geoair.apidoc.enable"));
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    }
+	@Resource
+	GirSwaggerProperties girSwaggerProperties;
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		String path = "localhost:{}";
+		String port = environment.getProperty("server.port");
+		if (port == null) {
+			port = "8080";
+		}
+		String context_path = environment.getProperty("server.servlet.context-path");
+		boolean notBlank = GutilStr.isNotBlank(context_path);
+		if (notBlank) {
+			path = path + context_path;
+		}
+		Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		Gir.log.info("接口文档地址：" + path + "{} 启用状态：{}", port, "/doc.html",
+				// girSwaggerProperties.isEnable());
+				environment.getProperty("geoair.apidoc.enable"));
+		Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	}
+
 }
