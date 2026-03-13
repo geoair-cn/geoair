@@ -13,31 +13,30 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-
 @Configuration
 public class JtsJacksonAutoConfig implements InitializingBean {
 
+	private static final Logger log = LoggerFactory.getLogger(JtsJacksonAutoConfig.class);
 
-    private static final Logger log = LoggerFactory.getLogger(JtsJacksonAutoConfig.class);
-    @Autowired(required = false)
-    private List<ObjectMapper> objectMappers;
+	@Autowired(required = false)
+	private List<ObjectMapper> objectMappers;
 
+	@Override
+	public void afterPropertiesSet() {
+		if (objectMappers != null) {
+			for (ObjectMapper objectMapper : objectMappers) {
+				objectMapper.registerModule(new JtsModule());
+				log.debug("JtsJacksonAutoConfig 注册");
+				if (GirPostGisTran.isNetConvert()) {
+					objectMapper.registerModule(new NetPGGeometryModule());
+					log.debug("NetPGGeometryModule 注册");
+				}
+				if (GirPostGisTran.isOrgConvert()) {
+					objectMapper.registerModule(new OrgPGGeometryModule());
+					log.debug("OrgPGGeometryModule 注册");
+				}
+			}
+		}
+	}
 
-    @Override
-    public void afterPropertiesSet() {
-        if (objectMappers != null) {
-            for (ObjectMapper objectMapper : objectMappers) {
-                objectMapper.registerModule(new JtsModule());
-                log.debug("JtsJacksonAutoConfig 注册" );
-                if (GirPostGisTran.isNetConvert()) {
-                    objectMapper.registerModule(new NetPGGeometryModule());
-                    log.debug("NetPGGeometryModule 注册" );
-                }
-                if (GirPostGisTran.isOrgConvert()) {
-                    objectMapper.registerModule(new OrgPGGeometryModule());
-                    log.debug("OrgPGGeometryModule 注册" );
-                }
-            }
-        }
-    }
 }

@@ -5,8 +5,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan("cn.geoair.comp.message.converter.jts.mybatis" )
-@AutoConfigureBefore(name = {"tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration" , "org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration"})
+@ComponentScan("cn.geoair.comp.message.converter.jts.mybatis")
+@AutoConfigureBefore(name = { "tk.mybatis.mapper.autoconfigure.MapperAutoConfiguration",
+		"org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration" })
 public class GirMybatisJtsAutoConfiguration {
 
 }

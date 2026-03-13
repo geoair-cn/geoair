@@ -15,24 +15,24 @@ import static cn.geoair.base.Gir.log;
 // PGGeometry 序列化器：转成 JTS Geometry 再用 JtsModule 序列化
 public class OrgPGGeometrySerializer extends StdSerializer<PGgeometry> {
 
-    public OrgPGGeometrySerializer() {
-        super(PGgeometry.class);
-    }
+	public OrgPGGeometrySerializer() {
+		super(PGgeometry.class);
+	}
 
-    @Override
-    public void serialize(PGgeometry pgGeometry, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        if (pgGeometry == null) {
-            gen.writeNull();
-            return;
-        }
-        try {
-            Geometry jtsGeometry = GirPostGisOrgTran.toJtsGeometry(pgGeometry);
-            new GeometrySerializer().serialize(jtsGeometry, gen, provider);
-        } catch (Exception e) {
-            log.error("PGGeometry 转 JTS Geometry 失败" , e);
-        }
+	@Override
+	public void serialize(PGgeometry pgGeometry, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		if (pgGeometry == null) {
+			gen.writeNull();
+			return;
+		}
+		try {
+			Geometry jtsGeometry = GirPostGisOrgTran.toJtsGeometry(pgGeometry);
+			new GeometrySerializer().serialize(jtsGeometry, gen, provider);
+		}
+		catch (Exception e) {
+			log.error("PGGeometry 转 JTS Geometry 失败", e);
+		}
 
-    }
+	}
+
 }
-
-
