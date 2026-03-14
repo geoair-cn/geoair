@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>cn.geoair.dependencies</groupId>
+        <groupId>cn.geoair</groupId>
         <artifactId>geoair-base-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../geoair-base-parent/pom.xml</relativePath>
@@ -88,7 +88,7 @@
 
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-mybatis</artifactId>
+                <artifactId>geoair-orm-mybatis</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
@@ -98,19 +98,19 @@
             </dependency>
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-mybatis-tk</artifactId>
+                <artifactId>geoair-orm-mybatis-tk</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-mybatis-plus</artifactId>
+                <artifactId>geoair-orm-mybatis-plus</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-springjpa</artifactId>
+                <artifactId>geoair-orm-springjpa</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 

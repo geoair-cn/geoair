@@ -10,13 +10,12 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair</groupId>
-    <artifactId>geoair-mybatis</artifactId>
+    <artifactId>geoair-orm-mybatis-plus</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>geoair-mybatis</name>
-    <description>geoair-mybatis</description>
-    <url>https://gitee.com/geoair/geoair</url>
 
+    <url>https://gitee.com/geoair/geoair</url>
+    <description>geoair-mybatis-plus</description>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -40,30 +39,20 @@
         <tag>HEAD</tag>
     </scm>
 
+    <name>geoair-mybatis-plus</name>
+
     <dependencies>
 
         <dependency>
             <groupId>cn.geoair</groupId>
-            <artifactId>geoair-core</artifactId>
+            <artifactId>geoair-orm-mybatis</artifactId>
             <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>cn.geoair</groupId>
-            <artifactId>geoair-orm-base</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>${mybatis-spring.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus</artifactId>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
         <dependency>
@@ -71,6 +60,7 @@
             <artifactId>pagehelper</artifactId>
             <version>${pagehelper.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>

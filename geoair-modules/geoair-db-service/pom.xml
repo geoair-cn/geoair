@@ -101,7 +101,7 @@
 
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-mybatis-tk</artifactId>
+                <artifactId>geoair-orm-mybatis-tk</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 

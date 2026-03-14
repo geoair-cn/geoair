@@ -43,10 +43,10 @@
     <modules>
 
 
-        <module>geoair-mybatis</module>
-        <module>geoair-mybatis-tk</module>
-        <module>geoair-mybatis-plus</module>
-        <module>geoair-springjpa</module>
+        <module>geoair-orm-mybatis</module>
+        <module>geoair-orm-mybatis-tk</module>
+        <module>geoair-orm-mybatis-plus</module>
+        <module>geoair-orm-springjpa</module>
         <module>geoair-orm-spi</module>
         <module>geoair-orm-base</module>
     </modules>

@@ -50,7 +50,6 @@
 
     <modules>
         <module>geoair-adv-query</module>
-
         <module>geoair-mvt</module>
         <module>geoair-file-tran</module>
         <module>geoair-geo-tools</module>
