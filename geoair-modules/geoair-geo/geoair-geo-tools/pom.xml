@@ -28,7 +28,7 @@
         <jts.version>1.19.0</jts.version>
     </properties>
 
-    <description>geoair-geo-tools</description>
+    <description>geoair空间处理相关的工具类集合</description>
 
     <url>https://gitee.com/geoair/geoair</url>
 

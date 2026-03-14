@@ -125,27 +125,32 @@
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-base-dependencies-geotools</artifactId>
                 <version>${geoair.version}</version>
+
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-base-dependencies-swagger</artifactId>
                 <version>${geoair.version}</version>
+
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-base-dependencies-spring</artifactId>
                 <version>${geoair.version}</version>
+
             </dependency>
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-base-dependencies-template</artifactId>
                 <version>${geoair.version}</version>
+
             </dependency>
 
             <dependency>
                 <groupId>cn.geoair.dependencies</groupId>
                 <artifactId>geoair-base-dependencies-other</artifactId>
                 <version>${geoair.version}</version>
+
             </dependency>
 
         </dependencies>

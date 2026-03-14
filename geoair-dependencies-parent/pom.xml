@@ -71,7 +71,6 @@
 
     <modules>
         <module>geoair-api-parent</module>
-        <module>geoair-comp-parent</module>
         <module>geoair-project-parent</module>
         <module>geoair-spring-boot-starter-parent</module>
     </modules>

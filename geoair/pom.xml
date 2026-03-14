@@ -16,7 +16,9 @@
     <packaging>pom</packaging>
     <name>Gir</name>
 
-    <description>Gir</description>
+    <description>
+        基础库，设计初衷是通过spi实现相关常用的工具
+    </description>
 
     <url>https://gitee.com/geoair/geoair</url>
 

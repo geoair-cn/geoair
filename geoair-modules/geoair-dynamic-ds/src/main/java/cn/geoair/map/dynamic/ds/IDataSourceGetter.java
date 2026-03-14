@@ -54,11 +54,11 @@ public interface IDataSourceGetter {
 	 */
 	DataSource getDataSource();
 
-	/**
-	 * 获取geotools封装的dataStore
-	 * @return
-	 */
-	DataStore getGeoToolsDataStore();
+//	/**
+//	 * 获取geotools封装的dataStore
+//	 * @return
+//	 */
+//	DataStore getGeoToolsDataStore();
 
 	/**
 	 * 关闭链接

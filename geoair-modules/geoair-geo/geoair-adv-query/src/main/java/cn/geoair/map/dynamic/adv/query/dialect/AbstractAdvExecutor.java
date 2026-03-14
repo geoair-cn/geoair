@@ -136,10 +136,10 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
 		return this.getDataSourceGetterPxy().getDataSource();
 	}
 
-	@Override
-	public DataStore getGeoToolsDataStore() {
-		return this.getDataSourceGetterPxy().getGeoToolsDataStore();
-	}
+//	@Override
+//	public DataStore getGeoToolsDataStore() {
+//		return this.getDataSourceGetterPxy().getGeoToolsDataStore();
+//	}
 
 	@Override
 	public void connectionClose(Connection connection) {

@@ -24,7 +24,6 @@
         <jts.version>1.19.0</jts.version>
         <proj4j.version>1.3.0</proj4j.version>
         <lombok.version>1.18.30</lombok.version>
-
         <spring-boot.version>2.7.18</spring-boot.version>
         <geojson-jackson.version>3.0</geojson-jackson.version>
     </properties>

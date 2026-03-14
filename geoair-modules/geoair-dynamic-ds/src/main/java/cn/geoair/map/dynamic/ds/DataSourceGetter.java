@@ -26,7 +26,7 @@ public class DataSourceGetter implements IDataSourceGetter {
 
 	private DataSource dataSource = null;
 
-	protected DataStore dataStore = null;
+//	protected DataStore dataStore = null;
 
 	protected String schemaName = null;
 
@@ -51,16 +51,9 @@ public class DataSourceGetter implements IDataSourceGetter {
 		schemaName = dataSourceApo.getSchemaName();
 		if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
 			dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
-			dataStore = AdvDynamicDataSourceStorage.getInstance().getGeotoolsDataStore((DruidDataSource) dataSource,
-					dataSourceId);
 		}
 		else {
 			dataSource = AdvDynamicDataSourceStorage.getInstance().getDruidDataSourceByDataSourceApo(dataSourceApo);
-			if (dataSource != null) {
-				AdvDynamicDataSourceStorage.getInstance().addDataSource((DruidDataSource) dataSource, dataSourceId);
-				dataStore = AdvDynamicDataSourceStorage.getInstance().getGeotoolsDataStore((DruidDataSource) dataSource,
-						schemaName);
-			}
 		}
 	}
 
@@ -93,10 +86,10 @@ public class DataSourceGetter implements IDataSourceGetter {
 		return dataSource;
 	}
 
-	@Override
-	public DataStore getGeoToolsDataStore() {
-		return dataStore;
-	}
+//	@Override
+//	public DataStore getGeoToolsDataStore() {
+//		return dataStore;
+//	}
 
 	@Override
 	public void connectionClose(Connection connection) {
