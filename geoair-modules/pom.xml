@@ -91,6 +91,8 @@
         <module>geoair-apidoc</module>
         <module>geoair-code-generator</module>
         <module>geoair-geo</module>
+        <module>geoair-dynamic-ds</module>
+        <module>geoair-db-service</module>
         <module>geoair-message-converter</module>
 
     </modules>

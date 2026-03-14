@@ -50,8 +50,7 @@
 
     <modules>
         <module>geoair-adv-query</module>
-        <module>geoair-dynamic-ds</module>
-        <module>geoair-db-service</module>
+
         <module>geoair-mvt</module>
         <module>geoair-file-tran</module>
         <module>geoair-geo-tools</module>

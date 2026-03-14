@@ -64,6 +64,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
             <groupId>cn.geoair</groupId>
             <artifactId>geoair-core</artifactId>
             <version>${geoair.version}</version>
