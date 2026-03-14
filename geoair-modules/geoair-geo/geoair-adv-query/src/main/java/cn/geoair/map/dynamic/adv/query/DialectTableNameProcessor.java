@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 
 /**
  * 数据库方言表名处理器接口 定义表名、Schema相关的通用操作规范，适配不同数据库方言实现 约定 ：以tb开头

@@ -10,7 +10,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseUpdateOpt;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 
 /**
  * PostgreSQL数据库的动态高级查询基础操作实现类

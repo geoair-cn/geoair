@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 
 import java.util.Map;
 import java.util.Set;

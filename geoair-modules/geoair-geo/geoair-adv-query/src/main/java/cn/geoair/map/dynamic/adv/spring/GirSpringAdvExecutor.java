@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.extra.spring.SpringUtil;
 
 /**

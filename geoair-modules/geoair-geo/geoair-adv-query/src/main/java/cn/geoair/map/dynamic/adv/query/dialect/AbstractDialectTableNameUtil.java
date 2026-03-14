@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;

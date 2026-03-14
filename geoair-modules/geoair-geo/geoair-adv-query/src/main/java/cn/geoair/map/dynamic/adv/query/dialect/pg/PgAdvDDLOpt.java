@@ -7,7 +7,7 @@ import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;

@@ -1,4 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.geoair.map.dynamic.dbservice.starter.run.AutoGirDbServiceConfiguration,\
-cn.geoair.map.dynamic.dbservice.starter.run.DsRunerConfig,\
-cn.geoair.map.dynamic.dbservice.starter.run.AutoGirDbServiceInitTableConfiguration
+cn.geoair.comp.db.service.starter.run.AutoGirDbServiceConfiguration,\
+cn.geoair.comp.db.service.starter.run.DsRunerConfig,\
+cn.geoair.comp.db.service.starter.run.AutoGirDbServiceInitTableConfiguration

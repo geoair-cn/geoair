@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
-import cn.geoair.map.dynamic.ds.simple.DriverManagerDataSource;
+import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.hutool.core.util.StrUtil;
 
 import lombok.Data;

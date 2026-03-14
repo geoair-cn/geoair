@@ -1,0 +1,90 @@
+package cn.geoair.comp.db.service.core.basic.service;
+
+import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
+import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
+import cn.geoair.comp.db.service.core.basic.util.UUIDUtil;
+import cn.geoair.comp.db.service.core.common.ResponseDto;
+import cn.geoair.comp.db.service.core.dao.GirDsApiConfigDao;
+import cn.geoair.comp.db.service.core.dao.GirDsApiGroupDao;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+@Service
+public class DsGroupService {
+
+	@Autowired
+	GirDsApiGroupDao girDsApiGroupDao;
+
+	@Autowired
+	GirDsApiConfigDao girDsApiConfigDao;
+
+	@Resource
+	DsApiUserInfoHelper dsApiUserInfoHelper;
+
+	public void insert(GroupApo groupApo) {
+		groupApo.setId(UUIDUtil.id());
+		groupApo.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		groupApo.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		// DbApiGroupPo po = group.toPo();
+		// po.initCreateMeta();
+		groupApo.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
+		groupApo.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
+		girDsApiGroupDao.accessSelective(groupApo);
+	}
+
+	@Transactional
+	public ResponseDto deleteById(String id) {
+		int size = girDsApiConfigDao.selectCountByGroup(id);
+		if (size > 0) {
+			return ResponseDto.fail("Group is not empty, can not delete");
+		}
+		else {
+			girDsApiGroupDao.deleteByPK(id);
+			return ResponseDto.successWithMsg("Group delete success");
+		}
+	}
+
+	public List<GroupApo> getAll() {
+		// List<DbApiGroupPo> dbApiGroupPos = apiGroupDao.searchAll();
+		// List<Group> groups = Group.fromPos(dbApiGroupPos);
+		return girDsApiGroupDao.searchAll();
+	}
+
+	public List<GroupApo> selectBatch(List<String> ids) {
+		// return Group.fromPos();
+		return girDsApiGroupDao.selectBatchIds(ids);
+	}
+
+	@Transactional
+	public void insertBatch(List<GroupApo> configs) {
+		configs.stream().forEach(t -> {
+			// DbApiGroupPo po = t.toPo();
+			//
+			// po.setNameCreate(dbApiUserInfoHelper.getSubjectName());
+			// po.initCreateMeta();
+			t.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
+			t.setCreateUserId(dsApiUserInfoHelper.getSubjectId());
+			// t.setId(UUIDUtil.id());
+			girDsApiGroupDao.accessSelective(t);
+		});
+	}
+
+	@Transactional
+	public void update(GroupApo groupApo) {
+		groupApo.setUpdateTime(DateFormatUtils.format(new Date(), "yyyy-MM-dd hh:mm:ss"));
+		// DbApiGroupPo po = group.toPo();
+		// po.setNameUpdate(dbApiUserInfoHelper.getSubjectName());
+		// po.initUpdateMeta();
+		girDsApiGroupDao.updateSelectiveById(groupApo);
+	}
+
+}

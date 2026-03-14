@@ -6,10 +6,8 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
-
-import org.geotools.data.DataStore;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

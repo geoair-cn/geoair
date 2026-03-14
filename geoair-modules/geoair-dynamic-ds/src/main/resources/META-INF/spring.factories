@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.geoair.map.dynamic.ds.spring.DataSourceHelperAutoConfiguration
+cn.geoair.comp.dynamic.ds.spring.DataSourceHelperAutoConfiguration
