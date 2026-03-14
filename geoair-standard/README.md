@@ -11,7 +11,4 @@
 
 *  geoair-orm    orm框架
 
-*  geoair-soa    面向服务的框架
 
-## 引包规则
-由该工程约束包版本规则，例如spring,spingboot,springcloud以及常用工具的版本

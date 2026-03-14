@@ -88,7 +88,7 @@ geoair-comp/
 **SpringDoc 版本 (推荐)**：
 ```xml
 <dependency>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -97,7 +97,7 @@ geoair-comp/
 **Swagger 2 版本**：
 ```xml
 <dependency>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-knife4j-core</artifactId>
     <version>1.0.0</version>
 </dependency>

@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair.eight</groupId>
+       <groupId>cn.geoair</groupId>
         <artifactId>geoair-base-dependencies-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-base-dependencies-swagger</artifactId>
     <name>geoair-base-dependencies-swagger</name>
     <version>J8.1.0-SNAPSHOT</version>

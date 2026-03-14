@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-dependencies</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <name>geoair-dependencies</name>
@@ -117,7 +117,7 @@
         <module>geoair-base-parent</module>
         <module>geoair-dependencies-parent</module>
         <module>geoair-base-dependencies-parent</module>
-        <module>geoair</module>
+        <module>geoair-standard</module>
         <module>geoair-modules</module>
     </modules>
 

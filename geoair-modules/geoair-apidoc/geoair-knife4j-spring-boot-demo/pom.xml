@@ -4,12 +4,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair.eight</groupId>
+       <groupId>cn.geoair</groupId>
         <artifactId>geoair-apidoc</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <name>geoair-knife4j-spring-boot-demo</name>
@@ -47,7 +47,7 @@
     <dependencies>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
             <version>${geoair.version}</version>
         </dependency>

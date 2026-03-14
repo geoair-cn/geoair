@@ -1,21 +1,24 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair.eight</groupId>
-        <artifactId>geoair-orm</artifactId>
+       <groupId>cn.geoair</groupId>
+        <artifactId>geoair-standard</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
-    <artifactId>geoair-orm-mybatis-plus</artifactId>
+   <groupId>cn.geoair</groupId>
+    <artifactId>geoair-sdk</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>geoair-sdk</name>
+
+    <description>geoair-sdk</description>
 
     <url>https://gitee.com/geoair/geoair</url>
-    <description>geoair-mybatis-plus</description>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -39,28 +42,29 @@
         <tag>HEAD</tag>
     </scm>
 
-    <name>geoair-mybatis-plus</name>
+    <properties>
+    </properties>
+
 
     <dependencies>
-
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
-            <artifactId>geoair-orm-mybatis</artifactId>
+           <groupId>cn.geoair</groupId>
+            <artifactId>geoair-core</artifactId>
             <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus</artifactId>
-            <version>${mybatis-plus.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.github.pagehelper</groupId>
-            <artifactId>pagehelper</artifactId>
-            <version>${pagehelper.version}</version>
-        </dependency>
-
+        <!--
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+		 -->
     </dependencies>
 
 </project>

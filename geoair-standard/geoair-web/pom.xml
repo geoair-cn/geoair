@@ -1,22 +1,20 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair.eight</groupId>
-        <artifactId>geoair</artifactId>
+       <groupId>cn.geoair</groupId>
+        <artifactId>geoair-standard</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
-    <artifactId>geoair-sdk</artifactId>
+   <groupId>cn.geoair</groupId>
+    <artifactId>geoair-web</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
+    <name>geoair-web</name>
     <packaging>jar</packaging>
-    <name>geoair-sdk</name>
-
-    <description>geoair-sdk</description>
-
+    <description>Web库</description>
     <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>
@@ -44,12 +42,11 @@
 
     <properties>
     </properties>
-
-
     <dependencies>
+
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
-            <artifactId>geoair-core</artifactId>
+           <groupId>cn.geoair</groupId>
+            <artifactId>geoair-base</artifactId>
             <version>${geoair.version}</version>
         </dependency>
 
@@ -59,12 +56,16 @@
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!--
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-		</dependency>
-		 -->
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <!--			<plugin>-->
+            <!--				<groupId>org.apache.maven.plugins</groupId>-->
+            <!--				<artifactId>maven-source-plugin</artifactId>-->
+            <!--			</plugin>-->
+        </plugins>
+    </build>
 
 </project>

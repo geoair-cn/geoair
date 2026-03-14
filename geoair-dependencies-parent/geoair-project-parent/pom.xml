@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair.eight</groupId>
+       <groupId>cn.geoair</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-project-parent</artifactId>
     <name>geoair-project-parent</name>
     <version>J8.1.0-SNAPSHOT</version>
@@ -49,7 +49,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-geotools</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -57,7 +57,7 @@
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-spring</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -65,7 +65,7 @@
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-other</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -74,7 +74,7 @@
 
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-swagger</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -82,15 +82,15 @@
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
-                <artifactId>geoair</artifactId>
+               <groupId>cn.geoair</groupId>
+                <artifactId>geoair-standard</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-modules</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -98,7 +98,7 @@
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-geo</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -111,21 +111,21 @@
 
     <dependencies>
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-base-dependencies-geotools</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-base-dependencies-spring</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-base-dependencies-other</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
@@ -133,28 +133,28 @@
 
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-base-dependencies-swagger</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
-            <artifactId>geoair</artifactId>
+           <groupId>cn.geoair</groupId>
+            <artifactId>geoair-standard</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-modules</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair.eight</groupId>
+           <groupId>cn.geoair</groupId>
             <artifactId>geoair-geo</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>

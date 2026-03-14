@@ -9,7 +9,7 @@
         <version>2.7.18</version>
         <relativePath/>
     </parent>
-   <groupId>cn.geoair.eight</groupId>
+   <groupId>cn.geoair</groupId>
     <artifactId>geoair-base-dependencies-parent</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <name>geoair-base-dependencies-parent</name>
@@ -122,32 +122,32 @@
         <dependencies>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-geotools</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-swagger</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-spring</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-template</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base-dependencies-other</artifactId>
                 <version>${geoair.version}</version>
 

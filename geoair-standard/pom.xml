@@ -4,20 +4,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair.eight</groupId>
+       <groupId>cn.geoair</groupId>
         <artifactId>geoair-base-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../geoair-base-parent/pom.xml</relativePath>
     </parent>
 
-   <groupId>cn.geoair.eight</groupId>
-    <artifactId>geoair</artifactId>
+   <groupId>cn.geoair</groupId>
+    <artifactId>geoair-standard</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Gir</name>
+    <name>geoair-standard</name>
 
     <description>
-        基础库，设计初衷是通过spi实现相关常用的工具
+        基础标准库，设计初衷是通过spi实现相关常用的工具
     </description>
 
     <url>https://gitee.com/geoair/geoair</url>
@@ -56,66 +56,66 @@
 
             <!-- gir版本约束 -->
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-base</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-web</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-tools</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-core</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-sdk</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-mybatis</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-base</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-mybatis-tk</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-mybatis-plus</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-springjpa</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.eight</groupId>
+               <groupId>cn.geoair</groupId>
                 <artifactId>geoair-orm-spi</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
