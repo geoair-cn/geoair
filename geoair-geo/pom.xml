@@ -10,11 +10,11 @@
     </parent>
 
     <groupId>cn.geoair</groupId>
-    <artifactId>geoair-dynamic</artifactId>
+    <artifactId>geoair-geo</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>geoair-dynamic</name>
-    <description>gis dynamic tile server</description>
+    <name>geoair-geo</name>
+    <description>空间处理相关的模块</description>
     <properties>
         <java.version>8</java.version>
         <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
@@ -57,7 +57,7 @@
         <module>geoair-geo-tools</module>
         <module>geoair-jts-all</module>
         <module>geoair-geoserver</module>
-        <module>geoair-dynamic-demo</module>
+        <module>geoair-geo-demo</module>
     </modules>
 
 

@@ -118,8 +118,8 @@
         <module>geoair-dependencies-parent</module>
         <module>geoair-base-dependencies-parent</module>
         <module>geoair</module>
-        <module>geoair-dynamic</module>
-        <module>geoair-comp</module>
+        <module>geoair-geo</module>
+        <module>geoair-modules</module>
     </modules>
 
 

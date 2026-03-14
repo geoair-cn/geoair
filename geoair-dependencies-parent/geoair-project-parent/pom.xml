@@ -99,7 +99,7 @@
 
             <dependency>
                 <groupId>cn.geoair</groupId>
-                <artifactId>geoair-dynamic</artifactId>
+                <artifactId>geoair-geo</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -155,7 +155,7 @@
 
         <dependency>
             <groupId>cn.geoair</groupId>
-            <artifactId>geoair-dynamic</artifactId>
+            <artifactId>geoair-geo</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
         </dependency>
