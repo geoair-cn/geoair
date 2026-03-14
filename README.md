@@ -1,199 +1,159 @@
-
-
-# GeoAir API Components
+# GeoAir Framework - 地理空间信息系统开发框架
 
 ## 项目简介
 
-GeoAir API Components 是一个用于 API 文档自动生成的组件库，提供了对 Swagger/Knife4j 的深度集成支持。该项目包含两个主要的 Starter 模块，分别支持传统的 Swagger 2 和现代的 SpringDoc OpenAPI 3 规范。
+GeoAir Framework 是一个面向**地理空间信息系统 (GIS)** 的**企业级 Java 开发框架**,提供从基础依赖管理、核心工具库到业务组件的全套解决方案。框架集成了 GeoTools、PostGIS 等地理空间处理库,支持多数据源动态切换、高级空间查询、坐标转换等 GIS 核心功能,并内置 API 文档自动生成、代码生成器等开发效率工具。
 
-## 项目结构
-
-```
-geoair-comp/
-├── geoair-apidoc/
-│   ├── geoair-knife4j-core/                           # Swagger 2 + Knife4j 集成核心模块
-│   │   ├── src/main/java/cn/geoair/comp/knife4j/ext/
-│   │   │   ├── auto/AutoApiConfig.java                # 自动配置类
-│   │   │   ├── config/                                 # 配置属性类
-│   │   │   │   ├── GirSwaggerApiConfig.java           # API配置接口
-│   │   │   │   └── GirSwaggerProperties.java          # 配置属性
-│   │   │   └── model/                                  # 数据模型
-│   │   │       ├── ApiModelInfo.java                  # API模型信息
-│   │   │       └── DocketInfo.java                     # 分组配置信息
-│   │   └── pom.xml
-│   │
-│   ├── geoair-knife4j-springdoc-spring-boot-starter/  # SpringDoc OpenAPI 3 + Knife4j 集成
-│   │   ├── src/main/java/cn/geoair/comp/knife4j/ext/springdoc/
-│   │   │   ├── auto/                                   # 自动配置
-│   │   │   │   └── SpringDocApiRunner.java            # 启动运行器
-│   │   │   ├── builder/                                # 构建器
-│   │   │   │   ├── GaModelFieldConverter.java         # 模型字段转换器
-│   │   │   │   ├── GiResultModelConverter.java        # 结果模型转换器
-│   │   │   │   ├── GiResultOperationConfig.java        # 操作配置
-│   │   │   │   └── SpringDocCustomConfig.java         # 自定义配置
-│   │   │   └── controller/                             # 控制器
-│   │   │       └── GroupedApiDocsController.java       # 分组API文档控制器
-│   │   ├── src/main/resources/static/                  # 静态资源
-│   │   │   └── gtcapi/                                 # 前端资源
-│   │   └── pom.xml
-│   │
-│   └── geoair-knife4j-spring-boot-demo/               # 演示项目
-│       ├── src/main/java/cn/geoair/comp/knife4j/demo/
-│       │   ├── config/Swagger2Configuration.java       # 配置示例
-│       │   ├── controller/                              # 控制器示例
-│       │   │   ├── group1/                             # 分组1
-│       │   │   └── group2/                             # 分组2
-│       │   └── model/                                  # 模型示例
-│       └── pom.xml
-│
-└── pom.xml
-```
-
-## 核心功能
-
-### geoair-knife4j-core
-- **自动扫描包路径**：自动扫描 Controller 所在的根包
-- **分组支持**：支持按包路径自动分组 API 文档
-- **自定义配置**：提供灵活的配置属性自定义
-- **Spring Boot 自动装配**：支持 Spring Boot Starter 自动配置
-
-### geoair-knife4j-springdoc-spring-boot-starter
-- **SpringDoc OpenAPI 3 支持**：基于 SpringDoc 生成 OpenAPI 3 规范的文档
-- **Knife4j 前端集成**：提供 Knife4j 增强的前端界面
-- **分组 API 文档**：支持多分组文档展示
-- **自定义模型转换**：支持自定义响应模型转换
-- **操作定制**：支持自定义操作行为
-
-## 技术栈
-
-- **Java 版本**：JDK 8+
-- **构建工具**：Maven 3.6+
-- **主要框架**：
-  - Spring Boot 2.7.x
-  - SpringDoc OpenAPI 3
-  - Knife4j 4.x
-- **API 规范**：
-  - OpenAPI 3 (SpringDoc)
-  - Swagger 2 (传统)
-
-## 快速开始
-
-### 环境要求
-
-- JDK 8 或更高版本
-- Maven 3.6 或更高版本
-
-### 引入依赖
-
-**SpringDoc 版本 (推荐)**：
-```xml
-<dependency>
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
-
-**Swagger 2 版本**：
-```xml
-<dependency>
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-knife4j-core</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
-
-### 配置说明
-
-在 `application.yml` 中添加配置：
-
-```yaml
-geoair:
-  apidoc:
-    enable: true
-    title: API 文档标题
-    version: 1.0.0
-    author: 作者
-    description: API 描述信息
-    controller-root-package: com.example.demo.controller
-```
-
-### 自定义配置
-
-实现 `GirSwaggerApiConfig` 接口进行自定义配置：
-
-```java
-@Configuration
-public class Swagger2Configuration implements GirSwaggerApiConfig {
-    
-    @Override
-    public List<DocketInfo> getDocketInfos() {
-        // 返回分组配置列表
-    }
-    
-    @Override
-    public ApiModelInfo getApiModelInfo() {
-        // 返回API基本信息
-    }
-}
-```
-
-## 使用示例
-
-### 控制器注解
-
-```java
-@Controller
-@GaApi(tags = "用户管理")
-public class UserController {
-    
-    @PostMapping("/user")
-    @ResponseBody
-    @GaApiAction(text = "创建用户")
-    public GiResult<UserVo> createUser(@RequestBody UserVo user) {
-        // ...
-    }
-}
-```
-
-### 模型注解
-
-```java
-@GaModel(text = "用户信息")
-public class UserVo {
-    
-    @GaModelField(text = "用户名")
-    private String username;
-    
-    @GaModelField(text = "邮箱")
-    private String email;
-}
-```
-
-## 访问文档
-
-启动应用后，访问以下地址查看 API 文档：
-
-- Knife4j 界面：`http://localhost:8080/doc.html`
-- Swagger 原始文档：`http://localhost:8080/swagger-ui.html`
-- OpenAPI 3 规范：`http://localhost:8080/v3/api-docs`
 
 ## 模块说明
 
-| 模块 | 说明 |
-|------|------|
-| geoair-knife4j-core | Swagger 2 + Knife4j 集成核心 |
-| geoair-knife4j-springdoc-spring-boot-starter | SpringDoc OpenAPI 3 + Knife4j 集成 |
-| geoair-knife4j-spring-boot-demo | 演示项目 |
+| 模块分类 | 模块名称 | 功能描述 |
+|---------|---------|---------|
+| **标准库** | geoair-base | 基础标准库 (API 注解/数据转换/缓存/异常处理) |
+| | geoair-core | 核心工具库 |
+| | geoair-web | Web 层公共组件 |
+| | geoair-sdk | 统一 SDK 输出 |
+| | geoair-orm | ORM 框架集成 (MyBatis/MyBatis-Plus/JPA) |
+| | geoair-tools | 通用工具集 |
+| **业务组件** | geoair-apidoc | API 文档自动生成 (Swagger/SpringDoc) |
+| | geoair-code-generator | 代码生成器 |
+| | geoair-geo | GIS 地理空间处理 (坐标转换/空间查询/几何处理) |
+| | geoair-dynamic-ds | 动态多数据源管理 |
+| | geoair-db-service | 数据库服务 (含 Web 可视化界面) |
+| | geoair-message-converter | JTS 几何对象消息转换器 |
+ 
+## 核心功能模块
+
+### 1. GIS 地理空间处理 (`geoair-geo`)
+
+#### 📍 坐标转换工具
+- 支持 WGS84、GCJ02(火星坐标系)、BD09(百度坐标系) 互转
+- 支持 EPSG:3857(墨卡托)、EPSG:4490(CGCS2000) 等投影转换
+- 提供 WKT、WKB、GeoJSON 格式互转
+
+#### 📏 空间测量计算
+- 距离计算 (测地线距离、平面的距离)
+- 面积计算 (支持多种单位:m²、km²、亩等)
+- 长度量算、缓冲区分析
+
+#### 🔧 几何对象处理
+- 几何对象合并、分割、简化
+- 空间关系判断 (相交、包含、相邻等)
+- 几何对象有效性检查
+
+#### 🗺️ 瓦片地图工具
+- XYZ/TMS/WMTS 瓦片坐标计算
+- 瓦片金字塔生成
+- 矢量瓦片 (MVT) 处理
+
+### 2. 动态多数据源 (`geoair-dynamic-ds`, `geoair-db-service`)
+
+- ✅ 运行时数据源动态切换
+- ✅ 支持 PostgreSQL+PostGIS、Oracle Spatial、达梦等空间数据库
+- ✅ 数据源元信息管理
+- ✅ JDBC URL 智能解析工具
+- ✅ 数据库连接池管理 (Druid)
+
+### 3. 高级空间查询 (`geoair-adv-query`)
+
+- ✅ 基于 GeoTools 的空间查询优化
+- ✅ 边界框查询 (BBox)、空间过滤
+- ✅ SQL 注入防护
+- ✅ 分页查询支持
+- ✅ PostgreSQL 方言特化支持
+
+### 4. API 文档自动化 (`geoair-apidoc`)
+
+#### Swagger 2 版本 (`geoair-knife4j-core`)
+- 自动扫描 Controller 包路径
+- 按包路径自动分组 API 文档
+- 自定义配置属性
+- Spring Boot 自动装配
+
+#### SpringDoc OpenAPI 3 版本 (`geoair-knife4j-springdoc-spring-boot-starter`)
+- 基于 SpringDoc 生成 OpenAPI 3 规范文档
+- Knife4j 增强 UI 界面
+- 自定义响应模型转换
+- 操作行为定制
+
+### 5. ORM 框架集成 (`geoair-orm`)
+
+通过 SPI 机制支持多种 ORM 框架:
+- **MyBatis** - 传统 XML 映射方式
+- **MyBatis-Plus** - 增强工具集
+- **Spring JPA** - JPA 规范实现
+- **通用 Mapper** - 单表 CRUD 简化
+
+### 6. 代码生成器 (`geoair-code-generator`)
+
+- 根据数据库表结构自动生成实体类
+- 生成 Mapper、Service、Controller 层代码
+- 支持自定义代码模板
+- 生成前端 Vue 组件代码
+
+### 7. 数据库服务 (`geoair-db-service`)
+
+- 统一的数据库访问层抽象
+- 支持多种数据库方言
+- 数据库元数据查询
+- Web 可视化数据库管理界面 (基于 Vue)
+
+### 8. 消息转换器 (`geoair-message-converter`)
+
+- **JTS-Jackson 转换** - Geometry 对象 JSON 序列化/反序列化
+- **JTS-MyBatis 转换** - Geometry 类型数据库映射处理器
+
+## 技术栈
+
+| 类别 | 技术选型 | 版本 |
+|------|----------|------|
+| **JDK** | Java Development Kit | 8+ |
+| **构建工具** | Maven | 3.6+ |
+| **核心框架** | Spring Boot | 2.7.18 |
+| **Spring** | Spring Framework | 5.3.31 |
+| **ORM 框架** | MyBatis / MyBatis-Plus | 3.5.9 / 3.5.2 |
+| **GIS 库** | GeoTools / JTS Core | 28.6.1 / 1.19.0 |
+| **空间数据库** | PostGIS / Oracle Spatial / 达梦 | - |
+| **JDBC 驱动** | PostgreSQL / Oracle / DM | 42.3.8 / 19.3.0.0 / 18 |
+| **连接池** | Druid | 1.2.23 |
+| **API 文档** | SpringDoc / Knife4j | 1.7.0 / 4.4.0 |
+| **Swagger 2** | Springfox / Knife4j | 3.0.0 / 3.0.3 |
+| **JSON 处理** | Jackson / FastJSON2 | 2.13.5 / 2.0.43 |
+| **工具库** | Hutool / Lombok | 5.8.42 / 1.18.30 |
+| **前端框架** | Vue.js | - |
 
 ## 贡献指南
 
+欢迎参与项目开发和改进!
+
 1. Fork 本仓库
 2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改
-4. 推送到分支
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启 Pull Request
+
+## 开发者信息
+
+- **作者**: 张逢吉
+- **邮箱**: 1159856928@qq.com
+- **组织**: geoair
+- **官网**: https://xmt.geoair.cn/
+- **Gitee**: https://gitee.com/geoair/geoair
 
 ## 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 **Apache License 2.0** 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 致谢
+
+感谢以下开源项目:
+
+- [GeoTools](https://geotools.org/) - 开源 GIS 工具包
+- [JTS Topology Suite](https://locationtech.github.io/jts/) - 空间索引和几何处理
+- [Spring Boot](https://spring.io/projects/spring-boot) - Java 应用框架
+- [Knife4j](https://doc.xiaominfo.com/) - Swagger 增强工具
+- [MyBatis-Plus](https://baomidou.com/) - MyBatis 增强工具
+
+---
+
+**GeoAir Framework** - 让地理信息系统开发更简单！🚀
