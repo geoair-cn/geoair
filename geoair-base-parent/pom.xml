@@ -3,7 +3,7 @@
 
     <parent>
        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-dependencies</artifactId>
+        <artifactId>geoair-framework</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
