@@ -90,6 +90,7 @@
     <modules>
         <module>geoair-apidoc</module>
         <module>geoair-code-generator</module>
+        <module>geoair-geo</module>
         <module>geoair-message-converter</module>
 
     </modules>
