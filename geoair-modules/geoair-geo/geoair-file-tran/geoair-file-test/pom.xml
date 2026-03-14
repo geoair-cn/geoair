@@ -3,12 +3,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>cn.geoair</groupId>
+       <groupId>cn.geoair.group</groupId>
         <artifactId>geoair-file-tran</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>cn.geoair</groupId>
+   <groupId>cn.geoair.group</groupId>
     <version>J8.1.0-SNAPSHOT</version>
     <artifactId>geoair-file-test</artifactId>
     <name>geoair-file-test</name>
@@ -64,12 +64,12 @@
             <version>${geotools.version}</version>
         </dependency>
         <dependency>
-            <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.group</groupId>
             <artifactId>geoair-file-geojson</artifactId>
             <version>${geoair.version}</version>
         </dependency>
         <dependency>
-            <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.group</groupId>
             <artifactId>geoair-file-postgis</artifactId>
             <version>${geoair.version}</version>
         </dependency>
