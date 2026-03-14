@@ -5,25 +5,25 @@
     <parent>
         <groupId>cn.geoair.dependencies</groupId>
         <artifactId>geoair-base-parent</artifactId>
-        <version>23.1.3-RC1-SNAPSHOT</version>
+        <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
-    <groupId>cn.geoair.geo.dynamic</groupId>
+    <groupId>cn.geoair</groupId>
     <artifactId>geoair-dynamic</artifactId>
-    <version>23.1.3-RC1-SNAPSHOT</version>
+    <version>J8.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>geoair-dynamic</name>
     <description>gis dynamic tile server</description>
     <properties>
         <java.version>8</java.version>
-        <geoair.version>23.1.3-RC1-SNAPSHOT</geoair.version>
+        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
 
-    <url>https://gitee.com/geoair/geo-dynamic</url>
+    <url>https://gitee.com/geoair/geoair</url>
 
     <licenses>
         <license>
@@ -42,21 +42,21 @@
     </developers>
 
     <scm>
-        <connection>https://gitee.com/geoair/geo-dynamic.git</connection>
-        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geo-dynamic.git</developerConnection>
-        <url>https://gitee.com/geoair/geo-dynamic</url>
+        <connection>https://gitee.com/geoair/geoair.git</connection>
+        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair.git</developerConnection>
+        <url>https://gitee.com/geoair/geoair</url>
     </scm>
 
 
     <modules>
-        <module>geo-dynamic-adv-query</module>
-        <module>geo-dynamic-ds</module>
-        <module>geo-dynamic-db-service</module>
-        <module>geo-dynamic-mvt</module>
-        <module>geo-dynamic-file-tran</module>
-        <module>geo-dynamic-tools</module>
-        <module>geo-dynamic-jts-all</module>
-        <module>geo-dynamic-geoserver</module>
+        <module>geoair-adv-query</module>
+        <module>geoair-dynamic-ds</module>
+        <module>geoair-db-service</module>
+        <module>geoair-mvt</module>
+        <module>geoair-file-tran</module>
+        <module>geoair-geo-tools</module>
+        <module>geoair-jts-all</module>
+        <module>geoair-geoserver</module>
         <module>geoair-dynamic-demo</module>
     </modules>
 
@@ -78,62 +78,62 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-ds</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-dynamic-ds</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-jts-all</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-real-mvt</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-tools</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-adv-query</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-jts-all</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
 
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-mvt-tools</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-real-mvt</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-geo-tools</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-static-mvt-spark</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-adv-query</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-mvt-tools</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-geoserver</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-static-mvt-spark</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-db-service-core</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-geoserver</artifactId>
+                <version>${geoair.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-db-service-core</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-                <groupId>cn.geoair.geo.dynamic</groupId>
-                <artifactId>geo-dynamic-db-service-spring-boot-starter</artifactId>
+                <groupId>cn.geoair</groupId>
+                <artifactId>geoair-db-service-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
