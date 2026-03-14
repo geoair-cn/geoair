@@ -1,4 +1,4 @@
-# GeoAir Framework - 地理空间信息系统开发框架
+# GeoAir Framework  
 
 ## 项目简介
 
