@@ -5,7 +5,7 @@
 
 ## 📚 模块概述
 
-`geoair-base-dependencies-parent` 是 GeoAir Framework 的**统一依赖版本管理中心**，负责统一管理所有第三方依赖的版本号，确保整个框架的依赖版本一致性和兼容性。
+`geoair-dependencies-bom` 是 GeoAir Framework 的**统一依赖版本管理中心**，负责统一管理所有第三方依赖的版本号，确保整个框架的依赖版本一致性和兼容性。
 
 本模块采用 **BOM (Bill of Materials)** 模式，将依赖按功能领域拆分为 5 个子模块，实现按需引入、灵活组合。
 
@@ -15,12 +15,12 @@
 ```
 spring-boot-dependencies (2.7.18)
 ↑
-geoair-base-dependencies-parent
-├── geoair-base-dependencies-geotools  # GIS 空间数据处理依赖
-├── geoair-base-dependencies-spring    # Spring 生态依赖
-├── geoair-base-dependencies-swagger   # API 文档依赖
-├── geoair-base-dependencies-template  # 模板预留模块
-└── geoair-base-dependencies-other     # 其他第三方依赖
+geoair-dependencies-bom
+├── geoair-geotools-dependencies  # GIS 空间数据处理依赖
+├── geoair-spring-dependencies    # Spring 生态依赖
+├── geoair-openapi-dependencies   # API 文档依赖
+├── geoair-template-dependencies  # 模板预留模块
+└── geoair-common-dependencies     # 其他第三方依赖
 ```
 
 ### 核心职责
@@ -31,7 +31,7 @@ geoair-base-dependencies-parent
 
 ## 📦 子模块详解
 
-### 1. geoair-base-dependencies-geotools
+### 1. geoair-geotools-dependencies
 **功能定位**：GIS 地理空间数据处理依赖集合
 
 #### 核心依赖
@@ -71,7 +71,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ---
 
-### 2. geoair-base-dependencies-spring
+### 2. geoair-spring-dependencies
 **功能定位**：Spring 生态系统依赖集合
 
 #### 核心依赖
@@ -96,7 +96,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ---
 
-### 3. geoair-base-dependencies-swagger
+### 3. geoair-openapi-dependencies
 **功能定位**：API 文档生成工具依赖集合
 
 #### 核心依赖
@@ -119,12 +119,12 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ---
 
-### 4. geoair-base-dependencies-other
+### 4. geoair-common-dependencies
 **功能定位**：其他常用第三方依赖集合
 
 ---
 
-### 5. geoair-base-dependencies-template
+### 5. geoair-template-dependencies
 **功能定位**：预留模板模块
 **当前状态**：空模块，用于未来扩展或作为新项目依赖模板参考
 
@@ -153,7 +153,7 @@ gt-cql (查询语言), gt-process (处理引擎)
     <dependencies>
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-geotools</artifactId>
+            <artifactId>geoair-geotools-dependencies</artifactId>
             <version>J8.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
@@ -168,7 +168,7 @@ gt-cql (查询语言), gt-process (处理引擎)
     <dependencies>
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-spring</artifactId>
+            <artifactId>geoair-spring-dependencies</artifactId>
             <version>J8.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
@@ -184,7 +184,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <!-- 引入 GIS 能力 -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-geotools</artifactId>
+            <artifactId>geoair-geotools-dependencies</artifactId>
             <version>J8.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
@@ -193,7 +193,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <!-- 引入 API 文档能力 -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-swagger</artifactId>
+            <artifactId>geoair-openapi-dependencies</artifactId>
             <version>J8.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>

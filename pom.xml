@@ -114,9 +114,9 @@
 
 
     <modules>
+        <module>geoair-dependencies-bom</module>
         <module>geoair-base-parent</module>
-        <module>geoair-dependencies-parent</module>
-        <module>geoair-base-dependencies-parent</module>
+        <module>geoair-framework-parent</module>
         <module>geoair-standard</module>
         <module>geoair-modules</module>
     </modules>
