@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair.devkit</groupId>
+        <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-base-dependencies-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair.devkit</groupId>
+    <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-dependencies-geotools</artifactId>
     <name>geoair-base-dependencies-geotools</name>
     <version>J8.1.0-SNAPSHOT</version>
@@ -143,23 +143,6 @@
                 <artifactId>gt-geojson-store</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-epsg-postgresql</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-api</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-
-
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-data</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
 
 
             <dependency>
@@ -310,31 +293,7 @@
                 <artifactId>gt-opengis</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-process-feature</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-process-geometry</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-process-raster</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-process</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-property</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
+
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-referencing</artifactId>
@@ -366,16 +325,7 @@
                 <artifactId>gt-render</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-sample-data</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-sample-data-access</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
+
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-shapefile</artifactId>
@@ -391,133 +341,6 @@
                 <artifactId>gt-swing</artifactId>
                 <version>${geotools.version}</version>
             </dependency>
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-tile-client</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-transform</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-wfs-ng</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-wms</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-wmts</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-xml</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools</groupId>-->
-            <!--				<artifactId>gt-ysld</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-db2</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-h2</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-hana</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-
-
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-sqlserver</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.jdbc</groupId>-->
-            <!--				<artifactId>gt-jdbc-teradata</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-core</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-csw</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-fes</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-filter</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-gml2</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-gml3</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-kml</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-ows</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-sld</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-wcs</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-wfs</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-wms</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
-            <!--			<dependency>-->
-            <!--				<groupId>org.geotools.xsd</groupId>-->
-            <!--				<artifactId>gt-xsd-wps</artifactId>-->
-            <!--				<version>${geotools.version}</version>-->
-            <!--			</dependency>-->
 
         </dependencies>
     </dependencyManagement>
