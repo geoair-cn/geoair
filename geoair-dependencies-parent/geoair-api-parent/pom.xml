@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair</groupId>
+       <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-dependencies-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair</groupId>
+   <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-api-parent</artifactId>
     <name>geoair-api-parent</name>
     <version>J8.1.0-SNAPSHOT</version>
@@ -49,7 +49,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-               <groupId>cn.geoair</groupId>
+               <groupId>cn.geoair.devkit</groupId>
                 <artifactId>geoair-project-parent</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -61,7 +61,7 @@
 
     <dependencies>
         <dependency>
-           <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-project-parent</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>

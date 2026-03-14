@@ -4,12 +4,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair</groupId>
+       <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-orm</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair</groupId>
+   <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm-mybatis</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -43,13 +43,13 @@
     <dependencies>
 
         <dependency>
-           <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-core</artifactId>
             <version>${geoair.version}</version>
         </dependency>
 
         <dependency>
-           <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-orm-base</artifactId>
             <version>${geoair.version}</version>
         </dependency>

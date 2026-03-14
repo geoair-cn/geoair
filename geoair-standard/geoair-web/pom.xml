@@ -4,12 +4,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair</groupId>
+       <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-standard</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-   <groupId>cn.geoair</groupId>
+   <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-web</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <name>geoair-web</name>
@@ -45,7 +45,7 @@
     <dependencies>
 
         <dependency>
-           <groupId>cn.geoair</groupId>
+           <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-base</artifactId>
             <version>${geoair.version}</version>
         </dependency>
