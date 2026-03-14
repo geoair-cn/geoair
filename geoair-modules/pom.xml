@@ -4,13 +4,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-       <groupId>cn.geoair.group</groupId>
+       <groupId>cn.geoair.eight</groupId>
         <artifactId>geoair-base-parent</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../geoair-base-parent</relativePath>
     </parent>
 
-   <groupId>cn.geoair.group</groupId>
+   <groupId>cn.geoair.eight</groupId>
     <artifactId>geoair-modules</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -51,7 +51,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -59,28 +59,28 @@
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
 
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair-code-gen-module</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair-message-jts-jackson</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.group</groupId>
+               <groupId>cn.geoair.eight</groupId>
                 <artifactId>geoair-message-jts-mybatis</artifactId>
                 <version>${geoair.version}</version>
             </dependency>
