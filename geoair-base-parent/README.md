@@ -47,10 +47,10 @@ geoair-base-parent
 ├── 继承：全局配置 + 通用插件
 ├── 导入：Spring Boot BOM (2.7.18)
 └── 聚合：4 个 base-dependencies BOMs
-├── geoair-base-dependencies-geotools # GIS 空间数据处理依赖
-├── geoair-base-dependencies-spring   # Spring 生态依赖
-├── geoair-base-dependencies-swagger  # API 文档依赖
-└── geoair-base-dependencies-other    # 其他第三方依赖
+├── geoair-geotools-dependencies # GIS 空间数据处理依赖
+├── geoair-spring-dependencies   # Spring 生态依赖
+├── geoair-openapi-dependencies  # API 文档依赖
+└── geoair-common-dependencies    # 其他第三方依赖
 ```
 
 ## 📦 依赖管理
@@ -71,7 +71,7 @@ geoair-base-parent
         <!-- 2. GeoTools GIS 依赖 BOM -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-geotools</artifactId>
+            <artifactId>geoair-geotools-dependencies</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
             <scope>import</scope>
@@ -80,7 +80,7 @@ geoair-base-parent
         <!-- 3. Spring 生态依赖 BOM -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-spring</artifactId>
+            <artifactId>geoair-spring-dependencies</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
             <scope>import</scope>
@@ -89,7 +89,7 @@ geoair-base-parent
         <!-- 4. Swagger/API 文档依赖 BOM -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-swagger</artifactId>
+            <artifactId>geoair-openapi-dependencies</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
             <scope>import</scope>
@@ -98,7 +98,7 @@ geoair-base-parent
         <!-- 5. 其他第三方依赖 BOM -->
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-dependencies-other</artifactId>
+            <artifactId>geoair-common-dependencies</artifactId>
             <version>${geoair.version}</version>
             <type>pom</type>
             <scope>import</scope>
@@ -115,28 +115,28 @@ geoair-base-parent
 <dependencies>
     <dependency>
         <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-base-dependencies-geotools</artifactId>
+        <artifactId>geoair-geotools-dependencies</artifactId>
         <version>${geoair.version}</version>
         <type>pom</type>
     </dependency>
 
     <dependency>
         <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-base-dependencies-spring</artifactId>
+        <artifactId>geoair-spring-dependencies</artifactId>
         <version>${geoair.version}</version>
         <type>pom</type>
     </dependency>
 
     <dependency>
         <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-base-dependencies-swagger</artifactId>
+        <artifactId>geoair-openapi-dependencies</artifactId>
         <version>${geoair.version}</version>
         <type>pom</type>
     </dependency>
 
     <dependency>
         <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-base-dependencies-other</artifactId>
+        <artifactId>geoair-common-dependencies</artifactId>
         <version>${geoair.version}</version>
         <type>pom</type>
     </dependency>
@@ -170,8 +170,8 @@ geoair-base-parent
 以下模块直接继承 `geoair-base-parent`，享受统一的依赖和构建配置：
 1. **geoair-standard** - 框架标准库模块
 2. **geoair-modules** - 业务功能组件模块
-3. **geoair-dependencies-parent** - 工程级依赖管理父 POM
-4. **geoair-base-dependencies-parent** - 基础依赖管理父 POM（间接继承）
+3. **geoair-framework-parent** - 工程级依赖管理父 POM
+4. **geoair-dependencies-bom** - 基础依赖管理父 POM（间接继承）
 
 ### 完整继承链
 ```
@@ -190,7 +190,7 @@ geoair-framework (根 POM)
 │       ├── geoair-geo            # GIS 功能模块
 │       ├── geoair-db-service     # 数据库服务模块
 │       └── ... (其他业务模块)
-└── geoair-dependencies-parent
+└── geoair-framework-parent
     ├── geoair-api-parent             # API 模块父 POM
     ├── geoair-project-parent         # 项目级父 POM
     └── geoair-spring-boot-starter-parent # Starter 模块父 POM
@@ -207,7 +207,7 @@ geoair-framework (根 POM)
   <!-- 示例：排除不需要的 GeoTools 依赖 -->
   <dependency>
       <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-base-dependencies-geotools</artifactId>
+      <artifactId>geoair-geotools-dependencies</artifactId>
       <version>${geoair.version}</version>
       <type>pom</type>
       <exclusions>

@@ -10,9 +10,9 @@
         <relativePath/>
     </parent>
    <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-base-dependencies-parent</artifactId>
+    <artifactId>geoair-dependencies-bom</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
-    <name>geoair-base-dependencies-parent</name>
+    <name>geoair-dependencies-bom</name>
     <packaging>pom</packaging>
     <description>用于定义各个组件的依赖管理</description>
 
@@ -123,32 +123,32 @@
 
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base-dependencies-geotools</artifactId>
+                <artifactId>geoair-geotools-dependencies</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base-dependencies-swagger</artifactId>
+                <artifactId>geoair-openapi-dependencies</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base-dependencies-spring</artifactId>
+                <artifactId>geoair-spring-dependencies</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base-dependencies-template</artifactId>
+                <artifactId>geoair-template-dependencies</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
 
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base-dependencies-other</artifactId>
+                <artifactId>geoair-common-dependencies</artifactId>
                 <version>${geoair.version}</version>
 
             </dependency>
@@ -158,11 +158,11 @@
 
 
     <modules>
-        <module>geoair-base-dependencies-geotools</module>
-        <module>geoair-base-dependencies-swagger</module>
-        <module>geoair-base-dependencies-spring</module>
-        <module>geoair-base-dependencies-template</module>
-        <module>geoair-base-dependencies-other</module>
+        <module>geoair-geotools-dependencies</module>
+        <module>geoair-openapi-dependencies</module>
+        <module>geoair-spring-dependencies</module>
+        <module>geoair-template-dependencies</module>
+        <module>geoair-common-dependencies</module>
     </modules>
 
 
