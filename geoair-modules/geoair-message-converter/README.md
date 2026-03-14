@@ -1,26 +1,31 @@
-# GeoAir Message Converter 模块使用指南
+# GeoAir ApiDoc 模块使用指南
 
 ## 模块介绍
 
-GeoAir Message Converter 模块提供了消息转换功能，支持 JTS 几何对象与 JSON、数据库类型的转换，为地理空间数据的序列化和反序列化提供了便捷的解决方案。
+GeoAir ApiDoc 模块提供了 API 文档生成功能，基于 Knife4j 实现，支持 Swagger 2.0 和 OpenAPI 3.0 规范，为 RESTful API 提供了美观、实用的文档界面。
 
 ## 目录结构
 
 ```
-goair-message-converter/
-├── geoair-message-jts-jackson/   # JTS Jackson 消息转换器
-└── geoair-message-jts-mybatis/   # JTS MyBatis 消息转换器
+goair-apidoc/
+├── geoair-knife4j-core/                    # Knife4j 核心模块
+├── geoair-knife4j-spring-boot-demo/        # Knife4j Spring Boot 示例
+└── geoair-knife4j-springdoc-spring-boot-starter/ # Knife4j SpringDoc Starter
 ```
 
 ## 模块说明
 
-### 1. geoair-message-jts-jackson
+### 1. geoair-knife4j-core
 
-JTS Jackson 消息转换器，支持 JTS 几何对象与 JSON 的转换。
+Knife4j 核心模块，提供了 API 文档生成的核心功能，包括配置管理、文档生成等。
 
-### 2. geoair-message-jts-mybatis
+### 2. geoair-knife4j-spring-boot-demo
 
-JTS MyBatis 消息转换器，支持 JTS 几何对象与数据库类型的转换。
+Knife4j Spring Boot 示例模块，展示了如何在 Spring Boot 项目中集成 Knife4j。
+
+### 3. geoair-knife4j-springdoc-spring-boot-starter
+
+Knife4j SpringDoc Starter 模块，提供了与 SpringDoc 集成的启动器，支持 OpenAPI 3.0 规范。
 
 ## 快速开始
 
@@ -29,54 +34,69 @@ JTS MyBatis 消息转换器，支持 JTS 几何对象与数据库类型的转换
 在 Maven 项目中，添加以下依赖：
 
 ```xml
-<!-- JTS Jackson 消息转换器 -->
+<!-- SpringDoc 版本（推荐） -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-message-jts-jackson</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
-</dependency>
-
-<!-- JTS MyBatis 消息转换器 -->
-<dependency>
-    <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-message-jts-mybatis</artifactId>
+    <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
 ### 2. 配置
 
-模块会自动配置，无需额外配置。
+在 application.yml 或 application.properties 中添加配置：
+
+```yaml
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+```
 
 ### 3. 使用
 
-使用消息转换功能：
+在控制器类上添加 Swagger 注解：
 
 ```java
-// JTS 几何对象转 JSON
-Geometry geometry = new Point(0, 0);
-ObjectMapper mapper = new ObjectMapper();
-String json = mapper.writeValueAsString(geometry);
+@RestController
+@RequestMapping("/api")
+@Tag(name = "示例接口", description = "示例接口描述")
+public class DemoController {
 
-// JSON 转 JTS 几何对象
-Geometry geometry = mapper.readValue(json, Geometry.class);
-
-// MyBatis 中使用
-@Select("SELECT id, geom FROM spatial_table")
-List<SpatialEntity> selectAll();
+    @Operation(summary = "获取示例数据", description = "获取示例数据的详细描述")
+    @GetMapping("/demo")
+    public ResponseEntity<String> getDemo() {
+        return ResponseEntity.ok("Hello, Knife4j!");
+    }
+}
 ```
+
+### 4. 访问文档
+
+启动应用后，访问以下地址查看 API 文档：
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- Knife4j UI: http://localhost:8080/doc.html
 
 ## 功能特性
 
-- 支持 JTS 几何对象与 JSON 的转换
-- 支持 JTS 几何对象与数据库类型的转换
-- 自动配置，使用简单
-- 支持多种几何类型
+- 支持 Swagger 2.0 和 OpenAPI 3.0 规范
+- 提供美观的文档界面
+- 支持接口测试
+- 支持文档导出（PDF、Markdown 等）
+- 支持接口分组
+- 支持参数验证
 
 ## 依赖关系
 
-- **geoair-message-jts-jackson**：JTS Jackson 消息转换器
-- **geoair-message-jts-mybatis**：JTS MyBatis 消息转换器
+- **geoair-knife4j-core**：核心功能模块
+- **geoair-knife4j-springdoc-spring-boot-starter**：SpringDoc 集成模块，依赖于 geoair-knife4j-core
+- **geoair-knife4j-spring-boot-demo**：示例模块，依赖于 geoair-knife4j-springdoc-spring-boot-starter
 
 ## 版本历史
 
@@ -100,4 +120,3 @@ List<SpatialEntity> selectAll();
 - 邮箱：1159856928@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
- 

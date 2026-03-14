@@ -1,26 +1,31 @@
-# GeoAir Code Generator 模块使用指南
+# GeoAir ApiDoc 模块使用指南
 
 ## 模块介绍
 
-GeoAir Code Generator 模块提供了代码生成功能，支持从数据库表结构生成实体类、Mapper、Service 等代码，大大提高了开发效率。
+GeoAir ApiDoc 模块提供了 API 文档生成功能，基于 Knife4j 实现，支持 Swagger 2.0 和 OpenAPI 3.0 规范，为 RESTful API 提供了美观、实用的文档界面。
 
 ## 目录结构
 
 ```
-goair-code-generator/
-├── geoair-code-gen-demo/    # 代码生成示例
-└── geoair-code-gen-module/  # 代码生成核心模块
+goair-apidoc/
+├── geoair-knife4j-core/                    # Knife4j 核心模块
+├── geoair-knife4j-spring-boot-demo/        # Knife4j Spring Boot 示例
+└── geoair-knife4j-springdoc-spring-boot-starter/ # Knife4j SpringDoc Starter
 ```
 
 ## 模块说明
 
-### 1. geoair-code-gen-module
+### 1. geoair-knife4j-core
 
-代码生成核心模块，提供了代码生成的核心功能，包括模板管理、代码生成等。
+Knife4j 核心模块，提供了 API 文档生成的核心功能，包括配置管理、文档生成等。
 
-### 2. geoair-code-gen-demo
+### 2. geoair-knife4j-spring-boot-demo
 
-代码生成示例模块，展示了如何使用代码生成功能。
+Knife4j Spring Boot 示例模块，展示了如何在 Spring Boot 项目中集成 Knife4j。
+
+### 3. geoair-knife4j-springdoc-spring-boot-starter
+
+Knife4j SpringDoc Starter 模块，提供了与 SpringDoc 集成的启动器，支持 OpenAPI 3.0 规范。
 
 ## 快速开始
 
@@ -29,60 +34,69 @@ goair-code-generator/
 在 Maven 项目中，添加以下依赖：
 
 ```xml
+<!-- SpringDoc 版本（推荐） -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-code-gen-module</artifactId>
+    <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
 ### 2. 配置
 
-创建代码生成配置类：
+在 application.yml 或 application.properties 中添加配置：
+
+```yaml
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+```
+
+### 3. 使用
+
+在控制器类上添加 Swagger 注解：
 
 ```java
-public class CodeGenConfig {
-    public static void main(String[] args) {
-        GirGeneratorConfig config = new GirGeneratorConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/test");
-        config.setUsername("root");
-        config.setPassword("123456");
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        config.setBasePackage("com.example");
-        config.setModuleName("demo");
-        config.setTableName("user");
-        
-        GirGenerator generator = new GirGenerator(config);
-        generator.generate();
+@RestController
+@RequestMapping("/api")
+@Tag(name = "示例接口", description = "示例接口描述")
+public class DemoController {
+
+    @Operation(summary = "获取示例数据", description = "获取示例数据的详细描述")
+    @GetMapping("/demo")
+    public ResponseEntity<String> getDemo() {
+        return ResponseEntity.ok("Hello, Knife4j!");
     }
 }
 ```
 
-### 3. 运行
+### 4. 访问文档
 
-运行配置类，生成代码。生成的代码会按照以下结构组织：
-
-```
-com.example.demo/
-├── controller/    # 控制器
-├── service/       # 服务层
-├── dao/           # 数据访问层
-├── model/         # 实体类
-└── vo/            # 值对象
-```
+启动应用后，访问以下地址查看 API 文档：
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- Knife4j UI: http://localhost:8080/doc.html
 
 ## 功能特性
 
-- 支持从数据库表结构生成代码
-- 支持多种 ORM 框架（MyBatis、MyBatis-Plus 等）
-- 支持自定义模板
-- 支持生成 Controller、Service、Dao、Model、VO 等代码
-- 支持代码自动覆盖或跳过
+- 支持 Swagger 2.0 和 OpenAPI 3.0 规范
+- 提供美观的文档界面
+- 支持接口测试
+- 支持文档导出（PDF、Markdown 等）
+- 支持接口分组
+- 支持参数验证
 
 ## 依赖关系
 
-- **geoair-code-gen-module**：核心功能模块
-- **geoair-code-gen-demo**：示例模块，依赖于 geoair-code-gen-module
+- **geoair-knife4j-core**：核心功能模块
+- **geoair-knife4j-springdoc-spring-boot-starter**：SpringDoc 集成模块，依赖于 geoair-knife4j-core
+- **geoair-knife4j-spring-boot-demo**：示例模块，依赖于 geoair-knife4j-springdoc-spring-boot-starter
 
 ## 版本历史
 
@@ -106,4 +120,3 @@ com.example.demo/
 - 邮箱：1159856928@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
- 
