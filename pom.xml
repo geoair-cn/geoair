@@ -88,10 +88,16 @@
 
     <url>https://gitee.com/geoair/geoair</url>
 
+    <organization>
+        <name>GeoAir</name>
+        <url>https://xmt.geoair.cn/</url>
+    </organization>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
@@ -116,7 +122,7 @@
     <modules>
         <module>geoair-dependencies-bom</module>
         <module>geoair-base-parent</module>
-        <module>geoair-framework-parent</module>
+        <module>geoair-framework-bom</module>
         <module>geoair-standard</module>
         <module>geoair-modules</module>
     </modules>

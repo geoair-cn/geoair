@@ -170,7 +170,7 @@ geoair-base-parent
 以下模块直接继承 `geoair-base-parent`，享受统一的依赖和构建配置：
 1. **geoair-standard** - 框架标准库模块
 2. **geoair-modules** - 业务功能组件模块
-3. **geoair-framework-parent** - 工程级依赖管理父 POM
+3. **geoair-framework-bom** - 工程级依赖管理父 POM
 4. **geoair-dependencies-bom** - 基础依赖管理父 POM（间接继承）
 
 ### 完整继承链
@@ -190,7 +190,7 @@ geoair-framework (根 POM)
 │       ├── geoair-geo            # GIS 功能模块
 │       ├── geoair-db-service     # 数据库服务模块
 │       └── ... (其他业务模块)
-└── geoair-framework-parent
+└── geoair-framework-bom
     ├── geoair-api-parent             # API 模块父 POM
     ├── geoair-project-parent         # 项目级父 POM
     └── geoair-spring-boot-starter-parent # Starter 模块父 POM
