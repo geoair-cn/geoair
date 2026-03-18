@@ -1,5 +1,6 @@
 package cn.geoair.comp.message.converter.jts.jackson.config;
 
+import cn.geoair.comp.message.converter.jts.jackson.serializer.jts.JtsExtModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net.NetPGGeometryModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org.OrgPGGeometryModule;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
@@ -16,27 +17,29 @@ import java.util.List;
 @Configuration
 public class JtsJacksonAutoConfig implements InitializingBean {
 
-	private static final Logger log = LoggerFactory.getLogger(JtsJacksonAutoConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(JtsJacksonAutoConfig.class);
 
-	@Autowired(required = false)
-	private List<ObjectMapper> objectMappers;
+    @Autowired(required = false)
+    private List<ObjectMapper> objectMappers;
 
-	@Override
-	public void afterPropertiesSet() {
-		if (objectMappers != null) {
-			for (ObjectMapper objectMapper : objectMappers) {
-				objectMapper.registerModule(new JtsModule());
-				log.debug("JtsJacksonAutoConfig 注册");
-				if (GirPostGisTran.isNetConvert()) {
-					objectMapper.registerModule(new NetPGGeometryModule());
-					log.debug("NetPGGeometryModule 注册");
-				}
-				if (GirPostGisTran.isOrgConvert()) {
-					objectMapper.registerModule(new OrgPGGeometryModule());
-					log.debug("OrgPGGeometryModule 注册");
-				}
-			}
-		}
-	}
+    @Override
+    public void afterPropertiesSet() {
+        if (objectMappers != null) {
+            for (ObjectMapper objectMapper : objectMappers) {
+                objectMapper.registerModule(new JtsModule());
+                log.debug("JtsModule注册");
+                objectMapper.registerModule(new JtsExtModule());
+                log.debug("JtsExtModule注册");
+                if (GirPostGisTran.isNetConvert()) {
+                    objectMapper.registerModule(new NetPGGeometryModule());
+                    log.debug("NetPGGeometryModule 注册");
+                }
+                if (GirPostGisTran.isOrgConvert()) {
+                    objectMapper.registerModule(new OrgPGGeometryModule());
+                    log.debug("OrgPGGeometryModule 注册");
+                }
+            }
+        }
+    }
 
 }
