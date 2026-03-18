@@ -63,7 +63,7 @@ public class ${ClassName}Controller {
                 BeanUtils.copyProperties(param, record);
 
                 // 生成ID
-                record.setId("${ClassName}_".toLowerCase() + IdUtil.getSnowflakeNextIdStr());
+                record.id("${ClassName}_".toLowerCase() + IdUtil.getSnowflakeNextIdStr());
 
                 // 调用Service
                     ${ClassName}Po result = ${className}Service.add(record);
@@ -150,7 +150,7 @@ public class ${ClassName}Controller {
                     }
 
                     for (${ClassName}Dto dto : dtos) {
-                            ${ClassName}Po po = ${className}Service.getPoById(dto.getId());
+                            ${ClassName}Po po = ${className}Service.getPoById(dto.id());
                             ${className}Service.logicDeleteById(po.id());
                     }
 

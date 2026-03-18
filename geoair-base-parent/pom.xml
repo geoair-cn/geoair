@@ -248,7 +248,7 @@
             </build>
         </profile>
         <profile>
-            <id>javaformat</id>
+            <id>java-code-format</id>
             <build>
                 <plugins>
                     <plugin>

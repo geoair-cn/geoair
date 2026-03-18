@@ -161,7 +161,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
         seo.setAndIdsIn(ArrayUtil.toArray(fieldValues, String.class));
         List<${ClassName}Dto> dtos = ${className}Dao.searchList(seo);
         for (${ClassName}Dto dto : dtos) {
-            resultMap.put(dto.getId(), dto);
+            resultMap.put(dto.id(), dto);
         }
         return resultMap;
     }

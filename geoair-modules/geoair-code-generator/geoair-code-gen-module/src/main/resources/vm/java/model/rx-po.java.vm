@@ -106,7 +106,9 @@ import $importone;
             #break
         #end
     #end
-
+    public void id($column.javaType  id) {
+          $column.javaField = id;
+    }
     public void setNotDel() {
     }
 
