@@ -1,5 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.service;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
@@ -10,13 +11,12 @@ import cn.geoair.comp.db.service.core.dao.GirDsApiConfigDao;
 import cn.geoair.comp.db.service.core.dao.GirDsApiGroupDao;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
-
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,11 +45,7 @@ public class DsApiConfigService {
 	@Autowired
 	GirDsApiConfigDao girDsApiConfigDao;
 
-	// @Autowired
-	// CacheManager cacheManager;
 
-	@Value("${server.servlet.context-path}")
-	String apiContext;
 
 	@Resource
 	DsApiUserInfoHelper dsApiUserInfoHelper;
@@ -251,10 +247,15 @@ public class DsApiConfigService {
 	public String apiDocs(List<String> ids) {
 		StringBuffer temp = new StringBuffer("# 接口文档\n---\n");
 		List<ApiConfigApo> list = girDsApiConfigDao.selectBatchIds(ids);
+		String property = SpringUtil.getProperty("server.servlet.context-path");
+		if (GutilObject.isEmpty(property)) {
+			property = "";
+		}
+		String finalProperty = property;
 		list.forEach(t -> {
 			String templ = "## {0}\n- 接口地址： /{1}/{2}\n- 接口备注：{3}\n- Content-Type：{4}\n";
 			temp.append(
-					MessageFormat.format(templ, t.getName(), apiContext, t.getPath(), t.getNote(), t.getContentType()));
+					MessageFormat.format(templ, t.getName(), finalProperty, t.getPath(), t.getNote(), t.getContentType()));
 			temp.append("\n- 请求参数：");
 			if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(t.getContentType())) {
 				String params = t.getParams();

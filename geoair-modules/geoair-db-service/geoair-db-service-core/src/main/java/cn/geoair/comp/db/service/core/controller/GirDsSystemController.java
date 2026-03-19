@@ -2,25 +2,23 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.basic.util.IPUtil;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONObject;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -28,8 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 @GaApi(tags = "GirDs系统相关")
 public class GirDsSystemController {
 
-	@Value("${server.servlet.context-path:}")
-	String apiContext;
 
 	@Resource
 	GirDsServiceProperties girDsServiceProperties;
@@ -114,9 +110,13 @@ public class GirDsSystemController {
 	public String getIPPort(HttpServletRequest request) {
 		try {
 			int originPort = IPUtil.getOriginPort(request);
+			String property = SpringUtil.getProperty("server.servlet.context-path");
+			if (GutilObject.isEmpty(property)) {
+				property = "";
+			}
 			String realApiContext1 = girDsServiceProperties.getRealApiContext();
 			String realApiContext2 = StrUtil.removePrefix(realApiContext1, "/");
-			String result = request.getServerName() + ":" + originPort + apiContext + "/" + realApiContext2;
+			String result = request.getServerName() + ":" + originPort + property + "/" + realApiContext2;
 			log.debug("获取服务器地址信息: {}", result);
 			return result;
 		}
