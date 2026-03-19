@@ -93,37 +93,37 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-geotools-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-spring-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-spring-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-openapi-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-openapi-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-common-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-common-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
 
-    </dependencies>
+<!--    </dependencies>-->
 
     <build>
         <plugins>
