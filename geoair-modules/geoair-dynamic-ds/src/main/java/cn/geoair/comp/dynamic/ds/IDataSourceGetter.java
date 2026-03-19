@@ -33,6 +33,8 @@ public interface IDataSourceGetter {
 
 	String getSchemaName();
 
+	void setSchemaName(String schemaName);
+
 	String getDataSourceId();
 
 	/**

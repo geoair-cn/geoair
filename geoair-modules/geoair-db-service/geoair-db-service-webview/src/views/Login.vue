@@ -52,6 +52,21 @@
         </el-form-item>
 
         <!-- 登录按钮 -->
+        <!-- 密码输入框 -->
+        <el-form-item prop="password">
+          <div class="input-wrapper">
+            <el-input
+                v-model="loginForm.password"
+                type="password"
+                placeholder="请输入密码"
+                prefix-icon="el-icon-lock"
+                clearable
+                show-password
+                class="custom-input"
+                @keyup.enter="handleLogin"
+            ></el-input>
+          </div>
+        </el-form-item>
         <el-form-item class="login-btn-group">
           <el-button
               type="primary"

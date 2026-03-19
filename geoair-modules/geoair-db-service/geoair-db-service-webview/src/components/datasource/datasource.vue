@@ -32,10 +32,11 @@
       <el-table-column prop="updateTime" :label="$t('m.update_time')" width="170px"></el-table-column>
       <el-table-column :label="$t('m.operation')" width="220px">
         <template slot-scope="scope">
-
-          <!-- <el-button plain size="mini" type="info" @click="detail(scope.row.id)" circle>
+          <el-tooltip placement="top" effect="dark" :content="$t('m.tool')">
+          <el-button plain size="mini" type="info"  @click="detail(scope.row.id)" circle>
             <i class="iconfont icon-detail"></i>
-          </el-button> -->
+          </el-button>
+          </el-tooltip>
           <el-tooltip placement="top" effect="dark" :content="$t('m.edit')">
             <el-button plain size="mini" type="warning" @click="handleEdit(scope.row.id)" circle>
               <i class="el-icon-edit"></i>

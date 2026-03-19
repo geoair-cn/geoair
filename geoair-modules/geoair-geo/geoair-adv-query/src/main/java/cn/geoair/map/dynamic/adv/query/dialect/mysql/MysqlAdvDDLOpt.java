@@ -1,13 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
+import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -397,11 +399,55 @@ public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
 		String actualSchema = ObjectUtil.isEmpty(schemaName) ? dataSourceGetter.getSchemaName() : schemaName;
 		String sql = StrUtil.format("SELECT table_name FROM information_schema.tables "
 				+ "WHERE table_type = 'BASE TABLE' AND table_schema = '{}' ORDER BY table_name", actualSchema);
-
 		List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
 		List<String> tables = new ArrayList<>();
 		rows.forEach(row -> tables.add(row.getStr("table_name")));
 		return tables;
+	}
+
+	@Override
+	public List<String> dGetTablesBySchema() {
+		return dGetTablesBySchema(null);
+	}
+
+	@Override
+	public List<SchemaTableApo> dGetTableAndViewBySchema(String schemaName) {
+		String actualSchema = ObjectUtil.isEmpty(schemaName) ? dataSourceGetter.getSchemaName() : schemaName;
+		String sql;
+		String fields = "table_type,table_name,table_catalog,table_schema";
+		if (StrUtil.isEmpty(actualSchema)) {
+			sql = "SELECT " + fields + " FROM information_schema.tables "
+					+ "ORDER BY table_name";
+		} else {
+			sql = StrUtil.format(
+					"SELECT " + fields + " FROM information_schema.tables "
+							+ "WHERE   table_schema = '{}' ORDER BY table_name",
+					actualSchema);
+		}
+		List<SchemaTableApo> result = new ArrayList<>();
+		List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
+
+		rows.forEach(row -> {
+			SchemaTableApo schemaTableApo = new SchemaTableApo();
+			schemaTableApo.setDatabaseName(row.getStr("TABLE_SCHEMA"));
+			schemaTableApo.setSchema(row.getStr("TABLE_SCHEMA"));
+			schemaTableApo.setName(row.getStr("TABLE_NAME"));
+			String tableType = row.getStr("TABLE_TYPE");
+			if (tableType.equals("BASE TABLE")) {
+				schemaTableApo.setType(AdvSchemaTableTypeOpt.表);
+			} else if (tableType.equals("VIEW")) {
+				schemaTableApo.setType(AdvSchemaTableTypeOpt.视图);
+			} else {
+				schemaTableApo.setType(AdvSchemaTableTypeOpt.未知);
+			}
+			result.add(schemaTableApo);
+		});
+		return result;
+	}
+
+	@Override
+	public List<SchemaTableApo> dGetTableAndViewBySchema() {
+		return dGetTableAndViewBySchema(null);
 	}
 
 	@Override
