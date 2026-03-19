@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableSwagger2
-public class SpringFoxApiRunner implements ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
+public class GirSpringFoxApiRunner implements ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
 
 	@Bean
 	@ConditionalOnMissingBean(Reflections.class)

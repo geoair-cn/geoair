@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
 import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
-import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
@@ -28,9 +28,9 @@ import java.util.Map;
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
-public class SpringFoxDocketRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
+public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
-    private static final Logger log = LoggerFactory.getLogger(SpringFoxDocketRunner.class);
+    private static final Logger log = LoggerFactory.getLogger(GirSpringFoxDocketRunner.class);
     private ApplicationContext applicationContext;
 
     private boolean enable;
@@ -49,7 +49,7 @@ public class SpringFoxDocketRunner implements BeanDefinitionRegistryPostProcesso
         }
 
         // 获取所有 GirSwaggerApiConfig 的实现类（支持多个配置）
-        Map<String, GirSwaggerApiConfig> apiConfigMap = applicationContext.getBeansOfType(GirSwaggerApiConfig.class);
+        Map<String, GirOpenApiConfig> apiConfigMap = applicationContext.getBeansOfType(GirOpenApiConfig.class);
 
         if (apiConfigMap.isEmpty()) {
 
@@ -61,9 +61,9 @@ public class SpringFoxDocketRunner implements BeanDefinitionRegistryPostProcesso
         }
 
         // 遍历每个配置，注册对应的Docket
-        for (Map.Entry<String, GirSwaggerApiConfig> entry : apiConfigMap.entrySet()) {
+        for (Map.Entry<String, GirOpenApiConfig> entry : apiConfigMap.entrySet()) {
             String configBeanName = entry.getKey();
-            GirSwaggerApiConfig apiConfig = entry.getValue();
+            GirOpenApiConfig apiConfig = entry.getValue();
 
             // System.out.println("【SpringFox】开始处理配置: " + configBeanName);
             registerDocketsFromConfig(apiConfig, registry);
@@ -73,8 +73,9 @@ public class SpringFoxDocketRunner implements BeanDefinitionRegistryPostProcesso
     /**
      * 从单个配置中注册所有Docket
      */
-    private void registerDocketsFromConfig(GirSwaggerApiConfig apiConfig, BeanDefinitionRegistry registry) {
+    private void registerDocketsFromConfig(GirOpenApiConfig apiConfig, BeanDefinitionRegistry registry) {
         // 获取DocketInfo列表
+        apiConfig.doLoading();
         List<DocketInfo> docketInfos = apiConfig.getDocketInfos();
         if (docketInfos == null || docketInfos.isEmpty()) {
             log.debug("【SpringFox】未配置任何DocketInfo，跳过Docket注册");
@@ -93,6 +94,7 @@ public class SpringFoxDocketRunner implements BeanDefinitionRegistryPostProcesso
         for (DocketInfo docketInfo : docketInfos) {
             registerSingleDocket(apiModelInfo, docketInfo, registry);
         }
+        apiConfig.loadEnd();
     }
 
     /**
