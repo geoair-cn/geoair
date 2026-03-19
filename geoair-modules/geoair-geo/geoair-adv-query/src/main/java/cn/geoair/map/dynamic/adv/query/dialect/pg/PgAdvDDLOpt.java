@@ -29,12 +29,14 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
 
     public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         super(dataSourceGetter);
-        baseOpt = new PgAdvBaseOpt(dataSourceGetter);
     }
 
     // ========== 初始化差异化组件 ==========
     @Override
     protected AbstractAdvBaseOpt getAdvBaseOpt() {
+        if (baseOpt == null) {
+            baseOpt = new PgAdvBaseOpt(dataSourceGetter);
+        }
         return baseOpt;
     }
 
@@ -80,7 +82,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
             sql += StrUtil.format(" AND table_schema = {}", "current_schema()");
         }
 
-        GirAdvOneRow row = baseOpt.bSelectOne(sql);
+        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
 
@@ -124,7 +126,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
             sqlBuilder.append("AND c.\"table_schema\" = '").append(schemaName).append("' ");
         }
 
-        List<FieldBySchemaApo> fields = baseOpt.bSelectObjList(sqlBuilder.toString(), FieldBySchemaApo.class);
+        List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sqlBuilder.toString(), FieldBySchemaApo.class);
         fields.forEach(f -> f.setOriginalColumnName(f.getColumnName()));
 
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
@@ -198,7 +200,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
             sql += StrUtil.format(" AND tco.table_schema = '{}'", dataSourceGetter.getSchemaName());
         }
 
-        List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> pks = new ArrayList<>();
         rows.forEach(row -> pks.add(row.getStr("column_name")));
         return pks;
@@ -210,7 +212,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
                 "SELECT constraint_name FROM information_schema.table_constraints "
                         + "WHERE table_name = '{}' AND constraint_type = '{}' AND constraint_name = '{}'",
                 tableName, constraintType, constraintName);
-        return ObjectUtil.isNotEmpty(baseOpt.bSelectList(sql));
+        return ObjectUtil.isNotEmpty(getAdvBaseOpt().bSelectList(sql));
     }
 
     @Override
@@ -354,7 +356,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
         String sql = StrUtil.format(" SELECT * FROM pg_indexes WHERE tablename = '{}' {}", tableName,
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName()) ? ""
                         : StrUtil.format("AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
-        return baseOpt.bSelectObjList(sql, IndexApo.class);
+        return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
 
     @Override
@@ -366,15 +368,22 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
     @Override
     public String dGetCurrentSchema() {
         String sql = "SELECT current_schema()  as schema  ";
-        GirAdvOneRow girAdvOneRow = baseOpt.bSelectOne(sql);
+        GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         return girAdvOneRow.getStr("schema");
+    }
+
+    @Override
+    public String dGetCurrentDataBase() {
+        String sql = "SELECT current_database() AS database_name ";
+        GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
+        return girAdvOneRow.getStr("database_name");
     }
 
     // ========== Schema/模式差异化实现 ==========
     @Override
     public List<String> dGetAllSchemas() {
         String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ORDER BY schema_name";
-        List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> schemas = new ArrayList<>();
         rows.forEach(row -> schemas.add(row.getStr("schema_name")));
         return schemas;
@@ -383,7 +392,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
     @Override
     public String dGetTableComment(String tableName) {
         String sql = StrUtil.format("SELECT obj_description('{}'::regclass)", tableName);
-        GirAdvOneRow girAdvOneRow = baseOpt.bSelectOne(sql);
+        GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         return girAdvOneRow == null ? "" : girAdvOneRow.getStr("obj_description");
     }
 
@@ -403,7 +412,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
                     actualSchema);
         }
 
-        List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> tables = new ArrayList<>();
         rows.forEach(row -> tables.add(row.getStr("table_name")));
         return tables;
@@ -430,7 +439,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
                     actualSchema);
         }
         List<SchemaTableApo> result = new ArrayList<>();
-        List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
 
         rows.forEach(row -> {
             SchemaTableApo schemaTableApo = new SchemaTableApo();
@@ -459,7 +468,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
     protected boolean checkSchemaExists(String schemaName) {
         String sql = StrUtil.format("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{}'",
                 schemaName);
-        return ObjectUtil.isNotEmpty(baseOpt.bSelectList(sql));
+        return ObjectUtil.isNotEmpty(getAdvBaseOpt().bSelectList(sql));
     }
 
     @Override
@@ -480,7 +489,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
         }
         String schemaTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = StrUtil.format("SELECT pg_total_relation_size('{}') AS table_size;", schemaTableName);
-        GirAdvOneRow row = baseOpt.bSelectOne(sql);
+        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row.getLong("table_size");
     }
 
@@ -542,7 +551,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
             sql += StrUtil.format(" AND specific_schema = {}", "current_schema()");
         }
 
-        GirAdvOneRow row = baseOpt.bSelectOne(sql);
+        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
 

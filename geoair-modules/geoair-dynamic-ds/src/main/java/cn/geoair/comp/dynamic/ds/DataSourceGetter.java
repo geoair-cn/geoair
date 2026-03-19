@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Supplier;
 
 /**
  * @author ：zhangjun
@@ -23,9 +24,13 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     private DataSource dataSource = null;
 
-//	protected DataStore dataStore = null;
+    private String databaseName = null;
+
 
     protected String schemaName = null;
+
+    Supplier<String> schemaNameGetterFunction;
+    Supplier<String> databaseNameGetterFunction;
 
     protected String dataSourceId = null;
 
@@ -35,8 +40,30 @@ public class DataSourceGetter implements IDataSourceGetter {
     }
 
     @Override
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+
+    @Override
+    public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
+        this.schemaNameGetterFunction = schemaNameGetterFunction;
+        if (schemaName != null) {
+            return;
+        }
+        if (schemaNameGetterFunction != null) {
+            schemaName = schemaNameGetterFunction.get();
+        }
+    }
+
+    public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
+        this.databaseNameGetterFunction = databaseNameGetterFunction;
+        if (databaseName != null) {
+            return;
+        }
+        if (databaseNameGetterFunction != null) {
+            databaseName = databaseNameGetterFunction.get();
+        }
     }
 
     @Override
@@ -50,7 +77,8 @@ public class DataSourceGetter implements IDataSourceGetter {
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {
         this.dataSourceApo = dataSourceApo;
         this.dataSourceId = dataSourceApo.getId();
-//		schemaName = dataSourceApo.getSchemaName();
+        schemaName = dataSourceApo.getSchemaName();
+        databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
             dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
         } else {
@@ -63,7 +91,6 @@ public class DataSourceGetter implements IDataSourceGetter {
     public void initByDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         this.dataSourceId = "";
-//		this.schemaName = "";
         this.dataSourceApo = null;
     }
 

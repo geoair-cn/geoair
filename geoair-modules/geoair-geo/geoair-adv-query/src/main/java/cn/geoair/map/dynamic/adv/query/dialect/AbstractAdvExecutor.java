@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 数据库的动态高级查询执行器
@@ -115,9 +116,19 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
         return getDataSourceGetterPxy().getSchemaName();
     }
     @Override
-    public void setSchemaName(String schemaName){
-        this.getDataSourceGetterPxy().setSchemaName(schemaName);
+    public String getDatabaseName() {
+        return getDataSourceGetterPxy().getDatabaseName();
     }
+
+    @Override
+    public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
+        this.getDataSourceGetterPxy().setDatabaseNameGetterFunction(databaseNameGetterFunction);
+    }
+    @Override
+    public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
+        this.getDataSourceGetterPxy().setSchemaNameGetterFunction(schemaNameGetterFunction);
+    }
+
     @Override
     public String getDataSourceId() {
         return getDataSourceGetterPxy().getDataSourceId();
@@ -450,7 +461,10 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public String dGetCurrentSchema() {
         return advDDLOptPxy.dGetCurrentSchema();
     }
-
+    @Override
+    public String dGetCurrentDataBase() {
+        return advDDLOptPxy.dGetCurrentDataBase();
+    }
     @Override
     public List<String> dGetAllSchemas() {
         return advDDLOptPxy.dGetAllSchemas();

@@ -39,7 +39,8 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     public AbstractAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
-        this.dataSourceGetter.setSchemaName(dGetCurrentSchema());
+        this.dataSourceGetter.setSchemaNameGetterFunction(this::dGetCurrentSchema);
+        this.dataSourceGetter.setDatabaseNameGetterFunction(this::dGetCurrentDataBase);
     }
 
     /**

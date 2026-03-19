@@ -55,6 +55,12 @@ public interface IAdvDDLOpt {
      * @return 模式名称
      */
     String dGetCurrentSchema();
+    /**
+     * 获取当前数据库名称
+     *
+     * @return 数据库名称
+     */
+    String dGetCurrentDataBase();
 
     /**
      * 查询所有数据库模式（schema）

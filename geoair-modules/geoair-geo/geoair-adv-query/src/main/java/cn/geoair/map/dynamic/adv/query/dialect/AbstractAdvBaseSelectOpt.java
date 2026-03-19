@@ -385,12 +385,12 @@ public abstract class AbstractAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
 	/** 统一打印SQL执行日志（无参数） */
 	protected void logExecuteSql(String methodName, String sql) {
-		log.debug("schema:[{}] db:[{}] {}执行的SQL为：{}", getSchemaName(), getDataSourceId(), methodName, sql);
+		log.debug("schema:[{}] db:[{}] {}执行的SQL为：{}", getSchemaName(), getDatabaseName(), methodName, sql);
 	}
 
 	/** 统一打印带参数的SQL执行日志 */
 	protected void logExecuteSql(String methodName, String sql, SqlParamMap sqlParam) {
-		log.debug("schema:[{}] db:[{}] {}执行的SQL为：{}，参数：{}", getSchemaName(), getDataSourceId(), methodName, sql,
+		log.debug("schema:[{}] db:[{}] {}执行的SQL为：{}，参数：{}", getSchemaName(), getDatabaseName(), methodName, sql,
 				sqlParam);
 	}
 
@@ -402,6 +402,10 @@ public abstract class AbstractAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 	/** 获取数据源ID（通用封装） */
 	protected String getDataSourceId() {
 		return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
+	}
+	/** 获取数据库名称（通用封装） */
+	protected String getDatabaseName() {
+		return dataSourceGetter != null ? dataSourceGetter.getDatabaseName() : "";
 	}
 
 	/** 关闭连接（通用封装） */
