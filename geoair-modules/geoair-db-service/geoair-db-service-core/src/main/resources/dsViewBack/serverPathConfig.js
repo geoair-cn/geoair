@@ -1,5 +1,5 @@
 // serverPathConfig.js
-const _basePath = "http://127.0.0.1:39222/demo";
+const _basePath = "http://127.0.0.1:19296/map-editor-v1";
 window.Config = {
     baseUrl: _basePath,
     loginPage: ""
