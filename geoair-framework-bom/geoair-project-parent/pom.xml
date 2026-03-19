@@ -110,55 +110,55 @@
 
 
     <dependencies>
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-geotools-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-spring-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-spring-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-common-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-common-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-openapi-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-openapi-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-standard</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-standard</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-modules</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-modules</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-geo</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-geo</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
     </dependencies>
 
