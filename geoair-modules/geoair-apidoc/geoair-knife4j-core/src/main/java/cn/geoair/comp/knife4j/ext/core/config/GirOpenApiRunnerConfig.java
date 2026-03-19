@@ -48,8 +48,7 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
         }
         Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         Gir.log.info("接口文档地址：" + path + "{} 启用状态：{}", port, "/doc.html",
-                // girSwaggerProperties.isEnable());
-                property);
+                "true".equals(property));
         Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 
