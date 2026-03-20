@@ -270,12 +270,12 @@ export default {
         return false
       }
 
-      // 路径校验：必须包含英文字符和下划线
-      const pathRegex = /^[a-zA-Z_]+$/;
-      if (!pathRegex.test(this.detail.path)) {
-        this.$message.warning("API path 必须是英文与下划线的组合!");
-        return false;
-      }
+      // // 路径校验：必须包含英文字符和下划线
+      // const pathRegex = /^[a-zA-Z_]+$/;
+      // if (!pathRegex.test(this.detail.path)) {
+      //   this.$message.warning("API path 必须是英文与下划线的组合!");
+      //   return false;
+      // }
 
       if (this.isNull(this.detail.groupId)) {
         this.$message.warning("API group empty!")

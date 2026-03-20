@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * @author ：张俊
  * @date ：Created in 2026/3/19 18:59
- * @description： 启用JTS自动注册
+ * @description： 用于以后拓展注册器
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
