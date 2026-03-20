@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
     <description>用于工程模块的依赖定义</description>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -35,9 +35,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -60,14 +60,14 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base-parent</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
-    </dependencies>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-base-parent</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
+<!--    </dependencies>-->
 
     <modules>
         <module>geoair-api-parent</module>

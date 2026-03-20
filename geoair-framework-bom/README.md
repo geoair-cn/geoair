@@ -79,7 +79,7 @@ Apache License 2.0
 
 ## 项目地址
 
-- **Gitee**：https://gitee.com/geoair/geoair
+- **Gitee**：https://github.com/geoair-cn/geoair
 
 ## 版本信息
 

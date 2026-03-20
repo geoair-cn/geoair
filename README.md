@@ -138,7 +138,7 @@ GeoAir Framework 是一个  **企业级 Java 开发框架**,提供从基础依�
 - **邮箱**: 1159856928@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
-- **Gitee**: https://gitee.com/geoair/geoair
+- **Gitee**: https://github.com/geoair-cn/geoair
 
 ## 许可证
 

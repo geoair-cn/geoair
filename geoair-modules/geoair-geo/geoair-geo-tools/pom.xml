@@ -30,7 +30,7 @@
 
     <description>geoair空间处理相关的工具类集合</description>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -49,9 +49,9 @@
     </developers>
 
     <scm>
-        <connection>https://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>https://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
     </scm>
 
 

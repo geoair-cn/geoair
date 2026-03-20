@@ -93,7 +93,7 @@
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
     </properties>
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -112,9 +112,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -252,7 +252,7 @@
                     <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
                     <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
                     <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
-                    <!--                    <scmUrl>scm:git:git://gitee.com/geoair/geoair.git</scmUrl>-->
+                    <!--                    <scmUrl>scm:git://github.com/geoair-cn/geoair.git</scmUrl>-->
 
                 </configuration>
             </plugin>

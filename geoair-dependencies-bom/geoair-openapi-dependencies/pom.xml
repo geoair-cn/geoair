@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
     <description>geoair swagger 相关的基础依赖声明</description>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
     <properties>
         <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
         <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
@@ -46,9 +46,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 

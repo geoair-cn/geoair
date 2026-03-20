@@ -15,7 +15,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -211,15 +210,7 @@ public class DsApiConfigService {
 	}
 
 	public List<ApiConfigApo> search(String name, String note, String path, String groupId) {
-		if (StringUtils.isNoneBlank(name)) {
-			name = "%" + name + "%";
-		}
-		if (StringUtils.isNoneBlank(note)) {
-			note = "%" + note + "%";
-		}
-		if (StringUtils.isNoneBlank(path)) {
-			path = "%" + path + "%";
-		}
+
 		return girDsApiConfigDao.search(name, note, path, groupId);
 	}
 

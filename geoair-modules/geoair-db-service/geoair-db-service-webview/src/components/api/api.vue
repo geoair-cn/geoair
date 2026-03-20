@@ -42,7 +42,7 @@
                 <span class="el-icon-download" @click="dialogVisible3=true">{{ $t('m.export_api') }}</span>
               </el-dropdown-item>
               <el-dropdown-item command="item">
-                <el-upload action="/apiConfig/import" accept=".json" :on-success="importSuccess" :headers="headers"
+                <el-upload :action="getUploadUrl()" accept=".json" :on-success="importSuccess" :headers="headers"
                            :on-error="importFail" :file-list="fileList">
                   <span class="el-icon-upload2">{{ $t('m.import_api') }}</span>
                 </el-upload>
@@ -52,7 +52,7 @@
               </el-dropdown-item>
 
               <el-dropdown-item command="item">
-                <el-upload action="/apiConfig/importGroup" accept=".json" :on-success="importGroupSuccess"
+                <el-upload :action="getUploadGroupUrl()" accept=".json" :on-success="importGroupSuccess"
                            :headers="headers" :on-error="importFail" :file-list="groupFile">
                   <span class="iconfont icon-group">{{ $t('m.import_api_groups') }}</span>
                 </el-upload>
@@ -231,6 +231,14 @@ export default {
             // this.$message.error("查询所有api失败")
           });
     },
+
+    getUploadUrl() {
+      return window.Config.baseUrl + "/ds_api/apiConfig/import";
+    },
+    getUploadGroupUrl() {
+      return window.Config.baseUrl + "/ds_api/apiConfig/importGroup";
+    },
+
     importSuccess(response, file, fileList) {
       this.fileList = [];
       this.$message.success("Import Success");

@@ -12,7 +12,7 @@
           </el-button>
         </li>
         <li>
-          <el-upload action="/datasource/import" accept=".json" :on-success="importSuccess" :headers="headers"
+          <el-upload :action="getUploadUrl()" accept=".json" :on-success="importSuccess" :headers="headers"
                      :on-error="importFail" :file-list="fileList">
             <el-button type="warning" icon="el-icon-upload2" round size="mini" plain>{{ $t('m.import_ds') }}</el-button>
           </el-upload>
@@ -99,6 +99,9 @@ export default {
             this.$message.error("Export Failed");
             console.error(error);
           });
+    },
+    getUploadUrl() {
+      return window.Config.baseUrl+ "/ds_api/datasource/import";
     },
     importSuccess(response, file, fileList) {
       this.fileList = [];

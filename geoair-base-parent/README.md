@@ -1,7 +1,7 @@
 # GeoAir Base Parent
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://gitee.com/geoair/geoair)
+[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://github.com/geoair-cn/geoair)
 [![JDK](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/downloads/#java8)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
@@ -294,14 +294,14 @@ geoair-framework (根 POM)
 - **Maven 依赖管理官方文档**: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html
 - **Spring Boot BOM 使用指南**: https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using.build-systems.dependency-management
 - **Maven Release 插件文档**: https://maven.apache.org/maven-release/maven-release-plugin/
-- **GeoAir Framework 源码**: https://gitee.com/geoair/geoair
+- **GeoAir Framework 源码**: https://github.com/geoair-cn/geoair
 
 ## 👥 开发者信息
 - **作者**: 张逢吉
 - **邮箱**: 1159856928@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
-- **Gitee 仓库**: https://gitee.com/geoair/geoair
+- **Gitee 仓库**: https://github.com/geoair-cn/geoair
 
 ## 📄 许可证
 本项目采用 **Apache License 2.0** 开源许可证。详情请参见 [LICENSE](LICENSE) 文件。
