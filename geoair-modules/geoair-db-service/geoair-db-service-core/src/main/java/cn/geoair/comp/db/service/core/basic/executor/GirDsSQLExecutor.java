@@ -14,7 +14,7 @@ import cn.geoair.comp.db.service.core.basic.util.SqlEngineUtil;
 import cn.geoair.comp.db.service.core.dialect.BaseDialect;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 

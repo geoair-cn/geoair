@@ -149,10 +149,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson1x.version}</version>
-            <optional>true</optional>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.locationtech.jts</groupId>

@@ -10,7 +10,7 @@ import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import cn.hutool.core.io.IoUtil;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 
 import lombok.extern.slf4j.Slf4j;
 

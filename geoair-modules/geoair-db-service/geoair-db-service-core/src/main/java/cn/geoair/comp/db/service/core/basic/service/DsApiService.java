@@ -2,9 +2,9 @@ package cn.geoair.comp.db.service.core.basic.service;
 
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 

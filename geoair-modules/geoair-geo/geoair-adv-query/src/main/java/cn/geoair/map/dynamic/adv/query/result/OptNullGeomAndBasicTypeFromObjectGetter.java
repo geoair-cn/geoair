@@ -9,8 +9,8 @@ import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 
 import org.locationtech.jts.geom.*;
 import org.postgresql.util.PGobject;

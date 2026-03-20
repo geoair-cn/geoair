@@ -24,7 +24,7 @@
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
-        <fastjson.version>2.0.43</fastjson.version>
+        <fastjson.version>2.0.61</fastjson.version>
         <dom4j.version>1.6.1</dom4j.version>
         <net.postgis.version>2025.1.1</net.postgis.version>
         <org.postgis.version>1.3.3</org.postgis.version>

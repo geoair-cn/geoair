@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.executor;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import java.util.Map;
 
