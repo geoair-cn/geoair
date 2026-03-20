@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.starter.openapi;
 
-import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.hutool.core.collection.ListUtil;
@@ -14,7 +14,7 @@ import java.util.List;
  * @description： 注入api文档的自动装配
  */
 @Component
-public class GirDbServiceApiConfig implements GirSwaggerApiConfig {
+public class GirDbServiceApiConfig extends GirOpenApiConfig {
     @Override
     public List<DocketInfo> getDocketInfos() {
         return ListUtil.of(new DocketInfo("GirDbServiceApi", "cn.geoair.comp.db.service.core"));

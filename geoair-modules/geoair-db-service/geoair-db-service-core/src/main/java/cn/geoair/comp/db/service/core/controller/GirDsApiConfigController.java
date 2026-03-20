@@ -2,8 +2,7 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.comp.db.service.core.basic.util.*;
-import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
@@ -11,31 +10,29 @@ import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
 import cn.geoair.comp.db.service.core.basic.service.DsApiConfigService;
 import cn.geoair.comp.db.service.core.basic.service.DsDataSourceService;
 import cn.geoair.comp.db.service.core.basic.service.DsGroupService;
+import cn.geoair.comp.db.service.core.basic.util.*;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
+import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
-
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.druid.pool.DruidPooledConnection;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @program: dbApi
@@ -61,13 +58,15 @@ public class GirDsApiConfigController {
 	@Autowired
 	DsGroupService dsGroupService;
 
-	@Value("${server.servlet.context-path:}")
-	String apiContext;
+
 
 	@PostMapping("/context")
-	@GaApiAction(text = "获取上下文")
 	public String getContext() {
-		String s = StrUtil.replaceFirst(apiContext, "/", "");
+		String property = SpringUtil.getProperty("server.servlet.context-path");
+		if (GutilObject.isEmpty(property)) {
+			property = "";
+		}
+		String s = StrUtil.replaceFirst(property, "/", "");
 		return s;
 	}
 

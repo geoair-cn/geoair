@@ -20,7 +20,7 @@
 
     <description>geoair-knife4j-springdoc-spring-boot-starter</description>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -39,9 +39,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -121,6 +121,11 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>${reflections.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

@@ -7,7 +7,7 @@ import cn.geoair.base.gpa.entity.GiCrudEntity;
 import cn.geoair.base.gpa.id.GiEntityIdGenerator;
 import cn.hutool.core.bean.BeanUtil;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;

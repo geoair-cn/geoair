@@ -24,7 +24,7 @@
         <resource.delimiter>@</resource.delimiter>
         <skipTests>true</skipTests>
     </properties>
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -43,9 +43,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
     <!--
@@ -75,48 +75,14 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-project-parent</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
 
     </dependencies>
 
     <build>
-
         <pluginManagement>
 
             <plugins>
 
-                <!--
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-source-plugin</artifactId>
-                  <version>${maven-source-plugin.version}</version>
-                  <configuration>
-                        <attach>true</attach>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                    <configuration>
-                        <parameters>true</parameters>
-                    </configuration>
-                </plugin>
-                -->
                 <plugin>
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-maven-plugin</artifactId>
@@ -350,7 +316,7 @@
             </build>
         </profile>
         <profile>
-            <id>javaformat</id>
+            <id>java-code-format</id>
             <build>
                 <plugins>
                     <plugin>

@@ -12,7 +12,7 @@
           </el-button>
         </li>
         <li>
-          <el-upload action="/datasource/import" accept=".json" :on-success="importSuccess" :headers="headers"
+          <el-upload :action="getUploadUrl()" accept=".json" :on-success="importSuccess" :headers="headers"
                      :on-error="importFail" :file-list="fileList">
             <el-button type="warning" icon="el-icon-upload2" round size="mini" plain>{{ $t('m.import_ds') }}</el-button>
           </el-upload>
@@ -32,10 +32,11 @@
       <el-table-column prop="updateTime" :label="$t('m.update_time')" width="170px"></el-table-column>
       <el-table-column :label="$t('m.operation')" width="220px">
         <template slot-scope="scope">
-
-          <!-- <el-button plain size="mini" type="info" @click="detail(scope.row.id)" circle>
+          <el-tooltip placement="top" effect="dark" :content="$t('m.tool')">
+          <el-button plain size="mini" type="info"  @click="detail(scope.row.id)" circle>
             <i class="iconfont icon-detail"></i>
-          </el-button> -->
+          </el-button>
+          </el-tooltip>
           <el-tooltip placement="top" effect="dark" :content="$t('m.edit')">
             <el-button plain size="mini" type="warning" @click="handleEdit(scope.row.id)" circle>
               <i class="el-icon-edit"></i>
@@ -98,6 +99,9 @@ export default {
             this.$message.error("Export Failed");
             console.error(error);
           });
+    },
+    getUploadUrl() {
+      return window.Config.baseUrl+ "/ds_api/datasource/import";
     },
     importSuccess(response, file, fileList) {
       this.fileList = [];

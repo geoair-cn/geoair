@@ -25,7 +25,7 @@ import java.util.List;
  */
 @Configuration
 @ConditionalOnClass(WebMvcEndpointHandlerMapping.class)
-public class SwaggerSpring6Compatible {
+public class GirSwaggerSpring6Compatible {
 
 	/** 增加如下配置可解决Spring Boot 6.x 与Swagger 3.0.0 不兼容问题 */
 	@Bean

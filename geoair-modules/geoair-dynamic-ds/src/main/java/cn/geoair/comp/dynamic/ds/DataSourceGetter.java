@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Supplier;
 
 /**
  * @author ：zhangjun
@@ -19,98 +20,128 @@ import java.sql.Statement;
  */
 public class DataSourceGetter implements IDataSourceGetter {
 
-	private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLogger.getLoger();
 
-	private DataSource dataSource = null;
+    private DataSource dataSource = null;
 
-//	protected DataStore dataStore = null;
+    private String databaseName = null;
 
-	protected String schemaName = null;
 
-	protected String dataSourceId = null;
+    protected String schemaName = null;
 
-	@Override
-	public String getSchemaName() {
-		return schemaName;
-	}
+    Supplier<String> schemaNameGetterFunction;
+    Supplier<String> databaseNameGetterFunction;
 
-	@Override
-	public String getDataSourceId() {
-		return dataSourceId;
-	}
+    protected String dataSourceId = null;
 
-	protected DataSourceApo dataSourceApo = null;
+    @Override
+    public String getSchemaName() {
+        return schemaName;
+    }
 
-	@Override
-	public void initByDataSourceApo(DataSourceApo dataSourceApo) {
-		this.dataSourceApo = dataSourceApo;
-		this.dataSourceId = dataSourceApo.getId();
-		schemaName = dataSourceApo.getSchemaName();
-		if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
-			dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
-		}
-		else {
-			dataSource = AdvDynamicDataSourceStorage.getInstance().getDruidDataSourceByDataSourceApo(dataSourceApo);
-		}
-	}
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
 
-	@Override
-	public void initByDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.dataSourceId = "";
-		this.schemaName = "";
-		this.dataSourceApo = null;
-	}
 
-	@Override
-	public void initByConnection(Connection connection) {
-		AdvSimpleDataSource simpleDataSource = new AdvSimpleDataSource(connection);
-		initByDataSource(simpleDataSource);
-	}
+    @Override
+    public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
+        this.schemaNameGetterFunction = schemaNameGetterFunction;
+        if (schemaName != null) {
+            return;
+        }
+        if (schemaNameGetterFunction != null) {
+            schemaName = schemaNameGetterFunction.get();
+        }
+    }
 
-	@Override
-	public Connection getConnection() {
-		try {
-			return dataSource.getConnection();
-		}
-		catch (SQLException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
+        this.databaseNameGetterFunction = databaseNameGetterFunction;
+        if (databaseName != null) {
+            return;
+        }
+        if (databaseNameGetterFunction != null) {
+            databaseName = databaseNameGetterFunction.get();
+        }
+    }
 
-	@Override
-	public DataSource getDataSource() {
-		return dataSource;
-	}
+    @Override
+    public String getDataSourceId() {
+        return dataSourceId;
+    }
+
+    protected DataSourceApo dataSourceApo = null;
+
+    @Override
+    public void initByDataSourceApo(DataSourceApo dataSourceApo) {
+        this.dataSourceApo = dataSourceApo;
+        this.dataSourceId = dataSourceApo.getId();
+        schemaName = dataSourceApo.getSchemaName();
+        databaseName = dataSourceApo.getDbName();
+        if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
+            dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
+        } else {
+            dataSource = AdvDynamicDataSourceStorage.getInstance().getDruidDataSourceByDataSourceApo(dataSourceApo);
+
+        }
+    }
+
+    @Override
+    public void initByDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.dataSourceId = "";
+        this.dataSourceApo = null;
+    }
+
+    @Override
+    public void initByConnection(Connection connection) {
+        AdvSimpleDataSource simpleDataSource = new AdvSimpleDataSource(connection);
+        initByDataSource(simpleDataSource);
+    }
+
+    @Override
+    public Connection getConnection() {
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return dataSource;
+    }
 
 //	@Override
 //	public DataStore getGeoToolsDataStore() {
 //		return dataStore;
 //	}
 
-	@Override
-	public void connectionClose(Connection connection) {
-		IoUtil.close(connection);
-	}
+    @Override
+    public void connectionClose(Connection connection) {
+        IoUtil.close(connection);
+    }
 
-	@Override
-	public DataSourceApo getDataSourceApo() {
-		if (dataSourceApo == null) {
-			return null;
-		}
-		DataSourceApo apo = new DataSourceApo();
-		BeanUtil.copyProperties(dataSourceApo, apo);
-		return apo;
-	}
+    @Override
+    public DataSourceApo getDataSourceApo() {
+        if (dataSourceApo == null) {
+            return null;
+        }
+        DataSourceApo apo = new DataSourceApo();
+        BeanUtil.copyProperties(dataSourceApo, apo);
+        return apo;
+    }
 
-	/**
-	 * 关闭数据库资源
-	 */
-	@Override
-	public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
-		IoUtil.close(rs);
-		IoUtil.close(stmt);
-		IoUtil.close(conn);
-	}
+    /**
+     * 关闭数据库资源
+     */
+    @Override
+    public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
+        IoUtil.close(rs);
+        IoUtil.close(stmt);
+        IoUtil.close(conn);
+    }
 
 }

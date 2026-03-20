@@ -14,7 +14,7 @@ import cn.geoair.map.dynamic.mvt.tools.AdvMvtTileUtils;
 import cn.hutool.core.util.StrUtil;
 
 //import geotrellis.vector.Extent;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

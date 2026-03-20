@@ -5,9 +5,9 @@ cn.geoair.comp.knife4j.ext.springfox.aspect.GaApiListingAspect,\
 cn.geoair.comp.knife4j.ext.springfox.builder.GaApiActionOperationBuilder,\
 cn.geoair.comp.knife4j.ext.springfox.builder.GaModelFieldParameterBuilder,\
 cn.geoair.comp.knife4j.ext.springfox.builder.GaExpandedParameterBuilder,\
-cn.geoair.comp.knife4j.ext.springfox.config.SwaggerSpring6Compatible,\
+cn.geoair.comp.knife4j.ext.springfox.config.GirSwaggerSpring6Compatible,\
 cn.geoair.comp.knife4j.ext.springfox.aspect.TypeResolverAspect,\
-cn.geoair.comp.knife4j.ext.springfox.auto.SpringFoxApiRunner,\
-cn.geoair.comp.knife4j.ext.springfox.auto.SpringFoxAutoConfiguration
+cn.geoair.comp.knife4j.ext.springfox.auto.GirSpringFoxApiRunner,\
+cn.geoair.comp.knife4j.ext.springfox.auto.GirSpringFoxAutoConfiguration
 
 

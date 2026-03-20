@@ -1,7 +1,7 @@
 # GeoAir Base Parent
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://gitee.com/geoair/geoair)
+[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://github.com/geoair-cn/geoair)
 [![JDK](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/downloads/#java8)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
@@ -170,7 +170,7 @@ geoair-base-parent
 以下模块直接继承 `geoair-base-parent`，享受统一的依赖和构建配置：
 1. **geoair-standard** - 框架标准库模块
 2. **geoair-modules** - 业务功能组件模块
-3. **geoair-framework-parent** - 工程级依赖管理父 POM
+3. **geoair-framework-bom** - 工程级依赖管理父 POM
 4. **geoair-dependencies-bom** - 基础依赖管理父 POM（间接继承）
 
 ### 完整继承链
@@ -190,7 +190,7 @@ geoair-framework (根 POM)
 │       ├── geoair-geo            # GIS 功能模块
 │       ├── geoair-db-service     # 数据库服务模块
 │       └── ... (其他业务模块)
-└── geoair-framework-parent
+└── geoair-framework-bom
     ├── geoair-api-parent             # API 模块父 POM
     ├── geoair-project-parent         # 项目级父 POM
     └── geoair-spring-boot-starter-parent # Starter 模块父 POM
@@ -294,14 +294,14 @@ geoair-framework (根 POM)
 - **Maven 依赖管理官方文档**: https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html
 - **Spring Boot BOM 使用指南**: https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using.build-systems.dependency-management
 - **Maven Release 插件文档**: https://maven.apache.org/maven-release/maven-release-plugin/
-- **GeoAir Framework 源码**: https://gitee.com/geoair/geoair
+- **GeoAir Framework 源码**: https://github.com/geoair-cn/geoair
 
 ## 👥 开发者信息
 - **作者**: 张逢吉
 - **邮箱**: 1159856928@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
-- **Gitee 仓库**: https://gitee.com/geoair/geoair
+- **Gitee 仓库**: https://github.com/geoair-cn/geoair
 
 ## 📄 许可证
 本项目采用 **Apache License 2.0** 开源许可证。详情请参见 [LICENSE](LICENSE) 文件。

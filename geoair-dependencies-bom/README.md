@@ -1,7 +1,7 @@
 # GeoAir Base Dependencies Parent
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://gitee.com/geoair/geoair)
+[![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://github.com/geoair-cn/geoair)
 
 ## 📚 模块概述
 
@@ -203,7 +203,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 ```
 
 ## 📖 相关资源
-- **GeoAir Framework**: https://gitee.com/geoair/geoair
+- **GeoAir Framework**: https://github.com/geoair-cn/geoair
 - **Spring Boot**: https://spring.io/projects/spring-boot
 - **GeoTools**: https://geotools.org/
 - **Knife4j**: https://doc.xiaominfo.com/

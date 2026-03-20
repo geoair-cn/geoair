@@ -118,7 +118,7 @@ GeoAir Framework 是一个  **Java 开发框架**,提供从基础依赖管理、
 | **连接池** | Druid | 1.2.23 |
 | **API 文档** | SpringDoc / Knife4j | 1.7.0 / 4.4.0 |
 | **Swagger 2** | Springfox / Knife4j | 3.0.0 / 3.0.3 |
-| **JSON 处理** | Jackson / FastJSON2 | 2.13.5 / 2.0.43 |
+| **JSON 处理** | Jackson / FastJSON2 | 2.13.5 / 2.0.61 |
 | **工具库** | Hutool / Lombok | 5.8.42 / 1.18.30 |
 | **前端框架** | Vue.js | - |
 
@@ -138,7 +138,7 @@ GeoAir Framework 是一个  **Java 开发框架**,提供从基础依赖管理、
 - **邮箱**: 1159856928@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
-- **Gitee**: https://gitee.com/geoair/geoair
+- **Gitee**: https://github.com/geoair-cn/geoair
 
 ## 许可证
 

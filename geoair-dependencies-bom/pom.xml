@@ -31,7 +31,7 @@
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
-        <fastjson.version>2.0.43</fastjson.version>
+        <fastjson.version>2.0.61</fastjson.version>
         <dom4j.version>1.6.1</dom4j.version>
 
 
@@ -59,7 +59,7 @@
         <mybatis-spring.version>2.0.7</mybatis-spring.version>
         <pagehelper.version>5.3.2</pagehelper.version>
         <lombok.version>1.18.30</lombok.version>
-        <fastjson1x.version>1.2.83</fastjson1x.version>
+        <fastjson1x.version>2.0.9</fastjson1x.version>
         <jackson.version>2.13.5</jackson.version>
         <gson.version>2.9.1</gson.version>
         <javax-persistence.version>2.2</javax-persistence.version>
@@ -93,7 +93,7 @@
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
     </properties>
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -112,9 +112,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -252,7 +252,7 @@
                     <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
                     <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
                     <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
-                    <!--                    <scmUrl>scm:git:git://gitee.com/geoair/geoair.git</scmUrl>-->
+                    <!--                    <scmUrl>scm:git://github.com/geoair-cn/geoair.git</scmUrl>-->
 
                 </configuration>
             </plugin>
@@ -363,7 +363,7 @@
         </profile>
 
         <profile>
-            <id>javaformat</id>
+            <id>java-code-format</id>
             <build>
                 <plugins>
                     <plugin>

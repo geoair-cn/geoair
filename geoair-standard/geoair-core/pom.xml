@@ -17,7 +17,7 @@
     <description>核心工具包</description>
     <properties>
     </properties>
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -36,9 +36,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
     <dependencies>
@@ -86,6 +86,12 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <dependency>

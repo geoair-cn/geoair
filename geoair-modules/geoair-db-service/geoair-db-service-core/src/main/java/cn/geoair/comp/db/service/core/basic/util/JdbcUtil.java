@@ -2,7 +2,7 @@ package cn.geoair.comp.db.service.core.basic.util;
 
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 

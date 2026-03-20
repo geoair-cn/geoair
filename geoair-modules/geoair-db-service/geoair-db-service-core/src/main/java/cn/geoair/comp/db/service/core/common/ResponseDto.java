@@ -2,9 +2,6 @@ package cn.geoair.comp.db.service.core.common;
 
 import cn.geoair.base.data.result.GiResult;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-
 /**
  * @program: api
  * @description:
@@ -19,7 +16,7 @@ public class ResponseDto<T> implements GiResult<T> {
 
 	boolean success;
 
-	@JSONField(serialzeFeatures = { SerializerFeature.WriteMapNullValue })
+
 	T data;
 
 	public int getCode() {

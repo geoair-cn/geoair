@@ -22,6 +22,7 @@
           :rules="loginRules"
           label-width="0"
           class="login-form"
+          @keyup.enter="handleLogin"
       >
         <!-- 用户名输入框 -->
         <el-form-item prop="username">
@@ -36,6 +37,7 @@
           </div>
         </el-form-item>
 
+
         <!-- 密码输入框 -->
         <el-form-item prop="password">
           <div class="input-wrapper">
@@ -47,11 +49,10 @@
                 clearable
                 show-password
                 class="custom-input"
+                @keyup.enter="handleLogin"
             ></el-input>
           </div>
         </el-form-item>
-
-        <!-- 登录按钮 -->
         <el-form-item class="login-btn-group">
           <el-button
               type="primary"
@@ -144,7 +145,22 @@ export default {
         }
       });
     }
+  },
+  // 新增：页面挂载后，监听全局回车事件（增强方案）
+  mounted() {
+    // 监听全局回车事件，确保在页面任何地方按回车都能触发登录（可选）
+    this.enterHandler = (e) => {
+      if (e.key === 'Enter') {
+        this.handleLogin();
+      }
+    };
+    document.addEventListener('keyup', this.enterHandler);
+  },
+  // 新增：页面销毁前移除全局监听，防止内存泄漏
+  beforeDestroy() {
+    document.removeEventListener('keyup', this.enterHandler);
   }
+
 };
 </script>
 

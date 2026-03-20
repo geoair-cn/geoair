@@ -87,7 +87,16 @@ import {format} from "sql-formatter";
 import LabelTip from "@/components/common/LabelTip.vue";
 import * as dbApi from '@/api/dsApi'
 import {CONTENT_TYPE} from "@/constant";
-
+import {getAllColumnLabels} from "@/api/dsApi";
+function debounce(fn, delay = 300) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
 export default {
   name: "sqlIDE",
   components: {LabelTip},
@@ -103,6 +112,10 @@ export default {
       default: "",
     }
   },
+  created() {
+    // 初始化防抖函数
+    this.queryColumnsDebounced = debounce(this.loadTableColumns, 300);
+  },
   data() {
     return {
       sqlParam: "{}",
@@ -115,6 +128,14 @@ export default {
       CodeMirror: null,
       code: "",//不能null，否则报错
       coder: null,
+      dbMetadata: {
+        tables: [], // 仅存表名列表：["user", "order", "product"]
+        columnsCache: {}, // 字段缓存：{user: ["id", "name"], order: ["order_id"]}
+        loadingTables: false, // 表名加载中
+        loadingColumns: false // 字段加载中
+      },
+      // 防抖后的字段查询方法
+      queryColumnsDebounced: null,
       options: {
         tabSize: 2,
         lineNumbers: true,
@@ -132,7 +153,17 @@ export default {
         hintOptions: {
           completeSingle: false,
           alignWithWord: false,
-          hint: CodeMirror.hint.sql,
+          // hint: CodeMirror.hint.sql,
+          hint: (cm) => {
+            const cur = cm.getCursor();
+            const token = cm.getTokenAt(cur);
+            const inner = CodeMirror.hint.sql(cm, {
+              tables: this.dbMetadata.tablesMap, // 注入表/字段数据
+              defaultTable: "",
+              dialect: "mysql"
+            });
+            return inner;
+          }
         },
       },
       // JSON参数编辑器配置
@@ -158,7 +189,8 @@ export default {
         hintOptions: {
           completeSingle: false
         }
-      }
+      },
+      paramCoder: null
     };
   },
   mounted() {
@@ -174,8 +206,61 @@ export default {
       //
       // }
     });
+    if (this.ds) {
+      this.loadDbMetadata(this.ds);
+    }
   },
   methods: {
+    // 新增：加载数据库表/字段元数据
+    async loadDbMetadata(dsId) {
+      if (!dsId || this.dbMetadata.loadingTables) return;
+
+      try {
+        this.dbMetadata.loadingTables = true;
+        // 接口改为只查表名：返回 ["user", "order", "product"]
+        const res = await dbApi.getAllTables(dsId);
+        if (res.data && Array.isArray(res.data)) {
+          this.dbMetadata.tables = res.data;
+          // 初始化tablesMap（仅表名，无字段）
+          this.dbMetadata.tablesMap = res.data.reduce((map, tableName) => {
+            map[tableName] = []; // 先空数组，后续按需填充
+            return map;
+          }, {});
+          console.log("表名加载完成:", this.dbMetadata.tables);
+        }
+      } catch (e) {
+        console.error("加载表名失败:", e);
+        // this.$message.warning("加载表名提示失败，仅支持SQL关键字提示");
+      } finally {
+        this.dbMetadata.loadingTables = false;
+      }
+    },
+
+    async loadTableColumns(tableName, dsId) {
+      if (!tableName || !dsId || this.dbMetadata.loadingColumns) return;
+
+      // 优先用缓存
+      if (this.dbMetadata.columnsCache[tableName]) {
+        this.dbMetadata.tablesMap[tableName] = this.dbMetadata.columnsCache[tableName];
+        return;
+      }
+
+      try {
+        this.dbMetadata.loadingColumns = true;
+        // 接口改为：根据表名查字段，返回 ["id", "name", "age"]
+        const res = await dbApi.getAllColumnLabels(dsId, tableName);
+        if (res.data && Array.isArray(res.data)) {
+          this.dbMetadata.columnsCache[tableName] = res.data; // 缓存字段
+          this.dbMetadata.tablesMap[tableName] = res.data; // 更新到提示数据源
+          console.log(`表 ${tableName} 字段加载完成:`, res.data);
+        }
+      } catch (e) {
+        console.error(`加载表 ${tableName} 字段失败:`, e);
+      } finally {
+        this.dbMetadata.loadingColumns = false;
+      }
+    },
+
 
     initSqlParam() {
       // 如果detail存在且包含相关参数，则初始化sqlParam
@@ -381,8 +466,7 @@ export default {
     },
     selectTag() {
       this.coder.setValue(this.coder.getValue() +
-          `select *
-           from tableName`)
+          'select * from ${tableName} ' )
     },
     geomAsTextTag() {
       this.coder.setValue(this.coder.getValue() +
@@ -419,22 +503,63 @@ export default {
     },
 
     _initialize() {
-      //
       this.coder = CodeMirror.fromTextArea(
           this.$refs[this.textareaRef],
           this.options
       );
       this.coder.setSize("100%", "400px");
-      // alert(this.value)
       this.coder.setValue(this.value || this.code);
-
       this.coder.on("change", (coder, changeObj) => {
         this.code = coder.getValue();
-        if (/^[a-zA-Z.]/.test(changeObj.text[0])) {
-          this.coder.showHint();
+
+
+        if (changeObj.origin !== "setValue" && /^[a-zA-Z0-9_]/.test(changeObj.text[0])) {
+          setTimeout(() => {
+            if (!coder.state.completionActive) {
+              coder.showHint();
+            }
+          }, 100);
+        }
+
+        // 字段懒加载逻辑保持不变，仅在用户输入"."时触发
+        if (changeObj.text[0] === ".") {
+          const cur = coder.getCursor();
+          const token = coder.getTokenAt({
+            line: cur.line,
+            ch: cur.ch - 1
+          });
+          const tableName = token.string.trim();
+          if (this.dbMetadata.tables.includes(tableName) && !this.dbMetadata.columnsCache[tableName]) {
+            this.queryColumnsDebounced(tableName, this.ds);
+          }
         }
       });
 
+      // 自定义提示逻辑（兼容懒加载）
+      this.options.hintOptions.hint = (cm) => {
+        const cur = cm.getCursor();
+        const token = cm.getTokenAt(cur);
+
+        // 构建动态的tablesMap（已加载字段的表才显示字段）
+        const dynamicTablesMap = {...this.dbMetadata.tablesMap};
+
+        return CodeMirror.hint.sql(cm, {
+          tables: dynamicTablesMap,
+          defaultTable: "",
+          dialect: "mysql"
+        });
+      };
+
+      // 新增：光标移动时也触发提示（可选）
+      this.coder.on("cursorActivity", (coder) => {
+        const token = coder.getTokenAt(coder.getCursor());
+        // 光标在表名/字段位置时触发
+        if (token.type && (token.type.includes("variable") || token.string === ".")) {
+          if (!coder.state.completionActive) {
+            coder.showHint();
+          }
+        }
+      });
     },
   },
   watch: {
@@ -454,6 +579,15 @@ export default {
         this.initSqlParam();
       },
       immediate: true // 确保初始化时也会执行
+    },
+    // 新增：监听数据源变化
+    ds: {
+      handler(newDs) {
+        if (newDs) {
+          this.loadDbMetadata(newDs);
+        }
+      },
+      immediate: true
     }
   }
 };
@@ -473,7 +607,27 @@ export default {
 
 .cm_root {
   color: #A9B7C6;
+  position: relative;
+  /deep/ .CodeMirror-hints {
+    font-size: 14px;
+    line-height: 20px;
+    background: #2B2B2B !important;
+    border: 1px solid #555 !important;
+    color: #A9B7C6 !important;
+  }
 
+  /deep/ .CodeMirror-hint {
+    padding: 4px 8px !important;
+    color: #A9B7C6 !important;
+    &:hover {
+      background: #40556e !important;
+    }
+  }
+
+  /deep/ .CodeMirror-hint-active {
+    background: #40556e !important;
+    color: #fff !important;
+  }
   .cm {
     //position: fixed;
     //top: 10px;

@@ -22,7 +22,7 @@
         <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -41,9 +41,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -93,37 +93,37 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--    <dependencies>-->
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-geotools-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-spring-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-spring-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-openapi-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-openapi-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-common-dependencies</artifactId>
-            <version>${geoair.version}</version>
-            <type>pom</type>
-        </dependency>
+<!--        <dependency>-->
+<!--           <groupId>cn.geoair.devkit</groupId>-->
+<!--            <artifactId>geoair-common-dependencies</artifactId>-->
+<!--            <version>${geoair.version}</version>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
 
 
-    </dependencies>
+<!--    </dependencies>-->
 
     <build>
         <plugins>
@@ -248,7 +248,7 @@
             </build>
         </profile>
         <profile>
-            <id>javaformat</id>
+            <id>java-code-format</id>
             <build>
                 <plugins>
                     <plugin>

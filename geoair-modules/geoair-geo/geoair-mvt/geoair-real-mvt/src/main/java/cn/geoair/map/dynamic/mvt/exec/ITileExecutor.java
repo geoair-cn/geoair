@@ -4,7 +4,7 @@ import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileExecutorConfig;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 /**
  * @author ：zhangjun

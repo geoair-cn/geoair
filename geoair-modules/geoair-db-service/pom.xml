@@ -24,12 +24,12 @@
         <oracle.sdoutl.version>1.0</oracle.sdoutl.version>
         <dm.jdbc.version>18</dm.jdbc.version>
         <dameng.geoutil.version>1.0</dameng.geoutil.version>
-
+        <fastjson1x.version>2.0.9</fastjson1x.version>
         <!-- Apache Commons 版本 -->
         <commons.codec.version>1.15</commons.codec.version>
         <commons.text.version>1.9</commons.text.version>
         <commons.lang3.version>3.12.0</commons.lang3.version>
-
+        <fastjson.version>2.0.61</fastjson.version>
         <!-- Maven 插件版本 -->
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
 
@@ -37,7 +37,7 @@
 
     <description>geoair-db-service</description>
 
-    <url>https://gitee.com/geoair/geoair</url>
+    <url>https://github.com/geoair-cn/geoair</url>
 
     <licenses>
         <license>
@@ -56,9 +56,9 @@
     </developers>
 
     <scm>
-        <connection>https://gitee.com/geoair/geoair.git</connection>
-        <developerConnection>scm:git:ssh://git@gitee.com:geoair/geoair.git</developerConnection>
-        <url>https://gitee.com/geoair/geoair</url>
+        <connection>https://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
     </scm>
 
     <dependencyManagement>
@@ -220,24 +220,12 @@
                 <artifactId>javax.persistence-api</artifactId>
                 <version>${javax-persistence.version}</version>
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>javax.persistence</groupId>-->
-            <!--                <artifactId>persistence-api</artifactId>-->
-            <!--                <version>1.0</version>-->
-            <!--            </dependency>-->
+
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
-
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson1x.version}</version>
-            </dependency>
-
 
         </dependencies>
     </dependencyManagement>

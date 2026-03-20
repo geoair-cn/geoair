@@ -12,11 +12,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/v3/api-docs")
-public class GroupedApiDocsController {
+public class GirGroupedApiDocsController {
 
 	private final RestTemplate restTemplate;
 
-	public GroupedApiDocsController() {
+	public GirGroupedApiDocsController() {
 		this.restTemplate = new RestTemplate();
 	}
 

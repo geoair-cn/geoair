@@ -1,7 +1,7 @@
 package cn.geoair.comp.knife4j.ext.core.auto;
 
 import cn.geoair.base.Gir;
-import cn.geoair.comp.knife4j.ext.core.config.GirSwaggerApiConfig;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * 自动扫描控制器类，并生成DocketInfo列表
  */
 @Slf4j
-public class AutoApiConfigScanner implements GirSwaggerApiConfig {
+public class AutoApiConfigScanner extends GirOpenApiConfig {
 
     private ApplicationContext applicationContext;
     private Environment environment;
@@ -256,6 +256,8 @@ public class AutoApiConfigScanner implements GirSwaggerApiConfig {
 
         return new ApiModelInfo(title, description, author, version);
     }
+
+
 
 
 }

@@ -5,9 +5,10 @@ import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 
+import com.alibaba.fastjson2.JSONWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
@@ -81,7 +82,7 @@ public class VectorTileV2Controller extends TileCommon {
 		}
 		catch (Exception e) {
 		}
-		String jsonString = JSON.toJSONString(re, true);
+		String jsonString = JSON.toJSONString(re, JSONWriter.Feature.PrettyFormat);
 		toResponse(response, jsonString.getBytes(StandardCharsets.UTF_8), "application/json; charset=utf-8");
 	}
 

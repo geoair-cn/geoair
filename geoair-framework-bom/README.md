@@ -7,7 +7,7 @@ GeoAir Framework Parent 是一个用于工程模块的依赖定义的父项目�
 ## 项目结构
 
 ```
-geoair-framework-parent/
+geoair-framework-bom/
 ├── geoair-api-parent/          # API 模块父项目
 ├── geoair-project-parent/      # 项目模块父项目
 ├── geoair-spring-boot-starter-parent/  # Spring Boot Starter 模块父项目
@@ -54,7 +54,7 @@ geoair-framework-parent/
 ```xml
 <parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-framework-parent</artifactId>
+    <artifactId>geoair-framework-bom</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
 </parent>
 ```
@@ -79,7 +79,7 @@ Apache License 2.0
 
 ## 项目地址
 
-- **Gitee**：https://gitee.com/geoair/geoair
+- **Gitee**：https://github.com/geoair-cn/geoair
 
 ## 版本信息
 

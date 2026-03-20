@@ -501,11 +501,25 @@ export function getAllTables(sourceId) {
 
 // 获取指定表的所有列信息
 export function getAllColumns(sourceId, table) {
+    const dsToken = localStorage.getItem('dsToken')
     return request({
         url: window.Config.baseUrl + '/ds_api/table/getAllColumns',
         method: 'get',
         params: {
             sourceId: sourceId,
+            dsToken: dsToken,
+            table: table
+        }
+    });
+}
+export function getAllColumnLabels(sourceId, table) {
+    const dsToken = localStorage.getItem('dsToken')
+    return request({
+        url: window.Config.baseUrl + '/ds_api/table/getAllColumnsLabels',
+        method: 'get',
+        params: {
+            sourceId: sourceId,
+            dsToken: dsToken,
             table: table
         }
     });
