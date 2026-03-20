@@ -230,7 +230,7 @@ export default {
         }
       } catch (e) {
         console.error("加载表名失败:", e);
-        this.$message.warning("加载表名提示失败，仅支持SQL关键字提示");
+        // this.$message.warning("加载表名提示失败，仅支持SQL关键字提示");
       } finally {
         this.dbMetadata.loadingTables = false;
       }
@@ -512,8 +512,8 @@ export default {
       this.coder.on("change", (coder, changeObj) => {
         this.code = coder.getValue();
 
-        // 1. 触发表名提示（输入字母时）
-        if (/^[a-zA-Z0-9_]/.test(changeObj.text[0])) {
+
+        if (changeObj.origin !== "setValue" && /^[a-zA-Z0-9_]/.test(changeObj.text[0])) {
           setTimeout(() => {
             if (!coder.state.completionActive) {
               coder.showHint();
@@ -521,17 +521,16 @@ export default {
           }, 100);
         }
 
-        // 2. 检测到输入 "."，触发字段查询
+        // 字段懒加载逻辑保持不变，仅在用户输入"."时触发
         if (changeObj.text[0] === ".") {
           const cur = coder.getCursor();
           const token = coder.getTokenAt({
             line: cur.line,
-            ch: cur.ch - 1 // 取 "." 前面的token（表名）
+            ch: cur.ch - 1
           });
           const tableName = token.string.trim();
-          // 只有表名存在且未加载字段时，才触发查询
           if (this.dbMetadata.tables.includes(tableName) && !this.dbMetadata.columnsCache[tableName]) {
-            this.queryColumnsDebounced(tableName, this.ds); // 防抖查询
+            this.queryColumnsDebounced(tableName, this.ds);
           }
         }
       });
@@ -608,6 +607,7 @@ export default {
 
 .cm_root {
   color: #A9B7C6;
+  position: relative;
   /deep/ .CodeMirror-hints {
     font-size: 14px;
     line-height: 20px;
