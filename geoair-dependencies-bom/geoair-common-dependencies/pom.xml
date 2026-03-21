@@ -372,19 +372,20 @@
                 <version>1.5.26</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2-parent</artifactId>
-                <version>${fastjson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.springfox</groupId>
-                        <artifactId>springfox-spring-web</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+<!--            /这个会影响到swagger,所以就不要了-->
+<!--            <dependency>-->
+<!--                <groupId>com.alibaba.fastjson2</groupId>-->
+<!--                <artifactId>fastjson2-parent</artifactId>-->
+<!--                <version>${fastjson.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>io.springfox</groupId>-->
+<!--                        <artifactId>springfox-spring-web</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
