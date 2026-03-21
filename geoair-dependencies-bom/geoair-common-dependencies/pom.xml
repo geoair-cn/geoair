@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-       <groupId>cn.geoair.devkit</groupId>
+        <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-dependencies-bom</artifactId>
         <version>J8.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-   <groupId>cn.geoair.devkit</groupId>
+    <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-common-dependencies</artifactId>
     <name>geoair-common-dependencies</name>
     <version>J8.1.0-SNAPSHOT</version>
@@ -372,18 +372,30 @@
                 <version>1.5.26</version>
             </dependency>
 
+<!--            /这个会影响到swagger,所以就不要了-->
+<!--            <dependency>-->
+<!--                <groupId>com.alibaba.fastjson2</groupId>-->
+<!--                <artifactId>fastjson2-parent</artifactId>-->
+<!--                <version>${fastjson.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>io.springfox</groupId>-->
+<!--                        <artifactId>springfox-spring-web</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2-parent</artifactId>
+                <artifactId>fastjson2</artifactId>
                 <version>${fastjson.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>io.springfox</groupId>
-                        <artifactId>springfox-spring-web</artifactId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson1x.version}</version>
             </dependency>
 
         </dependencies>

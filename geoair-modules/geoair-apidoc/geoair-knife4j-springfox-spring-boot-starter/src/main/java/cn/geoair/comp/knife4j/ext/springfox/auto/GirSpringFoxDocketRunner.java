@@ -89,13 +89,18 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
             apiModelInfo = new ApiModelInfo("API文档", "API描述", "API", "1.0.0");
             log.debug("【SpringFox】未配置ApiModelInfo，使用默认配置");
         }
+        for (DocketInfo docketInfo : docketInfos) {
+            String groupName = docketInfo.getGroupName();
 
+        }
         // 遍历每个DocketInfo，创建并注册Docket
         for (DocketInfo docketInfo : docketInfos) {
             registerSingleDocket(apiModelInfo, docketInfo, registry);
         }
         apiConfig.loadEnd();
     }
+
+    HashMap <String, Integer> groupNameMap = new HashMap<>();
 
     /**
      * 注册单个Docket
@@ -105,13 +110,22 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         // 处理分组名
         String groupName = null;
         {
-            // 如果分组名为空，使用包名最后一部分作为分组名
-            String basePackage = docketInfo.getBasePackage();
-            if (basePackage != null && basePackage.contains(".")) {
-                groupName = basePackage.substring(basePackage.lastIndexOf('.') + 1);
-            } else {
-                groupName = "default";
+              groupName = docketInfo.getGroupName();
+              if (groupName == null || groupName.trim().isEmpty()) {
+                  groupName = "default";
+              }
+            if (groupNameMap.containsKey(groupName)) {
+                groupName = groupName + "_" + groupNameMap.get(groupName);
             }
+            groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
+
+//            // 如果分组名为空，使用包名最后一部分作为分组名
+//            String basePackage = docketInfo.getBasePackage();
+//            if (basePackage != null && basePackage.contains(".")) {
+//                groupName = basePackage.substring(basePackage.lastIndexOf('.') + 1);
+//            } else {
+//                groupName = "default";
+//            }
         }
 
         // 校验扫描包非空
@@ -127,13 +141,8 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         String finalGroupName = groupName;
         BeanDefinitionBuilder docketBuilder = BeanDefinitionBuilder.genericBeanDefinition(Docket.class,
                 // 使用Lambda表达式作为实例供应商
-                () -> {
-                    // 调用工具类创建Docket实例
-                    Docket docket = SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
-                            .groupName(finalGroupName).enable(enable);
-
-                    return docket;
-                });
+                () -> SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
+                        .groupName(finalGroupName).enable(enable));
 
         // 设置Bean的其他属性
         docketBuilder.setLazyInit(false); // 非懒加载
@@ -156,7 +165,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
      */
     private String generateBeanName(String groupName, String basePackage) {
         // 清理特殊字符，确保Bean名称合法
-        String cleanGroupName = groupName.replaceAll("[^a-zA-Z0-9]", "");
+        String cleanGroupName = groupName ;
         if (cleanGroupName.isEmpty()) {
             cleanGroupName = "Docket";
         }

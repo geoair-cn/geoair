@@ -49,6 +49,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>cn.geoair.devkit</groupId>
+                <artifactId>geoair-framework</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                <groupId>cn.geoair.devkit</groupId>
                 <artifactId>geoair-geotools-dependencies</artifactId>
                 <version>${geoair.version}</version>

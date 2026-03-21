@@ -63,54 +63,45 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-db-service-core</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-db-service-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
 
 
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-core</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-base</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-web</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
+
+<!--            <dependency>-->
+<!--               <groupId>cn.geoair.devkit</groupId>-->
+<!--                <artifactId>geoair-core</artifactId>-->
+<!--                <version>${geoair.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--               <groupId>cn.geoair.devkit</groupId>-->
+<!--                <artifactId>geoair-base</artifactId>-->
+<!--                <version>${geoair.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--               <groupId>cn.geoair.devkit</groupId>-->
+<!--                <artifactId>geoair-web</artifactId>-->
+<!--                <version>${geoair.version}</version>-->
+<!--            </dependency>-->
 
 
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-adv-query</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--               <groupId>cn.geoair.devkit</groupId>-->
+<!--                <artifactId>geoair-adv-query</artifactId>-->
+<!--                <version>${geoair.version}</version>-->
+<!--            </dependency>-->
 
 
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-orm-mybatis-tk</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--               <groupId>cn.geoair.devkit</groupId>-->
+<!--                <artifactId>geoair-orm-mybatis-tk</artifactId>-->
+<!--                <version>${geoair.version}</version>-->
+<!--            </dependency>-->
 
 
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>cn.hutool</groupId>-->
+<!--                <artifactId>hutool-all</artifactId>-->
+<!--                <version>${hutool.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
