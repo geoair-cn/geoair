@@ -4,17 +4,18 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.IdUtil;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -28,7 +29,7 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     static ConcurrentHashMap<String, String> dataBaseNameMap = new ConcurrentHashMap<>();
     static ConcurrentHashMap<String, String> schemaNameMap = new ConcurrentHashMap<>();
-    static ConcurrentHashMap<String, String> dataSourceNameMap = new ConcurrentHashMap<>();
+
 
     private DataSource dataSource = null;
 
@@ -65,7 +66,9 @@ public class DataSourceGetter implements IDataSourceGetter {
         }
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
-            schemaNameMap.put(dataSourceName, schemaName);
+            if (GutilObject.isNotEmpty(dataSourceName)) {
+                schemaNameMap.put(dataSourceName, schemaName);
+            }
         }
     }
 
@@ -80,7 +83,9 @@ public class DataSourceGetter implements IDataSourceGetter {
         }
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
-            dataBaseNameMap.put(dataSourceName, databaseName);
+            if (GutilObject.isNotEmpty(dataSourceName)) {
+                dataBaseNameMap.put(dataSourceName, databaseName);
+            }
         }
     }
 
@@ -108,7 +113,12 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     @Override
     public void initByDataSource(DataSource dataSource) {
-        initByDataSource(dataSource, null);
+        Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
+        String jdbcUrl = null;
+        if (wrapper.isPresent()) {
+            jdbcUrl = wrapper.get().getJdbcUrl();
+        }
+        initByDataSource(dataSource, jdbcUrl);
     }
 
     @Override
@@ -116,7 +126,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         this.dataSource = dataSource;
         this.dataSourceId = dataSourceName;
         this.dataSourceApo = null;
-        if ( GutilObject.isNotEmpty(dataSourceName)) {
+        if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;
         }
 

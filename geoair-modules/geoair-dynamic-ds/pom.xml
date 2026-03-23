@@ -101,6 +101,35 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- C3P0 -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- BoneCP（注意：已停止维护，仅适配老项目） -->
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <version>0.8.0.RELEASE</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Oracle UCP（需Oracle驱动依赖） -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ucp</artifactId>
+            <optional>true</optional>
+        </dependency>
+
 
     </dependencies>
 

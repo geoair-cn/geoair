@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds.simple;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.db.ds.simple.AbstractDataSource;
 import lombok.Data;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import java.util.Properties;
 @Data
 public class DriverManagerDataSource extends AbstractDataSource {
 
+	@Getter
 	private String url;
 
 	private String username;
