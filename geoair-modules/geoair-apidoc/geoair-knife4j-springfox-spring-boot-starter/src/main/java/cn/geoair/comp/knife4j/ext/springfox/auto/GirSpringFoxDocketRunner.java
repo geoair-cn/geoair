@@ -27,7 +27,6 @@ import java.util.Map;
  * SpringFox Docket 动态注册器 在Spring容器启动早期扫描GirSwaggerApiConfig实现类，动态创建并注册Docket Bean
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@Component
 public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(GirSpringFoxDocketRunner.class);
@@ -119,13 +118,6 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
             }
             groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
 
-//            // 如果分组名为空，使用包名最后一部分作为分组名
-//            String basePackage = docketInfo.getBasePackage();
-//            if (basePackage != null && basePackage.contains(".")) {
-//                groupName = basePackage.substring(basePackage.lastIndexOf('.') + 1);
-//            } else {
-//                groupName = "default";
-//            }
         }
 
         // 校验扫描包非空
