@@ -1,5 +1,6 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
+import cn.geoair.base.exception.GirException;
 import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
 import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
@@ -88,10 +89,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
             apiModelInfo = new ApiModelInfo("API文档", "API描述", "API", "1.0.0");
             log.debug("【SpringFox】未配置ApiModelInfo，使用默认配置");
         }
-        for (DocketInfo docketInfo : docketInfos) {
-            String groupName = docketInfo.getGroupName();
 
-        }
         // 遍历每个DocketInfo，创建并注册Docket
         for (DocketInfo docketInfo : docketInfos) {
             registerSingleDocket(apiModelInfo, docketInfo, registry);
@@ -99,7 +97,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         apiConfig.loadEnd();
     }
 
-    HashMap <String, Integer> groupNameMap = new HashMap<>();
+    HashMap<String, Integer> groupNameMap = new HashMap<>();
 
     /**
      * 注册单个Docket
@@ -109,14 +107,14 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         // 处理分组名
         String groupName = null;
         {
-              groupName = docketInfo.getGroupName();
-              if (groupName == null || groupName.trim().isEmpty()) {
-                  groupName = "default";
-              }
-            if (groupNameMap.containsKey(groupName)) {
-                groupName = groupName + "_" + groupNameMap.get(groupName);
+            groupName = docketInfo.getGroupName();
+            if (groupName == null || groupName.trim().isEmpty()) {
+                groupName = "default";
             }
-            groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
+            if (groupNameMap.containsKey(groupName)) {
+                throw new GirException("分组名重复：{}", groupName);
+            }
+//            groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
 
         }
 
@@ -157,7 +155,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
      */
     private String generateBeanName(String groupName, String basePackage) {
         // 清理特殊字符，确保Bean名称合法
-        String cleanGroupName = groupName ;
+        String cleanGroupName = groupName;
         if (cleanGroupName.isEmpty()) {
             cleanGroupName = "Docket";
         }
