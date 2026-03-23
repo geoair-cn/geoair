@@ -51,6 +51,7 @@
         <fastjson1x.version>2.0.9</fastjson1x.version>
 
         <jackson.version>2.13.5</jackson.version>
+<!--        <jackson.version>2.15.2</jackson.version>-->
         <gson.version>2.9.1</gson.version>
         <javax-persistence.version>2.2</javax-persistence.version>
         <javax-cache.version>1.1.1</javax-cache.version>

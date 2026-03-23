@@ -35,6 +35,10 @@ public class GirAdvQuery {
         return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
     }
 
+    public static IAdvExecutor getIAdvExecutor(DataSource dataSource, String dataSourceName) {
+        return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
+    }
+
     public static <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz) {
         IAdvExecutorAdapter pxyBeanC = GirService.getPxyBeanC(IAdvExecutorAdapter.class);
         return pxyBeanC.getIAdvExecutor(dataSourceId, schema, clazz);

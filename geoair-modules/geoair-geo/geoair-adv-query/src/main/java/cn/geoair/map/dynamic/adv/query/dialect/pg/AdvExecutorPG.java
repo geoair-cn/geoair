@@ -22,6 +22,9 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
     public AdvExecutorPG(DataSource dataSource) {
         super(dataSource);
     }
+    public AdvExecutorPG(DataSource dataSource,String dataSourceName) {
+        super(dataSource,dataSourceName);
+    }
 
     public AdvExecutorPG() {
     }

@@ -17,66 +17,68 @@ import java.sql.SQLException;
 @Slf4j
 public class AdvExecutorFactory {
 
-	/**
-	 * 根据数据源类型获取对应的执行器实例
-	 * @return 匹配的IAdvExecutor实现类
-	 */
-	public static IAdvExecutor getAdvExecutorByDataSource() {
-		DataSource dataSource = SpringUtil.getBean(DataSource.class);
-		return getAdvExecutorByDataSource(dataSource);
-	}
+    /**
+     * 根据数据源类型获取对应的执行器实例
+     *
+     * @return 匹配的IAdvExecutor实现类
+     */
+    public static IAdvExecutor getAdvExecutorByDataSource() {
+        DataSource dataSource = SpringUtil.getBean(DataSource.class);
+        return getAdvExecutorByDataSource(dataSource);
+    }
 
-	public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
+    public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
+        return getAdvExecutorByDataSource(dataSource, null);
+    }
 
-		DialectName dbType = getDbTypeFromDataSource(dataSource);
+    public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource, String dataSourceName) {
 
-		switch (dbType) {
-		case MYSQL:
-			log.info("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器");
-			return GirSpringMysqlAdvExecutor.newInstance(dataSource);
-		case POSTGRESQL:
-			log.info("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器");
-			return GirSpringPGAdvExecutor.newInstance(dataSource);
-		default:
-			throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
-		}
-	}
+        DialectName dbType = getDbTypeFromDataSource(dataSource);
 
-	/**
-	 * 从数据源中解析数据库类型（通过JDBC元数据）
-	 * @param dataSource Spring容器中的数据源
-	 * @return 数据库类型枚举
-	 */
-	private static DialectName getDbTypeFromDataSource(DataSource dataSource) {
-		Connection conn = null;
-		try {
-			// 获取数据库连接（Spring工具类，自动处理事务）
-			conn = dataSource.getConnection();
-			DatabaseMetaData metaData = conn.getMetaData();
-			// 获取数据库产品名称（标准化）
-			String dbProductName = metaData.getDatabaseProductName().toUpperCase();
+        switch (dbType) {
+            case MYSQL:
+                log.info("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器");
+                return GirSpringMysqlAdvExecutor.newInstance(dataSource, dataSourceName);
+            case POSTGRESQL:
+                log.info("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器");
+                return GirSpringPGAdvExecutor.newInstance(dataSource, dataSourceName);
+            default:
+                throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
+        }
+    }
 
-			// 匹配数据库类型
-			if (dbProductName.contains("MYSQL")) {
-				return DialectName.MYSQL;
-			}
-			else if (dbProductName.contains("POSTGRESQL") || dbProductName.contains("PG")) {
-				return DialectName.POSTGRESQL;
-			}
-			else {
-				throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);
-			}
-		}
-		catch (SQLException e) {
-			log.error("解析数据源类型失败", e);
-			throw new RuntimeException("获取数据库类型失败", e);
-		}
-		finally {
-			// 释放连接（Spring工具类，避免连接泄露）
-			if (conn != null) {
-				IoUtil.close(conn);
-			}
-		}
-	}
+    /**
+     * 从数据源中解析数据库类型（通过JDBC元数据）
+     *
+     * @param dataSource Spring容器中的数据源
+     * @return 数据库类型枚举
+     */
+    private static DialectName getDbTypeFromDataSource(DataSource dataSource) {
+        Connection conn = null;
+        try {
+            // 获取数据库连接（Spring工具类，自动处理事务）
+            conn = dataSource.getConnection();
+            DatabaseMetaData metaData = conn.getMetaData();
+            // 获取数据库产品名称（标准化）
+            String dbProductName = metaData.getDatabaseProductName().toUpperCase();
+
+            // 匹配数据库类型
+            if (dbProductName.contains("MYSQL")) {
+                return DialectName.MYSQL;
+            } else if (dbProductName.contains("POSTGRESQL") || dbProductName.contains("PG")) {
+                return DialectName.POSTGRESQL;
+            } else {
+                throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);
+            }
+        } catch (SQLException e) {
+            log.error("解析数据源类型失败", e);
+            throw new RuntimeException("获取数据库类型失败", e);
+        } finally {
+            // 释放连接（Spring工具类，避免连接泄露）
+            if (conn != null) {
+                IoUtil.close(conn);
+            }
+        }
+    }
 
 }
