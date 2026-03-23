@@ -50,10 +50,9 @@
 
     <dependencyManagement>
         <dependencies>
-            <!--            pom是后声明优先-->
             <dependency>
                 <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-common-dependencies</artifactId>
+                <artifactId>geoair-framework</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -74,6 +73,14 @@
             </dependency>
             <dependency>
                 <groupId>cn.geoair.devkit</groupId>
+                <artifactId>geoair-common-dependencies</artifactId>
+                <version>${geoair.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.geoair.devkit</groupId>
                 <artifactId>geoair-geotools-dependencies</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
@@ -86,13 +93,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-framework</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
 
 
         </dependencies>
@@ -167,6 +168,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <parameters>true</parameters>
                     <!-- 源码版本 -->
                     <source>8</source>
                     <!-- 目标字节码版本 -->

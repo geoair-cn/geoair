@@ -22,6 +22,10 @@ public class GirSpringMysqlAdvExecutor extends AdvExecutorMysql implements IAdvE
 		GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
 		advExecutor.initByDataSource(dataSource);
 		return advExecutor;
+	}	public static GirSpringMysqlAdvExecutor newInstance(DataSource dataSource, String dataSourceName) {
+		GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
+		advExecutor.initByDataSource(dataSource,dataSourceName);
+		return advExecutor;
 	}
 
 	public static DataSource getDataSourceBySpring() {

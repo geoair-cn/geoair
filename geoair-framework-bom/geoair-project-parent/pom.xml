@@ -56,8 +56,8 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-geotools-dependencies</artifactId>
+                <groupId>cn.geoair.devkit</groupId>
+                <artifactId>geoair-spring-dependencies</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -65,11 +65,12 @@
 
             <dependency>
                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-spring-dependencies</artifactId>
+                <artifactId>geoair-geotools-dependencies</artifactId>
                 <version>${geoair.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
 
             <dependency>
                <groupId>cn.geoair.devkit</groupId>

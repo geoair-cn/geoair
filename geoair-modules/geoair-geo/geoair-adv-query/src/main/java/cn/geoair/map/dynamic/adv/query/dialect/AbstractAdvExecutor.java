@@ -65,6 +65,9 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public AbstractAdvExecutor(DataSource dataSource) {
         this.initByDataSource(dataSource);
     }
+    public AbstractAdvExecutor(DataSource dataSource,String dataSourceName) {
+        this.initByDataSource(dataSource,dataSourceName);
+    }
 
     public AbstractAdvExecutor() {
     }
@@ -99,6 +102,14 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
             throw new IllegalArgumentException("DataSource 不能为空");
         }
         this.getDataSourceGetterPxy().initByDataSource(dataSource);
+        this.initProxyObjects();
+    }
+    @Override
+    public void initByDataSource(DataSource dataSource,String dataSourceName) {
+        if (dataSource == null) {
+            throw new IllegalArgumentException("DataSource 不能为空");
+        }
+        this.getDataSourceGetterPxy().initByDataSource(dataSource,dataSourceName);
         this.initProxyObjects();
     }
 

@@ -27,7 +27,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <redisson.version>3.23.5</redisson.version>
+        <redisson.version>3.18.0</redisson.version>
         <sa-token-version> 1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
@@ -191,6 +191,12 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <parameters>true</parameters>
+                        <!-- 源码版本 -->
+                        <source>8</source>
+                        <!-- 目标字节码版本 -->
+                        <target>8</target>
+                        <!-- 编码（可选，避免中文乱码） -->
+                        <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -276,6 +282,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <parameters>true</parameters>
                     <!-- 源码版本 -->
                     <source>8</source>
                     <!-- 目标字节码版本 -->

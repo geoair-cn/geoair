@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <redisson.version>3.23.5</redisson.version>
+        <redisson.version>3.18.0</redisson.version>
         <sa-token-version> 1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
@@ -51,6 +51,7 @@
         <fastjson1x.version>2.0.9</fastjson1x.version>
 
         <jackson.version>2.13.5</jackson.version>
+<!--        <jackson.version>2.15.2</jackson.version>-->
         <gson.version>2.9.1</gson.version>
         <javax-persistence.version>2.2</javax-persistence.version>
         <javax-cache.version>1.1.1</javax-cache.version>
@@ -206,6 +207,7 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
+                        <parameters>true</parameters>
                         <!-- 源码版本 -->
                         <source>8</source>
                         <!-- 目标字节码版本 -->
@@ -282,6 +284,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <parameters>true</parameters>
                     <!-- 源码版本 -->
                     <source>8</source>
                     <!-- 目标字节码版本 -->

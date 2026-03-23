@@ -41,6 +41,17 @@ public interface IDataSourceGetter {
     void initByDataSource(DataSource dataSource);
 
     /**
+     * 通过数据源对象初始化
+     * <p>
+     * 使用已有的 {@link DataSource} 对象初始化数据源获取器。
+     * </p>
+     *
+     * @param dataSource 数据源对象
+     * @param dataSourceName 数据源的名称
+     */
+    void initByDataSource(DataSource dataSource,String dataSourceName);
+
+    /**
      * 通过数据库连接初始化
      * <p>
      * 使用已有的数据库连接对象初始化数据源获取器。

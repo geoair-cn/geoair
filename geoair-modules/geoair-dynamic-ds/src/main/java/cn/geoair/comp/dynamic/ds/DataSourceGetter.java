@@ -2,7 +2,10 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
@@ -12,6 +15,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -22,9 +27,14 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     private static final GiLogger log = GirLogger.getLoger();
 
+    static ConcurrentHashMap<String, String> dataBaseNameMap = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, String> schemaNameMap = new ConcurrentHashMap<>();
+
+
     private DataSource dataSource = null;
 
     private String databaseName = null;
+    private String dataSourceName = null;
 
 
     protected String schemaName = null;
@@ -51,18 +61,31 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (schemaName != null) {
             return;
         }
+        if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
+            return;
+        }
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
+            if (GutilObject.isNotEmpty(dataSourceName)) {
+                schemaNameMap.put(dataSourceName, schemaName);
+            }
         }
     }
 
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
         this.databaseNameGetterFunction = databaseNameGetterFunction;
+
         if (databaseName != null) {
+            return;
+        }
+        if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
             return;
         }
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
+            if (GutilObject.isNotEmpty(dataSourceName)) {
+                dataBaseNameMap.put(dataSourceName, databaseName);
+            }
         }
     }
 
@@ -77,6 +100,7 @@ public class DataSourceGetter implements IDataSourceGetter {
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {
         this.dataSourceApo = dataSourceApo;
         this.dataSourceId = dataSourceApo.getId();
+        this.dataSourceName = dataSourceApo.getId();
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
@@ -89,10 +113,25 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     @Override
     public void initByDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        this.dataSourceId = "";
-        this.dataSourceApo = null;
+        Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
+        String jdbcUrl = null;
+        if (wrapper.isPresent()) {
+            jdbcUrl = wrapper.get().getJdbcUrl();
+        }
+        initByDataSource(dataSource, jdbcUrl);
     }
+
+    @Override
+    public void initByDataSource(DataSource dataSource, String dataSourceName) {
+        this.dataSource = dataSource;
+        this.dataSourceId = dataSourceName;
+        this.dataSourceApo = null;
+        if (GutilObject.isNotEmpty(dataSourceName)) {
+            this.dataSourceName = dataSourceName;
+        }
+
+    }
+
 
     @Override
     public void initByConnection(Connection connection) {

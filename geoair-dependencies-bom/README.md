@@ -80,7 +80,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 | Spring Boot | 2.7.18 | 应用框架核心 |
 | Spring Cloud | 2021.0.4 | 微服务框架 |
 | Spring Cloud Alibaba | 2021.0.4.0 | 阿里微服务生态 |
-| Redisson | 3.23.5 | Redis 客户端 |
+| Redisson | 3.18.0 | Redis 客户端 |
 | Spring Context Support | 1.0.11 | Spring 上下文扩展 |
 
 #### 特性

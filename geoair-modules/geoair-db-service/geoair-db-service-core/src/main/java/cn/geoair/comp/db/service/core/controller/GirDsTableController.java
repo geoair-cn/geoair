@@ -42,10 +42,10 @@ public class GirDsTableController {
     public List<String> getAllTables(String sourceId) throws SQLException {
         TokenManager.validateToken();
         DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-        IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor(PoolManager.getJdbcConnectionPool(dataSourceApo));
+        IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor(PoolManager.getJdbcConnectionPool(dataSourceApo), dataSourceApo.getUrl());
         List<SchemaTableApo> schemaTableApos = iAdvExecutor.dGetTableAndViewBySchema();
         List<String> tablesBySchema = schemaTableApos.stream().
-                filter(s -> s.getType().equals(AdvSchemaTableTypeOpt.表)||s.getType().equals(AdvSchemaTableTypeOpt.视图))
+                filter(s -> s.getType().equals(AdvSchemaTableTypeOpt.表) || s.getType().equals(AdvSchemaTableTypeOpt.视图))
                 .map(SchemaTableApo::getName).collect(Collectors.toList());
         return tablesBySchema;
     }
