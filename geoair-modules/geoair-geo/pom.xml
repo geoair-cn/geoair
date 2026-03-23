@@ -185,6 +185,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
+                    <parameters>true</parameters>
                     <!-- 源码版本 -->
                     <source>8</source>
                     <!-- 目标字节码版本 -->
