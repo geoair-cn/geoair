@@ -7,12 +7,18 @@ import lombok.Data;
 
 /**
  * 仅作为配置提示使用，不再通过此类读取配置 所有配置通过 Environment 直接读取
+ *
+ * @author Administrator
+ * @version $Id: $Id
  */
 @Data
 @Component
 @ConfigurationProperties(prefix = "geoair.apidoc")
 public class GirSwaggerProperties {
 
+	/**
+	 * <p>Constructor for GirSwaggerProperties.</p>
+	 */
 	public GirSwaggerProperties() {
 	}
 

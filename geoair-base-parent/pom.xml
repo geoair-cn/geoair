@@ -204,6 +204,8 @@
                     <fixMethodComment>true</fixMethodComment>
                     <!-- 自动修复字段注释 -->
                     <fixFieldComment>true</fixFieldComment>
+                    <version>false</version>
+                    <author>false</author>
                     <!-- 开启严格模式，注释不规范直接报错 -->
                     <failOnError>false</failOnError>
                     <!-- 文档编码 UTF-8 -->

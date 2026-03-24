@@ -23,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 自动扫描控制器类，并生成DocketInfo列表
+ *
+ * @author Administrator
+ * @version $Id: $Id
  */
 @Slf4j
 public class AutoApiConfigScanner extends GirOpenApiConfig {
@@ -31,6 +34,11 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
 
 	private Environment environment;
 
+	/**
+	 * <p>Constructor for AutoApiConfigScanner.</p>
+	 *
+	 * @param applicationContext a {@link org.springframework.context.ApplicationContext} object
+	 */
 	public AutoApiConfigScanner(ApplicationContext applicationContext) {
 		Gir.log.info("自动扫描控制器中。。。。。");
 		this.applicationContext = applicationContext;
@@ -198,6 +206,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
 		return lastPart.substring(0, 1).toUpperCase() + lastPart.substring(1).toLowerCase();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public List<DocketInfo> getDocketInfos() {
 		// 1. 校验Swagger开关是否开启（默认false）
@@ -250,6 +259,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
 		return docketList;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public ApiModelInfo getApiModelInfo() {
 		// 读取配置，设置默认值

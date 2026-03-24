@@ -13,8 +13,11 @@ import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilStr;
 
 /**
+ * <p>GirOpenApiRunnerConfig class.</p>
+ *
  * @author ：张俊
  * @date ：Created in 2022/8/29 9:32 @description： TODO
+ * @version $Id: $Id
  */
 @Component
 public class GirOpenApiRunnerConfig implements ApplicationRunner {
@@ -25,6 +28,7 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
 	@Resource
 	ApplicationContext applicationContext;
 
+	/** {@inheritDoc} */
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 
