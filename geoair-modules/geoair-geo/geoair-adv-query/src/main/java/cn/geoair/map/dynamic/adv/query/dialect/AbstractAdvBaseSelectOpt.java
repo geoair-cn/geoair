@@ -276,7 +276,7 @@ public abstract class AbstractAdvBaseSelectOpt implements IAdvBaseSelectOpt {
         Connection connection = dataSourceGetter.getConnection();
         try {
             return SqlExecutor.query(connection, countSqlMeta.getSql(), new NumberHandler(),
-                    countSqlMeta.getJdbcParamValues());
+                    countSqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectRecordRowCount查询失败，SQL：" + sqlStatement, e);
         } finally {
