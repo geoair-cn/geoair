@@ -205,7 +205,7 @@ public class Test {
 	 */
 	public static String encode36(long num) {
 
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuffer = new StringBuilder();
 
 		if (num == 0) {
 			stringBuffer.append(CHARS[0]);

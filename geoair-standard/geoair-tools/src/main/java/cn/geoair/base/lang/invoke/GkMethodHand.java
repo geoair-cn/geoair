@@ -21,7 +21,7 @@ import cn.geoair.base.util.GutilStr;
 public class GkMethodHand {
 
 	private static String formatMethodDesc(Method method) {
-		StringBuffer sb = new StringBuffer().append(method.getDeclaringClass().getName()).append(".")
+		StringBuilder sb = new StringBuilder().append(method.getDeclaringClass().getName()).append(".")
 				.append(method.getName()).append("(");
 		for (Class<?> pt : method.getParameterTypes()) {
 			sb.append(pt.getSimpleName()).append(",");
@@ -43,7 +43,7 @@ public class GkMethodHand {
 	}
 
 	private static String getCallerIdByStackTraceElement(StackTraceElement ste) {
-		return new StringBuffer().append(ste.getClassName()).append(".").append(ste.getMethodName()).append("(")
+		return new StringBuilder().append(ste.getClassName()).append(".").append(ste.getMethodName()).append("(")
 				.append(ste.getFileName()).append(":").append(ste.getLineNumber()).append(")").toString();
 	}
 

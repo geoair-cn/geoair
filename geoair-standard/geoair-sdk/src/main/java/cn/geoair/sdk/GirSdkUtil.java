@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -37,7 +38,7 @@ public class GirSdkUtil {
 
 	private static final GiLogger log = GirLogger.getLoger(GirSdkUtil.class);
 
-	public static String CharsetName = "UTF-8";
+	public static Charset CharsetName = StandardCharsets.UTF_8;
 
 	private static HttpURLConnection setHeaders(HttpURLConnection conn) throws Exception {
 		String nonce = getRandomFileName(Integer.valueOf(32));
@@ -197,7 +198,7 @@ public class GirSdkUtil {
 		if (conn.getResponseCode() != 200) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), CharsetName));
 
-			StringBuffer res = new StringBuffer();
+			StringBuilder res = new StringBuilder();
 			String lines;
 			while ((lines = br.readLine()) != null) {
 				res.append(lines);
@@ -210,7 +211,7 @@ public class GirSdkUtil {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), CharsetName));
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		String lines;
 		while ((lines = br.readLine()) != null) {
 			res.append(lines);
@@ -250,7 +251,7 @@ public class GirSdkUtil {
 		if (conn.getResponseCode() != 200) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), CharsetName));
 
-			StringBuffer res = new StringBuffer();
+			StringBuilder res = new StringBuilder();
 			String lines;
 			while ((lines = br.readLine()) != null) {
 				res.append(lines);
@@ -263,7 +264,7 @@ public class GirSdkUtil {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), CharsetName));
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		String lines;
 		while ((lines = br.readLine()) != null) {
 			res.append(lines);
@@ -308,7 +309,7 @@ public class GirSdkUtil {
 		if (conn.getResponseCode() != 200) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), CharsetName));
 
-			StringBuffer res = new StringBuffer();
+			StringBuilder res = new StringBuilder();
 			String lines;
 			while ((lines = br.readLine()) != null) {
 				res.append(lines);
@@ -320,7 +321,7 @@ public class GirSdkUtil {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), CharsetName));
 
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		String lines;
 		while ((lines = br.readLine()) != null) {
 			res.append(lines);
@@ -345,10 +346,10 @@ public class GirSdkUtil {
 	public static String appendUrl(String url, String key, String value, boolean encodeValue) throws Exception {
 		if (value != null) {
 			if (url.indexOf("?") >= 0) {
-				return url + "&" + key + "=" + (encodeValue ? URLEncoder.encode(value, CharsetName) : value);
+				return url + "&" + key + "=" + (encodeValue ? URLEncoder.encode(value, CharsetName.name()) : value);
 			}
 			else {
-				return url + "?" + key + "=" + (encodeValue ? URLEncoder.encode(value, CharsetName) : value);
+				return url + "?" + key + "=" + (encodeValue ? URLEncoder.encode(value, CharsetName.name()) : value);
 			}
 		}
 		return url;
@@ -358,13 +359,14 @@ public class GirSdkUtil {
 		if (data.isEmpty()) {
 			return null;
 		}
-		StringBuffer param = new StringBuffer();
+		StringBuilder param = new StringBuilder();
 		Object value = null;
 		for (String key : data.keySet()) {
 			value = data.get(key);
 			if (value != null) {
 				param.append(key).append("=");
-				param.append(encodeValue ? URLEncoder.encode(data.get(key).toString(), CharsetName) : value.toString());
+				param.append(encodeValue ? URLEncoder.encode(data.get(key).toString(), CharsetName.name())
+						: value.toString());
 				param.append("&");
 			}
 		}

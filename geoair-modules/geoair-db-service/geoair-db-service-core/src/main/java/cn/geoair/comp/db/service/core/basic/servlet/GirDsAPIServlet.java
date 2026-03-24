@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +179,7 @@ public class GirDsAPIServlet extends HttpServlet {
 
 	private JSONObject getHttpJsonBody(HttpServletRequest request) {
 		try {
-			InputStreamReader in = new InputStreamReader(request.getInputStream(), "utf-8");
+			InputStreamReader in = new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8);
 			BufferedReader br = new BufferedReader(in);
 			StringBuilder sb = new StringBuilder();
 			String line = null;

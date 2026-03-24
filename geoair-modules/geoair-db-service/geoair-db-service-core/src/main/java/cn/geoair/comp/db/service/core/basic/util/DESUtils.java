@@ -1,6 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -14,11 +15,11 @@ public class DESUtils {
 		String pass = "root123456";
 
 		try {
-			String s = Base64.encodeBase64String(pass.getBytes(ENCODE));
+			String s = Base64.encodeBase64String(pass.getBytes(StandardCharsets.UTF_8));
 			Gir.log.info(s);
 
 			byte[] bytes = Base64.decodeBase64(s);
-			String s1 = new String(bytes, ENCODE);
+			String s1 = new String(bytes, StandardCharsets.UTF_8);
 			Gir.log.info(s1);
 
 		}
@@ -35,7 +36,7 @@ public class DESUtils {
 	 * @throws Exception
 	 */
 	public static String encrypt(String data) throws Exception {
-		return Base64.encodeBase64String(data.getBytes(ENCODE));
+		return Base64.encodeBase64String(data.getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class DESUtils {
 		if (data == null)
 			return null;
 		byte[] bytes = Base64.decodeBase64(data);
-		return new String(bytes, ENCODE);
+		return new String(bytes, StandardCharsets.UTF_8);
 	}
 
 }

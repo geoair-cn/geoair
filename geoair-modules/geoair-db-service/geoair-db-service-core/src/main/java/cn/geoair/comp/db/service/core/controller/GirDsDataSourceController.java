@@ -2,6 +2,7 @@ package cn.geoair.comp.db.service.core.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -119,7 +120,7 @@ public class GirDsDataSourceController {
 		OutputStream os = null;
 		try {
 			os = response.getOutputStream();
-			os.write(s.getBytes("utf-8"));
+			os.write(s.getBytes(StandardCharsets.UTF_8));
 		}
 		catch (Exception e) {
 			e.printStackTrace();

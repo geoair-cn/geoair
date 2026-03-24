@@ -183,7 +183,7 @@ public abstract class SectionDao<M extends SectionModel<PK, F>, PK extends Seria
 	 */
 	public List<String> getExistingIds(Set<PK> ids, String tableName) {
 		String columnId = this.getColumnId();
-		StringBuffer sql = new StringBuffer("SELECT ").append(columnId).append(" FROM ").append(tableName)
+		StringBuilder sql = new StringBuilder("SELECT ").append(columnId).append(" FROM ").append(tableName)
 				.append(" WHERE ").append(columnId).append(" in (");
 
 		Class<PK> pkCls = this.getPKClass();
@@ -259,7 +259,7 @@ public abstract class SectionDao<M extends SectionModel<PK, F>, PK extends Seria
 			return;
 		}
 		String columnId = this.getColumnId();
-		StringBuffer sql = new StringBuffer("DELETE FROM ").append(tableName).append(" WHERE ").append(columnId)
+		StringBuilder sql = new StringBuilder("DELETE FROM ").append(tableName).append(" WHERE ").append(columnId)
 				.append(" in (");
 		for (M item : list) {
 			sql.append("'").append(item.id()).append("',");

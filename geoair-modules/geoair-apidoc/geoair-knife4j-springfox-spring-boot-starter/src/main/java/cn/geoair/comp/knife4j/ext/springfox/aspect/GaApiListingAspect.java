@@ -1,6 +1,5 @@
 package cn.geoair.comp.knife4j.ext.springfox.aspect;
 
-import static com.google.common.collect.Sets.newTreeSet;
 import static com.google.common.collect.Sets.union;
 import static springfox.documentation.service.Tags.emptyTags;
 
@@ -44,14 +43,14 @@ public class GaApiListingAspect {
 				// 过滤空描述（替代Guava的emptyToNull）
 				description = (description == null || description.trim().isEmpty()) ? null : description;
 
-				Set<String> tagSet = apiAnnotation != null ? extractApiTags(apiAnnotation) : newTreeSet();
+				Set<String> tagSet = apiAnnotation != null ? extractApiTags(apiAnnotation) : new TreeSet<>();
 
 				// ========== GTC自定义@GaApi注解处理 ==========
 				GaApi gaApiAnnotation = AnnotationUtils.findAnnotation(controller.get(), GaApi.class);
 				String descriptiongtc = gaApiAnnotation != null ? gaApiAnnotation.text() : null;
 				descriptiongtc = (descriptiongtc == null || descriptiongtc.trim().isEmpty()) ? null : descriptiongtc;
 
-				Set<String> taggtcSet = gaApiAnnotation != null ? extractGaApiTags(gaApiAnnotation) : newTreeSet();
+				Set<String> taggtcSet = gaApiAnnotation != null ? extractGaApiTags(gaApiAnnotation) : new TreeSet<>();
 
 				if (GutilStr.isBlank(descriptiongtc) && GutilObject.isNotEmpty(taggtcSet)) {
 					String next = taggtcSet.iterator().next();
@@ -81,7 +80,7 @@ public class GaApiListingAspect {
 	 */
 	private Set<String> extractGaApiTags(GaApi gaApi) {
 		if (gaApi.tags() == null || gaApi.tags().length == 0) {
-			return newTreeSet();
+			return new TreeSet<>();
 		}
 		return Arrays.stream(gaApi.tags()).collect(Collectors.toCollection(TreeSet::new));
 	}
@@ -91,7 +90,7 @@ public class GaApiListingAspect {
 	 */
 	private Set<String> extractApiTags(Api api) {
 		if (api.tags() == null || api.tags().length == 0) {
-			return newTreeSet();
+			return new TreeSet<>();
 		}
 		return Arrays.stream(api.tags()).filter(tag -> tag != null && !emptyTags().test(tag))
 				.collect(Collectors.toCollection(TreeSet::new));

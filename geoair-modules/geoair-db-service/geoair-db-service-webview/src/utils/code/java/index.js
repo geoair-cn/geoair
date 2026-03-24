@@ -48,7 +48,7 @@ public class Main {
 
         InputStream is = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         String strRead;
         while ((strRead = reader.readLine()) != null) {
             stringBuffer.append(strRead);

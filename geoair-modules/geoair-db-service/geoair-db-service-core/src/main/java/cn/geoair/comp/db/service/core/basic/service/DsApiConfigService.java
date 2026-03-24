@@ -238,7 +238,7 @@ public class DsApiConfigService {
 	}
 
 	public String apiDocs(List<String> ids) {
-		StringBuffer temp = new StringBuffer("# 接口文档\n---\n");
+		StringBuilder temp = new StringBuilder("# 接口文档\n---\n");
 		List<ApiConfigApo> list = girDsApiConfigDao.selectBatchIds(ids);
 		String property = SpringUtil.getProperty("server.servlet.context-path");
 		if (GutilObject.isEmpty(property)) {

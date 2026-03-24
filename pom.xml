@@ -317,7 +317,6 @@
                         </execution>
                     </executions>
                     <configuration>
-
                         <!-- Java 版本（你是8就填8） -->
                         <javaVersion>8</javaVersion>
                         <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->

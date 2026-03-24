@@ -3909,7 +3909,7 @@ public class GutilStr {
 	}
 
 	public static String join(Object[] keys, String split, boolean isSqm) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int len = keys.length;
 		boolean isNum = false;
 		for (int i = 0; i < len; i++) {
@@ -5177,7 +5177,7 @@ public class GutilStr {
 		if (str == null) {
 			return null;
 		}
-		return new StringBuffer(str).reverse().toString();
+		return new StringBuilder(str).reverse().toString();
 	}
 
 	/**

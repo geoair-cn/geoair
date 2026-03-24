@@ -2,6 +2,7 @@ package cn.geoair.comp.db.service.core.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -198,7 +199,7 @@ public class GirDsApiConfigController {
 		OutputStream os = null; // 输出流
 		try {
 			os = response.getOutputStream();
-			os.write(docs.getBytes("utf-8"));
+			os.write(docs.getBytes(StandardCharsets.UTF_8));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -230,7 +231,7 @@ public class GirDsApiConfigController {
 		OutputStream os = null;
 		try {
 			os = response.getOutputStream();
-			os.write(s.getBytes("utf-8"));
+			os.write(s.getBytes(StandardCharsets.UTF_8));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -257,7 +258,7 @@ public class GirDsApiConfigController {
 		OutputStream os = null;
 		try {
 			os = response.getOutputStream();
-			os.write(s.getBytes("utf-8"));
+			os.write(s.getBytes(StandardCharsets.UTF_8));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
