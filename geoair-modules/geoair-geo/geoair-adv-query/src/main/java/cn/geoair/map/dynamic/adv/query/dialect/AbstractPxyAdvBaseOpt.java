@@ -12,7 +12,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 /**
- *  数据库的动态高级查询基础操作实现类
+ * 数据库的动态高级查询基础操作实现类
  * <p>
  * 实现了IAdvBaseOpt接口，通过组合方式复用各细分操作类（插入/查询/更新/删除）的实现，
  * 统一对外提供PostgreSQL数据库的全量基础操作，封装了代理对象的初始化和数据源注入。

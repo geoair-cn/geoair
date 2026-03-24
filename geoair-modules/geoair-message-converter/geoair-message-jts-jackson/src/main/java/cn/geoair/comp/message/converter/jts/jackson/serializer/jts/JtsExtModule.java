@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  */
 public class JtsExtModule extends SimpleModule {
 
-    public JtsExtModule() {
-        addDeserializer(Envelope.class, new JtsEnvelopeDeserializer());
-        addSerializer(Envelope.class, new JtsEnvelopeSerializer());
-    }
+	public JtsExtModule() {
+		addDeserializer(Envelope.class, new JtsEnvelopeDeserializer());
+		addSerializer(Envelope.class, new JtsEnvelopeSerializer());
+	}
 
 }

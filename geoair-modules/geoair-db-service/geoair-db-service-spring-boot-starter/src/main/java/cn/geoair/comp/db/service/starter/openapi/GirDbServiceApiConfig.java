@@ -12,18 +12,19 @@ import cn.hutool.core.collection.ListUtil;
 
 /**
  * @author ：张逢吉
- * @date ：Created in   11:51
- * @description： 注入api文档的自动装配
+ * @date ：Created in 11:51 @description： 注入api文档的自动装配
  */
 @Component
 public class GirDbServiceApiConfig extends GirOpenApiConfig {
-    @Override
-    public List<DocketInfo> getDocketInfos() {
-        return ListUtil.of(new DocketInfo("GirDbServiceApi", "cn.geoair.comp.db.service.core"));
-    }
 
-    @Override
-    public ApiModelInfo getApiModelInfo() {
-        return new ApiModelInfo("GirDbServiceApi", "GirDbServiceApi", "GirDbServiceApi", "J8.1.0-SNAPSHOT");
-    }
+	@Override
+	public List<DocketInfo> getDocketInfos() {
+		return ListUtil.of(new DocketInfo("GirDbServiceApi", "cn.geoair.comp.db.service.core"));
+	}
+
+	@Override
+	public ApiModelInfo getApiModelInfo() {
+		return new ApiModelInfo("GirDbServiceApi", "GirDbServiceApi", "GirDbServiceApi", "J8.1.0-SNAPSHOT");
+	}
+
 }

@@ -15,6 +15,6 @@ public interface IAdvDataSourceHelper {
 	/**
 	 * 根据数据源Apo配置创建并返回Druid连接池实例
 	 */
-	 DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
+	DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
 
 }

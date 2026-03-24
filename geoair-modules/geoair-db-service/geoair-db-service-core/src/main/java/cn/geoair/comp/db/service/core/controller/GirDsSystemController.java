@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @GaApi(tags = "GirDs系统相关")
 public class GirDsSystemController {
 
-
 	@Resource
 	GirDsServiceProperties girDsServiceProperties;
 

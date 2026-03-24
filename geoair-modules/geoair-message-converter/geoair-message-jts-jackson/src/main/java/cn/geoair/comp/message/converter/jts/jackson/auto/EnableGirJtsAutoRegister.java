@@ -11,11 +11,11 @@ import cn.geoair.comp.message.converter.jts.jackson.config.GirJtsJacksonAutoConf
 
 /**
  * @author ：张俊
- * @date ：Created in 2026/3/19 18:59
- * @description： 启用JTS自动注册
+ * @date ：Created in 2026/3/19 18:59 @description： 启用JTS自动注册
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(GirJtsJacksonAutoConfig.class)
 public @interface EnableGirJtsAutoRegister {
+
 }

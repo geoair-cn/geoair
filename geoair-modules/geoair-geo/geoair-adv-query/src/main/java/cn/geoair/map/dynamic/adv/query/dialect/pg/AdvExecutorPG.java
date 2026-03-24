@@ -16,92 +16,92 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
  */
 public class AdvExecutorPG extends AbstractPxyAdvExecutor {
 
-    public AdvExecutorPG(DataSourceApo dataSourceApo) {
-        super(dataSourceApo);
-    }
+	public AdvExecutorPG(DataSourceApo dataSourceApo) {
+		super(dataSourceApo);
+	}
 
-    public AdvExecutorPG(DataSource dataSource) {
-        super(dataSource);
-    }
-    public AdvExecutorPG(DataSource dataSource,String dataSourceName) {
-        super(dataSource,dataSourceName);
-    }
+	public AdvExecutorPG(DataSource dataSource) {
+		super(dataSource);
+	}
 
-    public AdvExecutorPG() {
-    }
+	public AdvExecutorPG(DataSource dataSource, String dataSourceName) {
+		super(dataSource, dataSourceName);
+	}
 
-    public AdvExecutorPG(Connection connection) {
-        super(connection);
-    }
+	public AdvExecutorPG() {
+	}
 
-    @Override
-    protected IDataSourceGetter getDataSourceGetterPxy() {
-        if (dataSourceGetterPxy == null) {
-            dataSourceGetterPxy = new DataSourceGetter();
-        }
-        return dataSourceGetterPxy;
-    }
+	public AdvExecutorPG(Connection connection) {
+		super(connection);
+	}
 
-    private volatile IAdvBaseOpt advBaseOpt;
+	@Override
+	protected IDataSourceGetter getDataSourceGetterPxy() {
+		if (dataSourceGetterPxy == null) {
+			dataSourceGetterPxy = new DataSourceGetter();
+		}
+		return dataSourceGetterPxy;
+	}
 
-    private volatile IAdvDDLOpt advDDLOpt;
+	private volatile IAdvBaseOpt advBaseOpt;
 
-    private volatile IAdvSimplePagePreOpt simplePageOpt;
+	private volatile IAdvDDLOpt advDDLOpt;
 
-    private volatile IAdvGeoPreOpt geoOpt;
+	private volatile IAdvSimplePagePreOpt simplePageOpt;
 
-    @Override
-    protected IAdvBaseOpt getAdvBaseOpt() {
-        if (advBaseOpt == null) {
-            synchronized (this) {
-                if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(this);
-                }
-            }
-        }
-        return advBaseOpt;
-    }
+	private volatile IAdvGeoPreOpt geoOpt;
 
-    @Override
-    protected IAdvDDLOpt getAdvDDLOpt() {
-        if (advDDLOpt == null) {
-            synchronized (this) {
-                if (advDDLOpt == null) {
-                    advDDLOpt = new PgAdvDDLOpt(this);
-                }
-            }
-        }
-        return advDDLOpt;
-    }
+	@Override
+	protected IAdvBaseOpt getAdvBaseOpt() {
+		if (advBaseOpt == null) {
+			synchronized (this) {
+				if (advBaseOpt == null) {
+					advBaseOpt = new PgAdvBaseOpt(this);
+				}
+			}
+		}
+		return advBaseOpt;
+	}
 
-    @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
-        if (simplePageOpt == null) {
-            synchronized (this) {
-                if (simplePageOpt == null) {
-                    simplePageOpt = new PgAdvSimplePageOpt(this);
-                }
-            }
-        }
-        return simplePageOpt;
-    }
+	@Override
+	protected IAdvDDLOpt getAdvDDLOpt() {
+		if (advDDLOpt == null) {
+			synchronized (this) {
+				if (advDDLOpt == null) {
+					advDDLOpt = new PgAdvDDLOpt(this);
+				}
+			}
+		}
+		return advDDLOpt;
+	}
 
-    @Override
-    protected IAdvGeoPreOpt getGeoOpt() {
-        if (geoOpt == null) {
-            synchronized (this) {
-                if (geoOpt == null) {
-                    geoOpt = new PgAdvGeoOpt(this);
-                }
-            }
-        }
-        return geoOpt;
-    }
+	@Override
+	protected IAdvSimplePagePreOpt getSimplePageOpt() {
+		if (simplePageOpt == null) {
+			synchronized (this) {
+				if (simplePageOpt == null) {
+					simplePageOpt = new PgAdvSimplePageOpt(this);
+				}
+			}
+		}
+		return simplePageOpt;
+	}
 
-    @Override
-    protected DialectTableNameProcessor getDialectTableNameProcessor() {
-        return PgDialectTableNameUtil.getInstance();
-    }
+	@Override
+	protected IAdvGeoPreOpt getGeoOpt() {
+		if (geoOpt == null) {
+			synchronized (this) {
+				if (geoOpt == null) {
+					geoOpt = new PgAdvGeoOpt(this);
+				}
+			}
+		}
+		return geoOpt;
+	}
 
+	@Override
+	protected DialectTableNameProcessor getDialectTableNameProcessor() {
+		return PgDialectTableNameUtil.getInstance();
+	}
 
 }

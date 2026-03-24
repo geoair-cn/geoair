@@ -18,20 +18,20 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("cn.geoair.comp.db.service.starter.mapper")
 public class AutoGirDbServiceConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(DsApiUserInfoHelper.class)
-    public DsApiUserInfoHelper dsApiUserInfoHelper() {
-        return new DsApiUserInfoHelper() {
-            @Override
-            public String getSubjectName() {
-                return "geoair";
-            }
+	@Bean
+	@ConditionalOnMissingBean(DsApiUserInfoHelper.class)
+	public DsApiUserInfoHelper dsApiUserInfoHelper() {
+		return new DsApiUserInfoHelper() {
+			@Override
+			public String getSubjectName() {
+				return "geoair";
+			}
 
-            @Override
-            public String getSubjectId() {
-                return "geoair";
-            }
-        };
-    }
+			@Override
+			public String getSubjectId() {
+				return "geoair";
+			}
+		};
+	}
 
 }

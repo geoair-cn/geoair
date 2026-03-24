@@ -28,6 +28,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
 	// 表名处理器（差异化）
 	protected DialectTableNameProcessor dialectTableNameProcessor;
+
 	// 日志实例
 	protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
 
@@ -85,7 +86,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		validateUpdateData(rowData);
 		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema,
+				schemaNameByTableName);
 		// 构建SET子句（通用）
 		String setClause = buildSetClause(rowData);
 		// 差异化：构建按主键更新SQL
@@ -142,7 +144,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		}
 		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema,
+				schemaNameByTableName);
 		// 构建SET子句和WHERE子句（通用）
 		String setClause = buildSetClause(rowData);
 		String whereClause = buildWhereClause(whereMap);
@@ -256,7 +259,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		validateIdKeyAndValue(versionKey, version);
 		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema,
+				schemaNameByTableName);
 		// 构建SET子句（差异化：版本号自增逻辑）
 		String setClause = buildOptimisticLockSetClause(rowData, versionKey);
 		// 差异化：构建乐观锁更新SQL
@@ -293,7 +297,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		}
 		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema,
+				schemaNameByTableName);
 		// 通用字段/占位符构建
 		String fields = String.join(",", rowData.keySet());
 		String placeholders = rowData.keySet().stream().map(key -> "?").collect(Collectors.joining(","));

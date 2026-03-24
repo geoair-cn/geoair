@@ -48,8 +48,6 @@ public class DsApiConfigService {
 	@Autowired
 	GirDsApiConfigDao girDsApiConfigDao;
 
-
-
 	@Resource
 	DsApiUserInfoHelper dsApiUserInfoHelper;
 
@@ -249,8 +247,8 @@ public class DsApiConfigService {
 		String finalProperty = property;
 		list.forEach(t -> {
 			String templ = "## {0}\n- 接口地址： /{1}/{2}\n- 接口备注：{3}\n- Content-Type：{4}\n";
-			temp.append(
-					MessageFormat.format(templ, t.getName(), finalProperty, t.getPath(), t.getNote(), t.getContentType()));
+			temp.append(MessageFormat.format(templ, t.getName(), finalProperty, t.getPath(), t.getNote(),
+					t.getContentType()));
 			temp.append("\n- 请求参数：");
 			if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(t.getContentType())) {
 				String params = t.getParams();

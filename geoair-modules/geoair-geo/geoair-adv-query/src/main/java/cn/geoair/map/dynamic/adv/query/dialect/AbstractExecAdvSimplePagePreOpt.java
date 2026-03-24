@@ -20,7 +20,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 
-public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSimplePageOpt implements IAdvSimplePagePreOpt {
+public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSimplePageOpt
+		implements IAdvSimplePagePreOpt {
 
 	protected static final GiLogger log = GirLogger.getLoger();
 

@@ -38,79 +38,83 @@ import lombok.extern.slf4j.Slf4j;
 @GaApi(tags = "GirDs表相关的接口")
 public class GirDsTableController {
 
-    @Resource
-    GirDsDataSourceDao girDsDataSourceDao;
+	@Resource
+	GirDsDataSourceDao girDsDataSourceDao;
 
-    @RequestMapping("/getAllTables")
-    @GaApiAction(text = "获取所有的表")
-    public List<String> getAllTables(String sourceId) throws SQLException {
-        TokenManager.validateToken();
-        DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-        IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor(PoolManager.getJdbcConnectionPool(dataSourceApo), dataSourceApo.getUrl());
-        List<SchemaTableApo> schemaTableApos = iAdvExecutor.dGetTableAndViewBySchema();
-        List<String> tablesBySchema = schemaTableApos.stream().
-                filter(s -> s.getType().equals(AdvSchemaTableTypeOpt.表) || s.getType().equals(AdvSchemaTableTypeOpt.视图))
-                .map(SchemaTableApo::getName).collect(Collectors.toList());
-        return tablesBySchema;
-    }
+	@RequestMapping("/getAllTables")
+	@GaApiAction(text = "获取所有的表")
+	public List<String> getAllTables(String sourceId) throws SQLException {
+		TokenManager.validateToken();
+		DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
+		IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor(PoolManager.getJdbcConnectionPool(dataSourceApo),
+				dataSourceApo.getUrl());
+		List<SchemaTableApo> schemaTableApos = iAdvExecutor.dGetTableAndViewBySchema();
+		List<String> tablesBySchema = schemaTableApos.stream().filter(
+				s -> s.getType().equals(AdvSchemaTableTypeOpt.表) || s.getType().equals(AdvSchemaTableTypeOpt.视图))
+				.map(SchemaTableApo::getName).collect(Collectors.toList());
+		return tablesBySchema;
+	}
 
-    @RequestMapping("/getAllColumns")
-    @GaApiAction(text = "获取表的所有列")
-    public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
-        TokenManager.validateToken();
-        DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-        List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
-        return columns;
-    }
+	@RequestMapping("/getAllColumns")
+	@GaApiAction(text = "获取表的所有列")
+	public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
+		TokenManager.validateToken();
+		DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
+		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+		List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
+		return columns;
+	}
 
-    @RequestMapping("/getAllColumnsLabels")
-    @GaApiAction(text = "获取表的所有列")
-    public List<String> getAllColumnsLabels(String sourceId, String table) throws SQLException {
-        TokenManager.validateToken();
-        DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-        DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-        List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
-        List<String> labels = null;
-        if (columns != null) {
-            labels = columns.stream().map(c -> c.getString("label")).collect(Collectors.toList());
-        }
-        return labels;
-    }
+	@RequestMapping("/getAllColumnsLabels")
+	@GaApiAction(text = "获取表的所有列")
+	public List<String> getAllColumnsLabels(String sourceId, String table) throws SQLException {
+		TokenManager.validateToken();
+		DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
+		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+		List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
+		List<String> labels = null;
+		if (columns != null) {
+			labels = columns.stream().map(c -> c.getString("label")).collect(Collectors.toList());
+		}
+		return labels;
+	}
 
-
-//	@RequestMapping("/getAllTables")
-//	@GaApiAction(text = "获取所有的表")
-//	public List<JSONObject> getAllTables(String sourceId) throws SQLException {
-//		TokenManager.validateToken();
-//		DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-//		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-//		List<String> tables = JdbcUtil.getAllTables(connection, dataSourceApo.getTableSql());
-//		List<JSONObject> list = tables.stream().map(t -> {
-//			JSONObject jo = new JSONObject();
-//			jo.put("label", t);
-//			try {
-//				DruidPooledConnection conn = PoolManager.getPooledConnection(dataSourceApo);
-//				jo.put("columns", JdbcUtil.getRDBMSColumnProperties(conn, dataSourceApo.getType(), t));
-//			}
-//			catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//			// jo.put("columns",);
-//			jo.put("showColumns", false);
-//			return jo;
-//		}).collect(Collectors.toList());
-//		return list;
-//	}
-//
-//	@RequestMapping("/getAllColumns")
-//	@GaApiAction(text = "获取表的所有列")
-//	public List<JSONObject> getAllTables(String sourceId, String table) throws SQLException {
-//		TokenManager.validateToken();
-//		DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
-//		DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
-//		List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection, dataSourceApo.getType(), table);
-//		return columns;
-//	}
+	// @RequestMapping("/getAllTables")
+	// @GaApiAction(text = "获取所有的表")
+	// public List<JSONObject> getAllTables(String sourceId) throws SQLException {
+	// TokenManager.validateToken();
+	// DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
+	// DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+	// List<String> tables = JdbcUtil.getAllTables(connection,
+	// dataSourceApo.getTableSql());
+	// List<JSONObject> list = tables.stream().map(t -> {
+	// JSONObject jo = new JSONObject();
+	// jo.put("label", t);
+	// try {
+	// DruidPooledConnection conn = PoolManager.getPooledConnection(dataSourceApo);
+	// jo.put("columns", JdbcUtil.getRDBMSColumnProperties(conn, dataSourceApo.getType(),
+	// t));
+	// }
+	// catch (SQLException e) {
+	// e.printStackTrace();
+	// }
+	// // jo.put("columns",);
+	// jo.put("showColumns", false);
+	// return jo;
+	// }).collect(Collectors.toList());
+	// return list;
+	// }
+	//
+	// @RequestMapping("/getAllColumns")
+	// @GaApiAction(text = "获取表的所有列")
+	// public List<JSONObject> getAllTables(String sourceId, String table) throws
+	// SQLException {
+	// TokenManager.validateToken();
+	// DataSourceApo dataSourceApo = girDsDataSourceDao.getById(sourceId);
+	// DruidPooledConnection connection = PoolManager.getPooledConnection(dataSourceApo);
+	// List<JSONObject> columns = JdbcUtil.getRDBMSColumnProperties(connection,
+	// dataSourceApo.getType(), table);
+	// return columns;
+	// }
 
 }

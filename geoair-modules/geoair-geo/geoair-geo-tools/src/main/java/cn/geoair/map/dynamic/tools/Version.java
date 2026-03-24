@@ -9,19 +9,19 @@ import cn.hutool.core.util.StrUtil;
 
 public class Version {
 
-    private static final String VERSION = "J8.1.0-SNAPSHOT";
+	private static final String VERSION = "J8.1.0-SNAPSHOT";
 
-    public static String getVersion() {
-        return VERSION;
-    }
+	public static String getVersion() {
+		return VERSION;
+	}
 
-    public static void main(String[] args) {
-        Gir.log.info("Current version: " + VERSION);
-    }
+	public static void main(String[] args) {
+		Gir.log.info("Current version: " + VERSION);
+	}
 
-    public static Set<Class<?>> getAllUtils() {
-        return ClassUtil.scanPackage("cn.geoair.map.dynamic.tools" ,
-                (clazz) -> !clazz.isInterface() && StrUtil.endWith(clazz.getSimpleName(), "Utils" ));
-    }
+	public static Set<Class<?>> getAllUtils() {
+		return ClassUtil.scanPackage("cn.geoair.map.dynamic.tools",
+				(clazz) -> !clazz.isInterface() && StrUtil.endWith(clazz.getSimpleName(), "Utils"));
+	}
 
 }

@@ -21,6 +21,7 @@ public class MysqlAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 		// 绑定MySQL专属的表名处理器
 		this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();
 	}
+
 	// MySQL默认主键字段
 	private static final String MYSQL_DEFAULT_PRIMARY_KEY = "id";
 

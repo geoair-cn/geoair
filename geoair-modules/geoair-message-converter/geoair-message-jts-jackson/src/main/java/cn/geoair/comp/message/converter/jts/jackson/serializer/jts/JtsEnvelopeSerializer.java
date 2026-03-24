@@ -27,18 +27,21 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 class JtsEnvelopeSerializer extends JsonSerializer<Envelope> {
-    @Override
-    public void serialize(Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeStartArray();
-        jsonGenerator.writeNumber(round(bBox.getMinX(), 6));
-        jsonGenerator.writeNumber(round(bBox.getMinY(), 6));
-        jsonGenerator.writeNumber(round(bBox.getMaxX(), 6));
-        jsonGenerator.writeNumber(round(bBox.getMaxY(), 6));
-        jsonGenerator.writeEndArray();
-    }
 
-    public static double round(double value, int decimalPlaces) {
-        double factor = Math.pow(10, decimalPlaces);
-        return Math.round(value * factor) / factor;
-    }
+	@Override
+	public void serialize(Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+			throws IOException, JsonProcessingException {
+		jsonGenerator.writeStartArray();
+		jsonGenerator.writeNumber(round(bBox.getMinX(), 6));
+		jsonGenerator.writeNumber(round(bBox.getMinY(), 6));
+		jsonGenerator.writeNumber(round(bBox.getMaxX(), 6));
+		jsonGenerator.writeNumber(round(bBox.getMaxY(), 6));
+		jsonGenerator.writeEndArray();
+	}
+
+	public static double round(double value, int decimalPlaces) {
+		double factor = Math.pow(10, decimalPlaces);
+		return Math.round(value * factor) / factor;
+	}
+
 }

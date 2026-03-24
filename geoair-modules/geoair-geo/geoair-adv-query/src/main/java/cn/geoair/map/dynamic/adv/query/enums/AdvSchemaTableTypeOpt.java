@@ -11,16 +11,6 @@ import org.geotools.geometry.jts.Geometries;
  */
 public enum AdvSchemaTableTypeOpt implements Serializable {
 
-    视图,
-    表,
-    方法,
-    存储过程,
-    触发器,
-    索引,
-    序列,
-    数据源连接参数值,
-    函数,
-    未知,
-    ;
+	视图, 表, 方法, 存储过程, 触发器, 索引, 序列, 数据源连接参数值, 函数, 未知,;
 
 }

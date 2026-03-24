@@ -16,7 +16,6 @@ public class ResponseDto<T> implements GiResult<T> {
 
 	boolean success;
 
-
 	T data;
 
 	public int getCode() {

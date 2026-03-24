@@ -9,51 +9,53 @@ import com.jolbox.bonecp.BoneCPDataSource;
  */
 public class BoneCPDataSourceWrapper extends AbstractDataSourceWrapper {
 
-    private static Boolean canInit = null;
+	private static Boolean canInit = null;
 
-    public BoneCPDataSourceWrapper(DataSource targetDataSource) {
-        super(targetDataSource);
-    }
+	public BoneCPDataSourceWrapper(DataSource targetDataSource) {
+		super(targetDataSource);
+	}
 
-    @Override
-    protected Class<? extends DataSource> getTargetDataSourceClass() {
-        return BoneCPDataSource.class;
-    }
+	@Override
+	protected Class<? extends DataSource> getTargetDataSourceClass() {
+		return BoneCPDataSource.class;
+	}
 
-    public static boolean canInit() {
-        if (canInit != null) {
-            return canInit;
-        }
-        try {
-            Class.forName("com.jolbox.bonecp.BoneCPDataSource");
-            canInit = true;
-        } catch (ClassNotFoundException e) {
-            canInit = false;
-        }
-        return canInit;
-    }
+	public static boolean canInit() {
+		if (canInit != null) {
+			return canInit;
+		}
+		try {
+			Class.forName("com.jolbox.bonecp.BoneCPDataSource");
+			canInit = true;
+		}
+		catch (ClassNotFoundException e) {
+			canInit = false;
+		}
+		return canInit;
+	}
 
-    @Override
-    public boolean close() {
-        getBoneCPDataSource().close();
-        return true;
-    }
+	@Override
+	public boolean close() {
+		getBoneCPDataSource().close();
+		return true;
+	}
 
-    @Override
-    public String getSimpleDataSourceName() {
-        return null;
-    }
+	@Override
+	public String getSimpleDataSourceName() {
+		return null;
+	}
 
-    @Override
-    public String getJdbcUrl() {
-        BoneCPDataSource boneCPDataSource = (BoneCPDataSource) targetDataSource;
-        return boneCPDataSource.getJdbcUrl();
-    }
+	@Override
+	public String getJdbcUrl() {
+		BoneCPDataSource boneCPDataSource = (BoneCPDataSource) targetDataSource;
+		return boneCPDataSource.getJdbcUrl();
+	}
 
-    public BoneCPDataSource getBoneCPDataSource() {
-        if (isSupport()) {
-            return (BoneCPDataSource) targetDataSource;
-        }
-        throw new IllegalArgumentException("当前数据源不是BoneCP数据源");
-    }
+	public BoneCPDataSource getBoneCPDataSource() {
+		if (isSupport()) {
+			return (BoneCPDataSource) targetDataSource;
+		}
+		throw new IllegalArgumentException("当前数据源不是BoneCP数据源");
+	}
+
 }

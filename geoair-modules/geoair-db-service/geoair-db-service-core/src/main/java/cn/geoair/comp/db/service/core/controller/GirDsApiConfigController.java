@@ -62,8 +62,6 @@ public class GirDsApiConfigController {
 	@Autowired
 	DsGroupService dsGroupService;
 
-
-
 	@PostMapping("/context")
 	public String getContext() {
 		String property = SpringUtil.getProperty("server.servlet.context-path");

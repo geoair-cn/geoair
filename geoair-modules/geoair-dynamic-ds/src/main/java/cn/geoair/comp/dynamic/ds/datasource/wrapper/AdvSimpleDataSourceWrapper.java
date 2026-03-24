@@ -9,36 +9,34 @@ import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
  */
 public class AdvSimpleDataSourceWrapper extends AbstractDataSourceWrapper {
 
+	public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
+		super(targetDataSource);
+	}
 
-    public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
-        super(targetDataSource);
-    }
+	public static boolean canInit() {
 
+		return true;
+	}
 
-    public static boolean canInit() {
+	@Override
+	public boolean close() {
+		return true;
+	}
 
-        return true;
-    }
+	protected Class<? extends DataSource> getTargetDataSourceClass() {
+		return AdvSimpleDataSource.class;
+	}
 
-    @Override
-    public boolean close() {
-        return true;
-    }
-    protected Class<? extends DataSource> getTargetDataSourceClass() {
-        return AdvSimpleDataSource.class;
-    }
+	@Override
+	public String getSimpleDataSourceName() {
 
-    @Override
-    public String getSimpleDataSourceName() {
+		return null;
+	}
 
-        return null;
-    }
+	@Override
+	public String getJdbcUrl() {
 
-    @Override
-    public String getJdbcUrl() {
-
-        return null;
-    }
-
+		return null;
+	}
 
 }
