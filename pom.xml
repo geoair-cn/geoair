@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-   <groupId>cn.geoair.devkit</groupId>
+    <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
     <name>geoair-framework</name>
@@ -21,7 +21,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
         <versions-maven-release.version>3.1.0</versions-maven-release.version>
         <redisson.version>3.18.0</redisson.version>
-        <sa-token-version> 1.44.0</sa-token-version>
+        <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <fastjson.version>2.0.61</fastjson.version>
@@ -51,7 +51,7 @@
         <fastjson1x.version>2.0.61</fastjson1x.version>
 
         <jackson.version>2.13.5</jackson.version>
-<!--        <jackson.version>2.15.2</jackson.version>-->
+        <!--        <jackson.version>2.15.2</jackson.version>-->
         <gson.version>2.9.1</gson.version>
         <javax-persistence.version>2.2</javax-persistence.version>
         <javax-cache.version>1.1.1</javax-cache.version>
