@@ -63,7 +63,7 @@ public class DataSourceGetter implements IDataSourceGetter {
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
-            schemaName = schemaNameMap.get(databaseName);
+            schemaName = schemaNameMap.get(dataSourceName);
             return;
         }
         if (schemaNameGetterFunction != null) {
