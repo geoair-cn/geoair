@@ -1,9 +1,21 @@
 package cn.geoair.comp.db.service.core.basic.executor;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.alibaba.druid.pool.DruidPooledConnection;
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.support.GirPager;
-import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
 import cn.geoair.comp.db.service.core.basic.dto.ApiSqlDto;
 import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
@@ -12,21 +24,9 @@ import cn.geoair.comp.db.service.core.basic.util.JdbcUtil;
 import cn.geoair.comp.db.service.core.basic.util.PoolManager;
 import cn.geoair.comp.db.service.core.basic.util.SqlEngineUtil;
 import cn.geoair.comp.db.service.core.dialect.BaseDialect;
-
-import com.alibaba.druid.pool.DruidPooledConnection;
-import com.alibaba.fastjson2.JSONObject;
+import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component

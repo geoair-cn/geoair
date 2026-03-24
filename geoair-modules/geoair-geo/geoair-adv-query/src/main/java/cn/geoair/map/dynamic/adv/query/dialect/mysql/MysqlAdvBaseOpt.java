@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
@@ -9,8 +10,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseUpdateOpt;
-
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 
 /**
  * @author 张逢吉

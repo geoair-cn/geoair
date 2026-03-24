@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-//import org.springframework.transaction.annotation.Transactional;
-
+// import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import cn.geoair.base.gpa.dao.GiDeleteDao;
 import cn.geoair.base.gpa.entity.GiEntityRemovable;
 

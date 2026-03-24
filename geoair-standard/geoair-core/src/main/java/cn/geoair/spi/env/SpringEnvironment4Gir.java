@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 
 import cn.geoair.base.env.GiEnvironmenter;
 import cn.geoair.base.env.GirEnvironmentHelper;
-import cn.geoair.base.env.property.GirPropertyHelper;
 import cn.geoair.base.env.property.GiPropertier;
+import cn.geoair.base.env.property.GirPropertyHelper;
 import cn.geoair.base.env.support.GirSystemEnvironmentOperater;
-import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.base.lang.invoke.GkMethodHand;
 
 /**
  * 读取配置文件

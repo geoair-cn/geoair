@@ -1,21 +1,22 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
+import java.util.Map;
 
 import org.locationtech.jts.geom.*;
 import org.postgresql.util.PGobject;
 
-import java.util.Map;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
+import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
+import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * @author ：zhangjun

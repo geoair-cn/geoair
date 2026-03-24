@@ -1,16 +1,18 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org;
 
-import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
+import static cn.geoair.base.Gir.log;
+
+import java.io.IOException;
+
+import org.locationtech.jts.geom.Geometry;
+import org.postgis.PGgeometry;
+
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.locationtech.jts.geom.Geometry;
-import org.postgis.PGgeometry;
 
-import java.io.IOException;
-
-import static cn.geoair.base.Gir.log;
+import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
 
 // PGGeometry 序列化器：转成 JTS Geometry 再用 JtsModule 序列化
 public class OrgPGGeometrySerializer extends StdSerializer<PGgeometry> {

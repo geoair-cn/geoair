@@ -1,12 +1,14 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.data.model.annotation.GaModel;
-import com.fasterxml.classmate.TypeResolver;
-
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.classmate.TypeResolver;
+
+import cn.geoair.base.data.model.annotation.GaModel;
+
 import springfox.documentation.schema.TypeNameExtractor;
 import springfox.documentation.schema.property.ModelSpecificationFactory;
 import springfox.documentation.spi.schema.EnumTypeDeterminer;

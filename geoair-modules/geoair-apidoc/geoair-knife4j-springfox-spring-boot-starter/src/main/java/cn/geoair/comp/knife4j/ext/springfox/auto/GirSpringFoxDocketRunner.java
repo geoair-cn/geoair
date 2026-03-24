@@ -1,11 +1,9 @@
 package cn.geoair.comp.knife4j.ext.springfox.auto;
 
-import cn.geoair.base.exception.GirException;
-import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
-import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
-import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -17,12 +15,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import cn.geoair.base.exception.GirException;
+import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
+
+import springfox.documentation.spring.web.plugins.Docket;
 
 /**
  * SpringFox Docket 动态注册器 在Spring容器启动早期扫描GirSwaggerApiConfig实现类，动态创建并注册Docket Bean

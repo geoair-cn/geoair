@@ -1,8 +1,14 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Consumer;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -11,17 +17,12 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
 import cn.geoair.map.dynamic.adv.query.handler.StreamRsHandler;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.handler.*;
 import cn.hutool.db.sql.SqlExecutor;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * 数据库查询操作抽象父类 封装所有数据库通用的查询逻辑，差异化语法由子类实现

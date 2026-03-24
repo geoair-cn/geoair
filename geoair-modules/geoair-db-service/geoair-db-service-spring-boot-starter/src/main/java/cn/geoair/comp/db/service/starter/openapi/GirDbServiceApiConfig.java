@@ -1,12 +1,14 @@
 package cn.geoair.comp.db.service.starter.openapi;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-import cn.hutool.core.collection.ListUtil;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
+import cn.hutool.core.collection.ListUtil;
 
 /**
  * @author ：张逢吉

@@ -1,9 +1,9 @@
 package cn.geoair.comp.db.service.core.dialect;
 
+import org.springframework.stereotype.Component;
+
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.dialect.DriverNamePool;
-
-import org.springframework.stereotype.Component;
 
 /**
  * @author ：张俊

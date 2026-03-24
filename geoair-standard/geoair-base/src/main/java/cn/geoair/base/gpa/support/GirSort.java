@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+import cn.geoair.base.gpa.support.GirOrder.Direction;
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilStr;
-import cn.geoair.base.gpa.support.GirOrder.Direction;
 
 /**
  * 排序条件对象，用于封装排序规则

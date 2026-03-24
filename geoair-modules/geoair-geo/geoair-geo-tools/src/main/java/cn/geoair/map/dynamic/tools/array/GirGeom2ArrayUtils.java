@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.tools.array;
 
+import org.locationtech.jts.geom.*;
+
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.locationtech.jts.geom.*;
 
 /**
  * 几何对象与坐标数组互转接口实现类 基于JTS实现核心转换逻辑，支持指定坐标顺序，保证点顺序不变

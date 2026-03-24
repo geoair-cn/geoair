@@ -1,13 +1,8 @@
 package cn.geoair.map.dynamic.file.postgis;
 
-import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
-import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
-import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
@@ -18,9 +13,14 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Logger;
+import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
+import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
+import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
 
 public class PostgisGeoFileWriter implements GeoFileWriter {
 

@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.geoserver.beans;
 
+import java.util.Map;
+
 import cn.geoair.map.dynamic.geoserver.enums.DataSourceType;
 
 import lombok.Data;
-
-import java.util.Map;
 
 /** 所有数据源配置的抽象父类 定义通用属性，子类扩展专属属性 */
 @Data

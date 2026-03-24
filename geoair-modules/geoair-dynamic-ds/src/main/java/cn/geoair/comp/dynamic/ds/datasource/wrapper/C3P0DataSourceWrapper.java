@@ -1,8 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import javax.sql.DataSource;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 /**
  * C3P0 数据源包装器

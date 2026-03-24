@@ -1,10 +1,8 @@
 package cn.geoair.comp.knife4j.ext.core.auto;
 
-import cn.geoair.base.Gir;
-import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
-import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
@@ -16,8 +14,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import cn.geoair.base.Gir;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 自动扫描控制器类，并生成DocketInfo列表

@@ -6,8 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.geoair.base.def.annotation.GaParameter;
 import cn.geoair.base.data.model.applyer.GiModelApplyer;
+import cn.geoair.base.def.annotation.GaParameter;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

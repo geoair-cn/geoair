@@ -1,13 +1,13 @@
 package cn.geoair.comp.demo.knife4j.controller.group1;
 
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.comp.demo.knife4j.model.DemoVo1;
 // import io.swagger.annotations.Api;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.comp.demo.knife4j.model.DemoVo1;
 
 /**
  * @author ：张俊

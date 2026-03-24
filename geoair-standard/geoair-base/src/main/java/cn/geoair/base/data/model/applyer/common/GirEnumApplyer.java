@@ -2,11 +2,11 @@ package cn.geoair.base.data.model.applyer.common;
 
 import java.lang.reflect.Field;
 
-import cn.geoair.base.data.model.annotation.GaModelField;
-import cn.geoair.base.def.annotation.GaParameter;
 import cn.geoair.base.data.GiVisuable;
 import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.model.applyer.GiModelFieldApplyer;
+import cn.geoair.base.def.annotation.GaParameter;
 
 public class GirEnumApplyer implements GiModelFieldApplyer {
 

@@ -1,11 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.geoair.map.dynamic.adv.query.result.OptNullGeomAndBasicTypeFromObjectGetter;
-import cn.hutool.core.lang.Pair;
-
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import cn.geoair.map.dynamic.adv.query.result.OptNullGeomAndBasicTypeFromObjectGetter;
+
+import cn.hutool.core.lang.Pair;
 
 /**
  * @author ：张逢吉

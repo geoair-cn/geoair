@@ -1,5 +1,10 @@
 package cn.geoair.orm.spi.jpa;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
+import javax.persistence.*;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
@@ -9,10 +14,6 @@ import cn.geoair.orm.spi.entity.GirEntityField;
 import cn.geoair.orm.spi.entity.GirEntityTable;
 import cn.geoair.orm.spi.support.GirFieldHelper;
 import cn.geoair.orm.spi.support.GirSimpleTypeUtil;
-
-import javax.persistence.*;
-import java.util.LinkedHashSet;
-import java.util.List;
 
 /**
  * jpa实体类的解析器

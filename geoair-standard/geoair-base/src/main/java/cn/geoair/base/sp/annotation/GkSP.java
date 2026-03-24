@@ -6,9 +6,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.geoair.base.sp.support.GirJdkSpLoader;
 import cn.geoair.base.sp.GkSpLoader;
 import cn.geoair.base.sp.support.GirBeanFactorySpLoader;
+import cn.geoair.base.sp.support.GirJdkSpLoader;
 
 /**
  * Service Provider 实现提供者配置

@@ -7,10 +7,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import cn.geoair.base.bean.GirNoUniqueBeanException;
 import cn.geoair.base.exception.GirException;
+import cn.geoair.base.sp.annotation.GkSP;
 import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
-import cn.geoair.base.sp.annotation.GkSP;
 
 public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
 

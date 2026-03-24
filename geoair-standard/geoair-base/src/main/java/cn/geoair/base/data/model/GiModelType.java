@@ -1,8 +1,8 @@
 package cn.geoair.base.data.model;
 
+import cn.geoair.base.data.GiType;
 import cn.geoair.base.data.model.support.GirModelTypeKid;
 import cn.geoair.base.util.GutilStr;
-import cn.geoair.base.data.GiType;
 
 public interface GiModelType extends GiType {
 

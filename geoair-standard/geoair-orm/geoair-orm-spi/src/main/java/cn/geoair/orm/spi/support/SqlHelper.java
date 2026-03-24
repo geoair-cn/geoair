@@ -1,17 +1,16 @@
 package cn.geoair.orm.spi.support;
 
+// import javafx.util.GkPair;
+import java.util.*;
+
 /**
  * @author ：张俊
  * @date ：Created in 2022/6/30 19:00
  * @description： 拼常用SQL的工具类
  */
-
 import cn.geoair.base.data.tuples.GkPair;
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
-//import javafx.util.GkPair;
-
-import java.util.*;
 
 public class SqlHelper {
 

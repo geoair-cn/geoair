@@ -1,14 +1,15 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.listener;
 
-import cn.hutool.core.util.StrUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.spark.scheduler.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import cn.hutool.core.util.StrUtil;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author ：张逢吉

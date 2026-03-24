@@ -1,7 +1,5 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
-import cn.geoair.base.Gir;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -9,6 +7,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import cn.geoair.base.Gir;
 
 /**
  * 解决 Spring Security 对 PasswordEncoder 的歧义依赖： 1. 给 GeoServer 的 pbePasswordEncoder

@@ -1,11 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+
 import cn.hutool.core.util.StrUtil;
 
 /**

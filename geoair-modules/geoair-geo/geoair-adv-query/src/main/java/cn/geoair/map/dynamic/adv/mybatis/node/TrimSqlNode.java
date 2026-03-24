@@ -1,10 +1,11 @@
 package cn.geoair.map.dynamic.adv.mybatis.node;
 
-import cn.geoair.map.dynamic.adv.mybatis.context.Context;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+import cn.geoair.map.dynamic.adv.mybatis.context.Context;
 
 public class TrimSqlNode implements SqlNode {
 

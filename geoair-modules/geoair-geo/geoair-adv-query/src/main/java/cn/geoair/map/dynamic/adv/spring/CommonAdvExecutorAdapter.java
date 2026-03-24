@@ -1,14 +1,12 @@
 package cn.geoair.map.dynamic.adv.spring;
 
-import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import javax.sql.DataSource;
 
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.tools.GirService;
-import com.alibaba.druid.pool.DruidDataSource;
-
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉

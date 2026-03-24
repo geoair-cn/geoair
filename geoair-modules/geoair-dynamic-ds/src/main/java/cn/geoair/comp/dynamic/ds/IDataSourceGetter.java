@@ -1,12 +1,13 @@
 package cn.geoair.comp.dynamic.ds;
 
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.function.Supplier;
+
+import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 
 /**
  * 数据源获取器接口

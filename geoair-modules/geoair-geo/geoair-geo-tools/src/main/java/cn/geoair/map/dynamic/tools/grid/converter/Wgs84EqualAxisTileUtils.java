@@ -1,11 +1,12 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
-import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import java.util.Objects;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
-import java.util.Objects;
+import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 
 /**
  * WGS84（4326）等轴瓦片转换实现类 核心特征：经度/纬度轴使用相同瓦片跨度（均为360/2^z），兼容Mapbox4490逻辑

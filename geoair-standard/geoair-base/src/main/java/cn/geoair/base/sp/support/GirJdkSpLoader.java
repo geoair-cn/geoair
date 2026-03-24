@@ -8,8 +8,8 @@ import java.util.ServiceLoader;
 
 import cn.geoair.base.bean.GirNoUniqueBeanException;
 import cn.geoair.base.exception.GirException;
-import cn.geoair.base.util.GutilGenericType;
 import cn.geoair.base.sp.annotation.GkSP;
+import cn.geoair.base.util.GutilGenericType;
 
 /**
  * ServiceLoader 提供的spLoader

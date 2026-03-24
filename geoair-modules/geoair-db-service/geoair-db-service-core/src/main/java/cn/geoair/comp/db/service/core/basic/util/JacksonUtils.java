@@ -1,10 +1,11 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.comp.message.converter.jts.jackson.utils.GirJacksonUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import cn.geoair.comp.message.converter.jts.jackson.utils.GirJacksonUtils;
 
 /**
  * @author ：张俊

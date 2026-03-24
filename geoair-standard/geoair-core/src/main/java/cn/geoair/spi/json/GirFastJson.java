@@ -1,12 +1,13 @@
 package cn.geoair.spi.json;
 
+import java.lang.reflect.Type;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import cn.geoair.base.bean.GkBeanPath;
 import cn.geoair.base.json.GirJSON;
-
-import java.lang.reflect.Type;
 
 /**
  * @author ：张俊

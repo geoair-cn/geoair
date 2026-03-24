@@ -1,12 +1,12 @@
 package cn.geoair.base.util;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import cn.geoair.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 public class GutilGenericType {
 

@@ -1,10 +1,11 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
+import java.io.Serializable;
+
 import cn.geoair.map.dynamic.mvt.tools.model.PPbfType;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
 
 /**
  * @author ：张逢吉

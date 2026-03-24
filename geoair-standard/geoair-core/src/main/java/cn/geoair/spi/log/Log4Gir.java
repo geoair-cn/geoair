@@ -1,5 +1,8 @@
 package cn.geoair.spi.log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
@@ -8,9 +11,6 @@ import cn.geoair.base.log.GirConsoleLog;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.text.GuStrFormatter;
 import cn.geoair.base.util.GutilClass;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Log4Gir {
 

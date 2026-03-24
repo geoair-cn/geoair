@@ -6,12 +6,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import cn.geoair.base.data.model.GiModelType;
+import cn.geoair.base.data.model.GiTypeModelable;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.support.GirTypeKid;
 import cn.geoair.base.util.GutilDigest;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.base.data.model.GiModelType;
-import cn.geoair.base.data.model.GiTypeModelable;
 
 public class GirModelTypeKid extends GirTypeKid implements GiModelType {
 

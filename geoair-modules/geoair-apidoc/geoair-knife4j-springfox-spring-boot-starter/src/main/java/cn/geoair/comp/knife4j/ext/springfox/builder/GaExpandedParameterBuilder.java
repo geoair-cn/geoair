@@ -1,12 +1,29 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.data.GiVisualValuable;
-import cn.geoair.base.data.common.GemNull;
-import cn.geoair.base.data.model.annotation.GaModelField;
-import io.swagger.annotations.ApiParam;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import static org.springframework.util.StringUtils.isEmpty;
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+import static springfox.documentation.swagger.readers.parameter.Examples.examples;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import io.swagger.annotations.ApiParam;
+
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemNull;
+import cn.geoair.base.data.model.annotation.GaModelField;
+
 import springfox.documentation.builders.ExampleBuilder;
 import springfox.documentation.service.AllowableListValues;
 import springfox.documentation.service.AllowableValues;
@@ -17,19 +34,6 @@ import springfox.documentation.spi.service.contexts.ParameterExpansionContext;
 import springfox.documentation.spring.web.DescriptionResolver;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger.schema.ApiModelProperties;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.isEmpty;
-import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
-import static springfox.documentation.swagger.readers.parameter.Examples.examples;
 
 /**
  * @author ：张逢吉

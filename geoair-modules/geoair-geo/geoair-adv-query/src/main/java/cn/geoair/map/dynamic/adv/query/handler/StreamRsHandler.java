@@ -1,14 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.handler;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.hutool.db.Entity;
-import cn.hutool.db.handler.HandleHelper;
-import cn.hutool.db.handler.RsHandler;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.function.Consumer;
+
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
+import cn.hutool.db.Entity;
+import cn.hutool.db.handler.HandleHelper;
+import cn.hutool.db.handler.RsHandler;
 
 /**
  * @author ：张逢吉

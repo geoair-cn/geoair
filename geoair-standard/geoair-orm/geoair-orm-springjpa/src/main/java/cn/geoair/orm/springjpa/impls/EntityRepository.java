@@ -1,6 +1,7 @@
 package cn.geoair.orm.springjpa.impls;
 
 import java.io.Serializable;
+
 import cn.geoair.base.gpa.dao.GiEntityDao;
 import cn.geoair.base.gpa.entity.GiCrudEntity;
 

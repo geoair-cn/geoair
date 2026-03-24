@@ -1,21 +1,24 @@
 package cn.geoair.comp.knife4j.ext.springfox.aspect;
 
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.util.GutilObject;
-import cn.geoair.base.util.GutilStr;
-import io.swagger.annotations.Api;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.core.annotation.AnnotationUtils;
-import springfox.documentation.spi.service.contexts.ApiListingContext;
+import static com.google.common.collect.Sets.newTreeSet;
+import static com.google.common.collect.Sets.union;
+import static springfox.documentation.service.Tags.emptyTags;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Sets.newTreeSet;
-import static com.google.common.collect.Sets.union;
-import static springfox.documentation.service.Tags.emptyTags;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.annotation.AnnotationUtils;
+
+import io.swagger.annotations.Api;
+
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.util.GutilObject;
+import cn.geoair.base.util.GutilStr;
+
+import springfox.documentation.spi.service.contexts.ApiListingContext;
 
 /**
  * @author ：张俊

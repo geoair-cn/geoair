@@ -1,28 +1,14 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
 
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.hutool.core.lang.caller.CallerUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.log.Log;
-import cn.hutool.log.LogFactory;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
-import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
-import lombok.extern.slf4j.Slf4j;
+import javax.sql.DataSource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaFutureAction;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -30,19 +16,35 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.storage.StorageLevel;
+
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
+
+import cn.hutool.core.lang.caller.CallerUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.hutool.log.Log;
+import cn.hutool.log.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
-
-import javax.sql.DataSource;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class SparkVectorTileGeneratorAll implements Serializable {

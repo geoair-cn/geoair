@@ -1,32 +1,32 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.hutool.core.collection.ListUtil;
+import java.io.Serializable;
+import java.util.*;
 
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
-
-import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
-import scala.Tuple2;
 
-import java.io.Serializable;
-import java.util.*;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
+import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
+import scala.Tuple2;
 
 /**
  * 生成可序列化的spark的任务

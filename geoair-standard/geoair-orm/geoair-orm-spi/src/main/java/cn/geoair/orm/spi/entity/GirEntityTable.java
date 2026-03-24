@@ -1,9 +1,10 @@
 package cn.geoair.orm.spi.entity;
 
-import cn.geoair.base.util.GutilStr;
+import java.util.*;
 
 import javax.persistence.Table;
-import java.util.*;
+
+import cn.geoair.base.util.GutilStr;
 
 /**
  * @author ：张俊

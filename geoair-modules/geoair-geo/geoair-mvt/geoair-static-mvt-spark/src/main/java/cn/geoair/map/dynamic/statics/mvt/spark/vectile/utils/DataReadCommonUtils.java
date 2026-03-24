@@ -1,10 +1,11 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.hutool.core.util.StrUtil;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
+
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 数据读取通用工具类 抽离ID分页/BBox分片的通用逻辑

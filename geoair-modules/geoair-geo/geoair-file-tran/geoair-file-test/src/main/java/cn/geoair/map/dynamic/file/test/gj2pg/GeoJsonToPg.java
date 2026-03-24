@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.file.test.gj2pg;
 
 import static cn.geoair.base.Gir.log;
 
+import java.io.IOException;
+
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTran;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTranImpl;
@@ -13,8 +15,6 @@ import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisGeoFileWriter;
 import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
-
-import java.io.IOException;
 
 public class GeoJsonToPg {
 

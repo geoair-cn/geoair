@@ -1,9 +1,9 @@
 package cn.geoair.comp.dynamic.ds.utils;
 
-import lombok.Getter;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import lombok.Getter;
 
 /**
  * 创建人: 张逢吉 创建时间: 2025/9/30 09:28 描述: 将JDBC URL拆分为各个组件，支持解析参数为Map（适配PostgreSQL/MySQL等）

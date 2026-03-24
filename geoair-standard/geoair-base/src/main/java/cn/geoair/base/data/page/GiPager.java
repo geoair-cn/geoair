@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import cn.geoair.base.convert.GiConverter;
-import cn.geoair.base.util.GutilClass;
-import cn.geoair.base.util.GutilGenericType;
 import cn.geoair.base.data.GiValuable;
 import cn.geoair.base.sp.GirSpHelper;
+import cn.geoair.base.util.GutilClass;
+import cn.geoair.base.util.GutilGenericType;
 
 /**
  * 分页结果集接口

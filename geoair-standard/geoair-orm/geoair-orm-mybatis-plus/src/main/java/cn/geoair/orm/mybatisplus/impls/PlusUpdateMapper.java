@@ -4,16 +4,17 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import cn.geoair.base.util.GutilObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.gpa.dao.GiUpdateDao;
 import cn.geoair.base.gpa.entity.GiEntityAlterable;
+import cn.geoair.base.util.GutilObject;
 
 public interface PlusUpdateMapper<T extends GiEntityAlterable<PK>, PK extends Serializable>
 		extends GiUpdateDao<T, PK>, BaseMapper<T> {

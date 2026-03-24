@@ -7,11 +7,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.sql.DataSource;
 
+import cn.geoair.base.gpa.dao.GiDao;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
-import cn.geoair.base.gpa.dao.GiDao;
 
 /**
  * 分表Dao, dao继承该类型实现分表功能

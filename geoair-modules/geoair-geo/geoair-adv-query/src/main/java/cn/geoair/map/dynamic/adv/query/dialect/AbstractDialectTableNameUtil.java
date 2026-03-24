@@ -1,13 +1,14 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 数据库方言表名处理器抽象父类 封装所有数据库通用的表名/字段名处理逻辑，差异化逻辑由子类实现

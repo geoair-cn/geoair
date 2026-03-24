@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.tools.simple.executor;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 
 /**
  * 代理的线程池

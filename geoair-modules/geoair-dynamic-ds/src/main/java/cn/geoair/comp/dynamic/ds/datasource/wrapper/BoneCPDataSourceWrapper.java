@@ -1,8 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import com.jolbox.bonecp.BoneCPDataSource;
-
 import javax.sql.DataSource;
+
+import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
  * BoneCP 数据源包装器（轻量级高性能连接池）

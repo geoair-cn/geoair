@@ -5,7 +5,6 @@ package cn.geoair.orm.spi;
  * @date ：Created in 2022/6/30 15:14
  * @description： TODO
  */
-
 import cn.geoair.orm.spi.entity.GirEntityTable;
 
 /**

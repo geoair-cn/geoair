@@ -1,10 +1,10 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.base.Gir;
+import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.IOException;
+import cn.geoair.base.Gir;
 
 public class DESUtils {
 

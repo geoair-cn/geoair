@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
-import cn.geoair.base.Gir;
-
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import cn.geoair.base.Gir;
 
 /** 内置在三方Jar中的日志依赖检测初始化器 检测log4j-to-slf4j/log4j-api是否存在，缺失则抛出友好提示 */
 public class Log4jDependencyDetector implements ApplicationContextInitializer<ConfigurableApplicationContext> {

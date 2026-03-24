@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 
 /**
  * 数据插入相关的基础操作接口

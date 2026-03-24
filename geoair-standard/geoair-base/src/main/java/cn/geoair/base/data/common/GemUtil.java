@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.geoair.base.data.support.GirVisualValueKid;
 import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.support.GirVisualValueKid;
 
 public class GemUtil {
 

@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.geoserver.gss;
 
+import java.io.IOException;
+
 import org.geoserver.catalog.Catalog;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.security.*;
@@ -8,8 +10,6 @@ import org.geoserver.security.impl.*;
 import org.geoserver.security.password.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
 
 /** 替代 GeoServer 原生 applicationSecurityContext.xml 的配置类 手动定义安全相关 Bean，无需引入原生 XML */
 @Configuration

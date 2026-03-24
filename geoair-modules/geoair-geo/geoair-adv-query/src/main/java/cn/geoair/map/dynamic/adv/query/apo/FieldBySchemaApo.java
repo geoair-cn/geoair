@@ -1,12 +1,13 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
+import java.io.Serializable;
+
 import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.adv.dbmeta.DefaultJavaType;
 import cn.geoair.map.dynamic.adv.dbmeta.PostgreSqlType;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-import lombok.Data;
 
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * 数据库表的信息流水表(TableSchema)实体类

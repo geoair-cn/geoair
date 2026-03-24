@@ -1,9 +1,9 @@
 package cn.geoair.comp.knife4j.ext.springfox.model;
 
-import com.fasterxml.classmate.ResolvedType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.classmate.ResolvedType;
 
 /**
  * @author ：张俊

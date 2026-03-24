@@ -1,33 +1,35 @@
 package cn.geoair.map.dynamic.mvt.exec;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
-import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-import cn.geoair.map.dynamic.mvt.dto.TileExecutorConfig;
-import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
-import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
-import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
-import cn.geoair.map.dynamic.tools.page.PageActuator;
-import cn.geoair.map.dynamic.tools.page.PageConditionDef;
-import cn.geoair.map.dynamic.tools.page.PageConfig;
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
+import cn.geoair.map.dynamic.mvt.dto.TileExecutorConfig;
+import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
+import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
+import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.page.PageActuator;
+import cn.geoair.map.dynamic.tools.page.PageConditionDef;
+import cn.geoair.map.dynamic.tools.page.PageConfig;
+
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 矢量瓦片查询工具 V2版本，该版本把客户端传入的sql全部当做一个临时表进行处理

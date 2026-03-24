@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import org.locationtech.jts.geom.Geometry;
+
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 
 import net.postgis.jdbc.PGgeometry;
-
-import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author ：张逢吉

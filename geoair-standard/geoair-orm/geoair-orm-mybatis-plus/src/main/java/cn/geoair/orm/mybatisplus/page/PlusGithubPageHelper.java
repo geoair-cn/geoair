@@ -1,16 +1,17 @@
 package cn.geoair.orm.mybatisplus.page;
 
+import java.util.List;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.data.page.GfunPageExcute;
 import cn.geoair.base.data.page.GiPageExcuter;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.gpa.support.GirSort;
-
-import java.util.List;
 
 /**
  * TkMapper + GitHubPager的组合工具

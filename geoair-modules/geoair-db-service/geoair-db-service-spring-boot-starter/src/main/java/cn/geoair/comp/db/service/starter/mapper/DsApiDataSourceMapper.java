@@ -1,12 +1,12 @@
 package cn.geoair.comp.db.service.starter.mapper;
 
+import java.util.List;
+
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
 import cn.geoair.comp.db.service.core.dao.GirDsDataSourceDao;
 import cn.geoair.comp.db.service.starter.model.dto.DsApiDataSourceDto;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiDataSourcePo;
 import cn.geoair.orm.tkmapper.impls.TkEntityMapper;
-
-import java.util.List;
 
 /**
  * 数据源信息Mapper接口

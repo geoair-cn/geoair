@@ -1,9 +1,10 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+
+import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * Apache DBCP2 数据源包装器

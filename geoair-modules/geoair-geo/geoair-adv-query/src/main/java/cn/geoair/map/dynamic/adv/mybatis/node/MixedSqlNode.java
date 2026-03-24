@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.adv.mybatis.node;
 
-import cn.geoair.map.dynamic.adv.mybatis.context.Context;
-
 import java.util.List;
 import java.util.Set;
+
+import cn.geoair.map.dynamic.adv.mybatis.context.Context;
 
 public class MixedSqlNode implements SqlNode {
 

@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import java.util.List;
+import java.util.Map;
+
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 空间处理相关操作接口

@@ -1,10 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 public class SpringDiverManagerSourceWrapper extends AbstractDataSourceWrapper {
 

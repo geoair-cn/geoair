@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools;
 
 import cn.geoair.base.Gir;
+
 import cn.hutool.core.lang.Singleton;
 
 /**

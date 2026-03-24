@@ -1,12 +1,9 @@
 package cn.geoair.map.dynamic.adv.spring;
 
-import cn.geoair.base.Gir;
-import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
-import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
-import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
+import java.util.Optional;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -15,12 +12,17 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration; // 必须添加这个注解
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-import javax.sql.DataSource;
-import java.util.Optional;
+import cn.geoair.base.Gir;
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
+import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * @author ：张逢吉

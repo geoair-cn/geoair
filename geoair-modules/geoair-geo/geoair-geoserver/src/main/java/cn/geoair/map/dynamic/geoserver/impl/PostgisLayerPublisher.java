@@ -1,8 +1,7 @@
 package cn.geoair.map.dynamic.geoserver.impl;
 
-import cn.geoair.map.dynamic.geoserver.api.LayerPublisher;
-import cn.geoair.map.dynamic.geoserver.enums.OgcServiceType;
-import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.geoserver.catalog.*;
 import org.geoserver.config.GeoServer;
@@ -13,8 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
+import cn.geoair.map.dynamic.geoserver.api.LayerPublisher;
+import cn.geoair.map.dynamic.geoserver.enums.OgcServiceType;
+import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
 
 /** PostGIS 数据源的图层发布实现类 */
 @Component

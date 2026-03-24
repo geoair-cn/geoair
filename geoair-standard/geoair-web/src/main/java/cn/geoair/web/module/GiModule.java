@@ -1,7 +1,6 @@
 package cn.geoair.web.module;
 
 import java.io.Serializable;
-import java.util.List;
 
 public interface GiModule extends Serializable {
 

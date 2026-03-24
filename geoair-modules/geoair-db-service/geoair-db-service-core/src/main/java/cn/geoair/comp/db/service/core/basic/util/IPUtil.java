@@ -1,9 +1,5 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.base.Gir;
-import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
-import cn.geoair.map.dynamic.tools.GirService;
-
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -11,6 +7,10 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
+
+import cn.geoair.base.Gir;
+import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
+import cn.geoair.map.dynamic.tools.GirService;
 
 public class IPUtil {
 

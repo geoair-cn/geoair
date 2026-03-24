@@ -1,9 +1,8 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
-import cn.geoair.base.Gir;
-import cn.hutool.core.io.FileUtil;
+import java.io.File;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
-import java.io.File;
+import cn.geoair.base.Gir;
 
-import javax.servlet.ServletContext;
+import cn.hutool.core.io.FileUtil;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ImportResource(locations = { "classpath*:/applicationContext.xml"

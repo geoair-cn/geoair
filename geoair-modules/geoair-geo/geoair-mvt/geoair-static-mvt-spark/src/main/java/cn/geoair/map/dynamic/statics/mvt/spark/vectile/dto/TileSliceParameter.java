@@ -1,25 +1,26 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.URLUtil;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ：张逢吉

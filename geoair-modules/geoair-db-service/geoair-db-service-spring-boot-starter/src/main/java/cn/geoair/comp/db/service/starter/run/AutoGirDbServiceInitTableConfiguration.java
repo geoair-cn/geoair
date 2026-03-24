@@ -1,10 +1,11 @@
 package cn.geoair.comp.db.service.starter.run;
 
-import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 
 /**
  * @author ：张逢吉 @description： 自动装配模块（修复循环依赖最终版）

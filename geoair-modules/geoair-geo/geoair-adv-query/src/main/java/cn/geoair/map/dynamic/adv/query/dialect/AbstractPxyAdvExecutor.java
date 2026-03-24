@@ -1,15 +1,5 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.apo.*;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -19,6 +9,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.apo.*;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 /**
  * 数据库的动态高级查询执行器

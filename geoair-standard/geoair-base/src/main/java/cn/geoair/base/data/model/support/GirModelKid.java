@@ -2,8 +2,8 @@ package cn.geoair.base.data.model.support;
 
 import java.io.Serializable;
 
-import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.model.GiModelable;
+import cn.geoair.base.data.model.annotation.GaModelField;
 
 @SuppressWarnings("serial")
 public class GirModelKid<ID extends Serializable> implements GiModelable<ID> {

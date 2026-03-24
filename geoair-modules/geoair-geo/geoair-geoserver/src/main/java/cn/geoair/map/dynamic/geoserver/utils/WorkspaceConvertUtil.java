@@ -1,14 +1,14 @@
 package cn.geoair.map.dynamic.geoserver.utils;
 
-import cn.geoair.map.dynamic.geoserver.beans.GsWorkspace;
-import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
-
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.NamespaceInfo;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import cn.geoair.map.dynamic.geoserver.beans.GsWorkspace;
+import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
 
 /** GsWorkspace 与 WorkspaceInfo 的转换工具类 */
 @Component

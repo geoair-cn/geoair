@@ -1,14 +1,16 @@
 package cn.geoair.comp.knife4j.ext.core.config;
 
-import cn.geoair.base.Gir;
-import cn.geoair.base.util.GutilStr;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.util.Map;
+import cn.geoair.base.Gir;
+import cn.geoair.base.util.GutilStr;
 
 /**
  * @author ：张俊

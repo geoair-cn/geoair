@@ -1,17 +1,17 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ObjectUtil;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author yulei

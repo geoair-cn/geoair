@@ -1,21 +1,23 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.api.annotation.GaApiAction;
-
-import io.swagger.annotations.ApiOperation;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.OperationBuilderPlugin;
-import springfox.documentation.spi.service.contexts.OperationContext;
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+import io.swagger.annotations.ApiOperation;
+
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.OperationBuilderPlugin;
+import springfox.documentation.spi.service.contexts.OperationContext;
 
 /**
  * @author ：张俊

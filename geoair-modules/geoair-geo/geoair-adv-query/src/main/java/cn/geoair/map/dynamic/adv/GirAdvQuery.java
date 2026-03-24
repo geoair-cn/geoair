@@ -1,11 +1,11 @@
 package cn.geoair.map.dynamic.adv;
 
+import javax.sql.DataSource;
+
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.tools.GirService;
-
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉

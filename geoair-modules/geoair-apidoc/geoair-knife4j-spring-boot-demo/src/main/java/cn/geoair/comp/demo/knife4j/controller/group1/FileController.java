@@ -1,14 +1,14 @@
 package cn.geoair.comp.demo.knife4j.controller.group1;
 
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.base.data.result.GiResult;
-import cn.geoair.comp.demo.knife4j.model.DemoVo1;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.data.result.GiResult;
+import cn.geoair.comp.demo.knife4j.model.DemoVo1;
 
 @Controller
 @GaApi(tags = "文件")

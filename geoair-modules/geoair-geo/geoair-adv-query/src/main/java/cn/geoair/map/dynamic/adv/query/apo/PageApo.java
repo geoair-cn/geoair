@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.hutool.core.collection.ListUtil;
-
 import java.io.Serializable;
 import java.util.List;
+
+import cn.hutool.core.collection.ListUtil;
 
 /**
  * @author ：张逢吉

@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.geoserver.api;
 
-import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
 import org.geoserver.catalog.NamespaceInfo;
 import org.geoserver.catalog.WorkspaceInfo;
+
+import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
 
 /** GeoServer 工作区/命名空间管理接口 */
 public interface WorkspaceManager {

@@ -1,6 +1,7 @@
 package cn.geoair.base.gpa.entity;
 
 import java.io.Serializable;
+
 import cn.geoair.base.gpa.dao.GiUpdateDao;
 
 /**

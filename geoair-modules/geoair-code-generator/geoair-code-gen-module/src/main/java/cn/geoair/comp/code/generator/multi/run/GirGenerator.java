@@ -1,6 +1,19 @@
 package cn.geoair.comp.code.generator.multi.run;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+
 import cn.geoair.base.Gir;
+import cn.geoair.base.exception.GirException;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.db.CommonRuner;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
@@ -8,18 +21,8 @@ import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
-import cn.geoair.base.exception.GirException;
-import cn.hutool.core.map.MapUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
+import cn.hutool.core.map.MapUtil;
 
 public class GirGenerator {
 

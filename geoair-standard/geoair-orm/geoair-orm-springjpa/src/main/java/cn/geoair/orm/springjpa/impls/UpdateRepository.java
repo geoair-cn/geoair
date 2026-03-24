@@ -1,5 +1,11 @@
 package cn.geoair.orm.springjpa.impls;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.gpa.dao.GiUpdateDao;
@@ -7,11 +13,6 @@ import cn.geoair.base.gpa.entity.GiEntityAlterable;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.springjpa.extra.BatchRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.List;
 
 public interface UpdateRepository<T extends GiEntityAlterable<PK>, PK extends Serializable>
 		extends JpaRepository<T, PK>, GiUpdateDao<T, PK> {

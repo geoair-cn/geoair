@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
+import java.io.Closeable;
+
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-
-import java.io.Closeable;
 
 /**
  * 空间文件转换核心接口

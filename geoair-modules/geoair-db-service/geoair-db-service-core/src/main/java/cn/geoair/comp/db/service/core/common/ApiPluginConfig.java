@@ -1,9 +1,9 @@
 package cn.geoair.comp.db.service.core.common;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor

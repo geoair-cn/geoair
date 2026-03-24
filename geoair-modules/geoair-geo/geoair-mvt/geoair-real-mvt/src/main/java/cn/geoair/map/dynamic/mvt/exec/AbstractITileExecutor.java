@@ -1,25 +1,26 @@
 package cn.geoair.map.dynamic.mvt.exec;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
+// import geotrellis.vector.Extent;
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
-import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
-import cn.geoair.map.dynamic.mvt.dto.TileExecutorConfig;
-import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
-import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
+import cn.geoair.map.dynamic.mvt.dto.TileExecutorConfig;
+import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtTileUtils;
-import cn.hutool.core.util.StrUtil;
+import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
+import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 
-//import geotrellis.vector.Extent;
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * @author ：张逢吉

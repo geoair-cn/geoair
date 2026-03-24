@@ -1,12 +1,13 @@
 package cn.geoair.map.dynamic.file.core.tran.model;
 
-import cn.geoair.map.dynamic.file.core.tran.TranPostProcessor;
-import cn.geoair.map.dynamic.file.core.tran.TranPreProcessor;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import cn.geoair.map.dynamic.file.core.tran.TranPostProcessor;
+import cn.geoair.map.dynamic.file.core.tran.TranPreProcessor;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 转换上下文 用于传递自定义参数、配置、临时数据，支持扩展

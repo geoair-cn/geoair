@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.tools.page;
 
-import cn.hutool.log.StaticLog;
-
 import java.util.List;
 import java.util.function.Consumer;
+
+import cn.hutool.log.StaticLog;
 
 /**
  * 分页定义

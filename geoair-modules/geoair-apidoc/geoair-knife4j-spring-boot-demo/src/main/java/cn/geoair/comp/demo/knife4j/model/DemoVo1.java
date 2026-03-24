@@ -1,10 +1,10 @@
 package cn.geoair.comp.demo.knife4j.model;
 
+import java.util.List;
+
 import cn.geoair.base.data.common.GemDel;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
-import java.util.List;
 
 /**
  * 演示模型

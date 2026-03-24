@@ -1,7 +1,13 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -11,15 +17,10 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现

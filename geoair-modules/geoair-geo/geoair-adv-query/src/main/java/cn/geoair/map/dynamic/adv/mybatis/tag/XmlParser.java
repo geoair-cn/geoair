@@ -1,14 +1,15 @@
 package cn.geoair.map.dynamic.adv.mybatis.tag;
 
-import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
-import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
-import cn.geoair.map.dynamic.adv.mybatis.node.TextSqlNode;
-import org.dom4j.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.dom4j.*;
+
+import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
+import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
+import cn.geoair.map.dynamic.adv.mybatis.node.TextSqlNode;
 
 public class XmlParser {
 

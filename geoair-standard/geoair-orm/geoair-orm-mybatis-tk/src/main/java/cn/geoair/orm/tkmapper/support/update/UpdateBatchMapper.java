@@ -1,9 +1,10 @@
 package cn.geoair.orm.tkmapper.support.update;
 
-import org.apache.ibatis.annotations.UpdateProvider;
-import tk.mybatis.mapper.annotation.RegisterMapper;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.UpdateProvider;
+
+import tk.mybatis.mapper.annotation.RegisterMapper;
 
 /**
  * @author ：zhangjun

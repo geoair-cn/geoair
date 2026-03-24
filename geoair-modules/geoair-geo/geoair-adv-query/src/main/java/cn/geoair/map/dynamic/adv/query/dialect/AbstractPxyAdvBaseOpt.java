@@ -1,15 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 /**
  *  数据库的动态高级查询基础操作实现类

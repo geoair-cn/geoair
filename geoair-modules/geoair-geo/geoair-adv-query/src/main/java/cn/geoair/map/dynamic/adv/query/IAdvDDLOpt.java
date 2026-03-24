@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.map.dynamic.adv.query.apo.*;
-
 import java.util.List;
+
+import cn.geoair.map.dynamic.adv.query.apo.*;
 
 /**
  * DDL操作接口 约定：所有的方法都以 d 开头

@@ -1,14 +1,15 @@
 package cn.geoair.map.dynamic.file.core.read;
 
+import java.io.Closeable;
+import java.util.Iterator;
+
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import org.opengis.feature.simple.SimpleFeatureType;
-
-import java.io.Closeable;
-import java.util.Iterator;
 
 /**
  * @author ：张逢吉

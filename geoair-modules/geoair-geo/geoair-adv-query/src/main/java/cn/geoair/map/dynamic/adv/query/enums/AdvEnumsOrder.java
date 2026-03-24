@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.enums;
 
-import cn.hutool.core.util.ObjectUtil;
-
 import java.io.Serializable;
+
+import cn.hutool.core.util.ObjectUtil;
 
 /**
  * @author ：zhangjun

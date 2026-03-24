@@ -220,11 +220,26 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
+                    <configuration>
+                        <!-- 自动修复类注释 -->
+                        <fixClassComment>true</fixClassComment>
+                        <!-- 自动修复方法注释 -->
+                        <fixMethodComment>true</fixMethodComment>
+                        <!-- 自动修复字段注释 -->
+                        <fixFieldComment>true</fixFieldComment>
+                        <!-- 开启严格模式，注释不规范直接报错 -->
+                        <failOnError>false</failOnError>
+                        <!-- 文档编码 UTF-8 -->
+                        <encoding>UTF-8</encoding>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
                             <goals>
+                                <!-- 打包 javadoc.jar -->
                                 <goal>jar</goal>
+                                <!-- 编译时自动修复注释 -->
+                                <goal>fix</goal>
                             </goals>
                         </execution>
                     </executions>
@@ -252,6 +267,27 @@
                         <publishingServerId>central</publishingServerId>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>net.revelc.code</groupId>
+                    <artifactId>impsort-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                    <configuration>
+                        <groups>java.,javax.,org.,com.</groups>
+                        <staticGroups>java,*</staticGroups>
+                        <removeUnused>true</removeUnused>
+                        <groups>java.,javax.,org.,com.,io.,cn.geoair</groups>
+
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>sort-imports</id>
+                            <goals>
+                                <goal>sort</goal><!-- runs at process-sources phase by default -->
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -312,20 +348,33 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
+                    <!-- 自动修复类注释 -->
+                    <fixClassComment>true</fixClassComment>
+                    <!-- 自动修复方法注释 -->
+                    <fixMethodComment>true</fixMethodComment>
+                    <!-- 自动修复字段注释 -->
+                    <fixFieldComment>true</fixFieldComment>
+                    <!-- 开启严格模式，注释不规范直接报错 -->
+                    <failOnError>false</failOnError>
+                    <!-- 文档编码 UTF-8 -->
                     <encoding>UTF-8</encoding>
-                    <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
                 </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
                         <goals>
+                            <!-- 打包 javadoc.jar -->
                             <goal>jar</goal>
+                            <!-- 编译时自动修复注释 -->
+                            <goal>fix</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+
     </build>
     <profiles>
         <profile>
@@ -384,6 +433,26 @@
                                     <goal>validate</goal>
                                 </goals>
                                 <inherited>true</inherited>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>net.revelc.code</groupId>
+                        <artifactId>impsort-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <groups>java.,javax.,org.,com.</groups>
+                            <staticGroups>java,*</staticGroups>
+                            <removeUnused>true</removeUnused>
+                            <groups>java.,javax.,org.,com.,io.,cn.geoair</groups>
+
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sort-imports</id>
+                                <goals>
+                                    <goal>sort</goal><!-- runs at process-sources phase by default -->
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

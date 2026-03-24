@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.enums;
 
+import java.io.Serializable;
+
 import org.geotools.geometry.jts.Geometries;
 import org.locationtech.jts.geom.*;
-
-import java.io.Serializable;
 
 /**
  * 空间类型枚举

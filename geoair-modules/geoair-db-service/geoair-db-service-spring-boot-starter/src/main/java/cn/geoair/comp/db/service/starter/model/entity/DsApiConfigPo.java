@@ -1,21 +1,22 @@
 package cn.geoair.comp.db.service.starter.model.entity;
 
-import cn.geoair.base.data.common.GemDatePattern;
-import cn.geoair.base.data.model.annotation.GaModel;
-import cn.geoair.base.data.model.annotation.GaModelField;
-import cn.geoair.base.gpa.entity.GiCrudEntity;
-import cn.geoair.base.gpa.id.GiEntityIdGenerator;
-import cn.hutool.core.bean.BeanUtil;
-
-import com.alibaba.fastjson2.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import cn.geoair.base.data.common.GemDatePattern;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.gpa.entity.GiCrudEntity;
+import cn.geoair.base.gpa.id.GiEntityIdGenerator;
+
+import cn.hutool.core.bean.BeanUtil;
 
 /**
  * api配置信息(DbapiConfig)实体类

@@ -11,6 +11,7 @@ import cn.geoair.base.util.GutilBean;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
+
 import tk.mybatis.mapper.common.base.BaseSelectMapper;
 import tk.mybatis.mapper.common.example.SelectByExampleMapper;
 import tk.mybatis.mapper.common.example.SelectCountByExampleMapper;

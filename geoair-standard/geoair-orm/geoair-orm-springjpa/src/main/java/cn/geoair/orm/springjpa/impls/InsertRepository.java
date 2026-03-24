@@ -1,14 +1,15 @@
 package cn.geoair.orm.springjpa.impls;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.gpa.dao.GiCreateDao;
 import cn.geoair.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.orm.springjpa.extra.BatchRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public interface InsertRepository<T extends GiEntitySaveable<PK>, PK extends Serializable>
 		extends JpaRepository<T, PK>, GiCreateDao<T, PK> {

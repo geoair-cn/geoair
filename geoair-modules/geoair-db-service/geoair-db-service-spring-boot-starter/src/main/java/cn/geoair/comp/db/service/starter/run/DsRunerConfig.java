@@ -1,15 +1,15 @@
 package cn.geoair.comp.db.service.starter.run;
 
-import cn.geoair.base.Gir;
-import cn.geoair.base.util.GutilStr;
-import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
+import javax.annotation.Resource;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.Resource;
+import cn.geoair.base.Gir;
+import cn.geoair.base.util.GutilStr;
+import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 
 /**
  * @author ：张俊

@@ -1,7 +1,5 @@
 package cn.geoair.spi.cache;
 
-import cn.geoair.base.lang.invoke.GkMethodHand;
-
 import java.util.concurrent.Callable;
 
 import javax.cache.Cache;
@@ -14,6 +12,7 @@ import cn.geoair.base.cache.GiCache;
 import cn.geoair.base.cache.GirCacheHelper;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.util.GutilClass;
 
 public class Cache4Gir {

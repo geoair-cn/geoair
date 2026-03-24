@@ -6,10 +6,10 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import cn.geoair.base.Gir;
 import cn.geoair.base.data.model.GiModelable;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilReflection;
-import cn.geoair.base.Gir;
 
 public interface GiValuable<T> extends Serializable {
 

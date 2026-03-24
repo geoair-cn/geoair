@@ -1,23 +1,21 @@
 package cn.geoair.map.dynamic.mvt.tools;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import cn.geoair.map.dynamic.mvt.tools.model.*;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.StrUtil;
-
-import lombok.extern.slf4j.Slf4j;
-import no.ecc.vectortile.VectorTileEncoder;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
-import org.locationtech.jts.operation.union.UnaryUnionOp;
-
 import java.io.ByteArrayOutputStream;
 import java.util.*;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
+import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
+
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.mvt.tools.model.*;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
+import no.ecc.vectortile.VectorTileEncoder;
 
 /**
  * @author ：张逢吉

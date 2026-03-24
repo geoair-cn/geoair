@@ -1,24 +1,25 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
-import cn.geoair.map.dynamic.adv.query.IAdvSimplePageOpt;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.apo.PageApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.StrUtil;
+import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何操作;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何操作;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.IAdvSimplePageOpt;
+import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
+import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.apo.PageApo;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 
 public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt {
 

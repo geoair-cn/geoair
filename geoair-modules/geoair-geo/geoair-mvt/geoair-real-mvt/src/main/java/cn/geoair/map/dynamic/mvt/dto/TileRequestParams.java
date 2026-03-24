@@ -1,18 +1,18 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
-import cn.geoair.base.data.model.annotation.GaModelField;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.codec.Base32;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.URLUtil;
+import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 
+import cn.geoair.base.data.model.annotation.GaModelField;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.codec.Base32;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.URLUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @Slf4j
 @Data

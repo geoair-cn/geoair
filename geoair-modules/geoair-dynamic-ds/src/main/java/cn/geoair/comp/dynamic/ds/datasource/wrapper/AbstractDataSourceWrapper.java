@@ -1,8 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
-
 import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
 
 /**
  * 数据源包装器抽象基类

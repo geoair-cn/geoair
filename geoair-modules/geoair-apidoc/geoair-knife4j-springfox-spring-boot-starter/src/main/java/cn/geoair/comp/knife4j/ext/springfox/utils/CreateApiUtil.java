@@ -1,11 +1,15 @@
 package cn.geoair.comp.knife4j.ext.springfox.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+import org.springframework.util.StringUtils;
+
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.model.SpringAddtionalModel;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
-
-import org.springframework.util.StringUtils;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -14,10 +18,6 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * @author ：张俊

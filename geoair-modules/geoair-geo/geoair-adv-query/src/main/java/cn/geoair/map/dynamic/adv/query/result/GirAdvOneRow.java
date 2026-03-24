@@ -1,15 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.db.Entity;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.db.Entity;
 
 /**
  * @author ：张逢吉

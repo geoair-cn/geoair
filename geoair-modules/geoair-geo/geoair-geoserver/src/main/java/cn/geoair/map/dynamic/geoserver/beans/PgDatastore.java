@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.geoserver.beans;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.geoair.map.dynamic.geoserver.enums.DataSourceType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /** PostGIS 数据源配置 继承 BaseDatastore，扩展 PostGIS 专属连接参数 */
 @Data

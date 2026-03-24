@@ -1,18 +1,19 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.tran.model.*;
-import org.opengis.feature.simple.SimpleFeatureType;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
+import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 
 /**
  * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制

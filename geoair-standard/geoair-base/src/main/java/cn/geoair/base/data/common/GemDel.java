@@ -1,7 +1,7 @@
 package cn.geoair.base.data.common;
 
-import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.model.annotation.GaModelField;
 
 public enum GemDel implements GiVisualValuable<Integer> {
 

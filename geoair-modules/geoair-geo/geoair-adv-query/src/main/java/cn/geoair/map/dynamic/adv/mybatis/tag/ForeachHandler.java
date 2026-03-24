@@ -1,12 +1,13 @@
 package cn.geoair.map.dynamic.adv.mybatis.tag;
 
-import cn.geoair.map.dynamic.adv.mybatis.node.ForeachSqlNode;
-import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
-import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
-import java.util.List;
+import cn.geoair.map.dynamic.adv.mybatis.node.ForeachSqlNode;
+import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
+import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
 
 public class ForeachHandler implements TagHandler {
 

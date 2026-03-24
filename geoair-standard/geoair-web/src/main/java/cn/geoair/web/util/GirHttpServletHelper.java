@@ -3,8 +3,9 @@ package cn.geoair.web.util;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import cn.geoair.base.lang.invoke.GkMethodHand;
+
 import cn.geoair.base.lang.invoke.GaMethodHandDefine;
+import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirHttpServletHelper {
 

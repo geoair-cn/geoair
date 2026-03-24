@@ -1,14 +1,14 @@
 package cn.geoair.base.tool;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
 import java.util.Scanner;
 
 import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilChar;
 import cn.geoair.base.util.GutilStr;
-
-import static java.lang.System.err;
-import static java.lang.System.out;
 
 /**
  * 命令行（控制台）工具方法类<br>

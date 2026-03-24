@@ -1,17 +1,8 @@
 package cn.geoair.comp.knife4j.ext.springfox.aspect;
 
-import cn.geoair.base.data.page.GiPageParam;
-import cn.geoair.base.data.page.GiPager;
-import cn.geoair.base.data.page.support.GirPageParam;
-import cn.geoair.base.data.result.GiResult;
-import cn.geoair.base.util.GutilClass;
-import cn.geoair.web.data.result.GiWebResult;
-import cn.geoair.web.data.result.GirWebResult;
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeBindings;
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.classmate.types.ResolvedInterfaceType;
-import com.fasterxml.classmate.types.ResolvedObjectType;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,9 +12,19 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeBindings;
+import com.fasterxml.classmate.TypeResolver;
+import com.fasterxml.classmate.types.ResolvedInterfaceType;
+import com.fasterxml.classmate.types.ResolvedObjectType;
+
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.result.GiResult;
+import cn.geoair.base.util.GutilClass;
+import cn.geoair.web.data.result.GiWebResult;
+import cn.geoair.web.data.result.GirWebResult;
 
 /**
  * @author ：张俊

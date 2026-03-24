@@ -1,11 +1,12 @@
 package cn.geoair.map.dynamic.tools.coordinate;
 
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
-import org.locationtech.jts.geom.*;
-
 import java.util.Arrays;
 import java.util.function.BiFunction;
+
+import org.locationtech.jts.geom.*;
+
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 坐标转换工具类（单例模式） 实现WGS84/GCJ02/BD09坐标系互转、墨卡托投影转换、坐标格式标准化等能力 核心算法参考：高德/百度地图坐标系转换规范

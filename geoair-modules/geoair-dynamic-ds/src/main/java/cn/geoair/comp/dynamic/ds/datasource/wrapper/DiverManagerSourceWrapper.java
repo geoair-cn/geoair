@@ -1,11 +1,9 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import cn.geoair.base.Gir;
-import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
-
-
 import javax.sql.DataSource;
 
+import cn.geoair.base.Gir;
+import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 
 public class DiverManagerSourceWrapper extends AbstractDataSourceWrapper {
 

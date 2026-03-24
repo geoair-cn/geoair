@@ -1,13 +1,13 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.geoair.base.Gir;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GenUtils {
 

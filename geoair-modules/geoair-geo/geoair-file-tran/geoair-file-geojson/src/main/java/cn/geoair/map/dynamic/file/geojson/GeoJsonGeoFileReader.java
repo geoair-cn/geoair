@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.file.geojson;
 
-import cn.geoair.base.data.page.support.GirPageParam;
-import cn.geoair.base.data.page.support.GirPager;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
-import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.geotools.data.geojson.GeoJSONReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -14,10 +13,12 @@ import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.page.support.GirPager;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 
 public class GeoJsonGeoFileReader implements GeoFileReader {
 

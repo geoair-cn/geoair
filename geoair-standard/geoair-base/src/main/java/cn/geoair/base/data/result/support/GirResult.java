@@ -1,8 +1,8 @@
 package cn.geoair.base.data.result.support;
 
-import cn.geoair.base.data.result.GiResult;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.data.result.GiResult;
 import cn.geoair.base.data.result.GirEmAlertType;
 
 @SuppressWarnings("serial")

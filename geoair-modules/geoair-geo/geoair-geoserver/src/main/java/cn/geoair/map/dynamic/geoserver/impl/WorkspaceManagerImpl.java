@@ -1,10 +1,5 @@
 package cn.geoair.map.dynamic.geoserver.impl;
 
-import cn.geoair.map.dynamic.geoserver.api.WorkspaceManager;
-import cn.geoair.map.dynamic.geoserver.beans.GsWorkspace;
-import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
-import cn.geoair.map.dynamic.geoserver.utils.WorkspaceConvertUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.NamespaceInfo;
@@ -12,6 +7,11 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import cn.geoair.map.dynamic.geoserver.api.WorkspaceManager;
+import cn.geoair.map.dynamic.geoserver.beans.GsWorkspace;
+import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
+import cn.geoair.map.dynamic.geoserver.utils.WorkspaceConvertUtil;
 
 /** WorkspaceManager 接口的实现类 基于改造后的 WorkspaceConvertUtil 实现工作区/命名空间管理逻辑 */
 @Component

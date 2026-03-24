@@ -1,8 +1,8 @@
 package cn.geoair.base.env.property.support;
 
 import cn.geoair.base.convert.util.GirConvertHelper;
-import cn.geoair.base.util.GutilStr;
 import cn.geoair.base.env.property.GiPropertier;
+import cn.geoair.base.util.GutilStr;
 
 public class GirSystemPropertyOperater implements GiPropertier {
 

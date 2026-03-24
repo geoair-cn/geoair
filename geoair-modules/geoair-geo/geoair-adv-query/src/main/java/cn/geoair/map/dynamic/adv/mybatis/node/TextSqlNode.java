@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.adv.mybatis.node;
 
+import java.util.Set;
+
 import cn.geoair.map.dynamic.adv.mybatis.context.Context;
 import cn.geoair.map.dynamic.adv.mybatis.token.TokenHandler;
 import cn.geoair.map.dynamic.adv.mybatis.token.TokenParser;
-
-import java.util.Set;
 
 public class TextSqlNode implements SqlNode {
 

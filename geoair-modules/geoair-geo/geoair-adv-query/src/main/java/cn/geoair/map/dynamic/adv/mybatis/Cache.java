@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.mybatis;
 
-import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
-
 import java.util.concurrent.ConcurrentHashMap;
+
+import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
 
 public class Cache {
 

@@ -1,8 +1,5 @@
 package cn.geoair.sdk.file;
 
-import cn.geoair.base.gpa.id.GirIdGenerator;
-import cn.geoair.base.text.GuStrFormatter;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,6 +7,9 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+
+import cn.geoair.base.gpa.id.GirIdGenerator;
+import cn.geoair.base.text.GuStrFormatter;
 
 /**
  * @author ：张俊

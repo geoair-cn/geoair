@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json;
 
-import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
+
+import lombok.Data;
 
 // 顶层结果
 @Data

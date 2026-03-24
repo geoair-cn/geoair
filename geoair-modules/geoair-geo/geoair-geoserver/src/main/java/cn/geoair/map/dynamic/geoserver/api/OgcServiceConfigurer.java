@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.geoserver.api;
 
-import cn.geoair.map.dynamic.geoserver.enums.OgcServiceType;
-import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
+import java.util.Map;
 
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.ServiceInfo;
 
-import java.util.Map;
+import cn.geoair.map.dynamic.geoserver.enums.OgcServiceType;
+import cn.geoair.map.dynamic.geoserver.exception.ServicePublishException;
 
 /** OGC 服务全局配置接口 */
 public interface OgcServiceConfigurer {

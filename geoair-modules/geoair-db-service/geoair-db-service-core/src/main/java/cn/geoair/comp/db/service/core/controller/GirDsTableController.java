@@ -1,5 +1,17 @@
 package cn.geoair.comp.db.service.core.controller;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.druid.pool.DruidPooledConnection;
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
@@ -11,16 +23,8 @@ import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
-import com.alibaba.druid.pool.DruidPooledConnection;
-import com.alibaba.fastjson2.JSONObject;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @program: dbApi

@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.geoserver.beans;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.geoair.map.dynamic.geoserver.enums.DataSourceType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /** Shapefile（SHP）数据源配置 继承 BaseDatastore，扩展 SHP 专属参数 */
 @Data

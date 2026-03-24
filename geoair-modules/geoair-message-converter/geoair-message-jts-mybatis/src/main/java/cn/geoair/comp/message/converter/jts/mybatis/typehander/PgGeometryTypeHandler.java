@@ -1,16 +1,17 @@
 package cn.geoair.comp.message.converter.jts.mybatis.typehander;
 
-import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 import org.locationtech.jts.geom.Geometry;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 
 /**
  * @author ：张逢吉

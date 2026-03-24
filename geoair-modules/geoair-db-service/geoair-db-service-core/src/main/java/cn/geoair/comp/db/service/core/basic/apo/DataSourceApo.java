@@ -1,8 +1,8 @@
 package cn.geoair.comp.db.service.core.basic.apo;
 
-import lombok.Data;
-
 import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * @program: dbApi

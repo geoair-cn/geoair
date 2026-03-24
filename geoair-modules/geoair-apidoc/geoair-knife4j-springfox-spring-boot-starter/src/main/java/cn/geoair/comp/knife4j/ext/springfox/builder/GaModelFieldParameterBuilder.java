@@ -1,16 +1,28 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.data.GiVisualValuable;
-import cn.geoair.base.data.common.GemNull;
-import cn.geoair.base.data.model.annotation.GaModelField;
-import com.fasterxml.classmate.ResolvedType;
-import io.swagger.annotations.ApiParam;
+import static springfox.documentation.schema.Collections.collectionElementType;
+import static springfox.documentation.schema.Collections.isContainerType;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.classmate.ResolvedType;
+
+import io.swagger.annotations.ApiParam;
+
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemNull;
+import cn.geoair.base.data.model.annotation.GaModelField;
+
 import springfox.bean.validators.plugins.Validators;
 import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.schema.Example;
@@ -19,15 +31,6 @@ import springfox.documentation.service.ResolvedMethodParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.ParameterBuilderPlugin;
 import springfox.documentation.spi.service.contexts.ParameterContext;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static springfox.documentation.schema.Collections.collectionElementType;
-import static springfox.documentation.schema.Collections.isContainerType;
 
 /**
  * 适配高版本Springfox（3.0+）的GaModelField注解解析器 支持：1.单个@RequestParam参数 2.非@RequestBody实体类参数的字段

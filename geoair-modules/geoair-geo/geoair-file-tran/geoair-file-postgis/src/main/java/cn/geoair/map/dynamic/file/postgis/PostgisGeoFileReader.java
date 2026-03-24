@@ -1,15 +1,8 @@
 package cn.geoair.map.dynamic.file.postgis;
 
-import cn.geoair.base.data.page.support.GirPageParam;
-import cn.geoair.base.data.page.support.GirPager;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
-import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
-import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.hutool.core.util.IdUtil;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.*;
+
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
@@ -23,8 +16,17 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import java.io.IOException;
-import java.util.*;
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.page.support.GirPager;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
+import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.hutool.core.util.IdUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 改造后的 PostGIS 读取器 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑 基于 GeoTools 实现，统一要素类型标准

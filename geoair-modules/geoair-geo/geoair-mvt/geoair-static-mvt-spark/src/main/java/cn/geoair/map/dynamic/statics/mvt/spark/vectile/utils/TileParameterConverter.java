@@ -1,9 +1,10 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-import cn.hutool.core.collection.CollectionUtil;
-
 import java.util.*;
+
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+
+import cn.hutool.core.collection.CollectionUtil;
 
 /**
  * TileSliceParameter 与 tippecanoe 命令行参数双向转换工具类 实现： 1. toTippecanoeParams:

@@ -1,9 +1,9 @@
 package cn.geoair.comp.knife4j.ext.core.config;
 
+import java.util.List;
+
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-
-import java.util.List;
 
 /**
  * @author ：张俊

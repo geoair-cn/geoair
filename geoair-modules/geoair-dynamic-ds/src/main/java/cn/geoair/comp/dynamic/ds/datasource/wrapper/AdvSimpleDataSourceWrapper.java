@@ -1,8 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
-
 import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 
 /**
  * HikariCP数据源包装器

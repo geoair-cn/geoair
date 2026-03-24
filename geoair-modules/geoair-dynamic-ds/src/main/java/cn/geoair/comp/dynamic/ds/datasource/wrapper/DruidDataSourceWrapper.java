@@ -1,9 +1,10 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import cn.geoair.base.Gir;
+import javax.sql.DataSource;
+
 import com.alibaba.druid.pool.DruidDataSource;
 
-import javax.sql.DataSource;
+import cn.geoair.base.Gir;
 
 /**
  * Druid数据源包装器

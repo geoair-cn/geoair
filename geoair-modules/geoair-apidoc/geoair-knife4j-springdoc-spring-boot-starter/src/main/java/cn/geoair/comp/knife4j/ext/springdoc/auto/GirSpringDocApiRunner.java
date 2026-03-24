@@ -1,13 +1,12 @@
 package cn.geoair.comp.knife4j.ext.springdoc.auto;
 
-import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
-import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
-import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
-import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.annotation.PostConstruct;
+
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.SwaggerUiConfigProperties;
@@ -23,11 +22,16 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+
+import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
+import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
+import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {

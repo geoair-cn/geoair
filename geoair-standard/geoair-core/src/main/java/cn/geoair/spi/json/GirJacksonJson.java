@@ -1,17 +1,18 @@
 package cn.geoair.spi.json;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.bean.GkBeanPath;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.util.GutilArray;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 /**
  * @author ：张俊

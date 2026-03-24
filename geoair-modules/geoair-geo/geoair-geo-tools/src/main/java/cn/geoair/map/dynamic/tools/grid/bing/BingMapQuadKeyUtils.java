@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.tools.grid.bing;
 
-import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
-import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+
+import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 
 /** 必应地图QuadKey服务实现类 */
 public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {

@@ -1,8 +1,9 @@
 package cn.geoair.comp.knife4j.ext.core.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import lombok.Data;
 
 /**
  * 仅作为配置提示使用，不再通过此类读取配置

@@ -1,7 +1,6 @@
 package cn.geoair.comp.code.generator.multi.config;
 
 import cn.hutool.core.util.StrUtil;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 

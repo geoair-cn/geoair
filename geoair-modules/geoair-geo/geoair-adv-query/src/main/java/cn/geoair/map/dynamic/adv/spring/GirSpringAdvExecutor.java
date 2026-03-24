@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.adv.spring;
 
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+
 import cn.hutool.extra.spring.SpringUtil;
 
 /**

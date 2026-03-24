@@ -1,14 +1,15 @@
 package cn.geoair.comp.db.service.starter.mapper;
 
+import java.util.List;
+
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.dao.GirDsApiConfigDao;
 import cn.geoair.comp.db.service.starter.model.dto.DsApiConfigDto;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiConfigPo;
 import cn.geoair.orm.tkmapper.impls.TkEntityMapper;
-import tk.mybatis.mapper.entity.Example;
 
-import java.util.List;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * api配置信息Mapper接口

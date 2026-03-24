@@ -1,5 +1,9 @@
 package cn.geoair.comp.code.generator.multi.db;
 
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import cn.geoair.base.Gir;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
@@ -8,11 +12,9 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
+
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-
-import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * @author ：张逢吉

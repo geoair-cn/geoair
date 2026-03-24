@@ -5,9 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
 
+import cn.geoair.base.Gir;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilReflection;
-import cn.geoair.base.Gir;
 
 /**
  * 可显示的数据

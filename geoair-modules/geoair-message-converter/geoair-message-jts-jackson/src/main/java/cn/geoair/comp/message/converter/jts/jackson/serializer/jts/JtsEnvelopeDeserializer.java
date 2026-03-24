@@ -17,12 +17,13 @@
  */
 package cn.geoair.comp.message.converter.jts.jackson.serializer.jts;
 
+import java.io.IOException;
+
+import org.locationtech.jts.geom.Envelope;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import org.locationtech.jts.geom.Envelope;
-
-import java.io.IOException;
 
 class JtsEnvelopeDeserializer extends JsonDeserializer<Envelope> {
     @Override

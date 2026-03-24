@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import lombok.Data;
-
 import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * @author ：张逢吉

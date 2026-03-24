@@ -1,15 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-
 import java.sql.Connection;
 
 import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.DataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 
 /**
  * @author ：张逢吉

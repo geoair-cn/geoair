@@ -1,17 +1,17 @@
 package cn.geoair.comp.knife4j.ext.springfox.service;
 
+import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.classmate.TypeResolver;
+import com.github.xiaoymin.knife4j.core.io.ResourceUtil;
+
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.model.SpringAddtionalModel;
 import cn.geoair.comp.knife4j.ext.springfox.utils.CreateApiUtil;
 
-import com.fasterxml.classmate.TypeResolver;
-import com.github.xiaoymin.knife4j.core.io.ResourceUtil;
-
 import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author ：张俊

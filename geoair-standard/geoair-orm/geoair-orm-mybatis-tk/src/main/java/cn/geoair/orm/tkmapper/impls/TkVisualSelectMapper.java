@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.persistence.Id;
+
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.model.support.GirVisualModelKid;
 import cn.geoair.base.data.model.support.GirVisualTreeModelKid;
@@ -18,6 +20,7 @@ import cn.geoair.base.gpa.dao.GiVisualSelectDao;
 import cn.geoair.base.gpa.entity.GiEntityVisuable;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
+
 import tk.mybatis.mapper.common.example.SelectByExampleMapper;
 import tk.mybatis.mapper.entity.Example;
 

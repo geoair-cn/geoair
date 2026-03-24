@@ -1,24 +1,26 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.postgresql.jdbc.PgResultSetMetaData;
+
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import org.postgresql.jdbc.PgResultSetMetaData;
-
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * PostgreSQL DDL操作实现类

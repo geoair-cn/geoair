@@ -1,17 +1,19 @@
 package cn.geoair.spi.web;
 
 import java.lang.ref.WeakReference;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.geoair.web.util.GirHttpServletHelper;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import cn.geoair.base.lang.invoke.GkMethodHand;
+
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.base.lang.invoke.GkMethodHand;
+import cn.geoair.web.util.GirHttpServletHelper;
 
 public class SpringServlet4Gir {
 

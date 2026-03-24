@@ -1,13 +1,13 @@
 package cn.geoair.sdk.body;
 
-import cn.geoair.base.gpa.id.GirIdGenerator;
-import cn.geoair.base.util.GutilCollection;
-import cn.geoair.sdk.file.GirMultipartOutputStream;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
+
+import cn.geoair.base.gpa.id.GirIdGenerator;
+import cn.geoair.base.util.GutilCollection;
+import cn.geoair.sdk.file.GirMultipartOutputStream;
 
 /**
  * @author ：张俊

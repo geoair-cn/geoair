@@ -1,8 +1,8 @@
 package cn.geoair.orm.mybatisplus.impls;
 
-import cn.geoair.base.Gir;
-
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
+
+import cn.geoair.base.Gir;
 
 /**
  * @author ：张俊

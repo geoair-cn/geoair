@@ -2,9 +2,11 @@ package cn.geoair.orm.tkmapper.util;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.tool.GkConcurrentReferenceHashMap;
 import cn.geoair.base.util.GutilReflection;
+
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.EntityField;
 import tk.mybatis.mapper.entity.EntityTable;

@@ -1,14 +1,14 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
-
-import com.alibaba.fastjson2.JSONObject;
-
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.alibaba.fastjson2.JSONObject;
+
+import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JdbcUtil {

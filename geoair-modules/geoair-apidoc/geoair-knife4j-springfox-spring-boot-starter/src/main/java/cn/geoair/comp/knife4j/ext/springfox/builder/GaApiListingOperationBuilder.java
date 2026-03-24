@@ -1,28 +1,26 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.Gir;
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.base.util.GutilObject;
-import cn.hutool.core.collection.CollUtil;
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+
+import java.util.*;
+
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+import cn.geoair.base.Gir;
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.util.GutilObject;
+
+import cn.hutool.core.collection.CollUtil;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
-
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-
-import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
 
 /**
  * 适配Swagger 3.0.0 (springfox 3.x)：合并Swagger原生注解和GTC自定义注解的tags

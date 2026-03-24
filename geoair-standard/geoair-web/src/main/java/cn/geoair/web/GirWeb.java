@@ -1,10 +1,10 @@
 package cn.geoair.web;
 
-import cn.geoair.web.util.GirHttpServletHelper;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.geoair.web.util.GirHttpServletHelper;
 
 public class GirWeb {
 

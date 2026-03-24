@@ -1,11 +1,11 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-
 import java.util.List;
 import java.util.function.Consumer;
+
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 /**
  * 查询的基础操作接口

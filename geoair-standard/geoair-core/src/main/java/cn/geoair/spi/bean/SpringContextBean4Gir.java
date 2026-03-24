@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import cn.geoair.base.util.GutilClass;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
@@ -19,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
+
 import cn.geoair.base.bean.GiBeanFactory;
 import cn.geoair.base.bean.GirBeanDefinitionStoreException;
 import cn.geoair.base.bean.GirBeanException;
@@ -26,11 +26,12 @@ import cn.geoair.base.bean.GirBeanHelper;
 import cn.geoair.base.bean.GirBeanNotOfRequiredTypeException;
 import cn.geoair.base.bean.GirNoSuchBeanException;
 import cn.geoair.base.bean.GirNoUniqueBeanException;
-import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
+import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilClass;
 
 /**
  * 由spring提供bean容器

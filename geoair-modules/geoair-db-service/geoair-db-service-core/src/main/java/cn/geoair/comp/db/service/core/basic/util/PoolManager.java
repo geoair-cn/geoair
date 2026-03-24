@@ -1,14 +1,14 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
 
-import java.sql.SQLException;
-import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @program: api

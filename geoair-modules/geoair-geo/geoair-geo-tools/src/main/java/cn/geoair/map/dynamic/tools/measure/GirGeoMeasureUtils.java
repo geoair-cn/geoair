@@ -1,18 +1,20 @@
 package cn.geoair.map.dynamic.tools.measure;
 
-import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
-import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.operation.distance.DistanceOp;
-import org.geotools.referencing.GeodeticCalculator;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.geotools.referencing.GeodeticCalculator;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.operation.distance.DistanceOp;
+
+import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
+import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
+
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * 空间几何面积/长度/距离计算工具类（单例模式） 基于JTS+GeoTools实现，支持多输入格式、多单位转换

@@ -1,7 +1,8 @@
 package cn.geoair.map.dynamic.mvt.tools.model;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import org.locationtech.jts.geom.Coordinate;
+
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 /**
  * @author ：张逢吉

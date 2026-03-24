@@ -1,14 +1,14 @@
 package cn.geoair.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.gpa.id.GirIdGenerator;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.tool.GkSnowflake;
 import cn.geoair.base.util.GutilBean;
 import cn.geoair.spi.log.Log4Gir;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 测试用

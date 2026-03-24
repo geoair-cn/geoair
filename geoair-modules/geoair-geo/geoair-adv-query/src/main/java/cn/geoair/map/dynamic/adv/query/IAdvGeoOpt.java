@@ -1,14 +1,14 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import java.util.List;
+import java.util.Map;
+
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 空间处理相关操作接口 约定：所有的方法都以 e开头 (本来设计用g开头，但是后面发现get方法的g开头存在了太多，导致了干扰)

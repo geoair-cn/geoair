@@ -1,13 +1,13 @@
 package cn.geoair.orm.spi.support;
 
+import java.lang.reflect.Field;
+import java.util.*;
+
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
 import cn.geoair.orm.spi.entity.GirEntityField;
 import cn.geoair.orm.spi.entity.GirEntityTable;
-
-import java.lang.reflect.Field;
-import java.util.*;
 
 /**
  * 通用的Example查询对象

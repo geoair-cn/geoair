@@ -1,16 +1,20 @@
 package cn.geoair.comp.dynamic.ds.spring;
 
-import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import com.alibaba.druid.pool.DruidDataSource;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Date;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
-import java.util.Date;
+import com.alibaba.druid.pool.DruidDataSource;
+
+import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+
+import cn.hutool.extra.spring.SpringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ：张逢吉

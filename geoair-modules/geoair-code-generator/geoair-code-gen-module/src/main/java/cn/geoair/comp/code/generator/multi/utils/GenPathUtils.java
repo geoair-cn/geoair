@@ -1,11 +1,11 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
+import java.io.File;
+
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.config.OrmType;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
-
-import java.io.File;
 
 /**
  * @author ：张逢吉

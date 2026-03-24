@@ -1,5 +1,16 @@
 package cn.geoair.comp.db.service.core.controller;
 
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.alibaba.fastjson2.JSONObject;
+
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.base.util.GutilObject;
@@ -7,18 +18,11 @@ import cn.geoair.comp.db.service.core.basic.util.IPUtil;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 @RestController
 @Slf4j

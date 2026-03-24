@@ -1,9 +1,8 @@
 package cn.geoair.comp.dynamic.ds;
 
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import com.alibaba.druid.pool.DruidDataSource;
-
 import javax.sql.DataSource;
+
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 
 /**
  * @author ：张逢吉

@@ -1,11 +1,12 @@
 package cn.geoair.map.dynamic.mvt.tools.model;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.Serializable;
 import java.util.List;
+
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉

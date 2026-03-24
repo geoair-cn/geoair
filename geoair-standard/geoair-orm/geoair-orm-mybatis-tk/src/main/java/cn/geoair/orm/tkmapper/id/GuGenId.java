@@ -1,13 +1,16 @@
 package cn.geoair.orm.tkmapper.id;
 
-import org.apache.ibatis.reflection.MetaObject;
-import cn.geoair.base.gpa.id.GiGenId;
-import tk.mybatis.mapper.MapperException;
-import tk.mybatis.mapper.genid.GenId;
-import tk.mybatis.mapper.util.MetaObjectUtil;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.ibatis.reflection.MetaObject;
+
+import cn.geoair.base.gpa.id.GiGenId;
+
+import tk.mybatis.mapper.MapperException;
+import tk.mybatis.mapper.genid.GenId;
+import tk.mybatis.mapper.util.MetaObjectUtil;
 
 /**
  *

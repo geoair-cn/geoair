@@ -1,15 +1,15 @@
 package cn.geoair.comp.db.service.core.utils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
 import cn.geoair.base.Gir;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.web.util.GirHttpServletHelper;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 /** Token管理工具类（MD5版：用户名+密码+dsApi拼接后MD5作为Token，无需存储，多实例直接校验） */
 public class TokenManager {

@@ -1,7 +1,8 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.postgis.PGgeometry;
+
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class OrgPGGeometryModule extends SimpleModule {
 

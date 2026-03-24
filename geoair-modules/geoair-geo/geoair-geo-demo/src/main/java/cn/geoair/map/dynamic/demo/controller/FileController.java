@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.demo.controller;
 
-import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.base.api.annotation.GaApiAction;
-import cn.geoair.base.data.result.GiResult;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.data.result.GiResult;
 
 @Controller
 @GaApi(tags = "文件")

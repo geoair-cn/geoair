@@ -1,11 +1,11 @@
 package cn.geoair.comp.dynamic.ds.apo;
 
+import java.io.Serializable;
+import java.util.Date;
+
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.db.dialect.DriverNamePool;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 数据源的Api传递对象(Application Persistence Object)

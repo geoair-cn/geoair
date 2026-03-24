@@ -1,16 +1,10 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
-import cn.geoair.base.data.GiVisualValuable;
-import cn.geoair.base.data.common.GemNull;
-import cn.geoair.base.data.model.annotation.GaModelField;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import springfox.documentation.service.AllowableListValues;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin;
-import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
-import springfox.documentation.swagger.common.SwaggerPluginSupport;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static springfox.documentation.schema.Annotations.findPropertyAnnotation;
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -18,10 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static springfox.documentation.schema.Annotations.findPropertyAnnotation;
-import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+import cn.geoair.base.data.GiVisualValuable;
+import cn.geoair.base.data.common.GemNull;
+import cn.geoair.base.data.model.annotation.GaModelField;
+
+import springfox.documentation.service.AllowableListValues;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.schema.ModelPropertyBuilderPlugin;
+import springfox.documentation.spi.schema.contexts.ModelPropertyContext;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
 
 /**
  * @author ：张俊

@@ -1,15 +1,17 @@
 package cn.geoair.map.dynamic.tools.merge;
 
-import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
-import cn.hutool.core.util.ObjectUtil;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.operation.union.UnaryUnionOp;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
+
+import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
+
+import cn.hutool.core.util.ObjectUtil;
 
 /**
  * 几何对象合并工具类（单例模式） 基于JTS实现线/面的多格式合并，支持拓扑合并和简单拼接

@@ -6,9 +6,8 @@ import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
 import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateConvertOpt;
 import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
-
-import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
+import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.bing.BingMapQuadKeyUtils;
 import cn.geoair.map.dynamic.tools.grid.converter.TileConverter3857Utils;
 import cn.geoair.map.dynamic.tools.grid.converter.Wgs84EqualAxisTileUtils;

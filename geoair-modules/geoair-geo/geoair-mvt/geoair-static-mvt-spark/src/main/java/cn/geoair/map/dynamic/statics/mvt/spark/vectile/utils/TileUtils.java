@@ -1,10 +1,12 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+
 import scala.Tuple4;
 
 /**

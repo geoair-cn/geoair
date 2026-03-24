@@ -1,14 +1,15 @@
 package cn.geoair.orm.spi.support;
 
-import cn.geoair.orm.spi.entity.GirEntityField;
-
-import javax.persistence.Entity;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
+
+import javax.persistence.Entity;
+
+import cn.geoair.orm.spi.entity.GirEntityField;
 
 /**
  * 类字段工具类

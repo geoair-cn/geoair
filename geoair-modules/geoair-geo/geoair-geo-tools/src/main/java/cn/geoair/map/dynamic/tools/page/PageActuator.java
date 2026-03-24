@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.tools.page;
 
-import cn.geoair.base.Gir;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
+
+import cn.geoair.base.Gir;
 
 /**
  * @author ：张逢吉

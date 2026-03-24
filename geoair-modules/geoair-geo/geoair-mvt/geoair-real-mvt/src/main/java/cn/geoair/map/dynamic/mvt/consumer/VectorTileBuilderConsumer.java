@@ -1,13 +1,11 @@
 package cn.geoair.map.dynamic.mvt.consumer;
 
+import java.util.function.Consumer;
+
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
-import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * 基于Consumer模式的VectorTile PBF构建器（流式推送要素，低内存占用）

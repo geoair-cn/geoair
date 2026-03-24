@@ -1,12 +1,13 @@
 package cn.geoair.map.dynamic.file.core.write;
 
+import java.io.Closeable;
+
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import org.opengis.feature.simple.SimpleFeatureType;
-
-import java.io.Closeable;
 
 /**
  * @author ：张逢吉

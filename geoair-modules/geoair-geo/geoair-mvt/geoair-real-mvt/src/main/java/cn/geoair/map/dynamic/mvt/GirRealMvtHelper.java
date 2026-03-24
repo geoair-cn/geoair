@@ -1,9 +1,10 @@
 package cn.geoair.map.dynamic.mvt;
 
-import cn.geoair.base.bean.GirBeanHelper;
-import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
-import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
 import org.locationtech.jts.geom.Envelope;
+
+import cn.geoair.base.bean.GirBeanHelper;
+import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
+import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 
 /**
  * @author ：张逢吉

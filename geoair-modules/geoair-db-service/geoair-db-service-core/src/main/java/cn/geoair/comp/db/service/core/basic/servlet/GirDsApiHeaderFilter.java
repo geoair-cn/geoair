@@ -1,11 +1,11 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 // 不能加Bean注解，否则会自动注册，只有standalone需要

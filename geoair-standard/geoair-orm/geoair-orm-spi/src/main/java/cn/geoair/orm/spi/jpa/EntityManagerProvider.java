@@ -1,6 +1,11 @@
 package cn.geoair.orm.spi.jpa;
 
-import cn.geoair.base.Gir;
+import java.beans.PropertyDescriptor;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 
 import org.hibernate.metamodel.internal.MetamodelImpl;
 import org.hibernate.persister.entity.EntityPersister;
@@ -9,12 +14,7 @@ import org.hibernate.persister.walking.spi.AttributeDefinition;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import java.beans.PropertyDescriptor;
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
+import cn.geoair.base.Gir;
 
 /**
  * @author ：张俊

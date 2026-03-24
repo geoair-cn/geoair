@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
 import cn.geoair.base.data.model.GiModelType;
 import cn.geoair.base.data.model.GiTypeModelable;
 

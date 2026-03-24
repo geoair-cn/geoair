@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import java.util.List;
+
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import java.util.List;
 
 /**
  * @author ：张逢吉

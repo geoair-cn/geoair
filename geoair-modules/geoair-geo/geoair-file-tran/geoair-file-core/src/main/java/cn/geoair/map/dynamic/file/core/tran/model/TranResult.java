@@ -1,14 +1,14 @@
 package cn.geoair.map.dynamic.file.core.tran.model;
 
-import cn.geoair.map.dynamic.file.core.enums.TranStatus;
-import com.alibaba.druid.support.monitor.MonitorContext;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.geoair.map.dynamic.file.core.enums.TranStatus;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 结构化转换结果
