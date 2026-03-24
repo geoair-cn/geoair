@@ -274,15 +274,15 @@ public class SparkTaskSerializableUtil implements Serializable {
 	}
 
 	static int getTmsY(int zoom, int y, int x, int gridSrid) {
-		int wms_y = y;
+		int tms_y = y;
 		if (gridSrid == 3857) {
-			wms_y = GirAdvTools.getTileGrid3857Opt().reverseY(y, zoom);
+			tms_y = GirAdvTools.getTileGrid3857Opt().reverseY(y, zoom);
 		}
 		else {
-			wms_y = GirAdvTools.getTileGrid4326Opt().reverseY(y, zoom);
+			tms_y = GirAdvTools.getTileGrid4326Opt().reverseY(y, zoom);
 			// wms_y = y;
 		}
-		return wms_y;
+		return tms_y;
 	}
 
 	/**
