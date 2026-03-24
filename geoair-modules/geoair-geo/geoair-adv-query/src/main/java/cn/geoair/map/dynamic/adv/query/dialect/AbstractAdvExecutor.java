@@ -65,8 +65,9 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public AbstractAdvExecutor(DataSource dataSource) {
         this.initByDataSource(dataSource);
     }
-    public AbstractAdvExecutor(DataSource dataSource,String dataSourceName) {
-        this.initByDataSource(dataSource,dataSourceName);
+
+    public AbstractAdvExecutor(DataSource dataSource, String dataSourceName) {
+        this.initByDataSource(dataSource, dataSourceName);
     }
 
     public AbstractAdvExecutor() {
@@ -98,18 +99,15 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     @Override
     public void initByDataSource(DataSource dataSource) {
-        if (dataSource == null) {
-            throw new IllegalArgumentException("DataSource 不能为空");
-        }
-        this.getDataSourceGetterPxy().initByDataSource(dataSource);
-        this.initProxyObjects();
+        initByDataSource(dataSource, null);
     }
+
     @Override
-    public void initByDataSource(DataSource dataSource,String dataSourceName) {
+    public void initByDataSource(DataSource dataSource, String dataSourceName) {
         if (dataSource == null) {
             throw new IllegalArgumentException("DataSource 不能为空");
         }
-        this.getDataSourceGetterPxy().initByDataSource(dataSource,dataSourceName);
+        this.getDataSourceGetterPxy().initByDataSource(dataSource, dataSourceName);
         this.initProxyObjects();
     }
 
@@ -126,6 +124,7 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public String getSchemaName() {
         return getDataSourceGetterPxy().getSchemaName();
     }
+
     @Override
     public String getDatabaseName() {
         return getDataSourceGetterPxy().getDatabaseName();
@@ -135,6 +134,7 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
         this.getDataSourceGetterPxy().setDatabaseNameGetterFunction(databaseNameGetterFunction);
     }
+
     @Override
     public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
         this.getDataSourceGetterPxy().setSchemaNameGetterFunction(schemaNameGetterFunction);
@@ -472,10 +472,12 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
     public String dGetCurrentSchema() {
         return advDDLOptPxy.dGetCurrentSchema();
     }
+
     @Override
     public String dGetCurrentDataBase() {
         return advDDLOptPxy.dGetCurrentDataBase();
     }
+
     @Override
     public List<String> dGetAllSchemas() {
         return advDDLOptPxy.dGetAllSchemas();

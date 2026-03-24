@@ -24,7 +24,7 @@
         <oracle.sdoutl.version>1.0</oracle.sdoutl.version>
         <dm.jdbc.version>18</dm.jdbc.version>
         <dameng.geoutil.version>1.0</dameng.geoutil.version>
-        <fastjson1x.version>2.0.9</fastjson1x.version>
+        <fastjson1x.version>2.0.61</fastjson1x.version>
         <!-- Apache Commons 版本 -->
         <commons.codec.version>1.15</commons.codec.version>
         <commons.text.version>1.9</commons.text.version>

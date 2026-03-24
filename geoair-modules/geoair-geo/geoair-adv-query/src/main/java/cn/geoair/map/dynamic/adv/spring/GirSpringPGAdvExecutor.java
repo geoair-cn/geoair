@@ -20,9 +20,7 @@ public class GirSpringPGAdvExecutor extends AdvExecutorPG implements IAdvExecuto
     }
 
     public static GirSpringPGAdvExecutor newInstance(DataSource dataSource) {
-        GirSpringPGAdvExecutor advExecutor = new GirSpringPGAdvExecutor();
-        advExecutor.initByDataSource(dataSource);
-        return advExecutor;
+        return newInstance(dataSource, null);
     }
 
     public static GirSpringPGAdvExecutor newInstance(DataSource dataSource, String dataSourceName) {

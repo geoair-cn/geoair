@@ -9,6 +9,7 @@ import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -113,16 +114,19 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     @Override
     public void initByDataSource(DataSource dataSource) {
+        initByDataSource(dataSource, null);
+    }
+
+    @Override
+    public void initByDataSource(DataSource dataSource, String dataSourceName) {
         Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
         String jdbcUrl = null;
         if (wrapper.isPresent()) {
             jdbcUrl = wrapper.get().getJdbcUrl();
         }
-        initByDataSource(dataSource, jdbcUrl);
-    }
-
-    @Override
-    public void initByDataSource(DataSource dataSource, String dataSourceName) {
+        if (StrUtil.isEmpty(dataSourceName)) {
+            dataSourceName = jdbcUrl;
+        }
         this.dataSource = dataSource;
         this.dataSourceId = dataSourceName;
         this.dataSourceApo = null;
