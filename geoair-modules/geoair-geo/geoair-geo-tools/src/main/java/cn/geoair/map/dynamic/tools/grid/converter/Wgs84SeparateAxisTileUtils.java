@@ -10,6 +10,7 @@ import java.util.Objects;
 /**
  * WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z）
  */
+@Deprecated
 public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
 	// 单例实例

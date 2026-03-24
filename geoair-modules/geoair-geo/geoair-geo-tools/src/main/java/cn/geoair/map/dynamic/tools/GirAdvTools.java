@@ -70,6 +70,7 @@ public class GirAdvTools {
 	 * 获取WGS84坐标系瓦片转换操作接口(非等轴)
 	 * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
 	 */
+	@Deprecated
 	public static GirTileConverterOpt getTileGrid4326SeparateOpt() {
 		return Wgs84SeparateAxisTileUtils.getInstance();
 	}
