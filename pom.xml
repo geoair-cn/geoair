@@ -288,6 +288,47 @@
                     </executions>
                 </plugin>
 
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.7.3.6</version> <!-- Java8 最后稳定版 -->
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal> <!-- 构建时自动检查 -->
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <failOnError>false</failOnError>    <!-- 发现bug是否让构建失败 -->
+                        <includeTests>false</includeTests>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.gaul</groupId>
+                    <artifactId>modernizer-maven-plugin</artifactId>
+                    <version>2.7.0</version> <!-- Java8 稳定版 -->
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>modernizer</goal> <!-- 构建时自动检查 -->
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+
+                        <!-- Java 版本（你是8就填8） -->
+                        <javaVersion>8</javaVersion>
+                        <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
+                        <failOnViolations>false</failOnViolations>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.7.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -455,6 +496,45 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
+                        <version>4.7.3.6</version> <!-- Java8 最后稳定版 -->
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal> <!-- 构建时自动检查 -->
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <failOnError>false</failOnError>    <!-- 发现bug是否让构建失败 -->
+                            <includeTests>false</includeTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.gaul</groupId>
+                        <artifactId>modernizer-maven-plugin</artifactId>
+                        <version>2.7.0</version> <!-- Java8 稳定版 -->
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>modernizer</goal> <!-- 构建时自动检查 -->
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <javaVersion>8</javaVersion>
+                            <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
+                            <failOnViolations>false</failOnViolations>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.7.1</version>
                     </plugin>
                 </plugins>
             </build>
