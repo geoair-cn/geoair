@@ -1,5 +1,6 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
+import cn.geoair.base.Gir;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import javax.sql.DataSource;
@@ -20,6 +21,16 @@ public class DruidDataSourceWrapper extends AbstractDataSourceWrapper {
 
     static Boolean canInit = null;
 
+    @Override
+    public boolean close() {
+        DruidDataSource dataSource = (DruidDataSource) targetDataSource;
+        try {
+            dataSource.close();
+        } catch (Exception e) {
+            Gir.log.error(e);
+        }
+        return true;
+    }
 
     public static boolean canInit() {
         if (canInit != null) {

@@ -21,6 +21,9 @@ public class AdvSimpleDataSourceWrapper extends AbstractDataSourceWrapper {
     }
 
     @Override
+    public boolean close() {
+        return true;
+    }
     protected Class<? extends DataSource> getTargetDataSourceClass() {
         return AdvSimpleDataSource.class;
     }

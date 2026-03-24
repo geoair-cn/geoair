@@ -22,11 +22,29 @@ public class CommonSourceWrapper extends AbstractDataSourceWrapper {
             "jdbcUrl", "url", "rawJdbcUrl", "jdbcUrl", "getUrl", "getJdbcUrl", "rawUrl"
     );
 
+
+    private static final List<String> CLOSE_KEYS = Arrays.asList(
+            "close"
+    );
+
     public CommonSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
     }
 
     public static boolean canInit() {
+        return true;
+    }
+
+    @Override
+    public boolean close() {
+        for (String closeKey : CLOSE_KEYS) {
+            try {
+                Method method = targetDataSource.getClass().getMethod(closeKey);
+                method.invoke(targetDataSource);
+            } catch (Exception e) {
+                continue;
+            }
+        }
         return true;
     }
 
@@ -54,8 +72,9 @@ public class CommonSourceWrapper extends AbstractDataSourceWrapper {
 
     /**
      * 通用反射获取值的方法
+     *
      * @param target 目标对象
-     * @param keys 要尝试的属性/方法名列表
+     * @param keys   要尝试的属性/方法名列表
      * @return 找到的值（字符串），无则返回null
      */
     private String getValueByReflection(Object target, List<String> keys) {

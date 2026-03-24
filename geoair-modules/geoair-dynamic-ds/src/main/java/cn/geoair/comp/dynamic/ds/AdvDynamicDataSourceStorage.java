@@ -2,10 +2,10 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
 
-import com.alibaba.druid.pool.DruidDataSource;
-
+import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,13 +37,13 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     // 数据源映射
-    private final Map<String, DruidDataSource> dataSourceMap = new ConcurrentHashMap<>();
+    private final Map<String, AdvDataSourceWrapper> dataSourceMap = new ConcurrentHashMap<>();
 
     @Override
     public void cleanCache() {
         Gir.log.info("执行清空数据源缓存并释放数据库链接操作！");
         if (ObjectUtil.isNotEmpty(dataSourceMap)) {
-            Set<Map.Entry<String, DruidDataSource>> entries = dataSourceMap.entrySet();
+            Set<Map.Entry<String, AdvDataSourceWrapper>> entries = dataSourceMap.entrySet();
             entries.forEach(entry -> {
                 // 关闭数据源，释放连接
                 entry.getValue().close();
@@ -58,7 +58,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     @Override
-    public DruidDataSource getDataSource(String dataSourceId) {
+    public AdvDataSourceWrapper getDataSource(String dataSourceId) {
         if (containsDataSource(dataSourceId)) {
             return dataSourceMap.get(dataSourceId);
         } else {
@@ -67,11 +67,11 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     @Override
-    public void addDataSource(DruidDataSource druidDataSource, String dataSourceId) {
+    public void addDataSource(DataSource dataSource, String dataSourceId) {
         // 只有当数据源不存在时才添加
-        DruidDataSource existingDataSource = dataSourceMap.get(dataSourceId);
+        AdvDataSourceWrapper existingDataSource = dataSourceMap.get(dataSourceId);
         if (existingDataSource == null) {
-            dataSourceMap.put(dataSourceId, druidDataSource);
+            dataSourceMap.put(dataSourceId, AdvDataSourceWrapper.wrap(dataSource));
             Gir.log.debug("已添加数据源: {}", dataSourceId);
         } else {
             Gir.log.debug("数据源已存在，不执行添加操作: {}", dataSourceId);
@@ -85,16 +85,15 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
      * @return 创建的Druid数据源
      */
     @Override
-    public DruidDataSource getDruidDataSourceByDataSourceApo(DataSourceApo dataSource) {
-        return iAdvDataSourceHelper.getDbDataSourceByApo(dataSource);
-
+    public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource) {
+        return AdvDataSourceWrapper.wrap(iAdvDataSourceHelper.getDbDataSourceByApo(dataSource));
     }
 
 
     @Override
     public boolean removeDataSource(String dataSourceId) {
         if (containsDataSource(dataSourceId)) {
-            DruidDataSource dataSource = dataSourceMap.remove(dataSourceId);
+            AdvDataSourceWrapper dataSource = dataSourceMap.remove(dataSourceId);
             // 关闭数据源，释放资源
             if (dataSource != null) {
                 dataSource.close();

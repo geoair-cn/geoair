@@ -13,8 +13,12 @@ public abstract class AbstractDataSourceWrapper implements AdvDataSourceWrapper 
     // 被包装的原始数据源
     protected DataSource targetDataSource;
 
-
-
+    @Override
+    public String toString() {
+        return "AbstractDataSourceWrapper{" +
+                "targetDataSource=" + targetDataSource +
+                '}';
+    }
 
     public AbstractDataSourceWrapper(DataSource targetDataSource) {
         this.targetDataSource = targetDataSource;

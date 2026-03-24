@@ -107,7 +107,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
             dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
         } else {
-            dataSource = AdvDynamicDataSourceStorage.getInstance().getDruidDataSourceByDataSourceApo(dataSourceApo);
+            dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSourceByDataSourceApo(dataSourceApo);
 
         }
     }

@@ -1,7 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
-import com.zaxxer.hikari.HikariDataSource;
+
 
 import javax.sql.DataSource;
 
@@ -15,6 +16,17 @@ public class DiverManagerSourceWrapper extends AbstractDataSourceWrapper {
 
 
     public static boolean canInit() {
+        return true;
+    }
+
+    @Override
+    public boolean close() {
+        DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
+        try {
+            dataSource.close();
+        } catch (Exception e) {
+            Gir.log.error(e);
+        }
         return true;
     }
 

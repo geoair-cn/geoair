@@ -1,8 +1,6 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
 
-
-
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
@@ -16,7 +14,7 @@ public class SpringDiverManagerSourceWrapper extends AbstractDataSourceWrapper {
 
     static Boolean canInit = null;
 
-    public static boolean canInit(){
+    public static boolean canInit() {
         if (canInit != null) {
             return canInit;
         }
@@ -27,6 +25,12 @@ public class SpringDiverManagerSourceWrapper extends AbstractDataSourceWrapper {
             return false;
         }
         return canInit;
+    }
+
+    @Override
+    public boolean close() {
+
+        return true;
     }
 
     @Override

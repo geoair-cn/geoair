@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Apache DBCP2 数据源包装器
@@ -31,6 +32,15 @@ public class DBCP2DataSourceWrapper extends AbstractDataSourceWrapper {
             canInit = false;
         }
         return canInit;
+    }
+
+    @Override
+    public boolean close() {
+        try {
+            getDBCP2DataSource().close();
+        } catch (SQLException e) {
+        }
+        return true;
     }
 
     @Override

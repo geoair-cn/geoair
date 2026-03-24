@@ -9,12 +9,24 @@ import javax.sql.DataSource;
  */
 public interface AdvDataSourceWrapper extends DataSource {
 
+    static AdvDataSourceWrapper wrap(final DataSource dataSource) {
+        return DataSourceWrapperRegistry.getWrapper(dataSource).get();
+    }
+
+
     /**
      * 是否支持
      *
      * @return
      */
     boolean isSupport();
+
+    /**
+     * 关闭数据源
+     *
+     * @return
+     */
+    boolean close();
 
 
     /**
@@ -24,5 +36,9 @@ public interface AdvDataSourceWrapper extends DataSource {
      */
     String getSimpleDataSourceName();
 
+    /**
+     * 获取JDBC URL
+     * @return
+     */
     String getJdbcUrl();
 }

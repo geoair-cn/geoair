@@ -34,6 +34,12 @@ public class BoneCPDataSourceWrapper extends AbstractDataSourceWrapper {
     }
 
     @Override
+    public boolean close() {
+        getBoneCPDataSource().close();
+        return true;
+    }
+
+    @Override
     public String getSimpleDataSourceName() {
         return null;
     }

@@ -1,5 +1,6 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
+import cn.geoair.base.Gir;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
@@ -16,7 +17,7 @@ public class HikariDataSourceWrapper extends AbstractDataSourceWrapper {
 
     static Boolean canInit = null;
 
-    public static boolean canInit(){
+    public static boolean canInit() {
         if (canInit != null) {
             return canInit;
         }
@@ -27,6 +28,17 @@ public class HikariDataSourceWrapper extends AbstractDataSourceWrapper {
             return false;
         }
         return canInit;
+    }
+
+    @Override
+    public boolean close() {
+        HikariDataSource dataSource = (HikariDataSource) targetDataSource;
+        try {
+            dataSource.close();
+        } catch (Exception e) {
+            Gir.log.error(e);
+        }
+        return true;
     }
 
     @Override

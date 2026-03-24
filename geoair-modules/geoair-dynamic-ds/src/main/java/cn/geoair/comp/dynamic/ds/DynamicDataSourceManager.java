@@ -1,7 +1,9 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import com.alibaba.druid.pool.DruidDataSource;
+import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
+
+import javax.sql.DataSource;
 
 /**
  * 动态数据源管理器接口 定义动态数据源的添加、获取、移除、清空等操作
@@ -28,7 +30,7 @@ public interface DynamicDataSourceManager {
      * @return DruidDataSource对象
      * @throws RuntimeException 当数据源不存在时抛出异常
      */
-    DruidDataSource getDataSource(String dataSourceId);
+    AdvDataSourceWrapper getDataSource(String dataSourceId);
 
     /**
      * 添加数据源到管理器
@@ -36,15 +38,15 @@ public interface DynamicDataSourceManager {
      * @param druidDataSource Druid数据源对象
      * @param dataSourceId    数据源ID
      */
-    void addDataSource(DruidDataSource druidDataSource, String dataSourceId);
+    void addDataSource(DataSource druidDataSource, String dataSourceId);
 
     /**
      * 根据数据源APO对象创建Druid数据源
      *
      * @param dataSource 数据源APO对象
-     * @return 创建的DruidDataSource对象，失败返回null
+     * @return 创建的 DataSource对象，失败返回null
      */
-    DruidDataSource getDruidDataSourceByDataSourceApo(DataSourceApo dataSource);
+    AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource);
 
 
     /**

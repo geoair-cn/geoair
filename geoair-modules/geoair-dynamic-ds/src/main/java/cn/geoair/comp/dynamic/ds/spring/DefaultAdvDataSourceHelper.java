@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
 
+import javax.sql.DataSource;
 import java.util.Date;
 
 /**
@@ -24,7 +25,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 	}
 
 	@Override
-	public DruidDataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
+	public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
 		try {
 			// 创建新的Druid数据源
 			DruidDataSource dataSourceNew = new DruidDataSource();

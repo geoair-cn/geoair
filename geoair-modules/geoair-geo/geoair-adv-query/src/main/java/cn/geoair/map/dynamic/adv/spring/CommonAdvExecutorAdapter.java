@@ -8,6 +8,8 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.tools.GirService;
 import com.alibaba.druid.pool.DruidDataSource;
 
+import javax.sql.DataSource;
+
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/10/9 15:08 @description： 通用的获取器
@@ -23,7 +25,7 @@ public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
         DataSourceApo dataSourceApoById = pxyBeanC.getDataSourceApoById(dataSourceId);
         dataSourceApoById.setSchemaName(schema);
         // 这里进行区分数据库执行器
-        DruidDataSource dbDataSourceByApo = pxyBeanC.getDbDataSourceByApo(dataSourceApoById);
+         DataSource dbDataSourceByApo = pxyBeanC.getDbDataSourceByApo(dataSourceApoById);
         return AdvExecutorFactory.getAdvExecutorByDataSource(dbDataSourceByApo, dataSourceId);
     }
 

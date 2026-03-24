@@ -16,6 +16,12 @@ public class C3P0DataSourceWrapper extends AbstractDataSourceWrapper {
     }
 
     @Override
+    public boolean close() {
+        getC3P0DataSource().close();
+        return true;
+    }
+
+    @Override
     protected Class<? extends DataSource> getTargetDataSourceClass() {
         return ComboPooledDataSource.class;
     }
