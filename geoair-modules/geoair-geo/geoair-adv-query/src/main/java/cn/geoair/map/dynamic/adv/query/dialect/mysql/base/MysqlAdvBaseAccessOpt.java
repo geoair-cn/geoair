@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.sql.Connection;
@@ -15,6 +16,10 @@ import java.util.stream.Collectors;
  */
 public class MysqlAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
+	public MysqlAdvBaseAccessOpt() {
+		// 绑定MySQL专属的表名处理器
+		this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();
+	}
 	// MySQL默认主键字段
 	private static final String MYSQL_DEFAULT_PRIMARY_KEY = "id";
 

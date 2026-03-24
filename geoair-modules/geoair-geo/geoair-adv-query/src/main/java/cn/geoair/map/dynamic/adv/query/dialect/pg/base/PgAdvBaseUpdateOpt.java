@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
 /**
@@ -8,21 +9,26 @@ import cn.hutool.core.util.StrUtil;
  */
 public class PgAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-	// PG专属常量
-	private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT ";
+    public PgAdvBaseUpdateOpt() {
+        // 绑定MySQL专属的表名处理器
+        this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
+    }
 
-	@Override
-	protected String buildUpsertFieldClause(String field) {
-		// PG：EXCLUDED关键字引用插入值
-		return StrUtil.format("{} = EXCLUDED.{}", field, field);
-	}
+    // PG专属常量
+    private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT ";
 
-	@Override
-	protected String buildUpdateOrInsertSql(String tableName, String fields, String placeholders, String conflictFields,
-			String updateClause) {
-		// PG：ON CONFLICT DO UPDATE语法
-		return StrUtil.format("INSERT INTO {} ({}) VALUES ({}){}({}) DO UPDATE SET {}", tableName, fields, placeholders,
-				PG_CONFLICT_CLAUSE, conflictFields, updateClause);
-	}
+    @Override
+    protected String buildUpsertFieldClause(String field) {
+        // PG：EXCLUDED关键字引用插入值
+        return StrUtil.format("{} = EXCLUDED.{}", field, field);
+    }
+
+    @Override
+    protected String buildUpdateOrInsertSql(String tableName, String fields, String placeholders, String conflictFields,
+                                            String updateClause) {
+        // PG：ON CONFLICT DO UPDATE语法
+        return StrUtil.format("INSERT INTO {} ({}) VALUES ({}){}({}) DO UPDATE SET {}", tableName, fields, placeholders,
+                PG_CONFLICT_CLAUSE, conflictFields, updateClause);
+    }
 
 }

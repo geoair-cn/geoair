@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
 /**
@@ -8,6 +9,11 @@ import cn.hutool.core.util.StrUtil;
  */
 public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
+
+	public MysqlAdvBaseUpdateOpt() {
+		// 绑定MySQL专属的表名处理器
+		this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();
+	}
 	// MySQL专属常量
 	private static final String MYSQL_DUPLICATE_CLAUSE = " ON DUPLICATE KEY ";
 

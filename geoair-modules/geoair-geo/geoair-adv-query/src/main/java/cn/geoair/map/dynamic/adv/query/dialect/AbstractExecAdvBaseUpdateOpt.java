@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
@@ -24,6 +25,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 	// 注入数据源获取器
 	protected IDataSourceGetter dataSourceGetter;
 
+	// 表名处理器（差异化）
+	protected DialectTableNameProcessor dialectTableNameProcessor;
 	// 日志实例
 	protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
 
@@ -79,11 +82,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		validateTableName(tableName);
 		validateIdKeyAndValue(idKey, id);
 		validateUpdateData(rowData);
-
+		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 		// 构建SET子句（通用）
 		String setClause = buildSetClause(rowData);
 		// 差异化：构建按主键更新SQL
-		String execSql = buildUpdateByPrimaryKeySql(tableName, setClause, idKey);
+		String execSql = buildUpdateByPrimaryKeySql(quoteTableName, setClause, idKey);
 
 		// 组装参数（更新字段值 + 主键值）
 		List<Object> params = new ArrayList<>(rowData.values());
@@ -134,12 +139,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		if (CollUtil.isEmpty(whereMap)) {
 			throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
 		}
-
+		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 		// 构建SET子句和WHERE子句（通用）
 		String setClause = buildSetClause(rowData);
 		String whereClause = buildWhereClause(whereMap);
 		// 差异化：构建条件更新SQL
-		String execSql = buildUpdateByConditionSql(tableName, setClause, whereClause);
+		String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
 
 		// 组装参数（更新字段值 + 条件值）
 		List<Object> params = new ArrayList<>(rowData.values());
@@ -246,11 +253,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		validateIdKeyAndValue(idKey, id);
 		validateUpdateData(rowData);
 		validateIdKeyAndValue(versionKey, version);
-
+		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 		// 构建SET子句（差异化：版本号自增逻辑）
 		String setClause = buildOptimisticLockSetClause(rowData, versionKey);
 		// 差异化：构建乐观锁更新SQL
-		String execSql = buildUpdateWithOptimisticLockSql(tableName, setClause, idKey, versionKey);
+		String execSql = buildUpdateWithOptimisticLockSql(quoteTableName, setClause, idKey, versionKey);
 
 		// 组装参数（更新字段值 + 主键值 + 版本号）
 		List<Object> params = new ArrayList<>(rowData.values());
@@ -281,7 +290,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		if (CollUtil.isEmpty(conflictKeys)) {
 			throw new IllegalArgumentException("冲突判定字段不能为空");
 		}
-
+		String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+		String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+		String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 		// 通用字段/占位符构建
 		String fields = String.join(",", rowData.keySet());
 		String placeholders = rowData.keySet().stream().map(key -> "?").collect(Collectors.joining(","));
@@ -290,7 +301,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 		// 构建更新子句（冲突时更新非冲突字段）
 		String updateClause = buildUpsertUpdateClause(rowData, conflictKeys);
 		// 差异化：构建UPSERT SQL
-		String execSql = buildUpdateOrInsertSql(tableName, fields, placeholders, conflictFields, updateClause);
+		String execSql = buildUpdateOrInsertSql(quoteTableName, fields, placeholders, conflictFields, updateClause);
 
 		List<Object> params = new ArrayList<>(rowData.values());
 		Connection connection = dataSourceGetter.getConnection();
