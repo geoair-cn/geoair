@@ -120,13 +120,11 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     @Override
     public void initByDataSource(DataSource dataSource, String dataSourceName) {
-        Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
-        String jdbcUrl = null;
-        if (wrapper.isPresent()) {
-            jdbcUrl = wrapper.get().getJdbcUrl();
-        }
         if (StrUtil.isEmpty(dataSourceName)) {
-            dataSourceName = jdbcUrl;
+            Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
+            if (wrapper.isPresent()) {
+                dataSourceName = wrapper.get().getJdbcUrl();
+            }
         }
         this.dataSource = dataSource;
         this.dataSourceId = dataSourceName;
