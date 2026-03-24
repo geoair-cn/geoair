@@ -8,7 +8,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvGeoOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑
  */
-public class PgAdvGeoOpt extends AbstractAdvGeoOpt {
+public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
 	private static final GiLogger log = GirLogger.getLoger();
 

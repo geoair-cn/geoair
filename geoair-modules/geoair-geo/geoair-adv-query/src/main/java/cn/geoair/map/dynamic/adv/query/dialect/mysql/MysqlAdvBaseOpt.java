@@ -4,7 +4,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseSelectOpt;
@@ -16,7 +16,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
  * @author 张逢吉
  * @date 2025/10/9 10:16
  */
-public class MysqlAdvBaseOpt extends AbstractAdvBaseOpt {
+public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
 	public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
 		super(dataSourceGetter);

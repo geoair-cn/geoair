@@ -29,13 +29,13 @@ import java.util.Map;
 
 /** 空间操作抽象基类 封装通用参数校验、结果处理等逻辑，子类只需实现数据库方言相关逻辑 */
 @Slf4j
-public abstract class AbstractAdvGeoOpt implements IAdvGeoPreOpt {
+public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
 	protected final IDataSourceGetter dataSourceGetter;
 
 	protected final DialectTableNameProcessor dialectTableNameProcessor;
 
-	public AbstractAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
+	public AbstractExecAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
 		this.dataSourceGetter = dataSourceGetter;
 		this.dialectTableNameProcessor = getDialectTableNameProcessor();
 	}

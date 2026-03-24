@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.extra.spring.SpringUtil;
 
@@ -10,7 +10,7 @@ import cn.hutool.extra.spring.SpringUtil;
  * @date ：Created in 2025/11/20 09:40
  * @description：Spring环境下的高级查询执行器
  */
-public class GirSpringAdvExecutor extends AbstractAdvExecutor implements IAdvExecutor {
+public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdvExecutor {
 
 	IAdvExecutor iAdvExecutorPxy;
 

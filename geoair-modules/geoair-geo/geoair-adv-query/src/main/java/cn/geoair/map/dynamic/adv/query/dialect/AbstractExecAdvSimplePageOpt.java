@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何操作;
 
-public abstract class AbstractAdvSimplePageOpt implements IAdvSimplePageOpt {
+public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt {
 
 	protected static final GiLogger log = GirLogger.getLoger();
 
@@ -28,7 +28,7 @@ public abstract class AbstractAdvSimplePageOpt implements IAdvSimplePageOpt {
 
 	protected DialectTableNameProcessor dialectTableNameProcessor;
 
-	public AbstractAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
+	public AbstractExecAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
 		this.dataSourceGetter = dataSourceGetter;
 		this.dialectTableNameProcessor = getDialectTableNameProcessor();
 	}

@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseAccessOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.hutool.core.util.StrUtil;
 
 import java.sql.Connection;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * MySQL插入操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑
  */
-public class MysqlAdvBaseAccessOpt extends AbstractAdvBaseAccessOpt {
+public class MysqlAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
 	// MySQL默认主键字段
 	private static final String MYSQL_DEFAULT_PRIMARY_KEY = "id";

@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 /**
  * 数据库查询操作抽象父类 封装所有数据库通用的查询逻辑，差异化语法由子类实现
  */
-public abstract class AbstractAdvBaseSelectOpt implements IAdvBaseSelectOpt {
+public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
@@ -37,7 +37,7 @@ public abstract class AbstractAdvBaseSelectOpt implements IAdvBaseSelectOpt {
     private static final String COUNT_ALIAS_PREFIX = "count_query_";
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractAdvBaseSelectOpt.class);
+    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseSelectOpt.class);
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {

@@ -18,13 +18,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /** 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现 */
-public abstract class AbstractAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
+public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
 
 	// 注入数据源获取器
 	protected IDataSourceGetter dataSourceGetter;
 
 	// 日志实例
-	protected static final GiLogger log = GirLogger.getLoger(AbstractAdvBaseDeleteOpt.class);
+	protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseDeleteOpt.class);
 
 	// 默认分批删除批次大小（通用常量）
 	protected static final int DEFAULT_BATCH_SIZE = 1000;

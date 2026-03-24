@@ -4,7 +4,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
@@ -21,7 +21,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
  * @author 张逢吉
  * @date 2025/10/9 10:16
  */
-public class PgAdvBaseOpt extends AbstractAdvBaseOpt {
+public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
 	public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
 		super(dataSourceGetter);

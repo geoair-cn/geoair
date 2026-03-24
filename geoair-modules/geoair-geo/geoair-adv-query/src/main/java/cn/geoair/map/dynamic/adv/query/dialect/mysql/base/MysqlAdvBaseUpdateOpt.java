@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.hutool.core.util.StrUtil;
 
 /**
  * MySQL更新操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑
  */
-public class MysqlAdvBaseUpdateOpt extends AbstractAdvBaseUpdateOpt {
+public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
 	// MySQL专属常量
 	private static final String MYSQL_DUPLICATE_CLAUSE = " ON DUPLICATE KEY ";

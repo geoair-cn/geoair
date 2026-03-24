@@ -1,11 +1,11 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
 
 /**
  * MySQL删除操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑
  */
-public class MysqlAdvBaseDeleteOpt extends AbstractAdvBaseDeleteOpt {
+public class MysqlAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
 	// MySQL专属常量
 	private static final int MYSQL_MAX_IN_PARAMS = 1000;

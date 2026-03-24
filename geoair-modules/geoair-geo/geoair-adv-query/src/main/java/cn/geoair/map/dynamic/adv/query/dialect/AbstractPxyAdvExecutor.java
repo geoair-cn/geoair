@@ -30,7 +30,7 @@ import java.util.function.Supplier;
  * @author 张逢吉
  * @date 2025/10/9 11:10
  */
-public abstract class AbstractAdvExecutor implements IAdvExecutor {
+public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     // 数据源获取器（核心依赖）
     protected IDataSourceGetter dataSourceGetterPxy;
@@ -58,22 +58,22 @@ public abstract class AbstractAdvExecutor implements IAdvExecutor {
 
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    public AbstractAdvExecutor(DataSourceApo dataSourceApo) {
+    public AbstractPxyAdvExecutor(DataSourceApo dataSourceApo) {
         this.initByDataSourceApo(dataSourceApo);
     }
 
-    public AbstractAdvExecutor(DataSource dataSource) {
+    public AbstractPxyAdvExecutor(DataSource dataSource) {
         this.initByDataSource(dataSource);
     }
 
-    public AbstractAdvExecutor(DataSource dataSource, String dataSourceName) {
+    public AbstractPxyAdvExecutor(DataSource dataSource, String dataSourceName) {
         this.initByDataSource(dataSource, dataSourceName);
     }
 
-    public AbstractAdvExecutor() {
+    public AbstractPxyAdvExecutor() {
     }
 
-    public AbstractAdvExecutor(Connection connection) {
+    public AbstractPxyAdvExecutor(Connection connection) {
         this.initByConnection(connection);
     }
 

@@ -4,7 +4,7 @@ import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,7 +13,7 @@ import java.sql.Connection;
  * @author ：张逢吉
  * @date ：Created in 15:36 @description： PostgreSQL数据库的动态高级查询执行器
  */
-public class AdvExecutorPG extends AbstractAdvExecutor {
+public class AdvExecutorPG extends AbstractPxyAdvExecutor {
 
     public AdvExecutorPG(DataSourceApo dataSourceApo) {
         super(dataSourceApo);

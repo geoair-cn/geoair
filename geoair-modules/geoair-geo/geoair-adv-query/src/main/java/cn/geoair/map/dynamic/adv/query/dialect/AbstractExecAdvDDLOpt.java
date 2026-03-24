@@ -24,7 +24,7 @@ import java.util.Optional;
 /**
  * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现
  */
-public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
+public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
@@ -33,10 +33,10 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractAdvDDLOpt.class);
+    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
-    public AbstractAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
+    public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
         this.dataSourceGetter.setSchemaNameGetterFunction(this::dGetCurrentSchema);

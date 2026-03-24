@@ -19,13 +19,13 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /** 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现 */
-public abstract class AbstractAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
+public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
 
 	// 注入数据源获取器
 	protected IDataSourceGetter dataSourceGetter;
 
 	// 日志实例
-	protected static final GiLogger log = GirLogger.getLoger(AbstractAdvBaseUpdateOpt.class);
+	protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
 
 	protected static final int DEFAULT_BATCH_SIZE = 1000;
 

@@ -2,11 +2,13 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
@@ -20,11 +22,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /** 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑，差异化语法由子类实现 */
-public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
+public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
 	protected IDataSourceGetter dataSourceGetter;
 
-	protected static final GiLogger log = GirLogger.getLoger(AbstractAdvBaseAccessOpt.class);
+	protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseAccessOpt.class);
 
 	// 默认分批插入批次大小（通用常量）
 	protected static final int DEFAULT_BATCH_SIZE = 1000;
@@ -32,7 +34,7 @@ public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 	/** 构建带主键返回的插入SQL */
 	protected abstract String buildInsertReturnIdSql(String tableName, String fields, String placeholders);
 
-	/** 执行插入并返回主键 */
+	/** 执行插入并返回自增的主键 */
 	protected abstract Long executeInsertReturnId(Connection connection, String execSql, Object... params)
 			throws SQLException;
 
@@ -110,13 +112,15 @@ public abstract class AbstractAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
 	@Override
 	public <T> Integer bInsertOne(String tableName, T entity) {
-		validateTableName(tableName);
 		if (entity == null) {
 			throw new IllegalArgumentException("插入的实体对象不能为空");
 		}
 
 		// 通用实体转Map
 		Entity entityObj = Entity.parse(entity);
+		if(GutilObject.isEmpty(tableName)){
+			tableName = entityObj.getTableName();
+		}
 		return bInsertOne(tableName, entityObj);
 	}
 

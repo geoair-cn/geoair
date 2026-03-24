@@ -6,8 +6,8 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * PostgreSQL DDL操作实现类
  */
-public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
+public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     PgAdvBaseOpt baseOpt;
 
@@ -33,7 +33,7 @@ public class PgAdvDDLOpt extends AbstractAdvDDLOpt {
 
     // ========== 初始化差异化组件 ==========
     @Override
-    protected AbstractAdvBaseOpt getAdvBaseOpt() {
+    protected AbstractPxyAdvBaseOpt getAdvBaseOpt() {
         if (baseOpt == null) {
             baseOpt = new PgAdvBaseOpt(dataSourceGetter);
         }

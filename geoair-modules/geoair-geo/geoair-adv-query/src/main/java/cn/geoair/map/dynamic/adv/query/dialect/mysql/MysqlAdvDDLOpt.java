@@ -7,7 +7,7 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * MySQL DDL操作实现类 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑
  */
-public class MysqlAdvDDLOpt extends AbstractAdvDDLOpt {
+public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     IAdvBaseOpt baseOpt;
 

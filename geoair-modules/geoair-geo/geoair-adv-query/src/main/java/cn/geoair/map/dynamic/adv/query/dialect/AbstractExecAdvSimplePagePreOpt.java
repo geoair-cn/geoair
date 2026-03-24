@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 
 import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何操作;
 
-public abstract class AbstractAdvSimplePagePreOpt extends AbstractAdvSimplePageOpt implements IAdvSimplePagePreOpt {
+public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSimplePageOpt implements IAdvSimplePagePreOpt {
 
 	protected static final GiLogger log = GirLogger.getLoger();
 
-	public AbstractAdvSimplePagePreOpt(IDataSourceGetter dataSourceGetter) {
+	public AbstractExecAdvSimplePagePreOpt(IDataSourceGetter dataSourceGetter) {
 		super(dataSourceGetter);
 	}
 

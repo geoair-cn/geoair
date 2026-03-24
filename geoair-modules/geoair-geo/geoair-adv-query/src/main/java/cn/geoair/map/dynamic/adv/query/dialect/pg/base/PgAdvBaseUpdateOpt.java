@@ -1,12 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.hutool.core.util.StrUtil;
 
 /**
  * PostgreSQL更新操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑
  */
-public class PgAdvBaseUpdateOpt extends AbstractAdvBaseUpdateOpt {
+public class PgAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
 	// PG专属常量
 	private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT ";

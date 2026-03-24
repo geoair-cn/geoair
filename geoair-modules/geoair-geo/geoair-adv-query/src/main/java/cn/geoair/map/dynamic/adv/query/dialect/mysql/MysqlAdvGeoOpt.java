@@ -6,7 +6,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvGeoOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * MySQL（Spatial）空间操作实现类 基于MySQL Spatial扩展实现通用空间操作接口 适配MySQL 5.7+/8.0+ Spatial语法特性
  */
-public class MysqlAdvGeoOpt extends AbstractAdvGeoOpt {
+public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
 	private static final Logger log = LoggerFactory.getLogger(MysqlAdvGeoOpt.class);
 
