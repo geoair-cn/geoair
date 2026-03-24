@@ -63,6 +63,7 @@ public class DataSourceGetter implements IDataSourceGetter {
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
+            schemaName = schemaNameMap.get(databaseName);
             return;
         }
         if (schemaNameGetterFunction != null) {
@@ -75,11 +76,11 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
         this.databaseNameGetterFunction = databaseNameGetterFunction;
-
         if (databaseName != null) {
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
+            databaseName = dataBaseNameMap.get(dataSourceName);
             return;
         }
         if (databaseNameGetterFunction != null) {
