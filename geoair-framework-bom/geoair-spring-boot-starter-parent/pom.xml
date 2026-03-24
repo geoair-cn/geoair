@@ -179,25 +179,7 @@
                         <useDefaultDelimiters>true</useDefaultDelimiters>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
-                    <version>${git-commit-id-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>revision</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <verbose>true</verbose>
-                        <dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
-                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                        <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties
-                        </generateGitPropertiesFilename>
-                    </configuration>
-                </plugin>
+
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -407,6 +389,46 @@
                     <url>http://xmt.geoair.cn:32000/repository/109-snapshot/</url>
                 </snapshotRepository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>git-commit-id-gen</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>pl.project13.maven</groupId>
+                        <artifactId>git-commit-id-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>get-the-git-infos</id>
+                                <goals>
+                                    <goal>revision</goal>
+                                </goals>
+                                <phase>initialize</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                            <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+
+                            <!-- 包含提交信息相关属性（关键） -->
+                            <includeOnlyProperties>
+                                <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>          <!-- 完整提交哈希 -->
+                                <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>      <!-- 提交时间 -->
+                                <includeOnlyProperty>^git.commit.message.full$</includeOnlyProperty> <!-- 完整提交信息 -->
+                                <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty> <!-- 提交标题（第一行） -->
+                                <includeOnlyProperty>^git.branch$</includeOnlyProperty> <!-- 提交标题（第一行） -->
+                            </includeOnlyProperties>
+
+                            <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+                            <dateFormatTimeZone>Asia/Shanghai</dateFormatTimeZone>
+                            <verbose>false</verbose>
+                            <skipPoms>true</skipPoms>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
