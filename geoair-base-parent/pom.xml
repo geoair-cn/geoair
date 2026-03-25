@@ -1,198 +1,194 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-framework</artifactId>
+    <version>J8.1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-base-parent</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>geoair-base-parent</name>
+  <description>geoair base parent 用于Gir基础库的依赖约束</description>
+
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>张逢吉</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
+
+  <properties>
+    <versions-maven-release.version>3.1.0</versions-maven-release.version>
+
+    <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
+    <slf4j.version>1.7.36</slf4j.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-framework</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-base-parent</artifactId>
-    <name>geoair-base-parent</name>
-    <version>J8.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <description>geoair base parent 用于Gir基础库的依赖约束</description>
+        <version>${geoair.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-spring-dependencies</artifactId>
+        <version>${geoair.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-common-dependencies</artifactId>
+        <version>${geoair.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-    <properties>
-        <versions-maven-release.version>3.1.0</versions-maven-release.version>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-geotools-dependencies</artifactId>
+        <version>${geoair.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-openapi-dependencies</artifactId>
+        <version>${geoair.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
-        <slf4j.version>1.7.36</slf4j.version>
-    </properties>
+    </dependencies>
+  </dependencyManagement>
 
-    <url>https://github.com/geoair-cn/geoair</url>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${versions-maven-release.version}</version>
+        <configuration>
+          <!-- 跳过自动提交（如需手动确认可关闭） -->
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <!-- 避免重复提交标签 -->
+          <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
+          <!-- 发布后自动推送到远程仓库 -->
+          <pushChanges>true</pushChanges>
+          <branchName>master</branchName>
+        </configuration>
+      </plugin>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+      </plugin>
 
-    <developers>
-        <developer>
-            <name>张逢吉</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <configuration>
+          <!--					<classifier>bak</classifier>-->
+        </configuration>
+      </plugin>
 
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <parameters>true</parameters>
+          <!-- 源码版本 -->
+          <source>8</source>
+          <!-- 目标字节码版本 -->
+          <target>8</target>
+          <!-- 编码（可选，避免中文乱码） -->
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
 
+      <!--生成源码插件-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-framework</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-spring-dependencies</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-common-dependencies</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+      <!--生成API文档插件-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <!-- 打包 javadoc.jar -->
+              <goal>jar</goal>
+              <!-- 编译时自动修复注释 -->
+              <goal>fix</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- 自动修复类注释 -->
+          <fixClassComment>true</fixClassComment>
+          <!-- 自动修复方法注释 -->
+          <fixMethodComment>true</fixMethodComment>
+          <!-- 自动修复字段注释 -->
+          <fixFieldComment>true</fixFieldComment>
+          <version>false</version>
+          <author>false</author>
+          <!-- 开启严格模式，注释不规范直接报错 -->
+          <failOnError>false</failOnError>
+          <!-- 文档编码 UTF-8 -->
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+    </plugins>
 
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-geotools-dependencies</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-openapi-dependencies</artifactId>
-                <version>${geoair.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${versions-maven-release.version}</version>
-                <configuration>
-                    <!-- 跳过自动提交（如需手动确认可关闭） -->
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <!-- 避免重复提交标签 -->
-                    <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
-                    <!-- 发布后自动推送到远程仓库 -->
-                    <pushChanges>true</pushChanges>
-                    <branchName>master</branchName>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <!--					<classifier>bak</classifier>-->
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                    <!-- 源码版本 -->
-                    <source>8</source>
-                    <!-- 目标字节码版本 -->
-                    <target>8</target>
-                    <!-- 编码（可选，避免中文乱码） -->
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <!--生成源码插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--生成API文档插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <!-- 自动修复类注释 -->
-                    <fixClassComment>true</fixClassComment>
-                    <!-- 自动修复方法注释 -->
-                    <fixMethodComment>true</fixMethodComment>
-                    <!-- 自动修复字段注释 -->
-                    <fixFieldComment>true</fixFieldComment>
-                    <version>false</version>
-                    <author>false</author>
-                    <!-- 开启严格模式，注释不规范直接报错 -->
-                    <failOnError>false</failOnError>
-                    <!-- 文档编码 UTF-8 -->
-                    <encoding>UTF-8</encoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <!-- 打包 javadoc.jar -->
-                            <goal>jar</goal>
-                            <!-- 编译时自动修复注释 -->
-                            <goal>fix</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-
-    </build>
-
+  </build>
 
 </project>

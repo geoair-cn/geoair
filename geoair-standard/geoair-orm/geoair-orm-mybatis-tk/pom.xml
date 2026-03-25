@@ -1,129 +1,123 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-orm</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-orm-mybatis-tk</artifactId>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-orm</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-orm-mybatis-tk</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
+  <name>geoair-mybatis-tk</name>
+  <description>mybatis+tkmapper的实现</description>
+
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties></properties>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  <dependencies>
 
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-orm-mybatis</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-    <name>geoair-mybatis-tk</name>
-    <description>mybatis+tkmapper的实现</description>
+    <!--        <dependency>-->
+    <!--            <groupId>org.locationtech.jts</groupId>-->
+    <!--            <artifactId>jts-core</artifactId>-->
+    <!--            <version>${jts.version}</version>-->
+    <!--            <optional>true</optional>-->
+    <!--        </dependency>-->
 
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+      <optional>true</optional>
+    </dependency>
 
-    <properties>
-    </properties>
+    <!-- -->
+    <!--        <dependency>-->
+    <!--            <groupId>net.postgis</groupId>-->
+    <!--            <artifactId>postgis-geometry</artifactId>-->
+    <!--            <version>${net.postgis.version}</version>-->
+    <!--            <optional>true</optional>-->
+    <!--        </dependency>-->
 
+    <!-- https://mvnrepository.com/artifact/tk.mybatis/mapper-spring-boot-starter -->
+    <dependency>
+      <groupId>tk.mybatis</groupId>
+      <artifactId>mapper-core</artifactId>
+      <version>${mapper-module.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>persistence-api</artifactId>
+          <groupId>javax.persistence</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>tk.mybatis</groupId>
+      <artifactId>mapper-base</artifactId>
+      <version>${mapper-module.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>persistence-api</artifactId>
+          <groupId>javax.persistence</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>tk.mybatis</groupId>
+      <artifactId>mapper-weekend</artifactId>
+      <version>${mapper-module.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>tk.mybatis</groupId>
+      <artifactId>mapper-spring</artifactId>
+      <version>${mapper-module.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>tk.mybatis</groupId>
+      <artifactId>mapper-extra</artifactId>
+      <version>${mapper-module.version}</version>
+    </dependency>
 
-    <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
 
-
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-orm-mybatis</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.locationtech.jts</groupId>-->
-<!--            <artifactId>jts-core</artifactId>-->
-<!--            <version>${jts.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
-
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
-            <optional>true</optional>
-        </dependency>
-
-<!-- -->
-<!--        <dependency>-->
-<!--            <groupId>net.postgis</groupId>-->
-<!--            <artifactId>postgis-geometry</artifactId>-->
-<!--            <version>${net.postgis.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
-
-        <!-- https://mvnrepository.com/artifact/tk.mybatis/mapper-spring-boot-starter -->
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-core</artifactId>
-            <version>${mapper-module.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-base</artifactId>
-            <version>${mapper-module.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-weekend</artifactId>
-            <version>${mapper-module.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-spring</artifactId>
-            <version>${mapper-module.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-extra</artifactId>
-            <version>${mapper-module.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-
-    </dependencies>
+  </dependencies>
 
 </project>

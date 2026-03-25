@@ -1,93 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-apidoc</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-knife4j-core</artifactId>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-apidoc</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>geoair-knife4j-core</name>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-knife4j-core</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  <name>geoair-knife4j-core</name>
 
-    <description>geoair-knife4j-core</description>
+  <description>geoair-knife4j-core</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  </properties>
+  <dependencies>
 
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-base</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-    <properties>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
 
-    </properties>
-    <dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-base</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>${reflections.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>${spring-boot.version}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>${reflections.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>${spring-boot.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-    </dependencies>
+  </dependencies>
 
 </project>

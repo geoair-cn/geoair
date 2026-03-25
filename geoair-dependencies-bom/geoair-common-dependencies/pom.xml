@@ -1,422 +1,409 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-dependencies-bom</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-
+  <parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-common-dependencies</artifactId>
-    <name>geoair-common-dependencies</name>
+    <artifactId>geoair-dependencies-bom</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <description>geoair other module 其他第三方组件，无法归类的组件</description>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-    <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-common-dependencies</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>geoair-common-dependencies</name>
+  <description>geoair other module 其他第三方组件，无法归类的组件</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>张逢吉</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>张逢吉</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
-
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp-bom</artifactId>
-                <version>${okhttp.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-starter</artifactId>
-                <version>${druid.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>${druid.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>tk.mybatis</groupId>
-                <artifactId>mapper-spring-boot</artifactId>
-                <version>${mapper-module.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>tk.mybatis</groupId>
-                <artifactId>mapper-spring-boot-autoconfigure</artifactId>
-                <version>${mapper-module.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>tk.mybatis</groupId>
-                <artifactId>mapper-spring-boot-starter</artifactId>
-                <version>${mapper-module.version}</version>
-            </dependency>
-
-
-            <!-- 这里不能低于1.4.1 否则高版本的spring boot会让 pagehelper有循环引用问题,需要设置高于1.4.4因为spring data jpa会有sql解析错误               https://blog.csdn.net/weixin_40816738/article/details/124377632       -->
-            <dependency>
-                <groupId>com.github.pagehelper</groupId>
-                <artifactId>pagehelper-spring-boot</artifactId>
-                <version>1.4.5</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.dromara.x-file-storage</groupId>
-                <artifactId>x-file-storage-spring</artifactId>
-                <version>2.3.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>cn.hutool</groupId>
-                        <artifactId>hutool-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-annotation</artifactId>
-                <version>${mybatis-plus.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <!--				<version>5.8.3</version>-->
-                <!--				<version>5.8.26</version>   &lt;!&ndash;			升级最新版本 20240219 by zhangjun&ndash;&gt;-->
-                <version>${hutool.version}</version>   <!--			升级最新版本 20251206 by zhangjun-->
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.javatuples</groupId>
-                <artifactId>javatuples</artifactId>
-                <version>1.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>net.sf.json-lib</groupId>
-                <artifactId>json-lib</artifactId>
-                <version>2.4</version>
-                <classifier>jdk15</classifier>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.5</version>
-            </dependency>
-
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>2.12.7</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.11.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>dom4j</groupId>
-                <artifactId>dom4j</artifactId>
-                <version>${dom4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct</artifactId>
-                <version>${mapstruct.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>${mapstruct.version}</version>
-                <scope>compile</scope>
-            </dependency>
-
-
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>0.9.1</version>
-                <!--                <version>0.13.0</version>-->
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-parent</artifactId>
-                <version>25</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
-                <version>2.4.1</version>
-            </dependency>
-
-            <!-- WebDAV -->
-            <dependency>
-                <groupId>com.github.lookfirst</groupId>
-                <artifactId>sardine</artifactId>
-                <version>5.13</version>
-
-            </dependency>
-
-            <!-- SFTP -->
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>0.1.55</version>
-
-            </dependency>
-
-            <!-- FTP -->
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>3.9.0</version>
-
-            </dependency>
-
-
-            <!-- AWS S3 -->
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>1.12.625</version>
-
-            </dependency>
-
-
-            <!-- MinIO -->
-            <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>8.5.9</version>
-
-            </dependency>
-
-            <!-- 又拍云 USS -->
-            <dependency>
-                <groupId>com.upyun</groupId>
-                <artifactId>java-sdk</artifactId>
-                <version>4.3.3</version>
-
-            </dependency>
-
-            <!-- 百度云 BOS -->
-            <dependency>
-                <groupId>com.baidubce</groupId>
-                <artifactId>bce-java-sdk</artifactId>
-                <version>0.10.268</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- 腾讯云 COS -->
-            <dependency>
-                <groupId>com.qcloud</groupId>
-                <artifactId>cos_api</artifactId>
-                <version>5.6.196</version>
-            </dependency>
-
-            <!-- 七牛云 Kodo -->
-            <dependency>
-                <groupId>com.qiniu</groupId>
-                <artifactId>qiniu-java-sdk</artifactId>
-                <version>7.15.0</version>
-            </dependency>
-
-            <!-- 阿里云 OSS -->
-            <dependency>
-                <groupId>com.aliyun.oss</groupId>
-                <artifactId>aliyun-sdk-oss</artifactId>
-                <version>3.18.0</version>
-            </dependency>
-
-            <!-- 华为云 OBS -->
-            <dependency>
-                <groupId>com.huaweicloud</groupId>
-                <artifactId>esdk-obs-java</artifactId>
-                <version>3.22.17.1</version>
-            </dependency>
-
-            <!-- 谷歌云 Google Cloud Platform Storage-->
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>google-cloud-storage</artifactId>
-                <version>2.20.0</version>
-            </dependency>
-
-            <!-- 图片处理 https://github.com/coobird/thumbnailator -->
-            <dependency>
-                <groupId>net.coobird</groupId>
-                <artifactId>thumbnailator</artifactId>
-                <version>0.4.19</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-core</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-            <!-- Sa-Token 插件：整合SSO -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-sso</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-
-
-            <!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot-starter</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-
-            <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc/ -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-
-            <!-- Sa-Token 整合 jwt -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-jwt</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-grpc</artifactId>
-                <version>${sa-token-version}</version>
-            </dependency>
-            <!-- Http请求工具 -->
-            <dependency>
-                <groupId>com.dtflys.forest</groupId>
-                <artifactId>forest-spring-boot-starter</artifactId>
-                <version>1.5.26</version>
-            </dependency>
-
-<!--            /这个会影响到swagger,所以就不要了-->
-<!--            <dependency>-->
-<!--                <groupId>com.alibaba.fastjson2</groupId>-->
-<!--                <artifactId>fastjson2-parent</artifactId>-->
-<!--                <version>${fastjson.version}</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>io.springfox</groupId>-->
-<!--                        <artifactId>springfox-spring-web</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
-
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson1x.version}</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies></dependencies>
-
-    <build>
-        <pluginManagement>
-            <plugins></plugins>
-        </pluginManagement>
-
-        <plugins></plugins>
-
-
-    </build>
+  </scm>
+
+  <properties>
+    <java.version>8</java.version>
+    <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp-bom</artifactId>
+        <version>${okhttp.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper-spring-boot</artifactId>
+        <version>${mapper-module.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper-spring-boot-autoconfigure</artifactId>
+        <version>${mapper-module.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper-spring-boot-starter</artifactId>
+        <version>${mapper-module.version}</version>
+      </dependency>
+
+      <!-- 这里不能低于1.4.1 否则高版本的spring boot会让 pagehelper有循环引用问题,需要设置高于1.4.4因为spring data jpa会有sql解析错误               https://blog.csdn.net/weixin_40816738/article/details/124377632       -->
+      <dependency>
+        <groupId>com.github.pagehelper</groupId>
+        <artifactId>pagehelper-spring-boot</artifactId>
+        <version>1.4.5</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.dromara.x-file-storage</groupId>
+        <artifactId>x-file-storage-spring</artifactId>
+        <version>2.3.0</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>hutool-core</artifactId>
+            <groupId>cn.hutool</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-annotation</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-all</artifactId>
+        <!--				<version>5.8.3</version>-->
+        <!--				<version>5.8.26</version>   &lt;!&ndash;			升级最新版本 20240219 by zhangjun&ndash;&gt;-->
+        <version>${hutool.version}</version>
+        <!--			升级最新版本 20251206 by zhangjun-->
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.javatuples</groupId>
+        <artifactId>javatuples</artifactId>
+        <version>1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.sf.json-lib</groupId>
+        <artifactId>json-lib</artifactId>
+        <version>2.4</version>
+        <classifier>jdk15</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.12.7</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>dom4j</groupId>
+        <artifactId>dom4j</artifactId>
+        <version>${dom4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>0.9.1</version>
+        <!--                <version>0.13.0</version>-->
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-parent</artifactId>
+        <version>25</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>2.4.1</version>
+      </dependency>
+
+      <!-- WebDAV -->
+      <dependency>
+        <groupId>com.github.lookfirst</groupId>
+        <artifactId>sardine</artifactId>
+        <version>5.13</version>
+
+      </dependency>
+
+      <!-- SFTP -->
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.55</version>
+
+      </dependency>
+
+      <!-- FTP -->
+      <dependency>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>3.9.0</version>
+
+      </dependency>
+
+      <!-- AWS S3 -->
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-s3</artifactId>
+        <version>1.12.625</version>
+
+      </dependency>
+
+      <!-- MinIO -->
+      <dependency>
+        <groupId>io.minio</groupId>
+        <artifactId>minio</artifactId>
+        <version>8.5.9</version>
+
+      </dependency>
+
+      <!-- 又拍云 USS -->
+      <dependency>
+        <groupId>com.upyun</groupId>
+        <artifactId>java-sdk</artifactId>
+        <version>4.3.3</version>
+
+      </dependency>
+
+      <!-- 百度云 BOS -->
+      <dependency>
+        <groupId>com.baidubce</groupId>
+        <artifactId>bce-java-sdk</artifactId>
+        <version>0.10.268</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>spring-core</artifactId>
+            <groupId>org.springframework</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- 腾讯云 COS -->
+      <dependency>
+        <groupId>com.qcloud</groupId>
+        <artifactId>cos_api</artifactId>
+        <version>5.6.196</version>
+      </dependency>
+
+      <!-- 七牛云 Kodo -->
+      <dependency>
+        <groupId>com.qiniu</groupId>
+        <artifactId>qiniu-java-sdk</artifactId>
+        <version>7.15.0</version>
+      </dependency>
+
+      <!-- 阿里云 OSS -->
+      <dependency>
+        <groupId>com.aliyun.oss</groupId>
+        <artifactId>aliyun-sdk-oss</artifactId>
+        <version>3.18.0</version>
+      </dependency>
+
+      <!-- 华为云 OBS -->
+      <dependency>
+        <groupId>com.huaweicloud</groupId>
+        <artifactId>esdk-obs-java</artifactId>
+        <version>3.22.17.1</version>
+      </dependency>
+
+      <!-- 谷歌云 Google Cloud Platform Storage-->
+      <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-storage</artifactId>
+        <version>2.20.0</version>
+      </dependency>
+
+      <!-- 图片处理 https://github.com/coobird/thumbnailator -->
+      <dependency>
+        <groupId>net.coobird</groupId>
+        <artifactId>thumbnailator</artifactId>
+        <version>0.4.19</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-redis-jackson</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-core</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+      <!-- Sa-Token 插件：整合SSO -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-sso</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+
+      <!-- Sa-Token 权限认证, 在线文档：https://sa-token.cc/ -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-spring-boot-starter</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+
+      <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc/ -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+
+      <!-- Sa-Token 整合 jwt -->
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-jwt</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-grpc</artifactId>
+        <version>${sa-token-version}</version>
+      </dependency>
+      <!-- Http请求工具 -->
+      <dependency>
+        <groupId>com.dtflys.forest</groupId>
+        <artifactId>forest-spring-boot-starter</artifactId>
+        <version>1.5.26</version>
+      </dependency>
+
+      <!--            /这个会影响到swagger,所以就不要了-->
+      <!--            <dependency>-->
+      <!--                <groupId>com.alibaba.fastjson2</groupId>-->
+      <!--                <artifactId>fastjson2-parent</artifactId>-->
+      <!--                <version>${fastjson.version}</version>-->
+      <!--                <type>pom</type>-->
+      <!--                <scope>import</scope>-->
+      <!--                <exclusions>-->
+      <!--                    <exclusion>-->
+      <!--                        <groupId>io.springfox</groupId>-->
+      <!--                        <artifactId>springfox-spring-web</artifactId>-->
+      <!--                    </exclusion>-->
+      <!--                </exclusions>-->
+      <!--            </dependency>-->
+
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${fastjson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${fastjson1x.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies></dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins></plugins>
+    </pluginManagement>
+
+    <plugins></plugins>
+
+  </build>
 
 </project>

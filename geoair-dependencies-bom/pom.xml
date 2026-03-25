@@ -1,558 +1,563 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.18</version>
-        <relativePath/>
-    </parent>
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
-    <name>geoair-dependencies-bom</name>
-    <packaging>pom</packaging>
-    <description>用于定义各个组件的依赖管理</description>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-dependencies</artifactId>
+    <version>2.7.18</version>
+    <relativePath></relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-dependencies-bom</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>geoair-dependencies-bom</name>
+  <description>用于定义各个组件的依赖管理</description>
+  <url>https://github.com/geoair-cn/geoair</url>
 
-    <properties>
-        <skipTests>true</skipTests>
-        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
-        <java.version>8</java.version>
-        <okhttp.version>4.12.0</okhttp.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
-        <versions-maven-release.version>3.1.0</versions-maven-release.version>
-        <redisson.version>3.18.0</redisson.version>
-        <sa-token-version> 1.44.0</sa-token-version>
-        <tomcat.version>9.0.115</tomcat.version>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <fastjson.version>2.0.61</fastjson.version>
-        <fastjson1x.version>2.0.61</fastjson1x.version>
-        <dom4j.version>1.6.1</dom4j.version>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
 
+  <developers>
+    <developer>
+      <name>张逢吉</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
 
-        <!--        <mapstruct.version>1.4.2.Final</mapstruct.version>-->
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+  <modules>
+    <module>geoair-geotools-dependencies</module>
+    <module>geoair-openapi-dependencies</module>
+    <module>geoair-spring-dependencies</module>
+    <module>geoair-template-dependencies</module>
+    <module>geoair-common-dependencies</module>
+  </modules>
 
-
-        <net.postgis.version>2025.1.1</net.postgis.version>
-        <org.postgis.version>1.3.3</org.postgis.version>
-        <druid.version>1.2.23</druid.version>
-        <mapper-module.version>4.2.0</mapper-module.version>
-        <geotools.version>28.6.1</geotools.version>
-        <geoserver.version>2.22.6</geoserver.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
-        <hutool.version>5.8.42</hutool.version>
-        <jts.version>1.19.0</jts.version>
-        <ecc.vectortile.version>1.3.9</ecc.vectortile.version>
-        <proj4j.version>1.3.0</proj4j.version>
-        <spring-javaformat.version>0.0.28</spring-javaformat.version>
-
-
-        <spring.version>5.3.31</spring.version>
-        <reflections.version>0.10.2</reflections.version>
-        <mybatis.version>3.5.9</mybatis.version>
-        <mybatis-spring.version>2.0.7</mybatis-spring.version>
-        <pagehelper.version>5.3.2</pagehelper.version>
-        <lombok.version>1.18.30</lombok.version>
-
-        <jackson.version>2.13.5</jackson.version>
-        <gson.version>2.9.1</gson.version>
-        <javax-persistence.version>2.2</javax-persistence.version>
-        <javax-cache.version>1.1.1</javax-cache.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
-
-        <!-- Jackson 子版本（基于统一的jackson.version） -->
-        <jackson.version.annotations>${jackson.version}</jackson.version.annotations>
-        <jackson.version.core>${jackson.version}</jackson.version.core>
-        <jackson.version.databind>${jackson.version}</jackson.version.databind>
-        <jackson.version.dataformat>${jackson.version}</jackson.version.dataformat>
-        <jackson.version.datatype>${jackson.version}</jackson.version.datatype>
-        <jackson.version.jaxrs>${jackson.version}</jackson.version.jaxrs>
-        <jackson.version.jakarta.rs>${jackson.version}</jackson.version.jakarta.rs>
-        <jackson.version.jacksonjr>${jackson.version}</jackson.version.jacksonjr>
-
-        <postgresql.version>42.3.8</postgresql.version>
-        <jedis.version>3.8.0</jedis.version>
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-        <servlet-api.version>4.0.1</servlet-api.version>
-
-
-        <springfox.version>3.0.0</springfox.version>
-        <springdoc.version>1.7.0</springdoc.version>
-        <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
-        <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
-
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
-        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
-    </properties>
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties>
+    <skipTests>true</skipTests>
+    <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
+    <java.version>8</java.version>
+    <okhttp.version>4.12.0</okhttp.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
+    <versions-maven-release.version>3.1.0</versions-maven-release.version>
+    <redisson.version>3.18.0</redisson.version>
+    <sa-token-version>1.44.0</sa-token-version>
+    <tomcat.version>9.0.115</tomcat.version>
+    <spring-boot.version>2.7.18</spring-boot.version>
+    <fastjson.version>2.0.61</fastjson.version>
+    <fastjson1x.version>2.0.61</fastjson1x.version>
+    <dom4j.version>1.6.1</dom4j.version>
 
-    <developers>
-        <developer>
-            <name>张逢吉</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+    <!--        <mapstruct.version>1.4.2.Final</mapstruct.version>-->
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
 
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
+    <net.postgis.version>2025.1.1</net.postgis.version>
+    <org.postgis.version>1.3.3</org.postgis.version>
+    <druid.version>1.2.23</druid.version>
+    <mapper-module.version>4.2.0</mapper-module.version>
+    <geotools.version>28.6.1</geotools.version>
+    <geoserver.version>2.22.6</geoserver.version>
+    <mybatis-plus.version>3.5.2</mybatis-plus.version>
+    <hutool.version>5.8.42</hutool.version>
+    <jts.version>1.19.0</jts.version>
+    <ecc.vectortile.version>1.3.9</ecc.vectortile.version>
+    <proj4j.version>1.3.0</proj4j.version>
+    <spring-javaformat.version>0.0.28</spring-javaformat.version>
 
-    <dependencyManagement>
-        <dependencies>
+    <spring.version>5.3.31</spring.version>
+    <reflections.version>0.10.2</reflections.version>
+    <mybatis.version>3.5.9</mybatis.version>
+    <mybatis-spring.version>2.0.7</mybatis-spring.version>
+    <pagehelper.version>5.3.2</pagehelper.version>
+    <lombok.version>1.18.30</lombok.version>
 
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-geotools-dependencies</artifactId>
-                <version>${geoair.version}</version>
+    <jackson.version>2.13.5</jackson.version>
+    <gson.version>2.9.1</gson.version>
+    <javax-persistence.version>2.2</javax-persistence.version>
+    <javax-cache.version>1.1.1</javax-cache.version>
+    <javax-annotation.version>1.3.2</javax-annotation.version>
 
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-openapi-dependencies</artifactId>
-                <version>${geoair.version}</version>
+    <!-- Jackson 子版本（基于统一的jackson.version） -->
+    <jackson.version.annotations>${jackson.version}</jackson.version.annotations>
+    <jackson.version.core>${jackson.version}</jackson.version.core>
+    <jackson.version.databind>${jackson.version}</jackson.version.databind>
+    <jackson.version.dataformat>${jackson.version}</jackson.version.dataformat>
+    <jackson.version.datatype>${jackson.version}</jackson.version.datatype>
+    <jackson.version.jaxrs>${jackson.version}</jackson.version.jaxrs>
+    <jackson.version.jakarta.rs>${jackson.version}</jackson.version.jakarta.rs>
+    <jackson.version.jacksonjr>${jackson.version}</jackson.version.jacksonjr>
 
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-spring-dependencies</artifactId>
-                <version>${geoair.version}</version>
+    <postgresql.version>42.3.8</postgresql.version>
+    <jedis.version>3.8.0</jedis.version>
+    <hibernate.version>5.6.15.Final</hibernate.version>
+    <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+    <servlet-api.version>4.0.1</servlet-api.version>
 
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-template-dependencies</artifactId>
-                <version>${geoair.version}</version>
+    <springfox.version>3.0.0</springfox.version>
+    <springdoc.version>1.7.0</springdoc.version>
+    <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
+    <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
 
-            </dependency>
+    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+    <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+    <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+  </properties>
 
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-common-dependencies</artifactId>
-                <version>${geoair.version}</version>
+  <dependencyManagement>
+    <dependencies>
 
-            </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-geotools-dependencies</artifactId>
+        <version>${geoair.version}</version>
 
-        </dependencies>
-    </dependencyManagement>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-openapi-dependencies</artifactId>
+        <version>${geoair.version}</version>
 
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-spring-dependencies</artifactId>
+        <version>${geoair.version}</version>
 
-    <modules>
-        <module>geoair-geotools-dependencies</module>
-        <module>geoair-openapi-dependencies</module>
-        <module>geoair-spring-dependencies</module>
-        <module>geoair-template-dependencies</module>
-        <module>geoair-common-dependencies</module>
-    </modules>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-template-dependencies</artifactId>
+        <version>${geoair.version}</version>
 
+      </dependency>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                    <configuration>
-                        <attach>true</attach>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler-plugin.version}</version>
-                    <configuration>
-                        <parameters>true</parameters>
-                        <!-- 源码版本 -->
-                        <source>8</source>
-                        <!-- 目标字节码版本 -->
-                        <target>8</target>
-                        <!-- 编码（可选，避免中文乱码） -->
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${maven-javadoc-plugin.version}</version>
-                    <configuration>
-                        <!-- 自动修复类注释 -->
-                        <fixClassComment>true</fixClassComment>
-                        <!-- 自动修复方法注释 -->
-                        <fixMethodComment>true</fixMethodComment>
-                        <!-- 自动修复字段注释 -->
-                        <fixFieldComment>true</fixFieldComment>
-                    <version>false</version>
-                    <author>false</author>
-                        <!-- 开启严格模式，注释不规范直接报错 -->
-                        <failOnError>false</failOnError>
-                        <!-- 文档编码 UTF-8 -->
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <!-- 打包 javadoc.jar -->
-                                <goal>jar</goal>
-                                <!-- 编译时自动修复注释 -->
-                                <goal>fix</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.5</version>
-                    <executions>
-                        <execution>
-                            <id>sign-artifacts</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>sign</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.central</groupId>
-                    <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.9.0</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <publishingServerId>central</publishingServerId>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-common-dependencies</artifactId>
+        <version>${geoair.version}</version>
 
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven-source-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>compile</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <attach>true</attach>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <parameters>true</parameters>
+            <!-- 源码版本 -->
+            <source>8</source>
+            <!-- 目标字节码版本 -->
+            <target>8</target>
+            <!-- 编码（可选，避免中文乱码） -->
+            <encoding>UTF-8</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <!-- 打包 javadoc.jar -->
+                <goal>jar</goal>
+                <!-- 编译时自动修复注释 -->
+                <goal>fix</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- 自动修复类注释 -->
+            <fixClassComment>true</fixClassComment>
+            <!-- 自动修复方法注释 -->
+            <fixMethodComment>true</fixMethodComment>
+            <!-- 自动修复字段注释 -->
+            <fixFieldComment>true</fixFieldComment>
+            <version>false</version>
+            <author>false</author>
+            <!-- 开启严格模式，注释不规范直接报错 -->
+            <failOnError>false</failOnError>
+            <!-- 文档编码 UTF-8 -->
+            <encoding>UTF-8</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.5</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>sign</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>0.9.0</version>
+          <extensions>true</extensions>
+          <configuration>
+            <publishingServerId>central</publishingServerId>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>${versions-maven-release.version}</version>
+        <configuration>
+          <!-- 跳过自动提交（如需手动确认可关闭） -->
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <!-- 避免重复提交标签 -->
+          <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
+          <!-- 发布后自动推送到远程仓库 -->
+          <pushChanges>true</pushChanges>
+          <branchName>master</branchName>
+
+          <!--                    <threadSafe>true</threadSafe>-->
+          <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
+          <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
+          <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
+          <!--                    <scmUrl>scm:git://github.com/geoair-cn/geoair.git</scmUrl>-->
+
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <configuration>
+          <!--					<classifier>bak</classifier>-->
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <parameters>true</parameters>
+          <!-- 源码版本 -->
+          <source>8</source>
+          <!-- 目标字节码版本 -->
+          <target>8</target>
+          <!-- 编码（可选，避免中文乱码） -->
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <!--生成源码插件-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--生成API文档插件-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <failOnError>false</failOnError>
+          <!-- 忽略错误，继续执行 -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>central</id>
+      <build>
+        <!--发布到中央SNAPSHOT仓库插件-->
+        <plugins>
+          <!--gpg插件-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <distributionManagement>
+        <repository>
+          <id>ossrh</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </repository>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+    <profile>
+      <id>code-style</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.coveo</groupId>
+            <artifactId>fmt-maven-plugin</artifactId>
+            <version>2.4.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>format</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <verbose>false</verbose>
+              <filesNamePattern>.*\.java</filesNamePattern>
+              <skip>false</skip>
+              <style>aosp</style>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>net.revelc.code</groupId>
+            <artifactId>impsort-maven-plugin</artifactId>
+            <version>1.6.0</version>
+            <executions>
+              <execution>
+                <id>sort-imports</id>
+                <goals>
+                  <goal>sort</goal>
+                  <!-- runs at process-sources phase by default -->
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <groups>*</groups>
+              <!-- 静态导入也统一规则 -->
+              <staticGroups>*</staticGroups>
+              <!-- 保留：自动删除没用的 import -->
+              <removeUnused>true</removeUnused>
+
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>com.github.ekryd.sortpom</groupId>
+            <artifactId>sortpom-maven-plugin</artifactId>
+            <version>2.15.0</version>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sort</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <skip>false</skip>
+              <keepBlankLines>true</keepBlankLines>
+              <sortDependencies>false</sortDependencies>
+              <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
+              <createBackupFile>false</createBackupFile>
+              <verifyFail>stop</verifyFail>
+              <verifyFailOn>strict</verifyFailOn>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>code-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>4.7.3.6</version>
+            <!-- Java8 最后稳定版 -->
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                  <!-- 构建时自动检查 -->
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <encoding>UTF-8</encoding>
+              <failOnError>false</failOnError>
+              <!-- 发现bug是否让构建失败 -->
+              <includeTests>false</includeTests>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.gaul</groupId>
+            <artifactId>modernizer-maven-plugin</artifactId>
+            <version>2.7.0</version>
+            <!-- Java8 稳定版 -->
+            <executions>
+              <execution>
+                <goals>
+                  <goal>modernizer</goal>
+                  <!-- 构建时自动检查 -->
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <javaVersion>8</javaVersion>
+              <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
+              <failOnViolations>false</failOnViolations>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.7.1</version>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>geoair-group-repo</id>
+      <distributionManagement>
+        <repository>
+          <id>gir-release</id>
+          <url>http://xmt.geoair.cn:32000/repository/109-release/</url>
+        </repository>
+        <snapshotRepository>
+          <id>gir-snapshot</id>
+          <url>http://xmt.geoair.cn:32000/repository/109-snapshot/</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+    <profile>
+      <id>git-commit-id-gen</id>
+      <build>
         <plugins>
 
+          <plugin>
+            <groupId>pl.project13.maven</groupId>
+            <artifactId>git-commit-id-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>get-the-git-infos</id>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>revision</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <generateGitPropertiesFile>true</generateGitPropertiesFile>
+              <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${versions-maven-release.version}</version>
-                <configuration>
-                    <!-- 跳过自动提交（如需手动确认可关闭） -->
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <!-- 避免重复提交标签 -->
-                    <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
-                    <!-- 发布后自动推送到远程仓库 -->
-                    <pushChanges>true</pushChanges>
-                    <branchName>master</branchName>
+              <!-- 包含提交信息相关属性（关键） -->
+              <includeOnlyProperties>
+                <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>
+                <!-- 完整提交哈希 -->
+                <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>
+                <!-- 提交时间 -->
+                <includeOnlyProperty>^git.commit.message.full$</includeOnlyProperty>
+                <!-- 完整提交信息 -->
+                <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty>
+                <!-- 提交标题（第一行） -->
+                <includeOnlyProperty>^git.branch$</includeOnlyProperty>
+                <!-- 提交标题（第一行） -->
+              </includeOnlyProperties>
 
-                    <!--                    <threadSafe>true</threadSafe>-->
-                    <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
-                    <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
-                    <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
-                    <!--                    <scmUrl>scm:git://github.com/geoair-cn/geoair.git</scmUrl>-->
+              <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
+              <dateFormatTimeZone>Asia/Shanghai</dateFormatTimeZone>
+              <verbose>false</verbose>
+              <skipPoms>true</skipPoms>
+            </configuration>
+          </plugin>
 
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <!--					<classifier>bak</classifier>-->
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                    <!-- 源码版本 -->
-                    <source>8</source>
-                    <!-- 目标字节码版本 -->
-                    <target>8</target>
-                    <!-- 编码（可选，避免中文乱码） -->
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <!--生成源码插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--生成API文档插件-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>central</id>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>ossrh</id>
-                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-                </repository>
-            </distributionManagement>
-            <build>
-                <!--发布到中央SNAPSHOT仓库插件-->
-                <plugins>
-                    <!--gpg插件-->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.9.0</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <publishingServerId>central</publishingServerId>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>code-style</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.coveo</groupId>
-                        <artifactId>fmt-maven-plugin</artifactId>
-                        <version>2.4.0</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>format</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <verbose>false</verbose>
-                            <filesNamePattern>.*\.java</filesNamePattern>
-                            <skip>false</skip>
-                            <style>aosp</style>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.revelc.code</groupId>
-                        <artifactId>impsort-maven-plugin</artifactId>
-                        <version>1.6.0</version>
-                        <configuration>
-                            <groups>*</groups>
-                            <!-- 静态导入也统一规则 -->
-                            <staticGroups>*</staticGroups>
-                            <!-- 保留：自动删除没用的 import -->
-                            <removeUnused>true</removeUnused>
-
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>sort-imports</id>
-                                <goals>
-                                    <goal>sort</goal><!-- runs at process-sources phase by default -->
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.ekryd.sortpom</groupId>
-                        <artifactId>sortpom-maven-plugin</artifactId>
-                        <version>2.15.0</version>
-                        <executions>
-                            <execution>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sort</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <skip>false</skip>
-                            <keepBlankLines>true</keepBlankLines>
-                            <sortDependencies>false</sortDependencies>
-                            <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
-                            <createBackupFile>false</createBackupFile>
-                            <verifyFail>stop</verifyFail>
-                            <verifyFailOn>strict</verifyFailOn>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>code-check</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs-maven-plugin</artifactId>
-                        <version>4.7.3.6</version> <!-- Java8 最后稳定版 -->
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal> <!-- 构建时自动检查 -->
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <encoding>UTF-8</encoding>
-                            <failOnError>false</failOnError>    <!-- 发现bug是否让构建失败 -->
-                            <includeTests>false</includeTests>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.gaul</groupId>
-                        <artifactId>modernizer-maven-plugin</artifactId>
-                        <version>2.7.0</version> <!-- Java8 稳定版 -->
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>modernizer</goal> <!-- 构建时自动检查 -->
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <javaVersion>8</javaVersion>
-                            <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
-                            <failOnViolations>false</failOnViolations>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.7.1</version>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>geoair-group-repo</id>
-            <distributionManagement>
-                <repository>
-                    <id>gir-release</id>
-                    <url>http://xmt.geoair.cn:32000/repository/109-release/</url>
-                </repository>
-                <snapshotRepository>
-                    <id>gir-snapshot</id>
-                    <url>http://xmt.geoair.cn:32000/repository/109-snapshot/</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>git-commit-id-gen</id>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>pl.project13.maven</groupId>
-                        <artifactId>git-commit-id-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>get-the-git-infos</id>
-                                <goals>
-                                    <goal>revision</goal>
-                                </goals>
-                                <phase>initialize</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <generateGitPropertiesFile>true</generateGitPropertiesFile>
-                            <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-
-                            <!-- 包含提交信息相关属性（关键） -->
-                            <includeOnlyProperties>
-                                <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>          <!-- 完整提交哈希 -->
-                                <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>      <!-- 提交时间 -->
-                                <includeOnlyProperty>^git.commit.message.full$</includeOnlyProperty> <!-- 完整提交信息 -->
-                                <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty> <!-- 提交标题（第一行） -->
-                                <includeOnlyProperty>^git.branch$</includeOnlyProperty> <!-- 提交标题（第一行） -->
-                            </includeOnlyProperties>
-
-                            <dateFormat>yyyy-MM-dd HH:mm:ss</dateFormat>
-                            <dateFormatTimeZone>Asia/Shanghai</dateFormatTimeZone>
-                            <verbose>false</verbose>
-                            <skipPoms>true</skipPoms>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

@@ -1,80 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geo</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-   <groupId>cn.geoair.devkit</groupId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-geo</artifactId>
     <version>J8.1.0-SNAPSHOT</version>
-    <artifactId>geoair-mvt</artifactId>
-    <name>geoair-mvt</name>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-mvt</artifactId>
+  <version>J8.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>geoair-mvt</name>
+  <description>mvt相关模块的功能组合</description>
+  <url>https://github.com/geoair-cn/geoair</url>
 
-    <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
-    <description>mvt相关模块的功能组合</description>
-    <packaging>pom</packaging>
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>geoair-real-mvt</module>
+    <module>geoair-static-mvt-spark</module>
+    <module>geoair-mvt-tools</module>
+  </modules>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties>
+    <java.version>8</java.version>
+    <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-mvt-tools</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-real-mvt</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-static-mvt-spark</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
 
-    <scm>
-        <connection>https://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-    </scm>
+    </dependencies>
 
-
-    <modules>
-        <module>geoair-real-mvt</module>
-        <module>geoair-static-mvt-spark</module>
-        <module>geoair-mvt-tools</module>
-    </modules>
-
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-mvt-tools</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-real-mvt</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-static-mvt-spark</artifactId>
-                <version>${geoair.version}</version>
-            </dependency>
-
-        </dependencies>
-
-
-    </dependencyManagement>
-
+  </dependencyManagement>
 
 </project>
