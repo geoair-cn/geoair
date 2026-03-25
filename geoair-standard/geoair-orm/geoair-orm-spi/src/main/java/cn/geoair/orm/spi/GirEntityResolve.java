@@ -1,7 +1,5 @@
 package cn.geoair.orm.spi;
 
-
-
 import cn.geoair.orm.spi.entity.GirEntityTable;
 
 /**
