@@ -8,22 +8,25 @@ import cn.geoair.base.tool.GkSnowflake;
 
 public class GspIdGenerator4Gir {
 
-	static {
-		GkMethodHand.implFromClass(GspIdGenerator4Gir.class);
-	}
+    static {
+        GkMethodHand.implFromClass(GspIdGenerator4Gir.class);
+    }
 
-	private static GkSnowflake snowflake = null;
+    private static GkSnowflake snowflake = null;
 
-	public static GkSnowflake getGfSnowflake() {
-		if (snowflake == null) {
-			snowflake = new GkSnowflake(1, 1, false);
-		}
-		return snowflake;
-	}
+    public static GkSnowflake getGfSnowflake() {
+        if (snowflake == null) {
+            snowflake = new GkSnowflake(1, 1, false);
+        }
+        return snowflake;
+    }
 
-	@GaMethodHandImpl(implClass = GirIdGenerator.class, implMethod = "timestampId", type = ImplType.comity)
-	public static long timestampId() {
-		return getGfSnowflake().nextId();
-	}
-
+    @GaMethodHandImpl(
+        implClass = GirIdGenerator.class,
+        implMethod = "timestampId",
+        type = ImplType.comity
+    )
+    public static long timestampId() {
+        return getGfSnowflake().nextId();
+    }
 }

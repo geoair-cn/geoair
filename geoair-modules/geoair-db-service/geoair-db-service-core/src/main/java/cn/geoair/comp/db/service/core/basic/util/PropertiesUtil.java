@@ -6,20 +6,19 @@ import java.util.Properties;
 
 public class PropertiesUtil {
 
-	private static Properties p = new Properties();
+    private static Properties p = new Properties();
 
-	static {
-		InputStream in = PropertiesUtil.class.getClassLoader().getResourceAsStream("application.properties");
-		try {
-			p.load(in);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        InputStream in =
+                PropertiesUtil.class.getClassLoader().getResourceAsStream("application.properties");
+        try {
+            p.load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public static String getKey(String key) {
-		return p.getProperty(key);
-	}
-
+    public static String getKey(String key) {
+        return p.getProperty(key);
+    }
 }

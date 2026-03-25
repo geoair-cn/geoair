@@ -9,10 +9,9 @@ import lombok.Data;
 @Data
 public class GsLayer {
 
-	/** 图层名称 */
-	private String name;
+    /** 图层名称 */
+    private String name;
 
-	/** 空间参考系统 (SRS) */
-	private String srs;
-
+    /** 空间参考系统 (SRS) */
+    private String srs;
 }

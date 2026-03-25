@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.tools;
 
 import cn.geoair.base.Gir;
-
 import cn.hutool.core.lang.Singleton;
 
 /**
@@ -10,16 +9,13 @@ import cn.hutool.core.lang.Singleton;
  */
 public class GirService {
 
-	public static <T> T getPxyBeanC(Class<T> classs) {
-		if (Singleton.exists(classs)) {
-			return Singleton.get(classs);
-		}
-		else {
-			T bean = Gir.beans.getBean(classs);
-			Singleton.put(classs.getName(), bean);
-			return bean;
-		}
-
-	}
-
+    public static <T> T getPxyBeanC(Class<T> classs) {
+        if (Singleton.exists(classs)) {
+            return Singleton.get(classs);
+        } else {
+            T bean = Gir.beans.getBean(classs);
+            Singleton.put(classs.getName(), bean);
+            return bean;
+        }
+    }
 }

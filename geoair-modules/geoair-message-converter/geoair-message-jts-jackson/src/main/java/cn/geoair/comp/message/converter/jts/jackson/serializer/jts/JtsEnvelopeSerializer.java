@@ -17,31 +17,29 @@
  */
 package cn.geoair.comp.message.converter.jts.jackson.serializer.jts;
 
-import java.io.IOException;
-
-import org.locationtech.jts.geom.Envelope;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
+import org.locationtech.jts.geom.Envelope;
 
 class JtsEnvelopeSerializer extends JsonSerializer<Envelope> {
 
-	@Override
-	public void serialize(Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-			throws IOException, JsonProcessingException {
-		jsonGenerator.writeStartArray();
-		jsonGenerator.writeNumber(round(bBox.getMinX(), 6));
-		jsonGenerator.writeNumber(round(bBox.getMinY(), 6));
-		jsonGenerator.writeNumber(round(bBox.getMaxX(), 6));
-		jsonGenerator.writeNumber(round(bBox.getMaxY(), 6));
-		jsonGenerator.writeEndArray();
-	}
+    @Override
+    public void serialize(
+            Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException, JsonProcessingException {
+        jsonGenerator.writeStartArray();
+        jsonGenerator.writeNumber(round(bBox.getMinX(), 6));
+        jsonGenerator.writeNumber(round(bBox.getMinY(), 6));
+        jsonGenerator.writeNumber(round(bBox.getMaxX(), 6));
+        jsonGenerator.writeNumber(round(bBox.getMaxY(), 6));
+        jsonGenerator.writeEndArray();
+    }
 
-	public static double round(double value, int decimalPlaces) {
-		double factor = Math.pow(10, decimalPlaces);
-		return Math.round(value * factor) / factor;
-	}
-
+    public static double round(double value, int decimalPlaces) {
+        double factor = Math.pow(10, decimalPlaces);
+        return Math.round(value * factor) / factor;
+    }
 }

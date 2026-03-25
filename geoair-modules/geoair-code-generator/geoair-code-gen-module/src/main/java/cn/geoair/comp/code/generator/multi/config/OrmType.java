@@ -5,7 +5,7 @@ package cn.geoair.comp.code.generator.multi.config;
  * @date ：Created in 10:05 @description： TODO
  */
 public enum OrmType {
-
-	TKMAPPER, MYBATISPLUS, JPA;
-
+    TKMAPPER,
+    MYBATISPLUS,
+    JPA;
 }

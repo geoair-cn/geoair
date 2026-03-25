@@ -1,42 +1,38 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
+import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import javax.sql.DataSource;
 
-import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
-
-/**
- * HikariCP数据源包装器
- */
+/** HikariCP数据源包装器 */
 public class AdvSimpleDataSourceWrapper extends AbstractDataSourceWrapper {
 
-	public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
-		super(targetDataSource);
-	}
+    public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
+        super(targetDataSource);
+    }
 
-	public static boolean canInit() {
+    public static boolean canInit() {
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public boolean close() {
-		return true;
-	}
+    @Override
+    public boolean close() {
+        return true;
+    }
 
-	protected Class<? extends DataSource> getTargetDataSourceClass() {
-		return AdvSimpleDataSource.class;
-	}
+    protected Class<? extends DataSource> getTargetDataSourceClass() {
+        return AdvSimpleDataSource.class;
+    }
 
-	@Override
-	public String getSimpleDataSourceName() {
+    @Override
+    public String getSimpleDataSourceName() {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public String getJdbcUrl() {
+    @Override
+    public String getJdbcUrl() {
 
-		return null;
-	}
-
+        return null;
+    }
 }

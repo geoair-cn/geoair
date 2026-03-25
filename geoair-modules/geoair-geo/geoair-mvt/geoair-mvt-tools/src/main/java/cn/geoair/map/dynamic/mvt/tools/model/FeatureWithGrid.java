@@ -1,8 +1,7 @@
 package cn.geoair.map.dynamic.mvt.tools.model;
 
-import org.locationtech.jts.geom.Coordinate;
-
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * @author ：张逢吉
@@ -10,28 +9,27 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
  */
 public class FeatureWithGrid {
 
-	private GirAdvOneRow feature;
+    private GirAdvOneRow feature;
 
-	private String gridId;
+    private String gridId;
 
-	private Coordinate center;
+    private Coordinate center;
 
-	public FeatureWithGrid(GirAdvOneRow feature, String gridId, Coordinate center) {
-		this.feature = feature;
-		this.gridId = gridId;
-		this.center = center;
-	}
+    public FeatureWithGrid(GirAdvOneRow feature, String gridId, Coordinate center) {
+        this.feature = feature;
+        this.gridId = gridId;
+        this.center = center;
+    }
 
-	public GirAdvOneRow getFeature() {
-		return feature;
-	}
+    public GirAdvOneRow getFeature() {
+        return feature;
+    }
 
-	public String getGridId() {
-		return gridId;
-	}
+    public String getGridId() {
+        return gridId;
+    }
 
-	public Coordinate getCenter() {
-		return center;
-	}
-
+    public Coordinate getCenter() {
+        return center;
+    }
 }

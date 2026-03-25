@@ -8,17 +8,16 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface GaParameter {
 
-	public static String NULL = "";
+    public static String NULL = "";
 
-	public String key() default NULL;
+    public String key() default NULL;
 
-	public String value() default NULL;
+    public String value() default NULL;
 
-	public Class<?> valueType() default String.class;
+    public Class<?> valueType() default String.class;
 
-	public String tag() default NULL;
-
+    public String tag() default NULL;
 }

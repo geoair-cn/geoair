@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.adv;
 
-import javax.sql.DataSource;
-
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.tools.GirService;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -13,42 +12,43 @@ import cn.geoair.map.dynamic.tools.GirService;
  */
 public class GirAdvQuery {
 
-	/**
-	 * 获取执行器
-	 * @param dataSourceId
-	 * @param schema
-	 * @return
-	 */
-	public static IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
-		IAdvExecutorAdapter pxyBeanC = GirService.getPxyBeanC(IAdvExecutorAdapter.class);
-		return pxyBeanC.getIAdvExecutor(dataSourceId, schema);
-	}
+    /**
+     * 获取执行器
+     *
+     * @param dataSourceId
+     * @param schema
+     * @return
+     */
+    public static IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
+        IAdvExecutorAdapter pxyBeanC = GirService.getPxyBeanC(IAdvExecutorAdapter.class);
+        return pxyBeanC.getIAdvExecutor(dataSourceId, schema);
+    }
 
-	/**
-	 * 通过数据源快速获取执行器
-	 * @param dataSource
-	 * @return
-	 */
-	public static IAdvExecutor getIAdvExecutor(DataSource dataSource) {
-		return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
-	}
+    /**
+     * 通过数据源快速获取执行器
+     *
+     * @param dataSource
+     * @return
+     */
+    public static IAdvExecutor getIAdvExecutor(DataSource dataSource) {
+        return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
+    }
 
-	public static IAdvExecutor getIAdvExecutor(DataSource dataSource, String dataSourceName) {
-		return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
-	}
+    public static IAdvExecutor getIAdvExecutor(DataSource dataSource, String dataSourceName) {
+        return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
+    }
 
-	public static <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz) {
-		IAdvExecutorAdapter pxyBeanC = GirService.getPxyBeanC(IAdvExecutorAdapter.class);
-		return pxyBeanC.getIAdvExecutor(dataSourceId, schema, clazz);
-	}
+    public static <T extends IAdvExecutor> T getIAdvExecutor(
+            String dataSourceId, String schema, Class<T> clazz) {
+        IAdvExecutorAdapter pxyBeanC = GirService.getPxyBeanC(IAdvExecutorAdapter.class);
+        return pxyBeanC.getIAdvExecutor(dataSourceId, schema, clazz);
+    }
 
-	public static void main(String[] args) {
-		IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor("", "");
-		iAdvExecutor.bSelectOne("");
-		iAdvExecutor.bSelectList("");
-		String s = iAdvExecutor.eGetGeomColumnNameBySql("");
-		AdvEnumsTypeGeom advEnumsTypeGeom = iAdvExecutor.eGetGeoTypeBySql("");
-
-	}
-
+    public static void main(String[] args) {
+        IAdvExecutor iAdvExecutor = GirAdvQuery.getIAdvExecutor("", "");
+        iAdvExecutor.bSelectOne("");
+        iAdvExecutor.bSelectList("");
+        String s = iAdvExecutor.eGetGeomColumnNameBySql("");
+        AdvEnumsTypeGeom advEnumsTypeGeom = iAdvExecutor.eGetGeoTypeBySql("");
+    }
 }

@@ -1,11 +1,9 @@
 package cn.geoair.map.dynamic.adv.spring;
 
-import javax.sql.DataSource;
-
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.AdvExecutorMysql;
-
 import cn.hutool.extra.spring.SpringUtil;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -14,28 +12,27 @@ import cn.hutool.extra.spring.SpringUtil;
  */
 public class GirSpringMysqlAdvExecutor extends AdvExecutorMysql implements IAdvExecutor {
 
-	public static GirSpringMysqlAdvExecutor newInstanceBySpring() {
-		DataSource dataSourceBySpring = getDataSourceBySpring();
-		return newInstance(dataSourceBySpring);
-	}
+    public static GirSpringMysqlAdvExecutor newInstanceBySpring() {
+        DataSource dataSourceBySpring = getDataSourceBySpring();
+        return newInstance(dataSourceBySpring);
+    }
 
-	public static GirSpringMysqlAdvExecutor newInstance(DataSource dataSource) {
-		GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
-		advExecutor.initByDataSource(dataSource);
-		return advExecutor;
-	}
+    public static GirSpringMysqlAdvExecutor newInstance(DataSource dataSource) {
+        GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
+        advExecutor.initByDataSource(dataSource);
+        return advExecutor;
+    }
 
-	public static GirSpringMysqlAdvExecutor newInstance(DataSource dataSource, String dataSourceName) {
-		GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
-		advExecutor.initByDataSource(dataSource, dataSourceName);
-		return advExecutor;
-	}
+    public static GirSpringMysqlAdvExecutor newInstance(
+            DataSource dataSource, String dataSourceName) {
+        GirSpringMysqlAdvExecutor advExecutor = new GirSpringMysqlAdvExecutor();
+        advExecutor.initByDataSource(dataSource, dataSourceName);
+        return advExecutor;
+    }
 
-	public static DataSource getDataSourceBySpring() {
-		return SpringUtil.getBean(DataSource.class);
-	}
+    public static DataSource getDataSourceBySpring() {
+        return SpringUtil.getBean(DataSource.class);
+    }
 
-	public GirSpringMysqlAdvExecutor() {
-	}
-
+    public GirSpringMysqlAdvExecutor() {}
 }

@@ -11,9 +11,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class WriteConfig {
 
-	/**
-	 * 输出的srid
-	 */
-	private int outPutSrid = 4326;
-
+    /** 输出的srid */
+    private int outPutSrid = 4326;
 }

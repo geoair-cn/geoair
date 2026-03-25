@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.enums;
 
 import java.io.Serializable;
-
 import org.geotools.geometry.jts.Geometries;
 
 /**
@@ -10,7 +9,12 @@ import org.geotools.geometry.jts.Geometries;
  * @see Geometries
  */
 public enum AdvEnumsGeomOpt implements Serializable {
-
-	不做任何操作, 移除, 转换为NULL, 转换为空字符串, 转换成GeoJson, 转换成WKT, 转换成WKB,;
-
+    不做任何操作,
+    移除,
+    转换为NULL,
+    转换为空字符串,
+    转换成GeoJson,
+    转换成WKT,
+    转换成WKB,
+    ;
 }

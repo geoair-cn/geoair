@@ -1,10 +1,9 @@
 package cn.geoair.map.dynamic.mvt;
 
-import org.locationtech.jts.geom.Envelope;
-
 import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
 import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumerByJts;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
+import org.locationtech.jts.geom.Envelope;
 
 /**
  * @author ：张逢吉
@@ -12,9 +11,12 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
  */
 public class DefaultRealMvtHelper implements GirRealMvtHelper {
 
-	public VectorTileBuilderConsumer getVectorTileBuilderConsumer(Envelope envelope, String layerName, int outGridSrid,
-			TileGlobalConfig tileGlobalConfig) {
-		return VectorTileBuilderConsumerByJts.create(envelope, layerName, outGridSrid, tileGlobalConfig);
-	}
-
+    public VectorTileBuilderConsumer getVectorTileBuilderConsumer(
+            Envelope envelope,
+            String layerName,
+            int outGridSrid,
+            TileGlobalConfig tileGlobalConfig) {
+        return VectorTileBuilderConsumerByJts.create(
+                envelope, layerName, outGridSrid, tileGlobalConfig);
+    }
 }

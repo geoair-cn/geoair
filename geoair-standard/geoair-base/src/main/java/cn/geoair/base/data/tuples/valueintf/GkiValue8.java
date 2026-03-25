@@ -1,13 +1,7 @@
 package cn.geoair.base.data.tuples.valueintf;
 
-/**
- * <p>
- * Marker interface for tuples with a "8" value.
- * </p>
- *
- */
+/** Marker interface for tuples with a "8" value. */
 public interface GkiValue8<X> {
 
-	public X getValue8();
-
+    public X getValue8();
 }

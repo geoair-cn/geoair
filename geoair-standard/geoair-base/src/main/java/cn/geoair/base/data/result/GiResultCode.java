@@ -7,6 +7,4 @@ import cn.geoair.base.data.GiVisualValuable;
  *
  * @author Ray
  */
-public interface GiResultCode extends GiVisualValuable<Integer> {
-
-}
+public interface GiResultCode extends GiVisualValuable<Integer> {}

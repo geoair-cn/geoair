@@ -2,10 +2,9 @@ package cn.geoair.base.data;
 
 public interface GiGroup extends GiTypeable {
 
-	String gtcGroupId();
+    String gtcGroupId();
 
-	String gtcGroupName();
+    String gtcGroupName();
 
-	public GiGroupType gtcType();
-
+    public GiGroupType gtcType();
 }

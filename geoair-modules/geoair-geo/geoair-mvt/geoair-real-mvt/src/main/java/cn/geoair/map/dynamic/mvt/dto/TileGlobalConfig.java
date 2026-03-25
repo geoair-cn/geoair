@@ -1,9 +1,7 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
-import com.alibaba.fastjson2.JSONObject;
-
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -13,16 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 @Accessors(chain = true)
 public class TileGlobalConfig {
 
-	TileRequestParams tileRequestParams;
+    TileRequestParams tileRequestParams;
 
-	TileExecParams tileExecParams;
+    TileExecParams tileExecParams;
 
-	TileExecutorConfig tileExecConfig;
+    TileExecutorConfig tileExecConfig;
 
-	String layerName;
+    String layerName;
 
-	Integer version = 0;
+    Integer version = 0;
 
-	JSONObject customVariable;
-
+    JSONObject customVariable;
 }

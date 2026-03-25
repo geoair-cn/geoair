@@ -12,11 +12,11 @@ package cn.geoair.base.def;
 @FunctionalInterface
 public interface GkEditor<T> {
 
-	/**
-	 * 修改过滤后的结果
-	 * @param t 被过滤的对象
-	 * @return 修改后的对象，如果被过滤返回<code>null</code>
-	 */
-	T edit(T t);
-
+    /**
+     * 修改过滤后的结果
+     *
+     * @param t 被过滤的对象
+     * @return 修改后的对象，如果被过滤返回<code>null</code>
+     */
+    T edit(T t);
 }

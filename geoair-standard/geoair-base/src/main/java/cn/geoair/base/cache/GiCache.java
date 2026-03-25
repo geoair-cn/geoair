@@ -3,93 +3,98 @@ package cn.geoair.base.cache;
 import java.util.concurrent.Callable;
 
 /**
- * Cache 通用api，这里仿照spring cache而不是JSR是因为大部分缓存方案适配spring cache. 简化了spring
- * cache的ValueWrapper，加入了过期时间
+ * Cache 通用api，这里仿照spring cache而不是JSR是因为大部分缓存方案适配spring cache. 简化了spring cache的ValueWrapper，加入了过期时间
  *
  * @author Ray
- *
  */
 public interface GiCache {
 
-	/**
-	 * 获取缓存名称
-	 * @return 缓存名称
-	 */
-	String getName();
+    /**
+     * 获取缓存名称
+     *
+     * @return 缓存名称
+     */
+    String getName();
 
-	/**
-	 * 加入缓存，默认过期时间
-	 * @param key 缓存键
-	 * @param value 缓存值
-	 */
-	void put(Object key, Object value);
+    /**
+     * 加入缓存，默认过期时间
+     *
+     * @param key 缓存键
+     * @param value 缓存值
+     */
+    void put(Object key, Object value);
 
-	/**
-	 * 加入缓存，指定过期时间
-	 * @param key 缓存键
-	 * @param value 缓存值
-	 * @param milliseconds 缓存过期时间，单位毫秒
-	 */
-	void put(Object key, Object value, long milliseconds);
+    /**
+     * 加入缓存，指定过期时间
+     *
+     * @param key 缓存键
+     * @param value 缓存值
+     * @param milliseconds 缓存过期时间，单位毫秒
+     */
+    void put(Object key, Object value, long milliseconds);
 
-	/**
-	 * 获取缓存对象
-	 * @param key 缓存键
-	 * @return 缓存值对象
-	 */
-	Object getObject(Object key);
+    /**
+     * 获取缓存对象
+     *
+     * @param key 缓存键
+     * @return 缓存值对象
+     */
+    Object getObject(Object key);
 
-	/**
-	 * 判断缓存是否存在
-	 * @param key
-	 * @return
-	 */
-	boolean exists(Object key);
+    /**
+     * 判断缓存是否存在
+     *
+     * @param key
+     * @return
+     */
+    boolean exists(Object key);
 
-	/**
-	 * 获取指定类型的缓存值
-	 * @param <T> 泛型类型
-	 * @param key 缓存键
-	 * @param type 期望返回的类型
-	 * @return 指定类型的缓存值
-	 */
-	<T> T get(Object key, Class<T> type);
+    /**
+     * 获取指定类型的缓存值
+     *
+     * @param <T> 泛型类型
+     * @param key 缓存键
+     * @param type 期望返回的类型
+     * @return 指定类型的缓存值
+     */
+    <T> T get(Object key, Class<T> type);
 
-	/**
-	 * 获取字符串类型的缓存值
-	 * @param key 缓存键
-	 * @return 字符串类型的缓存值
-	 */
-	String getString(Object key);
+    /**
+     * 获取字符串类型的缓存值
+     *
+     * @param key 缓存键
+     * @return 字符串类型的缓存值
+     */
+    String getString(Object key);
 
-	/**
-	 * 获取缓存值，如果不存在则通过Callable加载
-	 * @param <T> 泛型类型
-	 * @param key 缓存键
-	 * @param valueLoader 值加载器
-	 * @return 缓存值
-	 * @throws Exception 加载异常
-	 */
-	<T> T get(Object key, Callable<T> valueLoader) throws Exception;
+    /**
+     * 获取缓存值，如果不存在则通过Callable加载
+     *
+     * @param <T> 泛型类型
+     * @param key 缓存键
+     * @param valueLoader 值加载器
+     * @return 缓存值
+     * @throws Exception 加载异常
+     */
+    <T> T get(Object key, Callable<T> valueLoader) throws Exception;
 
-	/**
-	 * 返回缓存剩余生存时间
-	 * @param key 缓存键
-	 * @return 剩余毫秒数，-1表示永不过期，-2表示键不存在
-	 */
-	long pttl(Object key);
+    /**
+     * 返回缓存剩余生存时间
+     *
+     * @param key 缓存键
+     * @return 剩余毫秒数，-1表示永不过期，-2表示键不存在
+     */
+    long pttl(Object key);
 
-	/**
-	 * 清除指定key的缓存
-	 * @param key 缓存键
-	 */
-	void evict(Object key);
+    /**
+     * 清除指定key的缓存
+     *
+     * @param key 缓存键
+     */
+    void evict(Object key);
 
-	/**
-	 * 清空所有缓存
-	 */
-	void clear();
-
+    /** 清空所有缓存 */
+    void clear();
 }
 
 /*

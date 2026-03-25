@@ -1,13 +1,11 @@
 package cn.geoair.comp.message.converter.jts.jackson.auto;
 
+import cn.geoair.comp.message.converter.jts.jackson.config.GirJtsJacksonAutoConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Import;
-
-import cn.geoair.comp.message.converter.jts.jackson.config.GirJtsJacksonAutoConfig;
 
 /**
  * @author ：张俊
@@ -16,6 +14,4 @@ import cn.geoair.comp.message.converter.jts.jackson.config.GirJtsJacksonAutoConf
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(GirJtsJacksonAutoConfig.class)
-public @interface EnableGirJtsAutoRegister {
-
-}
+public @interface EnableGirJtsAutoRegister {}

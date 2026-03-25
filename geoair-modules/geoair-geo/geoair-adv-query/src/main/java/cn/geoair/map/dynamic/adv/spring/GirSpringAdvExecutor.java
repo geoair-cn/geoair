@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.spring;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
-
 import cn.hutool.extra.spring.SpringUtil;
 
 /**
@@ -13,45 +12,44 @@ import cn.hutool.extra.spring.SpringUtil;
  */
 public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdvExecutor {
 
-	IAdvExecutor iAdvExecutorPxy;
+    IAdvExecutor iAdvExecutorPxy;
 
-	public static GirSpringAdvExecutor getInstance() {
-		return SpringUtil.getBean(GirSpringAdvExecutor.class);
-	}
+    public static GirSpringAdvExecutor getInstance() {
+        return SpringUtil.getBean(GirSpringAdvExecutor.class);
+    }
 
-	@Override
-	protected IDataSourceGetter getDataSourceGetterPxy() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IDataSourceGetter getDataSourceGetterPxy() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvBaseOpt getAdvBaseOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvBaseOpt getAdvBaseOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvDDLOpt getAdvDDLOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvDDLOpt getAdvDDLOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvSimplePagePreOpt getSimplePageOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected IAdvGeoPreOpt getGeoOpt() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected IAdvGeoPreOpt getGeoOpt() {
+        return iAdvExecutorPxy;
+    }
 
-	@Override
-	protected DialectTableNameProcessor getDialectTableNameProcessor() {
-		return iAdvExecutorPxy;
-	}
+    @Override
+    protected DialectTableNameProcessor getDialectTableNameProcessor() {
+        return iAdvExecutorPxy;
+    }
 
-	public GirSpringAdvExecutor(IAdvExecutor iAdvExecutorPxy) {
-		this.iAdvExecutorPxy = iAdvExecutorPxy;
-		this.initProxyObjects();
-	}
-
+    public GirSpringAdvExecutor(IAdvExecutor iAdvExecutorPxy) {
+        this.iAdvExecutorPxy = iAdvExecutorPxy;
+        this.initProxyObjects();
+    }
 }

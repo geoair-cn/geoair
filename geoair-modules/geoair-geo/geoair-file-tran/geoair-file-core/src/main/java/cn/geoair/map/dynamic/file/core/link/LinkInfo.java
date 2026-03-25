@@ -11,9 +11,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public abstract class LinkInfo {
 
-	/**
-	 * 检查链接是否可用
-	 */
-	public abstract void checkLinkInfo();
-
+    /** 检查链接是否可用 */
+    public abstract void checkLinkInfo();
 }

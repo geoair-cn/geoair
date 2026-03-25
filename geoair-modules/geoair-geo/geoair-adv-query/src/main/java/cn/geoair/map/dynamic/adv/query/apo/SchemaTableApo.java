@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,24 +12,15 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class SchemaTableApo {
 
-	/**
-	 * 数据库名称
-	 */
-	String databaseName;
+    /** 数据库名称 */
+    String databaseName;
 
-	/**
-	 * 模式名称
-	 */
-	String schema;
+    /** 模式名称 */
+    String schema;
 
-	/**
-	 * 表名称或者视图名称或者方法名称
-	 */
-	String name;
+    /** 表名称或者视图名称或者方法名称 */
+    String name;
 
-	/**
-	 * 表类型
-	 */
-	AdvSchemaTableTypeOpt type;
-
+    /** 表类型 */
+    AdvSchemaTableTypeOpt type;
 }

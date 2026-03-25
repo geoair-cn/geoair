@@ -8,23 +8,20 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 public @interface GaMethodHandImpl {
 
-	public String id() default "";
+    public String id() default "";
 
-	public Class<?> implClass() default Object.class;
+    public Class<?> implClass() default Object.class;
 
-	public String implMethod() default "";
+    public String implMethod() default "";
 
-	public ImplType type() default ImplType.expectfirst;
+    public ImplType type() default ImplType.expectfirst;
 
-	public static enum ImplType {
-
-		expectfirst, // 期待优先
-		cover, // 覆盖
-		comity // 礼让
-
-	}
-
+    public static enum ImplType {
+        expectfirst, // 期待优先
+        cover, // 覆盖
+        comity // 礼让
+    }
 }

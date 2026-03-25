@@ -5,37 +5,32 @@ import cn.geoair.base.data.result.support.GirResult;
 
 public class GirWebResult<T> extends GirResult<T> implements GiWebResult<T> {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -5431439929185394126L;
+    /** */
+    private static final long serialVersionUID = -5431439929185394126L;
 
-	public GirWebResult() {
-	}
+    public GirWebResult() {}
 
-	public GirWebResult(Class<T> cls) {
-	}
+    public GirWebResult(Class<T> cls) {}
 
-	@GaModelField(text = "跳转地址")
-	private String location;// 跳转地址
+    @GaModelField(text = "跳转地址")
+    private String location; // 跳转地址
 
-	public String getLocation() {
-		return location;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-	@Override
-	public String location() {
-		return location;
-	}
+    @Override
+    public String location() {
+        return location;
+    }
 
-	@Override
-	public GiWebResult<T> andLocation(String location) {
-		this.setLocation(location);
-		return this;
-	}
-
+    @Override
+    public GiWebResult<T> andLocation(String location) {
+        this.setLocation(location);
+        return this;
+    }
 }

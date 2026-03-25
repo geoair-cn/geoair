@@ -1,7 +1,7 @@
 package cn.geoair.comp.demo.knife4j.model;
 
-//import io.swagger.annotations.ApiModel;
-//import io.swagger.annotations.ApiModelProperty;
+// import io.swagger.annotations.ApiModel;
+// import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 演示模型
@@ -12,15 +12,14 @@ package cn.geoair.comp.demo.knife4j.model;
 // @ApiModel(value = "测试demoDemoVo3")
 public class DemoVo3 {
 
-	// @ApiModelProperty(value = "String 变量")
-	private String var1;
+    // @ApiModelProperty(value = "String 变量")
+    private String var1;
 
-	public String getVar1() {
-		return var1;
-	}
+    public String getVar1() {
+        return var1;
+    }
 
-	public void setVar1(String var1) {
-		this.var1 = var1;
-	}
-
+    public void setVar1(String var1) {
+        this.var1 = var1;
+    }
 }

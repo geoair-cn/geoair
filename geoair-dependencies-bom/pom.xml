@@ -386,34 +386,38 @@
                 </plugins>
             </build>
         </profile>
-
         <profile>
-            <id>java-code-format</id>
+            <id>code-style</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>io.spring.javaformat</groupId>
-                        <artifactId>spring-javaformat-maven-plugin</artifactId>
-                        <version>${spring-javaformat.version}</version>
+                        <groupId>com.coveo</groupId>
+                        <artifactId>fmt-maven-plugin</artifactId>
+                        <version>2.4.0</version>
                         <executions>
                             <execution>
-                                <phase>validate</phase>
                                 <goals>
-                                    <goal>validate</goal>
+                                    <goal>format</goal>
                                 </goals>
-                                <inherited>true</inherited>
                             </execution>
                         </executions>
+                        <configuration>
+                            <verbose>false</verbose>
+                            <filesNamePattern>.*\.java</filesNamePattern>
+                            <skip>false</skip>
+                            <style>aosp</style>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>net.revelc.code</groupId>
                         <artifactId>impsort-maven-plugin</artifactId>
                         <version>1.6.0</version>
                         <configuration>
-                            <groups>java.,javax.,org.,com.</groups>
-                            <staticGroups>java,*</staticGroups>
+                            <groups>*</groups>
+                            <!-- 静态导入也统一规则 -->
+                            <staticGroups>*</staticGroups>
+                            <!-- 保留：自动删除没用的 import -->
                             <removeUnused>true</removeUnused>
-                            <groups>java.,javax.,org.,com.,io.,cn.geoair</groups>
 
                         </configuration>
                         <executions>
@@ -425,6 +429,35 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>com.github.ekryd.sortpom</groupId>
+                        <artifactId>sortpom-maven-plugin</artifactId>
+                        <version>2.15.0</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sort</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>false</skip>
+                            <keepBlankLines>true</keepBlankLines>
+                            <sortDependencies>false</sortDependencies>
+                            <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
+                            <createBackupFile>false</createBackupFile>
+                            <verifyFail>stop</verifyFail>
+                            <verifyFailOn>strict</verifyFailOn>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>code-check</id>
+            <build>
+                <plugins>
                     <plugin>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs-maven-plugin</artifactId>
@@ -467,8 +500,6 @@
                 </plugins>
             </build>
         </profile>
-
-
         <profile>
             <id>geoair-group-repo</id>
             <distributionManagement>

@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public interface GiEntityIdGenerator<PK extends Serializable> {
 
-	/**
-	 * 自定义ID生成
-	 * @return
-	 */
-	public PK generatorId();
-
+    /**
+     * 自定义ID生成
+     *
+     * @return
+     */
+    public PK generatorId();
 }

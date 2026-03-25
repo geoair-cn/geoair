@@ -9,6 +9,5 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
  */
 public interface CustomTransformConsumer {
 
-	void accept(GirAdvOneRow oneRow, TileGlobalConfig tileGlobalConfig);
-
+    void accept(GirAdvOneRow oneRow, TileGlobalConfig tileGlobalConfig);
 }

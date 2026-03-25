@@ -1,11 +1,9 @@
 package cn.geoair.comp.db.service.core.typehander.oracle;
 
+import cn.geoair.comp.db.service.core.typehander.BlobTypeHandler;
+import cn.hutool.db.Entity;
 import java.sql.ResultSet;
 import java.util.Map;
-
-import cn.geoair.comp.db.service.core.typehander.BlobTypeHandler;
-
-import cn.hutool.db.Entity;
 
 /**
  * @author ：张俊
@@ -13,30 +11,29 @@ import cn.hutool.db.Entity;
  */
 public class OracleBlobTypeHandler extends BlobTypeHandler {
 
-	@Override
-	public String getResult(Entity entity, String columnName) {
+    @Override
+    public String getResult(Entity entity, String columnName) {
 
-		return String.valueOf("(OracleBlob)");
-	}
+        return String.valueOf("(OracleBlob)");
+    }
 
-	@Override
-	public String getResult(ResultSet resultSet, String columnName) {
-		return String.valueOf("(OracleBlob)");
-	}
+    @Override
+    public String getResult(ResultSet resultSet, String columnName) {
+        return String.valueOf("(OracleBlob)");
+    }
 
-	@Override
-	public String getResult(ResultSet resultSet, Integer columnIndex) {
-		return String.valueOf("(OracleBlob)");
-	}
+    @Override
+    public String getResult(ResultSet resultSet, Integer columnIndex) {
+        return String.valueOf("(OracleBlob)");
+    }
 
-	@Override
-	public String getResult(Map<String, Object> row, String columnName) {
-		return String.valueOf("(OracleBlob)");
-	}
+    @Override
+    public String getResult(Map<String, Object> row, String columnName) {
+        return String.valueOf("(OracleBlob)");
+    }
 
-	@Override
-	public String getResult(Object obj) {
-		return String.valueOf("(OracleBlob)");
-	}
-
+    @Override
+    public String getResult(Object obj) {
+        return String.valueOf("(OracleBlob)");
+    }
 }

@@ -8,20 +8,21 @@ import cn.geoair.base.bean.GirBeanHelper;
  */
 public interface DsApiUserInfoHelper {
 
-	static DsApiUserInfoHelper getInstance() {
-		return GirBeanHelper.getProvider().getBean(DsApiUserInfoHelper.class);
-	}
+    static DsApiUserInfoHelper getInstance() {
+        return GirBeanHelper.getProvider().getBean(DsApiUserInfoHelper.class);
+    }
 
-	/**
-	 * 获取用户名
-	 * @return
-	 */
-	String getSubjectName();
+    /**
+     * 获取用户名
+     *
+     * @return
+     */
+    String getSubjectName();
 
-	/**
-	 * 获取用户id
-	 * @return
-	 */
-	String getSubjectId();
-
+    /**
+     * 获取用户id
+     *
+     * @return
+     */
+    String getSubjectId();
 }

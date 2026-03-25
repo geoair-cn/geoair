@@ -9,14 +9,13 @@ import cn.geoair.orm.spi.entity.GirEntityTable;
  */
 public class GirMybatisPlusGirEntityResolve implements GirEntityResolve {
 
-	@Override
-	public GirEntityTable resolveEntity(Class<?> entityClass) {
-		return null;
-	}
+    @Override
+    public GirEntityTable resolveEntity(Class<?> entityClass) {
+        return null;
+    }
 
-	@Override
-	public GirEntityTable resolveEntity(Object entityidentification) {
-		return null;
-	}
-
+    @Override
+    public GirEntityTable resolveEntity(Object entityidentification) {
+        return null;
+    }
 }

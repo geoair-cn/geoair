@@ -1,8 +1,7 @@
 package cn.geoair.base.lang;
 
-import java.lang.reflect.Type;
-
 import cn.geoair.base.util.GutilType;
+import java.lang.reflect.Type;
 
 /**
  * Type类型参考<br>
@@ -13,37 +12,33 @@ import cn.geoair.base.util.GutilType;
  * Type t = tr.getType();
  * </pre>
  *
- * 此类无法应用于通配符泛型参数（wildcard parameters），比如：{@code Class<?>} 或者
- * {@code List? extends CharSequence>}
+ * 此类无法应用于通配符泛型参数（wildcard parameters），比如：{@code Class<?>} 或者 {@code List? extends CharSequence>}
  *
- * <p>
- * 此类参考FastJSON的TypeReference实现
+ * <p>此类参考FastJSON的TypeReference实现
  *
  * @param <T> 需要自定义的参考类型
  */
 public abstract class GkTypeReference<T> implements Type {
 
-	/** 泛型参数 */
-	private final Type type;
+    /** 泛型参数 */
+    private final Type type;
 
-	/**
-	 * 构造
-	 */
-	public GkTypeReference() {
-		this.type = GutilType.getTypeArgument(getClass());
-	}
+    /** 构造 */
+    public GkTypeReference() {
+        this.type = GutilType.getTypeArgument(getClass());
+    }
 
-	/**
-	 * 获取用户定义的泛型参数
-	 * @return 泛型参数
-	 */
-	public Type getType() {
-		return this.type;
-	}
+    /**
+     * 获取用户定义的泛型参数
+     *
+     * @return 泛型参数
+     */
+    public Type getType() {
+        return this.type;
+    }
 
-	@Override
-	public String toString() {
-		return this.type.toString();
-	}
-
+    @Override
+    public String toString() {
+        return this.type.toString();
+    }
 }

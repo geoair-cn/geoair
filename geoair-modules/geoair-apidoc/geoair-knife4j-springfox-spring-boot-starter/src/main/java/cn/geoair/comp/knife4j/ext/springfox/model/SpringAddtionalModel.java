@@ -1,9 +1,8 @@
 package cn.geoair.comp.knife4j.ext.springfox.model;
 
+import com.fasterxml.classmate.ResolvedType;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.classmate.ResolvedType;
 
 /**
  * @author ：张俊
@@ -11,33 +10,28 @@ import com.fasterxml.classmate.ResolvedType;
  */
 public class SpringAddtionalModel {
 
-	/***
-	 * 第一个Type
-	 */
-	private ResolvedType first;
+    /** * 第一个Type */
+    private ResolvedType first;
 
-	/***
-	 * 剩余
-	 */
-	private List<ResolvedType> remaining = new ArrayList<>();
+    /** * 剩余 */
+    private List<ResolvedType> remaining = new ArrayList<>();
 
-	public ResolvedType[] getRemaining() {
-		if (!remaining.isEmpty()) {
-			return remaining.toArray(new ResolvedType[] {});
-		}
-		return new ResolvedType[] {};
-	}
+    public ResolvedType[] getRemaining() {
+        if (!remaining.isEmpty()) {
+            return remaining.toArray(new ResolvedType[] {});
+        }
+        return new ResolvedType[] {};
+    }
 
-	public ResolvedType getFirst() {
-		return first;
-	}
+    public ResolvedType getFirst() {
+        return first;
+    }
 
-	public void setFirst(ResolvedType first) {
-		this.first = first;
-	}
+    public void setFirst(ResolvedType first) {
+        this.first = first;
+    }
 
-	public void add(ResolvedType type) {
-		remaining.add(type);
-	}
-
+    public void add(ResolvedType type) {
+        remaining.add(type);
+    }
 }

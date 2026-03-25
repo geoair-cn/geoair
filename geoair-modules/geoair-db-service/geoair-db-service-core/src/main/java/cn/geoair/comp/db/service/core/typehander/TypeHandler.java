@@ -1,10 +1,9 @@
 package cn.geoair.comp.db.service.core.typehander;
 
-import java.sql.ResultSet;
-import java.util.Map;
-
 import cn.hutool.db.Entity;
 import cn.hutool.db.meta.JdbcType;
+import java.sql.ResultSet;
+import java.util.Map;
 
 /**
  * @author ：张俊
@@ -12,22 +11,22 @@ import cn.hutool.db.meta.JdbcType;
  */
 public interface TypeHandler<T> {
 
-	/**
-	 * 转换sql进入的时候的参数
-	 * @param parameter
-	 * @param jdbcType
-	 * @return
-	 */
-	T getParameter(Object parameter, JdbcType jdbcType);
+    /**
+     * 转换sql进入的时候的参数
+     *
+     * @param parameter
+     * @param jdbcType
+     * @return
+     */
+    T getParameter(Object parameter, JdbcType jdbcType);
 
-	T getResult(Entity entity, String columnName);
+    T getResult(Entity entity, String columnName);
 
-	T getResult(ResultSet resultSet, String columnName);
+    T getResult(ResultSet resultSet, String columnName);
 
-	T getResult(ResultSet resultSet, Integer columnIndex);
+    T getResult(ResultSet resultSet, Integer columnIndex);
 
-	T getResult(Map<String, Object> row, String columnName);
+    T getResult(Map<String, Object> row, String columnName);
 
-	T getResult(Object obj);
-
+    T getResult(Object obj);
 }

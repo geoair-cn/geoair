@@ -1,12 +1,10 @@
 package cn.geoair.comp.db.service.starter.run;
 
+import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-
-import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
-
 import tk.mybatis.spring.annotation.MapperScan;
 
 /**
@@ -18,20 +16,19 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("cn.geoair.comp.db.service.starter.mapper")
 public class AutoGirDbServiceConfiguration {
 
-	@Bean
-	@ConditionalOnMissingBean(DsApiUserInfoHelper.class)
-	public DsApiUserInfoHelper dsApiUserInfoHelper() {
-		return new DsApiUserInfoHelper() {
-			@Override
-			public String getSubjectName() {
-				return "geoair";
-			}
+    @Bean
+    @ConditionalOnMissingBean(DsApiUserInfoHelper.class)
+    public DsApiUserInfoHelper dsApiUserInfoHelper() {
+        return new DsApiUserInfoHelper() {
+            @Override
+            public String getSubjectName() {
+                return "geoair";
+            }
 
-			@Override
-			public String getSubjectId() {
-				return "geoair";
-			}
-		};
-	}
-
+            @Override
+            public String getSubjectId() {
+                return "geoair";
+            }
+        };
+    }
 }

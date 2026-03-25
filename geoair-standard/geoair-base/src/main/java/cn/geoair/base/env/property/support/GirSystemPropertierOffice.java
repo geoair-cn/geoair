@@ -5,9 +5,8 @@ import cn.geoair.base.env.property.GiPropertier;
 
 public class GirSystemPropertierOffice implements GkOffice<GiPropertier> {
 
-	@Override
-	public GiPropertier getOperater() {
-		return new GirSystemPropertyOperater();
-	}
-
+    @Override
+    public GiPropertier getOperater() {
+        return new GirSystemPropertyOperater();
+    }
 }

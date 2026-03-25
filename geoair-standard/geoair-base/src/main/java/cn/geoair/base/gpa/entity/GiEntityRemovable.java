@@ -1,8 +1,7 @@
 package cn.geoair.base.gpa.entity;
 
-import java.io.Serializable;
-
 import cn.geoair.base.gpa.dao.GiDeleteDao;
+import java.io.Serializable;
 
 /**
  * 可以被移除的模型
@@ -12,17 +11,16 @@ import cn.geoair.base.gpa.dao.GiDeleteDao;
  */
 public interface GiEntityRemovable<ID extends Serializable> extends GiEntityable<ID> {
 
-	@SuppressWarnings("unchecked")
-	default <T extends GiEntityRemovable<ID>> GiDeleteDao<T, ID> deleteDao() {
-		return GiDeleteDao.getDao((Class<T>) this.modelClass());
-	}
+    @SuppressWarnings("unchecked")
+    default <T extends GiEntityRemovable<ID>> GiDeleteDao<T, ID> deleteDao() {
+        return GiDeleteDao.getDao((Class<T>) this.modelClass());
+    }
 
-	default void removeSelf() {
-		this.deleteDao().gtcDeleteByPK(this.id());
-	}
+    default void removeSelf() {
+        this.deleteDao().gtcDeleteByPK(this.id());
+    }
 
-	default int removeBySelf() {
-		return this.deleteDao().gtcDeleteBy(this);
-	}
-
+    default int removeBySelf() {
+        return this.deleteDao().gtcDeleteBy(this);
+    }
 }

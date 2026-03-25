@@ -1,9 +1,8 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile;
 
-import org.apache.spark.sql.SparkSession;
-
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.SparkVectorTileGeneratorAll;
+import org.apache.spark.sql.SparkSession;
 
 /**
  * @author ：张逢吉
@@ -11,18 +10,17 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.SparkVectorTileGener
  */
 public class SparkJavaTileApp {
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-		String base32 = args[0];
+        String base32 = args[0];
 
-		TileSliceParameter tileSliceParameter = TileSliceParameter.fromBase32(base32);
+        TileSliceParameter tileSliceParameter = TileSliceParameter.fromBase32(base32);
 
-		SparkSession spark = SparkSession.builder().appName("spark-tile-vec-tile").getOrCreate();
+        SparkSession spark = SparkSession.builder().appName("spark-tile-vec-tile").getOrCreate();
 
-		SparkVectorTileGeneratorAll sparkVectorTileGenerator = new SparkVectorTileGeneratorAll(spark);
+        SparkVectorTileGeneratorAll sparkVectorTileGenerator =
+                new SparkVectorTileGeneratorAll(spark);
 
-		sparkVectorTileGenerator.doGenerate(tileSliceParameter);
-
-	}
-
+        sparkVectorTileGenerator.doGenerate(tileSliceParameter);
+    }
 }

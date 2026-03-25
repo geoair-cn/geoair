@@ -1,8 +1,7 @@
 package cn.geoair.comp.db.service.core.dao;
 
-import java.util.List;
-
 import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import java.util.List;
 
 /**
  * 数据源信息Dao接口
@@ -12,16 +11,15 @@ import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
  */
 public interface GirDsDataSourceDao {
 
-	void accessSelective(DataSourceApo t);
+    void accessSelective(DataSourceApo t);
 
-	void updateSelectiveById(DataSourceApo t);
+    void updateSelectiveById(DataSourceApo t);
 
-	void deleteByPK(String id);
+    void deleteByPK(String id);
 
-	DataSourceApo getById(String id);
+    DataSourceApo getById(String id);
 
-	List<DataSourceApo> searchAll();
+    List<DataSourceApo> searchAll();
 
-	List<DataSourceApo> selectBatchIds(List<String> ids);
-
+    List<DataSourceApo> selectBatchIds(List<String> ids);
 }

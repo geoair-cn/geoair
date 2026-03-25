@@ -29,98 +29,106 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
  */
 public class GirAdvTools {
 
-	// 私有构造器，防止实例化
-	private GirAdvTools() {
-	}
+    // 私有构造器，防止实例化
+    private GirAdvTools() {}
 
-	/**
-	 * 获取几何对象转数组操作接口
-	 * @return GirGeom2ArrayOpt 几何对象转数组工具接口实例
-	 */
-	public static GirGeom2ArrayOpt getGeom2ArrayOpt() {
-		return GirGeom2ArrayUtils.getInstance();
-	}
+    /**
+     * 获取几何对象转数组操作接口
+     *
+     * @return GirGeom2ArrayOpt 几何对象转数组工具接口实例
+     */
+    public static GirGeom2ArrayOpt getGeom2ArrayOpt() {
+        return GirGeom2ArrayUtils.getInstance();
+    }
 
-	/**
-	 * 获取地理数据转换操作接口
-	 * @return GirGeoConvertOpt 地理数据转换工具接口实例
-	 */
-	public static GirGeoFormatOpt getFormatOpt() {
-		return GirFormatUtils.getInstance();
-	}
+    /**
+     * 获取地理数据转换操作接口
+     *
+     * @return GirGeoConvertOpt 地理数据转换工具接口实例
+     */
+    public static GirGeoFormatOpt getFormatOpt() {
+        return GirFormatUtils.getInstance();
+    }
 
-	/**
-	 * 获取坐标转换操作接口
-	 * @return GirCoordinateConvertOpt 坐标转换工具接口实例
-	 */
-	public static GirCoordinateConvertOpt geCoordinateOpt() {
-		return GirCoordinateUtils.getInstance();
-	}
+    /**
+     * 获取坐标转换操作接口
+     *
+     * @return GirCoordinateConvertOpt 坐标转换工具接口实例
+     */
+    public static GirCoordinateConvertOpt geCoordinateOpt() {
+        return GirCoordinateUtils.getInstance();
+    }
 
-	/**
-	 * 获取WGS84坐标系瓦片转换操作接口
-	 * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
-	 */
-	public static GirTileConverterOpt getTileGrid4326Opt() {
-		return Wgs84EqualAxisTileUtils.getInstance();
-	}
+    /**
+     * 获取WGS84坐标系瓦片转换操作接口
+     *
+     * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
+     */
+    public static GirTileConverterOpt getTileGrid4326Opt() {
+        return Wgs84EqualAxisTileUtils.getInstance();
+    }
 
-	/**
-	 * 获取WGS84坐标系瓦片转换操作接口(非等轴)
-	 * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
-	 */
+    /**
+     * 获取WGS84坐标系瓦片转换操作接口(非等轴)
+     *
+     * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
+     */
+    public static GirTileConverterOpt getTileGrid4326SeparateOpt() {
+        return Wgs84SeparateAxisTileUtils.getInstance();
+    }
 
-	public static GirTileConverterOpt getTileGrid4326SeparateOpt() {
-		return Wgs84SeparateAxisTileUtils.getInstance();
-	}
+    /**
+     * 必应地图QuadKey 的生成与解析接口
+     *
+     * @return 必应地图QuadKey的工具接口实例
+     */
+    public static GirBingMapQuadKeyOpt getTileGridBingMapOpt() {
+        return BingMapQuadKeyUtils.getInstance();
+    }
 
-	/**
-	 * 必应地图QuadKey 的生成与解析接口
-	 * @return 必应地图QuadKey的工具接口实例
-	 */
-	public static GirBingMapQuadKeyOpt getTileGridBingMapOpt() {
-		return BingMapQuadKeyUtils.getInstance();
-	}
+    /**
+     * 获取Web墨卡托坐标系瓦片转换操作接口
+     *
+     * @return GirTileConverterOpt Web墨卡托瓦片转换工具接口实例
+     */
+    public static GirTileConverterOpt getTileGrid3857Opt() {
+        return TileConverter3857Utils.getInstance();
+    }
 
-	/**
-	 * 获取Web墨卡托坐标系瓦片转换操作接口
-	 * @return GirTileConverterOpt Web墨卡托瓦片转换工具接口实例
-	 */
-	public static GirTileConverterOpt getTileGrid3857Opt() {
-		return TileConverter3857Utils.getInstance();
-	}
+    /**
+     * 获取地理测量操作接口
+     *
+     * @return GirGeoMeasureOpt 地理测量工具接口实例
+     */
+    public static GirGeoMeasureOpt getMeasureOpt() {
+        return GirGeoMeasureUtils.getInstance();
+    }
 
-	/**
-	 * 获取地理测量操作接口
-	 * @return GirGeoMeasureOpt 地理测量工具接口实例
-	 */
-	public static GirGeoMeasureOpt getMeasureOpt() {
-		return GirGeoMeasureUtils.getInstance();
-	}
+    /**
+     * 获取地理数据合并操作接口
+     *
+     * @return GirGeoMergeOpt 地理数据合并工具接口实例
+     */
+    public static GirGeoMergeOpt getMergeOpt() {
+        return GirGeoMergeUtils.getInstance();
+    }
 
-	/**
-	 * 获取地理数据合并操作接口
-	 * @return GirGeoMergeOpt 地理数据合并工具接口实例
-	 */
-	public static GirGeoMergeOpt getMergeOpt() {
-		return GirGeoMergeUtils.getInstance();
-	}
+    /**
+     * 获取SRID转换操作接口
+     *
+     * @return GirSridConvertOpt SRID转换工具接口实例
+     */
+    public static GirSridConvertOpt getSridOpt() {
+        return GirSridConvertUtils.getInstance();
+    }
 
-	/**
-	 * 获取SRID转换操作接口
-	 * @return GirSridConvertOpt SRID转换工具接口实例
-	 */
-	public static GirSridConvertOpt getSridOpt() {
-		return GirSridConvertUtils.getInstance();
-	}
-
-	/**
-	 * 获取分页执行器接口
-	 * @param pageConditionDef 分页定义接口实例
-	 * @return GirPageActuatorOpt 分页执行工具接口实例
-	 */
-	public static <T> PageActuator<T> getPageActuatorOpt(PageConditionDef<T> pageConditionDef) {
-		return PageActuator.getInstance(pageConditionDef);
-	}
-
+    /**
+     * 获取分页执行器接口
+     *
+     * @param pageConditionDef 分页定义接口实例
+     * @return GirPageActuatorOpt 分页执行工具接口实例
+     */
+    public static <T> PageActuator<T> getPageActuatorOpt(PageConditionDef<T> pageConditionDef) {
+        return PageActuator.getInstance(pageConditionDef);
+    }
 }

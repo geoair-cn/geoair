@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 public interface GiType extends Serializable {
 
-	String gtcTypeId();
+    String gtcTypeId();
 
-	String gtcTypeName();
-
+    String gtcTypeName();
 }

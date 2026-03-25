@@ -17,21 +17,19 @@
  */
 package cn.geoair.comp.message.converter.jts.jackson.serializer.jts;
 
-import java.io.IOException;
-
-import org.locationtech.jts.geom.Envelope;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import java.io.IOException;
+import org.locationtech.jts.geom.Envelope;
 
 class JtsEnvelopeDeserializer extends JsonDeserializer<Envelope> {
 
-	@Override
-	public Envelope deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-			throws IOException {
-		double[] bounds = jsonParser.readValueAs(double[].class);
-		return new Envelope(bounds[0], bounds[2], bounds[1], bounds[3]);
-	}
-
+    @Override
+    public Envelope deserialize(
+            JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException {
+        double[] bounds = jsonParser.readValueAs(double[].class);
+        return new Envelope(bounds[0], bounds[2], bounds[1], bounds[3]);
+    }
 }

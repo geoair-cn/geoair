@@ -10,26 +10,18 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-/**
- *
- */
-@Target({ PACKAGE, TYPE, METHOD, FIELD })
+/** */
+@Target({PACKAGE, TYPE, METHOD, FIELD})
 @Retention(RUNTIME)
 @Repeatable(GaGenericGenerators.class)
 public @interface GaGenericGenerator {
 
-	/**
-	 * unique generator name.
-	 */
-	String name();
+    /** unique generator name. */
+    String name();
 
-	/**
-	 * Generator strategy or a fully qualified class name.
-	 */
-	String strategy();
-	/**
-	 * Optional generator parameters.
-	 */
-	// Parameter[] parameters() default {};
+    /** Generator strategy or a fully qualified class name. */
+    String strategy();
+    /** Optional generator parameters. */
+    // Parameter[] parameters() default {};
 
 }

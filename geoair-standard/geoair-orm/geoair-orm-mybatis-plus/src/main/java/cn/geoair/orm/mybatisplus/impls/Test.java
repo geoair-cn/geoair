@@ -1,8 +1,7 @@
 package cn.geoair.orm.mybatisplus.impls;
 
-import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
-
 import cn.geoair.base.Gir;
+import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 
 /**
  * @author ：张俊
@@ -10,9 +9,8 @@ import cn.geoair.base.Gir;
  */
 public class Test {
 
-	public static void main(String[] args) {
-		String string = StringEscape.escapeString("{};");
-		Gir.log.info(string);
-	}
-
+    public static void main(String[] args) {
+        String string = StringEscape.escapeString("{};");
+        Gir.log.info(string);
+    }
 }

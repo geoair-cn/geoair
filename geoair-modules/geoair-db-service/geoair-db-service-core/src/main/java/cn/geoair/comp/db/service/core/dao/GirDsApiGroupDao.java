@@ -1,8 +1,7 @@
 package cn.geoair.comp.db.service.core.dao;
 
-import java.util.List;
-
 import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
+import java.util.List;
 
 /**
  * api分组信息Dao接口
@@ -12,14 +11,13 @@ import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
  */
 public interface GirDsApiGroupDao {
 
-	List<GroupApo> searchAll();
+    List<GroupApo> searchAll();
 
-	List<GroupApo> selectBatchIds(List<String> ids);
+    List<GroupApo> selectBatchIds(List<String> ids);
 
-	GroupApo accessSelective(GroupApo t);
+    GroupApo accessSelective(GroupApo t);
 
-	GroupApo updateSelectiveById(GroupApo t);
+    GroupApo updateSelectiveById(GroupApo t);
 
-	void deleteByPK(String id);
-
+    void deleteByPK(String id);
 }

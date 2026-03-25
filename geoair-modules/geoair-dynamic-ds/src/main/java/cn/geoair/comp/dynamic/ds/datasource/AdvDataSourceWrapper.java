@@ -8,32 +8,35 @@ import javax.sql.DataSource;
  */
 public interface AdvDataSourceWrapper extends DataSource {
 
-	static AdvDataSourceWrapper wrap(final DataSource dataSource) {
-		return DataSourceWrapperRegistry.getWrapper(dataSource).get();
-	}
+    static AdvDataSourceWrapper wrap(final DataSource dataSource) {
+        return DataSourceWrapperRegistry.getWrapper(dataSource).get();
+    }
 
-	/**
-	 * 是否支持
-	 * @return
-	 */
-	boolean isSupport();
+    /**
+     * 是否支持
+     *
+     * @return
+     */
+    boolean isSupport();
 
-	/**
-	 * 关闭数据源
-	 * @return
-	 */
-	boolean close();
+    /**
+     * 关闭数据源
+     *
+     * @return
+     */
+    boolean close();
 
-	/**
-	 * 获取简单数据源名称
-	 * @return
-	 */
-	String getSimpleDataSourceName();
+    /**
+     * 获取简单数据源名称
+     *
+     * @return
+     */
+    String getSimpleDataSourceName();
 
-	/**
-	 * 获取JDBC URL
-	 * @return
-	 */
-	String getJdbcUrl();
-
+    /**
+     * 获取JDBC URL
+     *
+     * @return
+     */
+    String getJdbcUrl();
 }

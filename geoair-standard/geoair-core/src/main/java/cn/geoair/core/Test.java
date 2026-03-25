@@ -1,14 +1,13 @@
 package cn.geoair.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import cn.geoair.base.Gir;
 import cn.geoair.base.gpa.id.GirIdGenerator;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.tool.GkSnowflake;
 import cn.geoair.base.util.GutilBean;
 import cn.geoair.spi.log.Log4Gir;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 测试用
@@ -17,227 +16,226 @@ import cn.geoair.spi.log.Log4Gir;
  */
 public class Test {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// SpringFactoriesLoader.loadFactories(null, null)
+        // SpringFactoriesLoader.loadFactories(null, null)
 
-		// GkSpLoader.LOADER_CACHE.clear();
+        // GkSpLoader.LOADER_CACHE.clear();
 
-	}
+    }
 
-	public static void main1(String[] args) {
+    public static void main1(String[] args) {
 
-		// System.out.println(CallerUtil.getCallerName());
-		for (int i = 0; i < 100; i++) {
-			System.out.println(GirIdGenerator.timestampId() + " ");
-		}
+        // System.out.println(CallerUtil.getCallerName());
+        for (int i = 0; i < 100; i++) {
+            System.out.println(GirIdGenerator.timestampId() + " ");
+        }
 
-		// if(1==1) {
-		// return;
-		// }
-		Student c = new Student("c", 12);
+        // if(1==1) {
+        // return;
+        // }
+        Student c = new Student("c", 12);
 
-		Student student = new Student();
+        Student student = new Student();
 
-		GutilBean.copyProperties(c, student, "12");
-		System.out.println(student.getName());
-		System.out.println(student.getAge() + "");
+        GutilBean.copyProperties(c, student, "12");
+        System.out.println(student.getName());
+        System.out.println(student.getAge() + "");
 
-		// Type[] clss = gtcGenericTypeUtil.resolveTypeArguments( gtcValueJson.class,
-		// gtcValueVo.class);
-		//
-		//
-		// gtc.log.info("{}", clss);
+        // Type[] clss = gtcGenericTypeUtil.resolveTypeArguments( gtcValueJson.class,
+        // gtcValueVo.class);
+        //
+        //
+        // gtc.log.info("{}", clss);
 
-	}
+    }
 
-	public static class Student {
+    public static class Student {
 
-		private String name;
+        private String name;
 
-		private int age;
+        private int age;
 
-		private Class<?> studentTypeClass = Student.class;
+        private Class<?> studentTypeClass = Student.class;
 
-		public Student() {
-		}
+        public Student() {}
 
-		public Student(String name, int age) {
-			super();
-			this.name = name;
-			this.age = age;
-		}
+        public Student(String name, int age) {
+            super();
+            this.name = name;
+            this.age = age;
+        }
 
-		public String getName() {
-			return name;
-		}
+        public String getName() {
+            return name;
+        }
 
-		public void setName(String name) {
-			this.name = name;
-		}
+        public void setName(String name) {
+            this.name = name;
+        }
 
-		public int getAge() {
-			return age;
-		}
+        public int getAge() {
+            return age;
+        }
 
-		public void setAge(int age) {
-			this.age = age;
-		}
+        public void setAge(int age) {
+            this.age = age;
+        }
 
-		public Class<?> getStudentTypeClass() {
-			return studentTypeClass;
-		}
+        public Class<?> getStudentTypeClass() {
+            return studentTypeClass;
+        }
 
-		public void setStudentTypeClass(Class<?> studentTypeClass) {
-			this.studentTypeClass = studentTypeClass;
-		}
+        public void setStudentTypeClass(Class<?> studentTypeClass) {
+            this.studentTypeClass = studentTypeClass;
+        }
+    }
 
-	}
+    public static void main3(String[] args) {
 
-	public static void main3(String[] args) {
+        Log4Gir.setLogType(Log4Gir.LogType.HUTOOL);
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", 111);
+        map.put("b", "df");
 
-		Log4Gir.setLogType(Log4Gir.LogType.HUTOOL);
-		Map<String, Object> map = new HashMap<>();
-		map.put("a", 111);
-		map.put("b", "df");
+        map.put("c", new Student("c", 12));
 
-		map.put("c", new Student("c", 12));
+        map.put("d", new Student("d", 12));
 
-		map.put("d", new Student("d", 12));
+        GirJSON js = Gir.toJson(map);
+        System.out.println(js.toJSONString());
+        GirJSON json = GirJSON.toJson(js.toJSONString());
 
-		GirJSON js = Gir.toJson(map);
-		System.out.println(js.toJSONString());
-		GirJSON json = GirJSON.toJson(js.toJSONString());
+        System.out.println(json.getByPath("d", Student.class).getName());
 
-		System.out.println(json.getByPath("d", Student.class).getName());
+        Student st = new Student("e", 14);
+        GirJSON jsSt = GirJSON.toJson(st);
+        // Student stu = jsSt.getByPath("", Student.class);
+        Student stu = jsSt.toBean(Student.class, true);
+        System.out.println(stu.getAge() + "");
+    }
 
-		Student st = new Student("e", 14);
-		GirJSON jsSt = GirJSON.toJson(st);
-		// Student stu = jsSt.getByPath("", Student.class);
-		Student stu = jsSt.toBean(Student.class, true);
-		System.out.println(stu.getAge() + "");
-	}
+    public static void main2(String[] args) {
 
-	public static void main2(String[] args) {
+        // System.out.println(new Morse().encode("123456qwe"));
+        // if(1==1)return;
+        /*
+         * if(1==1)return;
+         *
+         * System.out.println(IdUtil.fastSimpleUUID().toString());
+         * System.out.println(IdUtil.randomUUID().toString());
+         * System.out.println(IdUtil.simpleUUID().toString());
+         * System.out.println(IdUtil.fastUUID().toString());
+         *
+         *
+         * System.out.println(IdUtil.nanoId()); System.out.println(IdUtil.objectId());
+         * System.out.println(IdUtil.getWorkerId(1,1));
+         *
+         * System.out.println(IdUtil.fastUUID().toString()); if(1==1)return;
+         */
 
-		// System.out.println(new Morse().encode("123456qwe"));
-		// if(1==1)return;
-		/*
-		 * if(1==1)return;
-		 *
-		 * System.out.println(IdUtil.fastSimpleUUID().toString());
-		 * System.out.println(IdUtil.randomUUID().toString());
-		 * System.out.println(IdUtil.simpleUUID().toString());
-		 * System.out.println(IdUtil.fastUUID().toString());
-		 *
-		 *
-		 * System.out.println(IdUtil.nanoId()); System.out.println(IdUtil.objectId());
-		 * System.out.println(IdUtil.getWorkerId(1,1));
-		 *
-		 * System.out.println(IdUtil.fastUUID().toString()); if(1==1)return;
-		 */
+        long begin = System.currentTimeMillis();
 
-		long begin = System.currentTimeMillis();
+        GkSnowflake snowflake = new GkSnowflake(1, 1, false);
 
-		GkSnowflake snowflake = new GkSnowflake(1, 1, false);
+        for (int i = 0; i < 10; i++) {
+            long key = snowflake.nextId();
+            System.out.println(key);
+            System.out.println(key);
+            String key36 = encode36(key);
+            System.out.println(key36);
+            // System.out.println(snowflake.getGenerateSequence(key));
+            System.out.println(decode36(key36));
 
-		for (int i = 0; i < 10; i++) {
-			long key = snowflake.nextId();
-			System.out.println(key);
-			System.out.println(key);
-			String key36 = encode36(key);
-			System.out.println(key36);
-			// System.out.println(snowflake.getGenerateSequence(key));
-			System.out.println(decode36(key36));
+            System.out.println();
+            // System.out.println(key);
+            // System.out.println(System.currentTimeMillis());
+            // long times = snowflake.getGenerateDateTime(key);
 
-			System.out.println();
-			// System.out.println(key);
-			// System.out.println(System.currentTimeMillis());
-			// long times = snowflake.getGenerateDateTime(key);
+            // System.out.println(times);
 
-			// System.out.println(times);
+            // Date data = new Date(times);
 
-			// Date data = new Date(times);
+            // Calendar calendar = Calendar.getInstance();
 
-			// Calendar calendar = Calendar.getInstance();
+            // calendar.setTimeInMillis(times);
 
-			// calendar.setTimeInMillis(times);
+            /*
+             * StringBuilder sb = new StringBuilder();
+             * sb.append(snowflake.getDataCenterId(key)).append(":").append(snowflake.
+             * getWorkerId(key)).append(":");
+             * sb.append(String.valueOf(calendar.get(Calendar.YEAR)).substring(2));
+             * sb.append(calendar.get(Calendar.MONTH) + 1);
+             * sb.append(calendar.get(Calendar.DAY_OF_MONTH));
+             * sb.append(calendar.get(Calendar.HOUR_OF_DAY));
+             * sb.append(calendar.get(Calendar.MINUTE));
+             * sb.append(calendar.get(Calendar.SECOND));
+             * sb.append(calendar.get(Calendar.MILLISECOND));
+             *
+             * sb.append(":");
+             *
+             * sb.append(snowflake.getGenerateSequence(key));
+             * System.out.println(sb.toString());
+             */
+        }
+        /*
+         * for(int i=0;i<100;i++) { key = snowflake.nextId();
+         * //Gir.log.info(key);//1585181885799039031
+         *
+         * //Gir.log.info(Long.toHexString(key)); //Gir.log.info(Long.toOctalString(key));
+         * //Gir.log.info(Long.toBinaryString(key)); System.out.println(encode(key));
+         * //Gir.log.info("-----------------------------------------"); //Gir.log.info(
+         * gtcIdGenerator.timestampId());//20221026160931974011
+         * //Gir.log.info(IdUtil.objectId());//6358eb1f6b48166be281e427 }
+         */
+        System.out.println(System.currentTimeMillis() - begin);
+    }
 
-			/*
-			 * StringBuilder sb = new StringBuilder();
-			 * sb.append(snowflake.getDataCenterId(key)).append(":").append(snowflake.
-			 * getWorkerId(key)).append(":");
-			 * sb.append(String.valueOf(calendar.get(Calendar.YEAR)).substring(2));
-			 * sb.append(calendar.get(Calendar.MONTH) + 1);
-			 * sb.append(calendar.get(Calendar.DAY_OF_MONTH));
-			 * sb.append(calendar.get(Calendar.HOUR_OF_DAY));
-			 * sb.append(calendar.get(Calendar.MINUTE));
-			 * sb.append(calendar.get(Calendar.SECOND));
-			 * sb.append(calendar.get(Calendar.MILLISECOND));
-			 *
-			 * sb.append(":");
-			 *
-			 * sb.append(snowflake.getGenerateSequence(key));
-			 * System.out.println(sb.toString());
-			 */
-		}
-		/*
-		 * for(int i=0;i<100;i++) { key = snowflake.nextId();
-		 * //Gir.log.info(key);//1585181885799039031
-		 *
-		 * //Gir.log.info(Long.toHexString(key)); //Gir.log.info(Long.toOctalString(key));
-		 * //Gir.log.info(Long.toBinaryString(key)); System.out.println(encode(key));
-		 * //Gir.log.info("-----------------------------------------"); //Gir.log.info(
-		 * gtcIdGenerator.timestampId());//20221026160931974011
-		 * //Gir.log.info(IdUtil.objectId());//6358eb1f6b48166be281e427 }
-		 */
-		System.out.println(System.currentTimeMillis() - begin);
-	}
+    private static String CHARSTRING = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-	private static String CHARSTRING = "0123456789abcdefghijklmnopqrstuvwxyz";
+    private static char[] CHARS = CHARSTRING.toCharArray();
 
-	private static char[] CHARS = CHARSTRING.toCharArray();
+    /**
+     * 转字符串
+     *
+     * @param num
+     * @return
+     */
+    public static String encode36(long num) {
 
-	/**
-	 * 转字符串
-	 * @param num
-	 * @return
-	 */
-	public static String encode36(long num) {
+        StringBuilder stringBuffer = new StringBuilder();
 
-		StringBuilder stringBuffer = new StringBuilder();
+        if (num == 0) {
+            stringBuffer.append(CHARS[0]);
+        }
 
-		if (num == 0) {
-			stringBuffer.append(CHARS[0]);
-		}
+        while (num > 0) {
+            stringBuffer.append(CHARS[(int) (num % 36)]);
+            num = num / 36;
+        }
 
-		while (num > 0) {
-			stringBuffer.append(CHARS[(int) (num % 36)]);
-			num = num / 36;
-		}
+        return stringBuffer.reverse().toString();
+    }
 
-		return stringBuffer.reverse().toString();
-	}
+    /**
+     * 转数值
+     *
+     * @param code
+     * @return
+     */
+    public static long decode36(String code) {
+        int size = code.length();
+        long num = 0;
+        for (int i = 0; i < size; i++) {
+            // String char2str = String.valueOf(code.charAt(i)).toLowerCase();
+            // num = (long) (CHARSMAP.get(char2str.charAt(0)) * Math.pow(36, size - i - 1)
+            // + num);
 
-	/**
-	 * 转数值
-	 * @param code
-	 * @return
-	 */
-	public static long decode36(String code) {
-		int size = code.length();
-		long num = 0;
-		for (int i = 0; i < size; i++) {
-			// String char2str = String.valueOf(code.charAt(i)).toLowerCase();
-			// num = (long) (CHARSMAP.get(char2str.charAt(0)) * Math.pow(36, size - i - 1)
-			// + num);
+            num = (long) (CHARSTRING.indexOf(code.charAt(i)) * Math.pow(36, size - i - 1)) + num;
+            // num = (long) (CHARSMAP.get(code.charAt(i)) * Math.pow(36, size - i - 1)) +
+            // num;
+        }
 
-			num = (long) (CHARSTRING.indexOf(code.charAt(i)) * Math.pow(36, size - i - 1)) + num;
-			// num = (long) (CHARSMAP.get(code.charAt(i)) * Math.pow(36, size - i - 1)) +
-			// num;
-		}
-
-		return num;
-	}
-
+        return num;
+    }
 }

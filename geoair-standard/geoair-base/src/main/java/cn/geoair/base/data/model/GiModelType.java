@@ -6,23 +6,22 @@ import cn.geoair.base.util.GutilStr;
 
 public interface GiModelType extends GiType {
 
-	public <T extends GiTypeModelable> Class<T> gtcTypeModelClass(Class<? super T> cls);
+    public <T extends GiTypeModelable> Class<T> gtcTypeModelClass(Class<? super T> cls);
 
-	default GirModelTypeKid toModelTypeKid() {
+    default GirModelTypeKid toModelTypeKid() {
 
-		if (GutilStr.isNotEmpty(this.gtcTypeId())) {
-			GirModelTypeKid kid = GirModelTypeKid.valueFor(this.gtcTypeId());
-			if (kid != null) {
-				return kid;
-			}
-		}
+        if (GutilStr.isNotEmpty(this.gtcTypeId())) {
+            GirModelTypeKid kid = GirModelTypeKid.valueFor(this.gtcTypeId());
+            if (kid != null) {
+                return kid;
+            }
+        }
 
-		Class<? extends GiTypeModelable> typeModelClass = gtcTypeModelClass(GiTypeModelable.class);
-		if (typeModelClass != null) {
-			return GirModelTypeKid.valueFor(typeModelClass);
-		}
+        Class<? extends GiTypeModelable> typeModelClass = gtcTypeModelClass(GiTypeModelable.class);
+        if (typeModelClass != null) {
+            return GirModelTypeKid.valueFor(typeModelClass);
+        }
 
-		return null;
-	}
-
+        return null;
+    }
 }

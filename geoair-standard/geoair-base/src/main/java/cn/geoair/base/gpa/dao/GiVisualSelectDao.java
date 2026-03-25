@@ -1,25 +1,25 @@
 package cn.geoair.base.gpa.dao;
 
-import java.io.Serializable;
-import java.util.List;
-
 import cn.geoair.base.data.model.support.GirVisualModelKid;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.gpa.entity.GiEntityVisuable;
+import java.io.Serializable;
+import java.util.List;
 
-public interface GiVisualSelectDao<M extends GiEntityVisuable<PK>, PK extends Serializable> extends GiDao<M, PK> {
+public interface GiVisualSelectDao<M extends GiEntityVisuable<PK>, PK extends Serializable>
+        extends GiDao<M, PK> {
 
-	@SuppressWarnings("unchecked")
-	public static <M extends GiEntityVisuable<PK>, PK extends Serializable> GiVisualSelectDao<M, PK> getDao(
-			Class<M> modelCls) {
-		return GiDao.getDao(GiVisualSelectDao.class, modelCls);
-	}
+    @SuppressWarnings("unchecked")
+    public static <M extends GiEntityVisuable<PK>, PK extends Serializable>
+            GiVisualSelectDao<M, PK> getDao(Class<M> modelCls) {
+        return GiDao.getDao(GiVisualSelectDao.class, modelCls);
+    }
 
-	@SuppressWarnings("rawtypes")
-	List<GirVisualModelKid> gtcSearchVisualModel(String displayQuery, String[] containKeys);
+    @SuppressWarnings("rawtypes")
+    List<GirVisualModelKid> gtcSearchVisualModel(String displayQuery, String[] containKeys);
 
-	@SuppressWarnings("rawtypes")
-	GiPager<GirVisualModelKid> gtcSearchVisualPage(String displayQuery, String[] containKeys, GiPageParam pageParam);
-
+    @SuppressWarnings("rawtypes")
+    GiPager<GirVisualModelKid> gtcSearchVisualPage(
+            String displayQuery, String[] containKeys, GiPageParam pageParam);
 }

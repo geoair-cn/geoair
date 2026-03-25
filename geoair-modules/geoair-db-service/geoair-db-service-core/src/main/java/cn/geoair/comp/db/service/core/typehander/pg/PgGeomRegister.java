@@ -6,7 +6,6 @@ import cn.geoair.comp.db.service.core.typehander.pg.net.NetPostGisGeomTypeHandle
 import cn.geoair.comp.db.service.core.typehander.pg.org.OrgPgGeomTypeHandler;
 import cn.geoair.comp.db.service.core.typehander.pg.org.OrgPostGisGeomTypeHandler;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
-
 import cn.hutool.core.lang.Singleton;
 
 /**
@@ -15,17 +14,16 @@ import cn.hutool.core.lang.Singleton;
  */
 public class PgGeomRegister {
 
-	public static void register() {
-		if (GirPostGisTran.isOrgConvert()) {
-			OrgPgGeomTypeHandler.register();
-			OrgPostGisGeomTypeHandler.register();
-			TypeHandlerRegistry.register(1111, Singleton.get(OrgPgGeomTypeHandler.class));
-		}
-		if (GirPostGisTran.isNetConvert()) {
-			NetPgGeomTypeHandler.register();
-			NetPostGisGeomTypeHandler.register();
-			TypeHandlerRegistry.register(1112, Singleton.get(NetPgGeomTypeHandler.class));
-		}
-	}
-
+    public static void register() {
+        if (GirPostGisTran.isOrgConvert()) {
+            OrgPgGeomTypeHandler.register();
+            OrgPostGisGeomTypeHandler.register();
+            TypeHandlerRegistry.register(1111, Singleton.get(OrgPgGeomTypeHandler.class));
+        }
+        if (GirPostGisTran.isNetConvert()) {
+            NetPgGeomTypeHandler.register();
+            NetPostGisGeomTypeHandler.register();
+            TypeHandlerRegistry.register(1112, Singleton.get(NetPgGeomTypeHandler.class));
+        }
+    }
 }

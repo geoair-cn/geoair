@@ -3,94 +3,92 @@ package cn.geoair.base.lang.lambda;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.util.GutilClass;
 
-/**
- * 基于 {@link GkSerializedLambda} 创建的元信息
- *
- */
+/** 基于 {@link GkSerializedLambda} 创建的元信息 */
 public class GkShadowLambdaMeta implements GkfLambdaMeta {
 
-	private final GkSerializedLambda lambda;
+    private final GkSerializedLambda lambda;
 
-	public GkShadowLambdaMeta(GkSerializedLambda lambda) {
-		this.lambda = lambda;
-	}
+    public GkShadowLambdaMeta(GkSerializedLambda lambda) {
+        this.lambda = lambda;
+    }
 
-	@Override
-	public String getImplMethodName() {
-		return lambda.getImplMethodName();
-	}
+    @Override
+    public String getImplMethodName() {
+        return lambda.getImplMethodName();
+    }
 
-	@Override
-	public Class<?> getInstantiatedClass() {
-		String instantiatedMethodType = lambda.getInstantiatedMethodType();
-		String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(';')).replace('/',
-				'.');
-		try {
-			return GutilClass.forName(instantiatedType, lambda.getCapturingClass().getClassLoader());
-		}
-		catch (ClassNotFoundException | LinkageError e) {
-			throw new GirException("", e);
-		}
-	}
+    @Override
+    public Class<?> getInstantiatedClass() {
+        String instantiatedMethodType = lambda.getInstantiatedMethodType();
+        String instantiatedType =
+                instantiatedMethodType
+                        .substring(2, instantiatedMethodType.indexOf(';'))
+                        .replace('/', '.');
+        try {
+            return GutilClass.forName(
+                    instantiatedType, lambda.getCapturingClass().getClassLoader());
+        } catch (ClassNotFoundException | LinkageError e) {
+            throw new GirException("", e);
+        }
+    }
 
-	@Override
-	public Class<?> getCapturingClass() {
+    @Override
+    public Class<?> getCapturingClass() {
 
-		return lambda.getCapturingClass();
-	}
+        return lambda.getCapturingClass();
+    }
 
-	@Override
-	public String getFunctionalInterfaceClass() {
+    @Override
+    public String getFunctionalInterfaceClass() {
 
-		return lambda.getFunctionalInterfaceClass();
-	}
+        return lambda.getFunctionalInterfaceClass();
+    }
 
-	@Override
-	public String getFunctionalInterfaceMethodName() {
+    @Override
+    public String getFunctionalInterfaceMethodName() {
 
-		return lambda.getFunctionalInterfaceMethodName();
-	}
+        return lambda.getFunctionalInterfaceMethodName();
+    }
 
-	@Override
-	public String getFunctionalInterfaceMethodSignature() {
+    @Override
+    public String getFunctionalInterfaceMethodSignature() {
 
-		return lambda.getFunctionalInterfaceMethodSignature();
-	}
+        return lambda.getFunctionalInterfaceMethodSignature();
+    }
 
-	@Override
-	public String getImplClass() {
+    @Override
+    public String getImplClass() {
 
-		return lambda.getImplClass();
-	}
+        return lambda.getImplClass();
+    }
 
-	@Override
-	public String getImplMethodSignature() {
+    @Override
+    public String getImplMethodSignature() {
 
-		return lambda.getImplMethodSignature();
-	}
+        return lambda.getImplMethodSignature();
+    }
 
-	@Override
-	public int getImplMethodKind() {
+    @Override
+    public int getImplMethodKind() {
 
-		return lambda.getImplMethodKind();
-	}
+        return lambda.getImplMethodKind();
+    }
 
-	@Override
-	public String getInstantiatedMethodType() {
+    @Override
+    public String getInstantiatedMethodType() {
 
-		return lambda.getInstantiatedMethodType();
-	}
+        return lambda.getInstantiatedMethodType();
+    }
 
-	@Override
-	public int getCapturedArgCount() {
+    @Override
+    public int getCapturedArgCount() {
 
-		return lambda.getCapturedArgCount();
-	}
+        return lambda.getCapturedArgCount();
+    }
 
-	@Override
-	public Object getCapturedArg(int i) {
+    @Override
+    public Object getCapturedArg(int i) {
 
-		return lambda.getCapturedArg(i);
-	}
-
+        return lambda.getCapturedArg(i);
+    }
 }

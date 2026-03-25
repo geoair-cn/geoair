@@ -6,10 +6,8 @@ import java.io.Serializable;
  * 有描述的数据
  *
  * @author Ray
- *
  */
 public interface GiDescriptive extends Serializable {
 
-	public String describe();// 获得描述
-
+    public String describe(); // 获得描述
 }
