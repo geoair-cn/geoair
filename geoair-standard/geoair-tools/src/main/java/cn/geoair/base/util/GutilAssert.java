@@ -65,7 +65,8 @@ public abstract class GutilAssert {
      * evaluates to {@code false}.
      *
      * <pre class=
-     * "code">Assert.isTrue(i &gt; 0, "The value must be greater than zero");</pre>
+     * "code">Assert.isTrue(i &gt; 0, "The value must be greater than zero");
+     * </pre>
      *
      * @param expression a boolean expression
      * @param message the exception message to use if the assertion fails
@@ -394,7 +395,8 @@ public abstract class GutilAssert {
      * Assert that {@code superType.isAssignableFrom(subType)} is {@code true}.
      *
      * <pre class=
-     * "code">Assert.isAssignable(Number.class, myClass, "Number expected");</pre>
+     * "code">Assert.isAssignable(Number.class, myClass, "Number expected");
+     * </pre>
      *
      * @param superType the super type to check against
      * @param subType the sub type to check
