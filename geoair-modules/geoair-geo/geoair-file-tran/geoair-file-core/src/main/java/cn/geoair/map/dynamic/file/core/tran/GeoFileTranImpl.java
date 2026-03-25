@@ -8,12 +8,17 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.*;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+
 import org.opengis.feature.simple.SimpleFeatureType;
 
-/** 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制 */
+/**
+ * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制
+ */
 public class GeoFileTranImpl implements GeoFileTran {
 
     private static GiLogger log = GirLogger.getLoger(GeoFileTranImpl.class);
@@ -23,6 +28,13 @@ public class GeoFileTranImpl implements GeoFileTran {
 
     // 全局异常处理器
     private ExceptionConsumer exceptionConsumer;
+    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {
+
+    };
+
+    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {
+
+    };
 
     // 进度监听器
     private TranProgressListener progressListener;
@@ -75,6 +87,7 @@ public class GeoFileTranImpl implements GeoFileTran {
             if (featureType == null) {
                 throw new RuntimeException("读取表头失败，SimpleFeatureType 为空");
             }
+            headConsumer.accept(featureType);
             writer.writeHeader(featureType, this::handleException);
             log.info("表头初始化完成，要素类型：{}", featureType.getName());
 
@@ -83,7 +96,7 @@ public class GeoFileTranImpl implements GeoFileTran {
             while ((oneRow = reader.readOneRow(this::handleException)) != null) {
                 // 超时检查
                 checkTimeout();
-
+                oneRowConsumer.accept(oneRow);
                 try {
                     // 写入数据
                     writer.writeOneRow(oneRow, this::handleException);
@@ -155,7 +168,9 @@ public class GeoFileTranImpl implements GeoFileTran {
         return result;
     }
 
-    /** 超时检查 */
+    /**
+     * 超时检查
+     */
     private void checkTimeout() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - startTime > context.getTimeout()) {
@@ -164,7 +179,9 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /** 更新进度并回调监听器 */
+    /**
+     * 更新进度并回调监听器
+     */
     private void updateProgress() {
         if (progressListener == null) {
             return;
@@ -187,7 +204,9 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /** 统一异常处理 */
+    /**
+     * 统一异常处理
+     */
     private void handleException(Exception e) {
         if (exceptionConsumer != null) {
             exceptionConsumer.accept(e);
@@ -196,7 +215,9 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /** 静默关闭资源 */
+    /**
+     * 静默关闭资源
+     */
     private void closeQuietly(Closeable closeable) {
         if (closeable == null) {
             return;
@@ -213,6 +234,18 @@ public class GeoFileTranImpl implements GeoFileTran {
     @Override
     public GeoFileTran setExceptionConsumer(ExceptionConsumer exceptionConsumer) {
         this.exceptionConsumer = exceptionConsumer;
+        return this;
+    }
+
+    @Override
+    public GeoFileTran setGirAdvOneRowConsumer(Consumer<GirAdvOneRow> oneRowConsumer) {
+        this.oneRowConsumer = oneRowConsumer;
+        return this;
+    }
+
+    @Override
+    public GeoFileTran setHeadConsumer(Consumer<SimpleFeatureType> headConsumer) {
+        this.headConsumer = headConsumer;
         return this;
     }
 

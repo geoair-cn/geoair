@@ -55,7 +55,7 @@ public class GirAdvTools {
      *
      * @return GirCoordinateConvertOpt 坐标转换工具接口实例
      */
-    public static GirCoordinateConvertOpt geCoordinateOpt() {
+    public static GirCoordinateConvertOpt getCoordinateOpt() {
         return GirCoordinateUtils.getInstance();
     }
 
