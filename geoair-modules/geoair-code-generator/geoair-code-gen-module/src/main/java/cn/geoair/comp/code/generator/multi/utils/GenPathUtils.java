@@ -1,9 +1,12 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.config.OrmType;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
+import cn.hutool.core.util.StrUtil;
+
 import java.io.File;
 
 /**
@@ -12,10 +15,14 @@ import java.io.File;
  */
 public class GenPathUtils {
 
-    /** 项目空间路径 */
+    /**
+     * 项目空间路径
+     */
     private static final String PROJECT_PATH = "main/java";
 
-    /** 获取枚举生成地址 */
+    /**
+     * 获取枚举生成地址
+     */
     public static String getEnumGenPath(
             GenTable table, GenTableColumn column, String template, Boolean mutiIs) {
         String genPath = table.getGenPath();
@@ -29,7 +36,9 @@ public class GenPathUtils {
                 + GenPathUtils.getEnumFileName(template, table, column, mutiIs);
     }
 
-    /** 获取文件名 */
+    /**
+     * 获取文件名
+     */
     public static String getEnumFileName(
             String template, GenTable genTable, GenTableColumn column, Boolean mutiIs) {
         // 文件名称
@@ -63,7 +72,9 @@ public class GenPathUtils {
         return genPath + File.separator + getFileName(template, table, globalConfig);
     }
 
-    /** 获取文件名 */
+    /**
+     * 获取文件名
+     */
     private static String getFileName(
             String template, GenTable genTable, GirGeneratorConfig globalConfig) {
         // 文件名称
@@ -96,10 +107,10 @@ public class GenPathUtils {
     /**
      * 获取普通文件生成路径（KLF规范）
      *
-     * @param template 模板路径
-     * @param moduleName 模块名
-     * @param className 大驼峰类名
-     * @param classname 小驼峰/拼接类名
+     * @param template    模板路径
+     * @param moduleName  模块名
+     * @param className   大驼峰类名
+     * @param classname   小驼峰/拼接类名
      * @param packageName 包名
      * @return 完整文件路径（null表示未匹配到模板）
      */
@@ -116,167 +127,232 @@ public class GenPathUtils {
         String fileName = null;
         if (globalConfig.getMutiIs()) {
             if (template.contains("rx-po.java.vm")) {
+                String modelDirRoot = globalConfig.getModelDirRoot();
+                if (GutilObject.isEmpty(modelDirRoot)) {
+                    modelDirRoot = projectName + "-model";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-model/src/{}/{}/model/{}/entity/{}Po.java",
-                                projectName,
+                                "{}/src/{}/{}/model/{}/entity/{}Po.java",
+                                modelDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-po-mplus.java.vm")) {
+                String modelDirRoot = globalConfig.getModelDirRoot();
+                if (GutilObject.isEmpty(modelDirRoot)) {
+                    modelDirRoot = projectName + "-model";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-model/src/{}/{}/model/{}/entity/{}Po.java",
-                                projectName,
+                                "{}/src/{}/{}/model/{}/entity/{}Po.java",
+                                modelDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-dto.java.vm")) {
+                String modelDirRoot = globalConfig.getModelDirRoot();
+                if (GutilObject.isEmpty(modelDirRoot)) {
+                    modelDirRoot = projectName + "-model";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-model/src/{}/{}/model/{}/dto/{}Dto.java",
-                                projectName,
+                                "{}/src/{}/{}/model/{}/dto/{}Dto.java",
+                                modelDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-seo.java.vm")) {
+                String modelDirRoot = globalConfig.getModelDirRoot();
+                if (GutilObject.isEmpty(modelDirRoot)) {
+                    modelDirRoot = projectName + "-model";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-model/src/{}/{}/model/{}/seo/{}Seo.java",
-                                projectName,
+                                "{}/src/{}/{}/model/{}/seo/{}Seo.java",
+                                modelDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-dao.java.vm")) {
+                String daoDirRoot = globalConfig.getDaoDirRoot();
+                if (GutilObject.isEmpty(daoDirRoot)) {
+                    daoDirRoot = projectName + "-dao";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-dao/src/{}/{}/dao/{}/{}Dao.java",
-                                projectName,
+                                "{}/src/{}/{}/dao/{}/{}Dao.java",
+                                daoDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-mapper.java.vm")) {
+                String mapperDirRoot = globalConfig.getMapperDirRoot();
+                if (GutilObject.isEmpty(mapperDirRoot)) {
+                    mapperDirRoot = projectName + "-mapper-tk";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-mapper-tk/src/{}/{}/mapper/{}/{}Mapper.java",
-                                projectName,
+                                "{}/src/{}/{}/mapper/{}/{}Mapper.java",
+                                mapperDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-mapper-plus.java.vm")) {
+                String mapperDirRoot = globalConfig.getMapperDirRoot();
+                if (GutilObject.isEmpty(mapperDirRoot)) {
+                    mapperDirRoot = projectName + "-mybatis-plus";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-mybatis-plus/src/{}/{}/mp/{}/{}Mapper.java",
-                                projectName,
+                                "{}/src/{}/{}/mp/{}/{}Mapper.java",
+                                mapperDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-mapper.xml.vm")) {
+
                 if (globalConfig.getOrmType().equals(OrmType.TKMAPPER)) {
+                    String mapperDirRoot = globalConfig.getMapperDirRoot();
+                    if (GutilObject.isEmpty(mapperDirRoot)) {
+                        mapperDirRoot = projectName + "-mapper-tk";
+                    }
                     fileName =
                             StringUtils.format(
-                                    "{}-mapper-tk/src/{}/{}/mapper/{}/impl/{}Mapper.xml",
-                                    projectName,
+                                    "{}/src/{}/{}/mapper/{}/impl/{}Mapper.xml",
+                                    mapperDirRoot,
                                     PROJECT_PATH,
                                     packagePath,
                                     moduleName,
                                     className);
                 } else if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
+                    String mapperDirRoot = globalConfig.getMapperDirRoot();
+                    if (GutilObject.isEmpty(mapperDirRoot)) {
+                        mapperDirRoot = projectName + "-mybatis-plus";
+                    }
                     fileName =
                             StringUtils.format(
-                                    "{}-mybatis-plus/src/{}/{}/mp/{}/impl/{}Mapper.xml",
-                                    projectName,
+                                    "{}/src/{}/{}/mp/{}/impl/{}Mapper.xml",
+                                    mapperDirRoot,
                                     PROJECT_PATH,
                                     packagePath,
                                     moduleName,
                                     className);
                 }
             } else if (template.contains("rx-servface.java.vm")) {
+                String servfaceDirRoot = globalConfig.getServfaceDirRoot();
+                if (GutilObject.isEmpty(servfaceDirRoot)) {
+                    servfaceDirRoot = projectName + "-servface";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-servface/src/{}/{}/servface/{}/{}Service.java",
-                                projectName,
+                                "{}/src/{}/{}/servface/{}/{}Service.java",
+                                servfaceDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-event.java.vm")) {
+                String servfaceDirRoot = globalConfig.getServfaceDirRoot();
+                if (GutilObject.isEmpty(servfaceDirRoot)) {
+                    servfaceDirRoot = projectName + "-servface";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-servface/src/{}/{}/servface/{}/event/{}Event.java",
-                                projectName,
+                                "{}/src/{}/{}/servface/{}/event/{}Event.java",
+                                servfaceDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-serviceImpl.java.vm")) {
+                String serviceDirRoot = globalConfig.getServiceDirRoot();
+                if (GutilObject.isEmpty(serviceDirRoot)) {
+                    serviceDirRoot = projectName + "-service";
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-service/src/{}/{}/service/{}/{}ServiceImpl.java",
-                                projectName,
+                                "{}/src/{}/{}/service/{}/{}ServiceImpl.java",
+                                serviceDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-controller.java.vm")) {
+                String controllerDirRoot = globalConfig.getControllerDirRoot();
+                if (GutilObject.isEmpty(controllerDirRoot)) {
+                    controllerDirRoot = StrUtil.format("{}-boot/{}-wcs", projectName, projectName);
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-boot/{}-wcs/src/{}/{}/wcs/controller/{}/{}Controller.java",
-                                projectName,
-                                projectName,
+                                "{}/src/{}/{}/wcs/controller/{}/{}Controller.java",
+                                controllerDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 className);
             } else if (template.contains("rx-addvo.java.vm")) {
+                String controllerDirRoot = globalConfig.getControllerDirRoot();
+                if (GutilObject.isEmpty(controllerDirRoot)) {
+                    controllerDirRoot = StrUtil.format("{}-boot/{}-wcs", projectName, projectName);
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-boot/{}-wcs/src/{}/{}/wcs/controller/{}/{}AddVo.java",
-                                projectName,
-                                projectName,
+                                "{}/src/{}/{}/wcs/controller/{}/{}AddVo.java",
+                                controllerDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 classname + "/" + className);
             } else if (template.contains("rx-detailvo.java.vm")) {
+                String controllerDirRoot = globalConfig.getControllerDirRoot();
+                if (GutilObject.isEmpty(controllerDirRoot)) {
+                    controllerDirRoot = StrUtil.format("{}-boot/{}-wcs", projectName, projectName);
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-boot/{}-wcs/src/{}/{}/wcs/controller/{}/{}DetailVo.java",
-                                projectName,
-                                projectName,
+                                "{}/src/{}/{}/wcs/controller/{}/{}DetailVo.java",
+                                controllerDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 classname + "/" + className);
             } else if (template.contains("rx-searchvo.java.vm")) {
+                String controllerDirRoot = globalConfig.getControllerDirRoot();
+                if (GutilObject.isEmpty(controllerDirRoot)) {
+                    controllerDirRoot = StrUtil.format("{}-boot/{}-wcs", projectName, projectName);
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-boot/{}-wcs/src/{}/{}/wcs/controller/{}/{}SearchVo.java",
-                                projectName,
-                                projectName,
+                                "{}/src/{}/{}/wcs/controller/{}/{}SearchVo.java",
+                                controllerDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 classname + "/" + className);
             } else if (template.contains("rx-updatevo.java.vm")) {
+                String controllerDirRoot = globalConfig.getControllerDirRoot();
+                if (GutilObject.isEmpty(controllerDirRoot)) {
+                    controllerDirRoot = StrUtil.format("{}-boot/{}-wcs", projectName, projectName);
+                }
                 fileName =
                         StringUtils.format(
-                                "{}-boot/{}-wcs/src/{}/{}/wcs/controller/{}/{}UpdateVo.java",
-                                projectName,
-                                projectName,
+                                "{}/src/{}/{}/wcs/controller/{}/{}UpdateVo.java",
+                                controllerDirRoot,
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
                                 classname + "/" + className);
             }
-        } else {
+        }
+        else {
             if (template.contains("rx-po.java.vm")) {
                 fileName =
                         StringUtils.format(
@@ -378,7 +454,7 @@ public class GenPathUtils {
             } else if (template.contains("rx-controller.java.vm")) {
                 fileName =
                         StringUtils.format(
-                                "src/{}/{}/wcs/controller/{}/{}Controller.java",
+                                "src/{}/{}/controller/{}/{}Controller.java",
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
@@ -424,9 +500,9 @@ public class GenPathUtils {
     /**
      * 获取枚举文件生成路径（KLF规范）
      *
-     * @param template 模板路径
-     * @param moduleName 模块名
-     * @param enumsName 枚举类名
+     * @param template    模板路径
+     * @param moduleName  模块名
+     * @param enumsName   枚举类名
      * @param packageName 包名
      * @return 完整文件路径
      */
