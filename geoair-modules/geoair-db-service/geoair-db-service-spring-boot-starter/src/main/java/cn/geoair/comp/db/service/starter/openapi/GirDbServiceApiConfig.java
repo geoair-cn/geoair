@@ -22,6 +22,6 @@ public class GirDbServiceApiConfig extends GirOpenApiConfig {
     @Override
     public ApiModelInfo getApiModelInfo() {
         return new ApiModelInfo(
-                "GirDbServiceApi", "GirDbServiceApi", "GirDbServiceApi", "J8.1.0-SNAPSHOT");
+                "GirDbServiceApi", "GirDbServiceApi", "GirDbServiceApi", "J8.1.1");
     }
 }

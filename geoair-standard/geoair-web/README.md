@@ -57,7 +57,7 @@ geoair-web 是一个轻量级的 Web 工具库，为 Java Web 应用提供了一
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-web</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
+    <version>J8.1.1</version>
 </dependency>
 ```
 
@@ -163,7 +163,7 @@ Apache License 2.0
 
 ## 版本信息
 
-当前版本：J8.1.0-SNAPSHOT
+当前版本：J8.1.1
 
 ## 贡献指南
 
@@ -171,4 +171,4 @@ Apache License 2.0
 
 ## 更新日志
 
-- J8.1.0-SNAPSHOT：初始版本，提供基础 Web 工具功能
+- J8.1.1：初始版本，提供基础 Web 工具功能

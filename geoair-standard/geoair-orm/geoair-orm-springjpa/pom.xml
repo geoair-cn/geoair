@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
+    <version>J8.1.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-orm-springjpa</artifactId>
-  <version>J8.1.0-SNAPSHOT</version>
+  <version>J8.1.1</version>
   <packaging>jar</packaging>
 
   <name>geoair-springjpa</name>
