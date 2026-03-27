@@ -99,6 +99,9 @@ import $importone;
                 return $column.javaField;
             }
 
+            public void id($column.javaType  id) {
+                $column.javaField = id;
+            }
             @Override
             public $column.javaType generatorId() {
                 return UUID.randomUUID().toString();
@@ -106,9 +109,7 @@ import $importone;
             #break
         #end
     #end
-    public void id($column.javaType  id) {
-          $column.javaField = id;
-    }
+
     public void setNotDel() {
     }
 
