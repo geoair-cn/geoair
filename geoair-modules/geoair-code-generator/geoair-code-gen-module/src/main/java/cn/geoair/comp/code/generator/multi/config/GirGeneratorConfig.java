@@ -53,6 +53,14 @@ public class GirGeneratorConfig {
      */
     String controllerDirRoot = "";
     /**
+     * 控制器的包的模块名称 , 默认wcs
+     */
+    String controllerModuleName = "wcs";
+
+
+
+
+    /**
      * service的代码 生成在哪里，默认就是 projectName拼接service
      */
     String serviceDirRoot = "";

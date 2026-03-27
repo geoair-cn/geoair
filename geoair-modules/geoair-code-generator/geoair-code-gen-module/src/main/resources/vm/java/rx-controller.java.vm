@@ -1,5 +1,8 @@
-package ${packageName}.wcs.controller.${moduleName};
-
+#if($mutiIs==true)
+package ${packageName}.${controllerModuleName}.controller.${moduleName};
+#else
+package ${packageName}.controller.${moduleName};
+#end
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -15,10 +18,18 @@ import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
 import ${packageName}.servface.${moduleName}.${ClassName}Service;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}AddVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}SearchVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#if($mutiIs==true)
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#else
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#end
+
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.result.GiResult;
