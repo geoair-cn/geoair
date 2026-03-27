@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class GirDsServiceProperties {
 
-    String version = "J8.1.2-SNAPSHOT";
+    String version = "J17.1.0-SNAPSHOT";
 
     /** 配置API接口的访问路径 */
     String realApiContext = "/dsApiServer";

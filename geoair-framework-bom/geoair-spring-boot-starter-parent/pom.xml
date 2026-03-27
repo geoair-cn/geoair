@@ -11,7 +11,7 @@
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-boot-starter-parent</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J17.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-spring-boot-starter-parent</name>
   <description>geoair的springboot starter</description>
@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
     <tomcat.version>9.0.115</tomcat.version>
     <spring-boot.version>2.7.18</spring-boot.version>
@@ -111,9 +111,9 @@
           <configuration>
             <parameters>true</parameters>
             <!-- 源码版本 -->
-            <source>8</source>
+            <source>17</source>
             <!-- 目标字节码版本 -->
-            <target>8</target>
+            <target>17</target>
             <!-- 编码（可选，避免中文乱码） -->
             <encoding>UTF-8</encoding>
           </configuration>

@@ -41,7 +41,7 @@ Knife4j springfox Starter 模块，提供了与 springfox 集成的启动器，�
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J17.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -94,7 +94,7 @@ public class DemoController {
 
 ## 版本历史
 
-- J8.1.2-SNAPSHOT：当前开发版本
+- J17.1.0-SNAPSHOT：当前开发版本
 
 ## 贡献指南
 
