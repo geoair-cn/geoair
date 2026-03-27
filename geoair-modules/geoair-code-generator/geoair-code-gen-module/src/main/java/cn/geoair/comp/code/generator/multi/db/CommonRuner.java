@@ -1,6 +1,7 @@
 package cn.geoair.comp.code.generator.multi.db;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
@@ -10,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.List;
 import javax.sql.DataSource;
 
@@ -99,7 +101,16 @@ public class CommonRuner {
                         + "\t\t<foreach collection=\"array\" item=\"name\" open=\"(\" separator=\",\" close=\")\">\n"
                         + "\t\t\t#{name}\n"
                         + "\t\t</foreach>";
-        return executor.bSelectObjList(
+        List<GenTable> tableList = executor.bSelectObjList(
                 sql, SqlParamMap.of().addOne("array", tableNames), GenTable.class);
+        if (GutilObject.isNotEmpty(tableList)) {
+            for (GenTable genTable : tableList) {
+                String tableComment = genTable.getTableComment();
+                tableComment = StrUtil.trim(tableComment);
+                tableComment = StrUtil.removeAllLineBreaks(tableComment);
+                genTable.setTableComment(tableComment);
+            }
+        }
+        return tableList;
     }
 }

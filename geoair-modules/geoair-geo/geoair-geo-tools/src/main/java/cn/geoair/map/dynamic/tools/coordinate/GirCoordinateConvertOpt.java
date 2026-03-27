@@ -302,4 +302,7 @@ public interface GirCoordinateConvertOpt {
      * @return 转换后的Geometry对象或null
      */
     Geometry gcj02ToWgs84Geometry(Geometry geometry, boolean ifExceptionReturnNull);
+
+
+
 }
