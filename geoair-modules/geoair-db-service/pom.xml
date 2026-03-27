@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.1</version>
+    <version>J8.1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service</artifactId>
-  <version>J8.1.1</version>
+  <version>J8.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-db-service</name>
 
@@ -46,7 +46,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.1</geoair.version>
+    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 

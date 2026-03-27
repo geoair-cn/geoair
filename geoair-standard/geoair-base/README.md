@@ -159,7 +159,7 @@ goair-base/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base</artifactId>
-    <version>J8.1.1</version>
+    <version>J8.1.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -252,7 +252,7 @@ long total = pager.getTotal();
 
 ## 版本历史
 
-- J8.1.1：当前开发版本
+- J8.1.2-SNAPSHOT：当前开发版本
 
 ## 贡献指南
 

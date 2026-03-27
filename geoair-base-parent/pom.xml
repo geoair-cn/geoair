@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8.1.1</version>
+    <version>J8.1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-base-parent</artifactId>
-  <version>J8.1.1</version>
+  <version>J8.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-base-parent</name>
   <description>geoair base parent 用于Gir基础库的依赖约束</description>
@@ -43,7 +43,7 @@
   <properties>
     <versions-maven-release.version>3.1.0</versions-maven-release.version>
 
-    <geoair.version>J8.1.1</geoair.version>
+    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
     <slf4j.version>1.7.36</slf4j.version>
   </properties>
 
