@@ -462,7 +462,7 @@ public class GenPathUtils {
             } else if (template.contains("rx-addvo.java.vm")) {
                 fileName =
                         StringUtils.format(
-                                "src/{}/{}/wcs/controller/{}/{}AddVo.java",
+                                "src/{}/{}/controller/{}/{}AddVo.java",
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
@@ -470,7 +470,7 @@ public class GenPathUtils {
             } else if (template.contains("rx-detailvo.java.vm")) {
                 fileName =
                         StringUtils.format(
-                                "src/{}/{}/wcs/controller/{}/{}DetailVo.java",
+                                "src/{}/{}/controller/{}/{}DetailVo.java",
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
@@ -478,7 +478,7 @@ public class GenPathUtils {
             } else if (template.contains("rx-searchvo.java.vm")) {
                 fileName =
                         StringUtils.format(
-                                "src/{}/{}/wcs/controller/{}/{}SearchVo.java",
+                                "src/{}/{}/controller/{}/{}SearchVo.java",
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
@@ -486,7 +486,7 @@ public class GenPathUtils {
             } else if (template.contains("rx-updatevo.java.vm")) {
                 fileName =
                         StringUtils.format(
-                                "src/{}/{}/wcs/controller/{}/{}UpdateVo.java",
+                                "src/{}/{}/controller/{}/{}UpdateVo.java",
                                 PROJECT_PATH,
                                 packagePath,
                                 moduleName,
