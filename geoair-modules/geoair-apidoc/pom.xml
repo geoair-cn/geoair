@@ -1,91 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-modules</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-modules</artifactId>
+    <version>J8.1.1</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-apidoc</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>geoair-apidoc</name>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-apidoc</artifactId>
+  <version>J8.1.1</version>
+  <packaging>pom</packaging>
+  <name>geoair-apidoc</name>
 
-    <description>geoair-apidoc</description>
+  <description>geoair-apidoc</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>geoair-knife4j-core</module>
+    <module>geoair-knife4j-springfox-spring-boot-starter</module>
+    <module>geoair-knife4j-springdoc-spring-boot-starter</module>
+    <module>geoair-knife4j-spring-boot-demo</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties>
+    <skipTests>true</skipTests>
+  </properties>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
+        <version>${geoair.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
+        <version>${geoair.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-knife4j-core</artifactId>
+        <version>${geoair.version}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.reflections</groupId>
+        <artifactId>reflections</artifactId>
+        <version>${reflections.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-                <version>${geoair.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-               <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-knife4j-core</artifactId>
-                <version>${geoair.version}</version>
-                <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflections.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-
-    <modules>
-        <module>geoair-knife4j-core</module>
-        <module>geoair-knife4j-springfox-spring-boot-starter</module>
-        <module>geoair-knife4j-springdoc-spring-boot-starter</module>
-        <module>geoair-knife4j-spring-boot-demo</module>
-    </modules>
-
-    <build>
-        <plugins>
-        </plugins>
-    </build>
+  <build>
+    <plugins></plugins>
+  </build>
 </project>

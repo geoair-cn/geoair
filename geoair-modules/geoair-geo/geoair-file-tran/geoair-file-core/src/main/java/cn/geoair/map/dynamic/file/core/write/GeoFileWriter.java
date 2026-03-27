@@ -4,9 +4,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import org.opengis.feature.simple.SimpleFeatureType;
-
 import java.io.Closeable;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author ：张逢吉
@@ -14,16 +13,15 @@ import java.io.Closeable;
  */
 public interface GeoFileWriter extends Closeable {
 
-	// 链接信息
-	void setLinkInfo(LinkInfo linkInfo);
+    // 链接信息
+    void setLinkInfo(LinkInfo linkInfo);
 
-	// 设置写入配置信息
-	void setWriteConfig(WriteConfig writeConfig);
+    // 设置写入配置信息
+    void setWriteConfig(WriteConfig writeConfig);
 
-	// 写入表头
-	GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer);
+    // 写入表头
+    GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer);
 
-	// 写入一行
-	GeoFileWriter writeOneRow(GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer);
-
+    // 写入一行
+    GeoFileWriter writeOneRow(GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer);
 }

@@ -1,88 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-modules</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-modules</artifactId>
+    <version>J8.1.1</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-   <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-code-generator</artifactId>
-    <version>J8.1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>geoair-code-generator</name>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-code-generator</artifactId>
+  <version>J8.1.1</version>
+  <packaging>pom</packaging>
+  <name>geoair-code-generator</name>
 
-    <description>代码生成器模块</description>
+  <description>代码生成器模块</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>geoair-code-gen-module</module>
+    <module>geoair-code-gen-demo</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <properties>
-        <skipTests>true</skipTests>
-        <velocity.version>1.7</velocity.version>
-        <commons.collections.version>3.2.2</commons.collections.version>
-        <commons.io.version>2.11.0</commons.io.version>
-        <commons.fileupload.version>1.4</commons.fileupload.version>
-        <commons.collections.version>3.2.2</commons.collections.version>
-    </properties>
+  <properties>
+    <skipTests>true</skipTests>
+    <velocity.version>1.7</velocity.version>
+    <commons.collections.version>3.2.2</commons.collections.version>
+    <commons.io.version>2.11.0</commons.io.version>
+    <commons.fileupload.version>1.4</commons.fileupload.version>
+    <commons.collections.version>3.2.2</commons.collections.version>
+  </properties>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>${velocity.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-collections</artifactId>
+            <groupId>commons-collections</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>${commons.collections.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-        <tag>HEAD</tag>
-    </scm>
-
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
-                <version>${velocity.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-collections</groupId>
-                        <artifactId>commons-collections</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>${commons.collections.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-
-    <modules>
-        <module>geoair-code-gen-module</module>
-        <module>geoair-code-gen-demo</module>
-    </modules>
-
-    <build>
-        <plugins>
-        </plugins>
-    </build>
+  <build>
+    <plugins></plugins>
+  </build>
 </project>

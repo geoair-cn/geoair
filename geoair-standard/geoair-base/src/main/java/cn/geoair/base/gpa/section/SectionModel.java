@@ -1,13 +1,12 @@
 package cn.geoair.base.gpa.section;
 
-import java.io.Serializable;
-
 import cn.geoair.base.data.model.GiModelable;
+import java.io.Serializable;
 
 /**
  * 分表模型接口
- * <p>
- * 定义分表模型的基本结构，继承自GiModelable接口，添加了分表因子方法
+ *
+ * <p>定义分表模型的基本结构，继承自GiModelable接口，添加了分表因子方法
  *
  * @author Ray
  * @date 2022-04-25
@@ -16,10 +15,10 @@ import cn.geoair.base.data.model.GiModelable;
  */
 public interface SectionModel<PK extends Serializable, F> extends GiModelable<PK> {
 
-	/**
-	 * 获取分表因子
-	 * @return 分表因子值
-	 */
-	F factor();
-
+    /**
+     * 获取分表因子
+     *
+     * @return 分表因子值
+     */
+    F factor();
 }

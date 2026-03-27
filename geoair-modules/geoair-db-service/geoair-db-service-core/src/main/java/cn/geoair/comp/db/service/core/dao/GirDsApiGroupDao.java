@@ -1,7 +1,6 @@
 package cn.geoair.comp.db.service.core.dao;
 
 import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
-
 import java.util.List;
 
 /**
@@ -12,14 +11,13 @@ import java.util.List;
  */
 public interface GirDsApiGroupDao {
 
-	List<GroupApo> searchAll();
+    List<GroupApo> searchAll();
 
-	List<GroupApo> selectBatchIds(List<String> ids);
+    List<GroupApo> selectBatchIds(List<String> ids);
 
-	GroupApo accessSelective(GroupApo t);
+    GroupApo accessSelective(GroupApo t);
 
-	GroupApo updateSelectiveById(GroupApo t);
+    GroupApo updateSelectiveById(GroupApo t);
 
-	void deleteByPK(String id);
-
+    void deleteByPK(String id);
 }

@@ -9,6 +9,5 @@ package cn.geoair.base.def;
 @FunctionalInterface
 public interface GkOffice<T extends GkOperater> {
 
-	T getOperater();
-
+    T getOperater();
 }

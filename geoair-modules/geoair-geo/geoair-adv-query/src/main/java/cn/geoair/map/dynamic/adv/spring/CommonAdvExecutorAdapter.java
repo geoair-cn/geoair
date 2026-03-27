@@ -1,12 +1,11 @@
 package cn.geoair.map.dynamic.adv.spring;
 
-import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
-import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.tools.GirService;
-import com.alibaba.druid.pool.DruidDataSource;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -23,13 +22,13 @@ public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
         DataSourceApo dataSourceApoById = pxyBeanC.getDataSourceApoById(dataSourceId);
         dataSourceApoById.setSchemaName(schema);
         // 这里进行区分数据库执行器
-        DruidDataSource dbDataSourceByApo = pxyBeanC.getDbDataSourceByApo(dataSourceApoById);
+        DataSource dbDataSourceByApo = pxyBeanC.getDbDataSourceByApo(dataSourceApoById);
         return AdvExecutorFactory.getAdvExecutorByDataSource(dbDataSourceByApo, dataSourceId);
     }
 
     @Override
-    public <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz) {
+    public <T extends IAdvExecutor> T getIAdvExecutor(
+            String dataSourceId, String schema, Class<T> clazz) {
         return (T) getIAdvExecutor(dataSourceId, schema);
     }
-
 }

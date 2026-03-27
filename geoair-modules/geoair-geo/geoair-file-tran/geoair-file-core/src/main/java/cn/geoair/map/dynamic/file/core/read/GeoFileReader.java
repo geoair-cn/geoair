@@ -5,10 +5,9 @@ import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import org.opengis.feature.simple.SimpleFeatureType;
-
 import java.io.Closeable;
 import java.util.Iterator;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author ：张逢吉
@@ -16,18 +15,18 @@ import java.util.Iterator;
  */
 public interface GeoFileReader extends Closeable {
 
-	// 链接信息
-	void setLinkInfo(LinkInfo linkInfo);
+    // 链接信息
+    void setLinkInfo(LinkInfo linkInfo);
 
-	// 读取表头
-	SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
+    // 读取表头
+    SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
 
-	// 读取一行
-	GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
+    // 读取一行
+    GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
 
-	Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer);
+    Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer);
 
-	// 读取分页行数
-	GirPager<GirAdvOneRow> readRowPage(GirPageParam girPageParam, ExceptionConsumer exceptionConsumer);
-
+    // 读取分页行数
+    GirPager<GirAdvOneRow> readRowPage(
+            GirPageParam girPageParam, ExceptionConsumer exceptionConsumer);
 }

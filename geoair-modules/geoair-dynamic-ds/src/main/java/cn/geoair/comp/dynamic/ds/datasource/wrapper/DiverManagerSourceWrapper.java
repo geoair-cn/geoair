@@ -1,20 +1,27 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
-import com.zaxxer.hikari.HikariDataSource;
-
 import javax.sql.DataSource;
 
-
 public class DiverManagerSourceWrapper extends AbstractDataSourceWrapper {
-
 
     public DiverManagerSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
     }
 
-
     public static boolean canInit() {
+        return true;
+    }
+
+    @Override
+    public boolean close() {
+        DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
+        try {
+            dataSource.close();
+        } catch (Exception e) {
+            Gir.log.error(e);
+        }
         return true;
     }
 
@@ -34,6 +41,4 @@ public class DiverManagerSourceWrapper extends AbstractDataSourceWrapper {
         DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
         return dataSource.getUrl();
     }
-
-
 }

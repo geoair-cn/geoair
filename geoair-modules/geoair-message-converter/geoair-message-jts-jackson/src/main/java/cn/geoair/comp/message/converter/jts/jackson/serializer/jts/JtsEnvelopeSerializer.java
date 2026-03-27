@@ -21,13 +21,15 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
 import org.locationtech.jts.geom.Envelope;
 
-import java.io.IOException;
-
 class JtsEnvelopeSerializer extends JsonSerializer<Envelope> {
+
     @Override
-    public void serialize(Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+    public void serialize(
+            Envelope bBox, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
+            throws IOException, JsonProcessingException {
         jsonGenerator.writeStartArray();
         jsonGenerator.writeNumber(round(bBox.getMinX(), 6));
         jsonGenerator.writeNumber(round(bBox.getMinY(), 6));

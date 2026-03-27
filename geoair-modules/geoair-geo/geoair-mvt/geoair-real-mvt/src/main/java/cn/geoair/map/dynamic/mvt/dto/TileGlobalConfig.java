@@ -11,16 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 @Accessors(chain = true)
 public class TileGlobalConfig {
 
-	TileRequestParams tileRequestParams;
+    TileRequestParams tileRequestParams;
 
-	TileExecParams tileExecParams;
+    TileExecParams tileExecParams;
 
-	TileExecutorConfig tileExecConfig;
+    TileExecutorConfig tileExecConfig;
 
-	String layerName;
+    String layerName;
 
-	Integer version = 0;
+    Integer version = 0;
 
-	JSONObject customVariable;
-
+    JSONObject customVariable;
 }

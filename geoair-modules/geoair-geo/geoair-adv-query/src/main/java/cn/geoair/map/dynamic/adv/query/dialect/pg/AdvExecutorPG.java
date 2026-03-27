@@ -4,16 +4,15 @@ import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
-
-import javax.sql.DataSource;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import java.sql.Connection;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 15:36 @description： PostgreSQL数据库的动态高级查询执行器
  */
-public class AdvExecutorPG extends AbstractAdvExecutor {
+public class AdvExecutorPG extends AbstractPxyAdvExecutor {
 
     public AdvExecutorPG(DataSourceApo dataSourceApo) {
         super(dataSourceApo);
@@ -22,12 +21,12 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
     public AdvExecutorPG(DataSource dataSource) {
         super(dataSource);
     }
-    public AdvExecutorPG(DataSource dataSource,String dataSourceName) {
-        super(dataSource,dataSourceName);
+
+    public AdvExecutorPG(DataSource dataSource, String dataSourceName) {
+        super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorPG() {
-    }
+    public AdvExecutorPG() {}
 
     public AdvExecutorPG(Connection connection) {
         super(connection);
@@ -101,6 +100,4 @@ public class AdvExecutorPG extends AbstractAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
     }
-
-
 }

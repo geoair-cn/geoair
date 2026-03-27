@@ -4,16 +4,13 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.extra.spring.SpringUtil;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * 高级查询执行器工厂，根据数据源类型自动创建对应执行器
- */
+/** 高级查询执行器工厂，根据数据源类型自动创建对应执行器 */
 @Slf4j
 public class AdvExecutorFactory {
 
@@ -31,7 +28,8 @@ public class AdvExecutorFactory {
         return getAdvExecutorByDataSource(dataSource, null);
     }
 
-    public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource, String dataSourceName) {
+    public static IAdvExecutor getAdvExecutorByDataSource(
+            DataSource dataSource, String dataSourceName) {
 
         DialectName dbType = getDbTypeFromDataSource(dataSource);
 
@@ -80,5 +78,4 @@ public class AdvExecutorFactory {
             }
         }
     }
-
 }

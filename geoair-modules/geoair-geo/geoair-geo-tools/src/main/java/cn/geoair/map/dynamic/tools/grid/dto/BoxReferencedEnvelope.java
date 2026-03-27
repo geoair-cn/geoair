@@ -11,27 +11,28 @@ import org.opengis.geometry.MismatchedDimensionException;
  */
 public class BoxReferencedEnvelope extends ReferencedEnvelope {
 
-	int srid;
+    int srid;
 
-	public int getSrid() {
-		return srid;
-	}
+    public int getSrid() {
+        return srid;
+    }
 
-	public BoxReferencedEnvelope(org.locationtech.jts.geom.Envelope envelope, int srid)
-			throws MismatchedDimensionException {
-		super(envelope, GirAdvTools.getSridOpt().getCRS(srid));
-		this.srid = srid;
-	}
+    public BoxReferencedEnvelope(org.locationtech.jts.geom.Envelope envelope, int srid)
+            throws MismatchedDimensionException {
+        super(envelope, GirAdvTools.getSridOpt().getCRS(srid));
+        this.srid = srid;
+    }
 
-	public String getWktString(int targetSrid) {
-		Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this, srid, targetSrid);
-		return GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
-	}
+    public String getWktString(int targetSrid) {
+        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this, srid, targetSrid);
+        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+    }
 
-	@Override
-	public String toString() {
-		Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this);
-		return this.getSrid() + ";" + GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
-	}
-
+    @Override
+    public String toString() {
+        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this);
+        return this.getSrid()
+                + ";"
+                + GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+    }
 }

@@ -16,45 +16,40 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 @Slf4j
 @Component
 public class GirDsAPIServlet extends HttpServlet {
 
-    @Autowired
-    DsApiConfigService dsApiConfigService;
+    @Autowired DsApiConfigService dsApiConfigService;
 
-    @Autowired
-    GirDsServiceProperties girDsServiceProperties;
+    @Autowired GirDsServiceProperties girDsServiceProperties;
 
-    @Autowired
-    DsApiService dsApiService;
+    @Autowired DsApiService dsApiService;
 
-
-
-    @Autowired
-    GirDsSQLExecutor girDsSqlExecutor;
+    @Autowired GirDsSQLExecutor girDsSqlExecutor;
 
     ApiConfigApo config;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         log.debug("servlet execute");
         String realApiContext1 = girDsServiceProperties.getRealApiContext();
         String realApiContext2 = StrUtil.removePrefix(realApiContext1, "/");
@@ -82,17 +77,18 @@ public class GirDsAPIServlet extends HttpServlet {
             out.append(json);
             log.error(e.toString(), e);
         } finally {
-            if (out != null)
-                out.close();
+            if (out != null) out.close();
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         doGet(req, resp);
     }
 
-    public ResponseDto process(String path, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseDto process(
+            String path, HttpServletRequest request, HttpServletResponse response) {
         // // 校验接口是否存在
         this.config = dsApiConfigService.getConfig(path);
         if (config == null) {
@@ -108,14 +104,10 @@ public class GirDsAPIServlet extends HttpServlet {
                 int type = task.getIntValue("taskType");
                 Executor executor;
 
-                if (type == Constants.API_EXECUTOR_SQL)
-                    executor = girDsSqlExecutor;
-                else if (type == Constants.API_EXECUTOR_HTTP)
-                    executor = girDsSqlExecutor;
-                else if (type == Constants.API_EXECUTOR_ES)
-                    executor = girDsSqlExecutor;
-                else
-                    throw new RuntimeException("Executor type unknown!");
+                if (type == Constants.API_EXECUTOR_SQL) executor = girDsSqlExecutor;
+                else if (type == Constants.API_EXECUTOR_HTTP) executor = girDsSqlExecutor;
+                else if (type == Constants.API_EXECUTOR_ES) executor = girDsSqlExecutor;
+                else throw new RuntimeException("Executor type unknown!");
                 Object res = executor.execute(task, requestParam);
                 executorResults.add(res);
             }
@@ -151,16 +143,21 @@ public class GirDsAPIServlet extends HttpServlet {
         // 如果是application/json请求，不管接口规定的content-type是什么，接口都可以访问，且请求参数都以json body 为准
         if (contentType.equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE)) {
             JSONObject jo = getHttpJsonBody(request);
-            params = JSONObject.parseObject(jo.toJSONString(), new TypeReference<Map<String, Object>>() {
-            });
+            params =
+                    JSONObject.parseObject(
+                            jo.toJSONString(), new TypeReference<Map<String, Object>>() {});
         }
         // 如果是application/x-www-form-urlencoded请求，先判断接口规定的content-type是不是确实是application/x-www-form-urlencoded
         else if (contentType.equalsIgnoreCase(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
-            if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(apiConfigApo.getContentType())) {
+            if (MediaType.APPLICATION_FORM_URLENCODED_VALUE.equalsIgnoreCase(
+                    apiConfigApo.getContentType())) {
                 params = dsApiService.getSqlParam(request, apiConfigApo);
             } else {
-                throw new RuntimeException("This API only supports content-type: " + apiConfigApo.getContentType()
-                        + ", but you use: " + contentType);
+                throw new RuntimeException(
+                        "This API only supports content-type: "
+                                + apiConfigApo.getContentType()
+                                + ", but you use: "
+                                + contentType);
             }
         } else {
             throw new RuntimeException("Content-type not supported: " + contentType);
@@ -171,7 +168,8 @@ public class GirDsAPIServlet extends HttpServlet {
 
     private JSONObject getHttpJsonBody(HttpServletRequest request) {
         try {
-            InputStreamReader in = new InputStreamReader(request.getInputStream(), "utf-8");
+            InputStreamReader in =
+                    new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8);
             BufferedReader br = new BufferedReader(in);
             StringBuilder sb = new StringBuilder();
             String line = null;
@@ -198,5 +196,4 @@ public class GirDsAPIServlet extends HttpServlet {
     private Object globalTransform(ResponseDto responseDto) {
         return responseDto;
     }
-
 }

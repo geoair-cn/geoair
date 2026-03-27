@@ -5,7 +5,6 @@ import cn.geoair.base.json.GirJSON;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
-
 import java.lang.reflect.Type;
 
 /**
@@ -53,10 +52,12 @@ public class GirFastJson2 implements GirJSON {
     @Override
     public String toJSONString() {
         if (jsonString == null) {
-            jsonString = JSONObject.toJSONString(jsonTarget, JSONWriter.Feature.MapSortField,
-                    JSONWriter.Feature.WriteMapNullValue);
+            jsonString =
+                    JSONObject.toJSONString(
+                            jsonTarget,
+                            JSONWriter.Feature.MapSortField,
+                            JSONWriter.Feature.WriteMapNullValue);
         }
         return jsonString;
     }
-
 }

@@ -5,10 +5,9 @@ import lombok.Data;
 @Data
 public class ApiDto {
 
-	String id;
+    String id;
 
-	String name;
+    String name;
 
-	String groupName;
-
+    String groupName;
 }

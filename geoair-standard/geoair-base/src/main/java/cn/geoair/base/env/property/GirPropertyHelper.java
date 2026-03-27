@@ -7,21 +7,23 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirPropertyHelper {
 
-	// /*
-	// static {
-	// MethodHand.implFromClass( GirPropertyHelper.class);
-	// }
-	// */
+    // /*
+    // static {
+    // MethodHand.implFromClass( GirPropertyHelper.class);
+    // }
+    // */
 
-	@GaMethodHandDefine(expectClassName = "cn.geoair.spi.env.SpringEnvironment4Gir")
-	public static GiPropertier getPropertier() {
-		return (GiPropertier) GkMethodHand.invokeSelf();
-	}
+    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.env.SpringEnvironment4Gir")
+    public static GiPropertier getPropertier() {
+        return (GiPropertier) GkMethodHand.invokeSelf();
+    }
 
-	@GaMethodHandImpl(implClass = GirPropertyHelper.class, implMethod = "getPropertier",
-			type = GaMethodHandImpl.ImplType.comity)
-	protected GiPropertier _getPropertier() {
-		return new GirSystemPropertierOffice().getOperater();
-	}
-
+    @GaMethodHandImpl(
+        implClass = GirPropertyHelper.class,
+        implMethod = "getPropertier",
+        type = GaMethodHandImpl.ImplType.comity
+    )
+    protected GiPropertier _getPropertier() {
+        return new GirSystemPropertierOffice().getOperater();
+    }
 }

@@ -9,6 +9,7 @@ import java.io.Serializable;
  * @param <PK> 主键类型
  */
 public interface GiCrudEntity<PK extends Serializable>
-		extends GiEntitySaveable<PK>, GiEntityRemovable<PK>, GiEntityAlterable<PK>, GiEntityQueryable<PK> {
-
-}
+        extends GiEntitySaveable<PK>,
+                GiEntityRemovable<PK>,
+                GiEntityAlterable<PK>,
+                GiEntityQueryable<PK> {}

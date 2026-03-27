@@ -1,397 +1,390 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-       <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geo</artifactId>
-        <version>J8.1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-   <groupId>cn.geoair.devkit</groupId>
-    <version>J8.1.0-SNAPSHOT</version>
-    <artifactId>geoair-geoserver</artifactId>
-    <name>geoair-geoserver</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-geo</artifactId>
+    <version>J8.1.1</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-geoserver</artifactId>
+  <version>J8.1.1</version>
+  <packaging>jar</packaging>
+  <name>geoair-geoserver</name>
+  <description>geoair-geoserver的springBootStart集成模块</description>
 
-    <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8.1.0-SNAPSHOT</geoair.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <geotools.version>28.6.1</geotools.version>
-        <geoserver.version>2.22.6</geoserver.version>
-    </properties>
-    <packaging>jar</packaging>
-    <description>geoair-geoserver的springBootStart集成模块</description>
+  <url>https://github.com/geoair-cn/geoair</url>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>1159856928@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <properties>
+    <java.version>8</java.version>
+    <geoair.version>J8.1.1</geoair.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <geotools.version>28.6.1</geotools.version>
+    <geoserver.version>2.22.6</geoserver.version>
+  </properties>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>1159856928@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  <dependencies>
 
-    <scm>
-        <connection>https://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-    </scm>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-core</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-web</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
 
+    <dependency>
+      <groupId>org.geoserver.web</groupId>
+      <artifactId>gs-web-core</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <!-- 排除反向适配的 log4j-slf4j-impl -->
+        <exclusion>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <groupId>org.apache.logging.log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.geoserver.web</groupId>
+      <artifactId>gs-web-wms</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <!-- 排除反向适配的 log4j-slf4j-impl -->
+        <exclusion>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <groupId>org.apache.logging.log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!--        <dependency>-->
+    <!--            <groupId>org.geoserver.web</groupId>-->
+    <!--            <artifactId>gs-web-gwc</artifactId>-->
+    <!--            <version>${geoserver.version}</version>-->
+    <!--            <exclusions>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.geoserver</groupId>-->
+    <!--                    <artifactId>gs-main</artifactId>-->
+    <!--                </exclusion>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>javax.servlet</groupId>-->
+    <!--                    <artifactId>servlet-api</artifactId>-->
+    <!--                </exclusion>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.springframework</groupId>-->
+    <!--                    <artifactId>spring-core</artifactId>-->
+    <!--                </exclusion>-->
+    <!--                &lt;!&ndash; 排除反向适配的 log4j-slf4j-impl &ndash;&gt;-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.apache.logging.log4j</groupId>-->
+    <!--                    <artifactId>log4j-slf4j-impl</artifactId>-->
+    <!--                </exclusion>-->
+    <!--            </exclusions>-->
+    <!--        </dependency>-->
+    <dependency>
+      <groupId>org.geoserver.web</groupId>
+      <artifactId>gs-web-wfs</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <!-- 排除反向适配的 log4j-slf4j-impl -->
+        <exclusion>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <groupId>org.apache.logging.log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-    <dependencies>
+    <dependency>
+      <groupId>org.geoserver.web</groupId>
+      <artifactId>gs-web-rest</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>gs-restconfig</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <!-- 排除反向适配的 log4j-slf4j-impl -->
+        <exclusion>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <groupId>org.apache.logging.log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-core</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-web</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>${spring-boot.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-            <version>${spring-boot.version}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>org.geoserver</groupId>
+      <artifactId>gs-main</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>org.geotools</groupId>
+        </exclusion>
 
-        <dependency>
-            <groupId>org.geoserver.web</groupId>
-            <artifactId>gs-web-core</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <!-- 排除反向适配的 log4j-slf4j-impl -->
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.geoserver.web</groupId>
-            <artifactId>gs-web-wms</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <!-- 排除反向适配的 log4j-slf4j-impl -->
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.geoserver.web</groupId>-->
-        <!--            <artifactId>gs-web-gwc</artifactId>-->
-        <!--            <version>${geoserver.version}</version>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.geoserver</groupId>-->
-        <!--                    <artifactId>gs-main</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>javax.servlet</groupId>-->
-        <!--                    <artifactId>servlet-api</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.springframework</groupId>-->
-        <!--                    <artifactId>spring-core</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                &lt;!&ndash; 排除反向适配的 log4j-slf4j-impl &ndash;&gt;-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.apache.logging.log4j</groupId>-->
-        <!--                    <artifactId>log4j-slf4j-impl</artifactId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
-        <dependency>
-            <groupId>org.geoserver.web</groupId>
-            <artifactId>gs-web-wfs</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <!-- 排除反向适配的 log4j-slf4j-impl -->
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!-- 排除与 Spring Boot 冲突的依赖 -->
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <!-- 排除反向适配的 log4j-slf4j-impl -->
+        <exclusion>
+          <artifactId>log4j-slf4j-impl</artifactId>
+          <groupId>org.apache.logging.log4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>org.geoserver.web</groupId>
-            <artifactId>gs-web-rest</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-restconfig</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <!-- 排除反向适配的 log4j-slf4j-impl -->
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <dependency>
+      <groupId>org.geoserver</groupId>
+      <artifactId>gs-wms</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>org.geotools</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
+    <!--        <dependency>-->
+    <!--            <groupId>org.geoserver</groupId>-->
+    <!--            <artifactId>gs-gwc</artifactId>-->
+    <!--            <version>${geoserver.version}</version>-->
+    <!--            <exclusions>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.geotools</groupId>-->
+    <!--                    <artifactId>*</artifactId>-->
+    <!--                </exclusion>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.geoserver</groupId>-->
+    <!--                    <artifactId>gs-main</artifactId>-->
+    <!--                </exclusion>-->
+    <!--            </exclusions>-->
+    <!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>gs-main</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
+    <dependency>
+      <groupId>org.geoserver</groupId>
+      <artifactId>gs-kml</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>org.geotools</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-                <!-- 排除与 Spring Boot 冲突的依赖 -->
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <!-- 排除反向适配的 log4j-slf4j-impl -->
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <!--        <dependency>-->
+    <!--            <groupId>org.geoserver.community</groupId>-->
+    <!--            <artifactId>gs-wmts-styles</artifactId>-->
+    <!--            <version>${geoserver.version}</version>-->
+    <!--            <exclusions>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.geotools</groupId>-->
+    <!--                    <artifactId>*</artifactId>-->
+    <!--                </exclusion>-->
+    <!--                <exclusion>-->
+    <!--                    <groupId>org.geoserver</groupId>-->
+    <!--                    <artifactId>gs-main</artifactId>-->
+    <!--                </exclusion>-->
+    <!--            </exclusions>-->
+    <!--        </dependency>-->
 
+    <dependency>
+      <groupId>org.geoserver</groupId>
+      <artifactId>gs-wfs</artifactId>
+      <version>${geoserver.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>org.geotools</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gs-main</artifactId>
+          <groupId>org.geoserver</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>gs-wms</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-jts-all</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.geoserver</groupId>-->
-        <!--            <artifactId>gs-gwc</artifactId>-->
-        <!--            <version>${geoserver.version}</version>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.geotools</groupId>-->
-        <!--                    <artifactId>*</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.geoserver</groupId>-->
-        <!--                    <artifactId>gs-main</artifactId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>gs-kml</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+      <version>${spring-boot.version}</version>
+    </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.geoserver.community</groupId>-->
-        <!--            <artifactId>gs-wmts-styles</artifactId>-->
-        <!--            <version>${geoserver.version}</version>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.geotools</groupId>-->
-        <!--                    <artifactId>*</artifactId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <groupId>org.geoserver</groupId>-->
-        <!--                    <artifactId>gs-main</artifactId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <version>2.17.2</version>
+      <optional>true</optional>
+      <!-- 与 GeoServer 依赖的 Log4j 版本匹配（2.22.6 对应 2.17.2） -->
+    </dependency>
 
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.17.2</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${servlet-api.version}</version>
+    </dependency>
+    <!--        <dependency>-->
+    <!--            <groupId>org.springframework.boot</groupId>-->
+    <!--            <artifactId>spring-boot-actuator-autoconfigure</artifactId>-->
+    <!--            <version>${spring-boot.version}</version>-->
+    <!--            <scope>provided</scope>-->
+    <!--            <optional>true</optional>-->
+    <!--        </dependency>-->
+  </dependencies>
 
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>gs-wfs</artifactId>
-            <version>${geoserver.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.geotools</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.geoserver</groupId>
-                    <artifactId>gs-main</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>osgeo</id>
+      <name>OSGeo Release Repository</name>
+      <url>https://repo.osgeo.org/repository/release/</url>
+    </repository>
+    <repository>
+      <id>geotools</id>
+      <name>GeoTools Repository</name>
+      <url>https://repo.osgeo.org/repository/geotools/</url>
+    </repository>
+  </repositories>
 
-        <dependency>
-           <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-jts-all</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <parameters>true</parameters>
+          <!-- 源码版本 -->
+          <source>8</source>
+          <!-- 目标字节码版本 -->
+          <target>8</target>
+          <!-- 编码（可选，避免中文乱码） -->
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
 
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>${spring-boot.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-to-slf4j</artifactId>
-            <version>2.17.2</version>
-            <optional>true</optional>
-            <!-- 与 GeoServer 依赖的 Log4j 版本匹配（2.22.6 对应 2.17.2） -->
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.17.2</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-actuator-autoconfigure</artifactId>-->
-        <!--            <version>${spring-boot.version}</version>-->
-        <!--            <scope>provided</scope>-->
-        <!--            <optional>true</optional>-->
-        <!--        </dependency>-->
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                    <!-- 源码版本 -->
-                    <source>8</source>
-                    <!-- 目标字节码版本 -->
-                    <target>8</target>
-                    <!-- 编码（可选，避免中文乱码） -->
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>osgeo</id>
-            <name>OSGeo Release Repository</name>
-            <url>https://repo.osgeo.org/repository/release/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>geotools</id>
-            <name>GeoTools Repository</name>
-            <url>https://repo.osgeo.org/repository/geotools/</url>
-        </repository>
-    </repositories>
-
+    </plugins>
+  </build>
 
 </project>

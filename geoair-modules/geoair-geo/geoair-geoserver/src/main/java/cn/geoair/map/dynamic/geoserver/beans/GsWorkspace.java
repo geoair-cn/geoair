@@ -9,10 +9,9 @@ import lombok.Data;
 @Data
 public class GsWorkspace {
 
-	/** 工作区名称 */
-	private String name = "geoair";
+    /** 工作区名称 */
+    private String name = "geoair";
 
-	/** 工作区 URI */
-	private String uri = "http://www.geoair.cn";
-
+    /** 工作区 URI */
+    private String uri = "http://www.geoair.cn";
 }

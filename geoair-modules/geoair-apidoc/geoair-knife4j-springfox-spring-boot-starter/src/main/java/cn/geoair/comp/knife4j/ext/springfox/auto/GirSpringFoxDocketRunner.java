@@ -6,6 +6,9 @@ import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import cn.geoair.comp.knife4j.ext.springfox.service.SpringAddtionalModelUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -17,20 +20,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * SpringFox Docket 动态注册器 在Spring容器启动早期扫描GirSwaggerApiConfig实现类，动态创建并注册Docket Bean
- */
+/** SpringFox Docket 动态注册器 在Spring容器启动早期扫描GirSwaggerApiConfig实现类，动态创建并注册Docket Bean */
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
+public class GirSpringFoxDocketRunner
+        implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(GirSpringFoxDocketRunner.class);
+
     private ApplicationContext applicationContext;
 
     private boolean enable;
@@ -38,23 +36,30 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        enable = "true".equals(applicationContext.getEnvironment().getProperty("geoair.apidoc.enable"));
+        enable =
+                "true"
+                        .equals(
+                                applicationContext
+                                        .getEnvironment()
+                                        .getProperty("geoair.apidoc.enable"));
     }
 
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
+            throws BeansException {
 
         if (applicationContext == null) {
             throw new RuntimeException("ApplicationContext初始化失败！请检查Spring配置");
         }
 
         // 获取所有 GirSwaggerApiConfig 的实现类（支持多个配置）
-        Map<String, GirOpenApiConfig> apiConfigMap = applicationContext.getBeansOfType(GirOpenApiConfig.class);
+        Map<String, GirOpenApiConfig> apiConfigMap =
+                applicationContext.getBeansOfType(GirOpenApiConfig.class);
 
         if (apiConfigMap.isEmpty()) {
 
-//            log.debug("【SpringFox】未找到任何 GirSwaggerApiConfig 实现，跳过Docket注册");
-//            return;
+            // log.debug("【SpringFox】未找到任何 GirSwaggerApiConfig 实现，跳过Docket注册");
+            // return;
 
             apiConfigMap = new HashMap<>();
             apiConfigMap.put("byAutoScanner", new AutoApiConfigScanner(applicationContext));
@@ -70,10 +75,9 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         }
     }
 
-    /**
-     * 从单个配置中注册所有Docket
-     */
-    private void registerDocketsFromConfig(GirOpenApiConfig apiConfig, BeanDefinitionRegistry registry) {
+    /** 从单个配置中注册所有Docket */
+    private void registerDocketsFromConfig(
+            GirOpenApiConfig apiConfig, BeanDefinitionRegistry registry) {
         // 获取DocketInfo列表
         apiConfig.doLoading();
         List<DocketInfo> docketInfos = apiConfig.getDocketInfos();
@@ -99,11 +103,9 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
 
     HashMap<String, Integer> groupNameMap = new HashMap<>();
 
-    /**
-     * 注册单个Docket
-     */
-    private void registerSingleDocket(ApiModelInfo apiModelInfo, DocketInfo docketInfo,
-                                      BeanDefinitionRegistry registry) {
+    /** 注册单个Docket */
+    private void registerSingleDocket(
+            ApiModelInfo apiModelInfo, DocketInfo docketInfo, BeanDefinitionRegistry registry) {
         // 处理分组名
         String groupName = null;
         {
@@ -114,7 +116,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
             if (groupNameMap.containsKey(groupName)) {
                 throw new GirException("分组名重复：{}", groupName);
             }
-//            groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
+            // groupNameMap.put(groupName, groupNameMap.getOrDefault(groupName, 0) + 1);
 
         }
 
@@ -129,10 +131,14 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
 
         // 使用BeanDefinitionBuilder创建Bean定义
         String finalGroupName = groupName;
-        BeanDefinitionBuilder docketBuilder = BeanDefinitionBuilder.genericBeanDefinition(Docket.class,
-                // 使用Lambda表达式作为实例供应商
-                () -> SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
-                        .groupName(finalGroupName).enable(enable));
+        BeanDefinitionBuilder docketBuilder =
+                BeanDefinitionBuilder.genericBeanDefinition(
+                        Docket.class,
+                        // 使用Lambda表达式作为实例供应商
+                        () ->
+                                SpringAddtionalModelUtils.createApi(apiModelInfo, docketInfo)
+                                        .groupName(finalGroupName)
+                                        .enable(enable));
 
         // 设置Bean的其他属性
         docketBuilder.setLazyInit(false); // 非懒加载
@@ -150,9 +156,7 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
         // + basePackage);
     }
 
-    /**
-     * 生成唯一的Bean名称
-     */
+    /** 生成唯一的Bean名称 */
     private String generateBeanName(String groupName, String basePackage) {
         // 清理特殊字符，确保Bean名称合法
         String cleanGroupName = groupName;
@@ -166,9 +170,9 @@ public class GirSpringFoxDocketRunner implements BeanDefinitionRegistryPostProce
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+            throws BeansException {
         // 此处不需要额外处理
         // 如果需要修改已经注册的Bean，可以在这里进行
     }
-
 }

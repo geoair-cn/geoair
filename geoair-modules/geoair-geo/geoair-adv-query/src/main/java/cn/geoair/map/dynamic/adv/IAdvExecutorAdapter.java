@@ -8,8 +8,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
  */
 public interface IAdvExecutorAdapter {
 
-	<T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema);
+    <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema);
 
-	<T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz);
-
+    <T extends IAdvExecutor> T getIAdvExecutor(String dataSourceId, String schema, Class<T> clazz);
 }

@@ -1,18 +1,21 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import javax.sql.DataSource;
 
-/**
- * C3P0 数据源包装器
- */
+/** C3P0 数据源包装器 */
 public class C3P0DataSourceWrapper extends AbstractDataSourceWrapper {
 
     private static Boolean canInit = null;
 
     public C3P0DataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
+    }
+
+    @Override
+    public boolean close() {
+        getC3P0DataSource().close();
+        return true;
     }
 
     @Override
@@ -37,7 +40,9 @@ public class C3P0DataSourceWrapper extends AbstractDataSourceWrapper {
     public String getSimpleDataSourceName() {
         ComboPooledDataSource c3p0DataSource = (ComboPooledDataSource) targetDataSource;
         // C3P0的标识优先用dataSourceName，兜底返回c3p0
-        return c3p0DataSource.getDataSourceName() != null ? c3p0DataSource.getDataSourceName() : "c3p0";
+        return c3p0DataSource.getDataSourceName() != null
+                ? c3p0DataSource.getDataSourceName()
+                : "c3p0";
     }
 
     @Override

@@ -10,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ：张俊
- * @date ：Created in 2026/3/19 18:47
- * @description： TODO
+ * @date ：Created in 2026/3/19 18:47 @description： TODO
  */
 @Slf4j
 public class GirJacksonUtils {
+
     public static void registerModule(ObjectMapper objectMapper) {
         objectMapper.registerModule(new JtsModule());
         log.debug("JtsModule注册");

@@ -9,8 +9,7 @@ import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
-
-import javax.sql.DataSource;
+import cn.hutool.core.util.StrUtil;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +17,7 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import javax.sql.DataSource;
 
 /**
  * @author ：zhangjun
@@ -30,16 +30,16 @@ public class DataSourceGetter implements IDataSourceGetter {
     static ConcurrentHashMap<String, String> dataBaseNameMap = new ConcurrentHashMap<>();
     static ConcurrentHashMap<String, String> schemaNameMap = new ConcurrentHashMap<>();
 
-
     private DataSource dataSource = null;
 
     private String databaseName = null;
-    private String dataSourceName = null;
 
+    private String dataSourceName = null;
 
     protected String schemaName = null;
 
     Supplier<String> schemaNameGetterFunction;
+
     Supplier<String> databaseNameGetterFunction;
 
     protected String dataSourceId = null;
@@ -54,7 +54,6 @@ public class DataSourceGetter implements IDataSourceGetter {
         return databaseName;
     }
 
-
     @Override
     public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
         this.schemaNameGetterFunction = schemaNameGetterFunction;
@@ -62,6 +61,7 @@ public class DataSourceGetter implements IDataSourceGetter {
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
+            schemaName = schemaNameMap.get(dataSourceName);
             return;
         }
         if (schemaNameGetterFunction != null) {
@@ -74,11 +74,11 @@ public class DataSourceGetter implements IDataSourceGetter {
 
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
         this.databaseNameGetterFunction = databaseNameGetterFunction;
-
         if (databaseName != null) {
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
+            databaseName = dataBaseNameMap.get(dataSourceName);
             return;
         }
         if (databaseNameGetterFunction != null) {
@@ -106,32 +106,33 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
             dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
         } else {
-            dataSource = AdvDynamicDataSourceStorage.getInstance().getDruidDataSourceByDataSourceApo(dataSourceApo);
-
+            dataSource =
+                    AdvDynamicDataSourceStorage.getInstance()
+                            .getDataSourceByDataSourceApo(dataSourceApo);
         }
     }
 
     @Override
     public void initByDataSource(DataSource dataSource) {
-        Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
-        String jdbcUrl = null;
-        if (wrapper.isPresent()) {
-            jdbcUrl = wrapper.get().getJdbcUrl();
-        }
-        initByDataSource(dataSource, jdbcUrl);
+        initByDataSource(dataSource, null);
     }
 
     @Override
     public void initByDataSource(DataSource dataSource, String dataSourceName) {
+        if (StrUtil.isEmpty(dataSourceName)) {
+            Optional<AdvDataSourceWrapper> wrapper =
+                    DataSourceWrapperRegistry.getWrapper(dataSource);
+            if (wrapper.isPresent()) {
+                dataSourceName = wrapper.get().getJdbcUrl();
+            }
+        }
         this.dataSource = dataSource;
         this.dataSourceId = dataSourceName;
         this.dataSourceApo = null;
         if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;
         }
-
     }
-
 
     @Override
     public void initByConnection(Connection connection) {
@@ -153,10 +154,10 @@ public class DataSourceGetter implements IDataSourceGetter {
         return dataSource;
     }
 
-//	@Override
-//	public DataStore getGeoToolsDataStore() {
-//		return dataStore;
-//	}
+    // @Override
+    // public DataStore getGeoToolsDataStore() {
+    // return dataStore;
+    // }
 
     @Override
     public void connectionClose(Connection connection) {
@@ -173,14 +174,11 @@ public class DataSourceGetter implements IDataSourceGetter {
         return apo;
     }
 
-    /**
-     * 关闭数据库资源
-     */
+    /** 关闭数据库资源 */
     @Override
     public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
         IoUtil.close(rs);
         IoUtil.close(stmt);
         IoUtil.close(conn);
     }
-
 }

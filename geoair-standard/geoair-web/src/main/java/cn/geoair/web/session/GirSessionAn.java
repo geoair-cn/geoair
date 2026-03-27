@@ -8,27 +8,26 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface GirSessionAn {
 
-	public static String NULL = "";
+    public static String NULL = "";
 
-	public String cookieKey() default NULL;//
+    public String cookieKey() default NULL; //
 
-	public String tokenKey() default NULL;//
+    public String tokenKey() default NULL; //
 
-	public long httpTimeout() default 0;//
+    public long httpTimeout() default 0; //
 
-	public int cookieTimeout() default 0;//
+    public int cookieTimeout() default 0; //
 
-	public long tokenTimeout() default 0;//
+    public long tokenTimeout() default 0; //
 
-	public boolean useCache() default false;
+    public boolean useCache() default false;
 
-	public boolean tokenInHeader() default false;
+    public boolean tokenInHeader() default false;
 
-	public String catalog() default NULL;// 存储目录
+    public String catalog() default NULL; // 存储目录
 
-	public String cacheName() default " gtcSessionCache";
-
+    public String cacheName() default " gtcSessionCache";
 }

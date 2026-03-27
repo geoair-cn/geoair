@@ -14,53 +14,48 @@ import org.locationtech.jts.geom.Geometry;
 @Accessors(chain = true)
 public class TileExecParams {
 
-	// 执行的SQL
-	String execSql;
+    // 执行的SQL
+    String execSql;
 
-	// 【网格源】瓦片范围
-	protected Envelope gridExtent;
+    // 【网格源】瓦片范围
+    protected Envelope gridExtent;
 
-	// 【数据源】瓦片范围
-	protected Envelope dataExtent;
+    // 【数据源】瓦片范围
+    protected Envelope dataExtent;
 
-	// 【数据源】瓦片范围包围盒
-	protected Envelope dataExtentBox;
+    // 【数据源】瓦片范围包围盒
+    protected Envelope dataExtentBox;
 
-	// 【网格源】 瓦片范围包围盒
-	protected Envelope gridExtentBox;
+    // 【网格源】 瓦片范围包围盒
+    protected Envelope gridExtentBox;
 
-	// 带缓冲区的【网格源】 范围几何体，用于空间查询时避免边界问题
-	protected Geometry gridExtentBufferBoxGeom;
+    // 带缓冲区的【网格源】 范围几何体，用于空间查询时避免边界问题
+    protected Geometry gridExtentBufferBoxGeom;
 
-	// 带缓冲区的 【网格源】范围 包围盒
-	protected Envelope gridExtentBufferEnvelope;
+    // 带缓冲区的 【网格源】范围 包围盒
+    protected Envelope gridExtentBufferEnvelope;
 
-	// 带缓冲区的 【数据源】范围 几何体
-	protected Geometry dataExtentBufferBoxGeom;
+    // 带缓冲区的 【数据源】范围 几何体
+    protected Geometry dataExtentBufferBoxGeom;
 
-	// 带缓冲区的 【数据源】范围 包围盒
-	protected Envelope dataExtentBufferEnvelope;
+    // 带缓冲区的 【数据源】范围 包围盒
+    protected Envelope dataExtentBufferEnvelope;
 
-	/**
-	 * 网格的坐标系
-	 */
-	int gridSrid;
+    /** 网格的坐标系 */
+    int gridSrid;
 
-	/**
-	 * 数据的坐标系
-	 */
-	int sourceDataSrid;
+    /** 数据的坐标系 */
+    int sourceDataSrid;
 
-	protected int zoom;
+    protected int zoom;
 
-	protected int x;
+    protected int x;
 
-	protected int y;
+    protected int y;
 
-	public TileExecParams copy() {
-		TileExecParams params = new TileExecParams();
-		BeanUtil.copyProperties(this, params);
-		return params;
-	}
-
+    public TileExecParams copy() {
+        TileExecParams params = new TileExecParams();
+        BeanUtil.copyProperties(this, params);
+        return params;
+    }
 }

@@ -10,6 +10,5 @@ import java.io.Serializable;
  */
 public interface GiTypeModelable<ID extends Serializable> extends GiModelable<ID> {
 
-	GiModelType gtcModelType();
-
+    GiModelType gtcModelType();
 }

@@ -6,22 +6,21 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PPbfType {
+    rootPbf(0, "RootPbf"),
+    Label(1, "Label"),
+    Boundary(2, "Boundary"),
+    ;
 
-	rootPbf(0, "RootPbf"), Label(1, "Label"), Boundary(2, "Boundary"),
+    private Integer value;
 
-	;
+    private String text;
 
-	private Integer value;
-
-	private String text;
-
-	public static PPbfType findByValue(Integer value) {
-		for (PPbfType type : PPbfType.values()) {
-			if (type.getValue().equals(value)) {
-				return type;
-			}
-		}
-		return rootPbf;
-	}
-
+    public static PPbfType findByValue(Integer value) {
+        for (PPbfType type : PPbfType.values()) {
+            if (type.getValue().equals(value)) {
+                return type;
+            }
+        }
+        return rootPbf;
+    }
 }

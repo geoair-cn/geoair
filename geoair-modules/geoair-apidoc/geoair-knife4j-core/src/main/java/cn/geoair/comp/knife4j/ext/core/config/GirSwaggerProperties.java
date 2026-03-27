@@ -5,51 +5,38 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * 仅作为配置提示使用，不再通过此类读取配置
- * 所有配置通过 Environment 直接读取
+ * 仅作为配置提示使用，不再通过此类读取配置 所有配置通过 Environment 直接读取
+ *
+ * @author Administrator
+ * @version $Id: $Id
  */
 @Data
 @Component
 @ConfigurationProperties(prefix = "geoair.apidoc")
 public class GirSwaggerProperties {
 
-    public GirSwaggerProperties() {
-    }
+    /** Constructor for GirSwaggerProperties. */
+    public GirSwaggerProperties() {}
 
-    /**
-     * 是否启用swagger注解（全局开关）
-     */
+    /** 是否启用swagger注解（全局开关） */
     private boolean enable = false;
 
-    /**
-     * API版本号，默认为空
-     */
-    private String version = "J8.1.0-SNAPSHOT";
+    /** API版本号，默认为空 */
+    private String version = "J8.1.1";
 
-    /**
-     * API标题，默认为空
-     */
+    /** API标题，默认为空 */
     private String title = "API 在线文档";
 
-    /**
-     * API作者，默认为空
-     */
+    /** API作者，默认为空 */
     private String author = "geoair";
 
-    /**
-     * API描述，默认为空
-     */
-    private String description = "API文档 VJ8.1.0-SNAPSHOT";
+    /** API描述，默认为空 */
+    private String description = "API文档 VJ8.1.1";
 
-    /**
-     * 手动指定控制器根包（优先级高于从SpringBootApplication自动提取）
-     * 示例：com.gtc.gishubteam.editor.wcs.controller
-     */
+    /** 手动指定控制器根包（优先级高于从SpringBootApplication自动提取） 示例：com.gtc.gishubteam.editor.wcs.controller */
     private String controllerRootPackage;
 
-    /**
-     * 控制器根包列表（支持多根包扫描） 示例：["com.gtc.controller.web", "com.gtc.controller.base"]
-     */
+    /** 控制器根包列表（支持多根包扫描） 示例：["com.gtc.controller.web", "com.gtc.controller.base"] */
     private String[] controllerRootPackages = new String[0];
 
     /**
@@ -58,25 +45,15 @@ public class GirSwaggerProperties {
      */
     private String[] excludePackages = new String[0];
 
-    /**
-     * 分组固定排序的包列表（优先级高于字母序） 示例：["com.gtc.controller.web", "com.gtc.controller.base"]
-     */
+    /** 分组固定排序的包列表（优先级高于字母序） 示例：["com.gtc.controller.web", "com.gtc.controller.base"] */
     private String[] fixedOrderPackages = new String[0];
 
-    /**
-     * 分组名称前缀（如："业务模块-"，最终分组名：业务模块-Web）
-     */
+    /** 分组名称前缀（如："业务模块-"，最终分组名：业务模块-Web） */
     private String groupNamePrefix = "";
 
-    /**
-     * 是否按包名最后一级生成分组名（true：com.gtc.controller.web → Web；false：使用完整包名）
-     */
+    /** 是否按包名最后一级生成分组名（true：com.gtc.controller.web → Web；false：使用完整包名） */
     private boolean groupNameUseLastPackage = true;
 
-    /**
-     * 是否启用分组序号（true：1-Web；false：Web）
-     */
+    /** 是否启用分组序号（true：1-Web；false：Web） */
     private boolean enableGroupIndex = true;
-
-
 }

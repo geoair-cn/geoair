@@ -4,17 +4,17 @@ import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.druid.pool.DruidDataSource;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter{
+public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter {
 
     static GirGeoToolsDataStoreStorage girGeoToolsDataStoreStorage;
+
     public static GirGeoToolsDataStoreStorage getInstance() {
         if (girGeoToolsDataStoreStorage == null) {
             girGeoToolsDataStoreStorage = new GirGeoToolsDataStoreStorage();
@@ -22,11 +22,12 @@ public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter{
         return girGeoToolsDataStoreStorage;
     }
 
-
     @Override
     public DataStore getGeotoolsDataStore(DruidDataSource druidDataSource, String schema) {
         Map<String, Object> params = new HashMap<>();
-        params.put(PostgisNGDataStoreFactory.DBTYPE.key, (String) PostgisNGDataStoreFactory.DBTYPE.sample);
+        params.put(
+                PostgisNGDataStoreFactory.DBTYPE.key,
+                (String) PostgisNGDataStoreFactory.DBTYPE.sample);
 
         if (ObjectUtil.isNotEmpty(schema)) {
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, schema);
@@ -42,8 +43,7 @@ public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter{
 
         try {
             return DataStoreFinder.getDataStore(params);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Gir.log.error("初始化pg连接失败：{}", e.getMessage(), e);
             return null;
         }

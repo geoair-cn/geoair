@@ -1,15 +1,15 @@
 package cn.geoair.comp.dynamic.ds.datasource;
 
 import cn.geoair.comp.dynamic.ds.datasource.wrapper.*;
-
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.sql.DataSource;
 
 public class DataSourceWrapperRegistry {
 
-    private static final List<Class<? extends AdvDataSourceWrapper>> WRAPPER_CLASSES = new ArrayList<>();
+    private static final List<Class<? extends AdvDataSourceWrapper>> WRAPPER_CLASSES =
+            new ArrayList<>();
 
     // 静态初始化：注册所有常用包装器（按优先级排序）
     static {
@@ -22,7 +22,8 @@ public class DataSourceWrapperRegistry {
         if (BoneCPDataSourceWrapper.canInit()) registerWrapper(BoneCPDataSourceWrapper.class);
 
         // 简单/非池化数据源
-        if (SpringDiverManagerSourceWrapper.canInit()) registerWrapper(SpringDiverManagerSourceWrapper.class);
+        if (SpringDiverManagerSourceWrapper.canInit())
+            registerWrapper(SpringDiverManagerSourceWrapper.class);
         if (AdvSimpleDataSourceWrapper.canInit()) registerWrapper(AdvSimpleDataSourceWrapper.class);
         if (DiverManagerSourceWrapper.canInit()) registerWrapper(DiverManagerSourceWrapper.class);
         if (CommonSourceWrapper.canInit()) registerWrapper(CommonSourceWrapper.class);
@@ -37,7 +38,8 @@ public class DataSourceWrapperRegistry {
     public static Optional<AdvDataSourceWrapper> getWrapper(DataSource dataSource) {
         for (Class<? extends AdvDataSourceWrapper> wrapperClass : WRAPPER_CLASSES) {
             try {
-                AdvDataSourceWrapper wrapper = wrapperClass.getConstructor(DataSource.class).newInstance(dataSource);
+                AdvDataSourceWrapper wrapper =
+                        wrapperClass.getConstructor(DataSource.class).newInstance(dataSource);
                 if (wrapper.isSupport()) {
                     return Optional.of(wrapper);
                 }
@@ -55,10 +57,6 @@ public class DataSourceWrapperRegistry {
     }
 
     public static String getJdbcUrl(DataSource dataSource) {
-        return getWrapper(dataSource)
-                .map(AdvDataSourceWrapper::getJdbcUrl)
-                .orElse("unknown");
+        return getWrapper(dataSource).map(AdvDataSourceWrapper::getJdbcUrl).orElse("unknown");
     }
-
-
 }

@@ -5,15 +5,14 @@ import cn.geoair.base.util.GutilStr;
 
 public interface GiGroupType extends GiType {
 
-	default GirGroupTypeKid toGroupTypeKid() {
+    default GirGroupTypeKid toGroupTypeKid() {
 
-		if (GutilStr.isNotEmpty(this.gtcTypeId())) {
-			GirGroupTypeKid kid = GirGroupTypeKid.valueFor(this.gtcTypeId());
-			if (kid != null) {
-				return kid;
-			}
-		}
-		return null;
-	}
-
+        if (GutilStr.isNotEmpty(this.gtcTypeId())) {
+            GirGroupTypeKid kid = GirGroupTypeKid.valueFor(this.gtcTypeId());
+            if (kid != null) {
+                return kid;
+            }
+        }
+        return null;
+    }
 }

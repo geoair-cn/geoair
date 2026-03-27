@@ -8,21 +8,19 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-
+import java.util.Map;
 import org.locationtech.jts.geom.*;
 import org.postgresql.util.PGobject;
-
-import java.util.Map;
 
 /**
  * @author ：zhangjun
  * @date ：Created in 2025/1/8 15:09 @description： 空间类型的通用get器并适配hutools的
- * OptNullBasicTypeFromObjectGetter
+ *     OptNullBasicTypeFromObjectGetter
  */
-public interface OptNullGeomAndBasicTypeFromObjectGetter extends OptNullBasicTypeFromObjectGetter<String> {
+public interface OptNullGeomAndBasicTypeFromObjectGetter
+        extends OptNullBasicTypeFromObjectGetter<String> {
 
     default Class getValueClass(String key) {
         Object obj = getObj(key);
@@ -127,24 +125,29 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter extends OptNullBasicTyp
                 value = JSONObject.parseObject(key); // 判断是否为geojson字符串
             } catch (Exception e) {
                 try {
-                    jtsGeom = GirAdvTools.getFormatOpt().wktToJtsGeometry((String) value, true); // 不是geojson字符串就是wkt
+                    jtsGeom =
+                            GirAdvTools.getFormatOpt()
+                                    .wktToJtsGeometry((String) value, true); // 不是geojson字符串就是wkt
                 } catch (Exception e1) {
-                    jtsGeom = GirAdvTools.getFormatOpt().wkbToJtsGeometry((String) value, true); // 不是wkt字符串就是wbk
+                    jtsGeom =
+                            GirAdvTools.getFormatOpt()
+                                    .wkbToJtsGeometry((String) value, true); // 不是wkt字符串就是wbk
                 }
             }
         }
         if (value instanceof Map) { // 判断是否为json对象
             JSONObject jsonObject = new JSONObject((Map<String, Object>) value);
-            jtsGeom = GirAdvTools.getFormatOpt().geojsonToJtsGeometry(jsonObject.toJSONString(), true);
+            jtsGeom =
+                    GirAdvTools.getFormatOpt()
+                            .geojsonToJtsGeometry(jsonObject.toJSONString(), true);
         } else if (GirPostGisTran.isOrgConvert() && GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
         } else if (value instanceof PGobject) { // PGobject 是 PGgeometry的父类
             /**
-             * 若JDBCURL上面显示指定 currentSchema=onemap_tile_builder 。 然而空间类型的元数据（如类型定义）仅存在于
-             * public 中， 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的
-             * PgObject 类型。
+             * 若JDBCURL上面显示指定 currentSchema=onemap_tile_builder 。 然而空间类型的元数据（如类型定义）仅存在于 public 中，
+             * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
              */
             PGobject pObject = (PGobject) value;
             jtsGeom = GirAdvTools.getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
@@ -223,5 +226,4 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter extends OptNullBasicTyp
         }
         return (MultiPolygon) geometry;
     }
-
 }

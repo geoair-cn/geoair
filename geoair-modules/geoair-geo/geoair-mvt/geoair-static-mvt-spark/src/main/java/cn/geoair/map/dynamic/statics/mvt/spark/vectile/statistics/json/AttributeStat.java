@@ -1,10 +1,8 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
+import lombok.Data;
 
 /**
  * @author ：张逢吉
@@ -13,21 +11,20 @@ import java.util.Map;
 @Data
 public class AttributeStat implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String attribute; // 字段名
+    private String attribute; // 字段名
 
-	private long count; // 该字段非空值总数
+    private long count; // 该字段非空值总数
 
-	private String type; // number/string
+    private String type; // number/string
 
-	private List<Object> values; // 去重后的值列表
+    private List<Object> values; // 去重后的值列表
 
-	private Number min; // 数值型字段最小值（字符串为null）
+    private Number min; // 数值型字段最小值（字符串为null）
 
-	private Number max; // 数值型字段最大值（字符串为null）
+    private Number max; // 数值型字段最大值（字符串为null）
 
-	// 添加valueCounts字段，记录每个值的出现次数 {"小麦":2, "玉米":3}
-	private List<Long> statics;
-
+    // 添加valueCounts字段，记录每个值的出现次数 {"小麦":2, "玉米":3}
+    private List<Long> statics;
 }

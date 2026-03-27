@@ -1,70 +1,71 @@
 package cn.geoair.map.dynamic.adv.mybatis.node;
 
 import cn.geoair.map.dynamic.adv.mybatis.context.Context;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public class TrimSqlNode implements SqlNode {
 
-	SqlNode contents;
+    SqlNode contents;
 
-	String prefix;
+    String prefix;
 
-	String suffix;
+    String suffix;
 
-	List<String> prefixesToOverride;
+    List<String> prefixesToOverride;
 
-	List<String> suffixesToOverride;
+    List<String> suffixesToOverride;
 
-	public TrimSqlNode(SqlNode contents, String prefix, String suffix, List<String> prefixesToOverride,
-			List<String> suffixesToOverride) {
-		this.contents = contents;
-		this.prefix = prefix;
-		this.suffix = suffix;
-		this.prefixesToOverride = prefixesToOverride;
-		this.suffixesToOverride = suffixesToOverride;
-	}
+    public TrimSqlNode(
+            SqlNode contents,
+            String prefix,
+            String suffix,
+            List<String> prefixesToOverride,
+            List<String> suffixesToOverride) {
+        this.contents = contents;
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.prefixesToOverride = prefixesToOverride;
+        this.suffixesToOverride = suffixesToOverride;
+    }
 
-	@Override
-	public void apply(Context context) {
-		context.appendSql(" ");// 标签类SqlNode先拼接空格，和前面的内容隔开
-		Context proxy = new Context(context.getData());
-		// FilterContext filterContext = new FilterContext(context);
-		contents.apply(proxy);
-		String sql = proxy.getSql().trim();
+    @Override
+    public void apply(Context context) {
+        context.appendSql(" "); // 标签类SqlNode先拼接空格，和前面的内容隔开
+        Context proxy = new Context(context.getData());
+        // FilterContext filterContext = new FilterContext(context);
+        contents.apply(proxy);
+        String sql = proxy.getSql().trim();
 
-		if (sql.length() > 0) {
-			if (prefixesToOverride != null)
-				for (String key : prefixesToOverride) {
-					if (sql.startsWith(key)) {
-						sql = sql.substring(key.length());
-					}
-				}
-			if (suffixesToOverride != null)
-				for (String key : suffixesToOverride) {
-					if (sql.endsWith(key)) {
-						sql = sql.substring(0, sql.length() - key.length());
-					}
-				}
-		}
+        if (sql.length() > 0) {
+            if (prefixesToOverride != null)
+                for (String key : prefixesToOverride) {
+                    if (sql.startsWith(key)) {
+                        sql = sql.substring(key.length());
+                    }
+                }
+            if (suffixesToOverride != null)
+                for (String key : suffixesToOverride) {
+                    if (sql.endsWith(key)) {
+                        sql = sql.substring(0, sql.length() - key.length());
+                    }
+                }
+        }
 
-		if (StringUtils.isNotBlank(sql) && StringUtils.isNotBlank(prefix)) {
-			context.appendSql(prefix);
-		}
+        if (StringUtils.isNotBlank(sql) && StringUtils.isNotBlank(prefix)) {
+            context.appendSql(prefix);
+        }
 
-		context.appendSql(sql);
+        context.appendSql(sql);
 
-		if (StringUtils.isNotBlank(sql) && StringUtils.isNotBlank(suffix)) {
-			context.appendSql(suffix);
-		}
+        if (StringUtils.isNotBlank(sql) && StringUtils.isNotBlank(suffix)) {
+            context.appendSql(suffix);
+        }
+    }
 
-	}
-
-	@Override
-	public void applyParameter(Set<String> set) {
-		contents.applyParameter(set);
-	}
-
+    @Override
+    public void applyParameter(Set<String> set) {
+        contents.applyParameter(set);
+    }
 }

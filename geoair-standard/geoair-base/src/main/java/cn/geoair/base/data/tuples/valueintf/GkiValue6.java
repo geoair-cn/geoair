@@ -1,13 +1,7 @@
 package cn.geoair.base.data.tuples.valueintf;
 
-/**
- * <p>
- * Marker interface for tuples with a "6" value.
- * </p>
- *
- */
+/** Marker interface for tuples with a "6" value. */
 public interface GkiValue6<X> {
 
-	public X getValue6();
-
+    public X getValue6();
 }

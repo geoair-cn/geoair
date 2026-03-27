@@ -6,8 +6,7 @@ import cn.geoair.base.Gir;
  */
 public class Test {
 
-	public static void main(String[] args) {
-		Gir.log.info("cesi");
-	}
-
+    public static void main(String[] args) {
+        Gir.log.info("cesi");
+    }
 }

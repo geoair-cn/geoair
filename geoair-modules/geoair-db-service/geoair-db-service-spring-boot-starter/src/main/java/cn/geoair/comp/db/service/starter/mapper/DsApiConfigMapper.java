@@ -6,9 +6,8 @@ import cn.geoair.comp.db.service.core.dao.GirDsApiConfigDao;
 import cn.geoair.comp.db.service.starter.model.dto.DsApiConfigDto;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiConfigPo;
 import cn.geoair.orm.tkmapper.impls.TkEntityMapper;
-import tk.mybatis.mapper.entity.Example;
-
 import java.util.List;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * api配置信息Mapper接口
@@ -16,7 +15,8 @@ import java.util.List;
  * @author zhangjun
  * @date 2025-07-31
  */
-public interface DsApiConfigMapper extends TkEntityMapper<DsApiConfigPo, String>, GirDsApiConfigDao {
+public interface DsApiConfigMapper
+        extends TkEntityMapper<DsApiConfigPo, String>, GirDsApiConfigDao {
 
     default List<ApiConfigApo> selectBatchIds(List<String> ids) {
         List<DsApiConfigPo> dsApiConfigPos = gtcSearchByPK(ids);
@@ -107,5 +107,4 @@ public interface DsApiConfigMapper extends TkEntityMapper<DsApiConfigPo, String>
         DsApiConfigPo dsApiConfigPo = gtcSearchByPK(id);
         return DsApiConfigDto.fromPo(dsApiConfigPo);
     }
-
 }

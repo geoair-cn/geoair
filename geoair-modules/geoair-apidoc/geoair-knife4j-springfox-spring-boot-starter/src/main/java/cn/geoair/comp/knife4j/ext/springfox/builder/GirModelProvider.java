@@ -2,7 +2,6 @@ package cn.geoair.comp.knife4j.ext.springfox.builder;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import com.fasterxml.classmate.TypeResolver;
-
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
@@ -23,29 +22,31 @@ import springfox.documentation.swagger.schema.ApiModelBuilder;
 @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER - 1)
 public class GirModelProvider extends ApiModelBuilder {
 
-	private final TypeResolver typeResolver;
+    private final TypeResolver typeResolver;
 
-	private final TypeNameExtractor typeNameExtractor;
+    private final TypeNameExtractor typeNameExtractor;
 
-	public GirModelProvider(TypeResolver typeResolver, TypeNameExtractor typeNameExtractor,
-			EnumTypeDeterminer enumTypeDeterminer, ModelSpecificationFactory modelSpecifications) {
-		super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
-		this.typeNameExtractor = typeNameExtractor;
-		this.typeResolver = typeResolver;
-	}
+    public GirModelProvider(
+            TypeResolver typeResolver,
+            TypeNameExtractor typeNameExtractor,
+            EnumTypeDeterminer enumTypeDeterminer,
+            ModelSpecificationFactory modelSpecifications) {
+        super(typeResolver, typeNameExtractor, enumTypeDeterminer, modelSpecifications);
+        this.typeNameExtractor = typeNameExtractor;
+        this.typeResolver = typeResolver;
+    }
 
-	@Override
-	public void apply(ModelContext context) {
-		GaModel annotation = AnnotationUtils.findAnnotation(forClass(context), GaModel.class);
-		if (annotation != null) {
-			context.getBuilder().description(annotation.text());
-			context.getModelSpecificationBuilder().facets(f -> f.description(annotation.text()));
-			super.apply(context);
-		}
-	}
+    @Override
+    public void apply(ModelContext context) {
+        GaModel annotation = AnnotationUtils.findAnnotation(forClass(context), GaModel.class);
+        if (annotation != null) {
+            context.getBuilder().description(annotation.text());
+            context.getModelSpecificationBuilder().facets(f -> f.description(annotation.text()));
+            super.apply(context);
+        }
+    }
 
-	private Class<?> forClass(ModelContext context) {
-		return typeResolver.resolve(context.getType()).getErasedType();
-	}
-
+    private Class<?> forClass(ModelContext context) {
+        return typeResolver.resolve(context.getType()).getErasedType();
+    }
 }

@@ -4,8 +4,5 @@ import cn.geoair.base.data.model.GiModelable;
 
 public interface GiAttributeable<T extends GiModelable<?>> {
 
-	default void save() {
-
-	}
-
+    default void save() {}
 }

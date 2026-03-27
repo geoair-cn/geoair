@@ -6,7 +6,6 @@ import cn.geoair.comp.db.service.core.typehander.oracle.OracleGeomTypeHandler;
 import cn.geoair.comp.db.service.core.typehander.pg.PgGeomRegister;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.db.meta.JdbcType;
-
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,16 +33,22 @@ public class TypeHandlerRegistry {
         classTypeHandlerHashMap.put(byte[].class, Singleton.get(ByteTypeHandler.class));
         classTypeHandlerHashMap.put(Byte[].class, Singleton.get(ByteTypeHandler.class));
 
-
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.BOOLEAN.typeCode, Singleton.get(BooleanTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.VARCHAR.typeCode, Singleton.get(StringTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.NCHAR.typeCode, Singleton.get(StringTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.CHAR.typeCode, Singleton.get(StringTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.LONGVARCHAR.typeCode, Singleton.get(StringTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.DATE.typeCode, Singleton.get(DateTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.TIME.typeCode, Singleton.get(DateTypeHandler.class));
-        jdbcTypeTypeHandlerHashMap.put(JdbcType.TIMESTAMP.typeCode, Singleton.get(DateTypeHandler.class));
-
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.BOOLEAN.typeCode, Singleton.get(BooleanTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.VARCHAR.typeCode, Singleton.get(StringTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.NCHAR.typeCode, Singleton.get(StringTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.CHAR.typeCode, Singleton.get(StringTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.LONGVARCHAR.typeCode, Singleton.get(StringTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.DATE.typeCode, Singleton.get(DateTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.TIME.typeCode, Singleton.get(DateTypeHandler.class));
+        jdbcTypeTypeHandlerHashMap.put(
+                JdbcType.TIMESTAMP.typeCode, Singleton.get(DateTypeHandler.class));
     }
 
     static {
@@ -72,10 +77,14 @@ public class TypeHandlerRegistry {
     static {
         try {
             // Oracle BLOB/CLOB类型处理器注册
-            TypeHandlerRegistry.register(oracle.sql.BLOB.class, Singleton.get(OracleBlobTypeHandler.class));
-            TypeHandlerRegistry.register(oracle.jdbc.OracleBlob.class, Singleton.get(OracleBlobTypeHandler.class));
-            TypeHandlerRegistry.register(oracle.sql.CLOB.class, Singleton.get(CLOBTypeHandler.class));
-            TypeHandlerRegistry.register(oracle.jdbc.OracleClob.class, Singleton.get(CLOBTypeHandler.class));
+            TypeHandlerRegistry.register(
+                    oracle.sql.BLOB.class, Singleton.get(OracleBlobTypeHandler.class));
+            TypeHandlerRegistry.register(
+                    oracle.jdbc.OracleBlob.class, Singleton.get(OracleBlobTypeHandler.class));
+            TypeHandlerRegistry.register(
+                    oracle.sql.CLOB.class, Singleton.get(CLOBTypeHandler.class));
+            TypeHandlerRegistry.register(
+                    oracle.jdbc.OracleClob.class, Singleton.get(CLOBTypeHandler.class));
             Gir.log.info("Oracle BLOB/CLOB类型处理器注册成功");
         } catch (Throwable e) {
             System.err.println("Oracle BLOB/CLOB类型处理器注册失败: " + e.getMessage());
@@ -86,7 +95,8 @@ public class TypeHandlerRegistry {
     static {
         try {
             // Oracle空间类型处理器注册
-            TypeHandlerRegistry.register(oracle.sql.STRUCT.class, Singleton.get(OracleGeomTypeHandler.class));
+            TypeHandlerRegistry.register(
+                    oracle.sql.STRUCT.class, Singleton.get(OracleGeomTypeHandler.class));
             Gir.log.info("Oracle空间类型处理器注册成功");
         } catch (Throwable e) {
             System.err.println("Oracle空间类型处理器注册失败: " + e.getMessage());
@@ -134,5 +144,4 @@ public class TypeHandlerRegistry {
     public static void register(Integer c, TypeHandler<?> typeHandler) {
         jdbcTypeTypeHandlerHashMap.put(c, typeHandler);
     }
-
 }

@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import com.alibaba.druid.pool.DruidDataSource;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -9,11 +9,8 @@ import com.alibaba.druid.pool.DruidDataSource;
  */
 public interface IAdvDataSourceHelper {
 
-	DataSourceApo getDataSourceApoById(String dataSourceId);
+    DataSourceApo getDataSourceApoById(String dataSourceId);
 
-	/**
-	 * 根据数据源Apo配置创建并返回Druid连接池实例
-	 */
-	DruidDataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
-
+    /** 根据数据源Apo配置创建并返回Druid连接池实例 */
+    DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
 }

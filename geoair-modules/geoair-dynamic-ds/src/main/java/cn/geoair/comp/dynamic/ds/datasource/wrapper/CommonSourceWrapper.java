@@ -1,26 +1,24 @@
 package cn.geoair.comp.dynamic.ds.datasource.wrapper;
 
-import javax.sql.DataSource;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 
-/**
- * 通用数据源包装器
- * 基于反射适配所有未显式实现的数据源类型
- */
+/** 通用数据源包装器 基于反射适配所有未显式实现的数据源类型 */
 public class CommonSourceWrapper extends AbstractDataSourceWrapper {
 
     // 常见的数据源名称属性/方法名（按优先级排序）
-    private static final List<String> NAME_KEYS = Arrays.asList(
-            "name", "dataSourceName", "poolName", "dsName", "id", "identifier"
-    );
+    private static final List<String> NAME_KEYS =
+            Arrays.asList("name", "dataSourceName", "poolName", "dsName", "id", "identifier");
 
     // 常见的JDBC URL属性/方法名（按优先级排序）
-    private static final List<String> URL_KEYS = Arrays.asList(
-            "jdbcUrl", "url", "rawJdbcUrl", "jdbcUrl", "getUrl", "getJdbcUrl", "rawUrl"
-    );
+    private static final List<String> URL_KEYS =
+            Arrays.asList(
+                    "jdbcUrl", "url", "rawJdbcUrl", "jdbcUrl", "getUrl", "getJdbcUrl", "rawUrl");
+
+    private static final List<String> CLOSE_KEYS = Arrays.asList("close");
 
     public CommonSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
@@ -31,22 +29,31 @@ public class CommonSourceWrapper extends AbstractDataSourceWrapper {
     }
 
     @Override
+    public boolean close() {
+        for (String closeKey : CLOSE_KEYS) {
+            try {
+                Method method = targetDataSource.getClass().getMethod(closeKey);
+                method.invoke(targetDataSource);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return true;
+    }
+
+    @Override
     protected Class<? extends DataSource> getTargetDataSourceClass() {
         // 匹配所有DataSource类型（作为兜底包装器）
         return DataSource.class;
     }
 
-    /**
-     * 反射获取数据源名称（无则返回null）
-     */
+    /** 反射获取数据源名称（无则返回null） */
     @Override
     public String getSimpleDataSourceName() {
         return getValueByReflection(targetDataSource, NAME_KEYS);
     }
 
-    /**
-     * 反射获取JDBC URL（无则返回null）
-     */
+    /** 反射获取JDBC URL（无则返回null） */
     @Override
     public String getJdbcUrl() {
         return getValueByReflection(targetDataSource, URL_KEYS);
@@ -54,6 +61,7 @@ public class CommonSourceWrapper extends AbstractDataSourceWrapper {
 
     /**
      * 通用反射获取值的方法
+     *
      * @param target 目标对象
      * @param keys 要尝试的属性/方法名列表
      * @return 找到的值（字符串），无则返回null
@@ -99,9 +107,7 @@ public class CommonSourceWrapper extends AbstractDataSourceWrapper {
         return null;
     }
 
-    /**
-     * 递归获取声明的字段（包括父类）
-     */
+    /** 递归获取声明的字段（包括父类） */
     private Field getDeclaredField(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);

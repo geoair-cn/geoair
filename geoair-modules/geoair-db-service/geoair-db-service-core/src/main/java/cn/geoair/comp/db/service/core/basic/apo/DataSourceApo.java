@@ -1,8 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.apo;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 /**
  * @program: dbApi
@@ -13,33 +12,32 @@ import java.io.Serializable;
 @Data
 public class DataSourceApo implements Serializable {
 
-	String id;
+    String id;
 
-	String name;
+    String name;
 
-	String note;
+    String note;
 
-	String url;
+    String url;
 
-	String username;
+    String username;
 
-	String password;
+    String password;
 
-	/** true 修改密码 false不修改 */
-	boolean edit_password;
+    /** true 修改密码 false不修改 */
+    boolean edit_password;
 
-	String type;
+    String type;
 
-	String driver;
+    String driver;
 
-	String tableSql;
+    String tableSql;
 
-	String createUserId;
+    String createUserId;
 
-	String createUserName;
+    String createUserName;
 
-	String createTime;
+    String createTime;
 
-	String updateTime;
-
+    String updateTime;
 }

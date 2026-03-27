@@ -1,5 +1,16 @@
 package cn.geoair.orm.spi.jpa;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.support.GirPager;
@@ -11,17 +22,6 @@ import cn.geoair.orm.spi.GirExampleExecutor;
 // import javafx.util.GkPair;
 import cn.geoair.orm.spi.support.GirExample;
 import cn.geoair.orm.spi.support.GirSimpleExampleParser;
-
-import org.hibernate.SQLQuery;
-import org.hibernate.transform.Transformers;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 /** 简单的 jpa Example 查询条件器的 执行器 */
 @Component

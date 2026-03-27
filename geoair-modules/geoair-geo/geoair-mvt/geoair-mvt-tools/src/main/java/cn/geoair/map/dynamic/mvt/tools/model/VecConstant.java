@@ -6,15 +6,12 @@ package cn.geoair.map.dynamic.mvt.tools.model;
  */
 public class VecConstant {
 
-	/**
-	 * 对每一行自定义的一个Id
-	 */
-	public static final String FeatureRowID = "FeatureRowID";
+    /** 对每一行自定义的一个Id */
+    public static final String FeatureRowID = "FeatureRowID";
 
-	public static final String CoalesceDistancePointCount = "point_count";
+    public static final String CoalesceDistancePointCount = "point_count";
 
-	public static final String CoalesceDistanceSqrtPointCount = "sqrt_point_count";
+    public static final String CoalesceDistanceSqrtPointCount = "sqrt_point_count";
 
-	public static final String CoalesceDistanceClustered = "clustered";
-
+    public static final String CoalesceDistanceClustered = "clustered";
 }

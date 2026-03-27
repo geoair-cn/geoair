@@ -1,33 +1,24 @@
 package cn.geoair.comp.knife4j.ext.springfox.builder;
 
+import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
+
 import cn.geoair.base.Gir;
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.collection.CollUtil;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+import java.util.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
 import springfox.documentation.spi.service.contexts.OperationContext;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-
-import static springfox.documentation.swagger.common.SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER;
-
-/**
- * 适配Swagger 3.0.0 (springfox 3.x)：合并Swagger原生注解和GTC自定义注解的tags
- */
-
+/** 适配Swagger 3.0.0 (springfox 3.x)：合并Swagger原生注解和GTC自定义注解的tags */
 @Component
 @Order(value = SWAGGER_PLUGIN_ORDER)
 public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
@@ -42,16 +33,20 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         // 1. 获取默认标签（控制器类名首字母小写）
         Set<String> defaultTags = getDefaultTags(context);
 
-        Collection<String> swagger3Tags = CollUtil.union(operationTags(context), controllerTags(context));
+        Collection<String> swagger3Tags =
+                CollUtil.union(operationTags(context), controllerTags(context));
 
-        Collection<String> swagger2Tags = CollUtil.union(controllerApis(context), operationApiOperation(context));
+        Collection<String> swagger2Tags =
+                CollUtil.union(controllerApis(context), operationApiOperation(context));
 
-        Collection<String> gtcTags = CollUtil.union(operationGaApiActionTags(context), controllerGaApiTags(context));
+        Collection<String> gtcTags =
+                CollUtil.union(operationGaApiActionTags(context), controllerGaApiTags(context));
         Collection<String> swaggeTags = CollUtil.union(swagger3Tags, swagger2Tags);
         Collection<String> allTags = CollUtil.union(swaggeTags, gtcTags);
 
         // 3. 设置最终tags（无自定义tags则用默认）
-        context.operationBuilder().tags(GutilObject.isEmpty(allTags) ? defaultTags : new TreeSet<>(allTags));
+        context.operationBuilder()
+                .tags(GutilObject.isEmpty(allTags) ? defaultTags : new TreeSet<>(allTags));
     }
 
     @Override
@@ -101,8 +96,6 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         return tags;
     }
 
-
-
     // ----------------------- Swagger 3.x 原生注解（@Tag/@Operation）处理 -----------------------
     private Collection<String> controllerTags(OperationContext context) {
         Optional<Tag> tagAnnotation = context.findControllerAnnotation(Tag.class);
@@ -142,7 +135,8 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         Optional<GaApi> gaApiAnnotation = context.findControllerAnnotation(GaApi.class);
         if (gaApiAnnotation.isPresent()) {
             GaApi gaApiAction = gaApiAnnotation.get();
-            context.operationBuilder().summary(GutilObject.isEmpty(gaApiAction.text()) ? null : gaApiAction.text());
+            context.operationBuilder()
+                    .summary(GutilObject.isEmpty(gaApiAction.text()) ? null : gaApiAction.text());
         }
         return gaApiAnnotation.map(this::extractTagsFromGaApi).orElse(new HashSet<>());
     }
@@ -151,7 +145,8 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         Optional<GaApiAction> gaApiActionAnnotation = context.findAnnotation(GaApiAction.class);
         if (gaApiActionAnnotation.isPresent()) {
             GaApiAction gaApiAction = gaApiActionAnnotation.get();
-            context.operationBuilder().summary(GutilObject.isEmpty(gaApiAction.text()) ? null : gaApiAction.text());
+            context.operationBuilder()
+                    .summary(GutilObject.isEmpty(gaApiAction.text()) ? null : gaApiAction.text());
         }
         return gaApiActionAnnotation.map(this::extractTagsFromGaApiAction).orElse(new HashSet<>());
     }
@@ -183,5 +178,4 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         }
         return tags;
     }
-
 }

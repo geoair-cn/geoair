@@ -1,13 +1,7 @@
 package cn.geoair.base.data.tuples.valueintf;
 
-/**
- * <p>
- * Marker interface for tuples with a "label" value.
- * </p>
- *
- */
+/** Marker interface for tuples with a "label" value. */
 public interface GkiValueLabel<X> {
 
-	public X getLabel();
-
+    public X getLabel();
 }

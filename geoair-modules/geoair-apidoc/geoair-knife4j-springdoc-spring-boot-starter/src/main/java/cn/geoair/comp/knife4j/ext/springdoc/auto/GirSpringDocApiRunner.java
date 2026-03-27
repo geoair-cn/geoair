@@ -7,6 +7,11 @@ import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.SpringDocConfigProperties;
@@ -23,31 +28,33 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+/**
+ * GirSpringDocApiRunner class.
+ *
+ * @author Administrator
+ * @version $Id: $Id
+ */
 @Slf4j
-public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
+public class GirSpringDocApiRunner
+        implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
     // 1. 保存Spring应用上下文（通过ApplicationContextAware接口）
     private ApplicationContext applicationContext;
 
+    // private final GirOpenApiConfig apiConfig;
+    //
+    //
+    //
+    // private final GirSwaggerProperties girSwaggerProperties;
 
-//	private final GirOpenApiConfig apiConfig;
-//
-//
-//
-//	private final GirSwaggerProperties girSwaggerProperties;
+    // // 构造器注入ApiConfig（推荐，替代@Resource）
+    // public SpringDocApiRunner(IGirOpenApiConfig apiConfig, GirSwaggerProperties
+    // girSwaggerProperties) {
+    // this.apiConfig = apiConfig;
+    // this.girSwaggerProperties = girSwaggerProperties;
+    // }
 
-//	// 构造器注入ApiConfig（推荐，替代@Resource）
-//	public SpringDocApiRunner(IGirOpenApiConfig apiConfig, GirSwaggerProperties girSwaggerProperties) {
-//		this.apiConfig = apiConfig;
-//		this.girSwaggerProperties = girSwaggerProperties;
-//	}
-
+    /** registerGroupedOpenApi. */
     @PostConstruct
     public void registerGroupedOpenApi() {
         // 2. 将ApplicationContext转换为BeanDefinitionRegistry（兼容所有Spring环境）
@@ -55,8 +62,11 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
             throw new RuntimeException("无法获取BeanDefinitionRegistry，无法注册GroupedOpenApi");
         }
 
-        Map<String, GirOpenApiConfig> beansOfType = applicationContext.getBeansOfType(GirOpenApiConfig.class);
-        List<DocketInfo> docketInfos = Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null)).getDocketInfos();
+        Map<String, GirOpenApiConfig> beansOfType =
+                applicationContext.getBeansOfType(GirOpenApiConfig.class);
+        List<DocketInfo> docketInfos =
+                Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null))
+                        .getDocketInfos();
         if (docketInfos == null || docketInfos.isEmpty()) {
             return; // 无配置时直接返回
         }
@@ -73,22 +83,26 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
             String groupName = docketInfo.getGroupName();
 
             // 3.3 构建GroupedOpenApi的Bean定义
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(GroupedOpenApi.class,
-                    () -> GroupedOpenApi.builder().group(groupName) // 分组名称
-                            .packagesToScan(docketInfo.getBasePackage()) // 扫描的包
-                            .build());
+            BeanDefinitionBuilder builder =
+                    BeanDefinitionBuilder.genericBeanDefinition(
+                            GroupedOpenApi.class,
+                            () ->
+                                    GroupedOpenApi.builder()
+                                            .group(groupName) // 分组名称
+                                            .packagesToScan(docketInfo.getBasePackage()) // 扫描的包
+                                            .build());
 
             // 3.4 注册为独立的Spring Bean（核心修复）
             BeanDefinition beanDefinition = builder.getBeanDefinition();
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext;
             registry.registerBeanDefinition(groupName, beanDefinition);
-
-
         }
     }
 
     /**
-     * Spring自动注入ApplicationContext，并初始化配置属性
+     * {@inheritDoc}
+     *
+     * <p>Spring自动注入ApplicationContext，并初始化配置属性
      */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -97,22 +111,37 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
 
     /**
      * 基础OpenAPI配置
+     *
+     * @return a {@link io.swagger.v3.oas.models.OpenAPI} object
      */
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)
     public OpenAPI customOpenAPI() {
-        Map<String, GirOpenApiConfig> beansOfType = applicationContext.getBeansOfType(GirOpenApiConfig.class);
-        ApiModelInfo apiModelInfo1 = Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null)).getApiModelInfo();
+        Map<String, GirOpenApiConfig> beansOfType =
+                applicationContext.getBeansOfType(GirOpenApiConfig.class);
+        ApiModelInfo apiModelInfo1 =
+                Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null))
+                        .getApiModelInfo();
         Contact contact = new Contact();
         contact.setName(apiModelInfo1.getAuthor());
         contact.setEmail("");
         contact.setUrl("");
         return new OpenAPI()
-                .info(new Info().contact(contact).title(apiModelInfo1.getTitle()).version(apiModelInfo1.getVersion())
-                        .termsOfService(apiModelInfo1.getAuthor()).description(apiModelInfo1.getDescription()));
+                .info(
+                        new Info()
+                                .contact(contact)
+                                .title(apiModelInfo1.getTitle())
+                                .version(apiModelInfo1.getVersion())
+                                .termsOfService(apiModelInfo1.getAuthor())
+                                .description(apiModelInfo1.getDescription()));
     }
 
     // ========== 1. 替代application.yml的springdoc核心配置 ==========
+    /**
+     * springDocConfigProperties.
+     *
+     * @return a {@link org.springdoc.core.SpringDocConfigProperties} object
+     */
     @Bean
     @Primary
     public SpringDocConfigProperties springDocConfigProperties() {
@@ -128,11 +157,15 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         properties.setModelAndViewAllowed(true);
 
         List<SpringDocConfigProperties.GroupConfig> groupConfigs = properties.getGroupConfigs();
-        Map<String, GirOpenApiConfig> beansOfType = applicationContext.getBeansOfType(GirOpenApiConfig.class);
-        List<DocketInfo> docketInfos = Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null)).getDocketInfos();
+        Map<String, GirOpenApiConfig> beansOfType =
+                applicationContext.getBeansOfType(GirOpenApiConfig.class);
+        List<DocketInfo> docketInfos =
+                Objects.requireNonNull(beansOfType.values().stream().findFirst().orElse(null))
+                        .getDocketInfos();
         if (docketInfos != null && !docketInfos.isEmpty()) {
             for (DocketInfo docketInfo : docketInfos) {
-                SpringDocConfigProperties.GroupConfig groupConfig = new SpringDocConfigProperties.GroupConfig();
+                SpringDocConfigProperties.GroupConfig groupConfig =
+                        new SpringDocConfigProperties.GroupConfig();
                 groupConfig.setGroup(docketInfo.getGroupName());
                 groupConfig.setDisplayName(docketInfo.getGroupName());
                 groupConfig.setPackagesToScan(docketInfo.getBasePackages());
@@ -142,6 +175,11 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         return properties;
     }
 
+    /**
+     * swaggerUiConfigProperties.
+     *
+     * @return a {@link org.springdoc.core.SwaggerUiConfigProperties} object
+     */
     @Bean
     @Primary // 核心修复：标记为优先Bean，解决冲突
     public SwaggerUiConfigProperties swaggerUiConfigProperties() {
@@ -162,20 +200,21 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         return uiProperties;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
+            throws BeansException {
         if (applicationContext == null) {
             throw new RuntimeException("ApplicationContext初始化失败！请检查Spring配置");
         }
 
-        Map<String, GirOpenApiConfig> apiConfigMap = applicationContext.getBeansOfType(GirOpenApiConfig.class);
+        Map<String, GirOpenApiConfig> apiConfigMap =
+                applicationContext.getBeansOfType(GirOpenApiConfig.class);
         if (apiConfigMap.isEmpty()) {
-
 
             apiConfigMap = new HashMap<>();
             apiConfigMap.put("byAutoScanner", new AutoApiConfigScanner(applicationContext));
         }
-
 
         // 遍历每个配置，注册对应的Docket
         for (Map.Entry<String, GirOpenApiConfig> entry : apiConfigMap.entrySet()) {
@@ -186,7 +225,8 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         }
     }
 
-    private void registerDocketsFromConfig(GirOpenApiConfig apiConfig, BeanDefinitionRegistry registry) {
+    private void registerDocketsFromConfig(
+            GirOpenApiConfig apiConfig, BeanDefinitionRegistry registry) {
         // 获取DocketInfo列表
         apiConfig.doLoading();
         List<DocketInfo> docketInfos = apiConfig.getDocketInfos();
@@ -210,11 +250,9 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         apiConfig.loadEnd();
     }
 
-    /**
-     * 注册单个Docket
-     */
-    private void registerSingleDocket(ApiModelInfo apiModelInfo, DocketInfo docketInfo,
-                                      BeanDefinitionRegistry registry) {
+    /** 注册单个Docket */
+    private void registerSingleDocket(
+            ApiModelInfo apiModelInfo, DocketInfo docketInfo, BeanDefinitionRegistry registry) {
         // 处理分组名
         String groupName = null;
         {
@@ -230,7 +268,12 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         // 校验扫描包非空
         String basePackage = docketInfo.getBasePackage();
         if (basePackage == null || basePackage.trim().isEmpty()) {
-            throw new RuntimeException(new StringBuilder().append("【SpringDoc】 分组[").append(groupName).append("]的basePackage未配置！").toString());
+            throw new RuntimeException(
+                    new StringBuilder()
+                            .append("【SpringDoc】 分组[")
+                            .append(groupName)
+                            .append("]的basePackage未配置！")
+                            .toString());
         }
 
         // 生成Bean名称
@@ -238,11 +281,14 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
 
         String finalGroupName = groupName;
 
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(GroupedOpenApi.class,
-                () -> GroupedOpenApi.builder().group(finalGroupName) // 分组名称
-                        .packagesToScan(docketInfo.getBasePackage()) // 扫描的包
-                        .build());
-
+        BeanDefinitionBuilder builder =
+                BeanDefinitionBuilder.genericBeanDefinition(
+                        GroupedOpenApi.class,
+                        () ->
+                                GroupedOpenApi.builder()
+                                        .group(finalGroupName) // 分组名称
+                                        .packagesToScan(docketInfo.getBasePackage()) // 扫描的包
+                                        .build());
 
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         // 设置Bean的其他属性
@@ -263,8 +309,8 @@ public class GirSpringDocApiRunner implements BeanDefinitionRegistryPostProcesso
         return cleanGroupName + "Docket_" + packageHash;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
-    }
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+            throws BeansException {}
 }

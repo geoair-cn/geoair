@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -11,20 +12,16 @@ import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现
- */
-public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
+/** 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现 */
+public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
@@ -33,24 +30,20 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractAdvDDLOpt.class);
+    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
-    public AbstractAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
+    public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
         this.dataSourceGetter.setSchemaNameGetterFunction(this::dGetCurrentSchema);
         this.dataSourceGetter.setDatabaseNameGetterFunction(this::dGetCurrentDataBase);
     }
 
-    /**
-     * 获取抽象查询对象
-     */
+    /** 获取抽象查询对象 */
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
-    /**
-     * 创建表名处理器（子类实现：绑定PG/MySQL版本）
-     */
+    /** 创建表名处理器（子类实现：绑定PG/MySQL版本） */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
     // ========== 通用逻辑：表操作 ==========
@@ -67,7 +60,8 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建TRUNCATE SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = buildTruncateTableSql(qualifiedTableName);
 
         dExecuteDDL(sql, tableName, "清空表数据");
@@ -81,7 +75,8 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建DROP TABLE SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = buildDropTableSql(qualifiedTableName);
 
         dExecuteDDL(sql, tableName, "删除表");
@@ -101,8 +96,10 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建重命名表SQL
-        String oldQualifiedName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, oldTableName);
-        String newQualifiedName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, newTableName);
+        String oldQualifiedName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, oldTableName);
+        String newQualifiedName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, newTableName);
         String sql = buildRenameTableSql(oldQualifiedName, newQualifiedName);
 
         dExecuteDDL(sql, oldTableName, "重命名表");
@@ -121,14 +118,19 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
         // 通用检查：原字段是否存在
         DataFieldsApo existingFields = dGetColumnsByTable(tableName);
-        boolean oldFieldExists = existingFields.getDataFieldList().stream()
-                .anyMatch(f -> oldColumnName.equals(f.getColumnName()));
+        boolean oldFieldExists =
+                existingFields
+                        .getDataFieldList()
+                        .stream()
+                        .anyMatch(f -> oldColumnName.equals(f.getColumnName()));
         if (!oldFieldExists) {
-            throw new RuntimeException(StrUtil.format("表[{}]中原字段[{}]不存在，无法修改", tableName, oldColumnName));
+            throw new RuntimeException(
+                    StrUtil.format("表[{}]中原字段[{}]不存在，无法修改", tableName, oldColumnName));
         }
 
         // 差异化：构建修改字段SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = buildAlterColumnSql(qualifiedTableName, oldColumnName, newField);
 
         dExecuteDDL(sql, tableName, "修改字段[" + oldColumnName + "→" + newField.getColumnName() + "]");
@@ -146,8 +148,11 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
         // 通用检查：字段是否存在
         DataFieldsApo existingFields = dGetColumnsByTable(tableName);
-        boolean fieldExists = existingFields.getDataFieldList().stream()
-                .anyMatch(f -> columnName.equals(f.getColumnName()));
+        boolean fieldExists =
+                existingFields
+                        .getDataFieldList()
+                        .stream()
+                        .anyMatch(f -> columnName.equals(f.getColumnName()));
         if (!fieldExists) {
             log.warn("表[{}]中字段[{}]不存在，无需删除", tableName, columnName);
             return;
@@ -160,7 +165,8 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建删除字段SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = buildDropColumnSql(qualifiedTableName, columnName);
 
         dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
@@ -177,8 +183,10 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 通用：生成约束名（如果未指定）
-        String pkConstraintName = StrUtil.isEmpty(constraintName)
-                ? StrUtil.format("pk_{}_{}", tableName, System.currentTimeMillis()) : constraintName;
+        String pkConstraintName =
+                StrUtil.isEmpty(constraintName)
+                        ? StrUtil.format("pk_{}_{}", tableName, System.currentTimeMillis())
+                        : constraintName;
 
         // 通用检查：是否已存在主键
         List<String> existingPk = dGetPrimaryKeys(tableName);
@@ -187,32 +195,51 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建添加主键SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String columns = String.join(", ", columnNames);
         String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
 
         dExecuteDDL(sql, tableName, "添加主键约束[" + pkConstraintName + "]");
     }
 
-    public void dAddStringPrimaryKey(String tableName, String pkColumnName, int pkColumnLength, String constraintName,
-                                     String pkValuePrefix) {
-        dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.STRING, pkColumnLength, pkValuePrefix);
+    public void dAddStringPrimaryKey(
+            String tableName,
+            String pkColumnName,
+            int pkColumnLength,
+            String constraintName,
+            String pkValuePrefix) {
+        dAddPrimaryKey(
+                tableName,
+                pkColumnName,
+                constraintName,
+                PrimaryKeyType.STRING,
+                pkColumnLength,
+                pkValuePrefix);
     }
 
-    public void dAddIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
-        dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.INT_AUTO, null, null);
+    public void dAddIntAutoPrimaryKey(
+            String tableName, String pkColumnName, String constraintName) {
+        dAddPrimaryKey(
+                tableName, pkColumnName, constraintName, PrimaryKeyType.INT_AUTO, null, null);
     }
 
-    public void dAddBigIntAutoPrimaryKey(String tableName, String pkColumnName, String constraintName) {
-        dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_AUTO, null, null);
+    public void dAddBigIntAutoPrimaryKey(
+            String tableName, String pkColumnName, String constraintName) {
+        dAddPrimaryKey(
+                tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_AUTO, null, null);
     }
 
-    public void dAddIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
-        dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.INT_NORMAL, null, null);
+    public void dAddIntNormalPrimaryKey(
+            String tableName, String pkColumnName, String constraintName) {
+        dAddPrimaryKey(
+                tableName, pkColumnName, constraintName, PrimaryKeyType.INT_NORMAL, null, null);
     }
 
-    public void dAddBigIntNormalPrimaryKey(String tableName, String pkColumnName, String constraintName) {
-        dAddPrimaryKey(tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_NORMAL, null, null);
+    public void dAddBigIntNormalPrimaryKey(
+            String tableName, String pkColumnName, String constraintName) {
+        dAddPrimaryKey(
+                tableName, pkColumnName, constraintName, PrimaryKeyType.BIGINT_NORMAL, null, null);
     }
 
     @Override
@@ -232,16 +259,20 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 差异化：构建删除主键SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql = buildDropPrimaryKeySql(qualifiedTableName, constraintName);
 
         dExecuteDDL(sql, tableName, "删除主键约束[" + constraintName + "]");
     }
 
     @Override
-    public void dCreateIndex(String tableName, String indexName, List<String> columnNames, boolean isUnique) {
+    public void dCreateIndex(
+            String tableName, String indexName, List<String> columnNames, boolean isUnique) {
         // 通用参数校验
-        if (StrUtil.isEmpty(tableName) || StrUtil.isEmpty(indexName) || ObjectUtil.isEmpty(columnNames)) {
+        if (StrUtil.isEmpty(tableName)
+                || StrUtil.isEmpty(indexName)
+                || ObjectUtil.isEmpty(columnNames)) {
             throw new IllegalArgumentException("表名、索引名和列名列表不能为空");
         }
         if (!dIsTableExists(tableName)) {
@@ -250,11 +281,13 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
         // 通用检查：索引是否已存在
         if (dIndexesExists(tableName, indexName)) {
-            throw new RuntimeException(StrUtil.format("表[{}]中索引[{}]已存在，无法重复创建", tableName, indexName));
+            throw new RuntimeException(
+                    StrUtil.format("表[{}]中索引[{}]已存在，无法重复创建", tableName, indexName));
         }
 
         // 差异化：构建创建索引SQL
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String qualifiedTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String columns = String.join(", ", columnNames);
         String sql = buildCreateIndexSql(qualifiedTableName, indexName, columns, isUnique);
 
@@ -349,15 +382,19 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         String tableName = parse.getTableName();
         DataFieldsApo tableFields = null;
         if (ObjectUtil.isNotEmpty(tableName)) {
-            tableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName,
-                    parse.getSchema());
+            tableName =
+                    dialectTableNameProcessor.tbGetTableNameWithSchema(
+                            dataSourceGetter, tableName, parse.getSchema());
             tableFields = dGetColumnsByTable(tableName);
         }
 
         // 通用：构建元数据查询SQL（LIMIT 0/ROWNUM 0）
         String fieldQuerySql = buildMetadataQuerySql(sqlView);
-        log.debug("schema:[{}] db:[{}] SQL的元数据查询：{}", dataSourceGetter.getSchemaName(),
-                dataSourceGetter.getDataSourceId(), fieldQuerySql);
+        log.debug(
+                "schema:[{}] db:[{}] SQL的元数据查询：{}",
+                dataSourceGetter.getSchemaName(),
+                dataSourceGetter.getDataSourceId(),
+                fieldQuerySql);
 
         // 通用：获取元数据并封装结果
         return getMetadataFromSql(fieldQuerySql, tableFields, null);
@@ -376,15 +413,19 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         String tableName = parse.getTableName();
         DataFieldsApo tableFields = null;
         if (ObjectUtil.isNotEmpty(tableName)) {
-            tableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName,
-                    parse.getSchema());
+            tableName =
+                    dialectTableNameProcessor.tbGetTableNameWithSchema(
+                            dataSourceGetter, tableName, parse.getSchema());
             tableFields = dGetColumnsByTable(tableName);
         }
 
         // 通用：构建元数据查询SQL
         String fieldQuerySql = buildMetadataQuerySql(sqlStatement);
-        log.debug("schema:[{}] db:[{}] SQL的元数据查询：{}", dataSourceGetter.getSchemaName(),
-                dataSourceGetter.getDataSourceId(), fieldQuerySql);
+        log.debug(
+                "schema:[{}] db:[{}] SQL的元数据查询：{}",
+                dataSourceGetter.getSchemaName(),
+                dataSourceGetter.getDataSourceId(),
+                fieldQuerySql);
 
         // 通用：获取带参数的元数据并封装结果
         return getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
@@ -392,9 +433,7 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 通用工具方法（DDL执行模板） ==========
 
-    /**
-     * 通用DDL执行方法（无参数）
-     */
+    /** 通用DDL执行方法（无参数） */
     public int dExecuteDDL(String sql, String tableName, String operation) {
         Connection connection = null;
         Statement statement = null;
@@ -426,11 +465,10 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         return result;
     }
 
-    /**
-     * 通用DDL执行方法（带参数）
-     */
+    /** 通用DDL执行方法（带参数） */
     @Override
-    public int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
+    public int dExecuteDDL(
+            String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
         // 通用SQL解析
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
@@ -462,7 +500,13 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         } catch (SQLException e) {
             // 通用回滚
             rollbackConnection(connection, operation, tableName);
-            log.error("{}失败，表名: {}, SQL: {}, 错误: {}", operation, tableName, execSql, e.getMessage(), e);
+            log.error(
+                    "{}失败，表名: {}, SQL: {}, 错误: {}",
+                    operation,
+                    tableName,
+                    execSql,
+                    e.getMessage(),
+                    e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
         } finally {
             // 通用资源清理
@@ -474,9 +518,7 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 通用工具方法（资源/事务控制） ==========
 
-    /**
-     * 回滚连接
-     */
+    /** 回滚连接 */
     protected void rollbackConnection(Connection connection, String operation, String tableName) {
         if (connection != null) {
             try {
@@ -487,9 +529,7 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
     }
 
-    /**
-     * 恢复自动提交
-     */
+    /** 恢复自动提交 */
     protected void restoreAutoCommit(Connection connection) {
         if (connection != null) {
             try {
@@ -500,10 +540,9 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         }
     }
 
-    /**
-     * 从SQL获取元数据（通用逻辑）
-     */
-    protected DataFieldsApo getMetadataFromSql(String sql, DataFieldsApo tableFields, SqlParamMap sqlParam) {
+    /** 从SQL获取元数据（通用逻辑） */
+    protected DataFieldsApo getMetadataFromSql(
+            String sql, DataFieldsApo tableFields, SqlParamMap sqlParam) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -542,9 +581,14 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
                 // 复用表字段元数据（如果存在）
                 if (tableFields != null) {
-                    Optional<FieldBySchemaApo> fieldOpt = tableFields.getDataField(
-                            fieldBySchemaApo -> fieldBySchemaApo.getOriginalColumnName().equals(baseColumnName)
-                                    ? fieldBySchemaApo : null);
+                    Optional<FieldBySchemaApo> fieldOpt =
+                            tableFields.getDataField(
+                                    fieldBySchemaApo ->
+                                            fieldBySchemaApo
+                                                            .getOriginalColumnName()
+                                                            .equals(baseColumnName)
+                                                    ? fieldBySchemaApo
+                                                    : null);
                     if (fieldOpt.isPresent()) {
                         FieldBySchemaApo field = fieldOpt.get();
                         field.setColumnName(columnName);
@@ -558,7 +602,8 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
                 field.setColumnName(columnName);
                 field.setOriginalColumnName(baseColumnName);
                 field.setUdtName(columnTypeName);
-                field.setIsNullable(metaData.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NO" : "YES");
+                field.setIsNullable(
+                        metaData.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NO" : "YES");
                 // 差异化：设置字段长度信息
                 setFieldLengthInfo(metaData, i, field);
 
@@ -574,10 +619,9 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
         return dataFieldVO;
     }
 
-    /**
-     * 从带参数SQL获取元数据（通用封装）
-     */
-    protected DataFieldsApo getMetadataFromSqlWithParam(String sql, SqlParamMap sqlParam, DataFieldsApo tableFields) {
+    /** 从带参数SQL获取元数据（通用封装） */
+    protected DataFieldsApo getMetadataFromSqlWithParam(
+            String sql, SqlParamMap sqlParam, DataFieldsApo tableFields) {
         return getMetadataFromSql(sql, tableFields, sqlParam);
     }
 
@@ -589,19 +633,22 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
 
     protected abstract String buildRenameTableSql(String oldQualifiedName, String newQualifiedName);
 
-    protected abstract String buildAlterColumnSql(String qualifiedTableName, String oldColumnName,
-                                                  FieldBySchemaApo newField);
+    protected abstract String buildAlterColumnSql(
+            String qualifiedTableName, String oldColumnName, FieldBySchemaApo newField);
 
     protected abstract String buildDropColumnSql(String qualifiedTableName, String columnName);
 
-    protected abstract boolean checkConstraintExists(String tableName, String constraintName, String constraintType);
+    protected abstract boolean checkConstraintExists(
+            String tableName, String constraintName, String constraintType);
 
-    protected abstract String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns);
+    protected abstract String buildAddPrimaryKeySql(
+            String qualifiedTableName, String constraintName, String columns);
 
-    protected abstract String buildDropPrimaryKeySql(String qualifiedTableName, String constraintName);
+    protected abstract String buildDropPrimaryKeySql(
+            String qualifiedTableName, String constraintName);
 
-    protected abstract String buildCreateIndexSql(String qualifiedTableName, String indexName, String columns,
-                                                  boolean isUnique);
+    protected abstract String buildCreateIndexSql(
+            String qualifiedTableName, String indexName, String columns, boolean isUnique);
 
     protected abstract String buildDropIndexSql(String tableName, String indexName);
 
@@ -614,11 +661,14 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     // 6. 元数据相关
     protected abstract String buildMetadataQuerySql(String sqlView);
 
-    protected abstract String getBaseColumnName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+    protected abstract String getBaseColumnName(ResultSetMetaData metaData, int columnIndex)
+            throws SQLException;
 
-    protected abstract String getColumnTypeName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+    protected abstract String getColumnTypeName(ResultSetMetaData metaData, int columnIndex)
+            throws SQLException;
 
-    protected abstract void setFieldLengthInfo(ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field)
+    protected abstract void setFieldLengthInfo(
+            ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field)
             throws SQLException;
 
     // 7. 未实现方法（子类可选择实现）
@@ -631,5 +681,4 @@ public abstract class AbstractAdvDDLOpt implements IAdvDDLOpt {
     public void dAddColumn(String tableName, FieldBySchemaApo field) {
         throw new RuntimeException("暂时没有实现");
     }
-
 }

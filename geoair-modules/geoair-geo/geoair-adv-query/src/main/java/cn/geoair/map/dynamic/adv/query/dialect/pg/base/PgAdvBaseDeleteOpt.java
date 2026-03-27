@@ -1,19 +1,22 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 
-/**
- * PostgreSQL删除操作实现类
- */
-public class PgAdvBaseDeleteOpt extends AbstractAdvBaseDeleteOpt {
+/** PostgreSQL删除操作实现类 */
+public class PgAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
-	// PG专属常量
-	private static final int PG_MAX_IN_PARAMS = 1000;
+    public PgAdvBaseDeleteOpt() {
+        // 绑定MySQL专属的表名处理器
+        this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
+    }
 
-	// ========== 实现差异化抽象方法 ==========
-	@Override
-	protected int getMaxInParams() {
-		return PG_MAX_IN_PARAMS;
-	}
+    // PG专属常量
+    private static final int PG_MAX_IN_PARAMS = 1000;
 
+    // ========== 实现差异化抽象方法 ==========
+    @Override
+    protected int getMaxInParams() {
+        return PG_MAX_IN_PARAMS;
+    }
 }

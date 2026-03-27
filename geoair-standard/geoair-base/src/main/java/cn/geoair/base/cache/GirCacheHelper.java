@@ -7,60 +7,57 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 /**
  * 缓存操作工具类。如果要使用缓存注解，推荐使用JSR107定义的注解。
- * <p>
- * 该工具类提供了获取缓存实例的统一入口，并支持通过方法句柄机制进行扩展。 内置默认的内存缓存管理器实现。
- * </p>
+ *
+ * <p>该工具类提供了获取缓存实例的统一入口，并支持通过方法句柄机制进行扩展。 内置默认的内存缓存管理器实现。
  *
  * @author Ray
  * @since 1.0
  */
 public class GirCacheHelper {
 
-	/**
-	 * 私有构造函数，防止实例化
-	 */
-	private GirCacheHelper() {
-	}
+    /** 私有构造函数，防止实例化 */
+    private GirCacheHelper() {}
 
-	static {
-		GkMethodHand.implFromClass(GirCacheHelper.class);
-	}
+    static {
+        GkMethodHand.implFromClass(GirCacheHelper.class);
+    }
 
-	/**
-	 * 获取指定名称的缓存实例
-	 * <p>
-	 * 通过方法句柄机制调用具体的缓存实现，支持扩展不同的缓存管理器。
-	 * </p>
-	 * @param name 缓存名称，用于标识特定的缓存实例
-	 * @return GiCache 缓存实例接口
-	 */
-	@GaMethodHandDefine()
-	public static GiCache getCache(String name) {
-		return (GiCache) GkMethodHand.invokeSelf(name);
-	}
+    /**
+     * 获取指定名称的缓存实例
+     *
+     * <p>通过方法句柄机制调用具体的缓存实现，支持扩展不同的缓存管理器。
+     *
+     * @param name 缓存名称，用于标识特定的缓存实例
+     * @return GiCache 缓存实例接口
+     */
+    @GaMethodHandDefine()
+    public static GiCache getCache(String name) {
+        return (GiCache) GkMethodHand.invokeSelf(name);
+    }
 
-	/**
-	 * 内存缓存管理器实例
-	 * <p>
-	 * 提供基于内存的缓存实现，用于存储和管理缓存数据。
-	 * </p>
-	 */
-	private static GirMemoryCacheManager memoryCacheManager = new GirMemoryCacheManager();
+    /**
+     * 内存缓存管理器实例
+     *
+     * <p>提供基于内存的缓存实现，用于存储和管理缓存数据。
+     */
+    private static GirMemoryCacheManager memoryCacheManager = new GirMemoryCacheManager();
 
-	/**
-	 * 默认缓存获取实现
-	 * <p>
-	 * 提供一个基于内存的动态缓存管理器管理的缓存实现， 作为getCache方法的默认处理器。
-	 * </p>
-	 * @param name 缓存名称
-	 * @return GiCache 内存缓存实例
-	 */
-	@GaMethodHandImpl(implClass = GirCacheHelper.class, implMethod = "getCache",
-			type = GaMethodHandImpl.ImplType.comity)
-	private static GiCache _getCache(String name) {
-		return memoryCacheManager.getCache(name);
-	}
-
+    /**
+     * 默认缓存获取实现
+     *
+     * <p>提供一个基于内存的动态缓存管理器管理的缓存实现， 作为getCache方法的默认处理器。
+     *
+     * @param name 缓存名称
+     * @return GiCache 内存缓存实例
+     */
+    @GaMethodHandImpl(
+        implClass = GirCacheHelper.class,
+        implMethod = "getCache",
+        type = GaMethodHandImpl.ImplType.comity
+    )
+    private static GiCache _getCache(String name) {
+        return memoryCacheManager.getCache(name);
+    }
 }
 
 /*

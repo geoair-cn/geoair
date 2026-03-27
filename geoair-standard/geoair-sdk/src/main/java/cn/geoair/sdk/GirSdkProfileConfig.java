@@ -6,106 +6,108 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GirSdkProfileConfig {
 
-	private static Map<ProfileEnum, HashMap<String, String>> configMap = new ConcurrentHashMap<ProfileEnum, HashMap<String, String>>();
+    private static Map<ProfileEnum, HashMap<String, String>> configMap =
+            new ConcurrentHashMap<ProfileEnum, HashMap<String, String>>();
 
-	public static String getConfig(ProfileEnum profile, String busType) {
-		return getConfig(profile, busType, null);
-	}
+    public static String getConfig(ProfileEnum profile, String busType) {
+        return getConfig(profile, busType, null);
+    }
 
-	public static String getConfig(ProfileEnum profile, String busType, String defaultValue) {
-		HashMap<String, String> map = configMap.get(profile);
-		if (map != null) {
-			String res = map.get(busType);
-			if (res == null) {
-				return defaultValue;
-			}
-			return res;
-		}
-		return defaultValue;
-	}
+    public static String getConfig(ProfileEnum profile, String busType, String defaultValue) {
+        HashMap<String, String> map = configMap.get(profile);
+        if (map != null) {
+            String res = map.get(busType);
+            if (res == null) {
+                return defaultValue;
+            }
+            return res;
+        }
+        return defaultValue;
+    }
 
-	public static void setConfig(ProfileEnum profile, String busType, String value) {
-		HashMap<String, String> map = configMap.get(profile);
-		if (map == null) {
-			map = new HashMap<String, String>();
-			configMap.put(profile, map);
-		}
-		if (map.containsKey(busType)) {
-			throw new GirSdkException("重复的属性注册:profile=" + profile.name() + ",busType=" + busType + ",value=" + value);
-		}
-		map.put(busType, value);
-	}
+    public static void setConfig(ProfileEnum profile, String busType, String value) {
+        HashMap<String, String> map = configMap.get(profile);
+        if (map == null) {
+            map = new HashMap<String, String>();
+            configMap.put(profile, map);
+        }
+        if (map.containsKey(busType)) {
+            throw new GirSdkException(
+                    "重复的属性注册:profile="
+                            + profile.name()
+                            + ",busType="
+                            + busType
+                            + ",value="
+                            + value);
+        }
+        map.put(busType, value);
+    }
 
-	public final static String BusType_clientId = "_clientId";
+    public static final String BusType_clientId = "_clientId";
 
-	public final static String BusType_clientSecret = "_clientSecret";
+    public static final String BusType_clientSecret = "_clientSecret";
 
-	public final static String BusType_host = "_host";
+    public static final String BusType_host = "_host";
 
-	public final static String BusType_reslut_msgkey = "_result_msgkey";
+    public static final String BusType_reslut_msgkey = "_result_msgkey";
 
-	public static void initialize(String clientId, String clientSecret, ProfileEnum profile) throws GirSdkException {
+    public static void initialize(String clientId, String clientSecret, ProfileEnum profile)
+            throws GirSdkException {
 
-		if (clientId == null) {
-			throw new GirSdkException("clientId不能为空");
-		}
-		if (clientSecret == null) {
-			throw new GirSdkException("clientSecret不能为空");
-		}
-		if (profile == null) {
-			throw new GirSdkException("profile不能为空");
-		}
+        if (clientId == null) {
+            throw new GirSdkException("clientId不能为空");
+        }
+        if (clientSecret == null) {
+            throw new GirSdkException("clientSecret不能为空");
+        }
+        if (profile == null) {
+            throw new GirSdkException("profile不能为空");
+        }
 
-		ProfileLocal.setDefault(profile);
+        ProfileLocal.setDefault(profile);
 
-		setConfig(profile, BusType_clientId, clientId);
+        setConfig(profile, BusType_clientId, clientId);
 
-		setConfig(profile, BusType_clientSecret, clientSecret);
+        setConfig(profile, BusType_clientSecret, clientSecret);
+    }
 
-	}
+    public static enum ProfileEnum {
+        DEV,
+        TEST,
+        PRO
+    }
 
-	public static enum ProfileEnum {
+    public static class ProfileLocal {
 
-		DEV, TEST, PRO
+        /** 获取当前切面 */
+        private static final ThreadLocal<ProfileEnum> PROFILE_THREAD_LOCAL = new ThreadLocal<>();
 
-	}
+        private static ProfileEnum profile = ProfileEnum.DEV;
 
-	public static class ProfileLocal {
+        public static void set(ProfileEnum profile) {
 
-		/**
-		 * 获取当前切面
-		 */
-		private static final ThreadLocal<ProfileEnum> PROFILE_THREAD_LOCAL = new ThreadLocal<>();
+            PROFILE_THREAD_LOCAL.set(profile);
+        }
 
-		private static ProfileEnum profile = ProfileEnum.DEV;
+        public static void setDefault(ProfileEnum profile) {
 
-		public static void set(ProfileEnum profile) {
+            PROFILE_THREAD_LOCAL.set(profile);
+            ProfileLocal.profile = profile;
+        }
 
-			PROFILE_THREAD_LOCAL.set(profile);
-		}
+        public static ProfileEnum get() {
+            ProfileEnum pf = PROFILE_THREAD_LOCAL.get();
+            if (pf == null) {
+                pf = ProfileLocal.profile;
+            }
+            return pf;
+        }
 
-		public static void setDefault(ProfileEnum profile) {
+        public static void remove() {
 
-			PROFILE_THREAD_LOCAL.set(profile);
-			ProfileLocal.profile = profile;
-		}
+            PROFILE_THREAD_LOCAL.remove();
+        }
 
-		public static ProfileEnum get() {
-			ProfileEnum pf = PROFILE_THREAD_LOCAL.get();
-			if (pf == null) {
-				pf = ProfileLocal.profile;
-			}
-			return pf;
-		}
-
-		public static void remove() {
-
-			PROFILE_THREAD_LOCAL.remove();
-		}
-
-		private ProfileLocal() {
-		}
-
-	}
-
+        private ProfileLocal() {}
+    }
 }

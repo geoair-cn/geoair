@@ -1,21 +1,19 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-
+import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import java.sql.Connection;
-
 import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 15:36 @description： PostgreSQL数据库的动态高级查询执行器
  */
-public class AdvExecutorMysql extends AbstractAdvExecutor {
+public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
     public AdvExecutorMysql(DataSourceApo dataSourceApo) {
         super(dataSourceApo);
@@ -29,8 +27,7 @@ public class AdvExecutorMysql extends AbstractAdvExecutor {
         super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorMysql() {
-    }
+    public AdvExecutorMysql() {}
 
     public AdvExecutorMysql(Connection connection) {
         super(connection);
@@ -104,5 +101,4 @@ public class AdvExecutorMysql extends AbstractAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
     }
-
 }

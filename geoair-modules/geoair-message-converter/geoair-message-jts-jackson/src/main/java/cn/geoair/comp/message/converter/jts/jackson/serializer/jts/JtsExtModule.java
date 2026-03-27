@@ -20,14 +20,11 @@ package cn.geoair.comp.message.converter.jts.jackson.serializer.jts;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.locationtech.jts.geom.Envelope;
 
-/**
- * JTS的其他对象的序列化与反序列化处理
- */
+/** JTS的其他对象的序列化与反序列化处理 */
 public class JtsExtModule extends SimpleModule {
 
     public JtsExtModule() {
         addDeserializer(Envelope.class, new JtsEnvelopeDeserializer());
         addSerializer(Envelope.class, new JtsEnvelopeSerializer());
     }
-
 }
