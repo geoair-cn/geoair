@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
-      <version>${spring-boot.version}</version>
+      <version>${spring-data.jpa.version}</version>
     </dependency>
 
     <dependency>

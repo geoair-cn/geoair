@@ -49,9 +49,9 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-      <version>${javax-persistence.version}</version>
+      <groupId>jakarta.persistence</groupId>
+     <artifactId>jakarta.persistence-api</artifactId>
+      <version>${jakarta-persistence.version}</version>
     </dependency>
 
     <dependency>

@@ -40,9 +40,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-      <version>${javax-persistence.version}</version>
+      <groupId>jakarta.persistence</groupId>
+     <artifactId>jakarta.persistence-api</artifactId>
+      <version>${jakarta-persistence.version}</version>
       <optional>true</optional>
     </dependency>
 
@@ -52,16 +52,16 @@
       <version>${geoair.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>javax.persistence-api</artifactId>
-          <groupId>javax.persistence</groupId>
+         <artifactId>jakarta.persistence-api</artifactId>
+          <groupId>jakarta.persistence</groupId>
         </exclusion>
       </exclusions>
     </dependency>
 
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>${javax-annotation.version}</version>
+       <groupId>jakarta.annotation</groupId>
+       <artifactId>jakarta.annotation-api</artifactId>
+     <version>${jakarta-annotation.version}</version>
     </dependency>
 
     <dependency>
@@ -74,11 +74,11 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
-      <version>${spring-boot.version}</version>
+      <version>${spring-data.jpa.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>javax.persistence-api</artifactId>
-          <groupId>javax.persistence</groupId>
+         <artifactId>jakarta.persistence-api</artifactId>
+          <groupId>jakarta.persistence</groupId>
         </exclusion>
       </exclusions>
       <optional>true</optional>

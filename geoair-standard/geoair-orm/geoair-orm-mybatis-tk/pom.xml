@@ -81,7 +81,7 @@
       <exclusions>
         <exclusion>
           <artifactId>persistence-api</artifactId>
-          <groupId>javax.persistence</groupId>
+          <groupId>jakarta.persistence</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -92,7 +92,7 @@
       <exclusions>
         <exclusion>
           <artifactId>persistence-api</artifactId>
-          <groupId>javax.persistence</groupId>
+          <groupId>jakarta.persistence</groupId>
         </exclusion>
       </exclusions>
     </dependency>
