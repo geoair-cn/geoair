@@ -1,6 +1,5 @@
 package cn.geoair.comp.code.generator.multi.utils;
 
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.config.OrmType;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
@@ -9,7 +8,6 @@ import cn.hutool.core.date.DateUtil;
 
 import java.util.*;
 
-import cn.hutool.core.util.StrUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
