@@ -83,6 +83,12 @@ public class GirGeneratorConfig {
 
 
     /**
+     *  控制器接口风格，两个可选值 rest，hasType
+     */
+    ControllerStyleType  controllerStyle = ControllerStyleType.hasType;
+
+
+    /**
      * 生成作者
      */
     private String author = "geoair";

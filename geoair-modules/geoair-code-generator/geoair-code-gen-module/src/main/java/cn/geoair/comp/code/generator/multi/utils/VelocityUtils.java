@@ -45,6 +45,7 @@ public class VelocityUtils {
         VelocityContext velocityContext = new VelocityContext();
 
         velocityContext.put("tableName", genTable.getTableName());
+        velocityContext.put("controllerStyle", globalConfig.getControllerStyle().getCode());
         velocityContext.put(
                 "ormPackge",
                 globalConfig.getOrmType().equals(OrmType.MYBATISPLUS) ? "mp" : "mapper");
