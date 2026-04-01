@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.geometry.MismatchedDimensionException;
+import org.geotools.api.geometry.MismatchedDimensionException;
 
 /**
  * @author ：张逢吉

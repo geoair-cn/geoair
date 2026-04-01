@@ -19,7 +19,7 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.hutool.core.util.IdUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 
 import java.io.IOException;
 import java.util.function.Consumer;

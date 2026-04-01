@@ -9,7 +9,9 @@ import org.geoserver.catalog.*;
 import org.geoserver.config.GeoServer;
 import org.geoserver.wms.WMSInfo;
 import org.geotools.jdbc.JDBCDataStore;
-import org.opengis.feature.simple.SimpleFeatureType;
+
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;

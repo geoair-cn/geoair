@@ -6,7 +6,7 @@ import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 
 import java.io.Closeable;
 import java.util.function.Consumer;

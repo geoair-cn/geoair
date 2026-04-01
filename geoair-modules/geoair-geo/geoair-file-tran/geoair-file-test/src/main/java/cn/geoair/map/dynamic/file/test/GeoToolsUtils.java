@@ -1,9 +1,9 @@
 package cn.geoair.map.dynamic.file.test;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 
-import org.opengis.feature.type.AttributeDescriptor;
+import org.geotools.api.feature.type.AttributeDescriptor;
 /**
  * @author ：张逢吉
  * @date ：Created in 17:06 @description： TODO

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 
 /**
  * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制

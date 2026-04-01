@@ -39,7 +39,7 @@
     <module>geoair-file-tran</module>
     <module>geoair-geo-tools</module>
     <module>geoair-jts-all</module>
-    <module>geoair-geoserver</module>
+<!--    <module>geoair-geoserver</module>-->
     <module>geoair-geo-demo</module>
   </modules>
 
@@ -93,11 +93,11 @@
         <version>${geoair.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geoserver</artifactId>
-        <version>${geoair.version}</version>
-      </dependency>
+<!--      <dependency>-->
+<!--        <groupId>cn.geoair.devkit</groupId>-->
+<!--        <artifactId>geoair-geoserver</artifactId>-->
+<!--        <version>${geoair.version}</version>-->
+<!--      </dependency>-->
 
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
