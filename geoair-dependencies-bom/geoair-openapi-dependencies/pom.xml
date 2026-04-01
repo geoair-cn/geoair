@@ -46,7 +46,7 @@
     <springfox.version>3.0.0</springfox.version>
     <springdoc.version>1.7.0</springdoc.version>
     <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
-    <spring-boot.version>2.7.18</spring-boot.version>
+    <spring-boot.version>3.5.13</spring-boot.version>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

@@ -13,7 +13,7 @@
 
 ### 继承关系
 ```
-spring-boot-dependencies (2.7.18)
+spring-boot-dependencies (3.5.13)
 ↑
 geoair-dependencies-bom
 ├── geoair-geotools-dependencies  # GIS 空间数据处理依赖
@@ -77,7 +77,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 #### 核心依赖
 | 依赖 | 版本 | 说明 |
 |------|------|------|
-| Spring Boot | 2.7.18 | 应用框架核心 |
+| Spring Boot | 3.5.13 | 应用框架核心 |
 | Spring Cloud | 2021.0.4 | 微服务框架 |
 | Spring Cloud Alibaba | 2021.0.4.0 | 阿里微服务生态 |
 | Redisson | 3.18.0 | Redis 客户端 |

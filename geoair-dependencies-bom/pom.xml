@@ -64,7 +64,7 @@
         <elasticsearch-client.version>8.18.8</elasticsearch-client.version>
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
-        <spring-boot.version>2.7.18</spring-boot.version>
+        <spring-boot.version>3.5.13</spring-boot.version>
         <fastjson.version>2.0.61</fastjson.version>
         <fastjson1x.version>2.0.61</fastjson1x.version>
         <dom4j.version>1.6.1</dom4j.version>

@@ -114,7 +114,7 @@ GeoAir Framework 是一个  **企业级 Java 开发框架**,提供从基础依�
 |------|----------|------|
 | **JDK** | Java Development Kit | 8+ |
 | **构建工具** | Maven | 3.6+ |
-| **核心框架** | Spring Boot | 2.7.18 |
+| **核心框架** | Spring Boot | 3.5.13 |
 | **Spring** | Spring Framework | 5.3.31 |
 | **ORM 框架** | MyBatis / MyBatis-Plus | 3.5.9 / 3.5.2 |
 | **GIS 库** | GeoTools / JTS Core | 28.6.1 / 1.19.0 |

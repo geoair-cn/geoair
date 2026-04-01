@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-J8.1.0--SNAPSHOT-orange.svg)](https://github.com/geoair-cn/geoair)
 [![JDK](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/downloads/#java8)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.13-brightgreen.svg)](https://spring.io/projects/spring-boot)
 
 ## 📚 模块概述
 
@@ -17,7 +17,7 @@
 ## 🎯 核心职责
 
 ### 1. 依赖版本管理
-- 📦 导入 Spring Boot Dependencies BOM (2.7.18) 作为基础
+- 📦 导入 Spring Boot Dependencies BOM (3.5.13) 作为基础
 - 🧰 聚合 4 个领域专用 BOM（GeoTools、Spring、Swagger、Other）
 - 🔒 统一版本号定义，从根源避免版本冲突
 - 📌 提供版本属性覆盖机制，支持灵活定制
@@ -45,7 +45,7 @@ geoair-framework (根 POM)
 ↑
 geoair-base-parent
 ├── 继承：全局配置 + 通用插件
-├── 导入：Spring Boot BOM (2.7.18)
+├── 导入：Spring Boot BOM (3.5.13)
 └── 聚合：4 个 base-dependencies BOMs
 ├── geoair-geotools-dependencies # GIS 空间数据处理依赖
 ├── geoair-spring-dependencies   # Spring 生态依赖
@@ -220,7 +220,7 @@ geoair-framework (根 POM)
   ```
 
 ### 2. Spring Boot 版本约束
-- **默认版本**：Spring Boot 2.7.18（框架稳定版本）
+- **默认版本**：Spring Boot 3.5.13（框架稳定版本）
 - **版本修改方案**：
     - 方案 A（推荐）：在子模块 POM 中覆盖版本属性
       ```xml
