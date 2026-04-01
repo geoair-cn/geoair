@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.mvt.filter;
 
+import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class CorsInterceptor implements HandlerInterceptor {
         response.setHeader(ACCESS_CONTROL_MAX_AGE, MAX_AGE_VALUE);
 
         // 组合默认允许的请求头和实际请求中的头信息
-        Set<String> requestHeaderKeys = ServletUtil.getHeaderMap(request).keySet();
+        Set<String> requestHeaderKeys = GirServletUtil.getHeaderMap(request).keySet();
         String requestHeaders = StrUtil.join(",", requestHeaderKeys);
         String allowedHeaders =
                 StrUtil.isNotBlank(requestHeaders)
