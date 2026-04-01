@@ -4,7 +4,7 @@ import cn.geoair.web.util.GirHttpServletHelper;
 import java.util.Enumeration;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionContext;
+
 
 @SuppressWarnings("deprecation")
 @GirSessionAn(catalog = " gtc:session:spring-sessions:")
@@ -45,20 +45,12 @@ public class GirSpringSession extends GirHttpSession {
         return getHttpSession(true).getMaxInactiveInterval();
     }
 
-    @Override
-    public HttpSessionContext getSessionContext() {
-        return getHttpSession(true).getSessionContext();
-    }
 
     @Override
     public Enumeration<String> getAttributeNames() {
         return getHttpSession(true).getAttributeNames();
     }
 
-    @Override
-    public String[] getValueNames() {
-        return getHttpSession(true).getValueNames();
-    }
 
     @Override
     public boolean isNew() {
@@ -81,19 +73,7 @@ public class GirSpringSession extends GirHttpSession {
         return null;
     }
 
-    @Override
-    public void putValue(String name, Object value) {
-        getHttpSession(true).setAttribute(name, value);
-    }
 
-    @Override
-    public Object getValue(String name) {
-        HttpSession session = getHttpSession(false);
-        if (session != null) {
-            return session.getAttribute(name);
-        }
-        return null;
-    }
 
     @Override
     public void removeAttribute(String name) {
@@ -103,13 +83,7 @@ public class GirSpringSession extends GirHttpSession {
         }
     }
 
-    @Override
-    public void removeValue(String name) {
-        HttpSession session = getHttpSession(false);
-        if (session != null) {
-            session.removeAttribute(name);
-        }
-    }
+
 
     @Override
     public void invalidate() {

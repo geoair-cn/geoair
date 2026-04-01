@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionContext;
+
 
 @SuppressWarnings("deprecation")
 public abstract class GirHttpSession implements HttpSession, Serializable {
@@ -125,20 +125,14 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
         return 0;
     }
 
-    @Override
-    public HttpSessionContext getSessionContext() {
-        return null;
-    }
+
 
     @Override
     public Enumeration<String> getAttributeNames() {
         return null;
     }
 
-    @Override
-    public String[] getValueNames() {
-        return (String[]) attributes.keySet().toArray();
-    }
+
 
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -153,16 +147,6 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
         return attributes.get(name);
     }
 
-    @Override
-    public void putValue(String name, Object value) {
-        attributes.put(name, value);
-        this.freshCache();
-    }
-
-    @Override
-    public Object getValue(String name) {
-        return attributes.get(name);
-    }
 
     @Override
     public void removeAttribute(String name) {
@@ -170,11 +154,7 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
         this.freshCache();
     }
 
-    @Override
-    public void removeValue(String name) {
-        attributes.remove(name);
-        this.freshCache();
-    }
+
 
     @Override
     public void invalidate() {
