@@ -8,7 +8,8 @@ import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.Transaction;
+import org.geotools.api.data.Transaction;
+
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;

@@ -8,7 +8,8 @@ import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
+import org.geotools.api.data.FeatureSource;
+
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
