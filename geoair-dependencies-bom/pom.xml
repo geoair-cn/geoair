@@ -252,32 +252,8 @@
 
     <plugins>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${versions-maven-release.version}</version>
-        <configuration>
-          <!-- 跳过自动提交（如需手动确认可关闭） -->
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <!-- 避免重复提交标签 -->
-          <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
-          <!-- 发布后自动推送到远程仓库 -->
-          <pushChanges>true</pushChanges>
-          <branchName>master</branchName>
 
-          <!--                    <threadSafe>true</threadSafe>-->
-          <!--                    &lt;!&ndash; 核心：跳过从 SCM 检出代码，直接用本地代码 &ndash;&gt;-->
-          <!--                    <checkoutReleaseBranch>false</checkoutReleaseBranch>-->
-          <!--                    &lt;!&ndash; 强制指定 SCM 地址 &ndash;&gt;-->
-          <!--                    <scmUrl>scm:git://github.com/geoair-cn/geoair.git</scmUrl>-->
 
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -292,48 +268,21 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <parameters>true</parameters>
-          <!-- 源码版本 -->
-          <source>8</source>
-          <!-- 目标字节码版本 -->
-          <target>8</target>
-          <!-- 编码（可选，避免中文乱码） -->
-          <encoding>UTF-8</encoding>
-        </configuration>
+
       </plugin>
 
       <!--生成源码插件-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
+
       </plugin>
 
       <!--生成API文档插件-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <failOnError>false</failOnError>
-          <!-- 忽略错误，继续执行 -->
-        </configuration>
+
       </plugin>
     </plugins>
   </build>
@@ -348,24 +297,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
           <plugin>
             <groupId>org.sonatype.central</groupId>
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>0.9.0</version>
-            <extensions>true</extensions>
-            <configuration>
-              <publishingServerId>central</publishingServerId>
-            </configuration>
+
           </plugin>
         </plugins>
       </build>

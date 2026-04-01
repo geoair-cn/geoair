@@ -142,20 +142,7 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <parameters>true</parameters>
-                    <!-- 源码版本 -->
-                    <source>8</source>
-                    <!-- 目标字节码版本 -->
-                    <target>8</target>
-                    <!-- 编码（可选，避免中文乱码） -->
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
+
 
         </plugins>
     </build>
