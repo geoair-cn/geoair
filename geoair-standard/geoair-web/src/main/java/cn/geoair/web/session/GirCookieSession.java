@@ -1,7 +1,7 @@
 package cn.geoair.web.session;
 
 import cn.geoair.web.util.GutilCookie;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 @GirSessionAn(catalog = " gir:session:cookie-sessions:")
 public class GirCookieSession extends GirHttpSession {

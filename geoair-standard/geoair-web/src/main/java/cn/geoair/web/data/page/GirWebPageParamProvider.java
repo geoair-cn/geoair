@@ -6,7 +6,7 @@ import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.env.property.GirPropertyHelper;
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.web.util.GirHttpServletHelper;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 分页参数默认提供者

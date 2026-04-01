@@ -1,8 +1,8 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
 import java.io.IOException;
-import javax.servlet.*;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

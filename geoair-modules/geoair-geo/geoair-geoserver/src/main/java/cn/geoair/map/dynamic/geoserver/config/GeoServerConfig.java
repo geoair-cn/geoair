@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.geoserver.config;
 import cn.geoair.base.Gir;
 import cn.hutool.core.io.FileUtil;
 import java.io.File;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;

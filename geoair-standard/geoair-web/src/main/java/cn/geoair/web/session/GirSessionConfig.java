@@ -8,8 +8,8 @@ import cn.geoair.web.util.GutilCookie;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
 
 public class GirSessionConfig implements Serializable {
 
