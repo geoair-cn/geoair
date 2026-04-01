@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.GeometryFixer;
 import scala.Tuple2;
 import scala.Tuple4;
 
@@ -36,8 +37,18 @@ public class VectorTileCommonUtils {
             return null;
         }
         if (!geometry.isValid()) {
-            log.error("=================Geometry is not valid===============");
-            return null;
+            try {
+                Geometry fixed = new GeometryFixer(geometry).getResult();
+                if (fixed != null && fixed.isValid()) {
+                    log.info("Geometry fixed successfully ");
+                    geometry = fixed;
+                } else {
+                    log.error("Cannot fix geometry  ");
+                    return null;
+                }
+            } catch (Exception e) {
+                return null;
+            }
         }
         // 坐标系转换
         Geometry convertedGeom =
