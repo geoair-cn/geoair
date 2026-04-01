@@ -6,7 +6,7 @@ import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author ：张逢吉
  * @date ：Created in 2024/3/29 12:30 @description： TODO
  */
-public class GirServletUtil extends ServletUtil {
+public class GirServletUtil extends JakartaServletUtil {
 
     /** 设置严格的无缓存响应头（适用于动态内容、API 等） */
     public static void setNoCacheHeaders() {
