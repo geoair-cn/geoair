@@ -55,18 +55,27 @@ public class PbfInfo implements Serializable {
 
     public PbfInfo setData(byte[] data) {
         this.data = data;
-        this.setDataLength(data.length);
+        if (data != null && data.length > 0) {
+            this.dataLength = data.length;
+        }
+
         return this;
     }
 
     public void setDataBoundary(byte[] dataBoundary) {
         this.dataBoundary = dataBoundary;
-        this.setDataBoundaryLength(dataBoundary.length);
+        if (dataBoundary != null && dataBoundary.length > 0) {
+            this.dataBoundaryLength = dataBoundary.length;
+        }
+
     }
 
     public void setDataLabel(byte[] dataLabel) {
         this.dataLabel = dataLabel;
-        this.setDataLabelLength(dataLabel.length);
+        if (dataLabel != null && dataLabel.length > 0) {
+            this.dataLabelLength = dataLabel.length;
+        }
+        ;
     }
 
 }
