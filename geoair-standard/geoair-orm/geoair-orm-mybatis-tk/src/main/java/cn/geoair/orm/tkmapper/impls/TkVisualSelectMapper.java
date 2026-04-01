@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import tk.mybatis.mapper.common.example.SelectByExampleMapper;
 import tk.mybatis.mapper.entity.Example;
 

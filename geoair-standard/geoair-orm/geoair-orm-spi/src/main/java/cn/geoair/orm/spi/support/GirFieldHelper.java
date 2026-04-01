@@ -7,7 +7,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /** 类字段工具类 */
 public class GirFieldHelper {

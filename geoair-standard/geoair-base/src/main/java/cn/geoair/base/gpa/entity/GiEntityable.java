@@ -20,8 +20,8 @@ public interface GiEntityable<PK extends Serializable> extends GiModelable<PK> {
             s -> {
                 Annotation[] ans = s.getAnnotations();
                 for (Annotation an : ans) {
-                    if ("javax.persistence.EmbeddedId".equals(an.annotationType().getName())
-                            || "javax.persistence.Id".equals(an.annotationType().getName())) {
+                    if ("jakarta.persistence.EmbeddedId".equals(an.annotationType().getName())
+                            || "jakarta.persistence.Id".equals(an.annotationType().getName())) {
                         return true;
                     }
                 }

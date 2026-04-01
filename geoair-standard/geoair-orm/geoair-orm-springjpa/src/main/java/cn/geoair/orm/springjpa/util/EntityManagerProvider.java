@@ -2,8 +2,8 @@ package cn.geoair.orm.springjpa.util;
 
 import cn.geoair.base.Gir;
 import java.lang.ref.WeakReference;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 
 /**

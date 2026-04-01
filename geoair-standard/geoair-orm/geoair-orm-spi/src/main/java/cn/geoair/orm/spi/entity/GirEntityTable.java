@@ -2,7 +2,7 @@ package cn.geoair.orm.spi.entity;
 
 import cn.geoair.base.util.GutilStr;
 import java.util.*;
-import javax.persistence.Table;
+import jakarta.persistence.Table;
 
 /**
  * @author ：张俊

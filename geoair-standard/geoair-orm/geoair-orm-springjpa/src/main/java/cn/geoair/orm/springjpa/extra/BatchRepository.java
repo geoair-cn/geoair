@@ -8,7 +8,8 @@ import cn.geoair.orm.springjpa.util.EntityManagerProvider;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Iterator;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
+
 import org.springframework.transaction.annotation.Transactional;
 
 /**

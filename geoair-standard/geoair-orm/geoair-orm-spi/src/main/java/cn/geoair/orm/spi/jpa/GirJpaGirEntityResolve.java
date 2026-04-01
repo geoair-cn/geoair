@@ -11,7 +11,7 @@ import cn.geoair.orm.spi.support.GirFieldHelper;
 import cn.geoair.orm.spi.support.GirSimpleTypeUtil;
 import java.util.LinkedHashSet;
 import java.util.List;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * jpa实体类的解析器
