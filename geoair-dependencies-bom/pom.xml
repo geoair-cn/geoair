@@ -134,7 +134,7 @@
         <maven-javadoc-plugin.version>3.11.3</maven-javadoc-plugin.version>
 
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-        <fmt-maven-plugin.version>2.13</fmt-maven-plugin.version>
+        <fmt-maven-plugin.version>2.29</fmt-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -399,7 +399,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.coveo</groupId>
+                        <groupId>com.spotify.fmt</groupId>
                         <artifactId>fmt-maven-plugin</artifactId>
                        <version>${fmt-maven-plugin.version}</version>
                         <executions>

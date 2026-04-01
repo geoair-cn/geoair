@@ -47,7 +47,7 @@
     <spring-boot.version>2.7.18</spring-boot.version>
     <resource.delimiter>@</resource.delimiter>
     <skipTests>true</skipTests>
-    <fmt-maven-plugin.version>2.13</fmt-maven-plugin.version>
+    <fmt-maven-plugin.version>2.29</fmt-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -294,7 +294,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.coveo</groupId>
+            <groupId>com.spotify.fmt</groupId>
             <artifactId>fmt-maven-plugin</artifactId>
            <version>${fmt-maven-plugin.version}</version>
             <executions>
