@@ -122,7 +122,7 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             transaction = new DefaultTransaction("shp-write");
             String typeName = dataStore.getTypeNames()[0];
 
-            try (org.geotools.data.FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
+            try (org.geotools.api.data.FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
                          dataStore.getFeatureWriterAppend(typeName, transaction)) {
 
                 for (SimpleFeature source : (Iterable<SimpleFeature>) featureCollection) {
