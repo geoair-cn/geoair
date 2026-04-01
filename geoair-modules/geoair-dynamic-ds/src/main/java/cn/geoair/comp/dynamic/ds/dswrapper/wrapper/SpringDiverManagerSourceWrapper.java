@@ -1,4 +1,4 @@
-package cn.geoair.comp.dynamic.ds.datasource.wrapper;
+package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;

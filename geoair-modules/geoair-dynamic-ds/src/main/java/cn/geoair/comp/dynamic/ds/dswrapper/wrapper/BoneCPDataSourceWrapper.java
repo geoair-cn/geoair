@@ -1,4 +1,4 @@
-package cn.geoair.comp.dynamic.ds.datasource.wrapper;
+package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import com.jolbox.bonecp.BoneCPDataSource;
 import javax.sql.DataSource;

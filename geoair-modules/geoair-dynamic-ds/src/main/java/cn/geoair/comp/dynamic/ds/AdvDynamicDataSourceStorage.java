@@ -2,7 +2,7 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
 import java.util.Map;
 import java.util.Set;
