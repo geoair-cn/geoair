@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import scala.Tuple2;
 import scala.Tuple4;
 
 /**
@@ -87,6 +88,32 @@ public class VectorTileCommonUtils {
             }
         }
         return tileMap;
+    }
+
+
+    public static Iterator<Tuple2<String, List<GirAdvOneRow>>> mapSingleFeatureToTilesStream(
+            GirAdvOneRow feature,
+            String geomFieldName,
+            Integer minZoom,
+            Integer maxZoom,
+            int outGridSrid) {
+
+        // 前置校验
+        Geometry geom = null;
+        try {
+            geom = (Geometry) feature.get(geomFieldName);
+            if (geom == null || geom.isEmpty()) {
+                return Collections.emptyIterator();
+            }
+        } catch (Exception e) {
+            return Collections.emptyIterator();
+        }
+
+        final int finalMinZoom = Optional.ofNullable(minZoom).orElse(4);
+        final int finalMaxZoom = Optional.ofNullable(maxZoom).orElse(15);
+        final Geometry finalGeom = geom;
+
+        return new TileIterator(feature, finalGeom, finalMinZoom, finalMaxZoom, outGridSrid);
     }
 
     public static Map<String, GirAdvOneRow> mapSingleFeatureToTiles1(
