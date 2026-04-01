@@ -165,22 +165,7 @@
             <skipPoms>true</skipPoms>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>${versions-maven-release.version}</version>
-          <configuration>
-            <!-- 跳过自动提交（如需手动确认可关闭） -->
-            <autoVersionSubmodules>true</autoVersionSubmodules>
-            <!-- 避免重复提交标签 -->
-            <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
-            <!-- 发布后自动推送到远程仓库 -->
-            <pushChanges>true</pushChanges>
 
-            <branchName>master</branchName>
-
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
@@ -379,21 +364,7 @@
     </pluginManagement>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${versions-maven-release.version}</version>
-        <configuration>
-          <!-- 跳过自动提交（如需手动确认可关闭） -->
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <!-- 避免重复提交标签 -->
-          <tagNameFormat>${project.artifactId}-${project.version}</tagNameFormat>
-          <!-- 发布后自动推送到远程仓库 -->
-          <pushChanges>true</pushChanges>
-          <branchName>master</branchName>
 
-        </configuration>
-      </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
