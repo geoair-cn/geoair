@@ -2,7 +2,7 @@ package cn.geoair.orm.spi.jpa;
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 
