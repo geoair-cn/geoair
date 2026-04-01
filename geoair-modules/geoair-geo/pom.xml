@@ -40,7 +40,7 @@
     <module>geoair-geo-tools</module>
     <module>geoair-jts-all</module>
 <!--    <module>geoair-geoserver</module>-->
-    <module>geoair-geo-demo</module>
+<!--    <module>geoair-geo-demo</module>-->
   </modules>
 
   <scm>
