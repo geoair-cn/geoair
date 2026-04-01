@@ -1,14 +1,16 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.base.Gir;
-import cn.geoair.comp.dynamic.ds.datasource.AdvDataSourceWrapper;
-import cn.geoair.comp.dynamic.ds.datasource.DataSourceWrapperRegistry;
+import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.Optional;
 import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -17,6 +19,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
@@ -28,6 +31,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @EnableConfigurationProperties({DataSourceProperties.class})
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @Order(100)
+@Configuration
 public class AdvAutoConfiguration {
 
     @Bean
@@ -53,7 +57,9 @@ public class AdvAutoConfiguration {
         return girSpringAdvExecutor;
     }
 
-    /** 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 修复点：参数注入IAdvExecutor，确保依赖顺序 */
+    /**
+     * 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 修复点：参数注入IAdvExecutor，确保依赖顺序
+     */
     @Bean
     @ConditionalOnMissingBean(IAdvExecutorAdapter.class)
     @ConditionalOnBean(IAdvExecutor.class)

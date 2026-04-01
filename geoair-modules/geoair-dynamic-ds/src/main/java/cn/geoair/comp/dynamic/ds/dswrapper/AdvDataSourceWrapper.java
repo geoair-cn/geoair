@@ -1,4 +1,4 @@
-package cn.geoair.comp.dynamic.ds.datasource;
+package cn.geoair.comp.dynamic.ds.dswrapper;
 
 import javax.sql.DataSource;
 

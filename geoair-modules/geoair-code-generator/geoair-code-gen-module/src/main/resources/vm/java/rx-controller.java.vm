@@ -1,5 +1,8 @@
-package ${packageName}.wcs.controller.${moduleName};
-
+#if($mutiIs==true)
+package ${packageName}.${controllerModuleName}.controller.${moduleName};
+#else
+package ${packageName}.controller.${moduleName};
+#end
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -15,10 +18,18 @@ import ${packageName}.model.${moduleName}.dto.${ClassName}Dto;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import ${packageName}.model.${moduleName}.seo.${ClassName}Seo;
 import ${packageName}.servface.${moduleName}.${ClassName}Service;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}AddVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}SearchVo;
-import ${packageName}.wcs.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#if($mutiIs==true)
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.${controllerModuleName}.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#else
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}AddVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}UpdateVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}SearchVo;
+import ${packageName}.controller.${moduleName}.${classname}.${ClassName}DetailVo;
+#end
+
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.result.GiResult;
@@ -56,7 +67,11 @@ public class ${ClassName}Controller {
              * 新增${tableComment}
              */
             @GaApiAction(text = "新增${tableComment}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/add")
+            #elseif(${controllerStyle}=='2')
             @PostMapping("/add${ClassName}")
+             #end
             public GiResult<${ClassName}DetailVo> add${ClassName}(@Validated @RequestBody ${ClassName}AddVo param) {
                 // 转换为PO
                     ${ClassName}Po record = new ${ClassName}Po();
@@ -77,7 +92,11 @@ public class ${ClassName}Controller {
              * 修改${tableComment}
              */
             @GaApiAction(text = "修改${tableComment}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/update")
+            #elseif(${controllerStyle}=='2')
             @PostMapping("/update${ClassName}")
+            #end
             public GiResult<${ClassName}DetailVo> update${ClassName}(@Validated @RequestBody ${ClassName}UpdateVo param) {
                 // 转换为PO
                     ${ClassName}Po record = new ${ClassName}Po();
@@ -95,7 +114,11 @@ public class ${ClassName}Controller {
              * ${tableComment}详情
              */
             @GaApiAction(text = "${tableComment}详情")
-            @GetMapping("/load${ClassName}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/load")
+            #elseif(${controllerStyle}=='2')
+            @PostMapping("/load${ClassName}")
+            #end
             public GiResult<${ClassName}DetailVo> load${ClassName}(String id) {
                     ${ClassName}Dto dto = ${className}Service.getDtoById(id);
                 if (dto == null) {
@@ -111,7 +134,11 @@ public class ${ClassName}Controller {
              * 删除${tableComment}
              */
             @GaApiAction(text = "删除${tableComment}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/del")
+            #elseif(${controllerStyle}=='2')
             @PostMapping("/del${ClassName}")
+            #end
             public GiResult<?> del${ClassName}(String id, boolean confirmed) {
                 if (confirmed) {
                         ${ClassName}Po po = ${className}Service.getPoById(id);
@@ -134,7 +161,11 @@ public class ${ClassName}Controller {
              * 逻辑删除${tableComment}
              */
             @GaApiAction(text = "逻辑删除${tableComment}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/logicDel/{ids}")
+            #elseif(${controllerStyle}=='2')
             @PostMapping("/logicDel${ClassName}/{ids}")
+            #end
             public GiResult<?> logicDel${ClassName}(@PathVariable String[] ids, boolean confirmed) {
                 if (confirmed) {
                     if (GutilObject.isEmpty(ids)) {
@@ -168,7 +199,11 @@ public class ${ClassName}Controller {
              * 分页列出${tableComment}
              */
             @GaApiAction(text = "分页列出${tableComment}")
+            #if(${controllerStyle}=='1')
+            @PostMapping("/list")
+            #elseif(${controllerStyle}=='2')
             @PostMapping("/list${ClassName}Page")
+            #end
             public GiResult<GirPager<${ClassName}DetailVo>> list${ClassName}Page(@Validated @RequestBody ${ClassName}SearchVo param) {
                 // 构建查询条件
                     ${ClassName}Seo seo = new ${ClassName}Seo();

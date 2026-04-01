@@ -1,6 +1,6 @@
-package cn.geoair.comp.dynamic.ds.datasource;
+package cn.geoair.comp.dynamic.ds.dswrapper;
 
-import cn.geoair.comp.dynamic.ds.datasource.wrapper.*;
+import cn.geoair.comp.dynamic.ds.dswrapper.wrapper.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
