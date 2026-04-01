@@ -27,9 +27,7 @@ Knife4j Spring Boot 示例模块，展示了如何在 Spring Boot 项目中集�
 
 Knife4j SpringDoc Starter 模块，提供了与 SpringDoc 集成的启动器，支持 OpenAPI 3.0 规范。
 
-### 3. geoair-knife4j-springfox-spring-boot-starter
-
-Knife4j springfox Starter 模块，提供了与 springfox 集成的启动器，支持 OpenAPI 3.0/2.0 规范。
+ 
 ## 快速开始
 
 ### 1. 引入依赖

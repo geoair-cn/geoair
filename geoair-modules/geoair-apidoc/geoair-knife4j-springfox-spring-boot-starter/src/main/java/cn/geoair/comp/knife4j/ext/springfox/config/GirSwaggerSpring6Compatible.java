@@ -54,7 +54,7 @@ public class GirSwaggerSpring6Compatible {
                 corsProperties.toCorsConfiguration(),
                 new EndpointLinksResolver(allEndpoints, basePath),
                 shouldRegisterLinksMapping,
-                null);
+                 ;
     }
 
     private boolean shouldRegisterLinksMapping(

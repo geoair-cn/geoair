@@ -37,7 +37,7 @@
 
   <modules>
     <module>geoair-knife4j-core</module>
-    <module>geoair-knife4j-springfox-spring-boot-starter</module>
+<!--    <module>geoair-knife4j-springfox-spring-boot-starter</module>-->
     <module>geoair-knife4j-springdoc-spring-boot-starter</module>
     <module>geoair-knife4j-spring-boot-demo</module>
   </modules>
@@ -55,12 +55,7 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
-        <version>${geoair.version}</version>
-        <type>jar</type>
-      </dependency>
+
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>

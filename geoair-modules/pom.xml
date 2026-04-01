@@ -66,11 +66,7 @@
         <scope>import</scope>
       </dependency>
 
-      <dependency>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-knife4j-springfox-spring-boot-starter</artifactId>
-        <version>${geoair.version}</version>
-      </dependency>
+
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
