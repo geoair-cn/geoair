@@ -114,7 +114,7 @@ public class ShpGeoFileWriter implements GeoFileWriter {
         Transaction transaction = null;
 
         try {
-            dataStore = (ShapefileDataStore) org.geotools.data.DataStoreFinder.getDataStore(params);
+            dataStore = (ShapefileDataStore) org.geotools.api.data.DataStoreFinder.getDataStore(params);
             dataStore.createSchema(featureType);
             dataStore.forceSchemaCRS(featureType.getCoordinateReferenceSystem());
 

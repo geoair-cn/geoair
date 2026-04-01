@@ -9,7 +9,7 @@
 // import cn.geoair.map.dynamic.ds.DataSourceGetter;
 // import cn.geoair.map.dynamic.ds.IDataSourceGetter;
 // import cn.geoair.map.dynamic.ds.apo.DataSourceApo;
-// import org.geotools.data.DataStore;
+// import org.geotools.api.data.DataStore;
 //
 // import javax.sql.DataSource;
 // import java.sql.Connection;

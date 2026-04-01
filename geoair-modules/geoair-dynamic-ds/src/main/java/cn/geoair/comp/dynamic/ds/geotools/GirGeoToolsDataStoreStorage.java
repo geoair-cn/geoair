@@ -7,8 +7,9 @@ import com.alibaba.druid.pool.DruidDataSource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
+
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 
 public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter {

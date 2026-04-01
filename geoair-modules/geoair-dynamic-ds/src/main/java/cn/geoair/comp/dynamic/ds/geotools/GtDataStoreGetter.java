@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds.geotools;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.geotools.data.DataStore;
+import org.geotools.api.data.DataStore;
 
 /** GeoTools数据源获取器接口 */
 public interface GtDataStoreGetter {
