@@ -42,9 +42,9 @@
   </scm>
   <properties>
     <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
-    <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
+    <knife4j-openapi3.version>4.5.0</knife4j-openapi3.version>
     <springfox.version>3.0.0</springfox.version>
-    <springdoc.version>2.3.0</springdoc.version>
+    <springdoc.version>3.0.2</springdoc.version>
     <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
     <spring-boot.version>3.5.13</spring-boot.version>
     <java.version>17</java.version>
@@ -69,7 +69,29 @@
       <dependency>
         <groupId>com.github.xiaoymin</groupId>
         <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-        <version>${knife4j-openapi3.version}</version>
+        <version>4.5.0</version>
+        <!-- 核心：排除它自带的低版本 SpringDoc -->
+        <exclusions>
+          <exclusion>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+
+      <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>${springdoc.version}</version>
       </dependency>
 
 
