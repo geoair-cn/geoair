@@ -45,7 +45,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <geotools.version>34.3</geotools.version>
     <lombok.version>1.18.44</lombok.version>
-    <druid.version>1.2.23</druid.version>
+    <druid.version>1.2.28</druid.version>
     <aspectj.version>1.9.25.1</aspectj.version>
     <spring-boot.version>3.5.13</spring-boot.version>
     <commons-dbcp2.version>2.9.0</commons-dbcp2.version>

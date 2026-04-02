@@ -43,11 +43,11 @@
   <properties>
     <java.version>17</java.version>
     <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
-    <redisson.version>3.18.0</redisson.version>
+    <redisson.version>3.52.0</redisson.version>
     <spring-boot.version>3.5.13</spring-boot.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <tomcat.version>9.0.115</tomcat.version>
+    <tomcat.version>10.1.53</tomcat.version>
   </properties>
 
   <dependencyManagement>
@@ -70,21 +70,17 @@
       <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
-        <version>2021.0.4</version>
+        <version>2023.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
 
-      <dependency>
-        <groupId>com.alibaba.spring</groupId>
-        <artifactId>spring-context-support</artifactId>
-        <version>1.0.11</version>
-      </dependency>
+
 
       <dependency>
         <groupId>com.alibaba.cloud</groupId>
         <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-        <version>2021.0.4.0</version>
+        <version>2023.0.1.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

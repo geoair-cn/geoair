@@ -154,7 +154,7 @@ geoair-base-parent
 |----------|------|----------|----------|
 | `maven-compiler-plugin` | 3.10.1 | Java 编译 | source/target=1.8，encoding=UTF-8 |
 | `maven-source-plugin` | 3.2.1 | 生成源码包 | attach-sources=true |
-| `maven-javadoc-plugin` | 3.4.1 | 生成 API 文档 | encoding=UTF-8，支持中文 |
+| `maven-javadoc-plugin` | 4.0.0 | 生成 API 文档 | encoding=UTF-8，支持中文 |
 | `maven-release-plugin` | 3.1.0 | 版本发布管理 | 自动打 Tag，更新版本号 |
 | `versions-maven-plugin` | 2.7 | 版本管理工具 | 批量更新模块版本 |
 | `maven-jar-plugin` | 3.2.2 | JAR 包打包 | 统一打包规范 |
