@@ -181,7 +181,36 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
     }
 
+
+    /** 瓦片映射函数（可序列化 + 无OOM版本） */
+    public static class MapToTileFunction
+            implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private final TileSliceParameter parameter;
+
+        public MapToTileFunction(TileSliceParameter parameter) {
+            this.parameter = parameter;
+        }
+
+        @Override
+        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature) throws Exception {
+            if (feature == null) {
+                return Collections.emptyIterator();
+            }
+
+            // 直接调用
+            return VectorTileCommonUtils.mapSingleFeatureToTilesStream(
+                    feature,
+                    parameter.getGeomFieldName(),
+                    parameter.getMinZoom(),
+                    parameter.getMaxZoom(),
+                    parameter.getOutGridSrid());
+        }
+    }
     /** 瓦片映射函数（可序列化）  */
+    @Deprecated
     public static class MapToTileFunction1
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
 
@@ -217,34 +246,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
     }
 
-    /** 瓦片映射函数（可序列化 + 无OOM版本） */
-    public static class MapToTileFunction
-            implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        private final TileSliceParameter parameter;
-
-        public MapToTileFunction(TileSliceParameter parameter) {
-            this.parameter = parameter;
-        }
-
-        @Override
-        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature) throws Exception {
-            if (feature == null) {
-                return Collections.emptyIterator();
-            }
-
-            // 直接调用
-            return VectorTileCommonUtils.mapSingleFeatureToTilesStream(
-                    feature,
-                    parameter.getGeomFieldName(),
-                    parameter.getMinZoom(),
-                    parameter.getMaxZoom(),
-                    parameter.getOutGridSrid());
-        }
-    }
-
+    @Deprecated
     public static class MapToTileFunctionToStatic
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
 

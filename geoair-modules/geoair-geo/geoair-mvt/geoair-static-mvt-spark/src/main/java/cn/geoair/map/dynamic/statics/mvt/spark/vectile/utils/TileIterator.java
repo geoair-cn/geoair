@@ -8,10 +8,7 @@ import scala.Tuple2;
 import scala.Tuple4;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 
 /**
@@ -148,7 +145,7 @@ public class TileIterator
 
         // 使用 Collections.singletonList 避免创建新的 ArrayList
         // 注意：这个 List 是不可变的，如果下游需要修改，需要改为 new ArrayList<>(1)
-        List<GirAdvOneRow> singleList = Collections.singletonList(feature);
+        List<GirAdvOneRow> singleList =  Collections.singletonList(feature);
 
         // 创建结果 Tuple2
         Tuple2<String, List<GirAdvOneRow>> result =
