@@ -64,6 +64,7 @@ public class VectorTileCommonUtils {
     /**
      * 通用要素映射到瓦片（单条要素）
      */
+    @Deprecated
     public static Map<String, List<GirAdvOneRow>> mapSingleFeatureToTiles(
             GirAdvOneRow feature,
             String geomFieldName,
