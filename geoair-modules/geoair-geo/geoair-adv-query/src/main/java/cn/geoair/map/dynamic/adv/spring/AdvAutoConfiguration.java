@@ -11,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Optional;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -36,8 +37,7 @@ public class AdvAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(IAdvExecutor.class)
-    @ConditionalOnBean(DataSource.class)
-    public IAdvExecutor springAdvExecutor(DataSource dataSource) { // 注入DataSource，自动保证顺序
+    public IAdvExecutor springAdvExecutor(@Autowired  DataSource dataSource) { // 注入DataSource，自动保证顺序
         Gir.log.info("开始自动装配IAdvExecutor，检测数据源类型...");
         Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
         String dataSourceName = null;

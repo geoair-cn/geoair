@@ -89,6 +89,7 @@ public class GirSpringDocApiRunner
                             () ->
                                     GroupedOpenApi.builder()
                                             .group(groupName) // 分组名称
+
                                             .packagesToScan(docketInfo.getBasePackage()) // 扫描的包
                                             .build());
 
