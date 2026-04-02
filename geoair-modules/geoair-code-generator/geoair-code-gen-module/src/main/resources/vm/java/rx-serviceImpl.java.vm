@@ -1,10 +1,11 @@
 package ${packageName}.service.${moduleName};
-
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.util.GutilObject;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import ${packageName}.dao.${moduleName}.${ClassName}Dao;
@@ -45,12 +46,17 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
         @CacheEvict(key = "'list'", allEntries = true)
         #end
     public ${ClassName}Po add(${ClassName}Po po) {
+        // 触发新增前事件
+        triggerAddBeforeEvent(po);
+
         // 初始化创建元数据
         po.initCreateMeta();
         // 插入数据
             ${className}Dao.gtcAccessSelective(po);
-        // 触发新增事件
-        triggerAddEvent(po);
+
+        // 触发新增后事件
+        triggerAddAfterEvent(po);
+
         return po;
     }
 
@@ -64,12 +70,18 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
         if (oldPo == null) {
             throw new RuntimeException("数据不存在，ID：" + po.id());
         }
+        BeanUtil.copyProperties(oldPo ,po ,new CopyOptions().setOverride(false));
+        // 触发更新前事件
+        triggerUpdateBeforeEvent(oldPo, po);
+
         // 初始化更新元数据
         po.initUpdateMeta();
-        // 触发更新事件
-        triggerUpdateEvent(oldPo, po);
         // 更新数据
-            ${className}Dao.gtcUpdateByPKSelective(po);
+        boolean updateSuccess = ${className}Dao.gtcUpdateByPKSelective(po) > 0;
+
+        // 触发更新后事件
+        triggerUpdateAfterEvent(oldPo, po, updateSuccess);
+
         return po;
     }
 
@@ -83,10 +95,24 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
         if (po == null) {
             return;
         }
-        // 触发删除事件
-        triggerDeleteEvent(po);
-        // 物理删除
-            ${className}Dao.gtcDeleteByPK(id);
+
+
+        // 触发删除前事件
+        triggerDeleteBeforeEvent(po);
+
+        try {
+                ${className}Dao.gtcDeleteByPK(id);
+        } catch (Exception e) {
+            log.error(e);
+            // 触发删除后事件
+            triggerDeleteAfterEvent(po, false);
+            throw e;
+        }
+
+        // 触发删除后事件
+        triggerDeleteAfterEvent(po, true);
+
+
     }
 
     @Override
@@ -99,11 +125,16 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
         if (po == null) {
             return;
         }
-        // 触发删除事件
-        triggerDeleteEvent(po);
+
+        // 触发删除前事件
+        triggerDeleteBeforeEvent(po);
+
         // 逻辑删除
         po.setDel();
-            ${className}Dao.gtcUpdateByPKSelective(po);
+        boolean deleteSuccess = ${className}Dao.gtcUpdateByPKSelective(po) > 0;
+
+        // 触发删除后事件
+        triggerDeleteAfterEvent(po, deleteSuccess);
     }
 
     @Override
@@ -180,44 +211,87 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     }
 
 
+    // ==================== 事件触发统一封装 ====================
     /**
-     * 触发新增事件
+     * 触发新增前事件
      */
-    private void triggerAddEvent(${ClassName}Po po) {
+    private void triggerAddBeforeEvent(${ClassName}Po po) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
             try {
-                event.add${ClassName}Event(po);
+                event.addBefore${ClassName}Event(po);
             } catch (Exception e) {
-                log.error("触发新增事件失败", e);
+                log.error("触发【新增前】事件失败", e);
             }
         }
     }
 
     /**
-     * 触发更新事件
+     * 触发新增后事件
      */
-    private void triggerUpdateEvent(${ClassName}Po oldPo, ${ClassName}Po newPo) {
+    private void triggerAddAfterEvent(${ClassName}Po po) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
             try {
-                event.update${ClassName}Event(oldPo, newPo);
+                event.addAfter${ClassName}Event(po);
             } catch (Exception e) {
-                log.error("触发更新事件失败", e);
+                log.error("触发【新增后】事件失败", e);
             }
         }
     }
 
     /**
-     * 触发删除事件
+     * 触发更新前事件
      */
-    private void triggerDeleteEvent(${ClassName}Po po) {
+    private void triggerUpdateBeforeEvent(${ClassName}Po oldPo, ${ClassName}Po newPo) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
             try {
-                event.del${ClassName}Event(po);
+                event.updateBefore${ClassName}Event(oldPo, newPo);
             } catch (Exception e) {
-                log.error("触发删除事件失败", e);
+                log.error("触发【更新前】事件失败", e);
+            }
+        }
+    }
+
+    /**
+     * 触发更新后事件
+     */
+    private void triggerUpdateAfterEvent(${ClassName}Po oldPo, ${ClassName}Po newPo, boolean success) {
+        List<${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            try {
+                event.updateAfter${ClassName}Event(oldPo, newPo, success);
+            } catch (Exception e) {
+                log.error("触发【更新后】事件失败", e);
+            }
+        }
+    }
+
+    /**
+     * 触发删除前事件
+     */
+    private void triggerDeleteBeforeEvent(${ClassName}Po po) {
+        List<${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            try {
+                event.deleteBefore${ClassName}Event(po);
+            } catch (Exception e) {
+                log.error("触发【删除前】事件失败", e);
+            }
+        }
+    }
+
+    /**
+     * 触发删除后事件
+     */
+    private void triggerDeleteAfterEvent(${ClassName}Po po, boolean success) {
+        List<${ClassName}Event> events = ${ClassName}Event.getInstances();
+        for (${ClassName}Event event : events) {
+            try {
+                event.deleteAfter${ClassName}Event(po, success);
+            } catch (Exception e) {
+                log.error("触发【删除后】事件失败", e);
             }
         }
     }

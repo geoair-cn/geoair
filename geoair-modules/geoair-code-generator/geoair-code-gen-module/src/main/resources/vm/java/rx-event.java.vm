@@ -2,8 +2,11 @@ package ${packageName}.servface.${moduleName}.event;
 import cn.geoair.base.Gir;
 import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import java.util.*;
+
 import cn.hutool.core.collection.ListUtil;
+
 import java.util.Map;
+
 /**
  * ${tableComment}事件接口
  *
@@ -18,7 +21,7 @@ public interface ${ClassName}Event {
         for (Map.Entry<String, ${ClassName}Event> event : beans.entrySet()) {
             events.add(event.getValue());
         }
-        return   ListUtil.sort(events, new Comparator<${ClassName}Event>() {
+        return ListUtil.sort(events, new Comparator<${ClassName}Event>() {
             @Override
             public int compare(${ClassName}Event o1, ${ClassName}Event o2) {
                 return o1.getOrder() - o2.getOrder();
@@ -31,34 +34,56 @@ public interface ${ClassName}Event {
  *
  * @return
  */
-    default   Integer getOrder() {
+    default Integer getOrder() {
         return 10;
     }
-    /**
-* 新增事件
-*
-* @param ${className}Po
-*/
-    default void add${ClassName}Event(${ClassName}Po ${className}Po) {
-    }
 
     /**
- * 删除事件
- *
-     * @param ${className}Po
- */
-    void del${ClassName}Event(${ClassName}Po ${className}Po);
-
-
-
-    /**
-     * 更新事件
-     *
-     * @param oldPo 旧的对象
-     * @param newPo 新的对象
+     * 新增前事件：校验、填充、权限判断
+     * @param ${className}Po 待新增对象
      */
-    default void update${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo) {
+    default void addBefore${ClassName}Event(${ClassName}Po ${className}Po) {
     }
 
-    void get${ClassName}RelationEvent(${ClassName}Po po,Map<String, Object> relationObj) ;
+    /**
+     * 新增后事件：日志、通知、缓存、同步
+     * @param ${className}Po 新增成功后的对象
+     */
+    default void addAfter${ClassName}Event(${ClassName}Po ${className}Po) {
+    }
+
+    /**
+     * 更新前事件：更新校验、旧数据快照、防并发
+     * @param oldPo 更新前数据
+     * @param newPo 待更新数据
+     */
+    default void updateBefore${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo) ;
+
+    /**
+     * 更新后事件：记录变更、刷新缓存、通知
+     * @param oldPo 更新前数据
+     * @param newPo 更新后数据
+     * @param success 是否更新成功
+     */
+    default void updateAfter${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo, boolean success) ;
+
+    /**
+     * 删除前事件：删除校验、关联检查
+     * @param ${className}Po 待删除对象
+     */
+    default void deleteBefore${ClassName}Event(${ClassName}Po ${className}Po);
+
+    /**
+     * 删除后事件：清理关联数据、日志
+     * @param ${className}Po 已删除对象
+     * @param success 是否删除成功
+     */
+    default void deleteAfter${ClassName}Event(${ClassName}Po ${className}Po, boolean success);
+
+    /**
+    *  获取当前的PO的关联信息。关联信息放到relationObj里面
+ * @param po 当前的po对象
+ * @param relationObj 一个汇总的关联信息
+*/
+    void get${ClassName}RelationEvent(${ClassName}Po po, Map<String, Object> relationObj);
 }
