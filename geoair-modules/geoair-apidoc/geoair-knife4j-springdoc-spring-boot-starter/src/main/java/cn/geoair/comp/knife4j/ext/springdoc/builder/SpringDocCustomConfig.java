@@ -4,7 +4,7 @@ import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
 import io.swagger.v3.oas.models.tags.Tag;
 import java.util.*;
-import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -21,10 +21,10 @@ public class SpringDocCustomConfig {
     /**
      * 处理@GaApi注解，将其转换为OpenAPI的Tag（修复空指针异常，保留原有核心逻辑）
      *
-     * @return a {@link org.springdoc.core.customizers.OpenApiCustomiser} object
+     * @return a {@link org.springdoc.core.customizers.OpenApiCustomizer} object
      */
     @Bean
-    public OpenApiCustomiser gaApiTagCustomizer() {
+    public OpenApiCustomizer gaApiTagCustomizer() {
         return openApi -> {
             Map<String, Tag> tags = new HashMap<>();
 

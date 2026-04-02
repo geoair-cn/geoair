@@ -103,7 +103,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 | 依赖 | 版本 | 说明 |
 |------|------|------|
 | Knife4j OpenAPI3 | 4.4.0 | Knife4j 增强版 (OpenAPI 3) |
-| SpringDoc OpenAPI | 1.7.0 | OpenAPI 3 规范实现 |
+| SpringDoc OpenAPI | 2.3.0 | OpenAPI 3 规范实现 |
 | Springfox Swagger2 | 3.0.0 | Swagger 2 规范实现 |
 | Knife4j OpenAPI2 | 3.0.3 | Knife4j 经典版 (Swagger 2) |
 | Reflections | 0.10.2 | 运行时类扫描工具 |
