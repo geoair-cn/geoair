@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <versions-maven-release.version>3.1.0</versions-maven-release.version>
+
 
     <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
     <slf4j.version>1.7.36</slf4j.version>
