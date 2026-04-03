@@ -61,7 +61,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
-        <versions-maven-release.version>3.1.0</versions-maven-release.version>
+
         <redisson.version>3.18.0</redisson.version>
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>9.0.115</tomcat.version>
@@ -120,7 +120,7 @@
         <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
 
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
+
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
         <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
@@ -339,12 +339,6 @@
         </pluginManagement>
 
         <plugins>
-
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
