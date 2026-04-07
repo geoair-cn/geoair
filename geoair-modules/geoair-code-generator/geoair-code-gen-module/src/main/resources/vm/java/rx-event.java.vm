@@ -57,7 +57,7 @@ public interface ${ClassName}Event {
      * @param oldPo 更新前数据
      * @param newPo 待更新数据
      */
-    default void updateBefore${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo) ;
+    default void updateBefore${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo) {} ;
 
     /**
      * 更新后事件：记录变更、刷新缓存、通知
@@ -65,20 +65,20 @@ public interface ${ClassName}Event {
      * @param newPo 更新后数据
      * @param success 是否更新成功
      */
-    default void updateAfter${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo, boolean success) ;
+    default void updateAfter${ClassName}Event(${ClassName}Po oldPo, ${ClassName}Po newPo, boolean success) {} ;
 
     /**
      * 删除前事件：删除校验、关联检查
      * @param ${className}Po 待删除对象
      */
-    default void deleteBefore${ClassName}Event(${ClassName}Po ${className}Po);
+    default void deleteBefore${ClassName}Event(${ClassName}Po ${className}Po){};
 
     /**
      * 删除后事件：清理关联数据、日志
      * @param ${className}Po 已删除对象
      * @param success 是否删除成功
      */
-    default void deleteAfter${ClassName}Event(${ClassName}Po ${className}Po, boolean success);
+    default void deleteAfter${ClassName}Event(${ClassName}Po ${className}Po, boolean success){};
 
     /**
     *  获取当前的PO的关联信息。关联信息放到relationObj里面
