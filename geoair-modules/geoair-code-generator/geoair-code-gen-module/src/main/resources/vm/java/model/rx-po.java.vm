@@ -107,7 +107,7 @@ import $importone;
             }
 
             public void id($column.javaType id) {
-                $column.javaField = id;
+                this.$column.javaField = id;
             }
 
             @Override
