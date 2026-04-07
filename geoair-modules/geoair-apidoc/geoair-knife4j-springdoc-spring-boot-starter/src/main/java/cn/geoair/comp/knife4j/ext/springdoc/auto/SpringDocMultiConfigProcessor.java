@@ -3,6 +3,7 @@ package cn.geoair.comp.knife4j.ext.springdoc.auto;
 import cn.geoair.comp.knife4j.ext.core.config.IGirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+import cn.hutool.core.util.IdUtil;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -85,7 +86,7 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
                                         )
                         );
 
-                registry.registerBeanDefinition("openApi_" + System.currentTimeMillis(), builder.getBeanDefinition());
+                registry.registerBeanDefinition("openApi_" + IdUtil.getSnowflakeNextIdStr(), builder.getBeanDefinition());
             }
 
             config.loadEnd();
