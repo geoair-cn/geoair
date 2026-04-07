@@ -44,7 +44,7 @@
     <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
     <knife4j-openapi3.version>4.5.0</knife4j-openapi3.version>
     <springfox.version>3.0.0</springfox.version>
-    <springdoc.version>3.0.2</springdoc.version>
+    <springdoc.version>2.8.16</springdoc.version>
     <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
     <spring-boot.version>3.5.13</spring-boot.version>
     <java.version>17</java.version>

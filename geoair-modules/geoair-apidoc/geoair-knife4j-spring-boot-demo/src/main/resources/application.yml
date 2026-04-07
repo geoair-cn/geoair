@@ -14,8 +14,8 @@ server:
 #server:
 #  servlet:
 #    context-path: /demo_context
-springdoc:
-  api-docs:
-    enabled: true
-  default-flat-param-object: true
+#springdoc:
+#  api-docs:
+#    enabled: true
+#  default-flat-param-object: true
 
