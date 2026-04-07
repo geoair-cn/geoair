@@ -348,7 +348,7 @@
             <configuration>
               <skip>false</skip>
               <keepBlankLines>true</keepBlankLines>
-              <sortDependencies>false</sortDependencies>
+              <sortDependencies>''</sortDependencies>
               <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
               <createBackupFile>false</createBackupFile>
               <verifyFail>stop</verifyFail>

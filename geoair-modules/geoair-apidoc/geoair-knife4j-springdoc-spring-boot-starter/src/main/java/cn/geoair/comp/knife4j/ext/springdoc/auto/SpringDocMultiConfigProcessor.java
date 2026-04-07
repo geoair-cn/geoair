@@ -70,7 +70,7 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
                                             .build()
                             );
 
-                    registry.registerBeanDefinition("groupApi_" + groupName, builder.getBeanDefinition());
+                    registry.registerBeanDefinition("groupedOpenApi_" + groupName, builder.getBeanDefinition());
                 }
             }
 
@@ -87,7 +87,7 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
                                         )
                         );
 
-                registry.registerBeanDefinition("openApi_" + IdUtil.getSnowflakeNextIdStr(), builder.getBeanDefinition());
+                registry.registerBeanDefinition("geoairOpenAPI", builder.getBeanDefinition());
                 modelInfoIsInit = true;
             }
 
