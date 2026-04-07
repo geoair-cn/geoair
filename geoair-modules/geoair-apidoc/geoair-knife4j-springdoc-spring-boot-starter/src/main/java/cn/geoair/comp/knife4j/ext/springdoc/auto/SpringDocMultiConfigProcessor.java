@@ -45,6 +45,7 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
 
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ctx;
 
+        boolean modelInfoIsInit = false;
         for (IGirOpenApiConfig config : configMap.values()) {
             // 1. 执行你的加载逻辑
             config.doLoading();
@@ -73,8 +74,8 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
                 }
             }
 
-            // 4. 注册当前配置的 OpenAPI 信息（用你自己的 ApiModelInfo）
-            if (modelInfo != null) {
+            // 4. 注册当前配置的 OpenAPI 信息
+            if (modelInfo != null &&!modelInfoIsInit) {
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder
                         .genericBeanDefinition(OpenAPI.class, () ->
                                 new OpenAPI()
@@ -87,6 +88,7 @@ public class SpringDocMultiConfigProcessor implements ApplicationContextAware {
                         );
 
                 registry.registerBeanDefinition("openApi_" + IdUtil.getSnowflakeNextIdStr(), builder.getBeanDefinition());
+                modelInfoIsInit = true;
             }
 
             config.loadEnd();
