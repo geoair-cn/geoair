@@ -46,8 +46,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hadoop-version>3.2.0</hadoop-version>
-    <spark.version>3.5.6</spark.version>
+<!--    <hadoop-version>3.2.0</hadoop-version>-->
+    <hadoop-version>3.4.0</hadoop-version>
+    <spark.version>4.0.0</spark.version>
+    <scala.version>2.13</scala.version>
+<!--    <spark.version>3.5.6</spark.version>-->
     <janino.version>3.1.9</janino.version>
   </properties>
 
@@ -61,7 +64,7 @@
 
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.12</artifactId>
+      <artifactId>spark-core_${scala.version}</artifactId>
       <version>${spark.version}</version>
       <exclusions>
         <exclusion>
@@ -99,20 +102,20 @@
 
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.12</artifactId>
+      <artifactId>spark-sql_${scala.version}</artifactId>
       <version>${spark.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_2.12</artifactId>
+      <artifactId>spark-mllib_${scala.version}</artifactId>
       <version>${spark.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>shapeless_2.12</artifactId>
+          <artifactId>shapeless_${scala.version}</artifactId>
           <groupId>com.chuusai</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>cats-kernel_2.12</artifactId>
+          <artifactId>cats-kernel_${scala.version}</artifactId>
           <groupId>org.typelevel</groupId>
         </exclusion>
       </exclusions>
