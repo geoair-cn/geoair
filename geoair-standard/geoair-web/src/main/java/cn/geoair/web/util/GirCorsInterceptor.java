@@ -3,6 +3,8 @@ package cn.geoair.web.util;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.geoair.base.util.GutilStr;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 
@@ -39,7 +41,7 @@ public class GirCorsInterceptor implements HandlerInterceptor {
 
     private void setCorsResponseHeaders(HttpServletRequest request, HttpServletResponse response) {
         String origin = request.getHeader("Origin");
-        if (StrUtil.isNotBlank(origin)) {
+        if (GutilStr.isNotBlank(origin)) {
             response.setHeader("Access-Control-Allow-Origin", origin);
         }
 
@@ -59,7 +61,7 @@ public class GirCorsInterceptor implements HandlerInterceptor {
         headerSet.addAll(Arrays.asList(ALLOWED_HEADERS));
 
         String requestHeaders = request.getHeader("Access-Control-Request-Headers");
-        if (StrUtil.isNotBlank(requestHeaders)) {
+        if (GutilStr.isNotBlank(requestHeaders)) {
             String[] requestHeaderArr = requestHeaders.split(",");
             for (String header : requestHeaderArr) {
                 headerSet.add(header.trim());
