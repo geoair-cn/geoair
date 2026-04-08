@@ -1,8 +1,8 @@
 package cn.geoair.web.util;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import cn.geoair.base.util.GutilStr;
 import org.springframework.web.servlet.HandlerInterceptor;
