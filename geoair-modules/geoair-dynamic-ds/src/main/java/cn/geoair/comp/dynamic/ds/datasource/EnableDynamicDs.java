@@ -9,6 +9,6 @@ import java.lang.annotation.RetentionPolicy;
  * 启用动态数据源的切换组件
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Import(GirDynamicDataSourceAspect.class)
+@Import(value = {GirDynamicDataSourceAspect.class})
 public @interface EnableDynamicDs {
 }
