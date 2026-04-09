@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 
 /** HikariCP数据源包装器 */
-public class HikariDataSourceWrapper extends AbstractDataSourceWrapper {
+public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public HikariDataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);

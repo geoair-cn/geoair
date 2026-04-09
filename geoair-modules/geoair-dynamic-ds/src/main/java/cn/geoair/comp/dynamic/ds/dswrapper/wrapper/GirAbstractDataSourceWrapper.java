@@ -4,7 +4,7 @@ import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import javax.sql.DataSource;
 
 /** 数据源包装器抽象基类 实现通用逻辑，子类只需实现特定方法 */
-public abstract class AbstractDataSourceWrapper implements AdvDataSourceWrapper {
+public abstract class GirAbstractDataSourceWrapper implements AdvDataSourceWrapper {
 
     // 被包装的原始数据源
     protected DataSource targetDataSource;
@@ -14,7 +14,7 @@ public abstract class AbstractDataSourceWrapper implements AdvDataSourceWrapper 
         return "AbstractDataSourceWrapper{" + "targetDataSource=" + targetDataSource + '}';
     }
 
-    public AbstractDataSourceWrapper(DataSource targetDataSource) {
+    public GirAbstractDataSourceWrapper(DataSource targetDataSource) {
         this.targetDataSource = targetDataSource;
     }
 

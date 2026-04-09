@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 跨域过滤器（由 Interceptor 改造为 Filter，处理更早、更稳定）
+ * 跨域过滤器
  */
 
 public class GirCorsFilter implements Filter {

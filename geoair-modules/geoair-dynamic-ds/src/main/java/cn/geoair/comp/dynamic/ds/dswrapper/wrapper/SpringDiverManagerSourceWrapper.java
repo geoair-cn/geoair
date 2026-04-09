@@ -3,7 +3,7 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-public class SpringDiverManagerSourceWrapper extends AbstractDataSourceWrapper {
+public class SpringDiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public SpringDiverManagerSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
