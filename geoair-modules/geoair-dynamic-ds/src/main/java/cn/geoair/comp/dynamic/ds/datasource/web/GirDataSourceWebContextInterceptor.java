@@ -1,8 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource.web;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import cn.geoair.comp.dynamic.ds.datasource.GirDynamicStackDataSource;
 import lombok.extern.slf4j.Slf4j;
