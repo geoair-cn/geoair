@@ -7,7 +7,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 /** 通用数据源包装器 基于反射适配所有未显式实现的数据源类型 */
-public class CommonSourceWrapper extends AbstractDataSourceWrapper {
+public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
 
     // 常见的数据源名称属性/方法名（按优先级排序）
     private static final List<String> NAME_KEYS =

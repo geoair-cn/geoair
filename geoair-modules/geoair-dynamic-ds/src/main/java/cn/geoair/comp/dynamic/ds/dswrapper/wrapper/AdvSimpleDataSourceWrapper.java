@@ -4,7 +4,7 @@ import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import javax.sql.DataSource;
 
 /** HikariCP数据源包装器 */
-public class AdvSimpleDataSourceWrapper extends AbstractDataSourceWrapper {
+public class AdvSimpleDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);

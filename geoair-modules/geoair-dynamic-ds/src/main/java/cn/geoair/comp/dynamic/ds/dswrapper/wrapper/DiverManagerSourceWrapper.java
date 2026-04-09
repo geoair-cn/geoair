@@ -4,7 +4,7 @@ import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import javax.sql.DataSource;
 
-public class DiverManagerSourceWrapper extends AbstractDataSourceWrapper {
+public class DiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public DiverManagerSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);

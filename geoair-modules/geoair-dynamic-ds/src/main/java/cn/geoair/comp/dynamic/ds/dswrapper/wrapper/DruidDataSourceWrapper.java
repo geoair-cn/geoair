@@ -5,7 +5,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import javax.sql.DataSource;
 
 /** Druid数据源包装器 */
-public class DruidDataSourceWrapper extends AbstractDataSourceWrapper {
+public class DruidDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public DruidDataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);

@@ -10,13 +10,26 @@ import java.lang.reflect.Method;
  */
 public interface GirDsAspectDoAroundApi {
 
+
+    String getDataSourceKey(String groupName, GirDataSourceRwTypeEnum girDataSourceRwTypeEnum);
+
     /**
      * 执行代理方法前
      *
      * @param method
      * @param point
      */
-    void doBefore(Method method, ProceedingJoinPoint point);
+    default void doBefore(Method method, ProceedingJoinPoint point) {
+        GirDsDataSource annotation =
+                method.getDeclaringClass().getAnnotation(GirDsDataSource.class);
+        if (annotation == null) {
+            annotation = method.getAnnotation(GirDsDataSource.class);
+        }
+        if (annotation != null) {
+            String dataSourceKey = getDataSourceKey(annotation.groupName(), annotation.rwType());
+            GirDynamicStackDataSource.pushDataSource(dataSourceKey);
+        }
+    }
 
     /**
      * 执行代理方法后
@@ -24,14 +37,18 @@ public interface GirDsAspectDoAroundApi {
      * @param method
      * @param point
      */
-    Object doAfter(Object proceed, Method method, ProceedingJoinPoint point);
+    default Object doAfter(Object proceed, Method method, ProceedingJoinPoint point) {
+        return proceed;
+    }
 
     /**
      * 发生异常的时候
      *
      * @param point
      */
-    void onError(Exception e, ProceedingJoinPoint point);
+    default void onError(Exception e, ProceedingJoinPoint point) {
+
+    }
 
     /**
      * 无论成功与否都执行的方法
@@ -39,5 +56,7 @@ public interface GirDsAspectDoAroundApi {
      * @param method
      * @param point
      */
-    void onFinally(Method method, ProceedingJoinPoint point);
+    default void onFinally(Method method, ProceedingJoinPoint point) {
+        GirDynamicStackDataSource.popDataSource();
+    }
 }

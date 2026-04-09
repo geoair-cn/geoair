@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 
 /** Apache DBCP2 数据源包装器 */
-public class DBCP2DataSourceWrapper extends AbstractDataSourceWrapper {
+public class DBCP2DataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     private static Boolean canInit = null;
 
