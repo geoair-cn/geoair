@@ -21,7 +21,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     private static final GiLogger log = GirLogger.getLoger();
 
-    static DynamicDataSourceManager dataSourceManager;
+    protected static AdvDynamicDataSourceStorage dataSourceManager;
     @Setter
     IAdvDataSourceHelper iAdvDataSourceHelper;
 
@@ -42,6 +42,10 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             AdvDynamicDataSourceStorage advDynamicDataSourceStorage = new AdvDynamicDataSourceStorage();
             advDynamicDataSourceStorage.setIAdvDataSourceHelper(iAdvDataSourceHelper);
             dataSourceManager = advDynamicDataSourceStorage;
+        } else {
+            if (dataSourceManager.iAdvDataSourceHelper == null) {
+                dataSourceManager.iAdvDataSourceHelper = iAdvDataSourceHelper;
+            }
         }
         return dataSourceManager;
     }
@@ -104,7 +108,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     @Override
-    public void addDataSource(DataSource dataSource, String dataSourceId) {
+    public void putDataSource(DataSource dataSource, String dataSourceId) {
         // 只有当数据源不存在时才添加
         AdvDataSourceWrapper existingDataSource = dataSourceMap.get(dataSourceId);
         if (existingDataSource == null) {
