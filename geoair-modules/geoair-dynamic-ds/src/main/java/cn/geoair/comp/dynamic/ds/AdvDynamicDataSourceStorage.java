@@ -7,6 +7,7 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.Setter;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     private static final GiLogger log = GirLogger.getLoger();
 
     static DynamicDataSourceManager dataSourceManager;
-
+    @Setter
     IAdvDataSourceHelper iAdvDataSourceHelper;
 
     /**
@@ -35,6 +36,16 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         }
         return dataSourceManager;
     }
+
+    public static DynamicDataSourceManager getInstance(IAdvDataSourceHelper iAdvDataSourceHelper) {
+        if (dataSourceManager == null) {
+            AdvDynamicDataSourceStorage advDynamicDataSourceStorage = new AdvDynamicDataSourceStorage();
+            advDynamicDataSourceStorage.setIAdvDataSourceHelper(iAdvDataSourceHelper);
+            dataSourceManager = advDynamicDataSourceStorage;
+        }
+        return dataSourceManager;
+    }
+
 
     public IAdvDataSourceHelper getAdvDataSourceHelper() {
         if (iAdvDataSourceHelper == null) {
