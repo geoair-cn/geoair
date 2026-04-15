@@ -73,7 +73,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setUrl(url);
             dataSourceNew.setUsername(dataSourceApo.getUsername());
             dataSourceNew.setPassword(dataSourceApo.getPassword());
-            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
+//            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
 
             // 初始化数据源
             dataSourceNew.init();
