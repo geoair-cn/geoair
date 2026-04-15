@@ -64,8 +64,14 @@ public class GirDynamicDataSourceAspect {
     @Around("dataSourcePointcut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         if (gtcDsAspectDoAroundApi == null) {
-            gtcDsAspectDoAroundApi =
-                    GirBeanHelper.getProvider().getBean(GirDsAspectDoAroundApi.class);
+            try {
+                gtcDsAspectDoAroundApi =
+                        GirBeanHelper.getProvider().getBean(GirDsAspectDoAroundApi.class);
+            }catch (Exception e){
+                log.error(e.getMessage());
+                throw new RuntimeException("无法找到 GirDsAspectDoAroundApi 对应的实现，请调用方进行手动实现");
+            }
+
         }
         Method method = null;
         try {

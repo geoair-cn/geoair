@@ -10,6 +10,8 @@ import java.lang.annotation.RetentionPolicy;
  * 启用动态数据源的切换组件 web环境下
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Import(value = {GirDataSourceWebContextWebConfig.class, GirDynamicDataSourceAspect.class})
+@Import(value = {
+        GirDataSourceWebContextWebConfig.class,
+        GirDynamicDataSourceAspect.class})
 public @interface EnableDynamicWebDs {
 }
