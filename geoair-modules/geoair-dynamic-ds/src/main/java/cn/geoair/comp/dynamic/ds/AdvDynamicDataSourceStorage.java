@@ -1,6 +1,8 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
@@ -15,6 +17,8 @@ import javax.sql.DataSource;
  * 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作
  */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
+
+    private static final GiLogger log = GirLogger.getLoger();
 
     static DynamicDataSourceManager dataSourceManager;
 
@@ -37,8 +41,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             try {
                 iAdvDataSourceHelper = Gir.beans.getBean(IAdvDataSourceHelper.class);
             } catch (Exception e) {
-                Gir.log.error(e.getMessage(), e);
-                throw new RuntimeException("无法找到 IAdvDataSourceHelper的实现类！");
+                log.error(e, e.getMessage());
+                throw new RuntimeException("无法找到 IAdvDataSourceHelper的实现类!" + e.getMessage());
             }
         }
         return iAdvDataSourceHelper;
@@ -53,7 +57,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     @Override
     public void cleanCache() {
-        Gir.log.info("执行清空数据源缓存并释放数据库链接操作！");
+        log.info("执行清空数据源缓存并释放数据库链接操作！");
         if (ObjectUtil.isNotEmpty(dataSourceMap)) {
             Set<Map.Entry<String, AdvDataSourceWrapper>> entries = dataSourceMap.entrySet();
             entries.forEach(
@@ -80,8 +84,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
                 AdvDataSourceWrapper dataSourceByDataSourceApo = getDataSourceByDataSourceApo(dataSourceApoById);
                 dataSourceMap.put(dataSourceId, dataSourceByDataSourceApo);
             } catch (Exception e) {
-                Gir.log.error(e.getMessage(), e);
-                String format = StrUtil.format("无法找到数据源ID为{}的数据源 ", dataSourceId);
+                log.error(e, e.getMessage());
+                String format = StrUtil.format("无法找到数据源ID为{}的数据源 message:{}", dataSourceId, e.getMessage());
                 throw new RuntimeException(format);
             }
             return dataSourceMap.get(dataSourceId);
@@ -94,9 +98,9 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         AdvDataSourceWrapper existingDataSource = dataSourceMap.get(dataSourceId);
         if (existingDataSource == null) {
             dataSourceMap.put(dataSourceId, AdvDataSourceWrapper.wrap(dataSource));
-            Gir.log.debug("已添加数据源: {}", dataSourceId);
+            log.debug("已添加数据源: {}", dataSourceId);
         } else {
-            Gir.log.debug("数据源已存在，不执行添加操作: {}", dataSourceId);
+            log.debug("数据源已存在，不执行添加操作: {}", dataSourceId);
         }
     }
 
@@ -118,11 +122,11 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             // 关闭数据源，释放资源
             if (dataSource != null) {
                 dataSource.close();
-                Gir.log.info("已移除并关闭数据源: {}", dataSourceId);
+                log.info("已移除并关闭数据源: {}", dataSourceId);
                 return true;
             }
         }
-        Gir.log.debug("数据源不存在，移除失败: {}", dataSourceId);
+        log.debug("数据源不存在，移除失败: {}", dataSourceId);
         return false;
     }
 }
