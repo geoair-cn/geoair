@@ -36,7 +36,9 @@ public class GirSpringDataSourceUtils {
         AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(properties.getUrl());
         apo.setJdbcUrl(properties.getUrl());
         apo.setDbName(jdbcUrlSplitter.database);
-        apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));
+        if (StringUtils.hasText(jdbcUrlSplitter.port)) {
+            apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));   // 端口是可以为空的，具体的数据源会去补充默认端口
+        }
         apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));
         apo.setAddress(jdbcUrlSplitter.host);
         // 设置用户名和密码
