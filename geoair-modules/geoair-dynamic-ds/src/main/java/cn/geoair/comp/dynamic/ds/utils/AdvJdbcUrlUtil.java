@@ -87,7 +87,7 @@ public class AdvJdbcUrlUtil {
                 throw new IllegalArgumentException("无效的JDBC URL：连接URI中未找到数据库名，格式应为//host:port/db");
             }
 
-            // 提取主机+端口部分（如10.11.14.182:5432）
+            // 提取主机+端口部分
             String hostPort = connUri.substring(2, dbStartPos);
             // 提取数据库名（如bdh）
             this.database = connUri.substring(dbStartPos + 1);
