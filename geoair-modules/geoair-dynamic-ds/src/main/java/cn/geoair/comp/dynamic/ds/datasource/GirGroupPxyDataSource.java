@@ -27,7 +27,11 @@ public class GirGroupPxyDataSource extends AbstractDataSource {
 
     List<String> dataSourceIds = new ArrayList<>();
 
-
+    /**
+     *
+     * @param groupName 组名称
+     * @param dataSourceIds 这个组对应有哪些数据源，这里传入数据源ID
+     */
     public GirGroupPxyDataSource(String groupName, List<String> dataSourceIds) {
         this.groupName = groupName;
         this.dataSourceIds = dataSourceIds;

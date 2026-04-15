@@ -36,7 +36,10 @@ public class GirDynamicDataSourceAspect {
     /**
      * 配置切点：匹配方法上带有GtcDsDataSource注解的方法
      */
-    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource)")
+//    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource)")
+//    public void methodPointcut() {
+//    }
+    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource) || @annotation(cn.geoair.comp.dynamic.ds.datasource.GirDataSourceChange)")
     public void methodPointcut() {
     }
 
