@@ -4,12 +4,16 @@ import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
-/** 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作 */
+/**
+ * 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作
+ */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     static DynamicDataSourceManager dataSourceManager;
@@ -28,8 +32,20 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return dataSourceManager;
     }
 
+    public IAdvDataSourceHelper getAdvDataSourceHelper() {
+        if (iAdvDataSourceHelper == null) {
+            try {
+                iAdvDataSourceHelper = Gir.beans.getBean(IAdvDataSourceHelper.class);
+            } catch (Exception e) {
+                Gir.log.error(e.getMessage(), e);
+                throw new RuntimeException("无法找到 IAdvDataSourceHelper的实现类！");
+            }
+        }
+        return iAdvDataSourceHelper;
+    }
+
     private AdvDynamicDataSourceStorage() {
-        iAdvDataSourceHelper = Gir.beans.getBean(IAdvDataSourceHelper.class);
+
     }
 
     // 数据源映射
@@ -59,7 +75,16 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         if (containsDataSource(dataSourceId)) {
             return dataSourceMap.get(dataSourceId);
         } else {
-            throw new RuntimeException("数据源不存在: " + dataSourceId);
+            try {
+                DataSourceApo dataSourceApoById = getAdvDataSourceHelper().getDataSourceApoById(dataSourceId);
+                AdvDataSourceWrapper dataSourceByDataSourceApo = getDataSourceByDataSourceApo(dataSourceApoById);
+                dataSourceMap.put(dataSourceId, dataSourceByDataSourceApo);
+            } catch (Exception e) {
+                Gir.log.error(e.getMessage(), e);
+                String format = StrUtil.format("无法找到数据源ID为{}的数据源 ", dataSourceId);
+                throw new RuntimeException(format);
+            }
+            return dataSourceMap.get(dataSourceId);
         }
     }
 
@@ -83,7 +108,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
      */
     @Override
     public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource) {
-        return AdvDataSourceWrapper.wrap(iAdvDataSourceHelper.getDbDataSourceByApo(dataSource));
+        return AdvDataSourceWrapper.wrap(getAdvDataSourceHelper().getDbDataSourceByApo(dataSource));
     }
 
     @Override
