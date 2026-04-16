@@ -17,7 +17,7 @@ public class ConvertOptions {
     private boolean ignoreEmptyCollection = true; // 是否忽略空集合
     private boolean throwOnNull = false;          // null值时是否抛出异常
     private boolean autoLike = false;             // 是否自动识别LIKE
-    private int autoLikeThreshold = 0;            // 自动LIKE的阈值（字符串长度超过此值时自动转为LIKE）
+    private int autoLikeThreshold = 20;            // 自动LIKE的阈值（字符串长度超过此值时自动转为LIKE）
     private Map<String,  FieldMapping> fieldMappings; // 字段映射配置
 
     public static  ConvertOptions defaultOptions() {

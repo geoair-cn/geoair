@@ -14,17 +14,17 @@ import cn.hutool.core.util.StrUtil;
 public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     // MySQL专属依赖
-    protected MysqlAdvGeoOpt mysqlAdvGeoPreOpt;
+    protected IAdvGeoPreOpt mysqlAdvGeoPreOpt;
 
-    protected MysqlAdvBaseOpt baseOpt;
+    protected IAdvBaseOpt baseOpt;
 
-    protected MysqlAdvDDLOpt mysqlAdvDDLOpt;
+    protected IAdvDDLOpt mysqlAdvDDLOpt;
 
-    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
+    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt mysqlAdvGeoOpt, IAdvDDLOpt mysqlAdvDDLOpt) {
         super(dataSourceGetter);
-        baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
-        mysqlAdvDDLOpt = new MysqlAdvDDLOpt(dataSourceGetter);
-        mysqlAdvGeoPreOpt = new MysqlAdvGeoOpt(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.mysqlAdvDDLOpt = mysqlAdvDDLOpt;
+        this.mysqlAdvGeoPreOpt = mysqlAdvGeoOpt;
     }
 
     @Override

@@ -43,7 +43,6 @@ public class GirAdvQuerySqlBuilder {
      */
     public SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
         SqlBuildResult result = buildSelectSql(param);
-
         if (param.hasPagination()) {
             String sql = result.getSql();
             List<Object> params = result.getParams();
@@ -80,7 +79,7 @@ public class GirAdvQuerySqlBuilder {
             );
             sql.append(tableName);
 
-            GirAdvQueryFilter where = param.getWhereOption();
+            GirAdvWhereFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
                 String whereClause = buildWhereClause(where.getExpression(), params);
                 if (StrUtil.isNotBlank(whereClause)) {
@@ -120,7 +119,7 @@ public class GirAdvQuerySqlBuilder {
         sql.append(tableName);
 
         // WHERE
-        GirAdvQueryFilter where = param.getWhereOption();
+        GirAdvWhereFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
             String whereClause = buildWhereClause(where.getExpression(), params);
             if (StrUtil.isNotBlank(whereClause)) {
@@ -164,7 +163,7 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建WHERE子句
      */
-    private String buildWhereClause(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
+    private String buildWhereClause(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
         if (expr == null) {
             return "";
         }
@@ -174,7 +173,7 @@ public class GirAdvQuerySqlBuilder {
         }
 
         if (expr.getLogicOperator() == AdvLogicOperatorEnums.NOT) {
-            List<GirAdvQueryFilter.ConditionExpression> children = expr.getChildren();
+            List<GirAdvWhereFilter.ConditionExpression> children = expr.getChildren();
             if (children != null && children.size() == 1) {
                 String subCondition = buildWhereClause(children.get(0), params);
                 if (StrUtil.isNotBlank(subCondition)) {
@@ -185,7 +184,7 @@ public class GirAdvQuerySqlBuilder {
         }
 
         List<String> subConditions = new ArrayList<>();
-        for (GirAdvQueryFilter.ConditionExpression child : expr.getChildren()) {
+        for (GirAdvWhereFilter.ConditionExpression child : expr.getChildren()) {
             String subSql = buildWhereClause(child, params);
             if (StrUtil.isNotBlank(subSql)) {
                 subConditions.add(subSql);
@@ -208,7 +207,7 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建叶子条件
      */
-    private String buildLeafCondition(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
+    private String buildLeafCondition(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
         // 字段名转义
         String column = dialectProcessor.tbQuoteFieldName(expr.getColumn());
         AdvOperatorEnums operator = expr.getOperator();
@@ -264,31 +263,91 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 格式化LIKE值
      */
-    private String formatLikeValue(AdvOperatorEnums operator, String value) {
+    public static String formatLikeValue(AdvOperatorEnums operator, String value) {
         if (value == null) {
             return null;
         }
 
+        // 如果值中已经包含通配符，不再进行额外包装
+        // 但需要根据实际模式进行智能处理
         switch (operator) {
             case LIKE_LEFT:
             case ILIKE_LEFT:
+            case NOT_LIKE_LEFT:
+                // 左模糊：期望 value%
+                if (value.endsWith("%")) {
+                    // 已经以%结尾，直接返回
+                    return value;
+                }
                 return value + "%";
+
             case LIKE_RIGHT:
             case ILIKE_RIGHT:
+            case NOT_LIKE_RIGHT:
+                // 右模糊：期望 %value
+                if (value.startsWith("%")) {
+                    // 已经以%开头，直接返回
+                    return value;
+                }
                 return "%" + value;
+
             case LIKE_ALL:
             case ILIKE_ALL:
-                return "%" + value + "%";
-            case NOT_LIKE_LEFT:
-                return value + "%";
-            case NOT_LIKE_RIGHT:
-                return "%" + value;
             case NOT_LIKE_ALL:
+                // 全模糊：期望 %value%
+                boolean hasLeft = value.startsWith("%");
+                boolean hasRight = value.endsWith("%");
+
+                if (hasLeft && hasRight) {
+                    // 已经是全模糊格式，直接返回
+                    return value;
+                }
+                if (hasLeft) {
+                    // 只有左通配符，添加右通配符
+                    return value + "%";
+                }
+                if (hasRight) {
+                    // 只有右通配符，添加左通配符
+                    return "%" + value;
+                }
+                // 没有通配符，添加双通配符
                 return "%" + value + "%";
+
             default:
                 return value;
         }
     }
+
+    /**
+     * 判断是否已经被左模糊包装（以%结尾）
+     */
+    private static boolean isAlreadyWrappedLeft(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        return value.endsWith("%");
+    }
+
+    /**
+     * 判断是否已经被右模糊包装（以%开头）
+     */
+    private static boolean isAlreadyWrappedRight(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        return value.startsWith("%");
+    }
+
+    /**
+     * 判断是否已经被全模糊包装（以%开头且以%结尾）
+     */
+    private static boolean isAlreadyWrappedAll(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        return value.startsWith("%") && value.endsWith("%");
+    }
+
 
     /**
      * 构建ORDER BY子句

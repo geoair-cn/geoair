@@ -33,12 +33,15 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     // 表名处理器（差异化）
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
+    protected IAdvBaseOpt baseOpt;
+
     // 日志实例
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
-    public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
+    public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         this.dataSourceGetter = dataSourceGetter;
+        this.baseOpt = baseOpt;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
         this.dataSourceGetter.setSchemaNameGetterFunction(this::dGetCurrentSchema);
         this.dataSourceGetter.setDatabaseNameGetterFunction(this::dGetCurrentDataBase);
@@ -47,7 +50,11 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     /**
      * 获取抽象查询对象
      */
-    protected abstract IAdvBaseOpt getAdvBaseOpt();
+
+
+    public IAdvBaseOpt getAdvBaseOpt() {
+        return baseOpt;
+    }
 
     /**
      * 创建表名处理器（子类实现：绑定PG/MySQL版本）

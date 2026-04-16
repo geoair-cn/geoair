@@ -68,17 +68,8 @@ public interface IAdvWhereSelectOpt {
      * @param query 查询请求对象，封装了表名、条件等参数（分页、排序参数会被忽略）
      * @return 匹配条件的记录总数；无结果时返回0
      */
-    int wSelectCount(GirAdvQueryRequest query);
+    Number wSelectCount(GirAdvQueryRequest query);
 
-    /**
-     * 判断记录是否存在
-     *
-     * <p>根据查询条件判断是否存在匹配的记录，适用于唯一性校验、存在性检查等场景</p>
-     *
-     * @param query 查询请求对象，封装了表名、条件等参数
-     * @return true=存在匹配记录，false=不存在
-     */
-    boolean wSelectExists(GirAdvQueryRequest query);
 
     /**
      * 查询并返回纯值列表结果

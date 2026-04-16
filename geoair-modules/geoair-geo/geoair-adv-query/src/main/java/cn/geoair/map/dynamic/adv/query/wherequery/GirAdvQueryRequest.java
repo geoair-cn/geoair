@@ -49,7 +49,7 @@ public class GirAdvQueryRequest {
      *
      * @return 条件参数映射
      */
-    private GirAdvQueryFilter whereOption = GirAdvQueryFilter.of();
+    private GirAdvWhereFilter whereOption = GirAdvWhereFilter.of();
 
     /**
      * NULL值处理策略（可选，默认INCLUDE）
@@ -102,11 +102,11 @@ public class GirAdvQueryRequest {
      * <p>用于处理空间字段的转换，如转换为空字符串等</p>
      * -- GETTER --
      * 获取空间操作规则
-     * 暂时没有实现
+
      *
      * @return 空间操作规则枚举
      */
-    @Deprecated
+
     private final AdvEnumsGeomOpt advEnumsGeomOpt;
 
     /**
@@ -114,10 +114,8 @@ public class GirAdvQueryRequest {
      * <p>true=返回字段元数据信息，false=仅返回数据</p>
      * -- GETTER --
      * 获取是否返回字段元数据
-     *
      * @return true=返回元数据，false=仅返回数据
      */
-    @Deprecated
     private final Boolean hasFieldsInfo;
 
     // ==================== 模式二：直接传SQL ====================
@@ -270,7 +268,7 @@ public class GirAdvQueryRequest {
         /**
          * WHERE条件参数映射
          */
-        private GirAdvQueryFilter whereOption;
+        private GirAdvWhereFilter whereOption;
 
         /**
          * NULL值处理策略（默认INCLUDE）
@@ -355,7 +353,7 @@ public class GirAdvQueryRequest {
          * @param whereOption 条件参数映射
          * @return Builder实例
          */
-        public Builder where(GirAdvQueryFilter whereOption) {
+        public Builder where(GirAdvWhereFilter whereOption) {
             this.whereOption = whereOption;
             return this;
         }
@@ -624,7 +622,7 @@ public class GirAdvQueryRequest {
         GirAdvQueryRequest query1 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age")
-                .where(GirAdvQueryFilter.of())
+                .where(GirAdvWhereFilter.of())
                 .ignoreNull()
                 .orderByAsc("name")           // 升序
                 .orderByDesc("age")           // 降序
@@ -636,7 +634,7 @@ public class GirAdvQueryRequest {
         GirAdvQueryRequest query2 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "gtc_id")
-                .where(GirAdvQueryFilter.of())
+                .where(GirAdvWhereFilter.of())
                 .orderByAscFunction("CAST(gtc_id AS numeric)")     // 函数升序
                 .orderByDescFunction("LENGTH(name)")               // 函数降序
                 .orderByFunction("YEAR(create_time)", AdvEnumsOrder.降序)
@@ -646,7 +644,7 @@ public class GirAdvQueryRequest {
         GirAdvQueryRequest query3 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name")
-                .where(GirAdvQueryFilter.of())
+                .where(GirAdvWhereFilter.of())
                 .order(OrderApo.ofASCFieldName("name"))              // 字段升序
                 .order(OrderApo.ofDescFunction("CAST(gtc_id AS numeric)")) // 函数降序
                 .build();
@@ -659,7 +657,7 @@ public class GirAdvQueryRequest {
         GirAdvQueryRequest query4 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name")
-                .where(GirAdvQueryFilter.of())
+                .where(GirAdvWhereFilter.of())
                 .orders(orderList)
                 .build();
 

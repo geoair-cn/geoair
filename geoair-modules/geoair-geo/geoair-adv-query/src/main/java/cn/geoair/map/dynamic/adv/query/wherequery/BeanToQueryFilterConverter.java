@@ -21,7 +21,7 @@ public class BeanToQueryFilterConverter {
      * @param bean Bean对象
      * @return QueryFilter实例
      */
-    public static GirAdvQueryFilter convert(Object bean) {
+    public static GirAdvWhereFilter convert(Object bean) {
         return convert(bean, ConvertOptions.defaultOptions());
     }
 
@@ -32,8 +32,8 @@ public class BeanToQueryFilterConverter {
      * @param options 转换配置选项
      * @return QueryFilter实例
      */
-    public static GirAdvQueryFilter convert(Object bean, ConvertOptions options) {
-        GirAdvQueryFilter filter = GirAdvQueryFilter.of();
+    public static GirAdvWhereFilter convert(Object bean, ConvertOptions options) {
+        GirAdvWhereFilter filter = GirAdvWhereFilter.of();
 
         if (bean == null) {
             return filter;
@@ -60,7 +60,7 @@ public class BeanToQueryFilterConverter {
      * @param fieldMappings 字段映射配置
      * @return QueryFilter实例
      */
-    public static GirAdvQueryFilter convertWithMapping(Object bean, Map<String, FieldMapping> fieldMappings) {
+    public static GirAdvWhereFilter convertWithMapping(Object bean, Map<String, FieldMapping> fieldMappings) {
         return convertWithMapping(bean, fieldMappings, ConvertOptions.defaultOptions());
     }
 
@@ -72,10 +72,10 @@ public class BeanToQueryFilterConverter {
      * @param options       转换配置选项
      * @return QueryFilter实例
      */
-    public static GirAdvQueryFilter convertWithMapping(Object bean,
+    public static GirAdvWhereFilter convertWithMapping(Object bean,
                                                        Map<String, FieldMapping> fieldMappings,
                                                        ConvertOptions options) {
-        GirAdvQueryFilter filter = GirAdvQueryFilter.of();
+        GirAdvWhereFilter filter = GirAdvWhereFilter.of();
 
         if (bean == null || fieldMappings == null || fieldMappings.isEmpty()) {
             return filter;
@@ -146,7 +146,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 应用默认条件（等值条件）
      */
-    private static void applyDefaultConditions(GirAdvQueryFilter filter,
+    private static void applyDefaultConditions(GirAdvWhereFilter filter,
                                                Map<String, Object> fieldMap,
                                                ConvertOptions options) {
         for (Map.Entry<String, Object> entry : fieldMap.entrySet()) {
@@ -187,7 +187,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 应用字段映射
      */
-    private static void applyFieldMappings(GirAdvQueryFilter filter, Object bean, ConvertOptions options) {
+    private static void applyFieldMappings(GirAdvWhereFilter filter, Object bean, ConvertOptions options) {
         Map<String, FieldMapping> fieldMappings = options.getFieldMappings();
         if (fieldMappings == null || fieldMappings.isEmpty()) {
             applyDefaultConditions(filter, extractFieldValues(bean, options), options);
@@ -220,6 +220,10 @@ public class BeanToQueryFilterConverter {
 
     /**
      * 根据值类型智能检测操作符
+     *
+     * @param value   值
+     * @param options 转换配置选项
+     * @return 操作符枚举
      */
     private static AdvOperatorEnums detectOperator(Object value, ConvertOptions options) {
         if (value == null) {
@@ -231,18 +235,35 @@ public class BeanToQueryFilterConverter {
             return AdvOperatorEnums.IN;
         }
 
-        // 字符串包含通配符 -> LIKE
+        // 字符串类型 -> 智能判断
         if (value instanceof String) {
             String str = (String) value;
-            if (str.contains("%") || str.contains("_")) {
+
+            // 检查通配符位置，智能选择LIKE类型
+            boolean hasLeftWildcard = str.startsWith("%");
+            boolean hasRightWildcard = str.endsWith("%");
+
+
+            // 情况1：用户已经指定了通配符模式
+            if (hasLeftWildcard && hasRightWildcard) {
+                // %xxx% -> 全模糊
                 return AdvOperatorEnums.LIKE_ALL;
+            } else if (hasLeftWildcard) {
+                // %xxx -> 右模糊
+                return AdvOperatorEnums.LIKE_RIGHT;
+            } else if (hasRightWildcard) {
+                // xxx% -> 左模糊
+                return AdvOperatorEnums.LIKE_LEFT;
             }
-            if (options.isAutoLike() && (str.length() > options.getAutoLikeThreshold())) {
+
+            // 情况2：没有通配符，根据配置决定
+            if (options.isAutoLike() && str.length() >= options.getAutoLikeThreshold()) {
+                // 长字符串自动转为全模糊
                 return AdvOperatorEnums.LIKE_ALL;
             }
         }
 
-
+        // 默认等值查询
         return AdvOperatorEnums.等于;
     }
 
@@ -255,12 +276,6 @@ public class BeanToQueryFilterConverter {
         }
 
         switch (operator) {
-            case LIKE_LEFT:
-                return value + "%";
-            case LIKE_RIGHT:
-                return "%" + value;
-            case LIKE_ALL:
-                return "%" + value + "%";
             case BETWEEN:
                 if (value instanceof Object[] && ((Object[]) value).length == 2) {
                     return value;
@@ -320,9 +335,6 @@ public class BeanToQueryFilterConverter {
     }
 
     // ==================== 内部类 ====================
-
-
-
 
 
 }

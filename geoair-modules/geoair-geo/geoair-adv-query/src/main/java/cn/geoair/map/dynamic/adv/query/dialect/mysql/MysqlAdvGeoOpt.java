@@ -28,14 +28,14 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private static final Logger log = LoggerFactory.getLogger(MysqlAdvGeoOpt.class);
 
-    private MysqlAdvBaseOpt baseOpt;
+    private IAdvBaseOpt baseOpt;
 
-    private MysqlAdvDDLOpt ddlOpt;
+    private IAdvDDLOpt ddlOpt;
 
-    public MysqlAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
+    public MysqlAdvGeoOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
         super(dataSourceGetter);
-        this.baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
-        this.ddlOpt = new MysqlAdvDDLOpt(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.ddlOpt = ddlOpt;
     }
 
     @Override

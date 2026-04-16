@@ -92,7 +92,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "status")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .eq("name", "张三")
                         .eq("status", 1)
                 )
@@ -110,7 +110,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age", "score")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .gt("age", 18)
                         .ge("score", 60)
                         .lt("create_time", new Date())
@@ -129,7 +129,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .in("id", Arrays.asList(1, 2, 3, 4, 5))
                         .between("age", 18, 30)
                 )
@@ -147,7 +147,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "email")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .like("name", "张")
                         .likeLeft("email", "admin")
                         .likeRight("phone", "1234")
@@ -166,7 +166,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "email")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .isNull("deleted_at")
                         .isNotNull("email")
                 )
@@ -184,7 +184,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "status", "age", "score")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .eq("status", 1)
                         .group(group -> group
                                 .gt("age", 18)
@@ -205,7 +205,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "status", "age", "vip")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .eq("status", 1)
                         .or()
                         .group(group -> group
@@ -227,7 +227,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age", "status", "dept_id", "role")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .like("name", "张")
                         .group(group -> group
                                 .gt("age", 18)
@@ -254,7 +254,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "status", "create_time")
-                .where(GirAdvQueryFilter.of().eq("status", 1))
+                .where(GirAdvWhereFilter.of().eq("status", 1))
                 .orderByDesc("create_time")
                 .orderByAsc("id")
                 .page(2, 10)
@@ -287,7 +287,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .eq("name", "张三")
                         .eq("age", null)
                 )
@@ -311,7 +311,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age")
-                .where(GirAdvQueryFilter.of())
+                .where(GirAdvWhereFilter.of())
                 .orders(orders)
                 .build();
 
@@ -327,7 +327,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age", "vip", "status", "score", "level")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .group(group -> group
                                 .like("name", "张")
                                 .group(sub -> sub
@@ -360,7 +360,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "status", "age")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .notGroup(group -> group.eq("status", 0))
                         .notGroup(group -> group.lt("age", 18))
                 )
@@ -378,7 +378,7 @@ public class WhereQueryExample {
 
                 .table("user")
                 .fields("id", "name", "age", "status", "score", "dept_id", "create_time")
-                .where(GirAdvQueryFilter.of()
+                .where(GirAdvWhereFilter.of()
                         .eq("status", 1)
                         .isNotNull("email")
                         .group(ageGroup -> ageGroup
