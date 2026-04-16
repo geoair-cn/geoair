@@ -319,8 +319,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectList(String sql, Consumer<GirAdvOneRow> rowConsumer) {
-        advBaseOptPxy.bSelectList(sql, rowConsumer);
+    public void bSelectListStream(String sql, Consumer<GirAdvOneRow> rowConsumer) {
+        advBaseOptPxy.bSelectListStream(sql, rowConsumer);
     }
 
     @Override
@@ -349,8 +349,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> void bSelectObjList(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
-        advBaseOptPxy.bSelectObjList(sql, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
+        advBaseOptPxy.bSelectObjListStream(sql, clazz, rowConsumer);
     }
 
     @Override
@@ -364,9 +364,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectList(
+    public void bSelectListStream(
             String   dynamicSql, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        advBaseOptPxy.bSelectList(dynamicSql, sqlParam, rowConsumer);
+        advBaseOptPxy.bSelectListStream(dynamicSql, sqlParam, rowConsumer);
     }
 
     @Override
@@ -395,9 +395,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> void bSelectObjList(
+    public <E> void bSelectObjListStream(
             String   dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        advBaseOptPxy.bSelectObjList(dynamicSql, sqlParam, clazz, rowConsumer);
+        advBaseOptPxy.bSelectObjListStream(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
 
@@ -412,8 +412,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectList(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
-        advBaseOptPxy.bSelectList(sqlStatement, sqlParamList, rowConsumer);
+    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+        advBaseOptPxy.bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
     }
 
     @Override
@@ -442,8 +442,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> void bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
-        advBaseOptPxy.bSelectObjList(sqlStatement, sqlParamList, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+        advBaseOptPxy.bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
     }
 
 

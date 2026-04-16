@@ -54,7 +54,7 @@ public interface IAdvBaseSelectOpt {
      * @param rowConsumer 行数据消费器，用于逐行处理查询结果中的每一条GirAdvOneRow数据 <br>
      *                    示例：row -> Gir.log.info("日志ID：" + row.get("id") + " 内容：" + row.get("log_content"))
      */
-    void bSelectList(String sql, Consumer<GirAdvOneRow> rowConsumer);
+    void bSelectListStream(String sql, Consumer<GirAdvOneRow> rowConsumer);
 
     /**
      * 执行查询并返回多行纯值列表结果（无参数版），仅保留值无列名
@@ -128,7 +128,7 @@ public interface IAdvBaseSelectOpt {
      *                    示例：emp -> Gir.log.info("员工姓名：" + emp.getName() + " 薪资：" + emp.getSalary())
      * @param <E>         目标对象的泛型类型
      */
-    <E> void bSelectObjList(String sql, Class<E> clazz, Consumer<E> rowConsumer);
+    <E> void bSelectObjListStream(String sql, Class<E> clazz, Consumer<E> rowConsumer);
 
 
     /**
@@ -173,7 +173,7 @@ public interface IAdvBaseSelectOpt {
      *                    示例：{"startTime": "2024-01-01 00:00:00", "endTime": "2024-01-31 23:59:59"}
      * @param rowConsumer 行数据消费器，用于逐行处理查询结果
      */
-    void bSelectList(String dynamicSql, SqlParamMap sqlParamMap, Consumer<GirAdvOneRow> rowConsumer);
+    void bSelectListStream(String dynamicSql, SqlParamMap sqlParamMap, Consumer<GirAdvOneRow> rowConsumer);
 
     /**
      * 执行查询并返回多行纯值列表结果（支持MyBatis动态SQL）
@@ -248,7 +248,7 @@ public interface IAdvBaseSelectOpt {
      * @param rowConsumer 行对象消费器
      * @param <E>         目标对象的泛型类型
      */
-    <E> void bSelectObjList(String dynamicSql, SqlParamMap sqlParamMap, Class<E> clazz, Consumer<E> rowConsumer);
+    <E> void bSelectObjListStream(String dynamicSql, SqlParamMap sqlParamMap, Class<E> clazz, Consumer<E> rowConsumer);
 
 
     //=============================================================================================
@@ -286,7 +286,7 @@ public interface IAdvBaseSelectOpt {
      * @param rowConsumer  行数据消费器，用于逐行处理查询结果中的每一条GirAdvOneRow数据 <br>
      *                     示例：row -> log.info("日志ID：" + row.get("id") + " 内容：" + row.get("log_content"))
      */
-    void bSelectList(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer);
+    void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer);
 
     /**
      * 执行查询并返回多行结果，结果以纯值列表形式封装（仅保留值，无列名）
@@ -372,7 +372,7 @@ public interface IAdvBaseSelectOpt {
      *                     示例：emp -> log.info("员工姓名：" + emp.getName() + " 薪资：" + emp.getSalary())
      * @param <E>          目标对象的泛型类型
      */
-    <E> void bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer);
+    <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer);
 
 
 }

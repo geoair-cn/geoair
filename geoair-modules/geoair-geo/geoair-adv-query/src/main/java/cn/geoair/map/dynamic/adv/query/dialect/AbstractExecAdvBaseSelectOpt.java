@@ -4,7 +4,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
@@ -22,7 +21,6 @@ import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -86,7 +84,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public void bSelectList(String sql, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(String sql, Consumer<GirAdvOneRow> rowConsumer) {
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
@@ -173,7 +171,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public <E> void bSelectObjList(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjListStream(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
@@ -201,10 +199,10 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public void bSelectList(
+    public void bSelectListStream(
             String dynamicSql, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
-        bSelectList(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), rowConsumer);
+        bSelectListStream(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), rowConsumer);
     }
 
     @Override
@@ -238,10 +236,10 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public <E> void bSelectObjList(
+    public <E> void bSelectObjListStream(
             String dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
-        bSelectObjList(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), clazz, rowConsumer);
+        bSelectObjListStream(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), clazz, rowConsumer);
     }
 
     @Override
@@ -288,7 +286,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public void bSelectList(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -409,7 +407,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public <E> void bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
         Connection connection = dataSourceGetter.getConnection();
         try {
             sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
