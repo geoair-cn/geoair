@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class Example {
+public class WhereQueryExample {
 
     public static void main(String[] args) {
 
@@ -62,16 +62,16 @@ public class Example {
      * SQL: SELECT * FROM user WHERE name = ? AND status = ?
      */
     static void example1() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "status")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .eq("name", "张三")
                         .eq("status", 1)
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例1】简单等值查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -83,17 +83,17 @@ public class Example {
      * SQL: SELECT * FROM user WHERE age > ? AND score >= ? AND create_time < ?
      */
     static void example2() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age", "score", "create_time")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .gt("age", 18)
                         .ge("score", 60)
                         .lt("create_time", new Date())
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例2】比较运算符查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -105,16 +105,16 @@ public class Example {
      * SQL: SELECT * FROM user WHERE id IN (?, ?, ?) AND age BETWEEN ? AND ?
      */
     static void example3() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .in("id", Arrays.asList(1, 2, 3, 4, 5))
                         .between("age", 18, 30)
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例3】IN和BETWEEN查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -126,17 +126,17 @@ public class Example {
      * SQL: SELECT * FROM user WHERE name LIKE ? AND email LIKE ?
      */
     static void example4() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "email")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .like("name", "张")
                         .likeLeft("email", "admin")
                         .likeRight("phone", "1234")
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例4】模糊查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -148,16 +148,16 @@ public class Example {
      * SQL: SELECT * FROM user WHERE deleted_at IS NULL AND email IS NOT NULL
      */
     static void example5() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "email")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .isNull("deleted_at")
                         .isNotNull("email")
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例5】NULL判断查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -169,10 +169,10 @@ public class Example {
      * SQL: SELECT * FROM user WHERE status = ? AND (age > ? AND score > ?)
      */
     static void example6() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "status", "age", "score")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .eq("status", 1)
                         .group(group -> group
                                 .gt("age", 18)
@@ -181,7 +181,7 @@ public class Example {
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例6】AND条件组");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -193,10 +193,10 @@ public class Example {
      * SQL: SELECT * FROM user WHERE status = ? OR (age > ? AND vip = ?)
      */
     static void example7() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "status", "age", "vip")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .eq("status", 1)
                         .or()
                         .group(group -> group
@@ -206,7 +206,7 @@ public class Example {
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例7】OR条件组");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -218,10 +218,10 @@ public class Example {
      * SQL: SELECT * FROM user WHERE name LIKE ? AND (age > ? OR status = ?) AND (dept_id = ? OR role = ?)
      */
     static void example8() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age", "status", "dept_id", "role")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .like("name", "张")
                         .group(group -> group
                                 .gt("age", 18)
@@ -236,7 +236,7 @@ public class Example {
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例8】复杂嵌套查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -248,16 +248,16 @@ public class Example {
      * SQL: SELECT * FROM user WHERE status = ? ORDER BY create_time DESC, id ASC LIMIT ? OFFSET ?
      */
     static void example9() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "status", "create_time")
-                .where(QueryFilter.of().eq("status", 1))
+                .where(GirAdvQueryFilter.of().eq("status", 1))
                 .orderByDesc("create_time")
                 .orderByAsc("id")
                 .page(2, 10)
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildPageSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildPageSql(query);
         System.out.println("【示例9】带排序的分页查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -269,13 +269,13 @@ public class Example {
      * SQL: SELECT * FROM user WHERE age > 18 ORDER BY create_time DESC LIMIT ? OFFSET ?
      */
     static void example10() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .customSql("SELECT * FROM user WHERE age > 18")
                 .orderByDesc("create_time")
                 .page(1, 20)
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildPageSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildPageSql(query);
         System.out.println("【示例10】自定义SQL模式");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -287,17 +287,17 @@ public class Example {
      * SQL: SELECT * FROM user WHERE name = ? (age=null会被忽略)
      */
     static void example11() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .eq("name", "张三")
                         .eq("age", null)  // 会被忽略
                 )
                 .nullHandling(AdvNullHandling.IGNORE)
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例11】忽略NULL值查询");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -314,14 +314,14 @@ public class Example {
                 OrderApo.ofASCFieldName("name")
         );
 
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age")
-                .where(QueryFilter.of())
+                .where(GirAdvQueryFilter.of())
                 .orders(orders)
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例12】使用OrderApo排序");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -333,10 +333,10 @@ public class Example {
      * SQL: SELECT * FROM user WHERE (name LIKE ? AND (age > ? OR vip = ?)) OR (status IN (?,?) AND (score > ? OR level = ?))
      */
     static void example13() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age", "vip", "status", "score", "level")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .group(group -> group
                                 .like("name", "张")
                                 .group(sub -> sub
@@ -357,7 +357,7 @@ public class Example {
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例13】多层嵌套复杂场景");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -369,16 +369,16 @@ public class Example {
      * SQL: SELECT * FROM user WHERE NOT (status = ?) AND NOT (age < ?)
      */
     static void example14() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "status", "age")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         .notGroup(group -> group.eq("status", 0))
                         .notGroup(group -> group.lt("age", 18))
                 )
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildSelectSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildSelectSql(query);
         System.out.println("【示例14】NOT条件组");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());
@@ -390,10 +390,10 @@ public class Example {
      * 包含：AND/OR组合、IN、BETWEEN、LIKE、NULL判断、排序、分页
      */
     static void example15() {
-        QueryRequest query = QueryRequest.builder()
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age", "status", "score", "dept_id", "create_time")
-                .where(QueryFilter.of()
+                .where(GirAdvQueryFilter.of()
                         // 基础条件
                         .eq("status", 1)
                         .isNotNull("email")
@@ -425,7 +425,7 @@ public class Example {
                 .page(1, 15)
                 .build();
 
-        QuerySqlBuilder.SqlBuildResult result = QuerySqlBuilder.buildPageSql(query);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = GirAdvQuerySqlBuilder.buildPageSql(query);
         System.out.println("【示例15】组合所有特性");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());

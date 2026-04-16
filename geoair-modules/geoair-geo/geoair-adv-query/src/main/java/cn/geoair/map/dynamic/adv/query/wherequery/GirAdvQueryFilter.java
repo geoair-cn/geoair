@@ -17,7 +17,7 @@ import java.util.*;
  * @date Created in 2026/4/16 10:18
  */
 @Getter
-public class QueryFilter extends LinkedHashMap<String, Object> implements Serializable {
+public class GirAdvQueryFilter extends LinkedHashMap<String, Object> implements Serializable {
 
     // 条件条目列表（保持添加顺序，每个条件有自己的连接符）
     private final List<ConditionEntry> entries = new ArrayList<>();
@@ -25,15 +25,15 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     // 当前连接符（用于下一个添加的条件）
     private AdvLogicOperatorEnums currentConnector = AdvLogicOperatorEnums.AND;
 
-    public static QueryFilter of() {
-        return new QueryFilter();
+    public static GirAdvQueryFilter of() {
+        return new GirAdvQueryFilter();
     }
 
     /**
      * 通过bean创建 QueryFilter
      */
-    public static QueryFilter ofBean(Object bean, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        QueryFilter queryFilter = new QueryFilter();
+    public static GirAdvQueryFilter ofBean(Object bean, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        GirAdvQueryFilter queryFilter = new GirAdvQueryFilter();
         BeanUtil.beanToMap(bean, queryFilter, isToUnderlineCase, ignoreNullValue);
         return queryFilter;
     }
@@ -43,7 +43,7 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     /**
      * 设置下一个条件使用 AND 连接（默认行为）
      */
-    public QueryFilter and() {
+    public GirAdvQueryFilter and() {
         this.currentConnector = AdvLogicOperatorEnums.AND;
         return this;
     }
@@ -51,7 +51,7 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     /**
      * 设置下一个条件使用 OR 连接
      */
-    public QueryFilter or() {
+    public GirAdvQueryFilter or() {
         this.currentConnector = AdvLogicOperatorEnums.OR;
         return this;
     }
@@ -61,7 +61,7 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     /**
      * 添加条件（自动处理NULL值）
      */
-    public QueryFilter addCondition(String column, AdvOperatorEnums operator, Object value) {
+    public GirAdvQueryFilter addCondition(String column, AdvOperatorEnums operator, Object value) {
         if (value == null && !operator.isNullCheck()) {
             return this;
         }
@@ -78,105 +78,105 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     /**
      * 等值条件 =
      */
-    public QueryFilter eq(String column, Object value) {
+    public GirAdvQueryFilter eq(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.等于, value);
     }
 
     /**
      * 不等条件 !=
      */
-    public QueryFilter ne(String column, Object value) {
+    public GirAdvQueryFilter ne(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.不等于, value);
     }
 
     /**
      * 大于条件 >
      */
-    public QueryFilter gt(String column, Object value) {
+    public GirAdvQueryFilter gt(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.大于, value);
     }
 
     /**
      * 大于等于条件 >=
      */
-    public QueryFilter ge(String column, Object value) {
+    public GirAdvQueryFilter ge(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.大于等于, value);
     }
 
     /**
      * 小于条件 <
      */
-    public QueryFilter lt(String column, Object value) {
+    public GirAdvQueryFilter lt(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.小于, value);
     }
 
     /**
      * 小于等于条件 <=
      */
-    public QueryFilter le(String column, Object value) {
+    public GirAdvQueryFilter le(String column, Object value) {
         return addCondition(column, AdvOperatorEnums.小于等于, value);
     }
 
     /**
      * IN条件
      */
-    public QueryFilter in(String column, Collection<?> values) {
+    public GirAdvQueryFilter in(String column, Collection<?> values) {
         return addCondition(column, AdvOperatorEnums.IN, values);
     }
 
     /**
      * IN条件（数组）
      */
-    public QueryFilter in(String column, Object[] values) {
+    public GirAdvQueryFilter in(String column, Object[] values) {
         return addCondition(column, AdvOperatorEnums.IN, Arrays.asList(values));
     }
 
     /**
      * NOT IN条件
      */
-    public QueryFilter notIn(String column, Collection<?> values) {
+    public GirAdvQueryFilter notIn(String column, Collection<?> values) {
         return addCondition(column, AdvOperatorEnums.NOT_IN, values);
     }
 
     /**
      * LIKE条件（全模糊 %value%）
      */
-    public QueryFilter like(String column, String value) {
+    public GirAdvQueryFilter like(String column, String value) {
         return addCondition(column, AdvOperatorEnums.LIKE_ALL, value);
     }
 
     /**
      * 左模糊匹配 value%
      */
-    public QueryFilter likeLeft(String column, String value) {
+    public GirAdvQueryFilter likeLeft(String column, String value) {
         return addCondition(column, AdvOperatorEnums.LIKE_LEFT, value);
     }
 
     /**
      * 右模糊匹配 %value
      */
-    public QueryFilter likeRight(String column, String value) {
+    public GirAdvQueryFilter likeRight(String column, String value) {
         return addCondition(column, AdvOperatorEnums.LIKE_RIGHT, value);
     }
 
     /**
      * BETWEEN条件
      */
-    public QueryFilter between(String column, Object start, Object end) {
+    public GirAdvQueryFilter between(String column, Object start, Object end) {
         return addCondition(column, AdvOperatorEnums.BETWEEN, new Object[]{start, end});
     }
 
     /**
      * IS NULL条件
      */
-    public QueryFilter isNull(String column) {
+    public GirAdvQueryFilter isNull(String column) {
         return addCondition(column, AdvOperatorEnums.IS_NULL, null);
     }
 
     /**
      * IS NOT NULL条件
      */
-    public QueryFilter isNotNull(String column) {
+    public GirAdvQueryFilter isNotNull(String column) {
         return addCondition(column, AdvOperatorEnums.IS_NOT_NULL, null);
     }
 
@@ -206,7 +206,7 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
      *     )
      * </pre>
      */
-    public QueryFilter group(GroupBuilderCallback callback) {
+    public GirAdvQueryFilter group(GroupBuilderCallback callback) {
         ConditionGroupBuilder groupBuilder = new ConditionGroupBuilder();
         callback.build(groupBuilder);
         ConditionExpression groupExpr = groupBuilder.build();
@@ -219,7 +219,7 @@ public class QueryFilter extends LinkedHashMap<String, Object> implements Serial
     /**
      * NOT条件组
      */
-    public QueryFilter notGroup(GroupBuilderCallback callback) {
+    public GirAdvQueryFilter notGroup(GroupBuilderCallback callback) {
         ConditionGroupBuilder groupBuilder = new ConditionGroupBuilder();
         callback.build(groupBuilder);
         ConditionExpression groupExpr = groupBuilder.build();

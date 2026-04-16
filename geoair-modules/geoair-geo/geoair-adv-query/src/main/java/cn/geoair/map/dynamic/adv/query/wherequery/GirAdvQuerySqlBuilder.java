@@ -14,12 +14,12 @@ import java.util.*;
  *
  * @author zhangjun
  */
-public class QuerySqlBuilder {
+public class GirAdvQuerySqlBuilder {
 
     /**
      * 生成查询SQL
      */
-    public static SqlBuildResult buildSelectSql(QueryRequest param) {
+    public static SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             return buildCustomSql(param);
         } else {
@@ -30,14 +30,13 @@ public class QuerySqlBuilder {
     /**
      * 生成分页查询SQL
      */
-    public static SqlBuildResult buildPageSql(QueryRequest param) {
+    public static SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
         SqlBuildResult result = buildSelectSql(param);
 
         if (param.hasPagination()) {
             String sql = result.getSql();
             List<Object> params = result.getParams();
 
-            // MySQL/PostgreSQL 分页语法
             String pageSql = sql + " LIMIT ? OFFSET ?";
             params.add(param.getPageSize());
             params.add(param.getOffset());
@@ -51,7 +50,7 @@ public class QuerySqlBuilder {
     /**
      * 生成统计总数SQL
      */
-    public static SqlBuildResult buildCountSql(QueryRequest param) {
+    public static SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             String customSql = param.getCustomSql();
             String countSql = "SELECT COUNT(*) FROM (" + customSql + ") t";
@@ -63,7 +62,7 @@ public class QuerySqlBuilder {
             sql.append("SELECT COUNT(*) FROM ");
             sql.append(param.getTableOrViewName());
 
-            QueryFilter where = param.getWhereOption();
+            GirAdvQueryFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
                 String whereClause = buildWhereClause(where.getExpression(), params);
                 if (StrUtil.isNotBlank(whereClause)) {
@@ -78,7 +77,7 @@ public class QuerySqlBuilder {
     /**
      * 构建对象模式SQL
      */
-    private static SqlBuildResult buildObjectModeSql(QueryRequest param) {
+    private static SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
 
@@ -90,7 +89,7 @@ public class QuerySqlBuilder {
         sql.append(" FROM ").append(param.getTableOrViewName());
 
         // WHERE
-        QueryFilter where = param.getWhereOption();
+        GirAdvQueryFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
             String whereClause = buildWhereClause(where.getExpression(), params);
             if (StrUtil.isNotBlank(whereClause)) {
@@ -112,7 +111,7 @@ public class QuerySqlBuilder {
     /**
      * 构建自定义SQL模式
      */
-    private static SqlBuildResult buildCustomSql(QueryRequest param) {
+    private static SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
         String sql = param.getCustomSql();
         List<Object> params = new ArrayList<>();
 
@@ -135,7 +134,7 @@ public class QuerySqlBuilder {
      * 构建WHERE子句
      * <p>核心逻辑：按照条件的原始顺序和连接符生成SQL，不额外添加括号</p>
      */
-    private static String buildWhereClause(QueryFilter.ConditionExpression expr, List<Object> params) {
+    private static String buildWhereClause(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
         if (expr == null) {
             return "";
         }
@@ -147,7 +146,7 @@ public class QuerySqlBuilder {
 
         // 处理 NOT 逻辑
         if (expr.getLogicOperator() == AdvLogicOperatorEnums.NOT) {
-            List<QueryFilter.ConditionExpression> children = expr.getChildren();
+            List<GirAdvQueryFilter.ConditionExpression> children = expr.getChildren();
             if (children != null && children.size() == 1) {
                 String subCondition = buildWhereClause(children.get(0), params);
                 if (StrUtil.isNotBlank(subCondition)) {
@@ -160,7 +159,7 @@ public class QuerySqlBuilder {
         // 处理 AND/OR 逻辑组
         // 关键：按照条件的原始顺序生成，每个子条件保持原样，组内用连接符连接
         List<String> subConditions = new ArrayList<>();
-        for (QueryFilter.ConditionExpression child : expr.getChildren()) {
+        for (GirAdvQueryFilter.ConditionExpression child : expr.getChildren()) {
             String subSql = buildWhereClause(child, params);
             if (StrUtil.isNotBlank(subSql)) {
                 subConditions.add(subSql);
@@ -185,7 +184,7 @@ public class QuerySqlBuilder {
     /**
      * 构建叶子条件
      */
-    private static String buildLeafCondition(QueryFilter.ConditionExpression expr, List<Object> params) {
+    private static String buildLeafCondition(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
         String column = expr.getColumn();
         AdvOperatorEnums operator = expr.getOperator();
         Object value = expr.getValue();

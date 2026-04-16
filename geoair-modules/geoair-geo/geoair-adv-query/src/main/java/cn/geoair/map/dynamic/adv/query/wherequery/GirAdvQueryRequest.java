@@ -20,7 +20,7 @@ import java.util.*;
  * @author zhangjun
  */
 @Getter
-public class QueryRequest {
+public class GirAdvQueryRequest {
 
     // ==================== 模式一：对象组装SQL ====================
 
@@ -49,7 +49,7 @@ public class QueryRequest {
      *
      * @return 条件参数映射
      */
-    private QueryFilter whereOption = QueryFilter.of();
+    private GirAdvQueryFilter whereOption = GirAdvQueryFilter.of();
 
     /**
      * NULL值处理策略（可选，默认INCLUDE）
@@ -134,7 +134,7 @@ public class QueryRequest {
      *
      * @param builder 构建器实例
      */
-    private QueryRequest(Builder builder) {
+    private GirAdvQueryRequest(Builder builder) {
         // 模式一参数
         this.tableOrViewName = builder.tableOrViewName;
         this.fieldNames = builder.fieldNames;
@@ -267,7 +267,7 @@ public class QueryRequest {
         /**
          * WHERE条件参数映射
          */
-        private QueryFilter whereOption;
+        private GirAdvQueryFilter whereOption;
 
         /**
          * NULL值处理策略（默认INCLUDE）
@@ -352,7 +352,7 @@ public class QueryRequest {
          * @param whereOption 条件参数映射
          * @return Builder实例
          */
-        public Builder where(QueryFilter whereOption) {
+        public Builder where(GirAdvQueryFilter whereOption) {
             this.whereOption = whereOption;
             return this;
         }
@@ -583,7 +583,7 @@ public class QueryRequest {
          * @return SelectQueryParam实例
          * @throws IllegalArgumentException 当参数校验失败时抛出
          */
-        public QueryRequest build() {
+        public GirAdvQueryRequest build() {
             // 校验：两种模式至少选一种
             boolean hasObjectMode = tableOrViewName != null && fieldNames != null && whereOption != null;
             boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
@@ -609,7 +609,7 @@ public class QueryRequest {
                 throw new IllegalArgumentException("pageSize must be greater than 0");
             }
 
-            return new QueryRequest(this);
+            return new GirAdvQueryRequest(this);
         }
     }
 
@@ -618,10 +618,10 @@ public class QueryRequest {
      */
     public static void main(String[] args) {
         // 1. 字段排序示例
-        QueryRequest query1 = QueryRequest.builder()
+        GirAdvQueryRequest query1 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "age")
-                .where(QueryFilter.of())
+                .where(GirAdvQueryFilter.of())
                 .ignoreNull()
                 .orderByAsc("name")           // 升序
                 .orderByDesc("age")           // 降序
@@ -630,20 +630,20 @@ public class QueryRequest {
                 .build();
 
         // 2. 函数排序示例
-        QueryRequest query2 = QueryRequest.builder()
+        GirAdvQueryRequest query2 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name", "gtc_id")
-                .where(QueryFilter.of())
+                .where(GirAdvQueryFilter.of())
                 .orderByAscFunction("CAST(gtc_id AS numeric)")     // 函数升序
                 .orderByDescFunction("LENGTH(name)")               // 函数降序
                 .orderByFunction("YEAR(create_time)", AdvEnumsOrder.降序)
                 .build();
 
         // 3. 混合排序示例
-        QueryRequest query3 = QueryRequest.builder()
+        GirAdvQueryRequest query3 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name")
-                .where(QueryFilter.of())
+                .where(GirAdvQueryFilter.of())
                 .order(OrderApo.ofASCFieldName("name"))              // 字段升序
                 .order(OrderApo.ofDescFunction("CAST(gtc_id AS numeric)")) // 函数降序
                 .build();
@@ -653,10 +653,10 @@ public class QueryRequest {
                 OrderApo.ofDescFieldName("create_time"),
                 OrderApo.ofASCFieldName("id")
         );
-        QueryRequest query4 = QueryRequest.builder()
+        GirAdvQueryRequest query4 = GirAdvQueryRequest.builder()
                 .table("user")
                 .fields("id", "name")
-                .where(QueryFilter.of())
+                .where(GirAdvQueryFilter.of())
                 .orders(orderList)
                 .build();
 
