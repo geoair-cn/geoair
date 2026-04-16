@@ -8,7 +8,9 @@ import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
 import cn.hutool.core.util.StrUtil;
 
-/** MySQL 带参数分页实现类 */
+/**
+ * MySQL 带参数分页实现类
+ */
 public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     // MySQL专属依赖
@@ -45,13 +47,5 @@ public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
         return mysqlAdvGeoPreOpt;
     }
 
-    @Override
-    protected String buildPageSql(String noPageSql, int pageSize, long offset) {
-        return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);
-    }
 
-    @Override
-    protected String getTempTableAlias() {
-        return "t_mysql_page_temp";
-    }
 }

@@ -16,6 +16,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,24 +33,29 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }
 
-    /** 获取方言专属的表名处理器 */
+    /**
+     * 获取方言专属的表名处理器
+     */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    /** 执行统计SQL，返回总数 */
+    /**
+     * 执行统计SQL，返回总数
+     */
     protected abstract Long executeCountSql(String countSql);
 
-    /** 构建分页SQL（不同数据库语法不同） */
-    protected abstract String buildPageSql(String noPageSql, int pageSize, long offset);
 
-    /** 获取SQL对应的字段元数据 */
+    /**
+     * 获取SQL对应的字段元数据
+     */
     protected abstract DataFieldsApo getColumnsBySQL(String noPageSql);
 
-    /** 执行分页查询，返回结果列表 */
+    /**
+     * 执行分页查询，返回结果列表
+     */
     protected abstract List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
 
-    /** 获取临时表别名 */
-    protected abstract String getTempTableAlias();
+
 
     // ========== 通用逻辑：所有数据库都适用 ==========
     @Override
@@ -77,7 +83,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
             String noPageSql, int pageSize, int pageNum, boolean pageNumStartZero) {
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
-        return buildPageSql(cleanSql, pageSize, offset);
+        return dialectTableNameProcessor.tbBuildPageSql(cleanSql, pageSize, offset);
     }
 
     @Override
@@ -207,7 +213,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
                 fieldNames.stream().map(this::quoteFieldName).collect(Collectors.joining(", "));
 
         // 通用：临时表别名
-        String tableAlias = getTempTableAlias();
+        String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();
 
         // 通用：重构SQL
         String refactorNoPageSql =
@@ -228,7 +234,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         int lastPageNum = calculateLastPageNum(total, pageSize);
 
         // 子类实现：构建分页SQL
-        String pageSql = buildPageSql(sqlWithOrder, pageSize, offset);
+        String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
 
         // 子类实现：执行分页查询
         List<GirAdvOneRow> records = executePageSql(pageSql, advEnumsGeomOpt, geomFieldNameList);

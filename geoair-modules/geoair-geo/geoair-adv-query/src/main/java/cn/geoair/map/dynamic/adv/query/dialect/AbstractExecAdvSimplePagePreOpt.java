@@ -15,6 +15,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         List<String> geomFieldNameList = dataFieldsApo.getGeomFieldNameList();
         String quotedFields =
                 fieldNames.stream().map(this::quoteFieldName).collect(Collectors.joining(", "));
-        String tableAlias = getTempTableAlias();
+        String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();
         String refactorNoPageSql =
                 StrUtil.format(
                         "SELECT {} FROM ({}) AS {}",
@@ -103,7 +104,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         int lastPageNum = calculateLastPageNum(total, pageSize);
 
         // 6. 通用：构建分页SQL（子类实现语法）
-        String pageSql = buildPageSql(sqlWithOrder, pageSize, offset);
+        String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
 
         // 7. 子类实现：执行带参数的分页查询
         List<GirAdvOneRow> records =
@@ -319,7 +320,9 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
                 orders);
     }
 
-    /** 执行带参数的统计SQL，返回总数 */
+    /**
+     * 执行带参数的统计SQL，返回总数
+     */
     protected Long executeCountSqlWithParam(String countSql, SqlParamMap sqlParam) {
         GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
         return result != null ? result.getLong("count") : 0L;
@@ -330,7 +333,9 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         return executeCountSqlWithParam(countSql, new SqlParamMap());
     }
 
-    /** 带参数获取SQL字段元数据 */
+    /**
+     * 带参数获取SQL字段元数据
+     */
     protected DataFieldsApo getColumnsBySQLWithParam(String noPageSql, SqlParamMap sqlParam) {
         return getAdvDDLOpt().dGetColumnsBySQL(noPageSql, sqlParam);
     }
@@ -340,7 +345,9 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         return getColumnsBySQLWithParam(noPageSql, new SqlParamMap());
     }
 
-    /** 执行带参数的分页查询，返回结果列表 */
+    /**
+     * 执行带参数的分页查询，返回结果列表
+     */
     protected List<GirAdvOneRow> executePageSqlWithParam(
             String pageSql,
             SqlParamMap sqlParam,

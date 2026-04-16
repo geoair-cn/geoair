@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -67,13 +68,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         this.initByDataSource(dataSource, dataSourceName);
     }
 
-    public AbstractPxyAdvExecutor() {}
+    public AbstractPxyAdvExecutor() {
+    }
 
     public AbstractPxyAdvExecutor(Connection connection) {
         this.initByConnection(connection);
     }
 
-    /** 初始化所有功能模块代理对象 */
+    /**
+     * 初始化所有功能模块代理对象
+     */
     public void initProxyObjects() {
         this.advBaseOptPxy = getAdvBaseOpt();
         this.advDDLOptPxy = getAdvDDLOpt();
@@ -300,7 +304,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {}
+    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    }
 
     // ==================== 基础查询操作（代理调用PgAdvBaseOpt） ====================
     @Override
@@ -1111,6 +1116,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return dialectTableNameProcessorPxy.tbGetTableNameWithSchema(dataSourceGetter, tableName);
     }
 
+
     @Override
     public String tbGetTableNameWithSchema(
             IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
@@ -1192,6 +1198,17 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public String tbGetTableNameWithSchema(String tableName, String schemaName) {
         return tbGetTableNameWithSchema(this, tableName, schemaName);
     }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql, int pageSize, long offset) {
+        return dialectTableNameProcessorPxy.tbBuildPageSql(noPageSql, pageSize, offset);
+    }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql) {
+        return dialectTableNameProcessorPxy.tbBuildPageSql(noPageSql);
+    }
+
 
     @Override
     public GirAdvOneRow eSelectOne(

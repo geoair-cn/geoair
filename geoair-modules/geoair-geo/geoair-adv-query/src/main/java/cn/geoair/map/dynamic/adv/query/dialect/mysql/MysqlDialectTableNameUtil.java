@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecDialectTableUtil;
 import cn.hutool.core.util.StrUtil;
 
 /** MySQL方言表名处理器 仅实现MySQL专属的差异化逻辑 */
-public class MysqlDialectTableNameUtil extends AbstractDialectTableNameUtil {
+public class MysqlDialectTableNameUtil extends AbstractExecDialectTableUtil {
 
     // 单例实例
     private static final MysqlDialectTableNameUtil INSTANCE = new MysqlDialectTableNameUtil();
@@ -42,5 +42,15 @@ public class MysqlDialectTableNameUtil extends AbstractDialectTableNameUtil {
             return fieldName;
         }
         return FIELD_QUOTE_PREFIX + fieldName + FIELD_QUOTE_SUFFIX;
+    }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql, int pageSize, long offset) {
+        return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);
+    }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql) {
+        return StrUtil.format("{} LIMIT {}, {}", noPageSql, "?", "?");
     }
 }
