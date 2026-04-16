@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Version {
 
-    private static final String VERSION = "J8.1.2-SNAPSHOT";
+    private static final String VERSION = "J8.1.2";
 
     public static String getVersion() {
         return VERSION;

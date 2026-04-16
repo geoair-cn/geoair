@@ -6,7 +6,7 @@
 
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8.1.2</version>
     <packaging>pom</packaging>
     <name>geoair-framework</name>
 
@@ -53,7 +53,7 @@
 
     <properties>
         <skipTests>true</skipTests>
-        <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
+        <geoair.version>J8.1.2</geoair.version>
         <java.version>8</java.version>
         <okhttp.version>4.12.0</okhttp.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -204,7 +204,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
-
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <failOnError>false</failOnError> <!-- 忽略错误，继续执行 -->
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

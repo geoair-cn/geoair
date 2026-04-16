@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8.1.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-web</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J8.1.2</version>
   <packaging>jar</packaging>
   <name>geoair-web</name>
   <description>Web库</description>
@@ -58,6 +58,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
+      <version>${spring.version}</version>
       <optional>true</optional>
     </dependency>
 
