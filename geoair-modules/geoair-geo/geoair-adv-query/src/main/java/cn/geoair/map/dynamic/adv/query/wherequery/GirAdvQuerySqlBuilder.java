@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
@@ -11,16 +12,24 @@ import java.util.*;
 
 /**
  * SQL生成工具类
- * <p>根据QueryRequest生成完整的SQL语句</p>
+ * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理</p>
  *
  * @author zhangjun
  */
 public class GirAdvQuerySqlBuilder {
 
+    private final DialectTableNameProcessor dialectProcessor;
+    private final IDataSourceGetter dataSourceGetter;
+
+    public GirAdvQuerySqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+        this.dialectProcessor = dialectProcessor;
+        this.dataSourceGetter = dataSourceGetter;
+    }
+
     /**
      * 生成查询SQL
      */
-    public static SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
+    public SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             return buildCustomSql(param);
         } else {
@@ -31,14 +40,15 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 生成分页查询SQL
      */
-    public static SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
+    public SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
         SqlBuildResult result = buildSelectSql(param);
 
         if (param.hasPagination()) {
             String sql = result.getSql();
             List<Object> params = result.getParams();
 
-            String pageSql = sql + " LIMIT ? OFFSET ?";
+            // 使用方言处理器构建分页SQL
+            String pageSql = dialectProcessor.tbBuildPageSql(sql);
             params.add(param.getPageSize());
             params.add(param.getOffset());
 
@@ -51,7 +61,7 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 生成统计总数SQL
      */
-    public static SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
+    public SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             String customSql = param.getCustomSql();
             String countSql = "SELECT COUNT(*) FROM (" + customSql + ") t";
@@ -61,7 +71,13 @@ public class GirAdvQuerySqlBuilder {
             List<Object> params = new ArrayList<>();
 
             sql.append("SELECT COUNT(*) FROM ");
-            sql.append(param.getTableOrViewName());
+
+            // 使用方言处理器获取带Schema的表名
+            String tableName = dialectProcessor.tbGetTableNameWithSchema(
+                  dataSourceGetter,
+                    param.getTableOrViewName()
+            );
+            sql.append(tableName);
 
             GirAdvQueryFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
@@ -78,16 +94,29 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建对象模式SQL
      */
-    private static SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
+    private SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
 
-        // SELECT
+        // SELECT - 字段名转义
         sql.append("SELECT ");
-        sql.append(String.join(", ", param.getFieldNames()));
+        List<String> escapedFields = new ArrayList<>();
+        for (String field : param.getFieldNames()) {
+            if ("*".equals(field)) {
+                escapedFields.add("*");
+            } else {
+                escapedFields.add(dialectProcessor.tbQuoteFieldName(field));
+            }
+        }
+        sql.append(String.join(", ", escapedFields));
 
-        // FROM
-        sql.append(" FROM ").append(param.getTableOrViewName());
+        // FROM - 使用方言处理器获取带Schema的表名
+        sql.append(" FROM ");
+        String tableName = dialectProcessor.tbGetTableNameWithSchema(
+              dataSourceGetter,
+                param.getTableOrViewName()
+        );
+        sql.append(tableName);
 
         // WHERE
         GirAdvQueryFilter where = param.getWhereOption();
@@ -112,7 +141,7 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建自定义SQL模式
      */
-    private static SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
+    private SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
         String sql = param.getCustomSql();
         List<Object> params = new ArrayList<>();
 
@@ -133,19 +162,16 @@ public class GirAdvQuerySqlBuilder {
 
     /**
      * 构建WHERE子句
-     * <p>核心逻辑：按照条件的原始顺序和连接符生成SQL，不额外添加括号</p>
      */
-    private static String buildWhereClause(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
+    private String buildWhereClause(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
         if (expr == null) {
             return "";
         }
 
-        // 叶子节点：直接生成条件
         if (expr.isLeaf()) {
             return buildLeafCondition(expr, params);
         }
 
-        // 处理 NOT 逻辑
         if (expr.getLogicOperator() == AdvLogicOperatorEnums.NOT) {
             List<GirAdvQueryFilter.ConditionExpression> children = expr.getChildren();
             if (children != null && children.size() == 1) {
@@ -157,8 +183,6 @@ public class GirAdvQuerySqlBuilder {
             return "";
         }
 
-        // 处理 AND/OR 逻辑组
-        // 关键：按照条件的原始顺序生成，每个子条件保持原样，组内用连接符连接
         List<String> subConditions = new ArrayList<>();
         for (GirAdvQueryFilter.ConditionExpression child : expr.getChildren()) {
             String subSql = buildWhereClause(child, params);
@@ -173,8 +197,6 @@ public class GirAdvQuerySqlBuilder {
 
         String connector = expr.getLogicOperator() == AdvLogicOperatorEnums.AND ? " AND " : " OR ";
 
-        // 根据您的期望：保持原始结构，不额外添加括号
-        // 只有当组内条件数量大于1时才加括号，保证优先级正确
         if (subConditions.size() > 1) {
             return "(" + String.join(connector, subConditions) + ")";
         } else {
@@ -185,8 +207,9 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建叶子条件
      */
-    private static String buildLeafCondition(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
-        String column = expr.getColumn();
+    private String buildLeafCondition(GirAdvQueryFilter.ConditionExpression expr, List<Object> params) {
+        // 字段名转义
+        String column = dialectProcessor.tbQuoteFieldName(expr.getColumn());
         AdvOperatorEnums operator = expr.getOperator();
         Object value = expr.getValue();
 
@@ -240,7 +263,7 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 格式化LIKE值
      */
-    private static String formatLikeValue(AdvOperatorEnums operator, String value) {
+    private String formatLikeValue(AdvOperatorEnums operator, String value) {
         if (value == null) {
             return null;
         }
@@ -269,18 +292,20 @@ public class GirAdvQuerySqlBuilder {
     /**
      * 构建ORDER BY子句
      */
-    private static String buildOrderByClause(List<OrderApo> orders) {
+    private String buildOrderByClause(List<OrderApo> orders) {
         if (orders == null || orders.isEmpty()) {
             return "";
         }
 
         List<String> orderItems = new ArrayList<>();
         for (OrderApo order : orders) {
+            String field;
             if (order.isFunction()) {
-                orderItems.add(order.getFunction() + " " + order.getAdvEnumsOrder().getValue());
+                field = order.getFunction();
             } else {
-                orderItems.add(order.getFieldName() + " " + order.getAdvEnumsOrder().getValue());
+                field = dialectProcessor.tbQuoteFieldName(order.getFieldName());
             }
+            orderItems.add(field + " " + order.getAdvEnumsOrder().getValue());
         }
 
         return String.join(", ", orderItems);
