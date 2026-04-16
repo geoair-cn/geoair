@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -470,8 +471,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     public int dExecuteDDL(
             String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
         // 通用SQL解析
-        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -556,7 +556,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
             // 带参数/无参数处理
             if (sqlParam != null) {
-                SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, sqlParam);
+
+                SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sql, sqlParam, dialectTableNameProcessor);
                 statement = connection.prepareStatement(sqlMeta.getSql());
                 for (int i = 1; i <= sqlMeta.getJdbcParamValues().size(); i++) {
                     statement.setObject(i, sqlMeta.getJdbcParamValues().get(i - 1));

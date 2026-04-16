@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
@@ -52,9 +53,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("更新SQL语句不能为空");
         }
-        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-        // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 

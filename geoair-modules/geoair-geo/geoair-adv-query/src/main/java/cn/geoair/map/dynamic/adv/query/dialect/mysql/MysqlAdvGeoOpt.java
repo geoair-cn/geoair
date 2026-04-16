@@ -10,6 +10,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
@@ -671,7 +672,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String fieldQuerySql =
                     StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", sqlStatement, alias);
             // 解析带参数SQL
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(fieldQuerySql, sqlParam);
+            SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
+
 
             conn = dataSourceGetter.getConnection();
             if (conn == null) {
