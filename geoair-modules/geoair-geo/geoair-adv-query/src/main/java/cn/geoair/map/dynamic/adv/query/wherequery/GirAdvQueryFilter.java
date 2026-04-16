@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
-import cn.hutool.core.bean.BeanUtil;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -29,13 +28,13 @@ public class GirAdvQueryFilter extends LinkedHashMap<String, Object> implements 
         return new GirAdvQueryFilter();
     }
 
-    /**
-     * 通过bean创建 QueryFilter
-     */
-    public static GirAdvQueryFilter ofBean(Object bean, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        GirAdvQueryFilter queryFilter = new GirAdvQueryFilter();
-        BeanUtil.beanToMap(bean, queryFilter, isToUnderlineCase, ignoreNullValue);
-        return queryFilter;
+    public static GirAdvQueryFilter ofBean(Object bean) {
+        ConvertOptions options = ConvertOptions.defaultOptions();
+        return BeanToQueryFilterConverter.convert(bean, options);
+    }
+
+    public static GirAdvQueryFilter ofBean(Object bean, ConvertOptions convertOptions) {
+        return BeanToQueryFilterConverter.convert(bean, convertOptions);
     }
 
     // ==================== 连接符设置 ====================
@@ -185,7 +184,7 @@ public class GirAdvQueryFilter extends LinkedHashMap<String, Object> implements 
     /**
      * 条件组
      * <p>组内的连接关系通过 .and() / .or() 来控制</p>
-     *
+     * <p>
      * 使用示例：
      * <pre>
      * QueryFilter.of()

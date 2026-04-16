@@ -109,7 +109,6 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     public List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query) {
         try {
 
-
             // 构建SQL
             GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
             SqlBuildResult result = sqlBuilder.buildSelectSql(query);
@@ -205,10 +204,6 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
      */
     public void wSelectStream(GirAdvQueryRequest query, Consumer<GirAdvOneRow> rowConsumer) {
         try {
-            // 设置数据源获取器
-            if (query.getDataSourceGetter() == null) {
-                query.setDataSourceGetter(dataSourceGetter);
-            }
 
             // 构建SQL
             GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
@@ -234,20 +229,6 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
         }
     }
 
-    /**
-     * 批量查询
-     *
-     * @param queries 查询请求列表
-     * @return 查询结果列表
-     */
-    public List<List<GirAdvOneRow>> wSelectBatch(List<GirAdvQueryRequest> queries) {
-        if (queries == null || queries.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return queries.stream()
-                .map(this::wSelectList)
-                .toList();
-    }
 
     /**
      * 将参数列表转换为 SqlParamMap
@@ -263,7 +244,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
         // 使用索引作为参数名
         for (int i = 0; i < params.size(); i++) {
-            paramMap.addOne("param" + i, params.get(i));
+            paramMap.addOne("" + i, params.get(i));
         }
         return paramMap;
     }

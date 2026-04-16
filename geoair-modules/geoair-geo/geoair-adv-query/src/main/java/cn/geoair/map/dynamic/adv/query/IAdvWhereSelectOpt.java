@@ -25,6 +25,14 @@ public interface IAdvWhereSelectOpt {
     List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query);
 
     /**
+     * 查询列表  返回对象
+     *
+     * @param query 查询请求对象
+     * @return 查询结果列表
+     */
+    <T> List<T> wSelectListObj(GirAdvQueryRequest query, Class<T> objClass);
+
+    /**
      * 分页查询
      *
      * @param query 查询请求对象
