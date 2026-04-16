@@ -13,6 +13,7 @@ import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
@@ -54,7 +55,6 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
      */
     protected abstract List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
-
 
 
     // ========== 通用逻辑：所有数据库都适用 ==========
@@ -233,7 +233,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
         int lastPageNum = calculateLastPageNum(total, pageSize);
 
-        // 子类实现：构建分页SQL
+        //  构建分页SQL
         String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
 
         // 子类实现：执行分页查询
@@ -241,7 +241,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
 
         // 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
-                createPageApo(
+                GirAdvQueryCommonUtils.createPageApo(
                         total, pageNum, pageSize, pageNumStartZero, lastPageNum, offset, records);
 
         // 通用：组装字段元数据
@@ -301,24 +301,6 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         return (int) ((total + pageSize - 1) / pageSize);
     }
 
-    protected PageApo<GirAdvOneRow> createPageApo(
-            long total,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            int lastPageNum,
-            long startRow,
-            List<GirAdvOneRow> records) {
-        PageApo<GirAdvOneRow> pageApo = new PageApo<>();
-        pageApo.setTotal(total)
-                .setPageNum(pageNum)
-                .setPageSize(pageSize)
-                .setPageNumStartZero(pageNumStartZero)
-                .setLastPageNum(lastPageNum)
-                .setStartRow(startRow)
-                .setRecords(records);
-        return pageApo;
-    }
 
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders, String tableAlias) {
         if (CollectionUtil.isEmpty(orders)) {

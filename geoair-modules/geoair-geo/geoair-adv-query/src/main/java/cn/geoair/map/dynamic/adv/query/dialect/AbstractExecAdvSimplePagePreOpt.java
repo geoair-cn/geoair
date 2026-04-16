@@ -13,6 +13,7 @@ import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -107,12 +108,12 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
 
         // 7. 子类实现：执行带参数的分页查询
-        List<GirAdvOneRow> records =
-                executePageSqlWithParam(pageSql, param, advEnumsGeomOpt, geomFieldNameList);
+        List<GirAdvOneRow> records = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+
 
         // 8. 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
-                createPageApo(
+                GirAdvQueryCommonUtils.createPageApo(
                         total, pageNum, pageSize, pageNumStartZero, lastPageNum, offset, records);
 
         // 9. 通用：组装字段元数据
@@ -345,21 +346,11 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         return getColumnsBySQLWithParam(noPageSql, new SqlParamMap());
     }
 
-    /**
-     * 执行带参数的分页查询，返回结果列表
-     */
-    protected List<GirAdvOneRow> executePageSqlWithParam(
-            String pageSql,
-            SqlParamMap sqlParam,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            List<String> geomFieldNameList) {
-        return getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
-    }
 
     @Override
     protected List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return executePageSqlWithParam(
-                pageSql, new SqlParamMap(), advEnumsGeomOpt, geomFieldNameList);
+        return getAdvGeoPreOpt().eSelectList(pageSql, new SqlParamMap(), advEnumsGeomOpt, geomFieldNameList);
+
     }
 }
