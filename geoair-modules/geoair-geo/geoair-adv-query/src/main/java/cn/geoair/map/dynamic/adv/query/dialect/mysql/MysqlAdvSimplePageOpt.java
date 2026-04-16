@@ -8,21 +8,23 @@ import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
 import cn.hutool.core.util.StrUtil;
 
-/** MySQL 带参数分页实现类 */
+/**
+ * MySQL 带参数分页实现类
+ */
 public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     // MySQL专属依赖
-    protected MysqlAdvGeoOpt mysqlAdvGeoPreOpt;
+    protected IAdvGeoPreOpt mysqlAdvGeoPreOpt;
 
-    protected MysqlAdvBaseOpt baseOpt;
+    protected IAdvBaseOpt baseOpt;
 
-    protected MysqlAdvDDLOpt mysqlAdvDDLOpt;
+    protected IAdvDDLOpt mysqlAdvDDLOpt;
 
-    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
+    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt mysqlAdvGeoOpt, IAdvDDLOpt mysqlAdvDDLOpt) {
         super(dataSourceGetter);
-        baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
-        mysqlAdvDDLOpt = new MysqlAdvDDLOpt(dataSourceGetter);
-        mysqlAdvGeoPreOpt = new MysqlAdvGeoOpt(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.mysqlAdvDDLOpt = mysqlAdvDDLOpt;
+        this.mysqlAdvGeoPreOpt = mysqlAdvGeoOpt;
     }
 
     @Override
@@ -45,13 +47,5 @@ public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
         return mysqlAdvGeoPreOpt;
     }
 
-    @Override
-    protected String buildPageSql(String noPageSql, int pageSize, long offset) {
-        return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);
-    }
 
-    @Override
-    protected String getTempTableAlias() {
-        return "t_mysql_page_temp";
-    }
 }

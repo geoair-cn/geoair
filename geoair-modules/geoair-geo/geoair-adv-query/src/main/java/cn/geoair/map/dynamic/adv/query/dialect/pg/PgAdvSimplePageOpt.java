@@ -10,23 +10,25 @@ import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
 import cn.hutool.core.util.StrUtil;
 
-/** PG 带参数分页实现类 */
+/**
+ * PG 带参数分页实现类
+ */
 public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
 
     // PG专属的依赖类（复用父类已初始化的）
-    protected PgAdvGeoOpt pgAdvGeoPreOpt;
+    protected IAdvGeoPreOpt advGeoPreOpt;
 
-    protected PgAdvBaseOpt baseOpt;
+    protected IAdvBaseOpt baseOpt;
 
-    protected PgAdvDDLOpt pgAdvDDLOpt;
+    protected IAdvDDLOpt advDDLOpt;
 
-    public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
+    public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
-        baseOpt = new PgAdvBaseOpt(dataSourceGetter);
-        pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);
-        pgAdvGeoPreOpt = new PgAdvGeoOpt(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.advDDLOpt = advDDLOpt;
+        this.advGeoPreOpt = advGeoPreOpt;
     }
 
     @Override
@@ -41,21 +43,12 @@ public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     @Override
     protected IAdvDDLOpt getAdvDDLOpt() {
-        return pgAdvDDLOpt;
+        return advDDLOpt;
     }
 
     @Override
     protected IAdvGeoPreOpt getAdvGeoPreOpt() {
-        return pgAdvGeoPreOpt;
+        return advGeoPreOpt;
     }
 
-    @Override
-    protected String buildPageSql(String noPageSql, int pageSize, long offset) {
-        return StrUtil.format("{} LIMIT {} OFFSET {}", noPageSql, pageSize, offset);
-    }
-
-    @Override
-    protected String getTempTableAlias() {
-        return "t_384_page_temp";
-    }
 }

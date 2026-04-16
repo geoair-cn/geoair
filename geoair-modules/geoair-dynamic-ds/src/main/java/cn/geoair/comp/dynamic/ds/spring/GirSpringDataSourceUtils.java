@@ -1,0 +1,56 @@
+package cn.geoair.comp.dynamic.ds.spring;
+
+import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.util.StringUtils;
+
+import java.util.Date;
+
+/**
+ * @author ：张俊
+ * @date ：Created in 2026/4/15 17:24
+ * @description： Spring的DataSourceProperties 转换成 DataSourceApo
+ */
+public class GirSpringDataSourceUtils {
+
+
+    /**
+     * 将Spring Boot的DataSourceProperties转换为自定义的DataSourceApo
+     *
+     * @param properties Spring数据源配置属性
+     * @return 转换后的DataSourceApo实例
+     */
+    public static DataSourceApo convertToDataSourceApo(DataSourceProperties properties) {
+        if (properties == null) {
+            throw new IllegalStateException("DataSourceProperties未在Spring容器中找到");
+        }
+
+        DataSourceApo apo = new DataSourceApo();
+
+
+        // 设置驱动类名
+        if (StringUtils.hasText(properties.getDriverClassName())) {
+            apo.setDriver(properties.getDriverClassName());
+        }
+        AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(properties.getUrl());
+        apo.setJdbcUrl(properties.getUrl());
+        apo.setDbName(jdbcUrlSplitter.database);
+        if (StringUtils.hasText(jdbcUrlSplitter.port)) {
+            apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));   // 端口是可以为空的，具体的数据源会去补充默认端口
+        }
+        apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));
+        apo.setAddress(jdbcUrlSplitter.host);
+        // 设置用户名和密码
+        apo.setUsername(properties.getUsername());
+        apo.setPassword(properties.getPassword());
+
+
+        // 设置时间戳
+        Date now = new Date();
+        apo.setCreateTime(now);
+        apo.setUpdateTime(now);
+
+        return apo;
+    }
+}

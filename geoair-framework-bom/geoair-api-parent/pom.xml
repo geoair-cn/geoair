@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework-bom</artifactId>
-    <version>J8.1.1</version>
+    <version>J8.1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-api-parent</artifactId>
-  <version>J8.1.1</version>
+  <version>J8.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-api-parent</name>
   <description>geoair api parent</description>
@@ -43,7 +43,7 @@
 
   <properties>
     <skipTests>true</skipTests>
-    <geoair.version>J8.1.1</geoair.version>
+    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
   </properties>
 
   <dependencyManagement>
@@ -69,12 +69,7 @@
 
   <build>
 
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-    </plugins>
+
   </build>
 
 </project>

@@ -4,13 +4,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.1</version>
+    <version>J8.1.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geo</artifactId>
-  <version>J8.1.1</version>
+  <version>J8.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-geo</name>
   <description>空间处理相关的模块</description>
@@ -50,7 +50,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.1</geoair.version>
+    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -173,69 +173,6 @@
       <url>https://repo.osgeo.org/repository/release/</url>
     </pluginRepository>
   </pluginRepositories>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <parameters>true</parameters>
-          <!-- 源码版本 -->
-          <source>8</source>
-          <!-- 目标字节码版本 -->
-          <target>8</target>
-          <!-- 编码（可选，避免中文乱码） -->
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
 
-      <!--生成源码插件-->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--生成API文档插件-->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <!-- 打包 javadoc.jar -->
-              <goal>jar</goal>
-              <!-- 编译时自动修复注释 -->
-              <goal>fix</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!-- 自动修复类注释 -->
-          <fixClassComment>true</fixClassComment>
-          <!-- 自动修复方法注释 -->
-          <fixMethodComment>true</fixMethodComment>
-          <!-- 自动修复字段注释 -->
-          <fixFieldComment>true</fixFieldComment>
-          <version>false</version>
-          <author>false</author>
-          <!-- 开启严格模式，注释不规范直接报错 -->
-          <failOnError>false</failOnError>
-          <!-- 文档编码 UTF-8 -->
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

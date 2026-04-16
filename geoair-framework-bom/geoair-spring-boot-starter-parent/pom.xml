@@ -11,7 +11,7 @@
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-boot-starter-parent</artifactId>
-  <version>J8.1.1</version>
+  <version>J8.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-spring-boot-starter-parent</name>
   <description>geoair的springboot starter</description>
@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J8.1.1</geoair.version>
+    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
     <tomcat.version>9.0.115</tomcat.version>
     <spring-boot.version>2.7.18</spring-boot.version>
@@ -295,7 +295,7 @@
           <plugin>
             <groupId>com.coveo</groupId>
             <artifactId>fmt-maven-plugin</artifactId>
-            <version>2.4.0</version>
+            <version>2.6.0</version>
             <executions>
               <execution>
                 <goals>

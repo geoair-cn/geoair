@@ -73,7 +73,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setUrl(url);
             dataSourceNew.setUsername(dataSourceApo.getUsername());
             dataSourceNew.setPassword(dataSourceApo.getPassword());
-            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
+//            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
 
             // 初始化数据源
             dataSourceNew.init();
@@ -104,34 +104,10 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
         if (properties == null) {
             throw new IllegalStateException("DataSourceProperties未在Spring容器中找到");
         }
-
-        DataSourceApo apo = new DataSourceApo();
-
+        DataSourceApo apo = GirSpringDataSourceUtils.convertToDataSourceApo(properties);
         // 生成唯一ID
         apo.setId(generateDataSourceId());
-
-        // 设置驱动类名
-        if (StringUtils.hasText(properties.getDriverClassName())) {
-            apo.setDriver(properties.getDriverClassName());
-        }
-        AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(properties.getUrl());
-        apo.setJdbcUrl(properties.getUrl());
-        apo.setDbName(jdbcUrlSplitter.database);
-        apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));
-        apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));
-        apo.setAddress(jdbcUrlSplitter.host);
-        // 设置用户名和密码
-        apo.setUsername(properties.getUsername());
-        apo.setPassword(properties.getPassword());
-
-        // 设置名称（可以使用URL或生成默认名称）
         apo.setName(generateDataSourceName(properties));
-
-        // 设置时间戳
-        Date now = new Date();
-        apo.setCreateTime(now);
-        apo.setUpdateTime(now);
-
         return apo;
     }
 

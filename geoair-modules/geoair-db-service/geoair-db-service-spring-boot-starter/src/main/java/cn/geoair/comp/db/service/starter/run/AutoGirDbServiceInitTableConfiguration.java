@@ -2,16 +2,19 @@ package cn.geoair.comp.db.service.starter.run;
 
 import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.spring.EnableGirAdvDynamic;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /** @author ：张逢吉 @description： 自动装配模块（修复循环依赖最终版） */
 @Configuration
+@EnableGirAdvDynamic
 public class AutoGirDbServiceInitTableConfiguration {
 
     @Bean
-    @ConditionalOnClass(IAdvExecutor.class) // 有这个类就肯定会有这个Bean，因为我会自动注入
+    @ConditionalOnBean(IAdvExecutor.class) // 有这个类就肯定会有这个Bean，因为我会自动注入
     public Integer initTableByGirSpringAdvExecutor(IAdvExecutor iAdvExecutor) {
 
         Gir.log.debug("开始初始化表...");

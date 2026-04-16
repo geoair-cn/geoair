@@ -30,7 +30,7 @@ public interface DialectTableNameProcessor {
     /**
      * （指定Schema）获取带Schema的完整表名
      *
-     * @param tableName 原始表名（可含Schema，也可不含）
+     * @param tableName  原始表名（可含Schema，也可不含）
      * @param schemaName 指定的Schema名（优先级低于表名中提取的Schema）
      * @return 带Schema的标准表名
      */
@@ -85,7 +85,9 @@ public interface DialectTableNameProcessor {
      */
     String tbUnquoteSchemaName(String quotedSchemaName);
 
-    /** 字段名转义（PG用""，MySQL用`） */
+    /**
+     * 字段名转义（PG用""，MySQL用`）
+     */
     String tbQuoteFieldName(String fieldName);
 
     /**
@@ -110,4 +112,20 @@ public interface DialectTableNameProcessor {
      * @return
      */
     String tbRemoveSqlSpaces(String sqlView);
+
+
+    /**
+     * 构建分页SQL
+     */
+    String tbBuildPageSql(String noPageSql, int pageSize, long offset);
+
+    /**
+     * 不进行具体的值填充，只进行 ? 占位符填充
+     *
+     * @param noPageSql
+     * @return noPageSql  LIMIT ? OFFSET ?
+     */
+    String tbBuildPageSql(String noPageSql);
+
+
 }
