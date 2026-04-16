@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
 import cn.geoair.map.dynamic.adv.query.handler.StreamRsHandler;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
@@ -49,7 +50,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public GirAdvOneRow bSelectOne(String sql) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             // 差异化：构建单条查询包装SQL
             String execSql = buildSelectOneWrapSql(cleanSql);
 
@@ -68,7 +70,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public List<GirAdvOneRow> bSelectList(String sql) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectList", cleanSql);
 
             List<Entity> queryResult =
@@ -85,7 +87,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public void bSelectList(String sql, Consumer<GirAdvOneRow> rowConsumer) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectList(流式)", cleanSql);
 
             SqlExecutor.query(connection, cleanSql, new StreamRsHandler(rowConsumer));
@@ -100,7 +102,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public List<List<Object>> bSelectListToValueList(String sql) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectListToValueList", cleanSql);
 
             return SqlExecutor.query(connection, cleanSql, new ValueListHandler());
@@ -115,7 +117,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public Number bSelectNumber(String sql) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectNumber", cleanSql);
 
             return SqlExecutor.query(connection, cleanSql, new NumberHandler());
@@ -128,7 +130,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public Number bSelectRecordRowCount(String sql) {
-        String cleanSql = cleanQuerySql(sql);
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(cleanSql);
         logExecuteSql("bSelectRecordRowCount", countSql);
@@ -139,7 +141,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public <E> E bSelectObjOne(String sql, Class<E> clazz) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectObjOne", cleanSql);
 
             Object queryResult = SqlExecutor.query(connection, cleanSql, BeanHandler.create(clazz));
@@ -156,7 +158,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public <E> List<E> bSelectObjList(String sql, Class<E> clazz) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectObjList", cleanSql);
 
             return SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
@@ -172,7 +174,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public <E> void bSelectObjList(String sql, Class<E> clazz, Consumer<E> rowConsumer) {
         Connection connection = dataSourceGetter.getConnection();
         try {
-            String cleanSql = cleanQuerySql(sql);
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             logExecuteSql("bSelectObjList(流式)", cleanSql);
 
             SqlExecutor.query(connection, cleanSql, new StreamBeanRsHandler<>(rowConsumer, clazz));
@@ -187,7 +189,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     // ========== 通用逻辑：带参数查询 ==========
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             // 差异化：构建单条查询包装SQL
@@ -210,7 +212,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectList(带参数)", sqlMeta.getSql(), sqlParam);
@@ -232,7 +235,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     @Override
     public void bSelectList(
             String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectList(带参数-流式)", sqlMeta.getSql(), sqlParam);
@@ -251,7 +254,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectListToValueList(带参数)", sqlMeta.getSql(), sqlParam);
@@ -270,7 +273,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectNumber(带参数)", sqlMeta.getSql(), sqlParam);
@@ -289,7 +292,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(sqlMeta.getSql());
         SqlMeta countSqlMeta = new SqlMeta(countSql, sqlMeta.getJdbcParamValues());
@@ -311,7 +314,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjOne(带参数)", sqlMeta.getSql(), sqlParam);
@@ -333,7 +336,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjList(带参数)", sqlMeta.getSql(), sqlParam);
@@ -354,7 +357,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     @Override
     public <E> void bSelectObjList(
             String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        SqlMeta sqlMeta = parseSqlWithParam(sqlStatement, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjList(带参数-流式)", sqlMeta.getSql(), sqlParam);
@@ -373,28 +376,6 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         }
     }
 
-    // ========== 通用工具方法（子类无需重写） ==========
-
-    /**
-     * 解析带参数的SQL语句，生成可执行的SQL和参数列表
-     */
-    protected SqlMeta parseSqlWithParam(String sqlStatement, SqlParamMap sqlParam) {
-        if (StrUtil.isEmpty(sqlStatement)) {
-            throw new IllegalArgumentException("SQL语句不能为空");
-        }
-        String cleanSql = cleanQuerySql(sqlStatement);
-        return SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
-    }
-
-    /**
-     * 清理查询SQL（移除多余空格，子类可扩展）
-     */
-    protected String cleanQuerySql(String sql) {
-        if (dialectTableNameProcessor != null) {
-            return dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-        }
-        return StrUtil.trim(sql);
-    }
 
     /**
      * 统一打印SQL执行日志（无参数）

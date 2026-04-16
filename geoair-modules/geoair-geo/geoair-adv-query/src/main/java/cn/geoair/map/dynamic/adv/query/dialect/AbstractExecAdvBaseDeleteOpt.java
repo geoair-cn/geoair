@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.handler.NumberHandler;
@@ -49,9 +50,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("删除SQL语句不能为空");
         }
-        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
