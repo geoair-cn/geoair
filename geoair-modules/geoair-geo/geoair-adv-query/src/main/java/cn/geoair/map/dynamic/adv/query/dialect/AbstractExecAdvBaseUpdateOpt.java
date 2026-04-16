@@ -12,13 +12,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/** 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现 */
+/**
+ * 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现
+ */
 public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
 
     // 注入数据源获取器
@@ -49,9 +52,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("更新SQL语句不能为空");
         }
-
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql(sqlStatement), sqlParam);
+        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -362,31 +365,28 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    // ========== 通用工具方法（子类无需重写） ==========
 
-    /** 清理SQL语句（移除末尾分号、多余空格） */
-    protected String cleanSql(String sql) {
-        if (StrUtil.isEmpty(sql)) {
-            return sql;
-        }
-        return sql.replaceAll("\\s*;\\s*$", "").trim();
-    }
-
-    /** 校验表名 */
+    /**
+     * 校验表名
+     */
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
             throw new IllegalArgumentException("表名不能为空");
         }
     }
 
-    /** 校验主键字段名 */
+    /**
+     * 校验主键字段名
+     */
     protected void validateIdKey(String idKey) {
         if (StrUtil.isEmpty(idKey)) {
             throw new IllegalArgumentException("主键字段名不能为空");
         }
     }
 
-    /** 校验主键字段名和值 */
+    /**
+     * 校验主键字段名和值
+     */
     protected void validateIdKeyAndValue(String idKey, Object id) {
         validateIdKey(idKey);
         if (id == null) {
@@ -394,14 +394,18 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    /** 校验更新数据（不能为空） */
+    /**
+     * 校验更新数据（不能为空）
+     */
     protected void validateUpdateData(Map<String, Object> rowData) {
         if (CollUtil.isEmpty(rowData)) {
             throw new IllegalArgumentException("更新的数据不能为空");
         }
     }
 
-    /** 构建SET子句（通用：field1 = ?, field2 = ?） */
+    /**
+     * 构建SET子句（通用：field1 = ?, field2 = ?）
+     */
     protected String buildSetClause(Map<String, Object> rowData) {
         return rowData.keySet()
                 .stream()
@@ -409,7 +413,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(","));
     }
 
-    /** 构建WHERE子句（通用：field1 = ? AND field2 = ?） */
+    /**
+     * 构建WHERE子句（通用：field1 = ? AND field2 = ?）
+     */
     protected String buildWhereClause(Map<String, Object> whereMap) {
         return whereMap.keySet()
                 .stream()
@@ -417,7 +423,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(" AND "));
     }
 
-    /** 构建UPSERT更新子句（通用：过滤冲突字段） */
+    /**
+     * 构建UPSERT更新子句（通用：过滤冲突字段）
+     */
     protected String buildUpsertUpdateClause(
             Map<String, Object> rowData, Set<String> conflictKeys) {
         return rowData.keySet()
@@ -427,24 +435,32 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(","));
     }
 
-    /** 获取Schema/库名（通用封装） */
+    /**
+     * 获取Schema/库名（通用封装）
+     */
     protected String getSchemaName() {
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
     }
 
-    /** 获取数据源ID（通用封装） */
+    /**
+     * 获取数据源ID（通用封装）
+     */
     protected String getDataSourceId() {
         return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
     }
 
-    /** 关闭连接（通用封装） */
+    /**
+     * 关闭连接（通用封装）
+     */
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
         }
     }
 
-    /** 回滚连接（通用封装） */
+    /**
+     * 回滚连接（通用封装）
+     */
     protected void rollbackConnection(Connection connection) {
         if (connection != null) {
             try {
@@ -455,7 +471,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    /** 恢复自动提交（通用封装） */
+    /**
+     * 恢复自动提交（通用封装）
+     */
     protected void restoreAutoCommit(Connection connection) {
         if (connection != null) {
             try {
@@ -466,19 +484,25 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    /** 构建按主键更新SQL */
+    /**
+     * 构建按主键更新SQL
+     */
     protected String buildUpdateByPrimaryKeySql(String tableName, String setClause, String idKey) {
         // PG：基础按主键更新语法
         return StrUtil.format("UPDATE {} SET {} WHERE {} = ?", tableName, setClause, idKey);
     }
 
-    /** 构建条件更新SQL */
+    /**
+     * 构建条件更新SQL
+     */
     protected String buildUpdateByConditionSql(
             String tableName, String setClause, String whereClause) {
         return StrUtil.format("UPDATE {} SET {} WHERE {}", tableName, setClause, whereClause);
     }
 
-    /** 构建乐观锁SET子句（版本号自增逻辑） */
+    /**
+     * 构建乐观锁SET子句（版本号自增逻辑）
+     */
     protected String buildOptimisticLockSetClause(Map<String, Object> rowData, String versionKey) {
         // PG：版本号自增（version = version + 1）
         return rowData.keySet()
@@ -493,7 +517,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(","));
     }
 
-    /** 构建乐观锁更新SQL */
+    /**
+     * 构建乐观锁更新SQL
+     */
     protected String buildUpdateWithOptimisticLockSql(
             String tableName, String setClause, String idKey, String versionKey) {
         // ：乐观锁更新语法（WHERE 主键 = ? AND 版本号 = ?）
@@ -505,10 +531,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 versionKey);
     }
 
-    /** 构建UPSERT字段更新子句（PG：EXCLUDED，MySQL：VALUES） */
+    /**
+     * 构建UPSERT字段更新子句（PG：EXCLUDED，MySQL：VALUES）
+     */
     protected abstract String buildUpsertFieldClause(String field);
 
-    /** 构建更新或插入（UPSERT）SQL */
+    /**
+     * 构建更新或插入（UPSERT）SQL
+     */
     protected abstract String buildUpdateOrInsertSql(
             String tableName,
             String fields,

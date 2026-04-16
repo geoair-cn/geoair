@@ -49,9 +49,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("删除SQL语句不能为空");
         }
-
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql(sqlStatement), sqlParam);
+        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -426,15 +426,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
-    // ========== 通用工具方法（子类无需重写） ==========
 
-    /** 清理SQL语句（移除末尾分号、多余空格） */
-    protected String cleanSql(String sql) {
-        if (StrUtil.isEmpty(sql)) {
-            return sql;
-        }
-        return sql.replaceAll("\\s*;\\s*$", "").trim();
-    }
 
     /** 校验表名 */
     protected void validateTableName(String tableName) {

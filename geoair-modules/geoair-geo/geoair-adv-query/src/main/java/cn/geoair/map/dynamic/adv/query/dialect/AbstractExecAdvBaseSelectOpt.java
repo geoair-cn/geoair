@@ -17,12 +17,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.handler.*;
 import cn.hutool.db.sql.SqlExecutor;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** 数据库查询操作抽象父类 封装所有数据库通用的查询逻辑，差异化语法由子类实现 */
+/**
+ * 数据库查询操作抽象父类 封装所有数据库通用的查询逻辑，差异化语法由子类实现
+ */
 public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
     // 注入数据源获取器
@@ -372,7 +375,9 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     // ========== 通用工具方法（子类无需重写） ==========
 
-    /** 解析带参数的SQL语句，生成可执行的SQL和参数列表 */
+    /**
+     * 解析带参数的SQL语句，生成可执行的SQL和参数列表
+     */
     protected SqlMeta parseSqlWithParam(String sqlStatement, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(sqlStatement)) {
             throw new IllegalArgumentException("SQL语句不能为空");
@@ -381,7 +386,9 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         return SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
     }
 
-    /** 清理查询SQL（移除多余空格，子类可扩展） */
+    /**
+     * 清理查询SQL（移除多余空格，子类可扩展）
+     */
     protected String cleanQuerySql(String sql) {
         if (dialectTableNameProcessor != null) {
             return dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
@@ -389,7 +396,9 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         return StrUtil.trim(sql);
     }
 
-    /** 统一打印SQL执行日志（无参数） */
+    /**
+     * 统一打印SQL执行日志（无参数）
+     */
     protected void logExecuteSql(String methodName, String sql) {
         log.debug(
                 "schema:[{}] db:[{}] {}执行的SQL为：{}",
@@ -399,7 +408,9 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                 sql);
     }
 
-    /** 统一打印带参数的SQL执行日志 */
+    /**
+     * 统一打印带参数的SQL执行日志
+     */
     protected void logExecuteSql(String methodName, String sql, SqlParamMap sqlParam) {
         log.debug(
                 "schema:[{}] db:[{}] {}执行的SQL为：{}，参数：{}",
@@ -410,34 +421,42 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                 sqlParam);
     }
 
-    /** 获取Schema/库名（通用封装） */
+    /**
+     * 获取Schema/库名（通用封装）
+     */
     protected String getSchemaName() {
         return dataSourceGetter != null
                 ? GutilObject.isEmpty(dataSourceGetter.getSchemaName())
-                        ? ""
-                        : dataSourceGetter.getSchemaName()
+                ? ""
+                : dataSourceGetter.getSchemaName()
                 : "";
     }
 
-    /** 获取数据源ID（通用封装） */
+    /**
+     * 获取数据源ID（通用封装）
+     */
     protected String getDataSourceId() {
         return dataSourceGetter != null
                 ? GutilObject.isEmpty(dataSourceGetter.getDataSourceId())
-                        ? ""
-                        : dataSourceGetter.getDataSourceId()
+                ? ""
+                : dataSourceGetter.getDataSourceId()
                 : "";
     }
 
-    /** 获取数据库名称（通用封装） */
+    /**
+     * 获取数据库名称（通用封装）
+     */
     protected String getDatabaseName() {
         return dataSourceGetter != null
                 ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
-                        ? ""
-                        : dataSourceGetter.getDatabaseName()
+                ? ""
+                : dataSourceGetter.getDatabaseName()
                 : "";
     }
 
-    /** 关闭连接（通用封装） */
+    /**
+     * 关闭连接（通用封装）
+     */
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
