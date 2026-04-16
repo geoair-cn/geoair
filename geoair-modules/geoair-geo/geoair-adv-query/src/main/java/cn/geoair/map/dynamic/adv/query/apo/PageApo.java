@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.hutool.core.collection.ListUtil;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import java.util.List;
  * @author ：张逢吉
  * @date ：Created in 2025/10/10 10:52 @description： 分页对象的返回结果
  */
+@Getter
 public class PageApo<T> implements Serializable {
 
     /** 每页条数 */
@@ -37,17 +40,9 @@ public class PageApo<T> implements Serializable {
     /** 字段列表 */
     private DataFieldsApo dataFieldsApo;
 
-    public DataFieldsApo getDataFieldsApo() {
-        return dataFieldsApo;
-    }
-
     public PageApo<T> setDataFieldsApo(DataFieldsApo dataFieldsApo) {
         this.dataFieldsApo = dataFieldsApo;
         return this;
-    }
-
-    public int getPageSize() {
-        return pageSize;
     }
 
     public PageApo<T> setPageSize(int pageSize) {
@@ -55,17 +50,9 @@ public class PageApo<T> implements Serializable {
         return this;
     }
 
-    public int getLastPageNum() {
-        return lastPageNum;
-    }
-
     public PageApo<T> setLastPageNum(int lastPageNum) {
         this.lastPageNum = lastPageNum;
         return this;
-    }
-
-    public long getStartRow() {
-        return startRow;
     }
 
     public PageApo<T> setStartRow(long startRow) {
@@ -73,17 +60,9 @@ public class PageApo<T> implements Serializable {
         return this;
     }
 
-    public int getPageNum() {
-        return pageNum;
-    }
-
     public PageApo<T> setPageNum(int pageNum) {
         this.pageNum = pageNum;
         return this;
-    }
-
-    public long getTotal() {
-        return total;
     }
 
     public PageApo<T> setTotal(long total) {
@@ -91,17 +70,9 @@ public class PageApo<T> implements Serializable {
         return this;
     }
 
-    public Iterable<T> getRecords() {
-        return records;
-    }
-
     public PageApo<T> setPageNumStartZero(boolean pageNumStartZero) {
         this.pageNumStartZero = pageNumStartZero;
         return this;
-    }
-
-    public boolean isPageNumStartZero() {
-        return pageNumStartZero;
     }
 
     public PageApo<T> setRecords(Iterable<T> records) {

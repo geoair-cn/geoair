@@ -19,7 +19,7 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
     }
 
     @Override
-    protected IDataSourceGetter getDataSourceGetterPxy() {
+    protected IDataSourceGetter getDataSourceGetter() {
         return iAdvExecutorPxy;
     }
 
@@ -40,6 +40,11 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
 
     @Override
     protected IAdvGeoPreOpt getGeoOpt() {
+        return iAdvExecutorPxy;
+    }
+
+    @Override
+    public IAdvWhereSelectOpt getWhereSelectOpt() {
         return iAdvExecutorPxy;
     }
 

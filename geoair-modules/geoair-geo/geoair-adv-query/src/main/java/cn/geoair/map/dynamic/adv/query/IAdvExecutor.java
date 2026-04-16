@@ -8,13 +8,14 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
  */
 public interface IAdvExecutor
         extends IDataSourceGetter,
-                IAdvBaseOpt,
-                IAdvDDLOpt,
-                IAdvGeoOpt,
-                IAdvGeoPreOpt,
-                IAdvSimplePageOpt,
-                IAdvSimplePagePreOpt,
-                DialectTableNameProcessor {
+        IAdvBaseOpt,
+        IAdvDDLOpt,
+        IAdvGeoOpt,
+        IAdvGeoPreOpt,
+        IAdvSimplePageOpt,
+        IAdvSimplePagePreOpt,
+        IAdvWhereSelectOpt,
+        DialectTableNameProcessor {
 
     /**
      * 获取用于SQL的Schema名（含默认值与基础校验）
@@ -34,7 +35,7 @@ public interface IAdvExecutor
     /**
      * （指定Schema）获取带Schema的完整表名
      *
-     * @param tableName 原始表名（可含Schema，也可不含）
+     * @param tableName  原始表名（可含Schema，也可不含）
      * @param schemaName 指定的Schema名（优先级低于表名中提取的Schema）
      * @return 带Schema的标准表名
      */

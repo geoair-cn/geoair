@@ -9,10 +9,12 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,7 +22,9 @@ import java.util.*;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/** 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑，差异化语法由子类实现 */
+/**
+ * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑，差异化语法由子类实现
+ */
 public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
     protected IDataSourceGetter dataSourceGetter;
@@ -33,11 +37,15 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     // 默认分批插入批次大小（通用常量）
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
-    /** 构建带主键返回的插入SQL */
+    /**
+     * 构建带主键返回的插入SQL
+     */
     protected abstract String buildInsertReturnIdSql(
             String tableName, String fields, String placeholders);
 
-    /** 执行插入并返回自增的主键 */
+    /**
+     * 执行插入并返回自增的主键
+     */
     protected abstract Long executeInsertReturnId(
             Connection connection, String execSql, Object... params) throws SQLException;
 
@@ -59,14 +67,15 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public Integer bInsertBySql(String   dynamicSql, SqlParamMap sqlParam) {
         // 通用参数校验
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("插入SQL语句不能为空");
         }
 
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(cleanSql(sqlStatement), sqlParam);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
+
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -364,26 +373,25 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    /** 清理SQL语句（移除末尾分号、多余空格） */
-    protected String cleanSql(String sql) {
-        if (StrUtil.isEmpty(sql)) {
-            return sql;
-        }
-        return sql.replaceAll("\\s*;\\s*$", "").trim();
-    }
 
-    /** 构建占位符（?,?,?） */
+    /**
+     * 构建占位符（?,?,?）
+     */
     protected String buildPlaceholders(int count) {
         String repeat = StrUtil.repeatAndJoin("? ", count, ",");
         return repeat;
     }
 
-    /** 构建基础INSERT SQL */
+    /**
+     * 构建基础INSERT SQL
+     */
     protected String buildInsertSql(String tableName, String fields, String placeholders) {
         return StrUtil.format("INSERT INTO {} ({}) VALUES ({})", tableName, fields, placeholders);
     }
 
-    /** 校验表名和单行数据 */
+    /**
+     * 校验表名和单行数据
+     */
     protected void validateTableNameAndData(String tableName, Map<String, Object> rowData) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(rowData)) {
@@ -391,7 +399,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    /** 校验表名、字段头和批量数据 */
+    /**
+     * 校验表名、字段头和批量数据
+     */
     protected void validateTableNameAndData(
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
         validateTableName(tableName);
@@ -403,31 +413,41 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    /** 校验表名 */
+    /**
+     * 校验表名
+     */
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
             throw new IllegalArgumentException("表名不能为空");
         }
     }
 
-    /** 获取Schema/库名（通用封装） */
+    /**
+     * 获取Schema/库名（通用封装）
+     */
     protected String getSchemaName() {
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
     }
 
-    /** 获取数据源ID（通用封装） */
+    /**
+     * 获取数据源ID（通用封装）
+     */
     protected String getDataSourceId() {
         return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
     }
 
-    /** 关闭连接（通用封装） */
+    /**
+     * 关闭连接（通用封装）
+     */
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
         }
     }
 
-    /** 回滚连接（通用封装） */
+    /**
+     * 回滚连接（通用封装）
+     */
     protected void rollbackConnection(Connection connection) {
         if (connection != null) {
             try {
@@ -438,7 +458,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    /** 恢复自动提交（通用封装） */
+    /**
+     * 恢复自动提交（通用封装）
+     */
     protected void restoreAutoCommit(Connection connection) {
         if (connection != null) {
             try {

@@ -12,14 +12,18 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.*;
 import java.util.*;
 
-/** PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑 */
+/**
+ * PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑
+ */
 public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private static final GiLogger log = GirLogger.getLoger();
@@ -28,14 +32,14 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private String _POSTGIS_VERSION;
 
-    private PgAdvBaseOpt baseOpt;
+    private IAdvBaseOpt baseOpt;
 
-    private PgAdvDDLOpt pgAdvDDLOpt;
+    private IAdvDDLOpt pgAdvDDLOpt;
 
-    public PgAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
+    public PgAdvGeoOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
         super(dataSourceGetter);
-        this.baseOpt = new PgAdvBaseOpt(dataSourceGetter);
-        this.pgAdvDDLOpt = new PgAdvDDLOpt(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.pgAdvDDLOpt = ddlOpt;
         // getPostGisVersion();
     }
 
@@ -92,7 +96,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
                         : StrUtil.format(
-                                "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
+                        "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
         String sql = StrUtil.format(sqlTemp, schemaFilter);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -272,11 +276,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 pgAdvDDLOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                                dataSourceGetter, tableNameOrSqlView)
+                        dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                                "({}) as {}",
-                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                                dialectTableNameProcessor.tbGetTempAliasTableName());
+                        "({}) as {}",
+                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql =
                 StrUtil.format(
@@ -296,11 +300,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 pgAdvDDLOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                                dataSourceGetter, tableNameOrSqlView)
+                        dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                                "({}) as {}",
-                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                                dialectTableNameProcessor.tbGetTempAliasTableName());
+                        "({}) as {}",
+                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        dialectTableNameProcessor.tbGetTempAliasTableName());
 
         StringBuilder sridSelect = new StringBuilder();
         StringBuilder where = new StringBuilder("WHERE ");
@@ -605,12 +609,12 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames) {
-        if (StrUtil.isEmpty(sqlStatement) || CollectionUtil.isEmpty(geomFieldNames)) {
+            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+        if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
 
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         StringBuilder fieldsSql = new StringBuilder();
         StringBuilder whereSql = new StringBuilder();
 
@@ -633,7 +637,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.format(
                         "SELECT {} FROM ({}) AS temp WHERE {} LIMIT 1;",
                         fieldsSql.toString(),
-                        sqlStatement,
+                        dynamicSql,
                         whereSql.toString());
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql, sqlParam);
 
@@ -650,11 +654,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam) {
-        if (StrUtil.isEmpty(sqlStatement)) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -662,8 +666,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         try {
             String fieldQuerySql =
-                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", sqlStatement, alias);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(fieldQuerySql, sqlParam);
+                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
+            SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
 
             conn = dataSourceGetter.getConnection();
             if (conn == null) {

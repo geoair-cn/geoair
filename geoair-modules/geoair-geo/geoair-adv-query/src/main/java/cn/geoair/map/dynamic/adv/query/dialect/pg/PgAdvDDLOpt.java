@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
@@ -13,28 +14,21 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.postgresql.jdbc.PgResultSetMetaData;
 
-/** PostgreSQL DDL操作实现类 */
+/**
+ * PostgreSQL DDL操作实现类
+ */
 public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
-    PgAdvBaseOpt baseOpt;
-
-    public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
-        super(dataSourceGetter);
-    }
-
-    // ========== 初始化差异化组件 ==========
-    @Override
-    protected AbstractPxyAdvBaseOpt getAdvBaseOpt() {
-        if (baseOpt == null) {
-            baseOpt = new PgAdvBaseOpt(dataSourceGetter);
-        }
-        return baseOpt;
+    public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
+        super(dataSourceGetter, baseOpt);
     }
 
     @Override
@@ -192,12 +186,12 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         // 处理长度/精度
         if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
                 && (newField.getUdtName().contains("char")
-                        || newField.getUdtName().contains("varchar"))) {
+                || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
                 && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
                 && (newField.getUdtName().contains("numeric")
-                        || newField.getUdtName().contains("decimal"))) {
+                || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -468,7 +462,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                                 ? ""
                                 : StrUtil.format(
-                                        "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
+                                "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
         return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
 

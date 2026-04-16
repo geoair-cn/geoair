@@ -5,6 +5,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
+
 import java.sql.Connection;
 import javax.sql.DataSource;
 
@@ -26,34 +27,41 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorPG() {}
+    public AdvExecutorPG() {
+    }
 
     public AdvExecutorPG(Connection connection) {
         super(connection);
     }
 
-    @Override
-    protected IDataSourceGetter getDataSourceGetterPxy() {
-        if (dataSourceGetterPxy == null) {
-            dataSourceGetterPxy = new DataSourceGetter();
-        }
-        return dataSourceGetterPxy;
-    }
 
     private volatile IAdvBaseOpt advBaseOpt;
-
     private volatile IAdvDDLOpt advDDLOpt;
-
+    private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
+    private volatile IDataSourceGetter dataSourceGetter;
     private volatile IAdvSimplePagePreOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
+
+    @Override
+    protected IDataSourceGetter getDataSourceGetter() {
+        if (dataSourceGetter == null) {
+            synchronized (this) {
+                if (dataSourceGetter == null) {
+                    dataSourceGetter = new DataSourceGetter();
+                }
+            }
+        }
+        return dataSourceGetter;
+    }
+
 
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(this);
+                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter());
                 }
             }
         }
@@ -65,7 +73,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (advDDLOpt == null) {
             synchronized (this) {
                 if (advDDLOpt == null) {
-                    advDDLOpt = new PgAdvDDLOpt(this);
+                    advDDLOpt = new PgAdvDDLOpt(getDataSourceGetter(), getAdvBaseOpt());
                 }
             }
         }
@@ -77,7 +85,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
-                    simplePageOpt = new PgAdvSimplePageOpt(this);
+                    simplePageOpt = new PgAdvSimplePageOpt(getDataSourceGetter(), getAdvBaseOpt(), getGeoOpt(), getAdvDDLOpt());
                 }
             }
         }
@@ -89,11 +97,23 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new PgAdvGeoOpt(this);
+                    geoOpt = new PgAdvGeoOpt(getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
                 }
             }
         }
         return geoOpt;
+    }
+
+    @Override
+    public IAdvWhereSelectOpt getWhereSelectOpt() {
+        if (iAdvWhereSelectOpt == null) {
+            synchronized (this) {
+                if (iAdvWhereSelectOpt == null) {
+                    iAdvWhereSelectOpt = new PgAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt());
+                }
+            }
+        }
+        return iAdvWhereSelectOpt;
     }
 
     @Override

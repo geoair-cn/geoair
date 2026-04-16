@@ -13,26 +13,21 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** MySQL DDL操作实现类 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑 */
+/**
+ * MySQL DDL操作实现类 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑
+ */
 public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
-    IAdvBaseOpt baseOpt;
 
-    public MysqlAdvDDLOpt(IDataSourceGetter dataSourceGetter) {
-        super(dataSourceGetter);
-    }
+    public MysqlAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
+        super(dataSourceGetter, baseOpt);
 
-    @Override
-    public IAdvBaseOpt getAdvBaseOpt() {
-        if (baseOpt == null) {
-            baseOpt = new MysqlAdvBaseOpt(dataSourceGetter);
-        }
-        return baseOpt;
     }
 
     @Override
@@ -146,12 +141,12 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         // 处理长度/精度
         if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
                 && (newField.getUdtName().contains("char")
-                        || newField.getUdtName().contains("varchar"))) {
+                || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
                 && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
                 && (newField.getUdtName().contains("numeric")
-                        || newField.getUdtName().contains("decimal"))) {
+                || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -238,12 +233,12 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     /**
      * MySQL 版本：给表添加主键（支持字符串/数值自增/数值非自增）
      *
-     * @param tableName 表名（不含库名）
-     * @param pkColumnName 主键列名（如id）
+     * @param tableName      表名（不含库名）
+     * @param pkColumnName   主键列名（如id）
      * @param constraintName 主键约束名（MySQL 中主键约束名可省略，为空自动生成）
-     * @param pkType 主键类型（STRING/INT_AUTO/BIGINT_AUTO/INT_NORMAL/BIGINT_NORMAL）
+     * @param pkType         主键类型（STRING/INT_AUTO/BIGINT_AUTO/INT_NORMAL/BIGINT_NORMAL）
      * @param pkColumnLength 字符串主键列长度（仅STRING类型需要，如50）
-     * @param pkValuePrefix 字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
+     * @param pkValuePrefix  字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
      */
     @Override
     public void dAddPrimaryKey(
