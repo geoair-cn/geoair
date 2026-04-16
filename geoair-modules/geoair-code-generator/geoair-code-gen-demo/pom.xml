@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-code-generator</artifactId>
-    <version>J17.1.0-SNAPSHOT</version>
+    <version>J17.1.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-code-gen-demo</artifactId>
-  <version>J17.1.0-SNAPSHOT</version>
+  <version>J17.1.2</version>
   <packaging>jar</packaging>
   <name>geoair-code-gen-demo</name>
 

@@ -10,7 +10,7 @@ GeoAir Framework 是一个  **企业级 Java 开发框架**,提供从基础依�
 | 23.1.0      | 2023-08-01 | 初始版本，包含核心功能模块：<br>• 基础标准库、核心工具库、Web 层公共组件、统一 SDK 输出<br>• GIS 地理空间处理、动态多数据源管理<br>• 数据库服务、瓦片地图工具                                                                                                                                                  |
 | 23.1.2-M2   | 2026-03-13 | 1. 修复若干已知 Bug<br>2. 优化核心模块性能<br>3. 新增部分功能模块                                                                                                                                                                                                     |
 | J8.1.0-RC2  | 2026-03-15 | 1. 统一 Group ID：原 `cn.geoair`、`cn.geoair.comp`、`cn.geoair.dependencies`、`cn.geoair.orm`、`cn.geoair.geo.dynamic` 等全部替换为 `cn.geoair.devkit`<br>2. 版本号规则更新：Java版本号 + 子版本号 + RC版本号<br>3. 兼容 JDK 11+，主线基于 Java 8 开发<br>4. 建议 23 开头版本逐步迁移至 J8.x.x 版本体系 |
-| J17.1.0-SNAPSHOT| 2026-04-01 | java17 spring-boot3分支                                                                                                                                                                                                                           |
+| J17.1.2| 2026-04-01 | java17 spring-boot3分支                                                                                                                                                                                                                           |
 ## 模块说明
 
 | 模块分类 | 模块名称 | 功能描述 |

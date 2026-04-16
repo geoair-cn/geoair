@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J17.1.0-SNAPSHOT</version>
+    <version>J17.1.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-framework-bom</artifactId>
-  <version>J17.1.0-SNAPSHOT</version>
+  <version>J17.1.2</version>
   <packaging>pom</packaging>
   <name>geoair-framework-bom</name>
   <description>用于工程模块的依赖定义</description>
@@ -57,8 +57,8 @@
   </scm>
 
   <properties>
-    <!--        <geoair.version>J17.1.0-SNAPSHOT</geoair.version>-->
-    <!--        <geoair.comp.version>J17.1.0-SNAPSHOT</geoair.comp.version>-->
+    <!--        <geoair.version>J17.1.2</geoair.version>-->
+    <!--        <geoair.comp.version>J17.1.2</geoair.comp.version>-->
 
     <skipTests>true</skipTests>
   </properties>

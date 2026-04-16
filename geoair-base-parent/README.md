@@ -242,7 +242,7 @@ geoair-framework (根 POM)
 <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J17.1.0-SNAPSHOT</version>
+    <version>J17.1.2</version>
 </parent>
 ```
 | | 外部项目引用 | 仅导入 dependencyManagement | 
@@ -252,7 +252,7 @@ geoair-framework (根 POM)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-base-parent</artifactId>
-            <version>J17.1.0-SNAPSHOT</version>
+            <version>J17.1.2</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -306,5 +306,5 @@ geoair-framework (根 POM)
 
 ---
 **最后更新**: 2026-03-14  
-**当前版本**: J17.1.0-SNAPSHOT
+**当前版本**: J17.1.2
 ```
