@@ -2,13 +2,11 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -284,6 +282,53 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
             String dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         getAdvBaseSelectPxyOpt().bSelectObjList(dynamicSql, sqlParam, clazz, rowConsumer);
     }
+
+
+    @Override
+    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseSelectPxyOpt().bSelectOne(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public void bSelectList(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+        getAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParamList, rowConsumer);
+    }
+
+    @Override
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseSelectPxyOpt().bSelectListToValueList(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Number bSelectNumber(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseSelectPxyOpt().bSelectNumber(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Number bSelectRecordRowCount(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseSelectPxyOpt().bSelectRecordRowCount(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public <E> E bSelectObjOne(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+        return getAdvBaseSelectPxyOpt().bSelectObjOne(sqlStatement, sqlParamList, clazz);
+    }
+
+    @Override
+    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+        return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParamList, clazz);
+    }
+
+    @Override
+    public <E> void bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParamList, clazz, rowConsumer);
+    }
+
 
     // ==================== 更新操作实现（代理调用） ====================
     @Override

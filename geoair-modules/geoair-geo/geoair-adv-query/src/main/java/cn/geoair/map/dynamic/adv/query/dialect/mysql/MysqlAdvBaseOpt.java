@@ -60,4 +60,6 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
         }
         return advBaseDeletePxyOpt;
     }
+
+
 }

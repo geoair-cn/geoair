@@ -400,6 +400,54 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         advBaseOptPxy.bSelectObjList(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
+
+    @Override
+    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
+        return advBaseOptPxy.bSelectOne(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamList sqlParamList) {
+        return advBaseOptPxy.bSelectList(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public void bSelectList(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+        advBaseOptPxy.bSelectList(sqlStatement, sqlParamList, rowConsumer);
+    }
+
+    @Override
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+        return advBaseOptPxy.bSelectListToValueList(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Number bSelectNumber(String sqlStatement, SqlParamList sqlParamList) {
+        return advBaseOptPxy.bSelectNumber(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Number bSelectRecordRowCount(String sqlStatement, SqlParamList sqlParamList) {
+        return advBaseOptPxy.bSelectRecordRowCount(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public <E> E bSelectObjOne(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+        return advBaseOptPxy.bSelectObjOne(sqlStatement, sqlParamList, clazz);
+    }
+
+    @Override
+    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+        return advBaseOptPxy.bSelectObjList(sqlStatement, sqlParamList, clazz);
+    }
+
+    @Override
+    public <E> void bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+        advBaseOptPxy.bSelectObjList(sqlStatement, sqlParamList, clazz, rowConsumer);
+    }
+
+
+
     // ==================== 基础更新操作（代理调用PgAdvBaseOpt） ====================
     @Override
     public Integer bUpdateBySql(String sqlStatement) {

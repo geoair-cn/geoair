@@ -102,9 +102,11 @@ public class GirAdvQueryRequest {
      * <p>用于处理空间字段的转换，如转换为空字符串等</p>
      * -- GETTER --
      * 获取空间操作规则
+     * 暂时没有实现
      *
      * @return 空间操作规则枚举
      */
+    @Deprecated
     private final AdvEnumsGeomOpt advEnumsGeomOpt;
 
     /**
@@ -115,6 +117,7 @@ public class GirAdvQueryRequest {
      *
      * @return true=返回元数据，false=仅返回数据
      */
+    @Deprecated
     private final Boolean hasFieldsInfo;
 
     // ==================== 模式二：直接传SQL ====================

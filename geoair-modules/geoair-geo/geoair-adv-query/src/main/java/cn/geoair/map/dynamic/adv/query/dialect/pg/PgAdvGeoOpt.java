@@ -607,11 +607,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
             String   dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
-        if (StrUtil.isEmpty(sqlStatement) || CollectionUtil.isEmpty(geomFieldNames)) {
+        if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
 
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         StringBuilder fieldsSql = new StringBuilder();
         StringBuilder whereSql = new StringBuilder();
 
@@ -634,7 +634,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.format(
                         "SELECT {} FROM ({}) AS temp WHERE {} LIMIT 1;",
                         fieldsSql.toString(),
-                        sqlStatement,
+                        dynamicSql,
                         whereSql.toString());
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql, sqlParam);
 
@@ -652,10 +652,10 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public String eGetGeomColumnNameBySql(String   dynamicSql, SqlParamMap sqlParam) {
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -663,7 +663,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         try {
             String fieldQuerySql =
-                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", sqlStatement, alias);
+                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
             SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
 
             conn = dataSourceGetter.getConnection();

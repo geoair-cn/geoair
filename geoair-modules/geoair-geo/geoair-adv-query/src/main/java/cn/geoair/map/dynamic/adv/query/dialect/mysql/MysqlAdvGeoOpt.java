@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -15,12 +14,16 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.*;
 import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** MySQL（Spatial）空间操作实现类 基于MySQL Spatial扩展实现通用空间操作接口 适配MySQL 5.7+/8.0+ Spatial语法特性 */
+/**
+ * MySQL（Spatial）空间操作实现类 基于MySQL Spatial扩展实现通用空间操作接口 适配MySQL 5.7+/8.0+ Spatial语法特性
+ */
 public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private static final Logger log = LoggerFactory.getLogger(MysqlAdvGeoOpt.class);
@@ -270,11 +273,11 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 ddlOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                                dataSourceGetter, tableNameOrSqlView)
+                        dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                                "({}) as {}",
-                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                                dialectTableNameProcessor.tbGetTempAliasTableName());
+                        "({}) as {}",
+                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        dialectTableNameProcessor.tbGetTempAliasTableName());
 
         // MySQL: ST_SRID获取空间参考系ID
         String sql =
@@ -296,11 +299,11 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 ddlOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                                dataSourceGetter, tableNameOrSqlView)
+                        dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                                "({}) as {}",
-                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                                dialectTableNameProcessor.tbGetTempAliasTableName());
+                        "({}) as {}",
+                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        dialectTableNameProcessor.tbGetTempAliasTableName());
 
         StringBuilder sridSelect = new StringBuilder();
         StringBuilder where = new StringBuilder("WHERE ");
@@ -613,12 +616,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String   dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
-        if (StrUtil.isEmpty(sqlStatement) || CollectionUtil.isEmpty(geomFieldNames)) {
+            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+        if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
 
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         StringBuilder fieldsSql = new StringBuilder();
         StringBuilder whereSql = new StringBuilder();
 
@@ -641,7 +644,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.format(
                         "SELECT {} FROM ({}) AS temp WHERE {} LIMIT 1;",
                         fieldsSql.toString(),
-                        sqlStatement,
+                        dynamicSql,
                         whereSql.toString());
 
         GirAdvOneRow row = baseOpt.bSelectOne(sql, sqlParam);
@@ -658,11 +661,11 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String   dynamicSql, SqlParamMap sqlParam) {
-        if (StrUtil.isEmpty(sqlStatement)) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -670,7 +673,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         try {
             String fieldQuerySql =
-                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", sqlStatement, alias);
+                    StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
             // 解析带参数SQL
             SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
 

@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryFilter;
@@ -115,15 +116,10 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query) {
         try {
-
-            // 构建SQL
             GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
             SqlBuildResult result = sqlBuilder.buildSelectSql(query);
-
             log.debug("执行查询SQL: {}, 参数: {}", result.getSql(), result.getParams());
-
-            return null;
-
+            return getBaseSelectOpt().bSelectList(result.getSql(), result.getParams());
         } catch (Exception e) {
             log.error("执行查询失败", e);
             throw new RuntimeException("执行查询失败: " + e.getMessage(), e);
@@ -133,67 +129,11 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query) {
         return null;
-//        try {
-//
-//            GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
-//
-//            // 1. 查询总数
-//            SqlBuildResult countResult = sqlBuilder.buildCountSql(query);
-//            log.debug("执行总数查询SQL: {}, 参数: {}", countResult.getSql(), countResult.getParams());
-//
-//            SqlParamMap countParamMap = convertToSqlParamMap(countResult.getParams());
-//            Number totalNum = executeCount(countResult.getSql(), countParamMap);
-//
-//            long total = totalNum != null ? totalNum.longValue() : 0L;
-//
-//
-//
-//            // 2. 分页查询数据
-//            SqlBuildResult dataResult = sqlBuilder.buildPageSql(query);
-//            log.debug("执行分页查询SQL: {}, 参数: {}", dataResult.getSql(), dataResult.getParams());
-//
-//            SqlParamMap dataParamMap = convertToSqlParamMap(dataResult.getParams());
-//            List<GirAdvOneRow> data = executeQuery(dataResult.getSql(), dataParamMap);
-//
-//            // 3. 构建分页结果
-//            int pageNum = query.getActualPageNum();
-//            int pageSize = query.getPageSize();
-//
-//            PageApo<GirAdvOneRow> pageResult = PageApo.of(data, (int) total, pageNum, pageSize);
-//            log.debug("分页查询结果: total={}, pageNum={}, pageSize={}, dataSize={}",
-//                    total, pageNum, pageSize, data.size());
-//
-//            return pageResult;
-//
-//        } catch (Exception e) {
-//            log.error("执行分页查询失败", e);
-//            throw new RuntimeException("执行分页查询失败: " + e.getMessage(), e);
-//        }
     }
 
     @Override
     public int wSelectCount(GirAdvQueryRequest query) {
-        try {
-
-
-            // 构建计数SQL
-            GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
-            SqlBuildResult result = sqlBuilder.buildCountSql(query);
-
-            log.debug("执行计数查询SQL: {}, 参数: {}", result.getSql(), result.getParams());
-
-            // 执行查询
-            SqlParamMap paramMap = convertToSqlParamMap(result.getParams());
-            Number count = executeCount(result.getSql(), paramMap);
-
-            int total = count != null ? count.intValue() : 0;
-            log.debug("计数结果: {}", total);
-            return total;
-
-        } catch (Exception e) {
-            log.error("执行计数查询失败", e);
-            throw new RuntimeException("执行计数查询失败: " + e.getMessage(), e);
-        }
+        return 0;
     }
 
     /**
@@ -203,59 +143,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
      * @param rowConsumer 行数据消费器
      */
     public void wSelectStream(GirAdvQueryRequest query, Consumer<GirAdvOneRow> rowConsumer) {
-        try {
 
-            // 构建SQL
-            GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
-            SqlBuildResult result = sqlBuilder.buildSelectSql(query);
-
-            log.debug("执行流式查询SQL: {}, 参数: {}", result.getSql(), result.getParams());
-
-            // 转换参数格式
-            SqlParamMap paramMap = convertToSqlParamMap(result.getParams());
-
-            // 执行流式查询
-            if (baseSelectOpt != null) {
-                baseSelectOpt.bSelectList(result.getSql(), paramMap, rowConsumer);
-            } else {
-                throw new IllegalStateException("baseSelectOpt is not initialized");
-            }
-
-            log.debug("流式查询完成");
-
-        } catch (Exception e) {
-            log.error("执行流式查询失败", e);
-            throw new RuntimeException("执行流式查询失败: " + e.getMessage(), e);
-        }
     }
 
 
-    /**
-     * 将参数列表转换为 SqlParamMap
-     *
-     * @param params 参数列表
-     * @return SqlParamMap
-     */
-    private SqlParamMap convertToSqlParamMap(List<Object> params) {
-        SqlParamMap paramMap = SqlParamMap.of();
-        if (params == null || params.isEmpty()) {
-            return paramMap;
-        }
-
-        // 使用索引作为参数名
-        for (int i = 0; i < params.size(); i++) {
-            paramMap.addOne("" + i, params.get(i));
-        }
-        return paramMap;
-    }
-
-    /**
-     * 检查记录是否存在
-     *
-     * @param query 查询请求
-     * @return true=存在，false=不存在
-     */
-    public boolean wSelectExists(GirAdvQueryRequest query) {
-        return wSelectCount(query) > 0;
-    }
 }
