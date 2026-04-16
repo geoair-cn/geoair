@@ -1,8 +1,6 @@
-package cn.geoair.map.dynamic.adv.query.utils;
+package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.apo.QueryRequest;
-import cn.geoair.map.dynamic.adv.query.apo.QueryFilter;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.hutool.core.util.StrUtil;

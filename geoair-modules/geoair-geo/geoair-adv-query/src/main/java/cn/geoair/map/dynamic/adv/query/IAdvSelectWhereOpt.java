@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
-import cn.geoair.map.dynamic.adv.query.apo.QueryRequest;
+import cn.geoair.map.dynamic.adv.query.wherequery.QueryRequest;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 

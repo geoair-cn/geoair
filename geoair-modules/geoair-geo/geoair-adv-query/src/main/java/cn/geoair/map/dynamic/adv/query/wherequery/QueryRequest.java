@@ -1,5 +1,6 @@
-package cn.geoair.map.dynamic.adv.query.apo;
+package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
