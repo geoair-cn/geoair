@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
@@ -45,14 +44,14 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     @Override
-    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public Integer bDeleteBySql(String   dynamicSql, SqlParamMap sqlParam) {
         // 通用参数校验
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("删除SQL语句不能为空");
         }
 
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
 
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();

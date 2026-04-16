@@ -180,8 +180,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bInsertBySql(sqlStatement, sqlParam);
+    public Integer bInsertBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bInsertBySql(dynamicSql, sqlParam);
     }
 
     @Override
@@ -254,8 +254,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bDeleteBySql(sqlStatement, sqlParam);
+    public Integer bDeleteBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bDeleteBySql(dynamicSql, sqlParam);
     }
 
     @Override
@@ -354,50 +354,50 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bSelectOne(sqlStatement, sqlParam);
+    public GirAdvOneRow bSelectOne(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bSelectOne(dynamicSql, sqlParam);
     }
 
     @Override
-    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bSelectList(sqlStatement, sqlParam);
+    public List<GirAdvOneRow> bSelectList(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bSelectList(dynamicSql, sqlParam);
     }
 
     @Override
     public void bSelectList(
-            String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        advBaseOptPxy.bSelectList(sqlStatement, sqlParam, rowConsumer);
+            String   dynamicSql, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+        advBaseOptPxy.bSelectList(dynamicSql, sqlParam, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bSelectListToValueList(sqlStatement, sqlParam);
+    public List<List<Object>> bSelectListToValueList(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bSelectListToValueList(dynamicSql, sqlParam);
     }
 
     @Override
-    public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bSelectNumber(sqlStatement, sqlParam);
+    public Number bSelectNumber(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bSelectNumber(dynamicSql, sqlParam);
     }
 
     @Override
-    public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bSelectRecordRowCount(sqlStatement, sqlParam);
+    public Number bSelectRecordRowCount(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bSelectRecordRowCount(dynamicSql, sqlParam);
     }
 
     @Override
-    public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return advBaseOptPxy.bSelectObjOne(sqlStatement, sqlParam, clazz);
+    public <E> E bSelectObjOne(String   dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        return advBaseOptPxy.bSelectObjOne(dynamicSql, sqlParam, clazz);
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return advBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz);
+    public <E> List<E> bSelectObjList(String   dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        return advBaseOptPxy.bSelectObjList(dynamicSql, sqlParam, clazz);
     }
 
     @Override
     public <E> void bSelectObjList(
-            String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        advBaseOptPxy.bSelectObjList(sqlStatement, sqlParam, clazz, rowConsumer);
+            String   dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        advBaseOptPxy.bSelectObjList(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
     // ==================== 基础更新操作（代理调用PgAdvBaseOpt） ====================
@@ -407,8 +407,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advBaseOptPxy.bUpdateBySql(sqlStatement, sqlParam);
+    public Integer bUpdateBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advBaseOptPxy.bUpdateBySql(dynamicSql, sqlParam);
     }
 
     @Override
@@ -472,8 +472,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public int dExecuteDDL(
-            String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
-        return advDDLOptPxy.dExecuteDDL(sqlStatement, sqlParam, tableName, operation);
+            String   dynamicSql, SqlParamMap sqlParam, String tableName, String operation) {
+        return advDDLOptPxy.dExecuteDDL(dynamicSql, sqlParam, tableName, operation);
     }
 
     @Override
@@ -522,8 +522,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public DataFieldsApo dGetColumnsBySQL(String sqlStatement, SqlParamMap sqlParam) {
-        return advDDLOptPxy.dGetColumnsBySQL(sqlStatement, sqlParam);
+    public DataFieldsApo dGetColumnsBySQL(String   dynamicSql, SqlParamMap sqlParam) {
+        return advDDLOptPxy.dGetColumnsBySQL(dynamicSql, sqlParam);
     }
 
     @Override
@@ -1212,8 +1212,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return advGeoOptPxy.eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt);
+            String   dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return advGeoOptPxy.eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
@@ -1236,8 +1236,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return advGeoOptPxy.eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt);
+            String   dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return advGeoOptPxy.eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
@@ -1259,46 +1259,46 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam);
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eGetGeoTypeBySql(dynamicSql, sqlParam);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String sqlStatement, SqlParamMap sqlParam, String geomFieldName) {
-        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldName);
+            String   dynamicSql, SqlParamMap sqlParam, String geomFieldName) {
+        return advGeoOptPxy.eGetGeoTypeBySql(dynamicSql, sqlParam, geomFieldName);
     }
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames) {
-        return advGeoOptPxy.eGetGeoTypeBySql(sqlStatement, sqlParam, geomFieldNames);
+            String   dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+        return advGeoOptPxy.eGetGeoTypeBySql(dynamicSql, sqlParam, geomFieldNames);
     }
 
     @Override
-    public boolean eIsGeomBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eIsGeomBySql(sqlStatement, sqlParam);
+    public boolean eIsGeomBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eIsGeomBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eGetGeomColumnNameBySql(sqlStatement, sqlParam);
+    public String eGetGeomColumnNameBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eGetGeomColumnNameBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
+    public List<String> eGetGeomColumnNameListBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eGetGeomColumnListBySql(sqlStatement, sqlParam);
+            String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eGetGeomColumnListBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return advGeoOptPxy.eGetGeomColumnBySql(sqlStatement, sqlParam);
+    public FieldBySchemaApo eGetGeomColumnBySql(String   dynamicSql, SqlParamMap sqlParam) {
+        return advGeoOptPxy.eGetGeomColumnBySql(dynamicSql, sqlParam);
     }
 
     @Override

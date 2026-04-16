@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
@@ -48,12 +47,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
-    public Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public Integer bUpdateBySql(String   dynamicSql, SqlParamMap sqlParam) {
         // 通用参数校验
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("更新SQL语句不能为空");
         }
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 

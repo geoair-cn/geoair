@@ -188,8 +188,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     // ========== 通用逻辑：带参数查询 ==========
     @Override
-    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public GirAdvOneRow bSelectOne(String dynamicSql, SqlParamMap sqlParam) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             // 差异化：构建单条查询包装SQL
@@ -204,15 +204,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                             sqlMeta.getJdbcParamValues().toArray());
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数bSelectOne查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数bSelectOne查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public List<GirAdvOneRow> bSelectList(String dynamicSql, SqlParamMap sqlParam) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
 
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -226,7 +226,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                             sqlMeta.getJdbcParamValues().toArray());
             return GirAdvOneRow.ofByEntityList(queryResult);
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数bSelectList查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数bSelectList查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
@@ -234,8 +234,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public void bSelectList(
-            String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+            String dynamicSql, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectList(带参数-流式)", sqlMeta.getSql(), sqlParam);
@@ -246,15 +246,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     new StreamRsHandler(rowConsumer),
                     sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数流式bSelectList查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数流式bSelectList查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public List<List<Object>> bSelectListToValueList(String dynamicSql, SqlParamMap sqlParam) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectListToValueList(带参数)", sqlMeta.getSql(), sqlParam);
@@ -265,15 +265,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     new ValueListHandler(),
                     sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数bSelectListToValueList查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数bSelectListToValueList查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public Number bSelectNumber(String dynamicSql, SqlParamMap sqlParam) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectNumber(带参数)", sqlMeta.getSql(), sqlParam);
@@ -284,15 +284,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     new NumberHandler(),
                     sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数bSelectNumber查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数bSelectNumber查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public Number bSelectRecordRowCount(String dynamicSql, SqlParamMap sqlParam) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(sqlMeta.getSql());
         SqlMeta countSqlMeta = new SqlMeta(countSql, sqlMeta.getJdbcParamValues());
@@ -306,15 +306,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     new NumberHandler(),
                     countSqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
-            throw new RuntimeException("执行带参数bSelectRecordRowCount查询失败，SQL：" + sqlStatement, e);
+            throw new RuntimeException("执行带参数bSelectRecordRowCount查询失败，SQL：" + dynamicSql, e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public <E> E bSelectObjOne(String dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjOne(带参数)", sqlMeta.getSql(), sqlParam);
@@ -328,15 +328,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             return (E) queryResult;
         } catch (SQLException e) {
             throw new RuntimeException(
-                    "执行带参数bSelectObjOne查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
+                    "执行带参数bSelectObjOne查询失败，SQL：" + dynamicSql + "，目标类型：" + clazz.getName(), e);
         } finally {
             closeConnection(connection);
         }
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+    public <E> List<E> bSelectObjList(String dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjList(带参数)", sqlMeta.getSql(), sqlParam);
@@ -348,7 +348,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException(
-                    "执行带参数bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
+                    "执行带参数bSelectObjList查询失败，SQL：" + dynamicSql + "，目标类型：" + clazz.getName(), e);
         } finally {
             closeConnection(connection);
         }
@@ -356,8 +356,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> void bSelectObjList(
-            String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+            String dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         Connection connection = dataSourceGetter.getConnection();
         try {
             logExecuteSql("bSelectObjList(带参数-流式)", sqlMeta.getSql(), sqlParam);
@@ -369,7 +369,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     sqlMeta.getJdbcParamValues().toArray());
         } catch (SQLException e) {
             throw new RuntimeException(
-                    "执行带参数流式bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(),
+                    "执行带参数流式bSelectObjList查询失败，SQL：" + dynamicSql + "，目标类型：" + clazz.getName(),
                     e);
         } finally {
             closeConnection(connection);

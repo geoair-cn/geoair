@@ -16,12 +16,15 @@ import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/** 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现 */
+/**
+ * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现
+ */
 public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // 注入数据源获取器
@@ -41,10 +44,14 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         this.dataSourceGetter.setDatabaseNameGetterFunction(this::dGetCurrentDataBase);
     }
 
-    /** 获取抽象查询对象 */
+    /**
+     * 获取抽象查询对象
+     */
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
-    /** 创建表名处理器（子类实现：绑定PG/MySQL版本） */
+    /**
+     * 创建表名处理器（子类实现：绑定PG/MySQL版本）
+     */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
     // ========== 通用逻辑：表操作 ==========
@@ -402,15 +409,15 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     }
 
     @Override
-    public DataFieldsApo dGetColumnsBySQL(String sqlStatement, SqlParamMap sqlParam) {
+    public DataFieldsApo dGetColumnsBySQL(String dynamicSql, SqlParamMap sqlParam) {
         // 通用参数校验
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL视图语句不能为空");
         }
-        sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
+        dynamicSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
 
         // 通用解析：提取表名和字段
-        AdvSqlParser.SqlParseResult parse = AdvSqlParser.parse(sqlStatement);
+        AdvSqlParser.SqlParseResult parse = AdvSqlParser.parse(dynamicSql);
         String tableName = parse.getTableName();
         DataFieldsApo tableFields = null;
         if (ObjectUtil.isNotEmpty(tableName)) {
@@ -421,7 +428,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
 
         // 通用：构建元数据查询SQL
-        String fieldQuerySql = buildMetadataQuerySql(sqlStatement);
+        String fieldQuerySql = buildMetadataQuerySql(dynamicSql);
         log.debug(
                 "schema:[{}] db:[{}] SQL的元数据查询：{}",
                 dataSourceGetter.getSchemaName(),
@@ -434,7 +441,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 通用工具方法（DDL执行模板） ==========
 
-    /** 通用DDL执行方法（无参数） */
+    /**
+     * 通用DDL执行方法（无参数）
+     */
     public int dExecuteDDL(String sql, String tableName, String operation) {
         Connection connection = null;
         Statement statement = null;
@@ -466,12 +475,14 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         return result;
     }
 
-    /** 通用DDL执行方法（带参数） */
+    /**
+     * 通用DDL执行方法（带参数）
+     */
     @Override
     public int dExecuteDDL(
-            String sqlStatement, SqlParamMap sqlParam, String tableName, String operation) {
+            String dynamicSql, SqlParamMap sqlParam, String tableName, String operation) {
         // 通用SQL解析
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -518,7 +529,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 通用工具方法（资源/事务控制） ==========
 
-    /** 回滚连接 */
+    /**
+     * 回滚连接
+     */
     protected void rollbackConnection(Connection connection, String operation, String tableName) {
         if (connection != null) {
             try {
@@ -529,7 +542,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
     }
 
-    /** 恢复自动提交 */
+    /**
+     * 恢复自动提交
+     */
     protected void restoreAutoCommit(Connection connection) {
         if (connection != null) {
             try {
@@ -540,7 +555,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
     }
 
-    /** 从SQL获取元数据（通用逻辑） */
+    /**
+     * 从SQL获取元数据（通用逻辑）
+     */
     protected DataFieldsApo getMetadataFromSql(
             String sql, DataFieldsApo tableFields, SqlParamMap sqlParam) {
         Connection connection = null;
@@ -586,8 +603,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                             tableFields.getDataField(
                                     fieldBySchemaApo ->
                                             fieldBySchemaApo
-                                                            .getOriginalColumnName()
-                                                            .equals(baseColumnName)
+                                                    .getOriginalColumnName()
+                                                    .equals(baseColumnName)
                                                     ? fieldBySchemaApo
                                                     : null);
                     if (fieldOpt.isPresent()) {
@@ -620,7 +637,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         return dataFieldVO;
     }
 
-    /** 从带参数SQL获取元数据（通用封装） */
+    /**
+     * 从带参数SQL获取元数据（通用封装）
+     */
     protected DataFieldsApo getMetadataFromSqlWithParam(
             String sql, SqlParamMap sqlParam, DataFieldsApo tableFields) {
         return getMetadataFromSql(sql, tableFields, sqlParam);

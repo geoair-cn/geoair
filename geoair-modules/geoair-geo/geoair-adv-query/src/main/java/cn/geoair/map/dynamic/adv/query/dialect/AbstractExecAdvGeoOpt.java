@@ -134,8 +134,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public boolean eIsGeomBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(sqlStatement, sqlParam));
+    public boolean eIsGeomBySql(String dynamicSql, SqlParamMap sqlParam) {
+        return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
     @Override
@@ -162,16 +162,16 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, SqlParamMap sqlParam) {
         return eGetGeoTypeBySql(
-                sqlStatement, sqlParam, eGetGeomColumnNameBySql(sqlStatement, sqlParam));
+                dynamicSql, sqlParam, eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String sqlStatement, SqlParamMap sqlParam, String geomFieldName) {
+            String dynamicSql, SqlParamMap sqlParam, String geomFieldName) {
         Map<String, AdvEnumsTypeGeom> map =
-                eGetGeoTypeBySql(sqlStatement, sqlParam, ListUtil.of(geomFieldName));
+                eGetGeoTypeBySql(dynamicSql, sqlParam, ListUtil.of(geomFieldName));
         return MapUtil.isEmpty(map) ? null : map.get(geomFieldName);
     }
 
@@ -197,8 +197,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String sqlStatement, SqlParamMap sqlParam) {
-        List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(sqlStatement, sqlParam);
+    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, SqlParamMap sqlParam) {
+        List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
         return dataFieldsApo.getFieldNameList();
@@ -229,15 +229,15 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String sqlStatement, SqlParamMap sqlParam) {
-        List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(sqlStatement, sqlParam);
+    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, SqlParamMap sqlParam) {
+        List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         return CollectionUtil.isNotEmpty(fields) ? fields.get(0) : null;
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String sqlStatement, SqlParamMap sqlParam) {
-        DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(sqlStatement, sqlParam);
+            String dynamicSql, SqlParamMap sqlParam) {
+        DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
         return dataFieldsApo.getGeomFields();
     }
 
@@ -542,9 +542,9 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
-        return eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        return eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
@@ -593,9 +593,9 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String sqlStatement, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sqlStatement, sqlParam);
-        return eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        return eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +27,24 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         this.dataSourceGetter = dataSourceGetter;
     }
 
-    /** 插入操作代理对象 */
+    /**
+     * 插入操作代理对象
+     */
     protected IAdvBaseAccessOpt advBaseAccessPxyOpt;
 
-    /** 查询操作代理对象 */
+    /**
+     * 查询操作代理对象
+     */
     protected IAdvBaseSelectOpt advBaseSelectPxyOpt;
 
-    /** 更新操作代理对象 */
+    /**
+     * 更新操作代理对象
+     */
     protected IAdvBaseUpdateOpt advBaseUpdatePxyOpt;
 
-    /** 删除操作代理对象 */
+    /**
+     * 删除操作代理对象
+     */
     protected IAdvBaseDeleteOpt advBaseDeletePxyOpt;
 
     public abstract IAdvBaseAccessOpt getAdvBaseAccessPxyOpt();
@@ -53,8 +62,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatement, sqlParam);
+    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseAccessPxyOpt().bInsertBySql(dynamicSql, sqlParam);
     }
 
     @Override
@@ -128,8 +137,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseDeletePxyOpt().bDeleteBySql(sqlStatement, sqlParam);
+    public Integer bDeleteBySql(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseDeletePxyOpt().bDeleteBySql(dynamicSql, sqlParam);
     }
 
     @Override
@@ -230,50 +239,50 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseSelectPxyOpt().bSelectOne(sqlStatement, sqlParam);
+    public GirAdvOneRow bSelectOne(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseSelectPxyOpt().bSelectOne(dynamicSql, sqlParam);
     }
 
     @Override
-    public List<GirAdvOneRow> bSelectList(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParam);
+    public List<GirAdvOneRow> bSelectList(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseSelectPxyOpt().bSelectList(dynamicSql, sqlParam);
     }
 
     @Override
     public void bSelectList(
-            String sqlStatement, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectList(sqlStatement, sqlParam, rowConsumer);
+            String dynamicSql, SqlParamMap sqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+        getAdvBaseSelectPxyOpt().bSelectList(dynamicSql, sqlParam, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseSelectPxyOpt().bSelectListToValueList(sqlStatement, sqlParam);
+    public List<List<Object>> bSelectListToValueList(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseSelectPxyOpt().bSelectListToValueList(dynamicSql, sqlParam);
     }
 
     @Override
-    public Number bSelectNumber(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseSelectPxyOpt().bSelectNumber(sqlStatement, sqlParam);
+    public Number bSelectNumber(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseSelectPxyOpt().bSelectNumber(dynamicSql, sqlParam);
     }
 
     @Override
-    public Number bSelectRecordRowCount(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseSelectPxyOpt().bSelectRecordRowCount(sqlStatement, sqlParam);
+    public Number bSelectRecordRowCount(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseSelectPxyOpt().bSelectRecordRowCount(dynamicSql, sqlParam);
     }
 
     @Override
-    public <E> E bSelectObjOne(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return getAdvBaseSelectPxyOpt().bSelectObjOne(sqlStatement, sqlParam, clazz);
+    public <E> E bSelectObjOne(String dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        return getAdvBaseSelectPxyOpt().bSelectObjOne(dynamicSql, sqlParam, clazz);
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamMap sqlParam, Class<E> clazz) {
-        return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParam, clazz);
+    public <E> List<E> bSelectObjList(String dynamicSql, SqlParamMap sqlParam, Class<E> clazz) {
+        return getAdvBaseSelectPxyOpt().bSelectObjList(dynamicSql, sqlParam, clazz);
     }
 
     @Override
     public <E> void bSelectObjList(
-            String sqlStatement, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParam, clazz, rowConsumer);
+            String dynamicSql, SqlParamMap sqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt().bSelectObjList(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
     // ==================== 更新操作实现（代理调用） ====================
@@ -283,8 +292,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam) {
-        return getAdvBaseUpdatePxyOpt().bUpdateBySql(sqlStatement, sqlParam);
+    public Integer bUpdateBySql(String dynamicSql, SqlParamMap sqlParam) {
+        return getAdvBaseUpdatePxyOpt().bUpdateBySql(dynamicSql, sqlParam);
     }
 
     @Override

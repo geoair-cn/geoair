@@ -67,14 +67,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public Integer bInsertBySql(String   dynamicSql, SqlParamMap sqlParam) {
         // 通用参数校验
-        if (StrUtil.isEmpty(sqlStatement)) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("插入SQL语句不能为空");
         }
 
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sqlStatement, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
 
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();

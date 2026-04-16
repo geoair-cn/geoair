@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.hutool.core.util.StrUtil;
@@ -74,7 +75,7 @@ public class GirAdvQuerySqlBuilder {
 
             // 使用方言处理器获取带Schema的表名
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                  dataSourceGetter,
+                    dataSourceGetter,
                     param.getTableOrViewName()
             );
             sql.append(tableName);
@@ -113,7 +114,7 @@ public class GirAdvQuerySqlBuilder {
         // FROM - 使用方言处理器获取带Schema的表名
         sql.append(" FROM ");
         String tableName = dialectProcessor.tbGetTableNameWithSchema(
-              dataSourceGetter,
+                dataSourceGetter,
                 param.getTableOrViewName()
         );
         sql.append(tableName);
@@ -317,11 +318,11 @@ public class GirAdvQuerySqlBuilder {
     @Getter
     public static class SqlBuildResult {
         private final String sql;
-        private final List<Object> params;
+        private final SqlParamList params;
 
         public SqlBuildResult(String sql, List<Object> params) {
             this.sql = sql;
-            this.params = params;
+            this.params = SqlParamList.of(params);
         }
 
         public String getPreparedSql() {

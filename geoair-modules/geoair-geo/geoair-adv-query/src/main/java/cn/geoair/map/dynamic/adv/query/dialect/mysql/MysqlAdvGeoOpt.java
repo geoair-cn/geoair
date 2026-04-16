@@ -613,7 +613,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String sqlStatement, SqlParamMap sqlParam, List<String> geomFieldNames) {
+            String   dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
         if (StrUtil.isEmpty(sqlStatement) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
@@ -658,7 +658,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String sqlStatement, SqlParamMap sqlParam) {
+    public String eGetGeomColumnNameBySql(String   dynamicSql, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(sqlStatement)) {
             return null;
         }

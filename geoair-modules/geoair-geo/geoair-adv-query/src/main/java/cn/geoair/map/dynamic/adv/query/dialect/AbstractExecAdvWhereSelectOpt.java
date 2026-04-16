@@ -1,19 +1,26 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder.SqlBuildResult;
+import cn.hutool.db.Entity;
+import cn.hutool.db.handler.EntityListHandler;
+import cn.hutool.db.sql.SqlExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -115,14 +122,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
             log.debug("执行查询SQL: {}, 参数: {}", result.getSql(), result.getParams());
 
-            // 转换参数格式
-            SqlParamMap paramMap = convertToSqlParamMap(result.getParams());
-
-            // 执行查询
-            List<GirAdvOneRow> list = executeQuery(result.getSql(), paramMap);
-
-            log.debug("查询结果数量: {}", list.size());
-            return list;
+            return null;
 
         } catch (Exception e) {
             log.error("执行查询失败", e);
