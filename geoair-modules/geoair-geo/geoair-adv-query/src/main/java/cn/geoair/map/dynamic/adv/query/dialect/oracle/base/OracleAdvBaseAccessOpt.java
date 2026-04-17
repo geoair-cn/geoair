@@ -6,70 +6,64 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
+/**
+ * Oracle插入操作实现类（简化版）
+ *
+ * @author zhangjun
+ */
 public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
     public OracleAdvBaseAccessOpt() {
-        // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
 
-    // PG专属常量
-    private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT DO ";
-
-    // PG默认主键字段
-    private static final String PG_DEFAULT_PRIMARY_KEY = "id";
-
-    // ========== 实现差异化抽象方法 ==========
     @Override
     protected String buildInsertReturnIdSql(String tableName, String fields, String placeholders) {
-        // PG：RETURNING 主键语法
+        // Oracle 使用 RETURNING INTO
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}) RETURNING {}",
-                tableName,
-                fields,
-                placeholders,
-                PG_DEFAULT_PRIMARY_KEY);
+                "INSERT INTO {} ({}) VALUES ({}) RETURNING id INTO ?",
+                tableName, fields, placeholders);
     }
 
     @Override
     protected Long executeInsertReturnId(Connection connection, String execSql, Object... params)
             throws SQLException {
-        // PG：执行并获取自增主键
-        return SqlExecutor.executeForGeneratedKey(connection, execSql, params).longValue();
+        throw new SQLException("oracle不支持");
     }
 
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders) {
-        // PG：ON CONFLICT DO NOTHING
+        // Oracle 使用子查询判断：不存在则插入
+        String[] fieldArray = fields.split(",");
+        String pkField = fieldArray[0].trim();
+
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}NOTHING",
-                tableName,
-                fields,
-                placeholders,
-                PG_CONFLICT_CLAUSE);
+                "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS " +
+                        "(SELECT 1 FROM {} WHERE {} = ?)",
+                tableName, fields, placeholders, tableName, pkField);
     }
 
     @Override
     protected String buildInsertOrUpdateSql(
             String tableName, String fields, String placeholders, Set<String> updateFields) {
-        // PG：ON CONFLICT DO UPDATE + EXCLUDED关键字
-        String updateClause =
-                updateFields
-                        .stream()
-                        .map(field -> StrUtil.format("{} = EXCLUDED.{}", field, field))
-                        .collect(Collectors.joining(","));
+        // Oracle 使用 MERGE 语句
+        String[] fieldArray = fields.split(",");
+        String pkField = fieldArray[0].trim();
+
+        String updateClause = updateFields.stream()
+                .filter(f -> !f.equals(pkField))
+                .map(f -> StrUtil.format("target.{} = source.{}", f, f))
+                .collect(Collectors.joining(", "));
 
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}UPDATE SET {}",
-                tableName,
-                fields,
-                placeholders,
-                PG_CONFLICT_CLAUSE,
-                updateClause);
+                "MERGE INTO {} target USING (SELECT {} FROM DUAL) source ON (target.{} = source.{}) " +
+                        "WHEN MATCHED THEN UPDATE SET {} " +
+                        "WHEN NOT MATCHED THEN INSERT ({}) VALUES ({})",
+                tableName, placeholders, pkField, pkField, updateClause, fields, placeholders);
     }
 }
