@@ -1,5 +1,9 @@
-package cn.geoair.comp.dynamic.ds.datasource;
+package cn.geoair.comp.dynamic.ds;
 
+import cn.geoair.comp.dynamic.ds.datasource.GirDataSourceChange;
+import cn.geoair.comp.dynamic.ds.datasource.GirDataSourceRwTypeEnum;
+import cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource;
+import cn.geoair.comp.dynamic.ds.datasource.GirDynamicStackDataSource;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 import java.lang.reflect.Method;
@@ -8,7 +12,7 @@ import java.lang.reflect.Method;
  * @author ：zhangjun
  * @date ：Created in 2025/1/7 13:39 @description： 切面拦截后的处理方法
  */
-public interface GirDsAspectDoAroundApi {
+public interface GirDsAspectDoAroundApiHelper {
 
 
     /**

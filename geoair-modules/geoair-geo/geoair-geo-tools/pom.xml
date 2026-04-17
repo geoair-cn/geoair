@@ -49,6 +49,10 @@
     <lombok.version>1.18.30</lombok.version>
     <net.postgis.version>2025.1.1</net.postgis.version>
     <org.postgis.version>1.3.3</org.postgis.version>
+    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>
+      <oracle.ojdbc.version>19.3.0.0</oracle.ojdbc.version>
+      <!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
+      <oracle.sdoutl.version>1.0</oracle.sdoutl.version>
     <fastjson1x.version>2.0.61</fastjson1x.version>
     <jts.version>1.19.0</jts.version>
   </properties>
@@ -121,6 +125,9 @@
       <version>${net.postgis.version}</version>
     </dependency>
 
+
+
+
     <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-jdbc</artifactId>
@@ -156,6 +163,32 @@
       <artifactId>jts-core</artifactId>
       <version>${jts.version}</version>
     </dependency>
+
+<!--    <dependency>-->
+<!--      <groupId>com.oracle.database.jdbc</groupId>-->
+<!--      <artifactId>ojdbc8</artifactId>-->
+<!--      <version>${version.lib.ojdbc}</version>-->
+<!--      <optional>true</optional>-->
+<!--    </dependency>-->
+
+<!--    <dependency>-->
+<!--      <groupId>com.oracle.database.jdbc</groupId>-->
+<!--      <artifactId>ojdbc11</artifactId>-->
+<!--      <version>${version.lib.ojdbc}</version>-->
+<!--      <optional>true</optional>-->
+<!--    </dependency>-->
+
+      <dependency>
+          <groupId>com.oracle.ojdbc</groupId>
+          <artifactId>ojdbc8</artifactId>
+          <version>${oracle.ojdbc.version}</version>
+      </dependency>
+      <!--oracle空间支持-->
+      <dependency>
+          <groupId>com.oracle</groupId>
+          <artifactId>sdoutl</artifactId>
+          <version>${oracle.sdoutl.version}</version>
+      </dependency>
   </dependencies>
 
   <build>
