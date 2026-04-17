@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /** PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
-public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
+public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
-    public PgAdvBaseAccessOpt() {
+    public OracleAdvBaseAccessOpt() {
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }

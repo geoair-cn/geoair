@@ -6,10 +6,10 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.PgAdvBaseAccessOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.PgAdvBaseDeleteOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.PgAdvBaseSelectOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.PgAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.OracleAdvBaseAccessOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.OracleAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.OracleAdvBaseSelectOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.oracle.base.OracleAdvBaseUpdateOpt;
 
 /**
  * Oracle数据库的动态高级查询基础操作实现类
@@ -30,7 +30,7 @@ public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt();
+            advBaseAccessPxyOpt = new OracleAdvBaseAccessOpt();
             advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseAccessPxyOpt;
@@ -40,7 +40,7 @@ public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt();
+            advBaseSelectPxyOpt = new OracleAdvBaseSelectOpt();
             advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseSelectPxyOpt;
@@ -50,7 +50,7 @@ public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt();
+            advBaseUpdatePxyOpt = new OracleAdvBaseUpdateOpt();
             advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseUpdatePxyOpt;
@@ -60,7 +60,7 @@ public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt();
+            advBaseDeletePxyOpt = new OracleAdvBaseDeleteOpt();
             advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseDeletePxyOpt;
