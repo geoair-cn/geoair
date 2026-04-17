@@ -61,10 +61,10 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         schemaName = (schemaName == null) ? dataSourceGetter.getSchemaName() : schemaName;
 
-        // 加双引号强制小写
+
         String sql = StrUtil.format(
-                "SELECT COUNT(*) AS \"cnt\" FROM USER_TABLES WHERE TABLE_NAME = UPPER('{}')",
-                nameNotSchema);
+                "SELECT COUNT(*) AS \"cnt\" FROM ALL_TABLES WHERE OWNER = UPPER('{}') AND TABLE_NAME = '{}'",
+                schemaName, nameNotSchema);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
@@ -81,22 +81,28 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String owner = (schemaName != null) ? schemaName.toUpperCase() : dataSourceGetter.getSchemaName().toUpperCase();
-        String tableNameUpper = notSchemaTableName.toUpperCase();
+        String tableNameUpper = notSchemaTableName ;
 
-        // 全部小写别名 + 双引号
+        // 关键修复：关联 ALL_COL_COMMENTS 查询字段注释
         String sql = StrUtil.format(
                 "SELECT " +
-                        "  COLUMN_NAME AS \"column_name\", " +
-                        "  DATA_TYPE AS \"udt_name\", " +
-                        "  DATA_LENGTH AS \"character_maximum_length\", " +
-                        "  DATA_PRECISION AS \"numeric_precision\", " +
-                        "  DATA_SCALE AS \"numeric_precision_radix\", " +
-                        "  NULLABLE AS \"is_nullable\", " +
-                        "  DATA_DEFAULT AS \"column_default\" " +
-                        "FROM USER_TAB_COLUMNS " +
-                        "WHERE TABLE_NAME = '{}' " +
-                        "ORDER BY COLUMN_ID",
-                tableNameUpper);
+                        "  col.COLUMN_NAME AS \"column_name\", " +
+                        "  col.DATA_TYPE AS \"udt_name\", " +
+                        "  col.DATA_TYPE AS \"data_type\", " +
+                        "  col.DATA_LENGTH AS \"character_maximum_length\", " +
+                        "  col.DATA_PRECISION AS \"numeric_precision\", " +
+                        "  col.DATA_SCALE AS \"numeric_precision_radix\", " +
+                        "  col.NULLABLE AS \"is_nullable\", " +
+                        "  col.DATA_DEFAULT AS \"column_default\", " +
+                        "  comm.COMMENTS AS \"column_comment\" " +  // 字段注释
+                        "FROM ALL_TAB_COLUMNS col " +
+                        "LEFT JOIN ALL_COL_COMMENTS comm " +
+                        "  ON col.OWNER = comm.OWNER " +
+                        "  AND col.TABLE_NAME = comm.TABLE_NAME " +
+                        "  AND col.COLUMN_NAME = comm.COLUMN_NAME " +
+                        "WHERE col.OWNER = '{}' AND col.TABLE_NAME = '{}' " +
+                        "ORDER BY col.COLUMN_ID",
+                owner, tableNameUpper);
 
         List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sql, FieldBySchemaApo.class);
         List<String> primaryKeys = dGetPrimaryKeys(tableName);
@@ -185,14 +191,23 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
 
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String owner = (schemaName != null) ? schemaName.toUpperCase() : dataSourceGetter.getSchemaName().toUpperCase();
+        String tableNameUpper = notSchemaTableName ;
 
+        // 修复：使用 ALL_* 视图 + 指定 OWNER，跨Schema也能查到主键
         String sql = StrUtil.format(
-                "SELECT COLUMN_NAME AS \"column_name\" FROM USER_CONS_COLUMNS " +
-                        "WHERE CONSTRAINT_NAME = ( " +
-                        "  SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS " +
-                        "  WHERE TABLE_NAME = UPPER('{}') AND CONSTRAINT_TYPE = 'P' " +
+                "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_CONS_COLUMNS " +
+                        "WHERE OWNER = '{}' " +
+                        "  AND TABLE_NAME = '{}' " +
+                        "  AND CONSTRAINT_NAME = ( " +
+                        "      SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS " +
+                        "      WHERE OWNER = '{}' " +
+                        "        AND TABLE_NAME = '{}' " +
+                        "        AND CONSTRAINT_TYPE = 'P' " +
                         ") ORDER BY POSITION",
-                notSchemaTableName);
+                owner, tableNameUpper,
+                owner, tableNameUpper);
 
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> pks = new ArrayList<>();
@@ -203,12 +218,15 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     protected boolean checkConstraintExists(String tableName, String constraintName, String constraintType) {
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String owner = (schemaName != null) ? schemaName.toUpperCase() : dataSourceGetter.getSchemaName().toUpperCase();
+        String tableNameUpper = notSchemaTableName ;
         String type = "PRIMARY KEY".equals(constraintType) ? "P" : constraintType;
 
         String sql = StrUtil.format(
-                "SELECT CONSTRAINT_NAME AS \"constraint_name\" FROM USER_CONSTRAINTS " +
-                        "WHERE TABLE_NAME = UPPER('{}') AND CONSTRAINT_TYPE = '{}' AND CONSTRAINT_NAME = UPPER('{}')",
-                notSchemaTableName, type, constraintName);
+                "SELECT CONSTRAINT_NAME AS \"constraint_name\" FROM ALL_CONSTRAINTS " +
+                        "WHERE OWNER = '{}' AND TABLE_NAME = '{}' AND CONSTRAINT_TYPE = '{}' AND CONSTRAINT_NAME = '{}'",
+                owner, tableNameUpper, type, constraintName);
 
         List<GirAdvOneRow> result = getAdvBaseOpt().bSelectList(sql);
         return ObjectUtil.isNotEmpty(result);
@@ -249,14 +267,19 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
 
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String owner = (schemaName != null) ? schemaName.toUpperCase() : dataSourceGetter.getSchemaName().toUpperCase();
+        String tableNameUpper = notSchemaTableName ;
 
+        // 修复：USER_INDEXES → ALL_INDEXES + 增加 OWNER 查询
         String sql = StrUtil.format(
                 "SELECT " +
                         "INDEX_NAME AS \"indexname\", " +
                         "TABLE_NAME AS \"tablename\", " +
                         "UNIQUENESS AS \"indexdef\" " +
-                        "FROM USER_INDEXES WHERE TABLE_NAME = UPPER('{}')",
-                notSchemaTableName);
+                        "FROM ALL_INDEXES " +
+                        "WHERE OWNER = '{}' AND TABLE_NAME = '{}'",
+                owner, tableNameUpper);
 
         return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
@@ -298,7 +321,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
     public String dGetTableComment(String tableName) {
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String sql = StrUtil.format(
-                "SELECT COMMENTS AS \"comments\" FROM USER_TAB_COMMENTS WHERE TABLE_NAME = UPPER('{}')",
+                "SELECT COMMENTS AS \"comments\" FROM USER_TAB_COMMENTS WHERE TABLE_NAME = '{}'",
                 notSchemaTableName);
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row == null ? "" : row.getStr("comments");
@@ -387,14 +410,11 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (StrUtil.isEmpty(tableName)) {
             return null;
         }
-
-        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String owner = (schemaName != null) ? schemaName.toUpperCase() : dataSourceGetter.getSchemaName().toUpperCase();
-        String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName).toUpperCase();
+        String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName) ;
 
         String sql = StrUtil.format(
                 "SELECT SUM(BYTES) AS \"table_size\" FROM USER_SEGMENTS " +
-                        "WHERE SEGMENT_NAME = UPPER('{}') AND SEGMENT_TYPE = 'TABLE'",
+                        "WHERE SEGMENT_NAME = '{}' AND SEGMENT_TYPE = 'TABLE'",
                 notSchemaTableName);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
@@ -444,7 +464,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         String sql = StrUtil.format(
                 "SELECT COUNT(*) AS \"cnt\" FROM ALL_OBJECTS " +
-                        "WHERE OBJECT_NAME = UPPER('{}') AND OWNER = '{}' AND OBJECT_TYPE = 'FUNCTION'",
+                        "WHERE OBJECT_NAME = '{}' AND OWNER = '{}' AND OBJECT_TYPE = 'FUNCTION'",
                 nameNotSchema, owner);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
