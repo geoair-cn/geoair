@@ -71,7 +71,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 nameNotSchema);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
-        return row != null && row.getInt("cnt") > 0;
+        return row != null && row.getInt("CNT") > 0;
     }
 
     // ========== 字段操作差异化实现 ==========
@@ -429,7 +429,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 notSchemaTableName);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
-        return row != null ? row.getLong("table_size") : null;
+        return row != null ? row.getLong("TABLE_SIZE") : null;
     }
 
     // ========== 元数据差异化实现 ==========
@@ -487,7 +487,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 nameNotSchema, owner);
 
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
-        return row != null && row.getInt("cnt") > 0;
+        return row != null && row.getInt("CNT") > 0;
     }
 
     // ========== 添加主键方法（Oracle 使用 SEQUENCE） ==========
