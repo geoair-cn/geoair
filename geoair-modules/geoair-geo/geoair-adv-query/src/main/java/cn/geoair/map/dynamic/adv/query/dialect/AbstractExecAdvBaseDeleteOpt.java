@@ -554,6 +554,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     protected String buildCountByConditionSql(String tableName, String whereClause) {
 
-        return StrUtil.format("SELECT COUNT(1) FROM {} WHERE {}", tableName, whereClause);
+        return StrUtil.format("SELECT COUNT(*) FROM {} WHERE {}", tableName, whereClause);
     }
 }
