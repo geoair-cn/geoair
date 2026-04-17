@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -32,7 +33,21 @@ public class WhereQueryExample {
         IDataSourceGetter dataSourceGetter = MockDataSourceGetter.getInstance();
         WhereQueryExample example = new WhereQueryExample(masql, dataSourceGetter);
 
-        example.runAllExamples();
+//        example.runAllExamples();
+        GirAdvWhereFilter filter = GirAdvWhereFilter.of()
+                .expr("YEAR(create_time)", AdvOperatorEnums.等于, 2024)
+                .expr("price * quantity", AdvOperatorEnums.大于, 1000)
+                .eq("status", 1);
+        GirAdvQueryRequest query = GirAdvQueryRequest.builder()
+
+                .table("user")
+                .fields("id", "name", "status")
+                .where(filter
+                )
+                .build();
+
+        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
+        printResult("示例1：表达式", result);
     }
 
     public void runAllExamples() {
@@ -410,7 +425,7 @@ public class WhereQueryExample {
         printResult("示例15：组合所有特性", result);
     }
 
-    private void printResult(String title, GirAdvQuerySqlBuilder.SqlBuildResult result) {
+    private static void printResult(String title, GirAdvQuerySqlBuilder.SqlBuildResult result) {
         System.out.println("【" + title + "】");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());

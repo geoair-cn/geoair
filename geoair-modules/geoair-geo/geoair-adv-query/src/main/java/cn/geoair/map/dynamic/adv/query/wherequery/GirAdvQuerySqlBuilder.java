@@ -206,19 +206,24 @@ public class GirAdvQuerySqlBuilder {
 
     /**
      * 构建叶子条件
+     * <p>支持普通字段和SQL表达式两种模式</p>
      */
     private String buildLeafCondition(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
-        // 字段名转义
-        String column = dialectProcessor.tbQuoteFieldName(expr.getColumn());
+        // 获取列名或表达式
+        String column = expr.getColumn();
         AdvOperatorEnums operator = expr.getOperator();
         Object value = expr.getValue();
+        boolean isExpression = expr.isExpression();
+
+        // 如果不是表达式，需要进行字段名转义；表达式原样输出
+        String columnPart = isExpression ? column : dialectProcessor.tbQuoteFieldName(column);
 
         // IS NULL / IS NOT NULL
         if (operator == AdvOperatorEnums.IS_NULL) {
-            return column + " IS NULL";
+            return columnPart + " IS NULL";
         }
         if (operator == AdvOperatorEnums.IS_NOT_NULL) {
-            return column + " IS NOT NULL";
+            return columnPart + " IS NOT NULL";
         }
 
         // IN / NOT IN
@@ -229,7 +234,7 @@ public class GirAdvQuerySqlBuilder {
             }
             String placeholders = String.join(", ", Collections.nCopies(collection.size(), "?"));
             params.addAll(collection);
-            return column + " " + operator.getSqlValue() + " (" + placeholders + ")";
+            return columnPart + " " + operator.getSqlValue() + " (" + placeholders + ")";
         }
 
         // BETWEEN / NOT BETWEEN
@@ -240,7 +245,7 @@ public class GirAdvQuerySqlBuilder {
             }
             params.add(between[0]);
             params.add(between[1]);
-            return column + " " + operator.getSqlValue() + " ? AND ?";
+            return columnPart + " " + operator.getSqlValue() + " ? AND ?";
         }
 
         // EXISTS / NOT EXISTS
@@ -252,14 +257,13 @@ public class GirAdvQuerySqlBuilder {
         if (operator.isLike()) {
             String formattedValue = formatLikeValue(operator, String.valueOf(value));
             params.add(formattedValue);
-            return column + " " + operator.getSqlValue() + " ?";
+            return columnPart + " " + operator.getSqlValue() + " ?";
         }
 
         // 普通比较操作符
         params.add(value);
-        return column + " " + operator.getSqlValue() + " ?";
+        return columnPart + " " + operator.getSqlValue() + " ?";
     }
-
     /**
      * 格式化LIKE值
      */
