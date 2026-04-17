@@ -7,6 +7,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
@@ -21,6 +22,7 @@ import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -424,6 +426,148 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     e);
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    @Override
+    public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
+        if (girSqlParam == null) {
+            return bSelectOne(sqlStatement);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectOne(sqlStatement, sqlParamList);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectOne(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+
+    }
+
+    @Override
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, GirSqlParam girSqlParam) {
+        if (girSqlParam == null) {
+            return bSelectList(sqlStatement);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectList(sqlStatement, sqlParamList);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectList(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+        if (girSqlParam == null) {
+            bSelectListStream(sqlStatement, rowConsumer);
+            return;
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
+            return;
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            bSelectListStream(sqlStatement, sqlParamMap, rowConsumer);
+            return;
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, GirSqlParam girSqlParam) {
+        if (girSqlParam == null) {
+            return bSelectListToValueList(sqlStatement);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectListToValueList(sqlStatement, sqlParamList);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectListToValueList(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public Number bSelectNumber(String sqlStatement, GirSqlParam girSqlParam) {
+        if (girSqlParam == null) {
+            return bSelectNumber(sqlStatement);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectNumber(sqlStatement, sqlParamList);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectNumber(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public Number bSelectRecordRowCount(String sqlStatement, GirSqlParam girSqlParam) {
+        if (girSqlParam == null) {
+            return bSelectRecordRowCount(sqlStatement);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectRecordRowCount(sqlStatement, sqlParamList);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectRecordRowCount(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public <E> E bSelectObjOne(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+        if (girSqlParam == null) {
+            return bSelectObjOne(sqlStatement, clazz);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectObjOne(sqlStatement,sqlParamList, clazz);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectObjOne(sqlStatement,sqlParamMap, clazz);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+        if (girSqlParam == null) {
+            return bSelectObjList(sqlStatement, clazz);
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            return bSelectObjList(sqlStatement,sqlParamList, clazz);
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            return bSelectObjList(sqlStatement,sqlParamMap, clazz);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
+        }
+    }
+
+    @Override
+    public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        if (girSqlParam == null) {
+            bSelectObjListStream(sqlStatement, clazz, rowConsumer);
+            return;
+        } else if (girSqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) girSqlParam;
+            bSelectObjListStream(sqlStatement,sqlParamList, clazz, rowConsumer);
+            return;
+        } else if (girSqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
+            bSelectObjListStream(sqlStatement,sqlParamMap, clazz, rowConsumer);
+            return;
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
         }
     }
 

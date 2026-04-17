@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -373,6 +374,36 @@ public interface IAdvBaseSelectOpt {
      * @param <E>          目标对象的泛型类型
      */
     <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer);
+
+
+    // ===========================================================================
+
+
+    GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam);
+
+
+    List<GirAdvOneRow> bSelectList(String sqlStatement, GirSqlParam girSqlParam);
+
+
+    void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer);
+
+
+    List<List<Object>> bSelectListToValueList(String sqlStatement, GirSqlParam girSqlParam);
+
+
+    Number bSelectNumber(String sqlStatement, GirSqlParam girSqlParam);
+
+
+    Number bSelectRecordRowCount(String sqlStatement, GirSqlParam girSqlParam);
+
+
+    <E> E bSelectObjOne(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz);
+
+
+    <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz);
+
+
+    <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer);
 
 
 }

@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
@@ -616,7 +617,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+            String dynamicSql, GirSqlParam sqlParam, List<String> geomFieldNames) {
         if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
@@ -661,7 +662,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam) {
         if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }
@@ -676,8 +677,6 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
             // 解析带参数SQL
             SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
-
-
             conn = dataSourceGetter.getConnection();
             if (conn == null) {
                 throw new IllegalStateException("无法获取MySQL数据库连接");

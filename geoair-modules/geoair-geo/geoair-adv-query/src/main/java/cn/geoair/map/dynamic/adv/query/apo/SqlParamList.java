@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 
 /**
  * 用于保存预编译之后的值
- * <p>封装SQL参数列表，提供便捷的API操作</p>
+ * <p>使用这个参数的时候，表示前面传的sql是 select * from name == ？ 这样的问号占位符</p>
  *
  * @author 张逢吉
  * @date Created in 17:47
  */
-public class SqlParamList extends ArrayList<Object> implements Serializable {
+public class SqlParamList extends ArrayList<Object> implements Serializable ,GirSqlParam{
 
     /**
      * 创建一个空的 SqlParamList

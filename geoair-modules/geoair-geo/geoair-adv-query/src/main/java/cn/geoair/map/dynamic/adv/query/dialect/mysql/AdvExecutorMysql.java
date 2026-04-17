@@ -4,10 +4,15 @@ import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.sql.Connection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 import javax.sql.DataSource;
 
 /**
@@ -123,6 +128,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
     }
+
 
 
 }

@@ -1,10 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
-import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
-import cn.geoair.map.dynamic.adv.query.IAdvSimplePageOpt;
-import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
+import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -58,6 +55,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     protected abstract IAdvBaseSelectOpt getBaseSelectOpt();
 
     protected abstract IAdvSimplePageOpt getSimplePageOpt();
+
+    protected abstract IAdvGeoPreOpt getGeoOpt();
 
     /**
      * 获取SQL构建器

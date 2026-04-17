@@ -3,13 +3,16 @@ package cn.geoair.map.dynamic.adv.query.utils;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,12 +24,19 @@ public class GirAdvSqlUtils {
     /**
      * 解析带参数的SQL语句，生成可执行的SQL和参数列表
      */
-    public static SqlMeta parseSqlWithParam(String sqlStatement, SqlParamMap sqlParam, DialectTableNameProcessor dialectTableNameProcessor) {
-        if (StrUtil.isEmpty(sqlStatement)) {
+    public static SqlMeta parseSqlWithParam(String dynamicSql, GirSqlParam sqlParam, DialectTableNameProcessor dialectTableNameProcessor) {
+        if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
-        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-        return SqlEngineUtil.getEngine().parse(cleanSql, sqlParam);
+        if (sqlParam == null) {
+            return new SqlMeta(dynamicSql, new ArrayList<>());
+        }
+        if (sqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) sqlParam;
+            return new SqlMeta(dynamicSql, sqlParamList.toList());
+        }
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
+        return SqlEngineUtil.getEngine().parse(cleanSql, (SqlParamMap) sqlParam);
     }
 
 }
