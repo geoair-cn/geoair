@@ -1,10 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+import cn.geoair.map.dynamic.tools.convert.*;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
@@ -145,10 +142,12 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
-        } else if (GirPostGisTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
-            return GirPostGisTran.pGobjectToJts(value);
+        } else if (GirPostGisTran.isPostGisAvailable() && GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
+            return GirPostGisJdbcTran.pGobjectToJts(value);
         } else if (GirMysqlTran.isGeomValue(value)) {
             return GirMysqlTran.mysqlBinaryToJtsGeom(value);
+        } else if (GirOracleTran.isOracleSpatialAvailable() && GirOracleSpatialTran.isSdoGeometry(value)) {
+            return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
         }
         return jtsGeom;
     }

@@ -52,6 +52,7 @@
 
     <!-- 数据库驱动版本 -->
     <oracle.ojdbc.version>19.3.0.0</oracle.ojdbc.version>
+<!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
     <oracle.sdoutl.version>1.0</oracle.sdoutl.version>
     <dm.jdbc.version>18</dm.jdbc.version>
     <dameng.geoutil.version>1.0</dameng.geoutil.version>

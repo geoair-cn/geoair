@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
@@ -406,7 +407,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         log.debug(
                 "schema:[{}] db:[{}] SQL的元数据查询：{}",
                 dataSourceGetter.getSchemaName(),
-                dataSourceGetter.getDataSourceId(),
+                getDatabaseName(),
                 fieldQuerySql);
 
         // 通用：获取元数据并封装结果
@@ -437,7 +438,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         log.debug(
                 "schema:[{}] db:[{}] SQL的元数据查询：{}",
                 dataSourceGetter.getSchemaName(),
-                dataSourceGetter.getDataSourceId(),
+                getDatabaseName(),
                 fieldQuerySql);
 
         // 通用：获取带参数的元数据并封装结果
@@ -714,5 +715,17 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     @Override
     public void dAddColumn(String tableName, FieldBySchemaApo field) {
         throw new RuntimeException("暂时没有实现");
+    }
+
+
+    /**
+     * 获取数据库名称（通用封装）
+     */
+    protected String getDatabaseName() {
+        return dataSourceGetter != null
+                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
+                ? ""
+                : dataSourceGetter.getDatabaseName()
+                : "";
     }
 }

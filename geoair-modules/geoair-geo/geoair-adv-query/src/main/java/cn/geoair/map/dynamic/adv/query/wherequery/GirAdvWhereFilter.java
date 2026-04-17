@@ -273,6 +273,117 @@ public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements 
         return result;
     }
 
+    /**
+     * 添加SQL表达式条件（字段名可以是SQL表达式）
+     * <p>适用于需要对字段进行函数计算或复杂表达式比较的场景</p>
+     * <p>
+     * 使用示例：
+     * <pre>
+     * // 按年份查询
+     * where.expr("YEAR(create_time)", AdvOperatorEnums.等于, 2024)
+     *
+     * // 按计算值比较
+     * where.expr("price * quantity", AdvOperatorEnums.大于, 1000)
+     *
+     * // 字符串拼接比较
+     * where.expr("CONCAT(first_name, ' ', last_name)", AdvOperatorEnums.LIKE, "张%")
+     *
+     * // 聚合函数条件
+     * where.expr("SUM(amount)", AdvOperatorEnums.大于, 10000)
+     * </pre>
+     * </p>
+     *
+     * @param sqlExpr  SQL表达式（如 "YEAR(create_time)"、"price * quantity"）
+     * @param operator 操作符
+     * @param value    值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter expr(String sqlExpr, AdvOperatorEnums operator, Object value) {
+        if (value == null && !operator.isNullCheck()) {
+            return this;
+        }
+        ConditionExpression expr = new ConditionExpression(sqlExpr, operator, value, true);
+        addEntry(expr);
+        return this;
+    }
+
+    /**
+     * 添加SQL表达式条件（等值查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprEq(String sqlExpr, Object value) {
+        return expr(sqlExpr, AdvOperatorEnums.等于, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（大于查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprGt(String sqlExpr, Object value) {
+        return expr(sqlExpr, AdvOperatorEnums.大于, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（大于等于查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprGe(String sqlExpr, Object value) {
+        return expr(sqlExpr, AdvOperatorEnums.大于等于, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（小于查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprLt(String sqlExpr, Object value) {
+        return expr(sqlExpr, AdvOperatorEnums.小于, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（小于等于查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprLe(String sqlExpr, Object value) {
+        return expr(sqlExpr, AdvOperatorEnums.小于等于, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（LIKE查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param value   值
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprLike(String sqlExpr, String value) {
+        return expr(sqlExpr, AdvOperatorEnums.LIKE_ALL, value);
+    }
+
+    /**
+     * 添加SQL表达式条件（IN查询）
+     *
+     * @param sqlExpr SQL表达式
+     * @param values  值集合
+     * @return 当前实例
+     */
+    public GirAdvWhereFilter exprIn(String sqlExpr, Collection<?> values) {
+        return expr(sqlExpr, AdvOperatorEnums.IN, values);
+    }
+
     // ==================== 条件组构建器 ====================
 
     /**
@@ -314,6 +425,42 @@ public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements 
             currentConnector = AdvLogicOperatorEnums.AND;
         }
 
+        // 在 ConditionGroupBuilder 中添加
+        public ConditionGroupBuilder expr(String sqlExpr, AdvOperatorEnums operator, Object value) {
+            if (value == null && !operator.isNullCheck()) {
+                return this;
+            }
+            addEntry(new ConditionExpression(sqlExpr, operator, value, true));
+            return this;
+        }
+
+        public ConditionGroupBuilder exprEq(String sqlExpr, Object value) {
+            return expr(sqlExpr, AdvOperatorEnums.等于, value);
+        }
+
+        public ConditionGroupBuilder exprGt(String sqlExpr, Object value) {
+            return expr(sqlExpr, AdvOperatorEnums.大于, value);
+        }
+
+        public ConditionGroupBuilder exprGe(String sqlExpr, Object value) {
+            return expr(sqlExpr, AdvOperatorEnums.大于等于, value);
+        }
+
+        public ConditionGroupBuilder exprLt(String sqlExpr, Object value) {
+            return expr(sqlExpr, AdvOperatorEnums.小于, value);
+        }
+
+        public ConditionGroupBuilder exprLe(String sqlExpr, Object value) {
+            return expr(sqlExpr, AdvOperatorEnums.小于等于, value);
+        }
+
+        public ConditionGroupBuilder exprLike(String sqlExpr, String value) {
+            return expr(sqlExpr, AdvOperatorEnums.LIKE_ALL, value);
+        }
+
+        public ConditionGroupBuilder exprIn(String sqlExpr, Collection<?> values) {
+            return expr(sqlExpr, AdvOperatorEnums.IN, values);
+        }
         // ==================== 简单条件 ====================
 
         public ConditionGroupBuilder eq(String column, Object value) {
@@ -479,16 +626,30 @@ public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements 
         private final String column;
         private final AdvOperatorEnums operator;
         private final Object value;
+        private final boolean isExpression;  // 新增：是否为表达式
 
         /**
          * 叶子节点构造器（具体条件）
          */
         public ConditionExpression(String column, AdvOperatorEnums operator, Object value) {
+            this(column, operator, value, false);
+        }
+
+        /**
+         * 叶子节点构造器（支持表达式）
+         *
+         * @param column       列名或SQL表达式
+         * @param operator     操作符
+         * @param value        值
+         * @param isExpression 是否为表达式（true表示column是SQL表达式，不进行引号转义）
+         */
+        public ConditionExpression(String column, AdvOperatorEnums operator, Object value, boolean isExpression) {
             this.logicOperator = null;
             this.children = null;
             this.column = column;
             this.operator = operator;
             this.value = value;
+            this.isExpression = isExpression;
         }
 
         /**
@@ -500,6 +661,7 @@ public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements 
             this.column = null;
             this.operator = null;
             this.value = null;
+            this.isExpression = false;
         }
 
         /**
@@ -507,6 +669,13 @@ public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements 
          */
         public boolean isLeaf() {
             return operator != null;
+        }
+
+        /**
+         * 是否为表达式（需要原样输出，不加引号）
+         */
+        public boolean isExpression() {
+            return isExpression;
         }
     }
 

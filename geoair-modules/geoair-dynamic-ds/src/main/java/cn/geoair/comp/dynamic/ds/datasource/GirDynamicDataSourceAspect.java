@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds.datasource;
 import cn.geoair.base.bean.GirBeanHelper;
 
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.comp.dynamic.ds.GirDsAspectDoAroundApiHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -10,7 +11,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 @Order(-1)
 public class GirDynamicDataSourceAspect {
 
-    static GirDsAspectDoAroundApi gtcDsAspectDoAroundApi;
+    static GirDsAspectDoAroundApiHelper gtcDsAspectDoAroundApi;
 
     /**
      * 配置切点：方法上带有我们自定义这个注解的就切 被切到就会执行下面的环绕通知去切换数据源
@@ -69,7 +69,7 @@ public class GirDynamicDataSourceAspect {
         if (gtcDsAspectDoAroundApi == null) {
             try {
                 gtcDsAspectDoAroundApi =
-                        GirBeanHelper.getProvider().getBean(GirDsAspectDoAroundApi.class);
+                        GirBeanHelper.getProvider().getBean(GirDsAspectDoAroundApiHelper.class);
             }catch (Exception e){
                 log.error(e.getMessage());
                 throw new RuntimeException("无法找到 GirDsAspectDoAroundApi 对应的实现，请调用方进行手动实现");
