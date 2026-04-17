@@ -43,7 +43,7 @@ public class WhereQueryExample {
                 .table("user")
                 .fields("id", "name", "status")
                 .where(filter
-                )
+                ).order(OrderApo.ofASCFunction("create_time1")).order(OrderApo.ofASCFieldName("aaaaa"))
                 .build();
 
         GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
