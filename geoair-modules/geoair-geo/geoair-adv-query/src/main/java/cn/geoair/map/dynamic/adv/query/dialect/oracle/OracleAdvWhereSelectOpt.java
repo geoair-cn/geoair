@@ -32,7 +32,7 @@ public class OracleAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     }
 
     @Override
-    protected IAdvSimplePageOpt getSimplePageOpt() {
+    protected IAdvSimplePagePreOpt getSimplePageOpt() {
         return simplePagePreOpt;
     }
 

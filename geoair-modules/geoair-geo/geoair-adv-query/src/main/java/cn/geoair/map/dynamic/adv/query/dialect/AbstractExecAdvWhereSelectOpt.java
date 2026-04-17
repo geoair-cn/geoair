@@ -54,7 +54,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
      */
     protected abstract IAdvBaseSelectOpt getBaseSelectOpt();
 
-    protected abstract IAdvSimplePageOpt getSimplePageOpt();
+    protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
 
     protected abstract IAdvGeoPreOpt getGeoOpt();
 
@@ -82,7 +82,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     public PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
         return getSimplePageOpt()
-                .pPage(result.getSql(),
+                .pPage(result.getSql(),result.getParams(),
                         query.getPageNum(),
                         query.getPageSize(),
                         query.getPageNumStartZero(),

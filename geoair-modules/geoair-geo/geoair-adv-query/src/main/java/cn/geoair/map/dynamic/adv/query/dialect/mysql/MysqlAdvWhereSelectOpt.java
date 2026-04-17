@@ -36,7 +36,7 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     }
 
     @Override
-    protected IAdvSimplePageOpt getSimplePageOpt() {
+    protected IAdvSimplePagePreOpt getSimplePageOpt() {
         return simplePagePreOpt;
     }
 
