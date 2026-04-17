@@ -35,4 +35,18 @@ public class GirPostGisTran {
     }
 
 
+    private static Boolean isPostgis;
+
+    public static boolean isPostGisAvailable() {
+        if (isPostgis == null) {
+            try {
+                Class.forName("org.postgresql.util.PGobject");
+                isPostgis = true;
+            } catch (ClassNotFoundException e) {
+                isPostgis = false;
+            }
+        }
+        return isPostgis;
+    }
+
 }

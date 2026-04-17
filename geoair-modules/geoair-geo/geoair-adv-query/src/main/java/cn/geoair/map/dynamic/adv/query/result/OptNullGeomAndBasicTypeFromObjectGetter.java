@@ -142,11 +142,11 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
-        } else if (GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
+        } else if (GirPostGisTran.isPostGisAvailable() && GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
             return GirPostGisJdbcTran.pGobjectToJts(value);
         } else if (GirMysqlTran.isGeomValue(value)) {
             return GirMysqlTran.mysqlBinaryToJtsGeom(value);
-        } else if (GirOracleTran.isOracleSpatialAvailable()) {
+        } else if (GirOracleTran.isOracleSpatialAvailable() && GirOracleSpatialTran.isSdoGeometry(value)) {
             return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
         }
         return jtsGeom;

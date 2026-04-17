@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.hutool.core.util.StrUtil;
-import net.postgis.jdbc.PGgeometry;
 import org.locationtech.jts.geom.Geometry;
 import org.postgresql.util.PGobject;
 
@@ -11,6 +10,8 @@ import org.postgresql.util.PGobject;
  * @date ：Created in 12:24 @description： 新版本的postgis驱动
  */
 public class GirPostGisJdbcTran {
+
+
 
     public static boolean isPGobject(Object value) {
         if (value instanceof PGobject) { // PGobject 是 PGgeometry的父类
