@@ -16,7 +16,7 @@ import java.util.*;
  * @date Created in 2026/4/16 10:18
  */
 @Getter
-public class GirAdvWhereFilter extends LinkedHashMap<String, Object> implements Serializable {
+public class GirAdvWhereFilter   implements Serializable {
 
     // 条件条目列表（保持添加顺序，每个条件有自己的连接符）
     private final List<ConditionEntry> entries = new ArrayList<>();
