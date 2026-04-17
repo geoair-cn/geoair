@@ -44,7 +44,8 @@
 
   <properties>
     <skipTests>true</skipTests>
-
+    <oracle.ojdbc.version>21.5.0.0</oracle.ojdbc.version>
+    <oracle.sdoutl.version>23.26</oracle.sdoutl.version>
   </properties>
 
   <dependencies>
@@ -59,6 +60,8 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -83,6 +86,22 @@
       <version>${org.postgis.version}</version>
       <optional>true</optional>
     </dependency>
+
+
+    <dependency>
+      <groupId>com.oracle.database.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>${oracle.ojdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle.database.spatial</groupId>
+      <artifactId>sdoutl</artifactId>
+      <version>${oracle.sdoutl.version}</version>
+      <optional>true</optional>
+    </dependency>
+
 
     <dependency>
       <groupId>cn.geoair.devkit</groupId>

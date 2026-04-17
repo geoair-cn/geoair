@@ -100,6 +100,20 @@
       </dependency>
 
       <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>${version.lib.ojdbc}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.oracle.database.spatial</groupId>
+        <artifactId>sdoutl</artifactId>
+        <version>${oracle.sdoutl.version}</version>
+        <optional>true</optional>
+      </dependency>
+
+
+      <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-coverage</artifactId>
         <version>${geotools.version}</version>
