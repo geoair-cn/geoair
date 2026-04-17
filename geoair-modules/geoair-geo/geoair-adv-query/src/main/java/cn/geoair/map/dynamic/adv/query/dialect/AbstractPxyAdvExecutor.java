@@ -429,49 +429,50 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     //=================================================
+
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
-        return null;
+        return getAdvBaseOpt().bSelectOne(sqlStatement, girSqlParam);
     }
 
     @Override
     public List<GirAdvOneRow> bSelectList(String sqlStatement, GirSqlParam girSqlParam) {
-        return Collections.emptyList();
+        return getAdvBaseOpt().bSelectList(sqlStatement, girSqlParam);
     }
 
     @Override
     public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-
+        getAdvBaseOpt().bSelectListStream(sqlStatement, girSqlParam, rowConsumer);
     }
 
     @Override
     public List<List<Object>> bSelectListToValueList(String sqlStatement, GirSqlParam girSqlParam) {
-        return Collections.emptyList();
+        return getAdvBaseOpt().bSelectListToValueList(sqlStatement, girSqlParam);
     }
 
     @Override
     public Number bSelectNumber(String sqlStatement, GirSqlParam girSqlParam) {
-        return null;
+        return getAdvBaseOpt().bSelectNumber(sqlStatement, girSqlParam);
     }
 
     @Override
     public Number bSelectRecordRowCount(String sqlStatement, GirSqlParam girSqlParam) {
-        return null;
+        return getAdvBaseOpt().bSelectRecordRowCount(sqlStatement, girSqlParam);
     }
 
     @Override
     public <E> E bSelectObjOne(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
-        return null;
+        return getAdvBaseOpt().bSelectObjOne(sqlStatement, girSqlParam, clazz);
     }
 
     @Override
     public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
-        return Collections.emptyList();
+        return getAdvBaseOpt().bSelectObjList(sqlStatement, girSqlParam, clazz);
     }
 
     @Override
     public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-
+        getAdvBaseOpt().bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
     }
 
 
