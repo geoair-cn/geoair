@@ -120,7 +120,7 @@ GeoAir Framework 是一个  **企业级 Java 开发框架**,提供从基础依�
 | **ORM 框架** | MyBatis / MyBatis-Plus | 3.5.9 / 3.5.2 |
 | **GIS 库** | GeoTools / JTS Core | 28.6.1 / 1.19.0 |
 | **空间数据库** | PostGIS / Oracle Spatial / 达梦 | - |
-| **JDBC 驱动** | PostgreSQL / Oracle / DM | 42.3.8 / 19.3.0.0 / 18 |
+| **JDBC 驱动** | PostgreSQL / Oracle / DM | 42.3.8 / 21.5.0.0 / 18 |
 | **连接池** | Druid | 1.2.23 |
 | **API 文档** | SpringDoc / Knife4j | 2.3.0 / 4.4.0 |
 | **Swagger 2** | Springfox / Knife4j | 3.0.0 / 3.0.3 |

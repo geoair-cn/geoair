@@ -51,9 +51,9 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- 数据库驱动版本 -->
-    <oracle.ojdbc.version>19.3.0.0</oracle.ojdbc.version>
+    <oracle.ojdbc.version>21.5.0.0</oracle.ojdbc.version>
 <!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
-    <oracle.sdoutl.version>1.0</oracle.sdoutl.version>
+    <oracle.sdoutl.version>23.26</oracle.sdoutl.version>
     <dm.jdbc.version>18</dm.jdbc.version>
     <dameng.geoutil.version>1.0</dameng.geoutil.version>
     <fastjson1x.version>2.0.61</fastjson1x.version>
@@ -156,13 +156,13 @@
       </dependency>
 
       <dependency>
-        <groupId>com.oracle.ojdbc</groupId>
+       <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc8</artifactId>
         <version>${oracle.ojdbc.version}</version>
       </dependency>
       <!--oracle空间支持-->
       <dependency>
-        <groupId>com.oracle</groupId>
+        <groupId>com.oracle.database.spatial</groupId>
         <artifactId>sdoutl</artifactId>
         <version>${oracle.sdoutl.version}</version>
       </dependency>
