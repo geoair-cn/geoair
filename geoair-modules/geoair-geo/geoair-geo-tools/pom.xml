@@ -182,12 +182,14 @@
           <groupId>com.oracle.ojdbc</groupId>
           <artifactId>ojdbc8</artifactId>
           <version>${oracle.ojdbc.version}</version>
+        <optional>true</optional>
       </dependency>
       <!--oracle空间支持-->
       <dependency>
           <groupId>com.oracle</groupId>
           <artifactId>sdoutl</artifactId>
           <version>${oracle.sdoutl.version}</version>
+        <optional>true</optional>
       </dependency>
   </dependencies>
 
