@@ -1,23 +1,24 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
 import java.util.Map;
+
 import org.locationtech.jts.geom.*;
-import org.postgresql.util.PGobject;
 
 /**
  * @author ：zhangjun
  * @date ：Created in 2025/1/8 15:09 @description： 空间类型的通用get器并适配hutools的
- *     OptNullBasicTypeFromObjectGetter
+ * OptNullBasicTypeFromObjectGetter
  */
 public interface OptNullGeomAndBasicTypeFromObjectGetter
         extends OptNullBasicTypeFromObjectGetter<String> {
@@ -144,13 +145,10 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
-        } else if (value instanceof PGobject) { // PGobject 是 PGgeometry的父类
-            /**
-             * 若JDBCURL上面显示指定 currentSchema=onemap_tile_builder 。 然而空间类型的元数据（如类型定义）仅存在于 public 中，
-             * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
-             */
-            PGobject pObject = (PGobject) value;
-            jtsGeom = GirAdvTools.getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
+        } else if (GirPostGisTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
+            return GirPostGisTran.pGobjectToJts(value);
+        } else if (GirMysqlTran.isGeomValue(value)) {
+            return GirMysqlTran.mysqlBinaryToJtsGeom(value);
         }
         return jtsGeom;
     }
