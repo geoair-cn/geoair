@@ -48,7 +48,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
             String countSql =
                     StrUtil.format(
-                            "SELECT COUNT (*) AS count FROM ({}) AS {}",
+                            "SELECT COUNT(*) AS count FROM ({}) AS {}",
                             cleanSql,
                             dialectTableNameProcessor.tbGetTempAliasTableName());
             // 子类实现：执行带参数的统计查询

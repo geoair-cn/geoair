@@ -31,7 +31,7 @@ public class GirJacksonUtils {
             objectMapper.registerModule(new OrgPGGeometryModule());
             log.debug("OrgPGGeometryModule 注册");
         }
-        if (GirOracleTran.isOracleSpatialAvailable()) {
+        if (GirOracleTran.isStructClassAvailable()) {
             objectMapper.registerModule(new OracleStdTypesFullModule());
             objectMapper.registerModule(new OracleTypesModule());
             log.debug("OracleStdTypesFullModule ,OracleTypesModule注册");

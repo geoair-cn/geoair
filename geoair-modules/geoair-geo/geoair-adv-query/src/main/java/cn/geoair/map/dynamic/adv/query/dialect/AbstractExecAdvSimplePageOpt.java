@@ -68,7 +68,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
             String countSql =
                     StrUtil.format(
-                            "SELECT COUNT (*) AS count FROM ({}) AS {}",
+                            "SELECT COUNT(*) AS count FROM ({}) AS {}",
                             cleanSql,
                             dialectTableNameProcessor.tbGetTempAliasTableName());
             return executeCountSql(countSql);
