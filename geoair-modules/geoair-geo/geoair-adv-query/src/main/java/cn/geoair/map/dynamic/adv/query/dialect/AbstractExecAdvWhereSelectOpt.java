@@ -1,10 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
-import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
-import cn.geoair.map.dynamic.adv.query.IAdvSimplePageOpt;
-import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
+import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -59,6 +56,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
     protected abstract IAdvSimplePageOpt getSimplePageOpt();
 
+    protected abstract IAdvGeoPreOpt getGeoOpt();
+
     /**
      * 获取SQL构建器
      */
@@ -70,13 +69,13 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public GirAdvOneRow wSelectOne(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
-        return getBaseSelectOpt().bSelectOne(result.getSql(), result.getParams());
+        return getGeoOpt().eSelectOne(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
     }
 
     @Override
     public List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
-        return getBaseSelectOpt().bSelectList(result.getSql(), result.getParams());
+        return getGeoOpt().eSelectList(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
     }
 
     @Override
@@ -107,6 +106,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public List<List<Object>> wSelectListToValueList(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
+        //  暂时不支持空间操作
         return getBaseSelectOpt().bSelectListToValueList(result.getSql(), result.getParams());
     }
 
@@ -131,6 +131,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
         SqlBuildResult result = getSqlBuildResult(query);
+        //  暂时不支持空间操作
         getBaseSelectOpt().bSelectObjListStream(result.getSql(), result.getParams(), clazz, rowConsumer);
     }
 

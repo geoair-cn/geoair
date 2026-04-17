@@ -12,12 +12,17 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvSimplePagePreOpt simplePagePreOpt;
+    protected IAdvGeoPreOpt iAdvGeoPreOpt;
 
 
-    public MysqlAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePagePreOpt pgAdvSimplePageOpt) {
+    public MysqlAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter,
+                                  IAdvBaseOpt baseOpt,
+                                  IAdvSimplePagePreOpt pgAdvSimplePageOpt,
+                                  IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;
+        this.iAdvGeoPreOpt = iAdvGeoPreOpt;
     }
 
     @Override
@@ -33,5 +38,10 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     @Override
     protected IAdvSimplePageOpt getSimplePageOpt() {
         return simplePagePreOpt;
+    }
+
+    @Override
+    protected IAdvGeoPreOpt getGeoOpt() {
+        return iAdvGeoPreOpt;
     }
 }

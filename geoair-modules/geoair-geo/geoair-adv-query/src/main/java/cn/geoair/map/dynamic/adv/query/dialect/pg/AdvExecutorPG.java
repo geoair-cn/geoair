@@ -109,7 +109,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new PgAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt());
+                    iAdvWhereSelectOpt = new PgAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(),getGeoOpt());
                 }
             }
         }

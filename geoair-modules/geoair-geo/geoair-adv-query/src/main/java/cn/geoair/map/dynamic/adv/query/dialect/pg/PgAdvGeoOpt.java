@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
@@ -609,7 +610,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+            String dynamicSql, GirSqlParam sqlParam, List<String> geomFieldNames) {
         if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
@@ -639,6 +640,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                         fieldsSql.toString(),
                         dynamicSql,
                         whereSql.toString());
+
+
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql, sqlParam);
 
         Map<String, AdvEnumsTypeGeom> resultMap = new HashMap<>();
@@ -654,7 +657,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam) {
         if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }

@@ -98,6 +98,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 StrUtil.format(
                         "SELECT "
                                 + "c.*, "
+                                + "c.data_type as udt_name, "
                                 + "COLUMN_COMMENT AS column_comment, "
                                 + "CASE WHEN kcu.column_name IS NOT NULL THEN 't' ELSE 'f' END AS primary_key_is "
                                 + "FROM information_schema.columns c "

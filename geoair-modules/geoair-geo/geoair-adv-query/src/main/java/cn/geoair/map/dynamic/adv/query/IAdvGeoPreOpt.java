@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
@@ -29,7 +30,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
      */
     GirAdvOneRow eSelectOne(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
 
     /**
      * 执行SQL查询并返回单行结果，指定单个空间字段并按规则处理
@@ -45,7 +46,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      */
     GirAdvOneRow eSelectOne(
             String dynamicSql,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName);
 
@@ -63,7 +64,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      */
     GirAdvOneRow eSelectOne(
             String dynamicSql,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList);
 
@@ -79,7 +80,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
      */
     List<GirAdvOneRow> eSelectList(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt);
 
     /**
      * 执行SQL查询并返回多行结果列表，指定单个空间字段并按规则处理
@@ -95,7 +96,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      */
     List<GirAdvOneRow> eSelectList(
             String dynamicSql,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName);
 
@@ -113,7 +114,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      */
     List<GirAdvOneRow> eSelectList(
             String dynamicSql,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList);
 
@@ -127,7 +128,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return AdvEnumsTypeGeom 自动识别的首个空间字段类型；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, SqlParamMap sqlParam);
+    AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, GirSqlParam sqlParam);
 
     /**
      * 解析SQL查询语句，获取指定单个空间字段的类型
@@ -141,7 +142,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
     AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, String geomFieldName);
+            String dynamicSql, GirSqlParam sqlParam, String geomFieldName);
 
     /**
      * 解析SQL查询语句，获取指定多个空间字段的类型
@@ -156,7 +157,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
     Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames);
+            String dynamicSql, GirSqlParam sqlParam, List<String> geomFieldNames);
 
     /**
      * 判断SQL查询语句的结果是否包含空间字段
@@ -168,7 +169,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return boolean 包含空间字段返回true，否则返回false
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    boolean eIsGeomBySql(String dynamicSql, SqlParamMap sqlParam);
+    boolean eIsGeomBySql(String dynamicSql, GirSqlParam sqlParam);
 
     /**
      * 获取SQL查询语句结果中的首个空间字段名称
@@ -180,7 +181,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return String 首个空间字段名称；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam);
+    String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam);
 
     /**
      * 获取SQL查询语句结果中的所有空间字段名称列表
@@ -192,7 +193,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return List<String> 所有空间字段名称列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    List<String> eGetGeomColumnNameListBySql(String dynamicSql, SqlParamMap sqlParam);
+    List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam);
 
     /**
      * 获取SQL查询语句结果中的所有空间字段的完整信息（包含schema、字段名、类型等）
@@ -204,7 +205,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return List<FieldBySchemaApo> 所有空间字段的元数据列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, SqlParamMap sqlParam);
+    List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, GirSqlParam sqlParam);
 
     /**
      * 获取SQL查询语句结果中的首个空间字段的完整信息（包含schema、字段名、类型等）
@@ -216,5 +217,5 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      * @return FieldBySchemaApo 首个空间字段的元数据；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
-    FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, SqlParamMap sqlParam);
+    FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, GirSqlParam sqlParam);
 }

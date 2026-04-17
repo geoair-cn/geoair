@@ -10,10 +10,10 @@ import java.util.Map;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 17:47 @description： SqlParam的一个map对象，主要是提供一个比较方便的API进行set值
+ * <p>使用这个参数的时候，表示前面传的sql是 select * from name == #{name} 这样的mybatis标签占位符</p>
  */
 public class SqlParamMap extends LinkedHashMap<String, Object>
-        implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable {
+        implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable, GirSqlParam {
 
     /**
      * 创建一个空的 SqlParamMap

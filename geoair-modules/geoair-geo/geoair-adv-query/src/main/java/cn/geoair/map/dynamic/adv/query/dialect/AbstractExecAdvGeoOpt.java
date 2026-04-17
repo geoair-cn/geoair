@@ -5,10 +5,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -134,7 +131,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public boolean eIsGeomBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public boolean eIsGeomBySql(String dynamicSql, GirSqlParam sqlParam) {
         return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
@@ -162,14 +159,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, GirSqlParam sqlParam) {
         return eGetGeoTypeBySql(
                 dynamicSql, sqlParam, eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, String geomFieldName) {
+            String dynamicSql, GirSqlParam sqlParam, String geomFieldName) {
         Map<String, AdvEnumsTypeGeom> map =
                 eGetGeoTypeBySql(dynamicSql, sqlParam, ListUtil.of(geomFieldName));
         return MapUtil.isEmpty(map) ? null : map.get(geomFieldName);
@@ -197,7 +194,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
@@ -229,14 +226,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         return CollectionUtil.isNotEmpty(fields) ? fields.get(0) : null;
     }
 
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String dynamicSql, SqlParamMap sqlParam) {
+            String dynamicSql, GirSqlParam sqlParam) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
         return dataFieldsApo.getGeomFields();
     }
@@ -542,7 +539,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
         List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
         return eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
@@ -550,7 +547,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public GirAdvOneRow eSelectOne(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
@@ -558,11 +555,12 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String sqlStatement,
-            SqlParamMap sqlParam,
+            String dynamicSql,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
-        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sqlStatement, sqlParam);
+        GirAdvOneRow row = null;
+        row = getAdvBaseOpt().bSelectOne(dynamicSql, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList) && ObjectUtil.isNotNull(row)) {
             GirAdvQueryCommonUtils.transGeometryField(ListUtil.of(row), advEnumsGeomOpt, geomFieldNameList);
         }
@@ -593,7 +591,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
         List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
         return eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
@@ -601,7 +599,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<GirAdvOneRow> eSelectList(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
@@ -609,11 +607,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String sqlStatement,
-            SqlParamMap sqlParam,
+            String dynamicSql,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sqlStatement, sqlParam);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(dynamicSql, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList) && CollectionUtil.isNotEmpty(rows)) {
             GirAdvQueryCommonUtils.transGeometryField(rows, advEnumsGeomOpt, geomFieldNameList);
         }

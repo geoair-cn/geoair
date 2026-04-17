@@ -8,9 +8,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.hutool.core.io.unit.DataSizeUtil;
@@ -416,7 +414,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     }
 
     @Override
-    public DataFieldsApo dGetColumnsBySQL(String dynamicSql, SqlParamMap sqlParam) {
+    public DataFieldsApo dGetColumnsBySQL(String dynamicSql, GirSqlParam sqlParam) {
         // 通用参数校验
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL视图语句不能为空");
@@ -566,7 +564,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 从SQL获取元数据（通用逻辑）
      */
     protected DataFieldsApo getMetadataFromSql(
-            String sql, DataFieldsApo tableFields, SqlParamMap sqlParam) {
+            String dynamicSql, DataFieldsApo tableFields, GirSqlParam sqlParam) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -580,14 +578,23 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
             // 带参数/无参数处理
             if (sqlParam != null) {
-
-                SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(sql, sqlParam, dialectTableNameProcessor);
-                statement = connection.prepareStatement(sqlMeta.getSql());
-                for (int i = 1; i <= sqlMeta.getJdbcParamValues().size(); i++) {
-                    statement.setObject(i, sqlMeta.getJdbcParamValues().get(i - 1));
+                if (sqlParam instanceof SqlParamList) {
+                    SqlParamList sqlParamList = (SqlParamList) sqlParam;
+                    statement = connection.prepareStatement(dynamicSql);
+                    List<Object> list = sqlParamList.toList();
+                    for (int i = 1; i <= list.size(); i++) {
+                        statement.setObject(i, list.get(i - 1));
+                    }
+                } else {
+                    SqlParamMap sqlParamMap = (SqlParamMap) sqlParam;
+                    SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParamMap, dialectTableNameProcessor);
+                    statement = connection.prepareStatement(sqlMeta.getSql());
+                    for (int i = 1; i <= sqlMeta.getJdbcParamValues().size(); i++) {
+                        statement.setObject(i, sqlMeta.getJdbcParamValues().get(i - 1));
+                    }
                 }
             } else {
-                statement = connection.prepareStatement(sql);
+                statement = connection.prepareStatement(dynamicSql);
             }
 
             resultSet = statement.executeQuery();
@@ -648,7 +655,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 从带参数SQL获取元数据（通用封装）
      */
     protected DataFieldsApo getMetadataFromSqlWithParam(
-            String sql, SqlParamMap sqlParam, DataFieldsApo tableFields) {
+            String sql, GirSqlParam sqlParam, DataFieldsApo tableFields) {
         return getMetadataFromSql(sql, tableFields, sqlParam);
     }
 
