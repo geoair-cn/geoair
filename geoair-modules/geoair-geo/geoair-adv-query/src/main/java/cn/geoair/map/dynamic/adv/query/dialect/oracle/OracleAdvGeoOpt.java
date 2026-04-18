@@ -19,6 +19,7 @@ import java.util.*;
 /**
  * Oracle Spatial 空间操作实现类
  * 已修复：所有查询字段增加双引号，强制小写别名
+ *
  * @author zhangjun
  */
 @Slf4j
@@ -108,32 +109,35 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         if (CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
-
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT COLUMN_NAME AS \"column_name\", DIMINFO AS \"diminfo\" FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('");
-        sql.append(qualifiedTableName.toUpperCase()).append("')");
-
-        List<GirAdvOneRow> rows = baseOpt.bSelectList(sql.toString());
-
         Map<String, AdvEnumsTypeGeom> resultMap = new HashMap<>();
+        // 遍历每个几何字段，直接从表中解析 SDO_GTYPE 获取真实类型
         for (String field : geomFieldNames) {
-            for (GirAdvOneRow row : rows) {
-                if (field.equalsIgnoreCase(row.getStr("column_name"))) {
-                    resultMap.put(field, inferGeometryType(tableName, field));
-                    break;
-                }
+            try {
+                AdvEnumsTypeGeom advEnumsTypeGeom = inferGeometryType(tableName, field);
+                resultMap.put(field, advEnumsTypeGeom);
+            } catch (Exception e) {
+                // 异常时跳过，不影响整体
+                log.warn("解析几何类型失败：表={}, 字段={}", tableName, field);
             }
         }
+
         return resultMap;
     }
 
     /**
      * 从数据推断几何类型
      */
-    private AdvEnumsTypeGeom inferGeometryType(String tableName, String geomFieldName) {
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+    private AdvEnumsTypeGeom inferGeometryType(String tableNameOrSqlView, String geomFieldName) {
+
+        boolean b = dialectTableNameProcessor.tbTableIsSqlView(tableNameOrSqlView);
+
+        String tableNameS = "";
+        if (b) {
+            tableNameS = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView);
+        } else {
+            tableNameS = StrUtil.wrap(tableNameOrSqlView, "( ", " )");
+        }
+
         String sql = StrUtil.format(
                 "SELECT CASE " +
                         "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 1 THEN 'POINT' " +
@@ -147,7 +151,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
                         "FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
                 geomFieldName, geomFieldName, geomFieldName, geomFieldName,
                 geomFieldName, geomFieldName, geomFieldName,
-                qualifiedTableName, geomFieldName);
+                tableNameS, geomFieldName);
 
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
         if (row != null) {
@@ -158,19 +162,13 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlView, List<String> geomFieldNames) {
-        Map<String, AdvEnumsTypeGeom> resultMap = new HashMap<>();
-        if (CollectionUtil.isNotEmpty(geomFieldNames)) {
-            for (String field : geomFieldNames) {
-                resultMap.put(field, AdvEnumsTypeGeom.Geometry);
-            }
-        }
-        return resultMap;
+        return eGetGeoTypeByTable(sqlView, geomFieldNames);
     }
 
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         validateTableName(tableName);
-        String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema( tableName);
+        String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 
         String sql = StrUtil.format(
                 "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_TAB_COLUMNS " +
@@ -218,31 +216,16 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Integer eGetSrid(String tableNameOrSqlView, String geomFieldName) {
-        if (StrUtil.isEmpty(tableNameOrSqlView) || StrUtil.isEmpty(geomFieldName)) {
-            return 0;
-        }
-
-        String qualifiedName;
-        if (ddlOpt.dIsTableExists(tableNameOrSqlView)) {
-            qualifiedName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView);
-        } else {
-            qualifiedName = StrUtil.format("({})", tableNameOrSqlView);
-        }
-
-        String sql = StrUtil.format(
-                "SELECT DIMINFO AS \"diminfo\", SRID AS \"srid\" FROM USER_SDO_GEOM_METADATA " +
-                        "WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
-                qualifiedName.toUpperCase(), geomFieldName.toUpperCase());
-
-        GirAdvOneRow row = baseOpt.bSelectOne(sql);
-        return row != null ? row.getInt("srid") : 0;
+        log.info("暂时不支持oracle获取srid");
+        return 0;
     }
 
     @Override
     public Map<String, Integer> eGetSrid(String tableNameOrSqlView, List<String> geomFieldNames) {
+        log.info("暂时不支持oracle获取srid");
         Map<String, Integer> sridMap = new HashMap<>();
         for (String field : geomFieldNames) {
-            sridMap.put(field, eGetSrid(tableNameOrSqlView, field));
+            sridMap.put(field, 0);
         }
         return sridMap;
     }
