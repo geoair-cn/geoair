@@ -3,6 +3,7 @@ package cn.geoair.comp.message.converter.jts.jackson.utils;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.jts.JtsExtModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module.OracleStdTypesFullModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module.OracleTypesModule;
+import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module.SdoGeometryModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net.NetPGGeometryModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org.OrgPGGeometryModule;
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
@@ -35,6 +36,11 @@ public class GirJacksonUtils {
             objectMapper.registerModule(new OracleStdTypesFullModule());
             objectMapper.registerModule(new OracleTypesModule());
             log.debug("OracleStdTypesFullModule ,OracleTypesModule注册");
+        }
+        if (GirOracleTran.isOracleSpatialAvailable()) {
+            objectMapper.registerModule(new SdoGeometryModule());
+
+            log.debug("SdoGeometryModule 注册");
         }
     }
 }
