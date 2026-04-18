@@ -10,12 +10,12 @@ public class GirOracleTran {
 
     // Oracle Spatial 相关类名
     private static final String STRUCT_CLASS_NAME = "oracle.sql.STRUCT";
-    private static final String JGEOMETRY_CLASS_NAME = "oracle.spatial.geometry.JGeometry";
+
 
     // 缓存判断结果
     private static Boolean isOracleSpatialAvailable;
     private static Boolean isStructClassAvailable;
-    private static Boolean isJGeometryClassAvailable;
+
 
     /**
      * 判断 Oracle Spatial 是否可用（完整支持）
@@ -24,7 +24,7 @@ public class GirOracleTran {
      */
     public static boolean isOracleSpatialAvailable() {
         if (isOracleSpatialAvailable == null) {
-            isOracleSpatialAvailable = isStructClassAvailable() && isJGeometryClassAvailable();
+            isOracleSpatialAvailable = isStructClassAvailable();
         }
         return isOracleSpatialAvailable;
     }
@@ -46,22 +46,6 @@ public class GirOracleTran {
         return isStructClassAvailable;
     }
 
-    /**
-     * 判断 JGeometry 类是否可用
-     *
-     * @return true=可用，false=不可用
-     */
-    public static boolean isJGeometryClassAvailable() {
-        if (isJGeometryClassAvailable == null) {
-            try {
-                Class.forName(JGEOMETRY_CLASS_NAME);
-                isJGeometryClassAvailable = true;
-            } catch (ClassNotFoundException e) {
-                isJGeometryClassAvailable = false;
-            }
-        }
-        return isJGeometryClassAvailable;
-    }
 
     /**
      * 判断值是否为 Oracle STRUCT 类型（通过类名判断，避免直接引用）
@@ -107,7 +91,6 @@ public class GirOracleTran {
         StringBuilder sb = new StringBuilder();
         sb.append("Oracle 环境信息:\n");
         sb.append("  - STRUCT 类: ").append(isStructClassAvailable() ? "可用" : "不可用").append("\n");
-        sb.append("  - JGeometry 类: ").append(isJGeometryClassAvailable() ? "可用" : "不可用").append("\n");
         sb.append("  - Oracle Spatial: ").append(isOracleSpatialAvailable() ? "可用" : "不可用");
         return sb.toString();
     }
