@@ -40,7 +40,6 @@ public class GirOracleSpatialTran {
         if (!(value instanceof STRUCT)) {
             return "无法解析空间数据：不是STRUCT类型";
         }
-
         try {
             // 使用 BIG_ENDIAN 字节序（Oracle 默认使用大端序）
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);

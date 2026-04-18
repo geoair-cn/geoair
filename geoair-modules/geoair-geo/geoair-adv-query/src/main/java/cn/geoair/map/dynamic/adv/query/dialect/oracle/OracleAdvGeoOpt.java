@@ -89,7 +89,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public List<String> eGetAllGeoLayerName() {
         String schemaName = dataSourceGetter.getSchemaName();
         String sql = StrUtil.format(
-                "SELECT TABLE_NAME AS \"table_name\" FROM USER_TAB_COLUMNS " +
+                "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS " +
                         "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
                         "GROUP BY TABLE_NAME",
                 schemaName);
@@ -170,12 +170,12 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         validateTableName(tableName);
-        String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema( tableName);
 
         String sql = StrUtil.format(
-                "SELECT COLUMN_NAME AS \"column_name\" FROM USER_TAB_COLUMNS " +
-                        "WHERE TABLE_NAME = UPPER('{}') AND DATA_TYPE = 'SDO_GEOMETRY'",
-                qualifiedTableName.toUpperCase());
+                "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_TAB_COLUMNS " +
+                        "WHERE TABLE_NAME = '{}' AND DATA_TYPE = 'SDO_GEOMETRY'",
+                nameNotSchema);
 
         List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
         List<String> names = new ArrayList<>();
