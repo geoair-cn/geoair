@@ -6,11 +6,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.apo.PageApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
@@ -37,22 +33,22 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
 
     // ========== 通用逻辑：带参数的总数统计 ==========
     @Override
-    public Long pCount(String noPageSqlStatement, SqlParamMap sqlParam) {
+    public Long pCount(String noPageSqlStatement, GirSqlParam sqlParam) {
         if (StrUtil.isEmpty(noPageSqlStatement)) {
             throw new IllegalArgumentException("分页统计SQL不能为空");
         }
         // 空参数初始化，避免NPE
-        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
+//        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
 
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
             String countSql =
                     StrUtil.format(
-                            "SELECT COUNT (1) AS count FROM ({}) AS {}",
+                            "SELECT COUNT(*) AS count FROM ({}) AS {}",
                             cleanSql,
                             dialectTableNameProcessor.tbGetTempAliasTableName());
             // 子类实现：执行带参数的统计查询
-            return executeCountSqlWithParam(countSql, param);
+            return executeCountSqlWithParam(countSql, sqlParam);
         } catch (Exception e) {
             log.error("带参数分页统计失败，SQL: {}, 参数: {}", noPageSqlStatement, sqlParam, e);
             throw new RuntimeException("带参数分页统计异常: " + e.getMessage(), e);
@@ -63,7 +59,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -72,14 +68,14 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             List<OrderApo> orders) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
-        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
+//        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
 
         // 2. 子类实现：带参数获取字段元数据
         DataFieldsApo dataFieldsApo = null;
         try {
-            dataFieldsApo = getColumnsBySQLWithParam(noPageSqlStatement, param);
+            dataFieldsApo = getColumnsBySQLWithParam(noPageSqlStatement, sqlParam);
         } catch (Exception e) {
-            log.error("查询带参数SQL字段元数据失败，SQL：{}，参数：{}", noPageSqlStatement, param, e);
+            log.error("查询带参数SQL字段元数据失败，SQL：{}，参数：{}", noPageSqlStatement, sqlParam, e);
             throw new RuntimeException("获取字段信息异常：" + e.getMessage(), e);
         }
 
@@ -98,7 +94,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         String sqlWithOrder = pBuildSqlWithOrder(refactorNoPageSql, orders, tableAlias);
 
         // 4. 通用：带参数统计总数
-        long total = pCount(sqlWithOrder, param);
+        long total = pCount(sqlWithOrder, sqlParam);
 
         // 5. 通用：计算分页参数
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
@@ -127,7 +123,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     // ========== 通用：所有重载方法（统一调用核心方法） ==========
     @Override
     public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize) {
+            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize) {
         return pPage(
                 noPageSqlStatement,
                 sqlParam,
@@ -142,7 +138,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
@@ -160,7 +156,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             List<OrderApo> orders) {
@@ -170,7 +166,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -189,7 +185,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -209,7 +205,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero) {
@@ -227,7 +223,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -246,7 +242,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -265,7 +261,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -285,7 +281,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
@@ -304,7 +300,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
@@ -324,7 +320,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     /**
      * 执行带参数的统计SQL，返回总数
      */
-    protected Long executeCountSqlWithParam(String countSql, SqlParamMap sqlParam) {
+    protected Long executeCountSqlWithParam(String countSql, GirSqlParam sqlParam) {
         GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
         return result != null ? result.getLong("count") : 0L;
     }
@@ -337,7 +333,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     /**
      * 带参数获取SQL字段元数据
      */
-    protected DataFieldsApo getColumnsBySQLWithParam(String noPageSql, SqlParamMap sqlParam) {
+    protected DataFieldsApo getColumnsBySQLWithParam(String noPageSql, GirSqlParam sqlParam) {
         return getAdvDDLOpt().dGetColumnsBySQL(noPageSql, sqlParam);
     }
 

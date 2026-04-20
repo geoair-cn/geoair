@@ -166,6 +166,12 @@
         <artifactId>sdoutl</artifactId>
         <version>${oracle.sdoutl.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.oracle.database.spatial</groupId>
+        <artifactId>sdoapi</artifactId>
+        <version>${oracle.sdoutl.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.dm</groupId>
         <artifactId>DmJdbcDriver</artifactId>

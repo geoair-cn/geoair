@@ -1378,14 +1378,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Long pCount(String noPageSqlStatement, SqlParamMap sqlParam) {
+    public Long pCount(String noPageSqlStatement, GirSqlParam sqlParam) {
         return getSimplePageOpt().pCount(noPageSqlStatement, sqlParam);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1405,14 +1405,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize) {
+            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize) {
         return getSimplePageOpt().pPage(noPageSqlStatement, sqlParam, pageNum, pageSize);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
@@ -1423,7 +1423,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             List<OrderApo> orders) {
@@ -1433,7 +1433,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1445,7 +1445,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1464,7 +1464,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero) {
@@ -1475,7 +1475,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1487,7 +1487,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1499,7 +1499,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -1518,7 +1518,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
@@ -1530,7 +1530,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
