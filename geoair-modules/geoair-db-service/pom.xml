@@ -157,7 +157,7 @@
 
       <dependency>
        <groupId>com.oracle.database.jdbc</groupId>
-        <artifactId>ojdbc8</artifactId>
+        <artifactId>ojdbc17</artifactId>
         <version>${oracle.ojdbc.version}</version>
       </dependency>
       <!--oracle空间支持-->
