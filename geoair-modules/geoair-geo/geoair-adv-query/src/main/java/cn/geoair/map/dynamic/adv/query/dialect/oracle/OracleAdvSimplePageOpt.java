@@ -10,10 +10,14 @@ import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.util.StrUtil;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Oracle带参数分页实现类
@@ -92,7 +96,7 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
-            java.util.List<OrderApo> orders) {
+            java.util.List<OrderApo> orders, AdvEnumsKeyTran advEnumsKeyTran) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
 
@@ -132,8 +136,13 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
         String pageSql = getDialectTableNameProcessor().tbBuildPageSql(sqlWithOrder, pageSize, offset);
 
         // 执行分页查询
-        java.util.List<GirAdvOneRow> records = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
-
+        List<GirAdvOneRow> records = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+        if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
+            records = GirAdvOneRow.toCaseInsensitiveList(records);
+        }
+        if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成驼峰)) {
+            records = GirAdvOneRow.toCamelCaseList(records);
+        }
         // 构建分页结果
         cn.geoair.map.dynamic.adv.query.apo.PageApo<GirAdvOneRow> pageApo =
                 GirAdvQueryCommonUtils.createPageApo(
