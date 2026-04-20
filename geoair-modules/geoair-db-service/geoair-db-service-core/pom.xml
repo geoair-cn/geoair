@@ -45,7 +45,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- 数据库驱动版本 -->
-    <oracle.ojdbc.version>21.5.0.0</oracle.ojdbc.version>
+    <oracle.ojdbc.version>23.7.0.25.01</oracle.ojdbc.version>
     <oracle.sdoutl.version>23.26</oracle.sdoutl.version>
     <dm.jdbc.version>18</dm.jdbc.version>
     <dameng.geoutil.version>1.0</dameng.geoutil.version>

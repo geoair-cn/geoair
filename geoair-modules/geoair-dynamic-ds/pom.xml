@@ -51,7 +51,7 @@
         <spring-boot.version>3.5.13</spring-boot.version>
         <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
 
-        <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>
+        <version.lib.ojdbc>23.7.0.25.01</version.lib.ojdbc>
     </properties>
 
     <dependencies>
