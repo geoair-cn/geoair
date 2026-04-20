@@ -109,13 +109,13 @@
         <groupId>com.oracle.database.spatial</groupId>
         <artifactId>sdoutl</artifactId>
         <version>${sdoutl.version}</version>
-        <optional>true</optional>
+
       </dependency>
       <dependency>
         <groupId>com.oracle.database.spatial</groupId>
         <artifactId>sdoapi</artifactId>
         <version>${sdoutl.version}</version>
-        <optional>true</optional>
+
       </dependency>
 
       <dependency>
