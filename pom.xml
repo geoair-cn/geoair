@@ -61,8 +61,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd-HH-mm-ss</maven.build.timestamp.format>
-        <oracle.ojdbc.version>23.7.0.25.01</oracle.ojdbc.version>
-        <oracle.sdoutl.version>23.26</oracle.sdoutl.version>
+        <ojdbc.version>23.7.0.25.01</ojdbc.version>
+        <sdoutl.version>23.26</sdoutl.version>
         <redisson.version>3.52.0</redisson.version>
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>10.1.53</tomcat.version>

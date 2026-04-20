@@ -45,8 +45,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- 数据库驱动版本 -->
-    <oracle.ojdbc.version>23.7.0.25.01</oracle.ojdbc.version>
-    <oracle.sdoutl.version>23.26</oracle.sdoutl.version>
+    <ojdbc.version>23.7.0.25.01</ojdbc.version>
+    <sdoutl.version>23.26</sdoutl.version>
     <dm.jdbc.version>18</dm.jdbc.version>
     <dameng.geoutil.version>1.0</dameng.geoutil.version>
 
@@ -142,18 +142,18 @@
     <dependency>
      <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc17</artifactId>
-      <version>${oracle.ojdbc.version}</version>
+      <version>${ojdbc.version}</version>
     </dependency>
     <!--oracle空间支持-->
     <dependency>
       <groupId>com.oracle.database.spatial</groupId>
       <artifactId>sdoutl</artifactId>
-      <version>${oracle.sdoutl.version}</version>
+      <version>${sdoutl.version}</version>
     </dependency>
     <dependency>
       <groupId>com.oracle.database.spatial</groupId>
       <artifactId>sdoapi</artifactId>
-      <version>${oracle.sdoutl.version}</version>
+      <version>${sdoutl.version}</version>
 
     </dependency>
     <!--        <dependency>-->
