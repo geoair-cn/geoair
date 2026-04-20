@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 import lombok.Getter;
@@ -102,7 +103,6 @@ public class GirAdvQueryRequest {
      * <p>用于处理空间字段的转换，如转换为空字符串等</p>
      * -- GETTER --
      * 获取空间操作规则
-
      *
      * @return 空间操作规则枚举
      */
@@ -114,10 +114,15 @@ public class GirAdvQueryRequest {
      * <p>true=返回字段元数据信息，false=仅返回数据</p>
      * -- GETTER --
      * 获取是否返回字段元数据
+     *
      * @return true=返回元数据，false=仅返回数据
      */
     private final Boolean hasFieldsInfo;
 
+    /**
+     * key的转换策略
+     */
+    private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
     // ==================== 模式二：直接传SQL ====================
 
     /**
@@ -129,6 +134,7 @@ public class GirAdvQueryRequest {
      * @return 自定义SQL
      */
     private final String customSql;
+
 
     /**
      * 私有构造器，使用Builder构建
@@ -150,11 +156,10 @@ public class GirAdvQueryRequest {
         this.customSql = builder.customSql;
         this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
         this.hasFieldsInfo = builder.hasFieldsInfo;
+        this.advEnumsKeyTran = builder.advEnumsKeyTran;
+
     }
 
-    // ==================== Getter方法 ====================
-
-    // ==================== 辅助方法 ====================
 
     /**
      * 判断是否为自定义SQL模式
@@ -311,6 +316,13 @@ public class GirAdvQueryRequest {
          * 是否返回字段元数据（默认false）
          */
         private Boolean hasFieldsInfo = false;
+
+
+        /**
+         * key的转换策略
+         */
+        private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
+
 
         // ==================== 模式一：对象组装SQL方法 ====================
 
@@ -543,6 +555,20 @@ public class GirAdvQueryRequest {
             this.hasFieldsInfo = hasFieldsInfo;
             return this;
         }
+
+        /**
+         * 设置key的转换策略
+         *
+         * @param advEnumsKeyTran
+         * @return Builder实例
+         */
+        public Builder advEnumsKeyTran(AdvEnumsKeyTran advEnumsKeyTran) {
+            this.advEnumsKeyTran = advEnumsKeyTran;
+            return this;
+        }
+
+
+
 
         /**
          * 完整的高级分页配置（自定义SQL模式）

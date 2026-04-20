@@ -5,6 +5,7 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
@@ -1179,6 +1180,20 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             List<OrderApo> orders) {
         return getSimplePageOpt().pPage(
                 noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement,
+                                       GirSqlParam sqlParam,
+                                       int pageNum,
+                                       int pageSize,
+                                       boolean pageNumStartZero,
+                                       AdvEnumsGeomOpt advEnumsGeomOpt,
+                                       boolean hasFieldsInfo,
+                                       List<OrderApo> orders,
+                                       AdvEnumsKeyTran advEnumsKeyTran) {
+        return getSimplePageOpt().pPage(
+                noPageSqlStatement, sqlParam,pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders,advEnumsKeyTran);
     }
 
     @Override

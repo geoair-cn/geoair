@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
@@ -20,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -82,11 +84,11 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     public PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
         return getSimplePageOpt()
-                .pPage(result.getSql(),result.getParams(),
+                .pPage(result.getSql(), result.getParams(),
                         query.getPageNum(),
                         query.getPageSize(),
                         query.getPageNumStartZero(),
-                        query.getAdvEnumsGeomOpt(), query.getHasFieldsInfo());
+                        query.getAdvEnumsGeomOpt(), query.getHasFieldsInfo(), query.getOrders(), query.getAdvEnumsKeyTran());
 
     }
 
