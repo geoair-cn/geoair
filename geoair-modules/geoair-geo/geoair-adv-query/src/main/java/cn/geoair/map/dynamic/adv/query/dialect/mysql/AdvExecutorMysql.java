@@ -5,8 +5,12 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.sql.Connection;

@@ -8,12 +8,14 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSimplePageOpt
@@ -56,6 +58,9 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     }
 
     // ========== 通用逻辑：核心带参数分页方法 ==========
+
+
+    // ========== 通用逻辑：核心带参数分页方法 ==========
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
@@ -66,6 +71,20 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
+        return pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+    }
+
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders, AdvEnumsKeyTran advEnumsKeyTran) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
 //        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
@@ -106,7 +125,12 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         // 7. 子类实现：执行带参数的分页查询
         List<GirAdvOneRow> records = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
 
-
+        if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
+            records = GirAdvOneRow.toCaseInsensitiveList(records);
+        }
+        if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成驼峰)) {
+            records = GirAdvOneRow.toCamelCaseList(records);
+        }
         // 8. 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
                 GirAdvQueryCommonUtils.createPageApo(
