@@ -3,9 +3,9 @@
 // import cn.geoair.base.log.GiLogger;
 // import cn.geoair.base.log.GirLogger;
 // import
-// cn.geoair.comp.message.converter.jts.mybatis.typehander.NetPgGeometryTypeHandler;
+// cn.geoair.comp.message.converter.jts.mybatis.typehander.impl.NetPgGeometryTypeHandler;
 // import
-// cn.geoair.comp.message.converter.jts.mybatis.typehander.OrgPgGeometryTypeHandler;
+// cn.geoair.comp.message.converter.jts.mybatis.typehander.impl.OrgPgGeometryTypeHandler;
 // import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 // import org.apache.ibatis.session.Configuration;
 // import org.apache.ibatis.type.TypeHandlerRegistry;
