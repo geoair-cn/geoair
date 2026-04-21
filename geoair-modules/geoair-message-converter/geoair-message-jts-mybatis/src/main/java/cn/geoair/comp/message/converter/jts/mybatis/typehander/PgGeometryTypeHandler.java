@@ -28,7 +28,7 @@ public class PgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
             return;
         }
         if (GirPostGisTran.isOrgConvert()) {
-            NetPgGeometryTypeHandler.getInstance().setNonNullParameter(ps, i, parameter, jdbcType);
+            OrgPgGeometryTypeHandler.getInstance().setNonNullParameter(ps, i, parameter, jdbcType);
         }
     }
 
@@ -38,7 +38,7 @@ public class PgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
             return NetPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnName);
         }
         if (GirPostGisTran.isOrgConvert()) {
-            return NetPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnName);
+            return OrgPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnName);
         }
         return null;
     }
@@ -49,7 +49,7 @@ public class PgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
             return NetPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnIndex);
         }
         if (GirPostGisTran.isOrgConvert()) {
-            return NetPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnIndex);
+            return OrgPgGeometryTypeHandler.getInstance().getNullableResult(rs, columnIndex);
         }
         return null;
     }
@@ -60,7 +60,7 @@ public class PgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
             return NetPgGeometryTypeHandler.getInstance().getNullableResult(cs, columnIndex);
         }
         if (GirPostGisTran.isOrgConvert()) {
-            return NetPgGeometryTypeHandler.getInstance().getNullableResult(cs, columnIndex);
+            return OrgPgGeometryTypeHandler.getInstance().getNullableResult(cs, columnIndex);
         }
         return null;
     }
