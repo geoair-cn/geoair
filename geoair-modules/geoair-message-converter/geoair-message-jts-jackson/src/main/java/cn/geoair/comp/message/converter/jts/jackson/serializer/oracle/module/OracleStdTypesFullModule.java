@@ -2,7 +2,6 @@ package cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module;
 
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import oracle.sql.json.OracleJsonObject;
 
 import java.sql.Blob;
 import java.sql.Clob;
@@ -23,7 +22,7 @@ public class OracleStdTypesFullModule extends SimpleModule {
         addSerializer(byte[].class, new StdRawSerializer());
         addDeserializer(byte[].class, new StdRawDeserializer());
 
-        // Oracle JSON 类型
-        addSerializer(OracleJsonObject.class, new StdOracleJsonObjectSerializer());
+
+
     }
 }
