@@ -11,9 +11,11 @@ public class GirOracleTran {
     // Oracle Spatial 相关类名
     private static final String STRUCT_CLASS_NAME = "oracle.sql.STRUCT";
     private static final String JGEOMETRY_CLASS_NAME = "oracle.spatial.geometry.JGeometry";
+    private static final String OracleJsonObject_CLASS_NAME = "oracle.sql.json.OracleJsonObject";
 
     // 缓存判断结果
     private static Boolean isOracleSpatialAvailable;
+    private static Boolean isOracleJsonObjectAvailable;
     private static Boolean isStructClassAvailable;
     private static Boolean isJGeometryClassAvailable;
 
@@ -27,6 +29,23 @@ public class GirOracleTran {
             isOracleSpatialAvailable = isStructClassAvailable() && isJGeometryClassAvailable();
         }
         return isOracleSpatialAvailable;
+    }
+
+    /**
+     * 判断 OracleJsonObject 类是否可用 旧版本驱动是肯定没有这个类的
+     *
+     * @return true=可用，false=不可用
+     */
+    public static boolean isOracleJsonObjectAvailable() {
+        if (isOracleJsonObjectAvailable == null) {
+            try {
+                Class.forName(OracleJsonObject_CLASS_NAME);
+                isOracleJsonObjectAvailable = true;
+            } catch (ClassNotFoundException e) {
+                isOracleJsonObjectAvailable = false;
+            }
+        }
+        return isOracleJsonObjectAvailable;
     }
 
     /**
