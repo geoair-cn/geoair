@@ -217,7 +217,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     }
 
     private Integer extractPortFromJdbcUrl(String jdbcUrl) {
-        return Integer.parseInt(AdvJdbcUrlUtil.splitter(jdbcUrl).port);
+        String port = AdvJdbcUrlUtil.splitter(jdbcUrl).port;
+        return  port!=null?Integer.parseInt(port):5432;
     }
 
     private String extractDbNameFromJdbcUrl(String jdbcUrl) {
