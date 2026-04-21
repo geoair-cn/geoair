@@ -1,5 +1,7 @@
 package cn.geoair.comp.message.converter.jts.mybatis.typehander;
 
+import cn.geoair.comp.message.converter.jts.mybatis.impl.NetPgGeometryTypeHandler;
+import cn.geoair.comp.message.converter.jts.mybatis.impl.OrgPgGeometryTypeHandler;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
