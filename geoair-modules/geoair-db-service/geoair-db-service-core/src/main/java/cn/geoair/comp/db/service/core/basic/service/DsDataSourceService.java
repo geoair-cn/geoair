@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
+import cn.geoair.comp.db.service.core.event.DsDataSourceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.cache.CacheManager;
 // import org.springframework.cache.annotation.CacheEvict;
@@ -87,9 +88,10 @@ public class DsDataSourceService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         dsDataSourceApo.setCreateUserName(dsApiUserInfoHelper.getSubjectName());
+        DsDataSourceEvent.triggerAddBeforeEvent(dsDataSourceApo);
         girDsDataSourceDao.accessSelective(dsDataSourceApo);
+        DsDataSourceEvent.triggerAddAfterEvent(dsDataSourceApo);
     }
 
     /**
@@ -112,8 +114,10 @@ public class DsDataSourceService {
                 e.printStackTrace();
             }
         }
-
+        DsDataSourceApo byId = girDsDataSourceDao.getById(dsDataSourceApo.getId());
+        DsDataSourceEvent.triggerUpdateBeforeEvent(byId, dsDataSourceApo);
         girDsDataSourceDao.updateSelectiveById(dsDataSourceApo);
+        DsDataSourceEvent.triggerUpdateAfterEvent(byId, dsDataSourceApo, true);
         PoolManager.removeJdbcConnectionPool(dsDataSourceApo.getId());
     }
 
@@ -143,8 +147,11 @@ public class DsDataSourceService {
         }).map(item -> item.getName() + "(" + item.getId() + ")").collect(Collectors.toList());
 
         if (str.isEmpty()) {
+            DsDataSourceApo byId = girDsDataSourceDao.getById(id);
+            DsDataSourceEvent.triggerDeleteBeforeEvent(byId);
             girDsDataSourceDao.deleteByPK(id);
             PoolManager.removeJdbcConnectionPool(id);
+            DsDataSourceEvent.triggerDeleteAfterEvent(byId, true);
             // cacheManager.getCache("datasource").evictIfPresent(id);
 
             return ResponseDto.successWithMsg("Datasource delete success");
