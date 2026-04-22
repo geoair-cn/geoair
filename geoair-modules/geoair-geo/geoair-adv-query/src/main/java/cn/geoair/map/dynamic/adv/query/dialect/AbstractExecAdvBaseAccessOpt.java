@@ -7,6 +7,8 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
@@ -37,17 +39,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     // 默认分批插入批次大小（通用常量）
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
-    /**
-     * 构建带主键返回的插入SQL
-     */
-    protected abstract String buildInsertReturnIdSql(
-            String tableName, String fields, String placeholders);
 
-    /**
-     * 执行插入并返回自增的主键
-     */
-    protected abstract Long executeInsertReturnId(
-            Connection connection, String execSql, Object... params) throws SQLException;
 
     protected abstract String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders);
@@ -150,16 +142,16 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     @Override
     public Integer bInsertBatch(
             String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
-        return bInsertBatchWithBatchSize(tableName, headers, rowsData, DEFAULT_BATCH_SIZE);
+        return bInsertBatch(tableName, headers, rowsData, DEFAULT_BATCH_SIZE);
     }
 
     @Override
     public <T> Integer bInsertBatch(String tableName, Collection<T> entities) {
-        return bInsertBatchWithBatchSize(tableName, entities, DEFAULT_BATCH_SIZE);
+        return bInsertBatch(tableName, entities, DEFAULT_BATCH_SIZE);
     }
 
     @Override
-    public Integer bInsertBatchWithBatchSize(
+    public Integer bInsertBatch(
             String tableName,
             List<String> headers,
             List<Map<String, Object>> rowsData,
@@ -226,7 +218,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertBatchWithBatchSize(
+    public <T> Integer bInsertBatch(
             String tableName, Collection<T> entities, int batchSize) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(entities)) {
@@ -244,7 +236,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         Set<String> headers = rowsData.get(0).keySet();
 
 
-        return bInsertBatchWithBatchSize(tableName, ListUtil.toList(headers), rowsData, batchSize);
+        return bInsertBatch(tableName, ListUtil.toList(headers), rowsData, batchSize);
     }
 
     // ========== 通用逻辑：插入忽略 ==========
@@ -331,6 +323,27 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
+
+
+    @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return 0;
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return 0;
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
+        return 0;
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
+        return 0;
+    }
 
     /**
      * 构建占位符（?,?,?）

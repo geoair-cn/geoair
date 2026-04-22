@@ -75,15 +75,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity);
     }
 
-    @Override
-    public Long bInsertOneReturnId(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseAccessPxyOpt().bInsertOneReturnId(tableName, rowData);
-    }
-
-    @Override
-    public <T> Long bInsertOneReturnId(String tableName, T entity) {
-        return getAdvBaseAccessPxyOpt().bInsertOneReturnId(tableName, entity);
-    }
 
     @Override
     public Integer bInsertBatch(
@@ -97,19 +88,19 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertBatchWithBatchSize(
+    public Integer bInsertBatch(
             String tableName,
             List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
         return getAdvBaseAccessPxyOpt()
-                .bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+                .bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bInsertBatchWithBatchSize(
+    public <T> Integer bInsertBatch(
             String tableName, Collection<T> entities, int batchSize) {
-        return getAdvBaseAccessPxyOpt().bInsertBatchWithBatchSize(tableName, entities, batchSize);
+        return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, batchSize);
     }
 
     @Override
@@ -127,6 +118,26 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public Integer bInsertOrUpdate(
             String tableName, Map<String, Object> rowData, Set<String> updateFields) {
         return getAdvBaseAccessPxyOpt().bInsertOrUpdate(tableName, rowData, updateFields);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
+        return getAdvBaseAccessPxyOpt().bInsertBatch(sqlStatementOrDynamicSql, sqlParams);
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
+        return getAdvBaseAccessPxyOpt().bInsertBatch(sqlStatementOrDynamicSql, batchSize, sqlParam);
     }
 
     // ==================== 删除操作实现（代理调用） ====================

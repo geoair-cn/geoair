@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;

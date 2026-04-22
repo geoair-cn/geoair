@@ -22,19 +22,7 @@ public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
 
-    @Override
-    protected String buildInsertReturnIdSql(String tableName, String fields, String placeholders) {
-        // Oracle 使用 RETURNING INTO
-        return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}) RETURNING id INTO ?",
-                tableName, fields, placeholders);
-    }
 
-    @Override
-    protected Long executeInsertReturnId(Connection connection, String execSql, Object... params)
-            throws SQLException {
-        throw new SQLException("oracle不支持");
-    }
 
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders) {

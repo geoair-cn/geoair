@@ -4,6 +4,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -55,15 +56,22 @@ public interface IAdvBaseAccessOpt {
      * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
      *
      * @param sqlStatement 自定义插入SQL语句（含参数占位符） <br>
-     *     示例：INSERT INTO user (name, age) VALUES (?, ?) sqlParam
-     *     SQL参数映射（ value为参数值） <br>
-     *     示例：【  "张三",  25 】
+     *                     示例：INSERT INTO user (name, age) VALUES (?, ?) sqlParam
+     *                     SQL参数映射（ value为参数值） <br>
+     *                     示例：【  "张三",  25 】
      * @return Integer 受影响的行数
      */
     Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList);
 
 
-    Integer bInsertBySql(String sqlStatement, GirSqlParam sqlParam);
+    /**
+     * 兼容SqlParamList 与SqlParamMap 的参数传入的执行器
+     *
+     * @param sqlStatementOrDynamicSql
+     * @param sqlParam
+     * @return
+     */
+    Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam);
 
     // ==================== 单条数据插入（标准化） ====================
 
@@ -73,8 +81,8 @@ public interface IAdvBaseAccessOpt {
      * <p>适用于单条数据插入，Map的key对应表字段名，value对应字段值
      *
      * @param tableName 目标表名（如：user）
-     * @param rowData 单行数据（key=字段名，value=字段值） <br>
-     *     示例：{ "name": "张三", "age": 25, "create_time": new Date() }
+     * @param rowData   单行数据（key=字段名，value=字段值） <br>
+     *                  示例：{ "name": "张三", "age": 25, "create_time": new Date() }
      * @return Integer 受影响的行数（成功返回1，失败返回0）
      */
     Integer bInsertOne(String tableName, Map<String, Object> rowData);
@@ -85,16 +93,37 @@ public interface IAdvBaseAccessOpt {
      * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
      *
      * @param tableName 目标表名（如：user）
-     * @param entity 待插入的Java对象（如User实体类）
-     * @param <T> 实体类泛型
+     * @param entity    待插入的Java对象（如User实体类）
+     * @param <T>       实体类泛型
      * @return Integer 受影响的行数
      */
     <T> Integer bInsertOne(String tableName, T entity);
 
 
+    /**
+     * 批量插入数据
+     *
+     * <p>适用于你在外部把 INSERT INTO ... VALUES (...), (...), ... 这样的sql拼接好了，传递进来只用执行就行了
+     *
+     * @param sqlStatementOrDynamicSql 待插入的预编译sql，可以是mybatis语法，可以是？占位符
+     * @param sqlParams                对应的参数数组
+     * @return Integer 成功插入的记录总数
+     */
+    Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams);
+
+    /**
+     * 批量插入数据
+     *
+     * <p>适用于你在外部把 INSERT INTO ... VALUES (...), (...), ... 这样的sql拼接好了，传递进来只用执行就行了
+     *
+     * @param sqlStatementOrDynamicSql 待插入的预编译sql，可以是mybatis语法，可以是？占位符
+     * @param sqlParam                 对应的参数数组
+     * @param batchSize                单次提交的条数
+     * @return Integer 成功插入的记录总数
+     */
+    Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam);
 
 
-    // ==================== 批量数据插入（高性能） ====================
 
     /**
      * 批量插入Map格式的数据
@@ -102,25 +131,14 @@ public interface IAdvBaseAccessOpt {
      * <p>适用于批量插入同结构数据，底层优化为批量SQL（如INSERT INTO ... VALUES (...), (...), ...）， 相比循环单条插入性能提升显著
      *
      * @param tableName 目标表名
-     * @param headers 字段名集合（指定插入的字段顺序，避免Map无序导致的问题） <br>
-     *     示例：Set.of("name", "age", "create_time")
-     * @param rowsData 多行数据列表（每个Map的key需包含headers中的所有字段） <br>
-     *     示例：[{ "name": "张三", "age":25 }, { "name": "李四", "age":28 }]
+     * @param headers   字段名集合（指定插入的字段顺序，避免Map无序导致的问题） <br>
+     *                  示例：Set.of("name", "age", "create_time")
+     * @param rowsData  多行数据列表（每个Map的key需包含headers中的所有字段） <br>
+     *                  示例：[{ "name": "张三", "age":25 }, { "name": "李四", "age":28 }]
      * @return Integer 成功插入的记录总数
      */
     Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData);
 
-    /**
-     * 批量插入Java对象数据
-     *
-     * <p>面向对象的批量插入，自动提取对象属性作为字段值
-     *
-     * @param tableName 目标表名
-     * @param entities 待插入的对象列表
-     * @param <T> 实体类泛型
-     * @return Integer 成功插入的记录总数
-     */
-    <T> Integer bInsertBatch(String tableName, Collection<T> entities);
 
     /**
      * 分批次批量插入（避免单次批量插入数据量过大导致数据库压力）
@@ -128,27 +146,35 @@ public interface IAdvBaseAccessOpt {
      * <p>自动将数据按批次拆分，分批插入，适用于超大数据量（如10万+条）插入场景
      *
      * @param tableName 目标表名
-     * @param headers 字段名集合
-     * @param rowsData 多行数据列表
+     * @param headers   字段名集合
+     * @param rowsData  多行数据列表
      * @param batchSize 每批次插入的条数（建议设置为1000-5000）
      * @return Integer 成功插入的记录总数
      */
-    Integer bInsertBatchWithBatchSize(
-            String tableName,
-            List<String> headers,
-            List<Map<String, Object>> rowsData,
-            int batchSize);
+    Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData, int batchSize);
+
+    /**
+     * 批量插入Java对象数据
+     *
+     * <p>面向对象的批量插入，自动提取对象属性作为字段值
+     *
+     * @param tableName 目标表名
+     * @param entities  待插入的对象列表
+     * @param <T>       实体类泛型
+     * @return Integer 成功插入的记录总数
+     */
+    <T> Integer bInsertBatch(String tableName, Collection<T> entities);
 
     /**
      * 分批次批量插入Java对象数据
      *
      * @param tableName 目标表名
-     * @param entities 待插入的对象列表
+     * @param entities  待插入的对象列表
      * @param batchSize 每批次插入的条数
-     * @param <T> 实体类泛型
+     * @param <T>       实体类泛型
      * @return Integer 成功插入的记录总数
      */
-    <T> Integer bInsertBatchWithBatchSize(String tableName, Collection<T> entities, int batchSize);
+    <T> Integer bInsertBatch(String tableName, Collection<T> entities, int batchSize);
 
     // ==================== 特殊场景插入 ====================
 
@@ -159,7 +185,7 @@ public interface IAdvBaseAccessOpt {
      * IGNORE INTO）
      *
      * @param tableName 目标表名
-     * @param rowData 单行数据
+     * @param rowData   单行数据
      * @return Integer 成功插入的行数（存在则返回0，不存在则返回1）
      */
     Integer bInsertIgnore(String tableName, Map<String, Object> rowData);
@@ -168,8 +194,8 @@ public interface IAdvBaseAccessOpt {
      * 批量插入或忽略
      *
      * @param tableName 目标表名
-     * @param headers 字段名集合
-     * @param rowsData 多行数据列表
+     * @param headers   字段名集合
+     * @param rowsData  多行数据列表
      * @return Integer 成功插入的记录总数（已存在的记录不计入）
      */
     Integer bInsertIgnoreBatch(
@@ -181,10 +207,10 @@ public interface IAdvBaseAccessOpt {
      * <p>即UPSERT操作（PostgreSQL：ON CONFLICT DO UPDATE；MySQL：ON DUPLICATE KEY UPDATE），
      * 适用于需要"插入-更新"一体化的场景
      *
-     * @param tableName 目标表名
-     * @param rowData 单行数据（包含插入/更新的字段）
+     * @param tableName    目标表名
+     * @param rowData      单行数据（包含插入/更新的字段）
      * @param updateFields 冲突时需要更新的字段集合（为空则更新所有字段） <br>
-     *     示例：Set.of("age", "update_time")
+     *                     示例：Set.of("age", "update_time")
      * @return Integer 受影响的行数（插入返回1，更新返回2，无变化返回0）
      */
     Integer bInsertOrUpdate(

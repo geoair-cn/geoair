@@ -191,18 +191,18 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBatchWithBatchSize(
+    public Integer bInsertBatch(
             String tableName,
             List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+        return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bInsertBatchWithBatchSize(
+    public <T> Integer bInsertBatch(
             String tableName, Collection<T> entities, int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, entities, batchSize);
+        return getAdvBaseOpt().bInsertBatch(tableName, entities, batchSize);
     }
 
     @Override
@@ -220,6 +220,25 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public Integer bInsertOrUpdate(
             String tableName, Map<String, Object> rowData, Set<String> updateFields) {
         return getAdvBaseOpt().bInsertOrUpdate(tableName, rowData, updateFields);
+    }
+    @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
+        return getAdvBaseOpt().bInsertBatch(sqlStatementOrDynamicSql, sqlParams);
+    }
+
+    @Override
+    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
+        return getAdvBaseOpt().bInsertBatch(sqlStatementOrDynamicSql, batchSize, sqlParam);
     }
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
