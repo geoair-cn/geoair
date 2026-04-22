@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-orm-mybatis-plus</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J8-dev-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>geoair-mybatis-plus</name>

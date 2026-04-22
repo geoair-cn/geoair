@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework-bom</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-project-parent</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J8-dev-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-project-parent</name>
   <description>geoair project parent</description>
@@ -42,7 +42,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J8.1.2-SNAPSHOT</geoair.version>
+    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
   </properties>
 
   <dependencyManagement>
