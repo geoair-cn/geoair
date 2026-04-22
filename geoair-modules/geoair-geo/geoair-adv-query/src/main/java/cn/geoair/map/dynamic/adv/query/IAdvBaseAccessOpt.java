@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Set;
 /**
  * 数据插入相关的基础操作接口
  *
- * <p>覆盖单条插入、批量插入、自定义SQL插入、忽略重复插入、插入并返回主键等全场景， 适配不同业务场景下的插入需求，保持与MyBatis-Plus风格一致的语义和命名规范
+ * <p>覆盖单条插入、批量插入、自定义SQL插入、忽略重复插入、插入并返回主键等全场景
  */
 public interface IAdvBaseAccessOpt {
 
@@ -27,13 +29,25 @@ public interface IAdvBaseAccessOpt {
      *
      * <p>支持任意复杂的INSERT SQL（含多表插入、子查询插入、自定义字段映射等）， 适用于无法通过标准化方法实现的特殊插入场景
      *
-     * @param sqlStatement 自定义插入SQL语句（支持MyBatis标签、参数占位符） <br>
-     *     示例1：INSERT INTO user (id, name, age) VALUES (#{id}, #{name}, #{age}) <br>
-     *     示例2：INSERT INTO dept (name, create_time) SELECT name, now() FROM temp_dept WHERE status =
-     *     1
+     * @param sql 自定义插入SQL语句  <br>
+     *            示例1：INSERT INTO user (id, name, age) VALUES (1, name, 21) <br>
      * @return Integer 受影响的行数（成功插入的记录数）
      */
-    Integer bInsertBySql(String sqlStatement);
+    Integer bInsertBySql(String sql);
+
+    /**
+     * 执行带参数的自定义插入SQL语句
+     *
+     * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
+     *
+     * @param dynamicSql  自定义插入SQL语句（含参数占位符） <br>
+     *                    示例：INSERT INTO user (name, age) VALUES (#{name}, #{age}) sqlParam
+     *                    SQL参数映射（key为占位符名称，value为参数值） <br>
+     *                    示例：{ "name": "张三", "age": 25 }
+     * @param sqlParamMap
+     * @return Integer 受影响的行数
+     */
+    Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParamMap);
 
     /**
      * 执行带参数的自定义插入SQL语句
@@ -41,12 +55,15 @@ public interface IAdvBaseAccessOpt {
      * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
      *
      * @param sqlStatement 自定义插入SQL语句（含参数占位符） <br>
-     *     示例：INSERT INTO user (name, age) VALUES (#{name}, #{age}) sqlParam
-     *     SQL参数映射（key为占位符名称，value为参数值） <br>
-     *     示例：{ "name": "张三", "age": 25 }
+     *     示例：INSERT INTO user (name, age) VALUES (?, ?) sqlParam
+     *     SQL参数映射（ value为参数值） <br>
+     *     示例：【  "张三",  25 】
      * @return Integer 受影响的行数
      */
-    Integer bInsertBySql(String sqlStatement, SqlParamMap sqlParam);
+    Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList);
+
+
+    Integer bInsertBySql(String sqlStatement, GirSqlParam sqlParam);
 
     // ==================== 单条数据插入（标准化） ====================
 
@@ -74,26 +91,8 @@ public interface IAdvBaseAccessOpt {
      */
     <T> Integer bInsertOne(String tableName, T entity);
 
-    /**
-     * 插入单条数据并返回自增主键
-     *
-     * <p>适用于主键自增的场景，插入后返回生成的主键值
-     *
-     * @param tableName 目标表名
-     * @param rowData 单行数据（无需传入主键字段）
-     * @return Long 生成的自增主键值（无自增主键时返回null）
-     */
-    Long bInsertOneReturnId(String tableName, Map<String, Object> rowData);
 
-    /**
-     * 插入单条Java对象数据并返回自增主键
-     *
-     * @param tableName 目标表名
-     * @param entity 待插入的Java对象
-     * @param <T> 实体类泛型
-     * @return Long 生成的自增主键值
-     */
-    <T> Long bInsertOneReturnId(String tableName, T entity);
+
 
     // ==================== 批量数据插入（高性能） ====================
 
@@ -109,7 +108,7 @@ public interface IAdvBaseAccessOpt {
      *     示例：[{ "name": "张三", "age":25 }, { "name": "李四", "age":28 }]
      * @return Integer 成功插入的记录总数
      */
-    Integer bInsertBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData);
+    Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData);
 
     /**
      * 批量插入Java对象数据
@@ -136,7 +135,7 @@ public interface IAdvBaseAccessOpt {
      */
     Integer bInsertBatchWithBatchSize(
             String tableName,
-            Set<String> headers,
+            List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize);
 

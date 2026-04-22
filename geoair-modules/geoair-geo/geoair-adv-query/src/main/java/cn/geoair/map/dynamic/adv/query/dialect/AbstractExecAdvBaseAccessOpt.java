@@ -4,13 +4,13 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
@@ -62,19 +62,19 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     // ========== 通用逻辑：自定义SQL插入 ==========
     @Override
-    public Integer bInsertBySql(String sqlStatement) {
-        return bInsertBySql(sqlStatement, SqlParamMap.of());
+    public Integer bInsertBySql(String sql) {
+        return bInsertBySql(sql, SqlParamMap.of());
     }
 
     @Override
-    public Integer bInsertBySql(String   dynamicSql, SqlParamMap sqlParam) {
+    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParamMap) {
         // 通用参数校验
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("插入SQL语句不能为空");
         }
 
         // 解析SQL（支持MyBatis标签）
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParamMap, dialectTableNameProcessor);
 
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
@@ -86,7 +86,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     getSchemaName(),
                     getDataSourceId(),
                     execSql,
-                    sqlParam);
+                    sqlParamMap);
             // 通用执行逻辑
             if (CollUtil.isEmpty(jdbcParams)) {
                 return SqlExecutor.execute(connection, execSql);
@@ -145,54 +145,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         return bInsertOne(tableName, entityObj);
     }
 
-    // ========== 通用逻辑：单条插入返回主键 ==========
-    @Override
-    public Long bInsertOneReturnId(String tableName, Map<String, Object> rowData) {
-        validateTableNameAndData(tableName, rowData);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String fields = String.join(",", rowData.keySet());
-        String placeholders = buildPlaceholders(rowData.keySet().size());
-        // 差异化：构建带主键返回的SQL（子类实现）
-        String execSql = buildInsertReturnIdSql(quoteTableName, fields, placeholders);
-
-        List<Object> params = new ArrayList<>(rowData.values());
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            log.debug(
-                    "schema:[{}] db:[{}] 执行单条插入并返回主键，SQL：{}  ",
-                    getSchemaName(),
-                    getDataSourceId(),
-                    execSql);
-            // 通用执行并返回主键
-            return executeInsertReturnId(connection, execSql, params.toArray());
-        } catch (SQLException e) {
-            throw new RuntimeException("插入并返回主键失败，表名：" + tableName, e);
-        } finally {
-            closeConnection(connection);
-        }
-    }
-
-    @Override
-    public <T> Long bInsertOneReturnId(String tableName, T entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
-        }
-
-        Entity entityObj = Entity.parse(entity);
-        if (GutilObject.isEmpty(tableName)) {
-            tableName = entityObj.getTableName();
-        }
-        return bInsertOneReturnId(tableName, entityObj);
-    }
 
     // ========== 通用逻辑：批量插入 ==========
     @Override
     public Integer bInsertBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return bInsertBatchWithBatchSize(tableName, headers, rowsData, DEFAULT_BATCH_SIZE);
     }
 
@@ -204,7 +161,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     @Override
     public Integer bInsertBatchWithBatchSize(
             String tableName,
-            Set<String> headers,
+            List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
         validateTableNameAndData(tableName, headers, rowsData);
@@ -286,7 +243,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         // 通用提取字段头
         Set<String> headers = rowsData.get(0).keySet();
 
-        return bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+
+        return bInsertBatchWithBatchSize(tableName, ListUtil.toList(headers), rowsData, batchSize);
     }
 
     // ========== 通用逻辑：插入忽略 ==========
@@ -322,7 +280,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     @Override
     public Integer bInsertIgnoreBatch(
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        validateTableNameAndData(tableName, headers, rowsData);
+        validateTableNameAndData(tableName, ListUtil.toList(headers), rowsData);
 
         // 通用批次拆分执行
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, DEFAULT_BATCH_SIZE);
@@ -403,7 +361,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
      * 校验表名、字段头和批量数据
      */
     protected void validateTableNameAndData(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(headers)) {
             throw new IllegalArgumentException("插入的字段头不能为空");
