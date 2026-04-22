@@ -11,7 +11,7 @@
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-boot-starter-parent</artifactId>
-  <version>J17.1.0-SNAPSHOT</version>
+  <version>J17-dev-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-spring-boot-starter-parent</name>
   <description>geoair的springboot starter</description>
@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J17.1.0-SNAPSHOT</geoair.version>
+    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
     <tomcat.version>10.1.53</tomcat.version>
     <spring-boot.version>3.5.13</spring-boot.version>

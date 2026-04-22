@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-message-converter</artifactId>
-    <version>J17.1.0-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-message-jts-mybatis</artifactId>
-  <version>J17.1.0-SNAPSHOT</version>
+  <version>J17-dev-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>geoair-message-jts-mybatis</name>
 
