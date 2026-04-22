@@ -1,7 +1,7 @@
 package cn.geoair.comp.db.service.starter.model.dto;
 
 import cn.geoair.base.data.model.annotation.GaModel;
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiDataSourcePo;
 import cn.hutool.core.bean.BeanUtil;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class DsApiDataSourceDto extends DsApiDataSourcePo {
         return copy;
     }
 
-    public static DsApiDataSourcePo toPo(DataSourceApo source) {
+    public static DsApiDataSourcePo toPo(DsDataSourceApo source) {
         if (source == null) {
             return null;
         }
@@ -38,22 +38,22 @@ public class DsApiDataSourceDto extends DsApiDataSourcePo {
         return thisPo;
     }
 
-    public static DataSourceApo fromPo(DsApiDataSourcePo po) {
+    public static DsDataSourceApo fromPo(DsApiDataSourcePo po) {
         if (po == null) {
             return null;
         }
-        DataSourceApo thisVo = new DataSourceApo();
+        DsDataSourceApo thisVo = new DsDataSourceApo();
         BeanUtils.copyProperties(po, thisVo);
         return thisVo;
     }
 
-    public static List<DataSourceApo> fromPos(List<DsApiDataSourcePo> pos) {
+    public static List<DsDataSourceApo> fromPos(List<DsApiDataSourcePo> pos) {
         if (pos == null) {
             return new ArrayList<>();
         }
-        List<DataSourceApo> list = new ArrayList<>();
+        List<DsDataSourceApo> list = new ArrayList<>();
         for (DsApiDataSourcePo po : pos) {
-            DataSourceApo thisVo = fromPo(po);
+            DsDataSourceApo thisVo = fromPo(po);
             list.add(thisVo);
         }
         return list;

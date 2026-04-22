@@ -10,7 +10,7 @@ import lombok.Data;
  * @create: 2021-01-20 09:52
  */
 @Data
-public class DataSourceApo implements Serializable {
+public class DsDataSourceApo implements Serializable {
 
     String id;
 

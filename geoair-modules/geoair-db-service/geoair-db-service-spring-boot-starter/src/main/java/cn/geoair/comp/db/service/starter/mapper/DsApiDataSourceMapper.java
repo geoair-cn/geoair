@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.starter.mapper;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.dao.GirDsDataSourceDao;
 import cn.geoair.comp.db.service.starter.model.dto.DsApiDataSourceDto;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiDataSourcePo;
@@ -16,12 +16,12 @@ import java.util.List;
 public interface DsApiDataSourceMapper
         extends TkEntityMapper<DsApiDataSourcePo, String>, GirDsDataSourceDao {
 
-    default void accessSelective(DataSourceApo t) {
+    default void accessSelective(DsDataSourceApo t) {
         DsApiDataSourcePo po = DsApiDataSourceDto.toPo(t);
         gtcAccessSelective(po);
     }
 
-    default void updateSelectiveById(DataSourceApo t) {
+    default void updateSelectiveById(DsDataSourceApo t) {
         DsApiDataSourcePo po = DsApiDataSourceDto.toPo(t);
         gtcUpdateByPKSelective(po);
     }
@@ -30,18 +30,18 @@ public interface DsApiDataSourceMapper
         gtcDeleteByPK(id);
     }
 
-    default DataSourceApo getById(String id) {
+    default DsDataSourceApo getById(String id) {
         DsApiDataSourcePo po = gtcSearchByPK(id);
         return DsApiDataSourceDto.fromPo(po);
     }
 
-    default List<DataSourceApo> searchAll() {
+    default List<DsDataSourceApo> searchAll() {
         DsApiDataSourcePo po = new DsApiDataSourcePo();
         List<DsApiDataSourcePo> dsApiDataSourcePos = gtcSearchAll();
         return DsApiDataSourceDto.fromPos(dsApiDataSourcePos);
     }
 
-    default List<DataSourceApo> selectBatchIds(List<String> ids) {
+    default List<DsDataSourceApo> selectBatchIds(List<String> ids) {
         List<DsApiDataSourcePo> dsApiDataSourcePos = gtcSearchByPK(ids);
         return DsApiDataSourceDto.fromPos(dsApiDataSourcePos);
     }
