@@ -126,6 +126,23 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         return list;
     }
 
+    /**
+     * 转换成Bean的List
+     *
+     * @param rowList
+     * @return
+     */
+    public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz) {
+        if (rowList == null) {
+            return new ArrayList<>();
+        }
+        List<T> list = new ArrayList<>();
+        for (GirAdvOneRow row : rowList) {
+            list.add(row.toBeanObj(clazz));
+        }
+        return list;
+    }
+
 
     public static List<GirAdvOneRow> ofByEntityList(List<Entity> rows) {
         if (rows == null || rows.isEmpty()) {
