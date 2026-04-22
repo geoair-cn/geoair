@@ -47,6 +47,14 @@
       <artifactId>geoair-tools</artifactId>
       <version>${geoair.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>${jakarta-annotation.version}</version>
+    </dependency>
+
+
   </dependencies>
 
   <build>
