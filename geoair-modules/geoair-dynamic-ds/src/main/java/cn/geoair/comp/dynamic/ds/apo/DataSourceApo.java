@@ -1,10 +1,13 @@
 package cn.geoair.comp.dynamic.ds.apo;
 
+import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.db.dialect.DriverNamePool;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -91,6 +94,22 @@ public class DataSourceApo implements Serializable {
     private Integer queryTimeout = 5; // 查询的超时时间 单位秒
 
     private Integer removeAbandonedTimeout = 1800; // 回收连接的超时时间
+
+    public void setJdbcUrl(String jdbcUrl) {
+        AdvJdbcUrlUtil splitter = AdvJdbcUrlUtil.splitter(jdbcUrl);
+        setDbName(splitter.getDatabase());
+        if (getPort() == null) {
+            setPort(splitter.port == null ? null : Integer.parseInt(splitter.getPort()));
+        }
+        setAddress(splitter.getHost());
+        if (getSchemaName() == null) {
+            Map<String, String> params = splitter.getParams();
+            if (!MapUtil.isEmpty(params)) {
+                setSchemaName(params.get("currentSchema"));
+            }
+        }
+        this.jdbcUrl = jdbcUrl;
+    }
 
     public String getJdbcUrl() {
         if (jdbcUrl == null) {
