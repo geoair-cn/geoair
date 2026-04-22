@@ -158,13 +158,13 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     // ==================== 基础插入操作（代理调用PgAdvBaseOpt） ====================
     @Override
-    public Integer bInsertBySql(String sqlStatement) {
-        return getAdvBaseOpt().bInsertBySql(sqlStatement);
+    public Integer bInsertBySql(String sql) {
+        return getAdvBaseOpt().bInsertBySql(sql);
     }
 
     @Override
-    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParam) {
-        return getAdvBaseOpt().bInsertBySql(dynamicSql, sqlParam);
+    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParamMap) {
+        return getAdvBaseOpt().bInsertBySql(dynamicSql, sqlParamMap);
     }
 
     @Override
@@ -177,19 +177,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getAdvBaseOpt().bInsertOne(tableName, entity);
     }
 
-    @Override
-    public Long bInsertOneReturnId(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseOpt().bInsertOneReturnId(tableName, rowData);
-    }
 
-    @Override
-    public <T> Long bInsertOneReturnId(String tableName, T entity) {
-        return getAdvBaseOpt().bInsertOneReturnId(tableName, entity);
-    }
 
     @Override
     public Integer bInsertBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData);
     }
 
@@ -199,18 +191,18 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBatchWithBatchSize(
+    public Integer bInsertBatch(
             String tableName,
-            Set<String> headers,
+            List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+        return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bInsertBatchWithBatchSize(
+    public <T> Integer bInsertBatch(
             String tableName, Collection<T> entities, int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, entities, batchSize);
+        return getAdvBaseOpt().bInsertBatch(tableName, entities, batchSize);
     }
 
     @Override
@@ -229,6 +221,17 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             String tableName, Map<String, Object> rowData, Set<String> updateFields) {
         return getAdvBaseOpt().bInsertOrUpdate(tableName, rowData, updateFields);
     }
+    @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
+    }
+
+
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
     @Override

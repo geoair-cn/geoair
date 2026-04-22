@@ -23,24 +23,7 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     // PG默认主键字段
     private static final String PG_DEFAULT_PRIMARY_KEY = "id";
 
-    // ========== 实现差异化抽象方法 ==========
-    @Override
-    protected String buildInsertReturnIdSql(String tableName, String fields, String placeholders) {
-        // PG：RETURNING 主键语法
-        return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}) RETURNING {}",
-                tableName,
-                fields,
-                placeholders,
-                PG_DEFAULT_PRIMARY_KEY);
-    }
 
-    @Override
-    protected Long executeInsertReturnId(Connection connection, String execSql, Object... params)
-            throws SQLException {
-        // PG：执行并获取自增主键
-        return SqlExecutor.executeForGeneratedKey(connection, execSql, params).longValue();
-    }
 
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders) {
