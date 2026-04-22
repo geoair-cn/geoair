@@ -130,15 +130,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
 
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
-        return getAdvBaseAccessPxyOpt().bInsertBatch(sqlStatementOrDynamicSql, sqlParams);
-    }
 
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
-        return getAdvBaseAccessPxyOpt().bInsertBatch(sqlStatementOrDynamicSql, batchSize, sqlParam);
-    }
 
     // ==================== 删除操作实现（代理调用） ====================
     @Override

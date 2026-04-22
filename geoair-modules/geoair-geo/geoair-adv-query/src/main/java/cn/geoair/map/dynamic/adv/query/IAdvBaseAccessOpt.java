@@ -100,28 +100,6 @@ public interface IAdvBaseAccessOpt {
     <T> Integer bInsertOne(String tableName, T entity);
 
 
-    /**
-     * 批量插入数据
-     *
-     * <p>适用于你在外部把 INSERT INTO ... VALUES (...), (...), ... 这样的sql拼接好了，传递进来只用执行就行了
-     *
-     * @param sqlStatementOrDynamicSql 待插入的预编译sql，可以是mybatis语法，可以是？占位符
-     * @param sqlParams                对应的参数数组
-     * @return Integer 成功插入的记录总数
-     */
-    Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams);
-
-    /**
-     * 批量插入数据
-     *
-     * <p>适用于你在外部把 INSERT INTO ... VALUES (...), (...), ... 这样的sql拼接好了，传递进来只用执行就行了
-     *
-     * @param sqlStatementOrDynamicSql 待插入的预编译sql，可以是mybatis语法，可以是？占位符
-     * @param sqlParam                 对应的参数数组
-     * @param batchSize                单次提交的条数
-     * @return Integer 成功插入的记录总数
-     */
-    Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam);
 
 
 

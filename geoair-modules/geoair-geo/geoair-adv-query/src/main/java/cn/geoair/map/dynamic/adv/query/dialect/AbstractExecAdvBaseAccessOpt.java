@@ -40,7 +40,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
 
-
     protected abstract String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders);
 
@@ -64,32 +63,12 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("插入SQL语句不能为空");
         }
-
         // 解析SQL（支持MyBatis标签）
         SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParamMap, dialectTableNameProcessor);
-
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
+        return bInsertBySql(execSql, SqlParamList.ofList(jdbcParams));
 
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            log.debug(
-                    "schema:[{}] db:[{}] 执行自定义插入SQL：{}，参数：{}",
-                    getSchemaName(),
-                    getDataSourceId(),
-                    execSql,
-                    sqlParamMap);
-            // 通用执行逻辑
-            if (CollUtil.isEmpty(jdbcParams)) {
-                return SqlExecutor.execute(connection, execSql);
-            } else {
-                return SqlExecutor.execute(connection, execSql, jdbcParams.toArray());
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("执行自定义插入SQL失败，SQL：" + execSql, e);
-        } finally {
-            closeConnection(connection);
-        }
     }
 
     // ========== 通用逻辑：单条数据插入 ==========
@@ -324,26 +303,45 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
 
-
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
-        return 0;
+        if (StrUtil.isEmpty(sqlStatement)) {
+            throw new IllegalArgumentException("插入SQL语句不能为空");
+        }
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            // 通用批量优化：关闭自动提交
+            connection.setAutoCommit(false);
+            log.debug(
+                    "schema:[{}] db:[{}] 执行自定义插入SQL：{}，参数：{}",
+                    getSchemaName(),
+                    getDataSourceId(),
+                    sqlStatement,
+                    sqlParamList);
+            return SqlExecutor.execute(connection, sqlStatement, sqlParamList.toArray());
+        } catch (SQLException e) {
+            // 通用回滚逻辑
+            rollbackConnection(connection);
+            throw new RuntimeException(" 插入失败，表名：", e);
+        } finally {
+            // 通用恢复自动提交
+            restoreAutoCommit(connection);
+            closeConnection(connection);
+        }
     }
 
     @Override
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
-        return 0;
+        if (sqlParam == null) {
+            return bInsertBySql(sqlStatementOrDynamicSql);
+        } else if (sqlParam instanceof SqlParamMap) {
+            return bInsertBySql(sqlStatementOrDynamicSql, (SqlParamMap) sqlParam);
+        } else if (sqlParam instanceof SqlParamList) {
+            return bInsertBySql(sqlStatementOrDynamicSql, (SqlParamList) sqlParam);
+        }
+        throw new RuntimeException("不支持的sqlParam参数！");
     }
 
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
-        return 0;
-    }
-
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
-        return 0;
-    }
 
     /**
      * 构建占位符（?,?,?）

@@ -231,15 +231,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
 
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, GirSqlParam... sqlParams) {
-        return getAdvBaseOpt().bInsertBatch(sqlStatementOrDynamicSql, sqlParams);
-    }
 
-    @Override
-    public Integer bInsertBatch(String sqlStatementOrDynamicSql, int batchSize, GirSqlParam... sqlParam) {
-        return getAdvBaseOpt().bInsertBatch(sqlStatementOrDynamicSql, batchSize, sqlParam);
-    }
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
     @Override
