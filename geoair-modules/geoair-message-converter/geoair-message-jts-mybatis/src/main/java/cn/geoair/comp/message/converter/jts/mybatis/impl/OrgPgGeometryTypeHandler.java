@@ -18,7 +18,7 @@ import org.postgis.PGgeometry;
 
 // @MappedTypes(Geometry.class)
 // @MappedJdbcTypes(JdbcType.OTHER)
-public class OrgPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
+public class OrgPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry>*/ {
 
     public static void register(TypeHandlerRegistry typeHandlerRegistry) {
         typeHandlerRegistry.register(PGgeometry.class, OrgPgGeometryTypeHandler.class);
@@ -33,7 +33,7 @@ public class OrgPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return pgGeometryTypeHandler;
     }
 
-    @Override
+
     public void setNonNullParameter(
             PreparedStatement ps, int i, Geometry parameter, JdbcType jdbcType)
             throws SQLException {
@@ -47,7 +47,7 @@ public class OrgPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         ps.setObject(i, pGobject);
     }
 
-    @Override
+
     public Geometry getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String geom = rs.getString(columnName);
         try {
@@ -58,7 +58,7 @@ public class OrgPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return null;
     }
 
-    @Override
+
     public Geometry getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String geom = rs.getString(columnIndex);
         try {
@@ -69,7 +69,7 @@ public class OrgPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return null;
     }
 
-    @Override
+
     public Geometry getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String geom = cs.getString(columnIndex);
         try {

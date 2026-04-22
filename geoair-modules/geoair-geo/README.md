@@ -99,7 +99,7 @@ double area = GirGeoMeasureUtils.getInstance().calculateArea(geom, 4326, "km²")
 ```
 java
 // 构造查询条件并执行
-AdvExecutorPG executor = new AdvExecutorPG(dataSourceApo);
+AdvExecutorPG executor = new AdvExecutorPG(dsDataSourceApo);
 List<AdvOneRow> results = executor.select(dataFieldsApo, filterApo, pageApo);
 ```
 
