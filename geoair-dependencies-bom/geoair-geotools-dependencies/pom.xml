@@ -42,6 +42,7 @@
   <properties>
     <java.version>17</java.version>
     <geotools.version>34.3</geotools.version>
+    <tileverse.version>1.1.0</tileverse.version>
     <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -261,6 +262,11 @@
         <groupId>org.geotools</groupId>
         <artifactId>gt-s3-geotiff </artifactId>
         <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.tileverse.rangereader</groupId>
+        <artifactId>tileverse-rangereader-all</artifactId>
+        <version>${tileverse.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
