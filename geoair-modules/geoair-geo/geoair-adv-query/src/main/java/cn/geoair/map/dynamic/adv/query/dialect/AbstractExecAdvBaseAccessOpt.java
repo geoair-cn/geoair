@@ -92,7 +92,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行单条插入，SQL：{}  ",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     execSql);
             return SqlExecutor.execute(connection, execSql, params.toArray());
         } catch (SQLException e) {
@@ -180,7 +180,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             log.debug(
                     "schema:[{}] db:[{}] 批量插入完成，表名：{}，总条数：{}，批次大小：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     totalSuccess,
                     batchSize);
@@ -238,7 +238,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行插入忽略操作，表名：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName);
             return SqlExecutor.execute(connection, execSql, params.toArray());
         } catch (SQLException e) {
@@ -291,7 +291,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行插入或更新操作，表名：{}，更新字段：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     String.join(",", finalUpdateFields));
             return SqlExecutor.execute(connection, execSql, params.toArray());
@@ -315,7 +315,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行自定义插入SQL：{}，参数：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     sqlStatement,
                     sqlParamList);
             return SqlExecutor.execute(connection, sqlStatement, sqlParamList.toArray());
@@ -398,13 +398,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
     }
 
-    /**
-     * 获取数据源ID（通用封装）
-     */
-    protected String getDataSourceId() {
-        return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
-    }
 
+    /**
+     * 获取数据库名称（通用封装）
+     */
+    protected String getDatabaseName() {
+        return dataSourceGetter != null
+                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
+                ? ""
+                : dataSourceGetter.getDatabaseName()
+                : "";
+    }
     /**
      * 关闭连接（通用封装）
      */

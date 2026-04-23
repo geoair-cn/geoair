@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -61,7 +62,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行自定义删除SQL：{}，参数：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     execSql,
                     sqlParam);
 
@@ -97,7 +98,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 按主键删除，表名：{}，主键：{}={}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     idKey,
                     id);
@@ -141,7 +142,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                 log.debug(
                         "schema:[{}] db:[{}] 批量主键删除，表名：{}，主键数量：{}",
                         getSchemaName(),
-                        getDataSourceId(),
+                        getDatabaseName(),
                         tableName,
                         idBatch.size());
 
@@ -185,7 +186,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         log.debug(
                 "schema:[{}] db:[{}] 分批次主键删除完成，表名：{}，总删除行数：{}，批次大小：{}",
                 getSchemaName(),
-                getDataSourceId(),
+                getDatabaseName(),
                 tableName,
                 totalSuccess,
                 batchSize);
@@ -217,7 +218,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 条件删除，表名：{}，条件：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     whereMap);
 
@@ -274,7 +275,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 分批次条件删除完成，表名：{}，总删除行数：{}，批次大小：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     totalSuccess,
                     batchSize);
@@ -309,7 +310,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 逻辑删除，表名：{}，主键：{}={}，删除标记：{}={}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     idKey,
                     id,
@@ -366,7 +367,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             log.debug(
                     "schema:[{}] db:[{}] 批量逻辑删除完成，表名：{}，删除行数：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     totalSuccess);
             return totalSuccess;
@@ -411,7 +412,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                 log.warn(
                         "schema:[{}] db:[{}] 安全删除触发阈值限制，表名：{}，符合条件行数：{}，阈值：{}，操作终止",
                         getSchemaName(),
-                        getDataSourceId(),
+                        getDatabaseName(),
                         tableName,
                         totalCount,
                         maxDelete);
@@ -484,9 +485,15 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
     }
 
-    /** 获取数据源ID（通用封装） */
-    protected String getDataSourceId() {
-        return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
+    /**
+     * 获取数据库名称（通用封装）
+     */
+    protected String getDatabaseName() {
+        return dataSourceGetter != null
+                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
+                ? ""
+                : dataSourceGetter.getDatabaseName()
+                : "";
     }
 
     /** 关闭连接（通用封装） */
