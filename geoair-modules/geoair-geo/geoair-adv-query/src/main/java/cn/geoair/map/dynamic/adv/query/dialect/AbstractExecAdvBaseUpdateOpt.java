@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -61,7 +62,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 执行自定义更新SQL：{}，参数：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     execSql,
                     sqlParam);
 
@@ -105,7 +106,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 按主键更新，表名：{}，主键：{}={}，更新字段：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     idKey,
                     id,
@@ -170,7 +171,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 条件更新，表名：{}，更新字段：{}，条件：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     rowData.keySet(),
                     whereMap);
@@ -235,7 +236,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 批量更新完成，表名：{}，总条数：{}，批次大小：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     totalSuccess,
                     batchSize);
@@ -301,7 +302,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 乐观锁更新，表名：{}，主键：{}={}，版本号：{}={}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     idKey,
                     id,
@@ -350,7 +351,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             log.debug(
                     "schema:[{}] db:[{}] 更新或插入，表名：{}，冲突字段：{}，更新字段：{}",
                     getSchemaName(),
-                    getDataSourceId(),
+                    getDatabaseName(),
                     tableName,
                     conflictFields,
                     updateClause);
@@ -441,10 +442,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     /**
-     * 获取数据源ID（通用封装）
+     * 获取数据库名称（通用封装）
      */
-    protected String getDataSourceId() {
-        return dataSourceGetter != null ? dataSourceGetter.getDataSourceId() : "";
+    protected String getDatabaseName() {
+        return dataSourceGetter != null
+                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
+                ? ""
+                : dataSourceGetter.getDatabaseName()
+                : "";
     }
 
     /**
