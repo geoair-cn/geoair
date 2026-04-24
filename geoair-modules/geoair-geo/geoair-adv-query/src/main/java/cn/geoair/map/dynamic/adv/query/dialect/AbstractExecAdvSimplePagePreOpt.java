@@ -14,9 +14,12 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSimplePageOpt
         implements IAdvSimplePagePreOpt {
@@ -111,26 +114,30 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
                         dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement),
                         tableAlias);
         String sqlWithOrder = pBuildSqlWithOrder(refactorNoPageSql, orders, tableAlias);
-
-        // 4. 通用：带参数统计总数
-        long total = pCount(sqlWithOrder, sqlParam);
-
-        // 5. 通用：计算分页参数
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
-        int lastPageNum = calculateLastPageNum(total, pageSize);
-
-        // 6. 通用：构建分页SQL（子类实现语法）
         String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
-
-        // 7. 子类实现：执行带参数的分页查询
-        List<GirAdvOneRow> records = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
-
+        Map<String, Object> resultMap = Stream.of("count", "list")
+                .parallel()
+                .map(task -> {
+                    Map<String, Object> map = new HashMap<>();
+                    if ("count".equals(task)) {
+                        map.put("count", pCount(sqlWithOrder, sqlParam));
+                    } else {
+                        map.put("list", getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList));
+                    }
+                    return map;
+                })
+                .flatMap(m -> m.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Long total = (Long) resultMap.get("count");
+        List<GirAdvOneRow> records =resultMap.get("list")!=null?(List<GirAdvOneRow>)resultMap.get("list"):ListUtil.empty() ;
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
             records = GirAdvOneRow.toCaseInsensitiveList(records);
         }
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成驼峰)) {
             records = GirAdvOneRow.toCamelCaseList(records);
         }
+        int lastPageNum = calculateLastPageNum(total, pageSize);
         // 8. 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
                 GirAdvQueryCommonUtils.createPageApo(

@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -404,14 +405,20 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
         // 通用：构建元数据查询SQL（LIMIT 0/ROWNUM 0）
         String fieldQuerySql = buildMetadataQuerySql(sqlView);
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        DataFieldsApo metadataFromSql = getMetadataFromSql(fieldQuerySql, tableFields, null);
+        stopWatch.stop();
+        long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
         log.debug(
-                "schema:[{}] db:[{}] SQL的元数据查询：{}",
+                "schema:[{}] db:[{}] 耗时[{}ms] SQL的元数据查询：{}",
                 dataSourceGetter.getSchemaName(),
                 getDatabaseName(),
+                lastTaskTimeMillis,
                 fieldQuerySql);
-
         // 通用：获取元数据并封装结果
-        return getMetadataFromSql(fieldQuerySql, tableFields, null);
+      return metadataFromSql;
     }
 
     @Override
@@ -440,9 +447,19 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 dataSourceGetter.getSchemaName(),
                 getDatabaseName(),
                 fieldQuerySql);
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         // 通用：获取带参数的元数据并封装结果
-        return getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
+        DataFieldsApo metadataFromSqlWithParam = getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
+        stopWatch.stop();
+        long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+        log.debug(
+                "schema:[{}] db:[{}] 耗时[{}ms] SQL的元数据查询：{}",
+                dataSourceGetter.getSchemaName(),
+                getDatabaseName(),
+                lastTaskTimeMillis,
+                fieldQuerySql);
+        return metadataFromSqlWithParam;
     }
 
     // ========== 通用工具方法（DDL执行模板） ==========

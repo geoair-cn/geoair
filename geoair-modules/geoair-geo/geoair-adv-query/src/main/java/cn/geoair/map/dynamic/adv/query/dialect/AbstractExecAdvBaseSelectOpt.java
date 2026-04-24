@@ -14,6 +14,7 @@ import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
 import cn.geoair.map.dynamic.adv.query.handler.StreamRsHandler;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
@@ -56,10 +57,12 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             // 差异化：构建单条查询包装SQL
             String execSql = buildSelectOneWrapSql(cleanSql);
-
-            logExecuteSql("bSelectOne", execSql);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Entity queryResult = SqlExecutor.query(connection, execSql, new EntityHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectOne", execSql, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectOne查询失败，SQL：" + sql, e);
@@ -73,10 +76,14 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectList", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             List<Entity> queryResult =
                     SqlExecutor.query(connection, cleanSql, new EntityListHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList", cleanSql, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntityList(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectList查询失败，SQL：" + sql, e);
@@ -90,9 +97,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectList(流式)", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             SqlExecutor.query(connection, cleanSql, new StreamRsHandler(rowConsumer));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList(流式)", cleanSql, lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException("执行流式bSelectList查询失败，SQL：" + sql, e);
         } finally {
@@ -105,9 +116,14 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectListToValueList", cleanSql);
 
-            return SqlExecutor.query(connection, cleanSql, new ValueListHandler());
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<List<Object>> query = SqlExecutor.query(connection, cleanSql, new ValueListHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectListToValueList", cleanSql, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectListToValueList查询失败，SQL：" + sql, e);
         } finally {
@@ -120,9 +136,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectNumber", cleanSql);
-
-            return SqlExecutor.query(connection, cleanSql, new NumberHandler());
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            Number query = SqlExecutor.query(connection, cleanSql, new NumberHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectNumber", cleanSql, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectNumber查询失败，SQL：" + sql, e);
         } finally {
@@ -135,7 +155,6 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(cleanSql);
-        logExecuteSql("bSelectRecordRowCount", countSql);
         return bSelectNumber(countSql);
     }
 
@@ -144,9 +163,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjOne", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Object queryResult = SqlExecutor.query(connection, cleanSql, BeanHandler.create(clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjOne", cleanSql,lastTaskTimeMillis);
             return (E) queryResult;
         } catch (SQLException e) {
             throw new RuntimeException(
@@ -161,9 +184,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjList", cleanSql);
-
-            return SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<E> query = SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList", cleanSql,lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行bSelectObjList查询失败，SQL：" + sql + "，目标类型：" + clazz.getName(), e);
@@ -177,9 +204,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjList(流式)", cleanSql);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
 
             SqlExecutor.query(connection, cleanSql, new StreamBeanRsHandler<>(rowConsumer, clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList(流式)", cleanSql,lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行流式bSelectObjList查询失败，SQL：" + sql + "，目标类型：" + clazz.getName(), e);
@@ -250,14 +281,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String execSql = buildSelectOneWrapSql(sqlStatement);
-            logExecuteSql("bSelectOne(带参数)", execSql, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Entity queryResult =
                     SqlExecutor.query(
                             connection,
                             execSql,
                             new EntityHandler(),
                             sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectOne(带参数)", execSql, sqlParamList, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectOne查询失败，SQL：" + sqlStatement, e);
@@ -271,14 +305,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         Connection connection = dataSourceGetter.getConnection();
         try {
-            logExecuteSql("bSelectList(带参数)", sqlStatement, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             List<Entity> queryResult =
                     SqlExecutor.query(
                             connection,
                             sqlStatement,
                             new EntityListHandler(),
                             sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList(带参数)", sqlStatement, sqlParamList, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntityList(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectList查询失败，SQL：" + sqlStatement, e);
@@ -292,13 +329,16 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         Connection connection = dataSourceGetter.getConnection();
         try {
-            logExecuteSql("bSelectList(带参数-流式)", sqlStatement, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             SqlExecutor.query(
                     connection,
                     sqlStatement,
                     new StreamRsHandler(rowConsumer),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList(带参数-流式)", sqlStatement, sqlParamList, lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数流式bSelectList查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -311,13 +351,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         Connection connection = dataSourceGetter.getConnection();
         try {
-            logExecuteSql("bSelectListToValueList(带参数)", sqlStatement, sqlParamList);
-
-            return SqlExecutor.query(
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<List<Object>> query = SqlExecutor.query(
                     connection,
                     sqlStatement,
                     new ValueListHandler(),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectListToValueList(带参数)", sqlStatement, sqlParamList, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectListToValueList查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -330,12 +374,18 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         Connection connection = dataSourceGetter.getConnection();
         try {
-            logExecuteSql("bSelectNumber(带参数)", sqlStatement, sqlParamList);
-            return SqlExecutor.query(
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            Number query = SqlExecutor.query(
                     connection,
                     sqlStatement,
                     new NumberHandler(),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectNumber(带参数)", sqlStatement, sqlParamList, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectNumber查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -348,16 +398,19 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(sqlStatement);
-
-        logExecuteSql("bSelectRecordRowCount(带参数)", countSql, sqlParamList);
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Connection connection = dataSourceGetter.getConnection();
         try {
-            return SqlExecutor.query(
+            Number query = SqlExecutor.query(
                     connection,
                     countSql,
                     new NumberHandler(),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectRecordRowCount(带参数)", countSql, sqlParamList, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectRecordRowCount查询失败，SQL：" + sqlStatement, e);
         } finally {
@@ -371,14 +424,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-            logExecuteSql("bSelectObjOne(带参数)", sqlStatement, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Object queryResult =
                     SqlExecutor.query(
                             connection,
                             sqlStatement,
                             BeanHandler.create(clazz),
                             sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjOne(带参数)", sqlStatement, sqlParamList, lastTaskTimeMillis);
             return (E) queryResult;
         } catch (SQLException e) {
             throw new RuntimeException(
@@ -393,13 +449,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-            logExecuteSql("bSelectObjList(带参数)", sqlStatement, sqlParamList);
-
-            return SqlExecutor.query(
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<E> query = SqlExecutor.query(
                     connection,
                     sqlStatement,
                     BeanListHandler.create(clazz),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList(带参数)", sqlStatement, sqlParamList, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行带参数bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(), e);
@@ -413,13 +473,16 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-            logExecuteSql("bSelectObjList(带参数-流式)", sqlStatement, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             SqlExecutor.query(
                     connection,
                     sqlStatement,
                     new StreamBeanRsHandler<>(rowConsumer, clazz),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList(带参数-流式)", sqlStatement, sqlParamList, lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行带参数流式bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(),
@@ -464,15 +527,12 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         if (girSqlParam == null) {
             bSelectListStream(sqlStatement, rowConsumer);
-            return;
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
             bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
-            return;
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
             bSelectListStream(sqlStatement, sqlParamMap, rowConsumer);
-            return;
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -529,10 +589,10 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             return bSelectObjOne(sqlStatement, clazz);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
-            return bSelectObjOne(sqlStatement,sqlParamList, clazz);
+            return bSelectObjOne(sqlStatement, sqlParamList, clazz);
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
-            return bSelectObjOne(sqlStatement,sqlParamMap, clazz);
+            return bSelectObjOne(sqlStatement, sqlParamMap, clazz);
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -544,10 +604,10 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             return bSelectObjList(sqlStatement, clazz);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
-            return bSelectObjList(sqlStatement,sqlParamList, clazz);
+            return bSelectObjList(sqlStatement, sqlParamList, clazz);
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
-            return bSelectObjList(sqlStatement,sqlParamMap, clazz);
+            return bSelectObjList(sqlStatement, sqlParamMap, clazz);
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -557,15 +617,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         if (girSqlParam == null) {
             bSelectObjListStream(sqlStatement, clazz, rowConsumer);
-            return;
+
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
-            bSelectObjListStream(sqlStatement,sqlParamList, clazz, rowConsumer);
-            return;
+            bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
+
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
-            bSelectObjListStream(sqlStatement,sqlParamMap, clazz, rowConsumer);
-            return;
+            bSelectObjListStream(sqlStatement, sqlParamMap, clazz, rowConsumer);
+
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -575,24 +635,26 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     /**
      * 统一打印SQL执行日志（无参数）
      */
-    protected void logExecuteSql(String methodName, String sql) {
+    protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {}执行的SQL为：{}",
+                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}",
                 getSchemaName(),
                 getDatabaseName(),
                 methodName,
+                lastTaskTimeMillis,
                 sql);
     }
 
     /**
      * 统一打印带参数的SQL执行日志
      */
-    protected void logExecuteSql(String methodName, String sql, SqlParamList sqlParamList) {
+    protected void logExecuteSql(String methodName, String sql, SqlParamList sqlParamList, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {}执行的SQL为：{}，参数：{}",
+                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}，参数：{}",
                 getSchemaName(),
                 getDatabaseName(),
                 methodName,
+                lastTaskTimeMillis,
                 sql,
                 sqlParamList.toParamString());
     }
@@ -605,17 +667,6 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                 ? GutilObject.isEmpty(dataSourceGetter.getSchemaName())
                 ? ""
                 : dataSourceGetter.getSchemaName()
-                : "";
-    }
-
-    /**
-     * 获取数据源ID（通用封装）
-     */
-    protected String getDataSourceId() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDataSourceId())
-                ? ""
-                : dataSourceGetter.getDataSourceId()
                 : "";
     }
 
