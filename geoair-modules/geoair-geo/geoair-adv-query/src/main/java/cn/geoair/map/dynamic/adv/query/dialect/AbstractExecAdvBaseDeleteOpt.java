@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
@@ -68,7 +69,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bDeleteBySql", execSql, jdbcParams, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteBySql", execSql, jdbcParams, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("执行自定义删除SQL失败，SQL：" + execSql, e);
@@ -94,7 +95,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bDeleteByPrimaryKey", execSql, Collections.singletonList(id), cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, Collections.singletonList(id), cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -192,7 +193,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bDeleteByCondition", execSql, params, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByCondition", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
@@ -265,7 +266,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bLogicDelete", execSql, params, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bLogicDelete", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("逻辑删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -361,16 +362,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
-    // ====================== 统一SQL执行日志方法 ======================
-    protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
-        log.debug("schema:[{}]db:[{}] time:[{}ms] {} 执行SQL：{}",
-                getSchemaName(), getDatabaseName(), lastTaskTimeMillis, methodName, sql);
-    }
 
-    protected void logExecuteSqlWithParams(String methodName, String sql, List<?> params, long lastTaskTimeMillis) {
-        log.debug("schema:[{}]db:[{}] time:[{}ms] {} 执行SQL：{}，参数：{}",
-                getSchemaName(), getDatabaseName(), lastTaskTimeMillis, methodName, sql, params);
-    }
+
 
     // ====================== 原有工具方法不动 ======================
     protected void validateTableName(String tableName) {

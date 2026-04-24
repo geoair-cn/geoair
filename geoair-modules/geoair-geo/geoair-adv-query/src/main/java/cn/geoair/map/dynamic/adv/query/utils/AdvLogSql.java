@@ -24,6 +24,7 @@ public class AdvLogSql {
     private static final String GREEN = "\u001B[32m";   // 绿色（参数）
     private static final String BOLD = "\u001B[1;37m";  // 白色加粗（SQL）
     private static final String GRAY = "\u001B[90m";    // 灰色（分割线）
+    private static final String BLUE = "\u001B[34m";    // 蓝色（影响行数）
 
     private final IDataSourceGetter dataSourceGetter;
 
@@ -52,6 +53,26 @@ public class AdvLogSql {
                 methodName,
                 sql);
     }
+
+    // ===================== 【新增】带影响行数 =====================
+    public void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis, long rows) {
+        if (!logEnable) {
+            return;
+        }
+        log.debug("\n"+GRAY + "============================================================================================" + RESET
+                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
+                        + "\n执行方法：{}"
+                        + "\nSQL 语句："
+                        + "\n" + BOLD + "{}" + RESET
+                        + "\n" + GRAY + "============================================================================================" + RESET,
+                getDatabaseName(),
+                getSchemaName(),
+                lastTaskTimeMillis,
+                rows,
+                methodName,
+                sql);
+    }
+
     public void logExecuteSql(Class callerClass,String methodName, String sql, long lastTaskTimeMillis) {
         if (!logEnable) {
             return;
@@ -65,6 +86,26 @@ public class AdvLogSql {
                 getDatabaseName(),
                 getSchemaName(),
                 lastTaskTimeMillis,
+                callerClass.getSimpleName(),
+                methodName,
+                sql);
+    }
+
+    // ===================== 【新增】带Class + 影响行数 =====================
+    public void logExecuteSql(Class callerClass,String methodName, String sql, long lastTaskTimeMillis, long rows) {
+        if (!logEnable) {
+            return;
+        }
+        log.debug("\n"+GRAY + "============================================================================================" + RESET
+                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
+                        + "\n执行方法：{}.{}"
+                        + "\nSQL 语句："
+                        + "\n" + BOLD + "{}" + RESET
+                        + "\n" + GRAY + "============================================================================================" + RESET,
+                getDatabaseName(),
+                getSchemaName(),
+                lastTaskTimeMillis,
+                rows,
                 callerClass.getSimpleName(),
                 methodName,
                 sql);
@@ -90,6 +131,26 @@ public class AdvLogSql {
                 params);
     }
 
+    // ===================== 【新增】带参数 + 影响行数 =====================
+    public void logExecuteSql(String methodName, String sql, List<Object> params, long lastTaskTimeMillis, long rows) {
+        if (!logEnable) {
+            return;
+        }
+        log.debug("\n"+GRAY + "============================================================================================" + RESET
+                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
+                        + "\n执行方法：{}"
+                        + "\nSQL 语句："
+                        + "\n" + BOLD + "{}" + RESET
+                        + "\n参数列表：" + GREEN + "{}" + RESET
+                        + "\n" + GRAY + "============================================================================================" + RESET,
+                getDatabaseName(),
+                getSchemaName(),
+                lastTaskTimeMillis,
+                rows,
+                methodName,
+                sql,
+                params);
+    }
 
     public void logExecuteSql(Class callerClass,String methodName, String sql, List<Object> params, long lastTaskTimeMillis) {
         if (!logEnable) {
@@ -105,6 +166,28 @@ public class AdvLogSql {
                 getDatabaseName(),
                 getSchemaName(),
                 lastTaskTimeMillis,
+                callerClass.getSimpleName(),
+                methodName,
+                sql,
+                params);
+    }
+
+    // ===================== 【新增】带Class + 参数 + 影响行数（完整版） =====================
+    public void logExecuteSql(Class callerClass,String methodName, String sql, List<Object> params, long lastTaskTimeMillis, long rows) {
+        if (!logEnable) {
+            return;
+        }
+        log.debug("\n"+GRAY + "============================================================================================" + RESET
+                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
+                        + "\n执行方法：{}.{}"
+                        + "\nSQL 语句："
+                        + "\n" + BOLD + "{}" + RESET
+                        + "\n参数列表：" + GREEN + "{}" + RESET
+                        + "\n" + GRAY + "============================================================================================" + RESET,
+                getDatabaseName(),
+                getSchemaName(),
+                lastTaskTimeMillis,
+                rows,
                 callerClass.getSimpleName(),
                 methodName,
                 sql,
