@@ -19,6 +19,10 @@ import java.util.function.Supplier;
 @Accessors(chain = true)
 public class GirAdvToolsGlobalConfig {
 
+    public static GirAdvToolsGlobalConfig of() {
+        return new GirAdvToolsGlobalConfig();
+    }
+
     // 线程安全（可全局单例）
     private GeometryFactory geometryFactory = new GeometryFactory();
     private WKBWriter wkbWriter = new WKBWriter();
