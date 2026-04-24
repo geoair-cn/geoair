@@ -20,11 +20,11 @@ import java.util.function.Supplier;
 public class GirAdvToolsGlobalConfig {
 
     // 线程安全（可全局单例）
-    private final GeometryFactory geometryFactory = new GeometryFactory();
-    private final WKBWriter wkbWriter = new WKBWriter();
-    private final GeometryJSON geometryJSON = new GeometryJSON();
+    private GeometryFactory geometryFactory = new GeometryFactory();
+    private WKBWriter wkbWriter = new WKBWriter();
+    private GeometryJSON geometryJSON = new GeometryJSON();
 
     // 非线程安全（只持有构造器，不持有实例）
-    private final Supplier<WKTReader> wktReaderSupplier = WKTReader::new;
-    private final Supplier<WKBReader> wkbReaderSupplier = WKBReader::new;
+    private Supplier<WKTReader> wktReaderSupplier = WKTReader::new;
+    private Supplier<WKBReader> wkbReaderSupplier = WKBReader::new;
 }
