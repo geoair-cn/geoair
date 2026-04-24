@@ -158,7 +158,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql( this.getClass(),"bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost);
+                AdvLogSql.of(dataSourceGetter).logExecuteSql(
+                        this.getClass(),"bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                        cost,totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -227,7 +229,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnoreBatch", StrUtil.format("表名：{}，总条数：{}", tableName, totalSuccess), cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnoreBatch", StrUtil.format("表名：{}，总条数：{}", tableName, totalSuccess), cost,totalSuccess);
         return totalSuccess;
     }
 

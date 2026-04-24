@@ -212,7 +212,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             String format = StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize);
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bUpdateBatchWithBatchSize",format,cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bUpdateBatchWithBatchSize",format,cost,totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);

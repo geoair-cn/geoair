@@ -18,7 +18,7 @@ public class AdvLogSql {
     public static boolean logEnable = true;
 
     // 一行最大长度（分割线自动根据这个生成）
-    private static final int MAX_LINE_LENGTH = 180;
+    public static final int MAX_LINE_LENGTH = 180;
 
     // 动态生成的分割线（只生成一次）
     private static final String SPLIT_LINE;
