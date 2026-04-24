@@ -166,7 +166,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
 
-        log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bDeleteBatchWithBatchSize 分批次主键删除完成，表名：{}，总删除行数：{}，批次大小：{}",
+        log.debug("schema:[{}]db:[{}] time:[{}ms] bDeleteBatchWithBatchSize 分批次主键删除完成，表名：{}，总删除行数：{}，批次大小：{}",
                 getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess, batchSize);
         return totalSuccess;
     }
@@ -363,12 +363,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     // ====================== 统一SQL执行日志方法 ======================
     protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
-        log.debug("schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}",
+        log.debug("schema:[{}]db:[{}] time:[{}ms] {} 执行SQL：{}",
                 getSchemaName(), getDatabaseName(), lastTaskTimeMillis, methodName, sql);
     }
 
     protected void logExecuteSqlWithParams(String methodName, String sql, List<?> params, long lastTaskTimeMillis) {
-        log.debug("schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}，参数：{}",
+        log.debug("schema:[{}]db:[{}] time:[{}ms] {} 执行SQL：{}，参数：{}",
                 getSchemaName(), getDatabaseName(), lastTaskTimeMillis, methodName, sql, params);
     }
 

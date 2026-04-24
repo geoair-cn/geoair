@@ -9,6 +9,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.geoair.map.dynamic.adv.query.utils.LogSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
@@ -68,7 +69,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bUpdateBySql", execSql, jdbcParams, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql ("bUpdateBySql", execSql, jdbcParams, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("执行自定义更新SQL失败，SQL：" + execSql, e);
@@ -102,7 +103,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bUpdateByPrimaryKey", execSql, params, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql ("bUpdateByPrimaryKey", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("按主键更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -156,7 +157,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bUpdateByCondition", execSql, params, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql ("bUpdateByCondition", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
@@ -211,8 +212,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bUpdateBatchWithBatchSize 批量更新完成，表名：{}，总条数：{}，批次大小：{}",
-                    getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess, batchSize);
+            String format = StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql("bUpdateBatchWithBatchSize",format,cost);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -270,7 +271,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bUpdateWithOptimisticLock", execSql, params, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql("bUpdateWithOptimisticLock", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("乐观锁更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -307,7 +308,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            logExecuteSqlWithParams("bUpdateOrInsert", execSql, params, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql("bUpdateOrInsert", execSql, params, cost);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("更新或插入失败，表名：" + tableName, e);
@@ -316,27 +317,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    // ====================== 统一SQL执行日志方法 ======================
-    protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
-        log.debug(
-                "schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}",
-                getSchemaName(),
-                getDatabaseName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql);
-    }
 
-    protected void logExecuteSqlWithParams(String methodName, String sql, List<?> params, long lastTaskTimeMillis) {
-        log.debug(
-                "schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}，参数：{}",
-                getSchemaName(),
-                getDatabaseName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql,
-                params);
-    }
 
     // ====================== 原有工具方法不动 ======================
     protected void validateTableName(String tableName) {
@@ -386,15 +367,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(","));
     }
 
-    protected String getSchemaName() {
-        return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
-    }
 
-    protected String getDatabaseName() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName()) ? "" : dataSourceGetter.getDatabaseName()
-                : "";
-    }
+
 
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {

@@ -95,6 +95,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     getDatabaseName(),
                     execSql);
             return SqlExecutor.execute(connection, execSql, params.toArray());
+
+
         } catch (SQLException e) {
             throw new RuntimeException("单条插入失败，表名：" + quoteTableName, e);
         } finally {

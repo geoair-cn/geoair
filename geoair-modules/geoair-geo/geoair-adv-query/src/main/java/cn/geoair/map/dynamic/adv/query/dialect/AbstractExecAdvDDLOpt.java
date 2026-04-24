@@ -10,6 +10,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.geoair.map.dynamic.adv.query.utils.LogSqlUtils;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.unit.DataSizeUtil;
@@ -330,7 +331,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSql = getMetadataFromSql(fieldQuerySql, tableFields, null);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        logExecuteSql("dGetColumnsBySQL", fieldQuerySql, cost);
+        LogSqlUtils.of(dataSourceGetter). logExecuteSql("dGetColumnsBySQL", fieldQuerySql, cost);
         return metadataFromSql;
     }
 
@@ -355,7 +356,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSqlWithParam = getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        logExecuteSql("dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
+        LogSqlUtils.of(dataSourceGetter). logExecuteSql("dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
         return metadataFromSqlWithParam;
     }
 
@@ -381,7 +382,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 统一打印DDL日志+耗时
-            logExecuteSql(operation, sql, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql(operation, sql, cost);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
             rollbackConnection(connection, operation, tableName);
@@ -424,7 +425,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
-            logExecuteSql(operation, execSql, jdbcParams, cost);
+            LogSqlUtils.of(dataSourceGetter). logExecuteSql(operation, execSql, jdbcParams, cost);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
             rollbackConnection(connection, operation, tableName);
@@ -441,40 +442,6 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             dataSourceGetter.closeResources(null, statement, connection);
         }
         return result;
-    }
-
-    // ========== 统一日志工具（和查询类完全一致） ==========
-    protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
-        log.debug(
-                "schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}",
-                getSchemaName(),
-                getDatabaseName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql);
-    }
-
-    protected void logExecuteSql(String methodName, String sql, List<Object> params, long lastTaskTimeMillis) {
-        log.debug(
-                "schema:[{}]db:[{}] 耗时:[{}ms] {} 执行SQL：{}，参数：{}",
-                getSchemaName(),
-                getDatabaseName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql,
-                params);
-    }
-
-    protected String getSchemaName() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getSchemaName()) ? "" : dataSourceGetter.getSchemaName()
-                : "";
-    }
-
-    protected String getDatabaseName() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName()) ? "" : dataSourceGetter.getDatabaseName()
-                : "";
     }
 
     // ========== 通用事务/资源 ==========
