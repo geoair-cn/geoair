@@ -1,13 +1,19 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+ 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
+import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -17,7 +23,17 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
 
-    protected final GirSridConvertOpt sridConvertOpt = GirAdvTools.getSridOpt();
+    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.me().getSridOpt();
+    protected GirGeoFormatOpt formatOpt = GirGeoTools.me().getFormatOpt();
+
+    GirAdvToolsGlobalConfig advToolsConfig;
+
+    public TileConverterCommon(GirAdvToolsGlobalConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+        sridConvertOpt = GirGeoTools.getInstance(advToolsConfig).getSridOpt();
+        formatOpt = GirGeoTools.getInstance(advToolsConfig).getFormatOpt();
+    }
+
 
     protected abstract Geometry transform(Geometry geometry, int srcSrid);
 
@@ -28,14 +44,14 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         validateXyz(z, x, y);
         ReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
         Geometry geometry =
-                GirAdvTools.getSridOpt()
+                sridConvertOpt
                         .convertToGeom(
                                 envelope,
                                 envelope.getCoordinateReferenceSystem()
                                         .getCoordinateSystem()
                                         .getDimension(),
                                 targetSrid);
-        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, false);
+        return formatOpt.jtsGeometryToWktString(geometry, false);
     }
 
     /**
@@ -205,7 +221,7 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     @Override
     public Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ) {
 
-        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(envelope);
+        Geometry geometry = sridConvertOpt.convertToGeom(envelope);
 
         return zxyListByGeom(geometry, srcSrid, targetZ);
     }

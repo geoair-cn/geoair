@@ -7,7 +7,7 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -68,7 +68,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         try {
             this.featureType = featureType;
             CoordinateReferenceSystem crs =
-                    GirAdvTools.getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                    GirGeoTools.me().getSridOpt().getCRS(writeConfig.getOutPutSrid());
             org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                     new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
             typeBuilder.init(featureType);
@@ -122,7 +122,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirAdvTools.getSridOpt()
+                            GirGeoTools.me().getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");

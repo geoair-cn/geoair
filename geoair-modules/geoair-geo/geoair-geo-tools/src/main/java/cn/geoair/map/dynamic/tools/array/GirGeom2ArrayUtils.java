@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.array;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.locationtech.jts.geom.*;
@@ -12,27 +13,36 @@ import org.locationtech.jts.geom.*;
  */
 public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
-    // 全局默认几何工厂（JTS推荐单例复用）
-    private static final GeometryFactory DEFAULT_GEOMETRY_FACTORY = new GeometryFactory();
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
 
+    GirAdvToolsGlobalConfig advToolsConfig;
+
+    public GirGeom2ArrayUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+    public static GirGeom2ArrayUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new GirGeom2ArrayUtils(advToolsConfig);
+    }
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static GirGeom2ArrayUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirGeom2ArrayUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeom2ArrayUtils();
+                    INSTANCE = new GirGeom2ArrayUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
         return INSTANCE;
     }
+
+
 
     @Override
     public double[] pointToDoubleArray(Point point) {
@@ -49,8 +59,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         Coordinate coord = point.getCoordinate();
         return CoordOrder.X_FIRST == actualOrder
-                ? new double[] {coord.x, coord.y} // X在前
-                : new double[] {coord.y, coord.x}; // Y在前
+                ? new double[]{coord.x, coord.y} // X在前
+                : new double[]{coord.y, coord.x}; // Y在前
     }
 
     @Override
@@ -108,7 +118,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public Point doubleArrayToPoint(double[] coords, CoordOrder order) {
-        return doubleArrayToPoint(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToPoint(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -116,7 +126,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         // 默认值处理
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         GeometryFactory actualFactory =
-                ObjectUtil.isNull(factory) ? DEFAULT_GEOMETRY_FACTORY : factory;
+                ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
 
         // 空值/维度校验
         if (ArrayUtil.isEmpty(coords)) {
@@ -148,7 +158,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
         // 空值处理：空数组返回空Point
         if (ArrayUtil.isEmpty(coords)) {
-            return DEFAULT_GEOMETRY_FACTORY.createPoint();
+            return advToolsConfig.getGeometryFactory().createPoint();
         }
 
         // 快速转换（跳过数值校验，仅维度简单判断）
@@ -159,12 +169,12 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         double x = CoordOrder.X_FIRST == actualOrder ? coords[0] : coords[1];
         double y = CoordOrder.X_FIRST == actualOrder ? coords[1] : coords[0];
 
-        return DEFAULT_GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
+        return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(x, y));
     }
 
     @Override
     public Geometry doubleArrayToGeometry(Object coords, CoordOrder order) {
-        return doubleArrayToGeometry(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToGeometry(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -193,7 +203,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public LineString doubleArrayToLineString(double[][] coords, CoordOrder order) {
-        return doubleArrayToLineString(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToLineString(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -202,7 +212,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         // 默认值处理
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         GeometryFactory actualFactory =
-                ObjectUtil.isNull(factory) ? DEFAULT_GEOMETRY_FACTORY : factory;
+                ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
         // 空值处理：空数组返回空LineString
         if (ArrayUtil.isEmpty(coords)) {
             return actualFactory.createLineString();
@@ -239,7 +249,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         // 空值处理：空数组返回空LineString
         if (ArrayUtil.isEmpty(coords)) {
-            return DEFAULT_GEOMETRY_FACTORY.createLineString();
+            return advToolsConfig.getGeometryFactory().createLineString();
         }
         // 快速转换（跳过数值校验）
         Coordinate[] jtsCoords = new Coordinate[coords.length];
@@ -249,6 +259,6 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
             double y = CoordOrder.X_FIRST == actualOrder ? point[1] : point[0];
             jtsCoords[i] = new Coordinate(x, y);
         }
-        return DEFAULT_GEOMETRY_FACTORY.createLineString(jtsCoords);
+        return advToolsConfig.getGeometryFactory().createLineString(jtsCoords);
     }
 }

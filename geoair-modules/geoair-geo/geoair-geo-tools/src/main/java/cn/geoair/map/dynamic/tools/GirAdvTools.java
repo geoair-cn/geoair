@@ -27,10 +27,9 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
  * @author 张逢吉
  * @date 2024/12/05
  */
+
 public class GirAdvTools {
 
-    // 私有构造器，防止实例化
-    private GirAdvTools() {}
 
     /**
      * 获取几何对象转数组操作接口
@@ -38,7 +37,7 @@ public class GirAdvTools {
      * @return GirGeom2ArrayOpt 几何对象转数组工具接口实例
      */
     public static GirGeom2ArrayOpt getGeom2ArrayOpt() {
-        return GirGeom2ArrayUtils.getInstance();
+        return GirGeoTools.me().getGeom2ArrayOpt();
     }
 
     /**
@@ -47,7 +46,7 @@ public class GirAdvTools {
      * @return GirGeoConvertOpt 地理数据转换工具接口实例
      */
     public static GirGeoFormatOpt getFormatOpt() {
-        return GirFormatUtils.getInstance();
+        return GirGeoTools.me().getFormatOpt();
     }
 
     /**
@@ -56,7 +55,7 @@ public class GirAdvTools {
      * @return GirCoordinateConvertOpt 坐标转换工具接口实例
      */
     public static GirCoordinateConvertOpt getCoordinateOpt() {
-        return GirCoordinateUtils.getInstance();
+        return GirGeoTools.me().getCoordinateOpt();
     }
 
     /**
@@ -65,7 +64,7 @@ public class GirAdvTools {
      * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
      */
     public static GirTileConverterOpt getTileGrid4326Opt() {
-        return Wgs84EqualAxisTileUtils.getInstance();
+        return GirGeoTools.me().getTileGrid4326Opt();
     }
 
     /**
@@ -74,7 +73,7 @@ public class GirAdvTools {
      * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
      */
     public static GirTileConverterOpt getTileGrid4326SeparateOpt() {
-        return Wgs84SeparateAxisTileUtils.getInstance();
+        return GirGeoTools.me().getTileGrid4326SeparateOpt();
     }
 
     /**
@@ -83,7 +82,7 @@ public class GirAdvTools {
      * @return 必应地图QuadKey的工具接口实例
      */
     public static GirBingMapQuadKeyOpt getTileGridBingMapOpt() {
-        return BingMapQuadKeyUtils.getInstance();
+        return GirGeoTools.me().getTileGridBingMapOpt();
     }
 
     /**
@@ -92,7 +91,7 @@ public class GirAdvTools {
      * @return GirTileConverterOpt Web墨卡托瓦片转换工具接口实例
      */
     public static GirTileConverterOpt getTileGrid3857Opt() {
-        return TileConverter3857Utils.getInstance();
+        return GirGeoTools.me().getTileGrid3857Opt();
     }
 
     /**
@@ -101,7 +100,7 @@ public class GirAdvTools {
      * @return GirGeoMeasureOpt 地理测量工具接口实例
      */
     public static GirGeoMeasureOpt getMeasureOpt() {
-        return GirGeoMeasureUtils.getInstance();
+        return GirGeoTools.me().getMeasureOpt();
     }
 
     /**
@@ -110,7 +109,7 @@ public class GirAdvTools {
      * @return GirGeoMergeOpt 地理数据合并工具接口实例
      */
     public static GirGeoMergeOpt getMergeOpt() {
-        return GirGeoMergeUtils.getInstance();
+        return GirGeoTools.me().getMergeOpt();
     }
 
     /**
@@ -119,7 +118,7 @@ public class GirAdvTools {
      * @return GirSridConvertOpt SRID转换工具接口实例
      */
     public static GirSridConvertOpt getSridOpt() {
-        return GirSridConvertUtils.getInstance();
+        return GirGeoTools.me().getSridOpt();
     }
 
     /**
@@ -129,6 +128,6 @@ public class GirAdvTools {
      * @return GirPageActuatorOpt 分页执行工具接口实例
      */
     public static <T> PageActuator<T> getPageActuatorOpt(PageConditionDef<T> pageConditionDef) {
-        return PageActuator.getInstance(pageConditionDef);
+        return GirGeoTools.me().getPageActuatorOpt(pageConditionDef);
     }
 }

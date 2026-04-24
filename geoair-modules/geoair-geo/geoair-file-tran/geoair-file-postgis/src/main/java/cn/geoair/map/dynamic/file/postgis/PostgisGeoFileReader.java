@@ -7,7 +7,8 @@ import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
 import java.io.IOException;
 import java.util.*;
@@ -154,7 +155,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
             if (linkInfo.getSrid() > 0 && featureType != null) {
                 SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
-                CoordinateReferenceSystem crs = GirAdvTools.getSridOpt().getCRS(linkInfo.getSrid());
+                CoordinateReferenceSystem crs = GirGeoTools.me().getSridOpt().getCRS(linkInfo.getSrid());
                 typeBuilder.setCRS(crs);
                 this.featureType = typeBuilder.buildFeatureType();
             }

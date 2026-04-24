@@ -1,8 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+ 
 import java.io.Serializable;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -181,7 +183,7 @@ public class BBoxApo implements Serializable {
             return "";
         }
         // 使用WKTWriter转换为字符串
-        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(polygon, true);
+        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(polygon, true);
     }
 
     /**
@@ -195,6 +197,6 @@ public class BBoxApo implements Serializable {
             return "";
         }
         // 使用WKTWriter转换为字符串
-        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(polygon, true);
+        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(polygon, true);
     }
 }

@@ -1,9 +1,13 @@
 package cn.geoair.map.dynamic.tools.coordinate;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.array.GirGeom2ArrayUtils;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.Arrays;
 import java.util.function.BiFunction;
+
 import org.locationtech.jts.geom.*;
 
 /**
@@ -26,22 +30,28 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
     private static final double X_PI = PI * 3000.0 / 180.0;
 
-    // JTS几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
-    // 私有构造器（防止外部实例化）
-    private GirCoordinateUtils() {}
+    GirAdvToolsGlobalConfig advToolsConfig;
+
+    public GirCoordinateUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+
+    public static GirCoordinateUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new GirCoordinateUtils(advToolsConfig);
+    }
 
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static GirCoordinateUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirCoordinateUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirCoordinateUtils();
+                    INSTANCE = new GirCoordinateUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
@@ -59,7 +69,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             // 校验坐标是否在国内（不在则不偏移）
             if (!isChinaCoord(lng, lat)) {
-                return new double[] {lng, lat};
+                return new double[]{lng, lat};
             }
 
             double dLat = transformLat(lng - 105.0, lat - 35.0);
@@ -72,7 +82,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
             dLng = (dLng * 180.0) / (A / sqrtMagic * Math.cos(radLat) * PI);
             double mgLat = lat + dLat;
             double mgLng = lng + dLng;
-            return new double[] {mgLng, mgLat};
+            return new double[]{mgLng, mgLat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -83,13 +93,15 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return gcj02ToWgs84(lng, lat, false);
     }
 
-    /** GCJ02转WGS84（纠偏） */
+    /**
+     * GCJ02转WGS84（纠偏）
+     */
     public double[] gcj02ToWgs84(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double[] gcj = wgs84ToGcj02(lng, lat);
             double dLng = gcj[0] - lng;
             double dLat = gcj[1] - lat;
-            return new double[] {lng - dLng, lat - dLat};
+            return new double[]{lng - dLng, lat - dLat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -100,7 +112,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return gcj02ToBd09(lng, lat, false);
     }
 
-    /** GCJ02转BD09 */
+    /**
+     * GCJ02转BD09
+     */
     public double[] gcj02ToBd09(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double x = lng, y = lat;
@@ -108,7 +122,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
             double theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * X_PI);
             double bdLng = z * Math.cos(theta) + 0.0065;
             double bdLat = z * Math.sin(theta) + 0.006;
-            return new double[] {bdLng, bdLat};
+            return new double[]{bdLng, bdLat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -119,7 +133,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return bd09ToGcj02(lng, lat, false);
     }
 
-    /** BD09转GCJ02 */
+    /**
+     * BD09转GCJ02
+     */
     public double[] bd09ToGcj02(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double x = lng - 0.0065, y = lat - 0.006;
@@ -127,7 +143,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
             double theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * X_PI);
             double gcjLng = z * Math.cos(theta);
             double gcjLat = z * Math.sin(theta);
-            return new double[] {gcjLng, gcjLat};
+            return new double[]{gcjLng, gcjLat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -138,7 +154,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return wgs84ToBd09(lng, lat, false);
     }
 
-    /** WGS84转BD09（先转GCJ02，再转BD09） */
+    /**
+     * WGS84转BD09（先转GCJ02，再转BD09）
+     */
     public double[] wgs84ToBd09(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double[] gcj = wgs84ToGcj02(lng, lat);
@@ -153,7 +171,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return bd09ToWgs84(lng, lat, false);
     }
 
-    /** BD09转WGS84（先转GCJ02，再转WGS84） */
+    /**
+     * BD09转WGS84（先转GCJ02，再转WGS84）
+     */
     public double[] bd09ToWgs84(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double[] gcj = bd09ToGcj02(lng, lat);
@@ -168,14 +188,16 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return mercatorToWgs84(mercatorX, mercatorY, false);
     }
 
-    /** 墨卡托转WGS84 */
+    /**
+     * 墨卡托转WGS84
+     */
     public double[] mercatorToWgs84(
             double mercatorX, double mercatorY, boolean ifExceptionReturnNull) {
         try {
             double lng = mercatorX / 20037508.34 * 180.0;
             double lat = mercatorY / 20037508.34 * 180.0;
             lat = 180.0 / PI * (2 * Math.atan(Math.exp(lat * PI / 180.0)) - PI / 2);
-            return new double[] {lng, lat};
+            return new double[]{lng, lat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -186,13 +208,15 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return wgs84ToMercator(lng, lat, false);
     }
 
-    /** WGS84转墨卡托 */
+    /**
+     * WGS84转墨卡托
+     */
     public double[] wgs84ToMercator(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             double x = lng * 20037508.34 / 180.0;
             double y = Math.log(Math.tan((90 + lat) * PI / 360.0)) / (PI / 180.0);
             y = y * 20037508.34 / 180.0;
-            return new double[] {x, y};
+            return new double[]{x, y};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -203,7 +227,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return dmsToDd(dmsStr, false);
     }
 
-    /** 度分秒转十进制度 支持格式：116°23′45.6″E, 39°54′32.1″N 或 116°23'45.6"E 39°54'32.1"N */
+    /**
+     * 度分秒转十进制度 支持格式：116°23′45.6″E, 39°54′32.1″N 或 116°23'45.6"E 39°54'32.1"N
+     */
     public double[] dmsToDd(String dmsStr, boolean ifExceptionReturnNull) {
         try {
             if (StrUtil.isBlank(dmsStr)) {
@@ -221,7 +247,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
             double lng = dmsPartToDd(coordParts[0]);
             double lat = dmsPartToDd(coordParts[1]);
-            return new double[] {lng, lat};
+            return new double[]{lng, lat};
         } catch (Exception e) {
             return handleException(e, ifExceptionReturnNull);
         }
@@ -232,7 +258,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return ddToDms(lng, lat, false);
     }
 
-    /** 十进制度转度分秒 */
+    /**
+     * 十进制度转度分秒
+     */
     public String ddToDms(double lng, double lat, boolean ifExceptionReturnNull) {
         try {
             String lngDms = ddPartToDms(lng, true);
@@ -248,7 +276,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return parseCoordString(coordStr, separator, false);
     }
 
-    /** 解析坐标字符串为十进制度 */
+    /**
+     * 解析坐标字符串为十进制度
+     */
     public double[] parseCoordString(
             String coordStr, String separator, boolean ifExceptionReturnNull) {
         try {
@@ -263,8 +293,8 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
             // 先尝试直接解析为十进制度
             if (NumberUtil.isNumber(parts[0]) && NumberUtil.isNumber(parts[1])) {
-                return new double[] {
-                    NumberUtil.parseDouble(parts[0]), NumberUtil.parseDouble(parts[1])
+                return new double[]{
+                        NumberUtil.parseDouble(parts[0]), NumberUtil.parseDouble(parts[1])
                 };
             }
 
@@ -285,7 +315,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] gcj = wgs84ToGcj02(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(gcj[0], gcj[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(gcj[0], gcj[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -300,7 +330,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = gcj02ToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -315,7 +345,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] bd = gcj02ToBd09(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(bd[0], bd[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(bd[0], bd[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -330,7 +360,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] gcj = bd09ToGcj02(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(gcj[0], gcj[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(gcj[0], gcj[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -345,7 +375,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] bd = wgs84ToBd09(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(bd[0], bd[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(bd[0], bd[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -360,7 +390,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = bd09ToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -375,7 +405,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = mercatorToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -390,7 +420,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] mercator = wgs84ToMercator(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(mercator[0], mercator[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(mercator[0], mercator[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -470,12 +500,16 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
     // ====================== 私有工具方法 ======================
 
-    /** 校验坐标是否在中国境内（用于判断是否需要偏移） */
+    /**
+     * 校验坐标是否在中国境内（用于判断是否需要偏移）
+     */
     private boolean isChinaCoord(double lng, double lat) {
         return lng >= 73.66 && lng <= 135.05 && lat >= 3.86 && lat <= 53.55;
     }
 
-    /** 纬度偏移计算 */
+    /**
+     * 纬度偏移计算
+     */
     private double transformLat(double x, double y) {
         double ret =
                 -100.0
@@ -490,7 +524,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return ret;
     }
 
-    /** 经度偏移计算 */
+    /**
+     * 经度偏移计算
+     */
     private double transformLng(double x, double y) {
         double ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
         ret += (20.0 * Math.sin(6.0 * x * PI) + 20.0 * Math.sin(2.0 * x * PI)) * 2.0 / 3.0;
@@ -499,7 +535,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return ret;
     }
 
-    /** 单部分度分秒转十进制度 */
+    /**
+     * 单部分度分秒转十进制度
+     */
     private double dmsPartToDd(String dmsPart) {
         // 提取方向（E/W/N/S）
         char dir = dmsPart.charAt(dmsPart.length() - 1);
@@ -519,7 +557,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return dd;
     }
 
-    /** 十进制度转单部分度分秒 */
+    /**
+     * 十进制度转单部分度分秒
+     */
     private String ddPartToDms(double dd, boolean isLongitude) {
         // 取绝对值计算度分秒
         double absDd = Math.abs(dd);
@@ -539,7 +579,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         return String.format("%d°%d′%.1f″%c", degree, minute, second, dir);
     }
 
-    /** 异常处理通用方法（数组返回） */
+    /**
+     * 异常处理通用方法（数组返回）
+     */
     private double[] handleException(Exception e, boolean ifExceptionReturnNull) {
         if (ifExceptionReturnNull) {
             return null;
@@ -548,12 +590,16 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         }
     }
 
-    /** 抛出运行时异常 */
+    /**
+     * 抛出运行时异常
+     */
     private <T> T throwRuntimeException(Exception e) {
         throw new RuntimeException("坐标转换失败", e);
     }
 
-    /** 校验Point对象有效性 */
+    /**
+     * 校验Point对象有效性
+     */
     private void validatePoint(Point point) {
         if (point == null || point.isEmpty()) {
             throw new IllegalArgumentException("Point对象不能为空或空几何");
@@ -563,9 +609,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
     /**
      * 批量坐标转换通用方法
      *
-     * @param coords 原始坐标二维数组
+     * @param coords                原始坐标二维数组
      * @param ifExceptionReturnNull 异常返回null
-     * @param converter 转换函数
+     * @param converter             转换函数
      * @return 转换后坐标二维数组
      */
     private double[][] batchConvert(
@@ -597,9 +643,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
     /**
      * Geometry对象转换通用方法（支持Point/LineString/Polygon/Multi几何）
      *
-     * @param geometry 原始几何对象
+     * @param geometry              原始几何对象
      * @param ifExceptionReturnNull 异常返回null
-     * @param converter 坐标转换函数
+     * @param converter             坐标转换函数
      * @return 转换后几何对象
      */
     private Geometry convertGeometry(
@@ -621,12 +667,12 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
             // 根据原始几何类型创建新对象
             if (geometry instanceof Point) {
-                return GEOMETRY_FACTORY.createPoint(newCoords[0]);
+                return advToolsConfig.getGeometryFactory().createPoint(newCoords[0]);
             } else if (geometry instanceof LineString) {
-                return GEOMETRY_FACTORY.createLineString(newCoords);
+                return advToolsConfig.getGeometryFactory().createLineString(newCoords);
             } else if (geometry instanceof Polygon) {
                 Polygon polygon = (Polygon) geometry;
-                LinearRing shell = GEOMETRY_FACTORY.createLinearRing(newCoords);
+                LinearRing shell = advToolsConfig.getGeometryFactory().createLinearRing(newCoords);
                 LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
                 for (int i = 0; i < holes.length; i++) {
                     Coordinate[] holeCoords = polygon.getInteriorRingN(i).getCoordinates();
@@ -638,14 +684,14 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
                                                 return new Coordinate(nc[0], nc[1]);
                                             })
                                     .toArray(Coordinate[]::new);
-                    holes[i] = GEOMETRY_FACTORY.createLinearRing(newHoleCoords);
+                    holes[i] = advToolsConfig.getGeometryFactory().createLinearRing(newHoleCoords);
                 }
-                return GEOMETRY_FACTORY.createPolygon(shell, holes);
+                return advToolsConfig.getGeometryFactory().createPolygon(shell, holes);
             } else if (geometry instanceof MultiPoint) {
-                return GEOMETRY_FACTORY.createMultiPoint(newCoords);
+                return advToolsConfig.getGeometryFactory().createMultiPointFromCoords(newCoords);
             } else if (geometry instanceof MultiLineString) {
-                return GEOMETRY_FACTORY.createMultiLineString(
-                        new LineString[] {GEOMETRY_FACTORY.createLineString(newCoords)});
+                return advToolsConfig.getGeometryFactory().createMultiLineString(
+                        new LineString[]{advToolsConfig.getGeometryFactory().createLineString(newCoords)});
             } else if (geometry instanceof MultiPolygon) {
                 throw new UnsupportedOperationException("暂不支持MultiPolygon直接转换，请拆分为单个Polygon转换");
             } else {

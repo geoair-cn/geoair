@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.tools.srid;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.StaticLog;
 import java.util.HashMap;
@@ -27,12 +29,18 @@ import org.geotools.api.referencing.operation.TransformException;
  */
 @Slf4j
 public class GirSridConvertUtils implements GirSridConvertOpt {
-
-    // 单例实例
     private static volatile GirSridConvertUtils INSTANCE;
+    GirAdvToolsGlobalConfig advToolsConfig;
 
-    // 几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    public GirSridConvertUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+        preloadCommonTransforms();
+    }
+
+    public static GirSridConvertUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new GirSridConvertUtils(advToolsConfig);
+    }
+
 
     // 转换算子缓存：key=srcSrid_targetSrid，value=MathTransform
     private final Map<String, MathTransform> transformCache = new HashMap<>();
@@ -40,18 +48,13 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     // 缓存锁（保证线程安全）
     private final Lock cacheLock = new ReentrantLock();
 
-    // 私有构造器（防止外部实例化）
-    private GirSridConvertUtils() {
-        // 预加载常用CRS转换算子，提升首次调用性能
-        preloadCommonTransforms();
-    }
-
     /** 获取单例实例（双重校验锁） */
+    @Deprecated
     public static GirSridConvertUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirSridConvertUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirSridConvertUtils();
+                    INSTANCE = new GirSridConvertUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
@@ -137,7 +140,7 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
             double lng, double lat, int srcSrid, int targetSrid, boolean ifExceptionReturnNull) {
         try {
             // 构建点几何对象
-            Point point = GEOMETRY_FACTORY.createPoint(new Coordinate(lng, lat));
+            Point point = advToolsConfig.getGeometryFactory().createPoint(new Coordinate(lng, lat));
             point.setSRID(srcSrid);
 
             // 转换点对象

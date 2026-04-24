@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
@@ -45,9 +46,7 @@ public class GirOracleSpatialTran {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             // 将 STRUCT 转换为字节数组
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            // 使用 JTS WKBReader 解析
-            WKBReader reader = new WKBReader();
-            Geometry jtsGeom = reader.read(bytes);
+            Geometry jtsGeom = GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
             return jtsGeom.toText();
         } catch (Exception e) {
             return "无法解析空间数据：" + e.getMessage();
@@ -68,8 +67,7 @@ public class GirOracleSpatialTran {
         try {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            WKBReader reader = new WKBReader();
-            return reader.read(bytes);
+            return  GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
             return null;
         }

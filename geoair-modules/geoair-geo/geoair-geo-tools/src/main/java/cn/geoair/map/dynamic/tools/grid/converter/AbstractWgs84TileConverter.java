@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
 import org.locationtech.jts.geom.Geometry;
 
 /** WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算 */
@@ -19,6 +20,10 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     protected static final double MIN_VALID_LAT = -85.0511287798; // 3857有效纬度下限
 
     protected static final double PRECISION = 1e-9; // 浮点精度补偿
+
+    public AbstractWgs84TileConverter(GirAdvToolsGlobalConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
 
     /** 数值范围限制（工具方法） */
     protected double clamp(double value, double min, double max) {

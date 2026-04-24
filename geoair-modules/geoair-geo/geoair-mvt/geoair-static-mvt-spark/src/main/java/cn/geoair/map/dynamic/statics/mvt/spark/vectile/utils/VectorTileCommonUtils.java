@@ -5,7 +5,8 @@ import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfTileParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.bean.BeanUtil;
 
@@ -52,7 +53,7 @@ public class VectorTileCommonUtils {
         }
         // 坐标系转换
         Geometry convertedGeom =
-                GirAdvTools.getSridOpt()
+                GirGeoTools.me().getSridOpt()
                         .convert(
                                 geometry,
                                 parameter.getSourceDataSrid(),
@@ -93,7 +94,7 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirAdvTools.getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                    String quadKey = GirGeoTools.me().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
                     // String tileId = zoom + "#" + y + "#" + x;
                     tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
                 }
@@ -148,7 +149,7 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirAdvTools.getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                    String quadKey = GirGeoTools.me().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
                     // String tileId = zoom + "#" + y + "#" + x;
                     tileMap.put(quadKey, feature);
                 }
@@ -211,7 +212,7 @@ public class VectorTileCommonUtils {
             TileSliceParameter parameter,
             PbfTargetInfo pbfTargetInfo)
             throws Exception {
-        TileZxyApo tileZxyApo = GirAdvTools.getTileGridBingMapOpt().quadKeyToXyz(tileId);
+        TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
         int zoom = tileZxyApo.getZ();
         int y = tileZxyApo.getY();
         int x = tileZxyApo.getX();

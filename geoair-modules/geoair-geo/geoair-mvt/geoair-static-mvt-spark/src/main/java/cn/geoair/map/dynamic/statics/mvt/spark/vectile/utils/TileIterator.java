@@ -2,7 +2,8 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.locationtech.jts.geom.Geometry;
 import scala.Tuple2;
 import scala.Tuple4;
@@ -140,7 +141,7 @@ public class TileIterator
         }
 
         // 生成当前瓦片的 quadKey
-        String quadKey = GirAdvTools.getTileGridBingMapOpt()
+        String quadKey = GirGeoTools.me().getTileGridBingMapOpt()
                 .xyzToQuadKey(currentX, currentY, currentZoom);
 
         // 使用 Collections.singletonList 避免创建新的 ArrayList

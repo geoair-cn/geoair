@@ -1,27 +1,40 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+
 import java.util.Objects;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
-/** WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z） */
+/**
+ * WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z）
+ */
 public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
     // 单例实例
     private static volatile Wgs84SeparateAxisTileUtils INSTANCE;
 
-    /** 双重校验锁单例 */
+    public Wgs84SeparateAxisTileUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
+
+    @Deprecated
     public static Wgs84SeparateAxisTileUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (Wgs84SeparateAxisTileUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Wgs84SeparateAxisTileUtils();
+                    INSTANCE = new Wgs84SeparateAxisTileUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static Wgs84SeparateAxisTileUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new Wgs84SeparateAxisTileUtils(advToolsConfig);
     }
 
     // ========== 差异化核心方法实现（非等轴） ==========

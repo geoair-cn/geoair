@@ -1,28 +1,41 @@
 package cn.geoair.map.dynamic.tools.grid.bing;
 
 import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
 import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-/** 必应地图QuadKey服务实现类 */
+/**
+ * 必应地图QuadKey服务实现类
+ */
 public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
 
     // 1. 私有静态实例（volatile保证可见性，防止指令重排）
     private static volatile BingMapQuadKeyUtils INSTANCE;
 
-    // 2. 私有构造方法（禁止外部实例化）
-    private BingMapQuadKeyUtils() {}
+    GirAdvToolsGlobalConfig advToolsConfig;
+
+    public BingMapQuadKeyUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+
+    public static BingMapQuadKeyUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new BingMapQuadKeyUtils(advToolsConfig);
+    }
 
     // 3. 公开静态方法获取单例（双重校验锁）
+    @Deprecated
     public static BingMapQuadKeyUtils getInstance() {
         if (INSTANCE == null) { // 第一次校验（减少锁竞争）
             synchronized (BingMapQuadKeyUtils.class) { // 类锁
                 if (INSTANCE == null) { // 第二次校验（防止多线程并发创建）
-                    INSTANCE = new BingMapQuadKeyUtils();
+                    INSTANCE = new BingMapQuadKeyUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
@@ -111,7 +124,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
         if (z >= 23) {
             throw new IllegalArgumentException("当前QuadKey已达最高缩放级别23，无子级");
         }
-        return new String[] {quadKey + "0", quadKey + "1", quadKey + "2", quadKey + "3"};
+        return new String[]{quadKey + "0", quadKey + "1", quadKey + "2", quadKey + "3"};
     }
 
     @Override
@@ -159,12 +172,12 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
         // 场景1：向上聚合（目标级别 < 当前级别）
         if (targetLevel < currentLevel) {
             String parentKey = targetLevel == 0 ? "" : sourceQuadKey.substring(0, targetLevel);
-            return new String[] {parentKey};
+            return new String[]{parentKey};
         }
 
         // 场景2：同级转换
         if (targetLevel == currentLevel) {
-            return new String[] {sourceQuadKey};
+            return new String[]{sourceQuadKey};
         }
 
         // 场景3：向下细化（目标级别 > 当前级别）→ 递归生成所有子节点
@@ -192,12 +205,12 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
         // 场景1：向上聚合（目标级别 < 当前级别）→ 最小值和最大值都是父级Key
         if (targetLevel < currentLevel) {
             String parentKey = targetLevel == 0 ? "" : sourceQuadKey.substring(0, targetLevel);
-            return new String[] {parentKey, parentKey};
+            return new String[]{parentKey, parentKey};
         }
 
         // 场景2：同级转换 → 最小值和最大值都是自身
         if (targetLevel == currentLevel) {
-            return new String[] {sourceQuadKey, sourceQuadKey};
+            return new String[]{sourceQuadKey, sourceQuadKey};
         }
 
         // 场景3：向下细化（目标级别 > 当前级别）→ 生成最小值（补0）和最大值（补3）
@@ -215,7 +228,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
             maxKey.append('3');
         }
 
-        return new String[] {minKey.toString(), maxKey.toString()};
+        return new String[]{minKey.toString(), maxKey.toString()};
     }
 
     @Override
@@ -227,7 +240,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
     /**
      * 重载方法：通过TileZxyApo实体获取目标级别QuadKey的范围
      *
-     * @param sourceZxy 源瓦片坐标实体
+     * @param sourceZxy   源瓦片坐标实体
      * @param targetLevel 目标级别
      * @return 长度为2的数组，[0]是最小值，[1]是最大值
      */
@@ -248,7 +261,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
     private String[] generateAllChildKeys(String parentKey, int levelDiff) {
         // 递归终止条件：级别差为0 → 返回自身
         if (levelDiff == 0) {
-            return new String[] {parentKey};
+            return new String[]{parentKey};
         }
 
         // 先获取下一级子节点
