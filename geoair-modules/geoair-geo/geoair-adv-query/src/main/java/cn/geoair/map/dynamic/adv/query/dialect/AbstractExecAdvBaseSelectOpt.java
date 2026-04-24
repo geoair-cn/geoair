@@ -57,10 +57,12 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             // 差异化：构建单条查询包装SQL
             String execSql = buildSelectOneWrapSql(cleanSql);
-
-            logExecuteSql("bSelectOne", execSql);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Entity queryResult = SqlExecutor.query(connection, execSql, new EntityHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectOne", execSql, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectOne查询失败，SQL：" + sql, e);
@@ -74,10 +76,14 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectList", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             List<Entity> queryResult =
                     SqlExecutor.query(connection, cleanSql, new EntityListHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList", cleanSql, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntityList(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectList查询失败，SQL：" + sql, e);
@@ -91,9 +97,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectList(流式)", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             SqlExecutor.query(connection, cleanSql, new StreamRsHandler(rowConsumer));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectList(流式)", cleanSql, lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException("执行流式bSelectList查询失败，SQL：" + sql, e);
         } finally {
@@ -106,9 +116,14 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectListToValueList", cleanSql);
 
-            return SqlExecutor.query(connection, cleanSql, new ValueListHandler());
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<List<Object>> query = SqlExecutor.query(connection, cleanSql, new ValueListHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectListToValueList", cleanSql, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectListToValueList查询失败，SQL：" + sql, e);
         } finally {
@@ -121,9 +136,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectNumber", cleanSql);
-
-            return SqlExecutor.query(connection, cleanSql, new NumberHandler());
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            Number query = SqlExecutor.query(connection, cleanSql, new NumberHandler());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectNumber", cleanSql, lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException("执行bSelectNumber查询失败，SQL：" + sql, e);
         } finally {
@@ -136,7 +155,6 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         // 差异化：构建COUNT查询SQL
         String countSql = buildCountQuerySql(cleanSql);
-        logExecuteSql("bSelectRecordRowCount", countSql);
         return bSelectNumber(countSql);
     }
 
@@ -145,9 +163,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjOne", cleanSql);
 
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Object queryResult = SqlExecutor.query(connection, cleanSql, BeanHandler.create(clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjOne", cleanSql,lastTaskTimeMillis);
             return (E) queryResult;
         } catch (SQLException e) {
             throw new RuntimeException(
@@ -162,9 +184,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjList", cleanSql);
-
-            return SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            List<E> query = SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList", cleanSql,lastTaskTimeMillis);
+            return query;
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行bSelectObjList查询失败，SQL：" + sql + "，目标类型：" + clazz.getName(), e);
@@ -178,9 +204,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
-            logExecuteSql("bSelectObjList(流式)", cleanSql);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
 
             SqlExecutor.query(connection, cleanSql, new StreamBeanRsHandler<>(rowConsumer, clazz));
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList(流式)", cleanSql,lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行流式bSelectObjList查询失败，SQL：" + sql + "，目标类型：" + clazz.getName(), e);
@@ -605,12 +635,13 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     /**
      * 统一打印SQL执行日志（无参数）
      */
-    protected void logExecuteSql(String methodName, String sql) {
+    protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {}执行的SQL为：{}",
+                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}",
                 getSchemaName(),
                 getDatabaseName(),
                 methodName,
+                lastTaskTimeMillis,
                 sql);
     }
 
@@ -619,7 +650,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
      */
     protected void logExecuteSql(String methodName, String sql, SqlParamList sqlParamList, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {} 耗时:{} ms 执行的SQL为：{}，参数：{}",
+                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}，参数：{}",
                 getSchemaName(),
                 getDatabaseName(),
                 methodName,
