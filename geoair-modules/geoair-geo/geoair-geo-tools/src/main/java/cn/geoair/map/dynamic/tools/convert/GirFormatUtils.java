@@ -57,7 +57,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().read(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -69,7 +69,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readLine(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -82,7 +82,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiLine(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -94,7 +94,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readPolygon(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -107,7 +107,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiPolygon(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -119,7 +119,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readPoint(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -131,7 +131,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiPoint(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -158,7 +158,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getGeometryJSON().toString(jtsGeometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -171,7 +171,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return WKBWriter.toHex(getWKBWriter().write(jtsGeometry));
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -190,7 +190,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             }
             return jtsGeom;
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -217,7 +217,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getWKTReader().read(wktString);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -285,7 +285,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getWKBWriter().write(geometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -311,7 +311,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             byte[] bytes = WKBReader.hexToBytes(wkbByteString);
             return getWKBReader().read(bytes);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -331,7 +331,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             List<String> split = StrUtil.split(pointString, separator);
             return jtsPointByStringList(split, xFirst, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -351,7 +351,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
                     ? jtsPointByXY(x, y, ifExceptionValueReturnNull)
                     : jtsPointByXY(y, x, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -366,7 +366,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             List<Object> of = ListUtil.of(pointArray[0], pointArray[1]);
             return jtsPointByStringList(of, xFirst, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -376,7 +376,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             Coordinate coord = new Coordinate(x, y);
             return GEOMETRY_FACTORY.createPoint(coord);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -389,7 +389,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getWKBReader().read(wkbBytes);
         } catch (ParseException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -401,7 +401,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getWKBWriter().write(jtsGeometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -443,7 +443,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return function.apply(geometry);
         } catch (Exception e) {
-            handleException(e, ifExceptionValueReturnNull, null);
+            handleException(e, ifExceptionValueReturnNull);
             return null;
         }
     }
@@ -465,14 +465,14 @@ public class GirFormatUtils implements GirGeoFormatOpt {
                                 + geometry.getGeometryType());
             }
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
     /** 异常处理通用方法 */
-    private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull, T nullValue) {
+    private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull) {
         if (ifExceptionValueReturnNull) {
-            return nullValue;
+            return null;
         } else {
             throw new RuntimeException(e);
         }
