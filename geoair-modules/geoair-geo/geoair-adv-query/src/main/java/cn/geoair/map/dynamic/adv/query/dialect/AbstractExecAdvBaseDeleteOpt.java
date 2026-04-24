@@ -7,6 +7,7 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
@@ -95,7 +96,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, Collections.singletonList(id), cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -133,8 +134,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bDeleteBatchByPrimaryKey 批量主键删除完成，表名：{}，总删除行数：{}",
-                    getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess);
+
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
+                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ",tableName, totalSuccess ), cost,totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -167,8 +169,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
 
-        log.debug("schema:[{}]db:[{}] time:[{}ms] bDeleteBatchWithBatchSize 分批次主键删除完成，表名：{}，总删除行数：{}，批次大小：{}",
-                getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess, batchSize);
+
+        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
+                "bDeleteBatchWithBatchSize", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}",tableName, totalSuccess, batchSize), cost,totalSuccess);
         return totalSuccess;
     }
 
@@ -235,8 +238,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bDeleteBatchByCondition 分批次条件删除完成，表名：{}，总删除行数：{}，批次大小：{}",
-                    getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess, batchSize);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
+                    "bDeleteBatchByCondition", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}",tableName, totalSuccess, batchSize), cost,totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
