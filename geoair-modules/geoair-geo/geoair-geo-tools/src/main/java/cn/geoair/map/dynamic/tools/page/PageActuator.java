@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,7 @@ public class PageActuator<T> {
     /** 分页配置 */
     PageConfig pageConfig = new PageConfig();
 
+    @Getter
     private final List<T> finalDataList = new ArrayList<T>();
 
     // 仅用于标记是否终止
@@ -27,10 +30,6 @@ public class PageActuator<T> {
     // 私有化构造器，通过静态方法创建实例
     private PageActuator(PageConditionDef<T> pageConditionDef) {
         this.pageConditionDef = pageConditionDef;
-    }
-
-    public List<T> getFinalDataList() {
-        return finalDataList;
     }
 
     // 静态工厂方法
