@@ -380,7 +380,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, sql, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, sql, cost,result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
             rollbackConnection(connection, operation, tableName);
@@ -423,7 +423,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, execSql, jdbcParams, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, execSql, jdbcParams, cost,result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
             rollbackConnection(connection, operation, tableName);

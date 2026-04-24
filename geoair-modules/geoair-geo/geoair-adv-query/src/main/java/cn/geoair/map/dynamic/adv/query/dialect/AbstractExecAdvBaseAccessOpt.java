@@ -88,7 +88,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql( this.getClass(),"bInsertOne", execSql, params, cost);
+                AdvLogSql.of(dataSourceGetter).logExecuteSql( this.getClass(),"bInsertOne", execSql, params, cost,1);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("单条插入失败，表名：" + quoteTableName, e);
@@ -203,7 +203,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnore", execSql, params, cost);
+                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnore", execSql, params, cost,1);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("插入忽略操作失败，表名：" + tableName, e);
@@ -252,7 +252,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertOrUpdate", execSql, params, cost);
+                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertOrUpdate", execSql, params, cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("插入或更新操作失败，表名：" + tableName, e);
@@ -274,7 +274,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, sqlStatement, sqlParamList.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertBySql", sqlStatement, sqlParamList.toList(), cost);
+                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertBySql", sqlStatement, sqlParamList.toList(), cost,result);
             return result;
         } catch (SQLException e) {
             rollbackConnection(connection);

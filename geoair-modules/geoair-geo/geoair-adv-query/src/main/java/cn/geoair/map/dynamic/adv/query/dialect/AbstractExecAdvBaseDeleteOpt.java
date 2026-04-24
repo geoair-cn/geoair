@@ -69,7 +69,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteBySql", execSql, jdbcParams, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteBySql", execSql, jdbcParams, cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("执行自定义删除SQL失败，SQL：" + execSql, e);
@@ -95,7 +95,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, Collections.singletonList(id), cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, Collections.singletonList(id), cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -193,7 +193,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByCondition", execSql, params, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByCondition", execSql, params, cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
@@ -266,7 +266,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bLogicDelete", execSql, params, cost);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bLogicDelete", execSql, params, cost,result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("逻辑删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);

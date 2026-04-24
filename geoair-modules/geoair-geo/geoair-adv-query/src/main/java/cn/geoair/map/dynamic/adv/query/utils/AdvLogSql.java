@@ -9,22 +9,36 @@ import java.util.List;
 /**
  * @author 张俊
  * @date 2026/4/24
- * @description SQL执行日志（彩色高亮版 · JDK8兼容）
+ * @description SQL 日志（智能换行，不截断单词 + 动态长度分割线）
  */
 @Slf4j
 public class AdvLogSql {
 
-    // 如果不需要日志打印，全局修改这个变量就可以了
+    // 全局开关
     public static boolean logEnable = true;
 
-    // ===================== ANSI 控制台颜色 =====================
+    // 一行最大长度（分割线自动根据这个生成）
+    private static final int MAX_LINE_LENGTH = 180;
+
+    // 动态生成的分割线（只生成一次）
+    private static final String SPLIT_LINE;
+
+    static {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < MAX_LINE_LENGTH; i++) {
+            sb.append("=");
+        }
+        SPLIT_LINE = sb.toString();
+    }
+
+    // ===================== 颜色 =====================
     private static final String RESET = "\u001B[0m";
-    private static final String CYAN = "\u001B[36m";    // 青色（库名）
-    private static final String YELLOW = "\u001B[33m";  // 黄色（耗时）
-    private static final String GREEN = "\u001B[32m";   // 绿色（参数）
-    private static final String BOLD = "\u001B[1;37m";  // 白色加粗（SQL）
-    private static final String GRAY = "\u001B[90m";    // 灰色（分割线）
-    private static final String BLUE = "\u001B[34m";    // 蓝色（影响行数）
+    private static final String CYAN = "\u001B[36m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String BOLD = "\u001B[1;37m";
+    private static final String GRAY = "\u001B[90m";
+    private static final String BLUE = "\u001B[34m";
 
     private final IDataSourceGetter dataSourceGetter;
 
@@ -36,162 +50,67 @@ public class AdvLogSql {
         this.dataSourceGetter = dataSourceGetter;
     }
 
-    // ===================== 日志输出 =====================
-    public void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
-        if (!logEnable) {
-            return;
+    private String wrapSql(String sql) {
+        if (sql == null || sql.isEmpty()) return "";
+        if (sql.length() <= MAX_LINE_LENGTH) return sql;
+
+        StringBuilder result = new StringBuilder();
+        StringBuilder currentLine = new StringBuilder();
+        String[] tokens = sql.split("(?<=\\s|,|\\()|(?=\\s|,|\\))");
+
+        for (String token : tokens) {
+            if (currentLine.length() + token.length() > MAX_LINE_LENGTH && currentLine.length() > 0) {
+                result.append(currentLine).append("\n");
+                currentLine = new StringBuilder();
+            }
+            currentLine.append(token);
         }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql);
+
+        if (currentLine.length() > 0) {
+            result.append(currentLine);
+        }
+
+        return result.toString().replace("\n ", "\n").trim();
     }
 
-    // ===================== 【新增】带影响行数 =====================
-    public void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis, long rows) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
-                        + "\n执行方法：{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                rows,
-                methodName,
-                sql);
-    }
-
-    public void logExecuteSql(Class callerClass,String methodName, String sql, long lastTaskTimeMillis) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
+    // ===================== 带Class =====================
+    public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis) {
+        if (!logEnable) return;
+        log.debug("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
                         + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                callerClass.getSimpleName(),
-                methodName,
-                sql);
+                        + "\n" + GRAY + SPLIT_LINE + RESET,
+                getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
+                callerClass.getSimpleName(), methodName, wrapSql(sql));
     }
 
-    // ===================== 【新增】带Class + 影响行数 =====================
-    public void logExecuteSql(Class callerClass,String methodName, String sql, long lastTaskTimeMillis, long rows) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
+    // ===================== 带Class + 影响行数 =====================
+    public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Number rows) {
+        if (!logEnable) return;
+        log.debug("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
                         + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                rows,
-                callerClass.getSimpleName(),
-                methodName,
-                sql);
+                        + "\n" + GRAY + SPLIT_LINE + RESET,
+                getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
+                callerClass.getSimpleName(), methodName, wrapSql(sql));
     }
 
-    // ===================== 带参数日志 =====================
-    public void logExecuteSql(String methodName, String sql, List<Object> params, long lastTaskTimeMillis) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                methodName,
-                sql,
-                params);
-    }
-
-    // ===================== 【新增】带参数 + 影响行数 =====================
-    public void logExecuteSql(String methodName, String sql, List<Object> params, long lastTaskTimeMillis, long rows) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
-                        + "\n执行方法：{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                rows,
-                methodName,
-                sql,
-                params);
-    }
-
-    public void logExecuteSql(Class callerClass,String methodName, String sql, List<Object> params, long lastTaskTimeMillis) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                callerClass.getSimpleName(),
-                methodName,
-                sql,
-                params);
-    }
-
-    // ===================== 【新增】带Class + 参数 + 影响行数（完整版） =====================
-    public void logExecuteSql(Class callerClass,String methodName, String sql, List<Object> params, long lastTaskTimeMillis, long rows) {
-        if (!logEnable) {
-            return;
-        }
-        log.debug("\n"+GRAY + "============================================================================================" + RESET
+    // ===================== 带Class + 参数 + 影响行数 =====================
+    public void logExecuteSql(Class callerClass, String methodName, String sql, List<Object> params, long lastTaskTimeMillis, Number rows) {
+        if (!logEnable) return;
+        log.debug("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
                         + "\n" + BOLD + "{}" + RESET
                         + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n" + GRAY + "============================================================================================" + RESET,
-                getDatabaseName(),
-                getSchemaName(),
-                lastTaskTimeMillis,
-                rows,
-                callerClass.getSimpleName(),
-                methodName,
-                sql,
-                params);
+                        + "\n" + GRAY + SPLIT_LINE + RESET,
+                getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
+                callerClass.getSimpleName(), methodName, wrapSql(sql), params);
     }
 
     // ===================== 工具方法 =====================
