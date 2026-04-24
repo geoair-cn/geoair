@@ -251,14 +251,17 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             String execSql = buildSelectOneWrapSql(sqlStatement);
-            logExecuteSql("bSelectOne(带参数)", execSql, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             Entity queryResult =
                     SqlExecutor.query(
                             connection,
                             execSql,
                             new EntityHandler(),
                             sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectOne(带参数)", execSql, sqlParamList, lastTaskTimeMillis);
             return GirAdvOneRow.ofByEntity(queryResult);
         } catch (SQLException e) {
             throw new RuntimeException("执行带参数bSelectOne查询失败，SQL：" + sqlStatement, e);
@@ -440,13 +443,16 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             sqlStatement = dialectTableNameProcessor.tbRemoveSqlSpaces(sqlStatement);
-            logExecuteSql("bSelectObjList(带参数-流式)", sqlStatement, sqlParamList);
-
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             SqlExecutor.query(
                     connection,
                     sqlStatement,
                     new StreamBeanRsHandler<>(rowConsumer, clazz),
                     sqlParamList.toArray());
+            stopWatch.stop();
+            long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
+            logExecuteSql("bSelectObjList(带参数-流式)", sqlStatement, sqlParamList, lastTaskTimeMillis);
         } catch (SQLException e) {
             throw new RuntimeException(
                     "执行带参数流式bSelectObjList查询失败，SQL：" + sqlStatement + "，目标类型：" + clazz.getName(),
@@ -491,15 +497,12 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         if (girSqlParam == null) {
             bSelectListStream(sqlStatement, rowConsumer);
-            return;
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
             bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
-            return;
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
             bSelectListStream(sqlStatement, sqlParamMap, rowConsumer);
-            return;
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -584,15 +587,15 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         if (girSqlParam == null) {
             bSelectObjListStream(sqlStatement, clazz, rowConsumer);
-            return;
+
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
             bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
-            return;
+
         } else if (girSqlParam instanceof SqlParamMap) {
             SqlParamMap sqlParamMap = (SqlParamMap) girSqlParam;
             bSelectObjListStream(sqlStatement, sqlParamMap, clazz, rowConsumer);
-            return;
+
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
@@ -633,17 +636,6 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                 ? GutilObject.isEmpty(dataSourceGetter.getSchemaName())
                 ? ""
                 : dataSourceGetter.getSchemaName()
-                : "";
-    }
-
-    /**
-     * 获取数据源ID（通用封装）
-     */
-    protected String getDataSourceId() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDataSourceId())
-                ? ""
-                : dataSourceGetter.getDataSourceId()
                 : "";
     }
 
