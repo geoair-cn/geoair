@@ -3,13 +3,14 @@ package cn.geoair.map.dynamic.mvt.tools;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
 
 // import geotrellis.vector.Extent;
 import cn.hutool.core.util.ObjectUtil;
@@ -23,10 +24,10 @@ public class AdvMvtTileUtils {
 	public static Envelope getTileRect(int level, int x, int y, int sourceGrid) {
 		ReferencedEnvelope referencedEnvelope = null;
 		if (sourceGrid == 3857) {
-			referencedEnvelope = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(level, x, y, 3857);
+			referencedEnvelope = GirGeoTools.me().getTileGrid3857Opt().xyzToTileBox(level, x, y, 3857);
 		}
 		else {
-			referencedEnvelope = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(level, x, y, 4326);
+			referencedEnvelope = GirGeoTools.me().getTileGrid4326Opt().xyzToTileBox(level, x, y, 4326);
 		}
 		return referencedEnvelope;
 	}
@@ -52,9 +53,9 @@ public class AdvMvtTileUtils {
 			double xmax = gridExtent.getMaxX();
 			double ymax = gridExtent.getMaxY();
 			gridExtentBox = new Envelope(xmin, xmax, ymin, ymax);
-			dataExtentBox = GirAdvTools.getSridOpt().convert(gridExtentBox, sourceGrid, sourceDataSrid, false);
+			dataExtentBox = GirGeoTools.me().getSridOpt().convert(gridExtentBox, sourceGrid, sourceDataSrid, false);
 			if (dataExtentBox == null) {
-				Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(gridExtentBox);
+				Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(gridExtentBox);
 				throw new RuntimeException(
 						StrUtil.format("网格计算异常：z:{}  x :{} y:{} geometry:{}  gridSrid :{} sourceDataSrid:{} ", zoom, x,
 								y, geometry.toText(), sourceGrid, sourceDataSrid));

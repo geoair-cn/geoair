@@ -2,7 +2,8 @@ package cn.geoair.map.dynamic.mvt.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
@@ -89,14 +90,14 @@ public class VectorTileV2Controller extends TileCommon {
             int gridSrid = params.isGeo() ? 4326 : 3857;
             if (!params.isGeo()) {
                 boxReferencedEnvelope =
-                        GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 3857);
+                        GirGeoTools.me().getTileGrid3857Opt().xyzToTileBox(z, x, y, 3857);
             } else {
                 boxReferencedEnvelope =
-                        GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
+                        GirGeoTools.me().getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
             }
-            Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(boxReferencedEnvelope);
+            Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(boxReferencedEnvelope);
             re.put("bbox", geometry.toText());
-            Geometry convert = GirAdvTools.getSridOpt().convert(geometry, gridSrid, 4326);
+            Geometry convert = GirGeoTools.me().getSridOpt().convert(geometry, gridSrid, 4326);
             re.put("bbox4326", convert.toText());
         } catch (Exception e) {
         }

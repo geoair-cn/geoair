@@ -2,7 +2,7 @@ package cn.geoair.comp.db.service.core.typehander.pg.org;
 
 import cn.geoair.comp.db.service.core.typehander.BaseTypeHandler;
 import cn.geoair.comp.db.service.core.typehander.TypeHandlerRegistry;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.db.Entity;
 import cn.hutool.db.meta.JdbcType;
@@ -29,7 +29,7 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
     @Override
     public String getResult(Entity entity, String columnName) {
         Object obj = entity.getObj(columnName);
-        return GirAdvTools.getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
             throwables.printStackTrace();
         }
 
-        return GirAdvTools.getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
@@ -52,18 +52,18 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return GirAdvTools.getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
     public String getResult(Map<String, Object> row, String columnName) {
         Object obj = null;
         obj = row.get(columnName);
-        return GirAdvTools.getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
     public String getResult(Object obj) {
-        return GirAdvTools.getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 }

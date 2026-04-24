@@ -9,7 +9,8 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.page.PageConfig;
@@ -331,7 +332,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             Geometry geometry = wkbReader.read(decode);
             // 将geom转到extent坐标系下
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirAdvTools.getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry = GirGeoTools.me().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
             }
             // 内存裁剪数据
             Geometry finalGeometry = geometry;
@@ -372,7 +373,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         Long maxPageSize = tileExecutorConfig.getMaxPageSize();
 
         PageActuator<GirAdvOneRow> pageActuatorOpt =
-                GirAdvTools.getPageActuatorOpt(
+                GirGeoTools.me().getPageActuatorOpt(
                         new PageConditionDef<GirAdvOneRow>() {
 
                             @Override

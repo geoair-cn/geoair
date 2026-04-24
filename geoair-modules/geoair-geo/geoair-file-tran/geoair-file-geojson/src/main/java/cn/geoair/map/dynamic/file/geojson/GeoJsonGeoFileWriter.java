@@ -9,13 +9,15 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.UUID;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.data.geojson.GeoJSONWriter;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -68,7 +70,7 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             // 覆盖坐标系（如果配置了目标 SRID）
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        GirAdvTools.getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        GirGeoTools.me().getSridOpt().getCRS(writeConfig.getOutPutSrid());
                 // 重建要素类型，替换 CRS
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
@@ -135,7 +137,7 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             /** geojson的Writer实在是无解，没办法生成3857的geojson */
             GeoJSONWriter geoJsonWriter = new GeoJSONWriter(fos);
             int outPutSrid = writeConfig.getOutPutSrid();
-            CoordinateReferenceSystem crs = GirAdvTools.getSridOpt().getCRS(outPutSrid);
+            CoordinateReferenceSystem crs = GirGeoTools.me().getSridOpt().getCRS(outPutSrid);
             GutilReflection.setFieldValue(geoJsonWriter, "outCRS", crs);
             geoJsonWriter.setEncodeFeatureCollectionCRS(false);
             geoJsonWriter.setEncodeFeatureBounds(false);

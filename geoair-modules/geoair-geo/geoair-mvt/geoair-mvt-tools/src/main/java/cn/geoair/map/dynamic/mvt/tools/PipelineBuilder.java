@@ -4,9 +4,11 @@
  */
 package cn.geoair.map.dynamic.mvt.tools;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -67,7 +69,7 @@ public class PipelineBuilder {
         Double xmax = extent.getMaxX();
         Double ymin = extent.getMinY();
         Double ymax = extent.getMaxY();
-        CoordinateReferenceSystem sourceCrs = GirAdvTools.getSridOpt().getCRS(srid);
+        CoordinateReferenceSystem sourceCrs = GirGeoTools.me().getSridOpt().getCRS(srid);
         Rectangle paintArea = new Rectangle(0, 0, 4096, 4096);
         ReferencedEnvelope mapArea = new ReferencedEnvelope(xmin, xmax, ymin, ymax, sourceCrs);
         Context context = new Context();

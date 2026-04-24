@@ -15,7 +15,8 @@ import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
 import cn.geoair.map.dynamic.file.shp.ShpGeoFileReader;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
 import cn.geoair.map.dynamic.file.test.GeoToolsUtils;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -88,11 +89,11 @@ public class ShpToPg {
                                 if (geometry != null) {
                                     if (geometry instanceof Point) {
                                         Point point = (Point) geometry;
-                                        Point point1 = GirAdvTools.getCoordinateOpt().wgs84ToBd09(point);
+                                        Point point1 = GirGeoTools.me().getCoordinateOpt().wgs84ToBd09(point);
                                         point1.setSRID(point.getSRID());
                                         girAdvOneRow.put("the_geom", point1);
                                     }
-//                                    girAdvOneRow.put("oldGeomWkt", GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry,true));
+//                                    girAdvOneRow.put("oldGeomWkt", GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry,true));
 //                                    girAdvOneRow.put("oldGeom", geometry);
                                 }
                             }

@@ -1,13 +1,18 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+ 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+
 import java.util.Objects;
+
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
-/** Web墨卡托（3857）坐标系瓦片转换实现类 */
+/**
+ * Web墨卡托（3857）坐标系瓦片转换实现类
+ */
 public class TileConverter3857Utils extends TileConverterCommon {
 
     // 墨卡托投影常量（地球半径）
@@ -18,20 +23,30 @@ public class TileConverter3857Utils extends TileConverterCommon {
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile TileConverter3857Utils INSTANCE;
 
+    public TileConverter3857Utils(GirAdvToolsGlobalConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
+
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static TileConverter3857Utils getInstance() {
         if (INSTANCE == null) {
             synchronized (TileConverter3857Utils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TileConverter3857Utils();
+                    INSTANCE = new TileConverter3857Utils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
         return INSTANCE;
+    }
+
+    @Deprecated
+    public static TileConverter3857Utils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new TileConverter3857Utils(advToolsConfig);
     }
 
     public BoxReferencedEnvelope xyzToTileBox(int z, int x, int y, int targetSrid) {
@@ -43,7 +58,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
         double maxY = tileYToCoordinateY(y, z);
 
         Envelope envelope = new Envelope(minX, maxX, minY, maxY);
-        Envelope convert = GirAdvTools.getSridOpt().convert(envelope, 3857, targetSrid);
+        Envelope convert = sridConvertOpt.convert(envelope, 3857, targetSrid);
         return new BoxReferencedEnvelope(convert, targetSrid);
     }
 
@@ -106,7 +121,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
      * 将几何图形从源坐标系转换为WGS84(4326)坐标系
      *
      * @param geometry 几何图形对象
-     * @param srcSrid 源坐标系SRID代码
+     * @param srcSrid  源坐标系SRID代码
      * @return 转换后的几何图形对象
      */
     public Geometry transform(Geometry geometry, int srcSrid) {

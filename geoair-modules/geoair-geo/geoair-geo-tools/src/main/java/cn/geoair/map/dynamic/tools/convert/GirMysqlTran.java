@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.ParseException;
@@ -95,9 +96,9 @@ public class GirMysqlTran {
             // 3. 提取标准WKB数据（去除前4字节）
             byte[] wkbData = extractWkbData(mysqlBinary);
 
-            // 4. 使用JTS WKBReader解析
-            WKBReader reader = new WKBReader();
-            jtsGeom = reader.read(wkbData);
+
+            jtsGeom =  GirGeoTools.me().getFormatOpt().getWKBReader().read(wkbData);
+
 
             // 5. 设置SRID
             if (jtsGeom != null && srid != 0) {

@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.geometry.MismatchedDimensionException;
@@ -19,20 +20,20 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
 
     public BoxReferencedEnvelope(org.locationtech.jts.geom.Envelope envelope, int srid)
             throws MismatchedDimensionException {
-        super(envelope, GirAdvTools.getSridOpt().getCRS(srid));
+        super(envelope, GirGeoTools.me().getSridOpt().getCRS(srid));
         this.srid = srid;
     }
 
     public String getWktString(int targetSrid) {
-        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this, srid, targetSrid);
-        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(this, srid, targetSrid);
+        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
     @Override
     public String toString() {
-        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(this);
+        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(this);
         return this.getSrid()
                 + ";"
-                + GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+                + GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 }

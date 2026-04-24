@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.*;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
@@ -73,7 +74,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToGeoJson(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToGeoJson(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -89,7 +90,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -105,7 +106,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToPgGeometryHex(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToPgGeometryHex(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -124,11 +125,11 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             } catch (Exception e) {
                 try {
                     jtsGeom =
-                            GirAdvTools.getFormatOpt()
+                            GirGeoTools.me().getFormatOpt()
                                     .wktToJtsGeometry((String) value, true); // 不是geojson字符串就是wkt
                 } catch (Exception e1) {
                     jtsGeom =
-                            GirAdvTools.getFormatOpt()
+                            GirGeoTools.me().getFormatOpt()
                                     .wkbToJtsGeometry((String) value, true); // 不是wkt字符串就是wbk
                 }
             }
@@ -136,7 +137,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (value instanceof Map) { // 判断是否为json对象
             JSONObject jsonObject = new JSONObject((Map<String, Object>) value);
             jtsGeom =
-                    GirAdvTools.getFormatOpt()
+                    GirGeoTools.me().getFormatOpt()
                             .geojsonToJtsGeometry(jsonObject.toJSONString(), true);
         } else if (GirPostGisTran.isOrgConvert() && GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);

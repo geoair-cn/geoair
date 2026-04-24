@@ -1,27 +1,43 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
+import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+
 import java.util.Objects;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
-/** WGS84（4326）等轴瓦片转换实现类 核心特征：经度/纬度轴使用相同瓦片跨度（均为360/2^z），兼容Mapbox4490逻辑 */
+/**
+ * WGS84（4326）等轴瓦片转换实现类 核心特征：经度/纬度轴使用相同瓦片跨度（均为360/2^z），兼容Mapbox4490逻辑
+ */
 public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
 
     // 单例实例
     private static volatile Wgs84EqualAxisTileUtils INSTANCE;
 
-    /** 双重校验锁单例 */
+    public Wgs84EqualAxisTileUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
+
+    /**
+     * 双重校验锁单例
+     */
+    @Deprecated
     public static Wgs84EqualAxisTileUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (Wgs84EqualAxisTileUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Wgs84EqualAxisTileUtils();
+                    INSTANCE = new Wgs84EqualAxisTileUtils(new GirAdvToolsGlobalConfig());
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static Wgs84EqualAxisTileUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+        return new Wgs84EqualAxisTileUtils(advToolsConfig);
     }
 
     // ========== 差异化核心方法实现（等轴） ==========
