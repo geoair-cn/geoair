@@ -637,11 +637,11 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
      */
     protected void logExecuteSql(String methodName, String sql, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}",
+                "schema:[{}]db:[{}] 耗时:[{}ms]{} 执行的SQL为：{}",
                 getSchemaName(),
                 getDatabaseName(),
-                methodName,
                 lastTaskTimeMillis,
+                methodName,
                 sql);
     }
 
@@ -650,11 +650,11 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
      */
     protected void logExecuteSql(String methodName, String sql, SqlParamList sqlParamList, long lastTaskTimeMillis) {
         log.debug(
-                "schema:[{}] db:[{}] {} 耗时:[{}ms] 执行的SQL为：{}，参数：{}",
+                "schema:[{}]db:[{}]time:[{}ms] {}执行的SQL为：{}，参数：{}",
                 getSchemaName(),
                 getDatabaseName(),
-                methodName,
                 lastTaskTimeMillis,
+                methodName,
                 sql,
                 sqlParamList.toParamString());
     }

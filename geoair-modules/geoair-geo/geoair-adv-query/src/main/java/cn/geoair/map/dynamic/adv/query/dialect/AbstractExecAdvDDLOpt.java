@@ -442,11 +442,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
         // 通用：构建元数据查询SQL
         String fieldQuerySql = buildMetadataQuerySql(dynamicSql);
-        log.debug(
-                "schema:[{}] db:[{}] SQL的元数据查询：{}",
-                dataSourceGetter.getSchemaName(),
-                getDatabaseName(),
-                fieldQuerySql);
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         // 通用：获取带参数的元数据并封装结果
@@ -454,7 +450,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         stopWatch.stop();
         long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
         log.debug(
-                "schema:[{}] db:[{}] 耗时[{}ms] SQL的元数据查询：{}",
+                "schema:[{}] db:[{}] time[{}ms] SQL的元数据查询：{}",
                 dataSourceGetter.getSchemaName(),
                 getDatabaseName(),
                 lastTaskTimeMillis,
