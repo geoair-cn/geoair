@@ -35,13 +35,13 @@ public class AdvExecutorFactory {
 
         switch (dbType) {
             case MYSQL:
-                log.debug("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器");
+                log.trace("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器");
                 return GirSpringMysqlAdvExecutor.newInstance(dataSource, dataSourceName);
             case POSTGRESQL:
-                log.debug("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器");
+                log.trace("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器");
                 return GirSpringPGAdvExecutor.newInstance(dataSource, dataSourceName);
             case ORACLE:
-                log.debug("检测到ORACLE数据源，创建GirSpringOracleAdvExecutor执行器");
+                log.trace("检测到ORACLE数据源，创建GirSpringOracleAdvExecutor执行器");
                 return GirSpringOracleAdvExecutor.newInstance(dataSource, dataSourceName);
             default:
                 throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
