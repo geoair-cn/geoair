@@ -61,7 +61,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 
             // 连接失败重试（适配连接难获取）
             dataSourceNew.setConnectionErrorRetryAttempts(3); // 从0→3：连接失败重试3次
-            dataSourceNew.setBreakAfterAcquireFailure(false); // 新增：获取连接失败后不中断，继续重试
+            dataSourceNew.setBreakAfterAcquireFailure(true); // 新增：获取连接失败后不中断，继续重试
             // 理由：连接难获取时，增加重试机会，提升连接获取成功率
 
             // 连接泄露与日志（强化监控）
