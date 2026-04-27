@@ -1,8 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.bing;
 
 import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
-import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 
@@ -19,13 +18,13 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
     // 1. 私有静态实例（volatile保证可见性，防止指令重排）
     private static volatile BingMapQuadKeyUtils INSTANCE;
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public BingMapQuadKeyUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public BingMapQuadKeyUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
 
-    public static BingMapQuadKeyUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static BingMapQuadKeyUtils getInstance(ToolsConfig advToolsConfig) {
         return new BingMapQuadKeyUtils(advToolsConfig);
     }
 
@@ -35,7 +34,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
         if (INSTANCE == null) { // 第一次校验（减少锁竞争）
             synchronized (BingMapQuadKeyUtils.class) { // 类锁
                 if (INSTANCE == null) { // 第二次校验（防止多线程并发创建）
-                    INSTANCE = new BingMapQuadKeyUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new BingMapQuadKeyUtils(new ToolsConfig());
                 }
             }
         }

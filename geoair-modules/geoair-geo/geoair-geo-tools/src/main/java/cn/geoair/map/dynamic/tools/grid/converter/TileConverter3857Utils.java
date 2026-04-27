@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
- 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 
@@ -23,7 +23,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile TileConverter3857Utils INSTANCE;
 
-    public TileConverter3857Utils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public TileConverter3857Utils(ToolsConfig advToolsConfig) {
         super(advToolsConfig);
     }
 
@@ -37,7 +37,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
         if (INSTANCE == null) {
             synchronized (TileConverter3857Utils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TileConverter3857Utils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new TileConverter3857Utils(new ToolsConfig());
                 }
             }
         }
@@ -45,7 +45,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
     }
 
     @Deprecated
-    public static TileConverter3857Utils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static TileConverter3857Utils getInstance(ToolsConfig advToolsConfig) {
         return new TileConverter3857Utils(advToolsConfig);
     }
 

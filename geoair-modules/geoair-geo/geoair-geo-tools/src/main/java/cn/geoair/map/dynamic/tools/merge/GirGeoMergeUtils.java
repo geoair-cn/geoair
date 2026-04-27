@@ -1,15 +1,12 @@
 package cn.geoair.map.dynamic.tools.merge;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
-import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
 import cn.hutool.core.util.ObjectUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
@@ -28,14 +25,14 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
 
     private final GirFormatUtils formatOpt ;
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public GirGeoMergeUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirGeoMergeUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         this.formatOpt = GirFormatUtils.getInstance(advToolsConfig);
     }
 
-    public static GirGeoMergeUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirGeoMergeUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirGeoMergeUtils(advToolsConfig);
     }
 
@@ -45,7 +42,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
         if (INSTANCE == null) {
             synchronized (GirGeoMergeUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeoMergeUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirGeoMergeUtils(new ToolsConfig());
                 }
             }
         }

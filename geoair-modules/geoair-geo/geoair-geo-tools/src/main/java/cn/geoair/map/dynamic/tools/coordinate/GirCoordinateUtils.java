@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.tools.coordinate;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
-import cn.geoair.map.dynamic.tools.array.GirGeom2ArrayUtils;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -31,13 +30,13 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
     private static final double X_PI = PI * 3000.0 / 180.0;
 
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public GirCoordinateUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirCoordinateUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
 
-    public static GirCoordinateUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirCoordinateUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirCoordinateUtils(advToolsConfig);
     }
 
@@ -51,7 +50,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         if (INSTANCE == null) {
             synchronized (GirCoordinateUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirCoordinateUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirCoordinateUtils(new ToolsConfig());
                 }
             }
         }

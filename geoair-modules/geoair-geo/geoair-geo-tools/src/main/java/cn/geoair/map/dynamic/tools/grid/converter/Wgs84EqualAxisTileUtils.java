@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 
@@ -17,7 +17,7 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
     // 单例实例
     private static volatile Wgs84EqualAxisTileUtils INSTANCE;
 
-    public Wgs84EqualAxisTileUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public Wgs84EqualAxisTileUtils(ToolsConfig advToolsConfig) {
         super(advToolsConfig);
     }
 
@@ -29,14 +29,14 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
         if (INSTANCE == null) {
             synchronized (Wgs84EqualAxisTileUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Wgs84EqualAxisTileUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new Wgs84EqualAxisTileUtils(new ToolsConfig());
                 }
             }
         }
         return INSTANCE;
     }
 
-    public static Wgs84EqualAxisTileUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static Wgs84EqualAxisTileUtils getInstance(ToolsConfig advToolsConfig) {
         return new Wgs84EqualAxisTileUtils(advToolsConfig);
     }
 
