@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import org.locationtech.jts.geom.Geometry;
 
 /** WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算 */
@@ -21,7 +21,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
     protected static final double PRECISION = 1e-9; // 浮点精度补偿
 
-    public AbstractWgs84TileConverter(GirAdvToolsGlobalConfig advToolsConfig) {
+    public AbstractWgs84TileConverter(ToolsConfig advToolsConfig) {
         super(advToolsConfig);
     }
 

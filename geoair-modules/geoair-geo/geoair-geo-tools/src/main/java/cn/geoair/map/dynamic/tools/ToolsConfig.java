@@ -17,10 +17,10 @@ import java.util.function.Supplier;
  */
 @Data
 @Accessors(chain = true)
-public class GirAdvToolsGlobalConfig {
+public class ToolsConfig {
 
-    public static GirAdvToolsGlobalConfig of() {
-        return new GirAdvToolsGlobalConfig();
+    public static ToolsConfig of() {
+        return new ToolsConfig();
     }
 
     // 线程安全（可全局单例）

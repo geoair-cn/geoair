@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.tools.srid;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
-import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.StaticLog;
 import java.util.HashMap;
@@ -30,14 +29,14 @@ import org.geotools.api.referencing.operation.TransformException;
 @Slf4j
 public class GirSridConvertUtils implements GirSridConvertOpt {
     private static volatile GirSridConvertUtils INSTANCE;
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public GirSridConvertUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirSridConvertUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         preloadCommonTransforms();
     }
 
-    public static GirSridConvertUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirSridConvertUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirSridConvertUtils(advToolsConfig);
     }
 
@@ -54,7 +53,7 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
         if (INSTANCE == null) {
             synchronized (GirSridConvertUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirSridConvertUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirSridConvertUtils(new ToolsConfig());
                 }
             }
         }

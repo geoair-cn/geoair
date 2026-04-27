@@ -32,18 +32,18 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     private static volatile GirGeoTools INSTANCE;
 
-    protected GirAdvToolsGlobalConfig advToolsConfig;
+    protected ToolsConfig advToolsConfig;
 
 
-    public GirGeoTools(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirGeoTools(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
 
     public GirGeoTools() {
-        this.advToolsConfig = new GirAdvToolsGlobalConfig();
+        this.advToolsConfig = new ToolsConfig();
     }
 
-    public static GirGeoTools getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirGeoTools getInstance(ToolsConfig advToolsConfig) {
         return new GirGeoTools(advToolsConfig);
     }
 

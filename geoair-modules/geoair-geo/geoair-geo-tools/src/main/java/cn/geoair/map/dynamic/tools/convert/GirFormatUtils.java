@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
@@ -30,9 +30,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     private static volatile GirFormatUtils INSTANCE;
 
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public GirFormatUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirFormatUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
 
@@ -46,7 +46,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         if (INSTANCE == null) {
             synchronized (GirFormatUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirFormatUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirFormatUtils(new ToolsConfig());
                 }
             }
         }
@@ -54,7 +54,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     }
 
 
-    public static GirFormatUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirFormatUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirFormatUtils(advToolsConfig);
     }
 

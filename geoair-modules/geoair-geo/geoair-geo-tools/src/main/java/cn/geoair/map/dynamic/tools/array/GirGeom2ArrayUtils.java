@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.tools.array;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.locationtech.jts.geom.*;
@@ -17,12 +17,12 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public GirGeom2ArrayUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirGeom2ArrayUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
-    public static GirGeom2ArrayUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirGeom2ArrayUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirGeom2ArrayUtils(advToolsConfig);
     }
     /**
@@ -35,7 +35,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         if (INSTANCE == null) {
             synchronized (GirGeom2ArrayUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeom2ArrayUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirGeom2ArrayUtils(new ToolsConfig());
                 }
             }
         }

@@ -1,10 +1,9 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
- 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
-import cn.geoair.map.dynamic.tools.coordinate.GirCoordinateUtils;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
@@ -26,9 +25,9 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     protected GirSridConvertOpt sridConvertOpt = GirGeoTools.me().getSridOpt();
     protected GirGeoFormatOpt formatOpt = GirGeoTools.me().getFormatOpt();
 
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
 
-    public TileConverterCommon(GirAdvToolsGlobalConfig advToolsConfig) {
+    public TileConverterCommon(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         sridConvertOpt = GirGeoTools.getInstance(advToolsConfig).getSridOpt();
         formatOpt = GirGeoTools.getInstance(advToolsConfig).getFormatOpt();

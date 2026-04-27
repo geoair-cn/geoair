@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.tools.measure;
 
-import cn.geoair.map.dynamic.tools.GirAdvToolsGlobalConfig;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
 import cn.hutool.core.util.ObjectUtil;
@@ -25,18 +25,18 @@ import org.locationtech.jts.operation.distance.DistanceOp;
 public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     // 单例实例
     private static volatile GirGeoMeasureUtils INSTANCE;
-    GirAdvToolsGlobalConfig advToolsConfig;
+    ToolsConfig advToolsConfig;
     private GirFormatUtils formatOpt = GirFormatUtils.getInstance();
     private GirSridConvertUtils sridConvert = GirSridConvertUtils.getInstance();
 
-    public GirGeoMeasureUtils(GirAdvToolsGlobalConfig advToolsConfig) {
+    public GirGeoMeasureUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         initUnitFactors();
         this.formatOpt = GirFormatUtils.getInstance(advToolsConfig);
         this.sridConvert = GirSridConvertUtils.getInstance(advToolsConfig);
     }
 
-    public static GirGeoMeasureUtils getInstance(GirAdvToolsGlobalConfig advToolsConfig) {
+    public static GirGeoMeasureUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirGeoMeasureUtils(advToolsConfig);
     }
 
@@ -58,7 +58,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         if (INSTANCE == null) {
             synchronized (GirGeoMeasureUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeoMeasureUtils(new GirAdvToolsGlobalConfig());
+                    INSTANCE = new GirGeoMeasureUtils(new ToolsConfig());
                 }
             }
         }
