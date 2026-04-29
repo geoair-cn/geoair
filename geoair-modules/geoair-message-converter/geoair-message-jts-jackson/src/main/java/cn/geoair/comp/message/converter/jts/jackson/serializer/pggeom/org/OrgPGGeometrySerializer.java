@@ -2,7 +2,7 @@ package cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org;
 
 import static cn.geoair.base.Gir.log;
 
-import cn.geoair.comp.message.converter.jts.jackson.utils.GirJacksonUtils;
+import cn.geoair.comp.message.converter.jts.jackson.utils.GirJtsJacksonUtils;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -29,7 +29,7 @@ public class OrgPGGeometrySerializer extends StdSerializer<PGgeometry> {
         }
         try {
             Geometry jtsGeometry = GirPostGisOrgTran.toJtsGeometry(pgGeometry);
-            if (GirJacksonUtils.jtsToWkt) {
+            if (GirJtsJacksonUtils.jtsToWkt) {
                 new GeometryAsWKTSerializer().serialize(jtsGeometry, gen, provider);
             } else {
                 new GeometryAsGeoJSONSerializer().serialize(jtsGeometry, gen, provider);

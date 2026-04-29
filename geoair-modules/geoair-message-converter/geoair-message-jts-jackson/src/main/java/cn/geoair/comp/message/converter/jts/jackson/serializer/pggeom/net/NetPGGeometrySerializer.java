@@ -1,6 +1,6 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net;
 
-import cn.geoair.comp.message.converter.jts.jackson.utils.GirJacksonUtils;
+import cn.geoair.comp.message.converter.jts.jackson.utils.GirJtsJacksonUtils;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -33,7 +33,7 @@ public class NetPGGeometrySerializer extends StdSerializer<PGgeometry> {
         }
         try {
             Geometry jtsGeometry = GirPostGisNetTran.toJtsGeometry(pgGeometry);
-            if (GirJacksonUtils.jtsToWkt) {
+            if (GirJtsJacksonUtils.jtsToWkt) {
                 new GeometryAsWKTSerializer().serialize(jtsGeometry, gen, provider);
             } else {
                 new GeometryAsGeoJSONSerializer().serialize(jtsGeometry, gen, provider);

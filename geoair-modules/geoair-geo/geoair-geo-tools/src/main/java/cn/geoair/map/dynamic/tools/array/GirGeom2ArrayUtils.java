@@ -1,9 +1,13 @@
 package cn.geoair.map.dynamic.tools.array;
 
 import cn.geoair.map.dynamic.tools.ToolsConfig;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.locationtech.jts.geom.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 几何对象与坐标数组互转接口实现类 基于JTS实现核心转换逻辑，支持指定坐标顺序，保证点顺序不变
@@ -22,9 +26,11 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     public GirGeom2ArrayUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
+
     public static GirGeom2ArrayUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirGeom2ArrayUtils(advToolsConfig);
     }
+
     /**
      * 获取单例实例（双重校验锁）
      *
@@ -41,7 +47,6 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         }
         return INSTANCE;
     }
-
 
 
     @Override
@@ -260,5 +265,29 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
             jtsCoords[i] = new Coordinate(x, y);
         }
         return advToolsConfig.getGeometryFactory().createLineString(jtsCoords);
+    }
+
+    @Override
+    public LineString doubleArrayToLineString(List<double[]> coords) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, CoordOrder.X_FIRST);
+    }
+
+    @Override
+    public LineString doubleArrayToLineString(List<double[]> coords, CoordOrder order) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, order);
+    }
+
+    @Override
+    public LineString doubleArrayToLineString(List<double[]> coords, CoordOrder order, GeometryFactory factory) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, order, factory);
+    }
+
+    @Override
+    public LineString doubleArrayToLineStringFast(List<double[]> coords, CoordOrder order) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineStringFast(coordsArray, order);
     }
 }
