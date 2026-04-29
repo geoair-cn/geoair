@@ -75,7 +75,7 @@ public class GirAdvQuerySqlBuilder {
 
             boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
             if (b) {
-                String format = dialectProcessor.tbBuildAsTable("select * from ( {} ) ", "{}");
+                String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
                 String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
                 sql.append(aliasTable);
             } else {
@@ -122,7 +122,7 @@ public class GirAdvQuerySqlBuilder {
         sql.append(" FROM ");
         boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
         if (b) {
-            String format = dialectProcessor.tbBuildAsTable("select * from ( {} ) ", "{}");
+            String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
             String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
             sql.append(aliasTable);
         } else {
