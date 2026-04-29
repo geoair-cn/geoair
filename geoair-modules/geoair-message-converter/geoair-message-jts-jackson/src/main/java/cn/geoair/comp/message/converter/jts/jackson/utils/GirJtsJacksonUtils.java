@@ -19,7 +19,7 @@ import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
  * @date ：Created in 2026/3/19 18:47 @description： TODO
  */
 @Slf4j
-public class GirJacksonUtils {
+public class GirJtsJacksonUtils {
 
     /**
      *  jts对象转换为wkt，如果为false，就转换为geojson
