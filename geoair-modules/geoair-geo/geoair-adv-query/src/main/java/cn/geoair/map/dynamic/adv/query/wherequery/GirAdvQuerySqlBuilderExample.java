@@ -10,7 +10,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 /**
  * @author ：张俊
  * @date ：Created in 2026/4/17 18:20
- * @description： TODO
+ * @description： 快速获取创建器，基于不同的数据库类型
  */
 public class GirAdvQuerySqlBuilderExample {
 

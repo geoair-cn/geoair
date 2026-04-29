@@ -139,7 +139,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
     private SqlBuildResult getSqlBuildResult(GirAdvQueryRequest query) {
         GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
-        return sqlBuilder.buildSelectSql(query);
+        return sqlBuilder.buildPageSql(query);
     }
 
 }

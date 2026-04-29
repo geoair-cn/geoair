@@ -10,13 +10,13 @@ import java.util.*;
 /**
  * WHERE条件参数构建器
  * <p>支持复杂AND/OR嵌套条件和各种操作符</p>
- * <p>核心特性：保持条件的添加顺序，每个条件可以有自己的连接符</p>
+ * <p> 保持条件的添加顺序，每个条件可以有自己的连接符</p>
  *
  * @author 张俊
  * @date Created in 2026/4/16 10:18
  */
 @Getter
-public class GirAdvWhereFilter   implements Serializable {
+public class GirAdvWhereFilter implements Serializable {
 
     // 条件条目列表（保持添加顺序，每个条件有自己的连接符）
     private final List<ConditionEntry> entries = new ArrayList<>();
@@ -28,11 +28,21 @@ public class GirAdvWhereFilter   implements Serializable {
         return new GirAdvWhereFilter();
     }
 
+    /**
+     *  通过bean或者map创建查询条件
+     * @param bean bean或者map
+     * @return GirAdvWhereFilter
+     */
     public static GirAdvWhereFilter ofBean(Object bean) {
         ConvertOptions options = ConvertOptions.defaultOptions();
         return BeanToQueryFilterConverter.convert(bean, options);
     }
-
+    /**
+     *  通过bean或者map创建查询条件
+     * @param bean bean或者map
+     * @param convertOptions 转换条件
+     * @return GirAdvWhereFilter
+     */
     public static GirAdvWhereFilter ofBean(Object bean, ConvertOptions convertOptions) {
         return BeanToQueryFilterConverter.convert(bean, convertOptions);
     }
@@ -143,6 +153,7 @@ public class GirAdvWhereFilter   implements Serializable {
     public GirAdvWhereFilter like(String column, String value) {
         return addCondition(column, AdvOperatorEnums.LIKE_ALL, value);
     }
+
 
     /**
      * 左模糊匹配 value%

@@ -128,13 +128,18 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     @Override
     public boolean tbTableIsSqlView(String tableName) {
-        // 通用视图判断逻辑：以SELECT/WITH开头（忽略大小写、空格）
-        String trim = StrUtil.trim(tableName);
-        if (StrUtil.isEmpty(trim)) {
+        // 1. 空值 → 肯定不是 SQL，是表名
+        if (StrUtil.isBlank(tableName)) {
             return false;
         }
-        String lowerCase = trim.toLowerCase();
-        return lowerCase.startsWith("select") || lowerCase.startsWith("with");
+        // 2. 去除首尾空格
+        String trim = tableName.trim();
+        // 3. 包含空格 → 一定是 SQL 表达式，不是表名
+        if (trim.contains(" ")) {
+            return true;
+        }
+        // 4. 不包含空格 → 认为是表名
+        return false;
     }
 
     @Override
@@ -153,6 +158,11 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         // 3. 移除/* */块注释（可选，根据业务需求）
         cleanedSql = cleanedSql.replaceAll("/\\*[\\s\\S]*?\\*/", " ");
         return cleanedSql;
+    }
+
+    @Override
+    public  String tbBuildAsTable(String startFragment, String aliasTableName){
+        return  startFragment + " as " + aliasTableName;
     }
 
     /**

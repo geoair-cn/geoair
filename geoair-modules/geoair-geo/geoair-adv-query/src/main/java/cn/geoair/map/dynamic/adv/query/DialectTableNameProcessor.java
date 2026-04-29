@@ -113,6 +113,15 @@ public interface DialectTableNameProcessor {
      */
     String tbRemoveSqlSpaces(String sqlView);
 
+    /**
+     * 构建基于sql的 alias语句  之所以有这个方法，是因为 oracle对于这个动作中间是没有as这个字符串的
+     *
+     * @param startFragment  有待定义别名的片段 示例 （select * from user ）
+     * @param aliasTableName 别名  示例  alias_t
+     * @return （select * from user ）as alias_t
+     */
+    String tbBuildAsTable(String startFragment, String aliasTableName);
+
 
     /**
      * 构建分页SQL

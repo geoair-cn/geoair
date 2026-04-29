@@ -26,13 +26,16 @@ public class GirAdvQueryRequest {
     // ==================== 模式一：对象组装SQL ====================
 
     /**
-     * 表名或视图名（必填）
+     * 表名或一个sql查询语句。但是必须是完整的sql
      * -- GETTER --
      * 获取表名或视图名
+     *    table ：user
+     *    sqlView：select * from user
+     *    不支持的写法 ( select * from user )  as rere
      *
      * @return 表名或视图名
      */
-    private final String tableOrViewName;
+    private final String tableOrSqlView;
 
     /**
      * 查询字段名列表（必填）
@@ -143,7 +146,7 @@ public class GirAdvQueryRequest {
      */
     private GirAdvQueryRequest(Builder builder) {
         // 模式一参数
-        this.tableOrViewName = builder.tableOrViewName;
+        this.tableOrSqlView = builder.tableOrSqlView;
         this.fieldNames = builder.fieldNames;
         this.whereOption = builder.whereOption;
         this.nullHandling = builder.nullHandling;
@@ -261,9 +264,11 @@ public class GirAdvQueryRequest {
         // ==================== 模式一参数 ====================
 
         /**
-         * 表名或视图名
+         * 表名或一个一个完整带结果的SQL
+         *    table ：user
+         *    sqlView：select * from user
          */
-        private String tableOrViewName;
+        private String tableOrSqlView;
 
         /**
          * 查询字段名列表
@@ -327,13 +332,15 @@ public class GirAdvQueryRequest {
         // ==================== 模式一：对象组装SQL方法 ====================
 
         /**
-         * 设置表名或视图名
-         *
-         * @param tableOrViewName 表名或视图名
+         * 表名或一个一个完整带结果的SQL
+         *    table ：user
+         *    sqlView：select * from user
+         *    不支持的写法 ( select * from user )  as alias
+         * @param tableOrSqlView 表名或
          * @return Builder实例
          */
-        public Builder table(String tableOrViewName) {
-            this.tableOrViewName = tableOrViewName;
+        public Builder table(String tableOrSqlView) {
+            this.tableOrSqlView = tableOrSqlView;
             return this;
         }
 
@@ -612,7 +619,7 @@ public class GirAdvQueryRequest {
          */
         public GirAdvQueryRequest build() {
             // 校验：两种模式至少选一种
-            boolean hasObjectMode = tableOrViewName != null && fieldNames != null && whereOption != null;
+            boolean hasObjectMode = tableOrSqlView != null && fieldNames != null && whereOption != null;
             boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
             if (!hasObjectMode && !hasCustomSqlMode) {
@@ -623,7 +630,7 @@ public class GirAdvQueryRequest {
 
             // 对象模式校验
             if (hasObjectMode) {
-                if (tableOrViewName.trim().isEmpty()) {
+                if (tableOrSqlView.trim().isEmpty()) {
                     throw new IllegalArgumentException("tableOrViewName cannot be empty");
                 }
                 if (fieldNames.isEmpty()) {

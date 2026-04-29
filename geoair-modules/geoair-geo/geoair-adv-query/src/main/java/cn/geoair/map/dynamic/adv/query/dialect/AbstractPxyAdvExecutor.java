@@ -178,7 +178,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
 
-
     @Override
     public Integer bInsertBatch(
             String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
@@ -221,6 +220,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             String tableName, Map<String, Object> rowData, Set<String> updateFields) {
         return getAdvBaseOpt().bInsertOrUpdate(tableName, rowData, updateFields);
     }
+
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
@@ -230,7 +230,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
         return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
-
 
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
@@ -1196,7 +1195,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
                                        List<OrderApo> orders,
                                        AdvEnumsKeyTran advEnumsKeyTran) {
         return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam,pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders,advEnumsKeyTran);
+                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders, advEnumsKeyTran);
     }
 
     @Override
@@ -1303,6 +1302,10 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getDialectTableNameProcessor().tbBuildPageSql(noPageSql);
     }
 
+    @Override
+    public String tbBuildAsTable(String startFragment, String aliasTableName) {
+        return getDialectTableNameProcessor().tbBuildAsTable(startFragment, aliasTableName);
+    }
 
     @Override
     public GirAdvOneRow eSelectOne(

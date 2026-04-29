@@ -138,6 +138,8 @@ public enum AdvOperatorEnums implements GiVisualValuable<String> {
      */
     ILIKE_ALL("513", "ilike", MatchMode.ALL),
 
+
+
     // ==================== 范围操作符 (6xx) ====================
     /**
      * BETWEEN 范围查询
@@ -200,6 +202,7 @@ public enum AdvOperatorEnums implements GiVisualValuable<String> {
                 || this == NOT_LIKE_LEFT || this == NOT_LIKE_RIGHT || this == NOT_LIKE_ALL
                 || this == ILIKE_LEFT || this == ILIKE_RIGHT || this == ILIKE_ALL;
     }
+
 
     /**
      * 是否为NOT操作

@@ -75,7 +75,7 @@ public class GirAdvQuerySqlBuilder {
             // 使用方言处理器获取带Schema的表名
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
                     dataSourceGetter,
-                    param.getTableOrViewName()
+                    param.getTableOrSqlView()
             );
             sql.append(tableName);
 
@@ -112,12 +112,18 @@ public class GirAdvQuerySqlBuilder {
 
         // FROM - 使用方言处理器获取带Schema的表名
         sql.append(" FROM ");
-        String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                dataSourceGetter,
-                param.getTableOrViewName()
-        );
-        sql.append(tableName);
-
+        boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+        if (b) {
+            String format = dialectProcessor.tbBuildAsTable("select * from ( {} ) ","{}");
+            String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
+            sql.append(aliasTable);
+        } else {
+            String tableName = dialectProcessor.tbGetTableNameWithSchema(
+                    dataSourceGetter,
+                    param.getTableOrSqlView()
+            );
+            sql.append(tableName);
+        }
         // WHERE
         GirAdvWhereFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
@@ -264,6 +270,7 @@ public class GirAdvQuerySqlBuilder {
         params.add(value);
         return columnPart + " " + operator.getSqlValue() + " ?";
     }
+
     /**
      * 格式化LIKE值
      */

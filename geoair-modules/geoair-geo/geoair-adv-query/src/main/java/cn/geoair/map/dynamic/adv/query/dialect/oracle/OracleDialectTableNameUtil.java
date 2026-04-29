@@ -53,6 +53,11 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         return FIELD_QUOTE_PREFIX + fieldName + FIELD_QUOTE_SUFFIX;
     }
 
+    @Override
+    public  String tbBuildAsTable(String startFragment, String aliasTableName){
+        return  startFragment + "  " + aliasTableName;
+    }
+
     /**
      * Oracle分页SQL（使用ROWNUM方式）
      * <p>Oracle 9i+ 兼容写法</p>
