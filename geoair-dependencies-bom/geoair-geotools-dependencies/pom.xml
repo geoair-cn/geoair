@@ -191,6 +191,12 @@
         <artifactId>gt-geobuf</artifactId>
         <version>${geotools.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-s3-geotiff </artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-flatgeobuf</artifactId>
@@ -316,6 +322,11 @@
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-wms</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-wmts</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>

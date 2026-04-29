@@ -9,9 +9,10 @@ import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net.NetPGG
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org.OrgPGGeometryModule;
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
-import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.spatial4j.io.jackson.ShapesAsGeoJSONModule;
+import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
 
 /**
  * @author ：张俊
@@ -20,8 +21,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GirJacksonUtils {
 
+    /**
+     *  jts对象转换为wkt，如果为false，就转换为geojson
+     */
+    public  static  boolean jtsToWkt = false;
+
+
     public static void registerModule(ObjectMapper objectMapper) {
-        objectMapper.registerModule(new JtsModule());
+        if (jtsToWkt) {
+            objectMapper.registerModule(new ShapesAsWKTModule());
+        }else{
+            objectMapper.registerModule(new ShapesAsGeoJSONModule());
+        }
+//        objectMapper.registerModule(new JtsModule());
         log.debug("JtsModule注册");
         objectMapper.registerModule(new JtsExtModule());
         log.debug("JtsExtModule注册");

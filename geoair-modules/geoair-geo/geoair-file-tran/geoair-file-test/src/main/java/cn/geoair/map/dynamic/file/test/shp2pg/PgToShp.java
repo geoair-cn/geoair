@@ -59,6 +59,7 @@ public class PgToShp {
                         .setPostProcessor(
                                 (result, ctx) -> {
                                     log.info("执行后处理：转换完成，归档结果");
+
                                     // 自定义归档逻辑（如写入日志表、发送通知）
                                     log.info("转换结果：{}", result);
                                 })
