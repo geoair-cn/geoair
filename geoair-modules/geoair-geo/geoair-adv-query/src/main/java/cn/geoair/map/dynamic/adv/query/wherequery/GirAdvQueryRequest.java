@@ -1,10 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+import cn.hutool.core.collection.ListUtil;
 import lombok.Getter;
 
 import java.util.*;
@@ -29,9 +31,9 @@ public class GirAdvQueryRequest {
      * 表名或一个sql查询语句。但是必须是完整的sql
      * -- GETTER --
      * 获取表名或视图名
-     *    table ：user
-     *    sqlView：select * from user
-     *    不支持的写法 ( select * from user )  as rere
+     * table ：user
+     * sqlView：select * from user
+     * 不支持的写法 ( select * from user )  as rere
      *
      * @return 表名或视图名
      */
@@ -147,7 +149,11 @@ public class GirAdvQueryRequest {
     private GirAdvQueryRequest(Builder builder) {
         // 模式一参数
         this.tableOrSqlView = builder.tableOrSqlView;
-        this.fieldNames = builder.fieldNames;
+        if (GutilObject.isEmpty(builder.fieldNames)) {
+            this.fieldNames = ListUtil.of("*");
+        } else {
+            this.fieldNames = builder.fieldNames;
+        }
         this.whereOption = builder.whereOption;
         this.nullHandling = builder.nullHandling;
         this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
@@ -265,8 +271,8 @@ public class GirAdvQueryRequest {
 
         /**
          * 表名或一个一个完整带结果的SQL
-         *    table ：user
-         *    sqlView：select * from user
+         * table ：user
+         * sqlView：select * from user
          */
         private String tableOrSqlView;
 
@@ -333,9 +339,10 @@ public class GirAdvQueryRequest {
 
         /**
          * 表名或一个一个完整带结果的SQL
-         *    table ：user
-         *    sqlView：select * from user
-         *    不支持的写法 ( select * from user )  as alias
+         * table ：user
+         * sqlView：select * from user
+         * 不支持的写法 ( select * from user )  as alias
+         *
          * @param tableOrSqlView 表名或
          * @return Builder实例
          */
@@ -573,8 +580,6 @@ public class GirAdvQueryRequest {
             this.advEnumsKeyTran = advEnumsKeyTran;
             return this;
         }
-
-
 
 
         /**
