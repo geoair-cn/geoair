@@ -59,6 +59,8 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
         return advGeoPreOpt;
     }
 
+
+
     /**
      * 执行带参数的统计SQL（复用父类方法）
      */
