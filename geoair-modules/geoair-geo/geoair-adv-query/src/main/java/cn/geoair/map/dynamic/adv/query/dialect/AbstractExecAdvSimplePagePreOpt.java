@@ -47,9 +47,10 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
 
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
+            String template = dialectTableNameProcessor.tbBuildAsTable(" SELECT COUNT(*) AS count FROM ({})", "{}");
             String countSql =
                     StrUtil.format(
-                            "SELECT COUNT(*) AS count FROM ({}) AS {}",
+                            template,
                             cleanSql,
                             dialectTableNameProcessor.tbGetTempAliasTableName());
             // 子类实现：执行带参数的统计查询
@@ -107,9 +108,10 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         String quotedFields =
                 fieldNames.stream().map(this::quoteFieldName).collect(Collectors.joining(", "));
         String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();
+        String template = dialectTableNameProcessor.tbBuildAsTable(" SELECT {} FROM ({})", "{}");
         String refactorNoPageSql =
                 StrUtil.format(
-                        "SELECT {} FROM ({}) AS {}",
+                        template,
                         quotedFields,
                         dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement),
                         tableAlias);
@@ -130,7 +132,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
                 .flatMap(m -> m.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         Long total = (Long) resultMap.get("count");
-        List<GirAdvOneRow> records =resultMap.get("list")!=null?(List<GirAdvOneRow>)resultMap.get("list"):ListUtil.empty() ;
+        List<GirAdvOneRow> records = resultMap.get("list") != null ? (List<GirAdvOneRow>) resultMap.get("list") : ListUtil.empty();
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
             records = GirAdvOneRow.toCaseInsensitiveList(records);
         }

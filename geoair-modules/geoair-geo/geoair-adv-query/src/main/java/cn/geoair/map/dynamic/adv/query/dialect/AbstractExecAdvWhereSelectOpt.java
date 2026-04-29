@@ -82,7 +82,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
     @Override
     public PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query) {
-        SqlBuildResult result = getSqlBuildResult(query);
+        SqlBuildResult result = getSqlBuildResultToPage(query);
         return getSimplePageOpt()
                 .pPage(result.getSql(), result.getParams(),
                         query.getPageNum(),
@@ -138,6 +138,11 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     private SqlBuildResult getSqlBuildResult(GirAdvQueryRequest query) {
+        GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
+        return sqlBuilder.buildPageSql(query);
+    }
+
+    private SqlBuildResult getSqlBuildResultToPage(GirAdvQueryRequest query) {
         GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
         return sqlBuilder.buildSelectSql(query);
     }

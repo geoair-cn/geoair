@@ -64,7 +64,7 @@ public class GirAdvQuerySqlBuilder {
     public SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             String customSql = param.getCustomSql();
-            String countSql = "SELECT COUNT(*) FROM (" + customSql + ") t";
+            String countSql = dialectProcessor.tbBuildAsTable("SELECT COUNT(*) FROM (" + customSql + ")", "t");
             return new SqlBuildResult(countSql, new ArrayList<>());
         } else {
             StringBuilder sql = new StringBuilder();
@@ -72,12 +72,20 @@ public class GirAdvQuerySqlBuilder {
 
             sql.append("SELECT COUNT(*) FROM ");
 
-            // 使用方言处理器获取带Schema的表名
-            String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceGetter,
-                    param.getTableOrViewName()
-            );
-            sql.append(tableName);
+
+            boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+            if (b) {
+                String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+                String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
+                sql.append(aliasTable);
+            } else {
+                String tableName = dialectProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter,
+                        param.getTableOrSqlView()
+                );
+                sql.append(tableName);
+            }
+
 
             GirAdvWhereFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
@@ -112,12 +120,18 @@ public class GirAdvQuerySqlBuilder {
 
         // FROM - 使用方言处理器获取带Schema的表名
         sql.append(" FROM ");
-        String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                dataSourceGetter,
-                param.getTableOrViewName()
-        );
-        sql.append(tableName);
-
+        boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+        if (b) {
+            String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+            String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
+            sql.append(aliasTable);
+        } else {
+            String tableName = dialectProcessor.tbGetTableNameWithSchema(
+                    dataSourceGetter,
+                    param.getTableOrSqlView()
+            );
+            sql.append(tableName);
+        }
         // WHERE
         GirAdvWhereFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
@@ -264,6 +278,7 @@ public class GirAdvQuerySqlBuilder {
         params.add(value);
         return columnPart + " " + operator.getSqlValue() + " ?";
     }
+
     /**
      * 格式化LIKE值
      */
