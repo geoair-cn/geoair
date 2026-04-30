@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.mvt.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
+import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
@@ -9,10 +11,12 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
+
 import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
@@ -23,8 +27,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @CrossOrigin
 @GaApi(
-    text = "矢量瓦片服务",
-    tags = {"矢量瓦片服务"}
+        text = "矢量瓦片服务",
+        tags = {"矢量瓦片服务"}
 )
 @RequestMapping("/vectorTileService")
 public class VectorTileV2Controller extends TileCommon {
@@ -56,7 +60,8 @@ public class VectorTileV2Controller extends TileCommon {
         if (isGeo != null) {
             params.setGeo(isGeo);
         }
-        doMvt(layerName, params, z, x, y, response, request, 2);
+
+        doMvt(layerName, params, z, x, y, response, request);
     }
 
     @RequestMapping(value = "/v2/debug/{layerName}/{z}/{x}/{y}.pbf", method = RequestMethod.GET)

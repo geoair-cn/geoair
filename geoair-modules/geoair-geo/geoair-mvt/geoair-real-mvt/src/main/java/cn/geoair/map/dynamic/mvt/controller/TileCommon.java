@@ -1,18 +1,24 @@
 package cn.geoair.map.dynamic.mvt.controller;
 
+import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
+import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
 import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
+import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+
 import java.io.ByteArrayInputStream;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Objects;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,21 +50,23 @@ public class TileCommon {
             int col,
             int row,
             HttpServletResponse response,
-            HttpServletRequest request,
-            int version)
+            HttpServletRequest request
+    )
             throws Exception {
         byte[] data = new byte[0];
+        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params);
 
-        String filter = params.getFilter();
-        if (ObjectUtil.isNotEmpty(filter)) {
-            filter = URLDecoder.decode(filter.replaceAll("%(?![0-9a-fA-F]{2})", "%25"), "UTF-8");
-            params.setFilter(filter);
+        if (!result.isSuccess()) {
+            String message = result.getMessage();
+            GirServletUtil.toResponse(response, message.getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+            return;
         }
+
         String schemaName = params.getSchemaName();
-        ITileExecutor executor = TileExecutorFactory.getInstance(version, params, layerName);
+        ITileExecutor executor = TileExecutorFactory.getInstance(params, layerName);
         TileRequest tileData = executor.getTileData(zoom, col, row);
         data = tileData.getPbfInfo().getData();
-        HttpSession session = request.getSession(); // 别看这个代码啥也没干，但是如果删除了，就会导致 MqLogAspect
+        HttpSession session = request.getSession(); // 别看这个代码啥也没干，但是不能删除了
         // 这个类里面的日志采集报异常
         boolean successIs = tileData.isSuccessIs();
         if (successIs) {
