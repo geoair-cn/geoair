@@ -38,10 +38,10 @@ public interface DynamicDataSourceManager {
     /**
      * 根据数据源APO对象创建Druid数据源
      *
-     * @param dataSource 数据源APO对象
+     * @param dataSourceApo 数据源APO对象
      * @return 创建的 DataSource对象，失败返回null
      */
-    AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource);
+    AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo);
 
     /**
      * 移除指定ID的数据源并释放连接
