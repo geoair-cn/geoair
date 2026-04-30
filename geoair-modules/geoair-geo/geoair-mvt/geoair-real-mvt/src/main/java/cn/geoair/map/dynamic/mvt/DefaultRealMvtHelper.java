@@ -23,7 +23,9 @@ public class DefaultRealMvtHelper implements GirRealMvtHelper {
     }
 
     @Override
-    public ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams) {
+    public ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName) {
         return ParamCheckResult.of(true);
     }
+
+
 }
