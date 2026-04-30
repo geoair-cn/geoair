@@ -8,13 +8,13 @@ import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ObjectUtil;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
