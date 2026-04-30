@@ -273,7 +273,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             }
         } catch (Exception e) {
             log.error("获取瓦片数据列表失败", e);
-            return;
+            throw new RuntimeException(e);
         }
         processGirAdvOneRowList(
                 girAdvOneRows,
