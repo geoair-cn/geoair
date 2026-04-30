@@ -122,12 +122,12 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 这里由于只有postgresql，故这里简化
      *
-     * @param dataSource 数据源APO对象
+     * @param dataSourceApo 数据源APO对象
      * @return 创建的Druid数据源
      */
     @Override
-    public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource) {
-        return AdvDataSourceWrapper.wrap(getAdvDataSourceHelper().getDbDataSourceByApo(dataSource));
+    public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo) {
+        return AdvDataSourceWrapper.wrap(getAdvDataSourceHelper().getDbDataSourceByApo(dataSourceApo));
     }
 
     @Override
