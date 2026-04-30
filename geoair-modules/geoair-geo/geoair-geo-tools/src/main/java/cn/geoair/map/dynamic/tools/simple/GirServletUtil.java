@@ -7,6 +7,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GirServletUtil extends ServletUtil {
 
-    /** 设置严格的无缓存响应头（适用于动态内容、API 等） */
+    /**
+     * 设置严格的无缓存响应头（适用于动态内容、API 等）
+     */
     public static void setNoCacheHeaders() {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
         // HTTP 1.1
@@ -90,6 +93,24 @@ public class GirServletUtil extends ServletUtil {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         response.setContentType(contentType);
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(re);
+            outputStream = response.getOutputStream();
+            IoUtil.copy(byteArrayInputStream, outputStream);
+        } catch (Exception e) {
+        } finally {
+            IoUtil.close(byteArrayInputStream);
+            IoUtil.close(outputStream);
+        }
+    }
+
+
+    public static void toResponse(HttpServletResponse response, byte[] re, String contentType, int code) {
+        ServletOutputStream outputStream = null;
+        ByteArrayInputStream byteArrayInputStream = null;
+        response.setContentType(contentType);
+        response.setContentLength(re.length);
+        response.setStatus(code);
         try {
             byteArrayInputStream = new ByteArrayInputStream(re);
             outputStream = response.getOutputStream();

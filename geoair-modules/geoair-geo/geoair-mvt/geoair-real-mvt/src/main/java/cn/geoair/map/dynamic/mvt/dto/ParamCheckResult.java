@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张俊
@@ -8,11 +9,12 @@ import lombok.Data;
  * @description： 事件返回值
  */
 @Data
+@Accessors(chain = true)
 public class ParamCheckResult {
 
 
     private boolean success;
-    private String  message;
+    private String message;
 
 
     public static ParamCheckResult of(final boolean success) {
