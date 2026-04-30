@@ -53,7 +53,7 @@ public class TileCommon {
     )
             throws Exception {
         byte[] data = new byte[0];
-        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params);
+        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params,layerName);
 
         if (!result.isSuccess()) {
             String message = result.getMessage();

@@ -28,6 +28,6 @@ public interface GirRealMvtHelper {
             TileGlobalConfig tileGlobalConfig);
 
 
-    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams);
+    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams,String layerName);
 
 }
