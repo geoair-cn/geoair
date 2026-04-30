@@ -102,7 +102,7 @@ public abstract class AbstractITileExecutor implements ITileExecutor {
 			sourceDataSrid = Integer.parseInt(srid);
 		}
 		this.iAdvExecutor = GirAdvQuery.getIAdvExecutor(
-				Objects.isNull(requestParams.getDsId()) ? "-1" : requestParams.getDsId().toString(),
+				Objects.isNull(requestParams.getDsId()) ? "-1" : requestParams.getDsId() ,
 				requestParams.getSchemaName());
 	}
 
