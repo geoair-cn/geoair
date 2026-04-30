@@ -11,14 +11,16 @@ import javax.sql.DataSource;
 public interface IAdvDataSourceHelper {
 
     /**
-     *  通过数据源ID获取数据源描述对象
+     * 通过数据源ID获取数据源描述对象
+     *
      * @param dataSourceId 数据源ID
-     * @return  数据源描述对象
+     * @return 数据源描述对象
      */
     DataSourceApo getDataSourceApoById(String dataSourceId);
 
     /**
      * 根据数据源Apo配置创建并返回Druid连接池实例
+     * 不到万不得已，不要去创建一个新的实例
      */
     DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
 }
