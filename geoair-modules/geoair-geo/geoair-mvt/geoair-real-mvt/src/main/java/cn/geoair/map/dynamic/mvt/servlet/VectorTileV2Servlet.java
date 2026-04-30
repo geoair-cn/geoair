@@ -1,8 +1,6 @@
 package cn.geoair.map.dynamic.mvt.servlet;
 
 import cn.geoair.base.api.annotation.GaApi;
-import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
-import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
@@ -12,11 +10,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @GaApi(text = "矢量瓦片服务", tags = {"矢量瓦片服务"})
-
 public class VectorTileV2Servlet extends TileCommonServlet {
 
     public VectorTileV2Servlet() {
