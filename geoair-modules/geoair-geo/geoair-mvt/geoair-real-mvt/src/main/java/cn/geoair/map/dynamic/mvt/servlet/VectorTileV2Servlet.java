@@ -32,6 +32,9 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         log.info("初始化矢量瓦片 Servlet 完成");
     }
 
+    String  mockPbfUrl = "vectorTileService/v2/real/preview/1/2/3.pbf?paramTile=XXXX";
+    String  mockDebugUrl = "vectorTileService/v2/debug/preview/1/2/3.pbf?paramTile=XXXX";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI();
@@ -54,14 +57,14 @@ public class VectorTileV2Servlet extends TileCommonServlet {
      * 处理真实 PBF 瓦片请求
      */
     private void handleRealTile(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String pathInfo = request.getPathInfo();
+        String pathInfo = request.getPathInfo();    //   "/v2/real/preview/1/2/3.pbf"
         String[] parts = pathInfo.split("/");
 
         // parts格式: [ "", layerName, z, x, y.pbf ]
-        String layerName = parts[1];
-        int z = Integer.parseInt(parts[2]);
-        int x = Integer.parseInt(parts[3]);
-        String yStr = parts[4].replace(".pbf", "");
+        String layerName = parts[3];
+        int z = Integer.parseInt(parts[4]);
+        int x = Integer.parseInt(parts[5]);
+        String yStr = parts[6].replace(".pbf", "");
         int y = Integer.parseInt(yStr);
 
         // 获取参数
@@ -95,10 +98,10 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         String pathInfo = request.getPathInfo();
         String[] parts = pathInfo.split("/");
 
-        String layerName = parts[1];
-        int z = Integer.parseInt(parts[2]);
-        int x = Integer.parseInt(parts[3]);
-        String yStr = parts[4].replace(".pbf", "");
+        String layerName = parts[3];
+        int z = Integer.parseInt(parts[4]);
+        int x = Integer.parseInt(parts[5]);
+        String yStr = parts[6].replace(".pbf", "");
         int y = Integer.parseInt(yStr);
 
         String paramTile = request.getParameter("paramTile");
