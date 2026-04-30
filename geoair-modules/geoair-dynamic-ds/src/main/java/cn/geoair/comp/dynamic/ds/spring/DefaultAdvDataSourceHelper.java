@@ -25,6 +25,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 
     @Override
     public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
+        log.info("创建全新的数据源实例！jdbcUrl:{}", dataSourceApo.getJdbcUrl());
         try {
             // 创建新的Druid数据源
             DruidDataSource dataSourceNew = new DruidDataSource();
