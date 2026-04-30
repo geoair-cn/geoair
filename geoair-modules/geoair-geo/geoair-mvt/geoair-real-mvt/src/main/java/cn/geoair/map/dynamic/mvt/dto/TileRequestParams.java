@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
 import cn.hutool.core.util.ObjectUtil;
@@ -73,7 +74,7 @@ public class TileRequestParams {
         String jsonStr = JSON.toJSONString(this);
         // 移除空值，压缩体积
         JSONObject jsonObject = JSON.parseObject(jsonStr);
-        jsonObject.entrySet().removeIf(entry -> ObjectUtil.isEmpty(entry.getValue()));
+        jsonObject.entrySet().removeIf(entry -> GutilObject.isEmpty(entry.getValue()));
         // 对处理后的JSON字符串进行Base32编码
         String encode = Base32.encode(jsonObject.toString());
         return encode;
