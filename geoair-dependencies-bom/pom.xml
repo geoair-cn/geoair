@@ -192,13 +192,14 @@
                         <execution>
                             <phase>compile</phase>
                             <goals>
-                                <goal>jar</goal>
+                                <goal>jar-no-fork</goal>
                             </goals>
+                            <configuration>
+                                <attach>true</attach>
+                                <classifier>sources</classifier>  <!-- 相同的 classifier！ -->
+                            </configuration>
                         </execution>
                     </executions>
-                    <configuration>
-                        <attach>true</attach>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -300,14 +301,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!--生成API文档插件-->
