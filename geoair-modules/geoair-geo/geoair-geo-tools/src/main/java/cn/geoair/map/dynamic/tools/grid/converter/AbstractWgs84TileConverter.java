@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools.grid.converter;
 
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -349,5 +350,17 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         Envelope envelope = new Envelope(minX, maxX, minY, maxY);
         Envelope converted = sridConvertOpt.convert(envelope, 4326, targetSrid);
         return new BoxReferencedEnvelope(converted, targetSrid);
+    }
+
+    @Override
+    public RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid) {
+        Envelope convert = sridConvertOpt.convert(tileBox, srcSrid, 4326);
+        return tileRangeByBox(z, convert);
+    }
+
+    @Override
+    public RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid) {
+        Geometry transform = transform(geometry, srcSrid);
+        return tileRangeByGeom(z, transform);
     }
 }

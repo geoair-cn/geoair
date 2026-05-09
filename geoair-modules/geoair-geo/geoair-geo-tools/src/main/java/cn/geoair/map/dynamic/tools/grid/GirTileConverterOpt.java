@@ -42,19 +42,37 @@ public interface GirTileConverterOpt {
      * 地理范围转换为瓦片索引范围
      *
      * @param z       缩放级别
-     * @param tileBox 地理范围DTO
+     * @param tileBox 地理范围DTO ，srid 默认为 opt的Srid
      * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
      */
     RangeApo tileRangeByBox(int z, Envelope tileBox);
+    /**
+     * 地理范围转换为瓦片索引范围
+     *
+     * @param z       缩放级别
+     * @param tileBox 地理范围DTO ，srid 默认为 opt的Srid
+     * @param srcSrid 地理范围DTO  的srid
+     * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
+     */
+    RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid);
+    /**
+     * 将几何图形转换为瓦片坐标范围
+     *
+     * @param z        缩放级别
+     * @param geometry 几何图形对象 ，srid 默认为 opt的Srid
+     * @return 瓦片坐标范围对象
+     */
+    RangeApo tileRangeByGeom(int z, Geometry geometry);
 
     /**
      * 将几何图形转换为瓦片坐标范围
      *
      * @param z        缩放级别
      * @param geometry 几何图形对象
+     * @param srcSrid  geometry 对象的srid
      * @return 瓦片坐标范围对象
      */
-    RangeApo tileRangeByGeom(int z, Geometry geometry);
+    RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid);
 
     double tileXToCoordinateX(int x, int z);
 
@@ -167,7 +185,7 @@ public interface GirTileConverterOpt {
      * @param zxyList
      * @return
      */
-    BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList,int targetSrid);
+    BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList, int targetSrid);
 
     /**
      * 通过一组瓦片行列号的最大最小值获取覆盖的大边界框
@@ -175,7 +193,7 @@ public interface GirTileConverterOpt {
      * @param rangeApo
      * @return
      */
-    BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo ,int targetSrid);
+    BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo, int targetSrid);
 
     /**
      * 根据比例尺反推合适的瓦片层级

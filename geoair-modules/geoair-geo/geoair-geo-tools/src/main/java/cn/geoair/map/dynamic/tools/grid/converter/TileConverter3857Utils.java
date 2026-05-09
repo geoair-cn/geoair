@@ -92,6 +92,18 @@ public class TileConverter3857Utils extends TileConverterCommon {
         return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
+    @Override
+    public RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid) {
+        Envelope convert = sridConvertOpt.convert(tileBox, srcSrid, 3857);
+        return tileRangeByBox(z, convert);
+    }
+
+    @Override
+    public RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid) {
+        Geometry transform = transform(geometry, srcSrid);
+        return tileRangeByGeom(z, transform);
+    }
+
     /**
      * 瓦片X索引转3857坐标系X坐标（米）
      *
