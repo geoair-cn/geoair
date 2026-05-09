@@ -121,7 +121,7 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         tileYmin = clamp(tileYmin, 0, maxTileIndex);
         tileYmax = clamp(tileYmax, 0, maxTileIndex);
 
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax,z);
     }
 
     // ========== 瓦片坐标转换（非等轴逻辑） ==========

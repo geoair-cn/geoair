@@ -15,16 +15,22 @@ public class RangeApo {
     private int minY;
 
     private int maxY;
+    private int z;
 
     private Envelope envelope;
 
-    public RangeApo(double xMinNum, double xMaxNum, double yMinNum, double yMaxNum) {
+    public RangeApo(double xMinNum, double xMaxNum, double yMinNum, double yMaxNum,int z) {
         Envelope envelope = new Envelope(xMinNum, xMaxNum, yMinNum, yMaxNum);
         this.envelope = envelope;
         this.minX = (int) envelope.getMinX();
         this.maxX = (int) envelope.getMaxX();
         this.minY = (int) envelope.getMinY();
         this.maxY = (int) envelope.getMaxY();
+        this.z = z;
+    }
+
+    public int getZ() {
+        return z;
     }
 
     public int getMinX() {

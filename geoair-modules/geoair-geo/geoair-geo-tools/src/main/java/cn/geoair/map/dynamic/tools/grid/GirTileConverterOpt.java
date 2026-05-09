@@ -160,6 +160,23 @@ public interface GirTileConverterOpt {
      */
     Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int minZ, int maxZ);
 
+
+    /**
+     * 通过一组zxy获取这个zxy覆盖的大边界框
+     *
+     * @param zxyList
+     * @return
+     */
+    BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList,int targetSrid);
+
+    /**
+     * 通过一组瓦片行列号的最大最小值获取覆盖的大边界框
+     *
+     * @param rangeApo
+     * @return
+     */
+    BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo ,int targetSrid);
+
     /**
      * 根据比例尺反推合适的瓦片层级
      *

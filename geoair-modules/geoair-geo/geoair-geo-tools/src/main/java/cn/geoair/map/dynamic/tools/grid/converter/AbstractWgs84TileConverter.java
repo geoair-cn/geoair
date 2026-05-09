@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
 import cn.geoair.map.dynamic.tools.ToolsConfig;
+import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -224,7 +225,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         double scale = groundResolutionDegree * EPSG4326_TO_METERS / (0.0254 / dpi);
         // 计算每像素代表的实际长度（毫米）
 //        double mmPerPixel = groundResolutionDegree * 1000;
-        double mmPerPixel =( (2 * Math.PI * EARTH_RADIUS) / (Math.pow(2, maxZoom) * tilePixelSize))* 1000;
+        double mmPerPixel = ((2 * Math.PI * EARTH_RADIUS) / (Math.pow(2, maxZoom) * tilePixelSize)) * 1000;
         // 全局范围（4326坐标系）
         Envelope extent = new Envelope(MIN_LON, MAX_LON, MIN_LAT, MAX_LAT);
 
@@ -330,5 +331,23 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         double targetResolution = targetScale * 0.0254 / dpi;
 
         return getZoomByResolution(targetResolution, tilePixelSize);
+    }
+
+
+    @Override
+    public BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
+        validateXyz(zoom, (int) minTileX, (int) minTileY);
+        // 计算四个角的瓦片边界
+        // 左下角瓦片
+        double minX = tileXToCoordinateX((int) minTileX, zoom);
+        double minY = tileYToCoordinateY((int) (maxTileY + 1), zoom);  // 注意Y轴方向
+
+        // 右上角瓦片
+        double maxX = tileXToCoordinateX((int) (maxTileX + 1), zoom);
+        double maxY = tileYToCoordinateY((int) minTileY, zoom);
+
+        Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+        Envelope converted = sridConvertOpt.convert(envelope, 4326, targetSrid);
+        return new BoxReferencedEnvelope(converted, targetSrid);
     }
 }

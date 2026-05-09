@@ -89,7 +89,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
         tileYmax = Math.max(0, Math.min(tileYmax, maxTileIndex));
 
         // 4. 返回瓦片索引范围
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
     /**
@@ -265,6 +265,23 @@ public class TileConverter3857Utils extends TileConverterCommon {
         double targetResolution = targetScale * 0.0254 / dpi;
 
         return getZoomByResolution(targetResolution, tilePixelSize);
+    }
+
+    @Override
+    public BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
+        validateXyz(zoom, (int) minTileX, (int) minTileY);
+        // 计算四个角的瓦片边界
+        // 左下角瓦片
+        double minX = tileXToCoordinateX((int) minTileX, zoom);
+        double minY = tileYToCoordinateY((int) (maxTileY + 1), zoom);  // 注意Y轴方向
+
+        // 右上角瓦片
+        double maxX = tileXToCoordinateX((int) (maxTileX + 1), zoom);
+        double maxY = tileYToCoordinateY((int) minTileY, zoom);
+
+        Envelope envelope3857 = new Envelope(minX, maxX, minY, maxY);
+        Envelope converted = sridConvertOpt.convert(envelope3857, 3857, targetSrid);
+        return new BoxReferencedEnvelope(converted, targetSrid);
     }
 
     public static void main(String[] args) {
