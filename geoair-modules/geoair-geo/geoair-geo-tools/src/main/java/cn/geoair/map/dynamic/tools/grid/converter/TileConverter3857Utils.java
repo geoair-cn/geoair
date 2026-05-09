@@ -5,8 +5,11 @@ import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
@@ -86,7 +89,19 @@ public class TileConverter3857Utils extends TileConverterCommon {
         tileYmax = Math.max(0, Math.min(tileYmax, maxTileIndex));
 
         // 4. 返回瓦片索引范围
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
+    }
+
+    @Override
+    public RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid) {
+        Envelope convert = sridConvertOpt.convert(tileBox, srcSrid, 3857);
+        return tileRangeByBox(z, convert);
+    }
+
+    @Override
+    public RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid) {
+        Geometry transform = transform(geometry, srcSrid);
+        return tileRangeByGeom(z, transform);
     }
 
     /**
@@ -139,4 +154,203 @@ public class TileConverter3857Utils extends TileConverterCommon {
             int equalAxisY, int zoom, AbstractWgs84TileConverter.RoundingType roundingType) {
         return equalAxisY;
     }
+
+    /**
+     * 根据最大分辨率层级获取瓦片元数据（支持自定义瓦片尺寸和DPI）
+     *
+     * @param maxZoom       最大分辨率层级（最大缩放级别）
+     * @param tilePixelSize 瓦片像素尺寸（例如：256、512）
+     * @param dpi           屏幕DPI（例如：72、96、300）
+     * @return 瓦片层级元数据对象
+     */
+    public TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi) {
+        validateXyz(maxZoom, 0, 0);
+
+        double tileCount = Math.pow(2.0, maxZoom);
+        double tileSize = 2 * MAX_MERCATOR / tileCount;  // 每个瓦片的实际地理尺寸（米）
+        double totalWidth = 2 * MAX_MERCATOR;             // 整个3857平面的总宽度（米）
+
+        // 计算该层级下的瓦片总数
+        long totalTiles = (long) (tileCount * tileCount);
+
+        // 计算该层级的地面分辨率（每像素代表的米数）
+        double groundResolution = tileSize / tilePixelSize;
+
+        // 计算该层级的比例尺
+        // 公式：Scale = (Pixel Size in Meters) * DPI / 0.0254
+        // 其中 1英寸 = 0.0254米
+        double scale = groundResolution * dpi / 0.0254;
+
+        // 计算每像素代表的实际长度（毫米）
+        double mmPerPixel = groundResolution * 1000;
+
+        return new TileLevelMetadata(
+                maxZoom,
+                tileCount,
+                tileSize,
+                groundResolution,
+                groundResolution,
+                scale,
+                totalTiles,
+                tilePixelSize,
+                dpi,
+                mmPerPixel,
+                new Envelope(-MAX_MERCATOR, MAX_MERCATOR, -MAX_MERCATOR, MAX_MERCATOR),
+                "EPSG:3857");
+    }
+
+    /**
+     * 根据最大分辨率层级获取瓦片元数据（使用默认配置）
+     *
+     * @param maxZoom 最大分辨率层级
+     * @return 瓦片层级元数据对象
+     */
+    public TileLevelMetadata getTileLevelMetadata(int maxZoom) {
+        int defaultTileSize = advToolsConfig.getTilePixelSize() > 0
+                ? advToolsConfig.getTilePixelSize() : 256;
+        int defaultDpi = advToolsConfig.getDpi() > 0
+                ? advToolsConfig.getDpi() : 96;
+        return getTileLevelMetadata(maxZoom, defaultTileSize, defaultDpi);
+    }
+
+    /**
+     * 批量获取多个层级的瓦片元数据
+     *
+     * @param minZoom       最小层级
+     * @param maxZoom       最大层级
+     * @param tilePixelSize 瓦片像素尺寸
+     * @param dpi           屏幕DPI
+     * @return 层级元数据列表
+     */
+    public List<TileLevelMetadata> getTileLevelMetadataList(int minZoom, int maxZoom,
+                                                            int tilePixelSize, double dpi) {
+        if (minZoom < 0 || maxZoom < minZoom) {
+            throw new IllegalArgumentException("层级参数无效: minZoom=" + minZoom + ", maxZoom=" + maxZoom);
+        }
+
+        List<TileLevelMetadata> metadataList = new ArrayList<>();
+        for (int z = minZoom; z <= maxZoom; z++) {
+            metadataList.add(getTileLevelMetadata(z, tilePixelSize, dpi));
+        }
+        return metadataList;
+    }
+
+    /**
+     * 根据地面分辨率反推合适的瓦片层级
+     *
+     * @param targetResolution 目标地面分辨率（米/像素）
+     * @param tilePixelSize    瓦片像素尺寸
+     * @return 最合适的瓦片层级
+     */
+    public int getZoomByResolution(double targetResolution, int tilePixelSize) {
+        if (targetResolution <= 0) {
+            throw new IllegalArgumentException("分辨率必须大于0");
+        }
+
+        // 计算每个层级的地面分辨率，找到最接近的
+        for (int z = 0; z <= 22; z++) {  // 最大支持到22级
+            double tileSize = 2 * MAX_MERCATOR / Math.pow(2, z);
+            double resolution = tileSize / tilePixelSize;
+
+            if (resolution <= targetResolution) {
+                return z;
+            }
+        }
+        return 22;  // 返回最大层级
+    }
+
+    /**
+     * 根据比例尺反推合适的瓦片层级
+     *
+     * @param targetScale   目标比例尺（例如：10000 表示 1:10000）
+     * @param tilePixelSize 瓦片像素尺寸
+     * @param dpi           屏幕DPI
+     * @return 最合适的瓦片层级
+     */
+    public int getZoomByScale(double targetScale, int tilePixelSize, double dpi) {
+        if (targetScale <= 0) {
+            throw new IllegalArgumentException("比例尺必须大于0");
+        }
+
+        // 根据比例尺计算地面分辨率
+        // 公式：Resolution = Scale * 0.0254 / DPI
+        double targetResolution = targetScale * 0.0254 / dpi;
+
+        return getZoomByResolution(targetResolution, tilePixelSize);
+    }
+
+    @Override
+    public BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
+        validateXyz(zoom, (int) minTileX, (int) minTileY);
+        // 计算四个角的瓦片边界
+        // 左下角瓦片
+        double minX = tileXToCoordinateX((int) minTileX, zoom);
+        double minY = tileYToCoordinateY((int) (maxTileY + 1), zoom);  // 注意Y轴方向
+
+        // 右上角瓦片
+        double maxX = tileXToCoordinateX((int) (maxTileX + 1), zoom);
+        double maxY = tileYToCoordinateY((int) minTileY, zoom);
+
+        Envelope envelope3857 = new Envelope(minX, maxX, minY, maxY);
+        Envelope converted = sridConvertOpt.convert(envelope3857, 3857, targetSrid);
+        return new BoxReferencedEnvelope(converted, targetSrid);
+    }
+
+    public static void main(String[] args) {
+        Test3857();
+        System.out.println();
+
+        Test4326();
+    }
+
+    public static void Test3857() {
+        TileConverter3857Utils converter = new TileConverter3857Utils(ToolsConfig.of());
+        TileLevelMetadata metadata1 = converter.getTileLevelMetadata(10);
+        System.out.println(metadata1);
+
+        // 示例2：自定义瓦片尺寸和DPI
+        TileLevelMetadata metadata2 = converter.getTileLevelMetadata(10, 256, 96);
+        System.out.println(metadata2);
+
+        // 示例3：批量获取多个层级的元数据（打印质量）
+        List<TileLevelMetadata> metadataList = converter.getTileLevelMetadataList(0, 10, 256, 96);
+        for (TileLevelMetadata meta : metadataList) {
+            System.out.println(meta);
+        }
+
+        // 示例4：根据地面分辨率找层级
+        double targetResolution = 0.1;  // 希望每像素0.1米
+        int zoom = converter.getZoomByResolution(targetResolution, 256);
+        System.out.println("分辨率 " + targetResolution + " m/px 对应的层级: " + zoom);
+
+        // 示例5：根据比例尺找层级
+        int zoomByScale = converter.getZoomByScale(10000, 256, 96);  // 1:10000比例尺
+        System.out.println("1:10000比例尺对应的层级: " + zoomByScale);
+    }
+
+    public static void Test4326() {
+        Wgs84EqualAxisTileUtils converter = new Wgs84EqualAxisTileUtils(ToolsConfig.of());
+        TileLevelMetadata metadata1 = converter.getTileLevelMetadata(10);
+        System.out.println(metadata1);
+
+        // 示例2：自定义瓦片尺寸和DPI
+        TileLevelMetadata metadata2 = converter.getTileLevelMetadata(10, 256, 96);
+        System.out.println(metadata2);
+
+        // 示例3：批量获取多个层级的元数据（打印质量）
+        List<TileLevelMetadata> metadataList = converter.getTileLevelMetadataList(0, 10, 256, 96);
+        for (TileLevelMetadata meta : metadataList) {
+            System.out.println(meta);
+        }
+
+//        // 示例4：根据地面分辨率找层级
+//        double targetResolution = 0.1;  // 希望每像素0.1米
+//        int zoom = converter.getZoomByResolution(targetResolution, 256);
+//        System.out.println("分辨率 " + targetResolution + " m/px 对应的层级: " + zoom);
+//
+//        // 示例5：根据比例尺找层级
+//        int zoomByScale = converter.getZoomByScale(10000, 256, 96);  // 1:10000比例尺
+//        System.out.println("1:10000比例尺对应的层级: " + zoomByScale);
+    }
+
 }

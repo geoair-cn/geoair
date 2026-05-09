@@ -31,4 +31,8 @@ public class ToolsConfig {
     // 非线程安全（只持有构造器，不持有实例）
     private Supplier<WKTReader> wktReaderSupplier = WKTReader::new;
     private Supplier<WKBReader> wkbReaderSupplier = WKBReader::new;
+
+
+    private int tilePixelSize = 256;  // 默认瓦片尺寸
+    private int dpi = 96;             // 默认DPI（屏幕标准DPI）
 }
