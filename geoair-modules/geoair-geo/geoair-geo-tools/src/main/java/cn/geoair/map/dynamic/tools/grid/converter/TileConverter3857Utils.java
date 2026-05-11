@@ -285,10 +285,10 @@ public class TileConverter3857Utils extends TileConverterCommon {
         // 计算四个角的瓦片边界
         // 左下角瓦片
         double minX = tileXToCoordinateX((int) minTileX, zoom);
-        double minY = tileYToCoordinateY((int) (maxTileY + 1), zoom);  // 注意Y轴方向
+        double minY = tileYToCoordinateY((int) (maxTileY  ), zoom);  // 注意Y轴方向
 
         // 右上角瓦片
-        double maxX = tileXToCoordinateX((int) (maxTileX + 1), zoom);
+        double maxX = tileXToCoordinateX((int) (maxTileX  ), zoom);
         double maxY = tileYToCoordinateY((int) minTileY, zoom);
 
         Envelope envelope3857 = new Envelope(minX, maxX, minY, maxY);
