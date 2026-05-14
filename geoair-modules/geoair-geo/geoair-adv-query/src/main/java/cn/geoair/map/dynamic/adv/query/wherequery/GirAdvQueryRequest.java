@@ -154,7 +154,11 @@ public class GirAdvQueryRequest {
         } else {
             this.fieldNames = builder.fieldNames;
         }
-        this.whereOption = builder.whereOption;
+        if (GutilObject.isEmpty(builder.whereOption)) {
+            this.whereOption = GirAdvWhereFilter.of();
+        } else {
+            this.whereOption = builder.whereOption;
+        }
         this.nullHandling = builder.nullHandling;
         this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
         this.pageNum = builder.pageNum;
@@ -624,7 +628,7 @@ public class GirAdvQueryRequest {
          */
         public GirAdvQueryRequest build() {
             // 校验：两种模式至少选一种
-            boolean hasObjectMode = tableOrSqlView != null && whereOption != null;
+            boolean hasObjectMode = tableOrSqlView != null;
             boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
             if (!hasObjectMode && !hasCustomSqlMode) {
