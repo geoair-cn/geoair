@@ -624,7 +624,7 @@ public class GirAdvQueryRequest {
          */
         public GirAdvQueryRequest build() {
             // 校验：两种模式至少选一种
-            boolean hasObjectMode = tableOrSqlView != null && fieldNames != null && whereOption != null;
+            boolean hasObjectMode = tableOrSqlView != null && whereOption != null;
             boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
             if (!hasObjectMode && !hasCustomSqlMode) {
@@ -637,9 +637,6 @@ public class GirAdvQueryRequest {
             if (hasObjectMode) {
                 if (tableOrSqlView.trim().isEmpty()) {
                     throw new IllegalArgumentException("tableOrViewName cannot be empty");
-                }
-                if (fieldNames.isEmpty()) {
-                    throw new IllegalArgumentException("fieldNames cannot be empty");
                 }
             }
 
