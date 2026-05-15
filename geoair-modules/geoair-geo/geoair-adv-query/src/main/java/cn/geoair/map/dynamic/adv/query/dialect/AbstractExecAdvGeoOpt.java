@@ -517,7 +517,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt = advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        }
         return eSelectOne(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
@@ -540,7 +544,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public GirAdvOneRow eSelectOne(
             String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt = advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        }
         return eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
@@ -569,7 +577,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt = advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList =  eGetGeomColumnNameListBySql(sql);
+        }
         return eSelectList(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
@@ -592,7 +604,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<GirAdvOneRow> eSelectList(
             String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt = advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        }
         return eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 

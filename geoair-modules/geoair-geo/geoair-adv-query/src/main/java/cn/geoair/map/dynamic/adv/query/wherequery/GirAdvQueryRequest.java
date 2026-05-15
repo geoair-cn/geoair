@@ -38,6 +38,10 @@ public class GirAdvQueryRequest {
      * @return 表名或视图名
      */
     private final String tableOrSqlView;
+    /**
+     * 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
+     */
+    private final String sqlViewTableNameAlias;
 
     /**
      * 查询字段名列表（必填）
@@ -149,6 +153,7 @@ public class GirAdvQueryRequest {
     private GirAdvQueryRequest(Builder builder) {
         // 模式一参数
         this.tableOrSqlView = builder.tableOrSqlView;
+        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
         if (GutilObject.isEmpty(builder.fieldNames)) {
             this.fieldNames = ListUtil.of("*");
         } else {
@@ -281,6 +286,11 @@ public class GirAdvQueryRequest {
         private String tableOrSqlView;
 
         /**
+         * 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
+         */
+        private String sqlViewTableNameAlias;
+
+        /**
          * 查询字段名列表
          */
         private List<String> fieldNames;
@@ -352,6 +362,22 @@ public class GirAdvQueryRequest {
          */
         public Builder table(String tableOrSqlView) {
             this.tableOrSqlView = tableOrSqlView;
+            return this;
+        }
+
+        /**
+         * 表名或一个一个完整带结果的SQL
+         * table ：user
+         * sqlView：select * from user
+         * 不支持的写法 ( select * from user )  as alias
+         *
+         * @param tableOrSqlView        表名或sql
+         * @param sqlViewTableNameAlias 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
+         * @return Builder实例
+         */
+        public Builder table(String tableOrSqlView, String sqlViewTableNameAlias) {
+            this.tableOrSqlView = tableOrSqlView;
+            this.sqlViewTableNameAlias = sqlViewTableNameAlias;
             return this;
         }
 
