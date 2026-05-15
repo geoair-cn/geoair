@@ -313,12 +313,12 @@ public class GirAdvQueryRequest {
         /**
          * 页码
          */
-        private Integer pageNum;
+        private Integer pageNum = 1;
 
         /**
          * 每页条数
          */
-        private Integer pageSize;
+        private Integer pageSize = 25;
 
         /**
          * 页码起始规则（默认false，从1开始）
