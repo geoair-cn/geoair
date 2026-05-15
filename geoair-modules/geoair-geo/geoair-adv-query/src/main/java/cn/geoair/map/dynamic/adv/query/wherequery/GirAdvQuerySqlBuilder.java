@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
@@ -123,7 +124,8 @@ public class GirAdvQuerySqlBuilder {
         boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
         if (b) {
             String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
-            String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
+            String aliasTableName = GutilObject.isEmpty(param.getSqlViewTableNameAlias()) ? dialectProcessor.tbGetTempAliasTableName() : param.getSqlViewTableNameAlias();
+            String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), aliasTableName);
             sql.append(aliasTable);
         } else {
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
