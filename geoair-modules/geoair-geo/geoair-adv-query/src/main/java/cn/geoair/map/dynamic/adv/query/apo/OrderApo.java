@@ -93,11 +93,11 @@ public class OrderApo implements Serializable {
     }
 
     public static OrderApo ofDescFieldName(String fieldName) {
-        return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(AdvEnumsOrder.升序);
+        return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(AdvEnumsOrder.降序);
     }
 
     public static OrderApo ofASCFieldName(String fieldName) {
-        return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(AdvEnumsOrder.降序);
+        return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(AdvEnumsOrder.升序);
     }
 
 
