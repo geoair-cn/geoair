@@ -125,7 +125,8 @@ public class GirAdvQuerySqlBuilder {
         if (b) {
             String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
             String aliasTableName = GutilObject.isEmpty(param.getSqlViewTableNameAlias()) ? dialectProcessor.tbGetTempAliasTableName() : param.getSqlViewTableNameAlias();
-            String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), aliasTableName);
+            String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
+            String aliasTable = StrUtil.format(format,sqlView , aliasTableName);
             sql.append(aliasTable);
         } else {
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
