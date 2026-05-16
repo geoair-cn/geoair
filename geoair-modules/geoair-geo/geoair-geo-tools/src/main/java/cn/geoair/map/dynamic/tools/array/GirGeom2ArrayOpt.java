@@ -68,6 +68,49 @@ public interface GirGeom2ArrayOpt {
      */
     Point doubleArrayToPointFast(double[] coords, CoordOrder order);
 
+
+    //==========================list类型传参===========================
+
+    /**
+     * 一维坐标数组转换为Point（默认X在前）
+     *
+     * @param coords 一维坐标数组 [x, y]
+     * @return JTS Point对象，空数组/非法格式抛出异常
+     * @throws IllegalArgumentException 坐标格式错误时抛出
+     */
+    Point doubleListToPoint(List<Double> coords);
+
+    /**
+     * 一维坐标数组转换为Point（支持指定坐标顺序）
+     *
+     * @param coords 一维坐标数组（按order指定的顺序排列）
+     * @param order  坐标顺序（X_FIRST：数组是[x,y]；Y_FIRST：数组是[y,x]）
+     * @return JTS Point对象，空数组/非法格式抛出异常
+     * @throws IllegalArgumentException 坐标格式错误时抛出
+     */
+    Point doubleListToPoint(List<Double> coords, CoordOrder order);
+
+    /**
+     * 重载：支持指定几何工厂+坐标顺序
+     *
+     * @param coords  一维坐标数组
+     * @param order   坐标顺序（X_FIRST/Y_FIRST）
+     * @param factory 自定义GeometryFactory（比如指定SRID）
+     * @return Point对象
+     */
+    Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory);
+
+    /**
+     * 快速转换（跳过严格校验，仅用于信任的坐标数据） 性能优先，不校验数值合法性，直接转换
+     *
+     * @param coords 一维坐标数组
+     * @param order  坐标顺序（X_FIRST/Y_FIRST）
+     * @return Point对象
+     */
+    Point doubleListToPointFast(List<Double> coords, CoordOrder order);
+
+
+
     /**
      * 通用坐标数组转换为Geometry（自动识别Point/LineString）
      *
@@ -184,7 +227,7 @@ public interface GirGeom2ArrayOpt {
      * @return JTS LineString对象，空数组返回空LineString
      * @throws IllegalArgumentException 坐标格式错误时抛出
      */
-    LineString doubleArrayToLineString(List<double[]> coords);
+    LineString doubleListToLineString(List<double[]> coords);
 
     /**
      * 二维坐标数组转换为LineString（支持指定坐标顺序，严格保证点顺序）
@@ -194,7 +237,7 @@ public interface GirGeom2ArrayOpt {
      * @return JTS LineString对象，空数组返回空LineString
      * @throws IllegalArgumentException 坐标格式错误时抛出
      */
-    LineString doubleArrayToLineString(List<double[]> coords, CoordOrder order);
+    LineString doubleListToLineString(List<double[]> coords, CoordOrder order);
 
     /**
      * 重载：支持指定几何工厂+坐标顺序
@@ -204,7 +247,7 @@ public interface GirGeom2ArrayOpt {
      * @param factory 自定义GeometryFactory（比如指定SRID）
      * @return LineString对象
      */
-    LineString doubleArrayToLineString(
+    LineString doubleListToLineString(
             List<double[]> coords, CoordOrder order, GeometryFactory factory);
 
     /**
@@ -214,7 +257,7 @@ public interface GirGeom2ArrayOpt {
      * @param order  坐标顺序（X_FIRST/Y_FIRST）
      * @return LineString对象
      */
-    LineString doubleArrayToLineStringFast(List<double[]> coords, CoordOrder order);
+    LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order);
 
 
 }

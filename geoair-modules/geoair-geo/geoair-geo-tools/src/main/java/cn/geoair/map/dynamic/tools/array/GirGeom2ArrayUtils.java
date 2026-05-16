@@ -1,12 +1,10 @@
 package cn.geoair.map.dynamic.tools.array;
 
 import cn.geoair.map.dynamic.tools.ToolsConfig;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import org.locationtech.jts.geom.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -178,6 +176,38 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
+    public Point doubleListToPoint(List<Double> coords) {
+        double[] doubles = coords.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+        return doubleArrayToPoint(doubles);
+    }
+
+    @Override
+    public Point doubleListToPoint(List<Double> coords, CoordOrder order) {
+        double[] doubles = coords.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+        return doubleArrayToPoint(doubles, order);
+    }
+
+    @Override
+    public Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory) {
+        double[] doubles = coords.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+        return doubleArrayToPoint(doubles, order, factory);
+    }
+
+    @Override
+    public Point doubleListToPointFast(List<Double> coords, CoordOrder order) {
+        double[] doubles = coords.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+        return doubleArrayToPointFast(doubles, order);
+    }
+
+    @Override
     public Geometry doubleArrayToGeometry(Object coords, CoordOrder order) {
         return doubleArrayToGeometry(coords, order, advToolsConfig.getGeometryFactory());
     }
@@ -268,25 +298,25 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
-    public LineString doubleArrayToLineString(List<double[]> coords) {
+    public LineString doubleListToLineString(List<double[]> coords) {
         double[][] coordsArray = coords.toArray(new double[0][]);
         return doubleArrayToLineString(coordsArray, CoordOrder.X_FIRST);
     }
 
     @Override
-    public LineString doubleArrayToLineString(List<double[]> coords, CoordOrder order) {
+    public LineString doubleListToLineString(List<double[]> coords, CoordOrder order) {
         double[][] coordsArray = coords.toArray(new double[0][]);
         return doubleArrayToLineString(coordsArray, order);
     }
 
     @Override
-    public LineString doubleArrayToLineString(List<double[]> coords, CoordOrder order, GeometryFactory factory) {
+    public LineString doubleListToLineString(List<double[]> coords, CoordOrder order, GeometryFactory factory) {
         double[][] coordsArray = coords.toArray(new double[0][]);
         return doubleArrayToLineString(coordsArray, order, factory);
     }
 
     @Override
-    public LineString doubleArrayToLineStringFast(List<double[]> coords, CoordOrder order) {
+    public LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order) {
         double[][] coordsArray = coords.toArray(new double[0][]);
         return doubleArrayToLineStringFast(coordsArray, order);
     }
