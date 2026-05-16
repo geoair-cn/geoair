@@ -88,7 +88,7 @@ public interface IAdvBaseAccessOpt {
     Integer bInsertOne(String tableName, Map<String, Object> rowData);
 
     /**
-     * 插入单条Java对象数据 字段名称默认不转下划线
+     * 插入单条Java对象数据 字段名称默认转下划线
      *
      * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配
      *
@@ -125,7 +125,7 @@ public interface IAdvBaseAccessOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase );
+    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
@@ -202,22 +202,85 @@ public interface IAdvBaseAccessOpt {
      * <p>基于数据库唯一索引/主键实现，避免重复插入，适用于无需更新仅需插入的场景 （PostgreSQL：ON CONFLICT DO NOTHING；MySQL：INSERT
      * IGNORE INTO）
      *
-     * @param tableName 目标表名
-     * @param rowData   单行数据
+     * @param tableName    目标表名
+     * @param rowData      单行数据
+     * @param conflictKeys 冲突判定字段（唯一索引/主键）
      * @return Integer 成功插入的行数（存在则返回0，不存在则返回1）
      */
-    Integer bInsertIgnore(String tableName, Map<String, Object> rowData);
+    Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys);
+
+
+    /**
+     * 插入单条Java对象数据 字段名称默认转下划线
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配
+     *
+     * @param tableName    目标表名（如：user）
+     * @param entity       待插入的Java对象（如User实体类）
+     * @param conflictKeys 冲突判定字段（唯一索引/主键）
+     * @param <T>          实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys);
+
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param conflictKeys      冲突判定字段（唯一索引/主键）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param ignoreNullValue   是否忽略值为空的字段
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
+
+
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param conflictKeys      冲突判定字段（唯一索引/主键）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase);
+
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param conflictKeys      冲突判定字段（唯一索引/主键）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param ignoreNullValue   是否忽略值为空的字段
+     * @param ignoreFieldNames  插入的时候，忽略哪些字段，这里传你实体里面的字段名称
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
+
 
     /**
      * 批量插入或忽略
      *
-     * @param tableName 目标表名
-     * @param headers   字段名集合
-     * @param rowsData  多行数据列表
+     * @param tableName    目标表名
+     * @param headers      字段名集合
+     * @param rowsData     多行数据列表
+     * @param conflictKeys 冲突判定字段（唯一索引/主键）
      * @return Integer 成功插入的记录总数（已存在的记录不计入）
      */
     Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData);
+            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys);
 
     /**
      * 插入或更新（存在则更新指定字段，不存在则插入）

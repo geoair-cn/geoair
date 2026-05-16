@@ -1,16 +1,11 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.hutool.core.bean.copier.BeanCopier;
-import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.StrUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -124,14 +119,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData);
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, );
     }
 
     @Override
     public Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData);
+            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, );
     }
 
     @Override

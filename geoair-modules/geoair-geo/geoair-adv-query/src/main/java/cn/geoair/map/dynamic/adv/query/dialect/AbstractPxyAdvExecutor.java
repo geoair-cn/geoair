@@ -218,14 +218,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, rowData);
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, rowData, );
     }
 
     @Override
     public Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData);
+            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, );
     }
 
     @Override

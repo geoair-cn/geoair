@@ -12,13 +12,9 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.BeanCopier;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
-import cn.hutool.core.lang.Editor;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
@@ -121,26 +117,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        Map<String, Object> rowData = new HashMap<>();
-        BeanCopier.create(entity, rowData,
-                CopyOptions.create()
-                        .setIgnoreNullValue(ignoreNullValue)
-                        .setTransientSupport(true)
-                        .setFieldNameEditor(key -> {
-                            if (ignoreFieldNames != null && ignoreFieldNames.contains(key)) {
-                                return null;
-                            }
-                            if (isToUnderlineCase) {
-                                return StrUtil.toUnderlineCase(key);
-                            }
-                            return key;
-                        })
-        ).copy();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
         return bInsertOne(tableName, rowData);
     }
+
 
     // ========== 通用逻辑：批量插入 ==========
     @Override
@@ -221,7 +204,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     // ========== 通用逻辑：插入忽略 ==========
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
@@ -247,8 +230,10 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
+
+
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
         validateTableNameAndData(tableName, ListUtil.toList(headers), rowsData);
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, DEFAULT_BATCH_SIZE);
         int totalSuccess = 0;
@@ -257,7 +242,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         stopWatch.start();
         for (List<Map<String, Object>> batch : batches) {
             for (Map<String, Object> row : batch) {
-                totalSuccess += bInsertIgnore(tableName, row);
+                totalSuccess += bInsertIgnore(tableName, row, );
             }
         }
         stopWatch.stop();
