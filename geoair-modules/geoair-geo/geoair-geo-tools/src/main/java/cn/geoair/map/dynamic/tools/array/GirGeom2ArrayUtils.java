@@ -115,6 +115,30 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
+    public Point pointByDouble(double x, double y) {
+        return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(x, y));
+    }
+
+    @Override
+    public Point pointByString(String x, String y) {
+        // 1. 空值校验
+        if (x == null || y == null) {
+            return null;
+        }
+        try {
+            // 2. 字符串转 double
+            double longitude = Double.parseDouble(x.trim());
+            double latitude = Double.parseDouble(y.trim());
+
+            // 3. 调用上面的 double 方法创建点
+            return pointByDouble(longitude, latitude);
+        } catch (NumberFormatException e) {
+            // 格式错误返回 null（或抛出异常，看业务需求）
+            return null;
+        }
+    }
+
+    @Override
     public Point doubleArrayToPoint(double[] coords) {
         return doubleArrayToPoint(coords, CoordOrder.X_FIRST);
     }
