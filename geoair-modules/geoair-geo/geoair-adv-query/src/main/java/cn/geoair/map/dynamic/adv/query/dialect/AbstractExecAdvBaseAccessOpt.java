@@ -178,6 +178,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
+            AdvLogSql.of(dataSourceGetter).logExecuteError(
+                    this.getClass(), "bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
         } finally {
             restoreAutoCommit(connection);

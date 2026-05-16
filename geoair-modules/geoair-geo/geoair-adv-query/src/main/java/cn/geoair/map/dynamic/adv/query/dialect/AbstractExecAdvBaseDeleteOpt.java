@@ -22,7 +22,9 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现 */
+/**
+ * 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现
+ */
 public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
 
     // 注入数据源获取器
@@ -70,7 +72,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteBySql", execSql, jdbcParams, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteBySql", execSql, jdbcParams, cost, result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("执行自定义删除SQL失败，SQL：" + execSql, e);
@@ -96,7 +98,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost, result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -136,9 +138,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             long cost = stopWatch.getLastTaskTimeMillis();
 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
-                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ",tableName, totalSuccess ), cost,totalSuccess);
+                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(
+                    this.getClass(),
+                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), e);
             rollbackConnection(connection);
             throw new RuntimeException("批量主键删除失败，表名：" + tableName, e);
         } finally {
@@ -171,7 +176,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
 
         AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
-                "bDeleteBatchWithBatchSize", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}",tableName, totalSuccess, batchSize), cost,totalSuccess);
+                "bDeleteBatchWithBatchSize", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
         return totalSuccess;
     }
 
@@ -196,7 +201,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bDeleteByCondition", execSql, params, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByCondition", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
@@ -239,7 +244,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),
-                    "bDeleteBatchByCondition", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}",tableName, totalSuccess, batchSize), cost,totalSuccess);
+                    "bDeleteBatchByCondition", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -269,7 +274,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bLogicDelete", execSql, params, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bLogicDelete", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("逻辑删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
@@ -364,8 +369,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             closeConnection(connection);
         }
     }
-
-
 
 
     // ====================== 原有工具方法不动 ======================
