@@ -258,6 +258,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
+        List<String> conflictKeysCopy = new ArrayList<>( );
+        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+            for (String conflictKey : conflictKeys) {
+                conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
+            }
+        }
+        conflictKeys = conflictKeysCopy;
         return bInsertIgnore(tableName, rowData, conflictKeys);
     }
 

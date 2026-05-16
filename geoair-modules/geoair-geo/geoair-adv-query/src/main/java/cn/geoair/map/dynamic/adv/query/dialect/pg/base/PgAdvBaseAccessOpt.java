@@ -29,11 +29,12 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String conflictFields = "";
-        if (GutilObject.isEmpty(conflictKeys)) {
-            conflictFields = String.join(",", conflictKeys);
+        if (GutilObject.isNotEmpty(conflictKeys)) {
+            conflictFields = StrUtil.join(",", conflictKeys);
+            conflictFields=   StrUtil.wrap(conflictFields,"(",")");
         }
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}({}) DO NOTHING",
+                "INSERT INTO {} ({}) VALUES ({}) {} {} DO NOTHING",
                 tableName,
                 fields,
                 placeholders,
