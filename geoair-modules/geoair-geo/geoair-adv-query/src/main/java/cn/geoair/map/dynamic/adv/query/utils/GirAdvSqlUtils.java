@@ -9,11 +9,15 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.hutool.core.bean.copier.BeanCopier;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ：张俊
@@ -37,6 +41,36 @@ public class GirAdvSqlUtils {
         }
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(dynamicSql);
         return SqlEngineUtil.getEngine().parse(cleanSql, (SqlParamMap) sqlParam);
+    }
+
+
+    /**
+     * bean对象转换成 键值对的map
+     *
+     * @param entity
+     * @param isToUnderlineCase
+     * @param ignoreNullValue
+     * @param ignoreFieldNames
+     * @param <T>
+     * @return
+     */
+    public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        Map<String, Object> rowData = new HashMap<>();
+        BeanCopier.create(entity, rowData,
+                CopyOptions.create()
+                        .setIgnoreNullValue(ignoreNullValue)
+                        .setTransientSupport(true)
+                        .setFieldNameEditor(key -> {
+                            if (ignoreFieldNames != null && ignoreFieldNames.contains(key)) {
+                                return null;
+                            }
+                            if (isToUnderlineCase) {
+                                return StrUtil.toUnderlineCase(key);
+                            }
+                            return key;
+                        })
+        ).copy();
+        return rowData;
     }
 
 }

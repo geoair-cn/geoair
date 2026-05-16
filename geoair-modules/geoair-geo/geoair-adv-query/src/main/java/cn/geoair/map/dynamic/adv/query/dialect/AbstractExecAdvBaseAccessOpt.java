@@ -12,13 +12,9 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.BeanCopier;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
-import cn.hutool.core.lang.Editor;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
@@ -45,10 +41,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
     protected abstract String buildInsertIgnoreSql(
-            String tableName, String fields, String placeholders);
+            String tableName, String fields, String placeholders, Set<String> conflictKeys);
 
-    protected abstract String buildInsertOrUpdateSql(
-            String tableName, String fields, String placeholders, Set<String> updateFields);
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
@@ -121,26 +115,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        Map<String, Object> rowData = new HashMap<>();
-        BeanCopier.create(entity, rowData,
-                CopyOptions.create()
-                        .setIgnoreNullValue(ignoreNullValue)
-                        .setTransientSupport(true)
-                        .setFieldNameEditor(key -> {
-                            if (ignoreFieldNames != null && ignoreFieldNames.contains(key)) {
-                                return null;
-                            }
-                            if (isToUnderlineCase) {
-                                return StrUtil.toUnderlineCase(key);
-                            }
-                            return key;
-                        })
-        ).copy();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
         return bInsertOne(tableName, rowData);
     }
+
 
     // ========== 通用逻辑：批量插入 ==========
     @Override
@@ -221,14 +202,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     // ========== 通用逻辑：插入忽略 ==========
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         String fields = String.join(",", rowData.keySet());
         String placeholders = buildPlaceholders(rowData.keySet().size());
-        String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders);
+        String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
 
         List<Object> params = new ArrayList<>(rowData.values());
         StopWatch stopWatch = new StopWatch();
@@ -247,8 +228,37 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
+
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys) {
+        return bInsertIgnore(tableName, entity, conflictKeys, true);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, false);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
+        }
+        return bInsertIgnore(tableName, rowData, conflictKeys);
+    }
+
+
+    @Override
+    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
         validateTableNameAndData(tableName, ListUtil.toList(headers), rowsData);
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, DEFAULT_BATCH_SIZE);
         int totalSuccess = 0;
@@ -257,7 +267,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         stopWatch.start();
         for (List<Map<String, Object>> batch : batches) {
             for (Map<String, Object> row : batch) {
-                totalSuccess += bInsertIgnore(tableName, row);
+                totalSuccess += bInsertIgnore(tableName, row, conflictKeys);
             }
         }
         stopWatch.stop();
@@ -266,35 +276,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         return totalSuccess;
     }
 
-    // ========== 通用逻辑：插入或更新（UPSERT） ==========
-    @Override
-    public Integer bInsertOrUpdate(String tableName, Map<String, Object> rowData, Set<String> updateFields) {
-        validateTableNameAndData(tableName, rowData);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        Set<String> finalUpdateFields = CollUtil.isEmpty(updateFields) ? rowData.keySet() : updateFields;
-
-        String fields = String.join(",", rowData.keySet());
-        String placeholders = buildPlaceholders(rowData.keySet().size());
-        String execSql = buildInsertOrUpdateSql(quoteTableName, fields, placeholders, finalUpdateFields);
-
-        List<Object> params = new ArrayList<>(rowData.values());
-        StopWatch stopWatch = new StopWatch();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertOrUpdate", execSql, params, cost, result);
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException("插入或更新操作失败，表名：" + tableName, e);
-        } finally {
-            closeConnection(connection);
-        }
-    }
 
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
