@@ -209,7 +209,7 @@ public interface IAdvBaseAccessOpt {
      * @param conflictKeys 冲突判定字段（唯一索引/主键）
      * @return Integer 成功插入的行数（存在则返回0，不存在则返回1）
      */
-    Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys);
+    Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys);
 
 
 
@@ -225,7 +225,7 @@ public interface IAdvBaseAccessOpt {
      * @param <T>          实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys);
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
@@ -240,7 +240,7 @@ public interface IAdvBaseAccessOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
 
 
     /**
@@ -255,7 +255,7 @@ public interface IAdvBaseAccessOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase);
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
@@ -271,7 +271,7 @@ public interface IAdvBaseAccessOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
 
 
     /**
@@ -284,7 +284,7 @@ public interface IAdvBaseAccessOpt {
      * @return Integer 成功插入的记录总数（已存在的记录不计入）
      */
     Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys);
+            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys);
 
 
 }

@@ -319,13 +319,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     // ========== 通用逻辑：更新或插入（UPSERT） ==========
     @Override
     public Integer bUpdateOrInsert(
-            String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return bUpsert(tableName, rowData, conflictKeys);
     }
 
 
     @Override
-    public Integer bUpsert(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+    public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         validateTableName(tableName);
         validateUpdateData(rowData);
         if (CollUtil.isEmpty(conflictKeys)) {
@@ -360,22 +360,22 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys) {
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys) {
         return bUpsert(tableName, entity, conflictKeys, true);
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
         return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, false);
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
@@ -387,17 +387,17 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
-    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true);
     }
 
     @Override
-    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys) {
+    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys) {
         return bUpsert(tableName, entity, conflictKeys, true, true);
     }
 
     @Override
-    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, List<String> ignoreFieldNames) {
+    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
     }
 
@@ -441,7 +441,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(" AND "));
     }
 
-    protected String buildUpsertUpdateClause(Map<String, Object> rowData, Set<String> conflictKeys) {
+    protected String buildUpsertUpdateClause(Map<String, Object> rowData, List<String> conflictKeys) {
         return rowData.keySet()
                 .stream()
                 .filter(field -> !conflictKeys.contains(field))

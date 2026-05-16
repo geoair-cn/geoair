@@ -19,7 +19,7 @@ public class MysqlAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, Set<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
         return StrUtil.format(
                 "INSERT IGNORE INTO {} ({}) VALUES ({})", tableName, fields, placeholders);
     }

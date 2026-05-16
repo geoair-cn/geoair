@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, Set<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String conflictFields = "";
         if (GutilObject.isEmpty(conflictKeys)) {
             conflictFields = String.join(",", conflictKeys);

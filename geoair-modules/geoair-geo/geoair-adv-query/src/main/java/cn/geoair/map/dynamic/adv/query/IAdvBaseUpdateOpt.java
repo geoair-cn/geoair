@@ -257,7 +257,7 @@ public interface IAdvBaseUpdateOpt {
      */
     @Deprecated()
     Integer bUpdateOrInsert(
-            String tableName, Map<String, Object> rowData, Set<String> conflictKeys);
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys);
 
     /**
      * 更新或插入（UPSERT）
@@ -269,7 +269,7 @@ public interface IAdvBaseUpdateOpt {
      * @param conflictKeys 冲突判定字段（唯一索引/主键）
      * @return Integer 受影响的行数（更新返回1，插入返回1，无变化返回0）
      */
-    Integer bUpsert(String tableName, Map<String, Object> rowData, Set<String> conflictKeys);
+    Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys);
 
     /**
      * 更新或插入（UPSERT）字段名称默认转下划线
@@ -282,7 +282,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>          实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys);
+    <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys);
 
     /**
      * 更新或插入（UPSERT）（字段名自动映射）
@@ -297,7 +297,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
+    <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
 
 
     /**
@@ -312,7 +312,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase);
+    <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
 
     /**
@@ -329,7 +329,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
+    <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
 
     /**
      * 更新或插入（UPSERT）忽略为空的字段
@@ -343,7 +343,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>               实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase);
+    <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
     /**
      * 更新或插入（UPSERT）忽略为空的字段
@@ -356,7 +356,7 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>          实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys);
+    <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys);
     /**
      * 更新或插入（UPSERT）忽略为空的字段
      *
@@ -369,6 +369,6 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>          实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys,List<String> ignoreFieldNames);
+    <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys,List<String> ignoreFieldNames);
 
 }
