@@ -128,7 +128,10 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
             String tableName, Collection<T> entities, int batchSize) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, batchSize);
     }
-
+    @Override
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
+        return getAdvBaseAccessPxyOpt(). bInsertIgnore(tableName, rowData );
+    }
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, conflictKeys);

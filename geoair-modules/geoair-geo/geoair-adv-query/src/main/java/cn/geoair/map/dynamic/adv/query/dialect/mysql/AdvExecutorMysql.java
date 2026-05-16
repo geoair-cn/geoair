@@ -17,6 +17,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
 

@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,7 +8,9 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
+/**
+ * PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑
+ */
 public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
     public PgAdvBaseAccessOpt() {
@@ -22,17 +25,19 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     private static final String PG_DEFAULT_PRIMARY_KEY = "id";
 
 
-
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, Set<String> conflictKeys) {
-        String conflictFields = String.join(",", conflictKeys);
+        String conflictFields = "";
+        if (GutilObject.isEmpty(conflictKeys)) {
+            conflictFields = String.join(",", conflictKeys);
+        }
         return StrUtil.format(
                 "INSERT INTO {} ({}) VALUES ({}){}({}) DO NOTHING",
                 tableName,
                 fields,
                 placeholders,
                 PG_CONFLICT_CLAUSE,
-                conflictFields );
+                conflictFields);
     }
 
 

@@ -202,6 +202,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     // ========== 通用逻辑：插入忽略 ==========
     @Override
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
+        return bInsertIgnore(tableName, rowData, new HashSet<>());
+    }
+
+    @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
