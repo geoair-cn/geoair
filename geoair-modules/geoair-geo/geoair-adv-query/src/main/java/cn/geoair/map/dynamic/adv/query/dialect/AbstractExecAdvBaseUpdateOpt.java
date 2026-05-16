@@ -383,6 +383,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
+        List<String> conflictKeysCopy = new ArrayList<>( );
+        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+            for (String conflictKey : conflictKeys) {
+                conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
+            }
+        }
+        conflictKeys = conflictKeysCopy;
         return bUpsert(tableName, rowData, conflictKeys);
     }
 
