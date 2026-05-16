@@ -21,7 +21,7 @@ public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, Set<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
         // Oracle 使用子查询判断：不存在则插入
         String[] fieldArray = fields.split(",");
         String pkField = fieldArray[0].trim();

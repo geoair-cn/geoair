@@ -41,7 +41,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
     protected abstract String buildInsertIgnoreSql(
-            String tableName, String fields, String placeholders, Set<String> conflictKeys);
+            String tableName, String fields, String placeholders, List<String> conflictKeys);
 
 
     @Override
@@ -203,11 +203,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     // ========== 通用逻辑：插入忽略 ==========
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
-        return bInsertIgnore(tableName, rowData, new HashSet<>());
+        return bInsertIgnore(tableName, rowData, ListUtil.empty());
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
@@ -235,22 +235,22 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys) {
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys) {
         return bInsertIgnore(tableName, entity, conflictKeys, true);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
         return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, false);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
@@ -263,7 +263,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
 
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
+    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
         validateTableNameAndData(tableName, ListUtil.toList(headers), rowsData);
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, DEFAULT_BATCH_SIZE);
         int totalSuccess = 0;
