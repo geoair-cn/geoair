@@ -1,11 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -432,6 +436,44 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
         return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity);
     }
+
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
+    }
+
+
+
+
+
+
+
+
 
     @Override
     public Integer bUpdateByCondition(

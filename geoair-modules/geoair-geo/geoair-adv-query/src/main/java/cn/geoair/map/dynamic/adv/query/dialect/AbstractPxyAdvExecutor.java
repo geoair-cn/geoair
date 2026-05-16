@@ -527,6 +527,35 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
         return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity);
     }
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
+    }
 
     @Override
     public Integer bUpdateByCondition(
