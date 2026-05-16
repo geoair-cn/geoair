@@ -196,6 +196,8 @@ public interface IAdvBaseAccessOpt {
 
     // ==================== 特殊场景插入 ====================
 
+    Integer bInsertIgnore(String tableName, Map<String, Object> rowData );
+
     /**
      * 插入或忽略（存在则跳过，不存在则插入）
      *
@@ -208,6 +210,8 @@ public interface IAdvBaseAccessOpt {
      * @return Integer 成功插入的行数（存在则返回0，不存在则返回1）
      */
     Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys);
+
+
 
 
     /**
