@@ -423,14 +423,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpdateByPrimaryKey(
+    public Integer bUpdateByPK(
             String tableName, String idKey, Object id, Map<String, Object> rowData) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPrimaryKey(tableName, idKey, id, rowData);
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, id, rowData);
     }
 
     @Override
-    public <T> Integer bUpdateByPrimaryKey(String tableName, String idKey, T entity) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPrimaryKey(tableName, idKey, entity);
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity);
     }
 
     @Override

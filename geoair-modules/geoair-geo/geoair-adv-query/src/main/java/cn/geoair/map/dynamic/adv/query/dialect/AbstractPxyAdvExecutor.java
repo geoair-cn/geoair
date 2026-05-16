@@ -518,14 +518,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateByPrimaryKey(
+    public Integer bUpdateByPK(
             String tableName, String idKey, Object id, Map<String, Object> rowData) {
-        return getAdvBaseOpt().bUpdateByPrimaryKey(tableName, idKey, id, rowData);
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, id, rowData);
     }
 
     @Override
-    public <T> Integer bUpdateByPrimaryKey(String tableName, String idKey, T entity) {
-        return getAdvBaseOpt().bUpdateByPrimaryKey(tableName, idKey, entity);
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity);
     }
 
     @Override
