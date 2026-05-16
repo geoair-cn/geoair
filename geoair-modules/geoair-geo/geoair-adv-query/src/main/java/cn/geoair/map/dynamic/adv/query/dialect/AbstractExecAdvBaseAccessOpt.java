@@ -12,9 +12,13 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.BeanCopier;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Editor;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
@@ -88,7 +92,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql( this.getClass(),"bInsertOne", execSql, params, cost,1);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertOne", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("单条插入失败，表名：" + quoteTableName, e);
@@ -99,14 +103,43 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertOne(String tableName, T entity) {
+        return bInsertOne(tableName, entity, true, false);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
+        return bInsertOne(tableName, entity, isToUnderlineCase, false, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        Entity entityObj = Entity.parse(entity);
+        Map<String, Object> rowData = new HashMap<>();
+        BeanCopier.create(entity, rowData,
+                CopyOptions.create()
+                        .setIgnoreNullValue(ignoreNullValue)
+                        .setTransientSupport(true)
+                        .setFieldNameEditor(key -> {
+                            if (ignoreFieldNames != null && ignoreFieldNames.contains(key)) {
+                                return null;
+                            }
+                            if (isToUnderlineCase) {
+                                return StrUtil.toUnderlineCase(key);
+                            }
+                            return key;
+                        })
+        ).copy();
         if (GutilObject.isEmpty(tableName)) {
-            tableName = entityObj.getTableName();
+            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
-        return bInsertOne(tableName, entityObj);
+        return bInsertOne(tableName, rowData);
     }
 
     // ========== 通用逻辑：批量插入 ==========
@@ -158,9 +191,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(
-                        this.getClass(),"bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
-                        cost,totalSuccess);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(
+                    this.getClass(), "bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                    cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -205,7 +238,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnore", execSql, params, cost,1);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertIgnore", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("插入忽略操作失败，表名：" + tableName, e);
@@ -229,7 +262,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertIgnoreBatch", StrUtil.format("表名：{}，总条数：{}", tableName, totalSuccess), cost,totalSuccess);
+        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertIgnoreBatch", StrUtil.format("表名：{}，总条数：{}", tableName, totalSuccess), cost, totalSuccess);
         return totalSuccess;
     }
 
@@ -254,7 +287,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertOrUpdate", execSql, params, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertOrUpdate", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
             throw new RuntimeException("插入或更新操作失败，表名：" + tableName, e);
@@ -276,7 +309,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, sqlStatement, sqlParamList.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-                AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"bInsertBySql", sqlStatement, sqlParamList.toList(), cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertBySql", sqlStatement, sqlParamList.toList(), cost, result);
             return result;
         } catch (SQLException e) {
             rollbackConnection(connection);

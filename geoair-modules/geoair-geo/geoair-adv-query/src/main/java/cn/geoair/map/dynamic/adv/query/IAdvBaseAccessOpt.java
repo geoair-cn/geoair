@@ -88,9 +88,9 @@ public interface IAdvBaseAccessOpt {
     Integer bInsertOne(String tableName, Map<String, Object> rowData);
 
     /**
-     * 插入单条Java对象数据（字段名自动映射）
+     * 插入单条Java对象数据 字段名称默认不转下划线
      *
-     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配
      *
      * @param tableName 目标表名（如：user）
      * @param entity    待插入的Java对象（如User实体类）
@@ -99,8 +99,48 @@ public interface IAdvBaseAccessOpt {
      */
     <T> Integer bInsertOne(String tableName, T entity);
 
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param ignoreNullValue   是否忽略值为空的字段
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue);
 
 
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase );
+
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param ignoreNullValue   是否忽略值为空的字段
+     * @param ignoreFieldNames  插入的时候，忽略哪些字段，这里传你实体里面的字段名称
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
 
 
     /**

@@ -176,7 +176,20 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public <T> Integer bInsertOne(String tableName, T entity) {
         return getAdvBaseOpt().bInsertOne(tableName, entity);
     }
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase);
+    }
 
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    }
 
     @Override
     public Integer bInsertBatch(
