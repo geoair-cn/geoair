@@ -4,11 +4,19 @@ import cn.geoair.base.def.GkOperater;
 
 public interface GiEnvironmenter extends GkOperater {
 
-    public String[] getActiveProfiles();
+    String[] getActiveProfiles();
 
-    public String[] getDefaultProfiles();
+    String[] getDefaultProfiles();
 
-    public boolean isDev();
+    /**
+     * 判断当前环境是否包含 指定profile
+     *
+     * @param profile 如：dev、pro、logSend
+     * @return true=包含 false=不包含
+     */
+    boolean containsProfile(String profile);
 
-    public boolean isDebugger();
+    boolean isDev();
+
+    boolean isDebugger();
 }

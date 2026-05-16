@@ -12,7 +12,11 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-/** 读取配置文件 */
+import java.util.Arrays;
+
+/**
+ * 读取配置文件
+ */
 @Component
 public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, EnvironmentAware {
 
@@ -21,18 +25,18 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
     }
 
     @GaMethodHandImpl(
-        implClass = GirPropertyHelper.class,
-        implMethod = "getPropertier",
-        type = ImplType.expectfirst
+            implClass = GirPropertyHelper.class,
+            implMethod = "getPropertier",
+            type = ImplType.expectfirst
     )
     private static GiPropertier getPropertier() {
         return me;
     }
 
     @GaMethodHandImpl(
-        implClass = GirEnvironmentHelper.class,
-        implMethod = "getEnvironmenter",
-        type = ImplType.expectfirst
+            implClass = GirEnvironmentHelper.class,
+            implMethod = "getEnvironmenter",
+            type = ImplType.expectfirst
     )
     private static GiEnvironmenter getEnvironmenter() {
         return me;
@@ -106,6 +110,15 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
     @Override
     public String[] getDefaultProfiles() {
         return getEnvironment().getDefaultProfiles();
+    }
+
+    @Override
+    public boolean containsProfile(String profile) {
+        String[] activeProfiles = getActiveProfiles();
+        if (activeProfiles == null || activeProfiles.length == 0) {
+            return false;
+        }
+        return Arrays.asList(activeProfiles).contains(profile);
     }
 
     @Override

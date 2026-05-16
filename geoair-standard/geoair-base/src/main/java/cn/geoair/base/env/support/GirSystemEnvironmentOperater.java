@@ -17,6 +17,11 @@ public class GirSystemEnvironmentOperater implements GiEnvironmenter {
     }
 
     @Override
+    public boolean containsProfile(String profile) {
+        return false;
+    }
+
+    @Override
     public boolean isDev() {
         return false;
     }
