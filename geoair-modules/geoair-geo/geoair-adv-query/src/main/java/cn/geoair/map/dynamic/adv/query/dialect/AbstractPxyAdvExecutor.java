@@ -176,6 +176,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public <T> Integer bInsertOne(String tableName, T entity) {
         return getAdvBaseOpt().bInsertOne(tableName, entity);
     }
+
     @Override
     public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
         return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase);
@@ -221,31 +222,32 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         return getAdvBaseOpt().bInsertIgnore(tableName, rowData, conflictKeys);
     }
+
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertIgnore(tableName,entity,conflictKeys);
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys);
     }
 
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseOpt().bInsertIgnore(tableName,entity,conflictKeys,isToUnderlineCase,ignoreNullValue);
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
     }
 
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertIgnore(tableName,entity,conflictKeys,isToUnderlineCase);
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
     }
 
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertIgnore(tableName,entity,conflictKeys,isToUnderlineCase,ignoreNullValue, ignoreFieldNames);
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }
+
     @Override
     public Integer bInsertIgnoreBatch(
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData,conflictKeys );
+        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
-
 
 
     @Override
@@ -527,6 +529,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
         return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity);
     }
+
     @Override
     public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
         return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
@@ -597,6 +600,46 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public Integer bUpdateOrInsert(
             String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         return getAdvBaseOpt().bUpdateOrInsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public Integer bUpsert(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
     }
 
     // ==================== DDL操作（代理调用PgAdvDDLOpt） ====================

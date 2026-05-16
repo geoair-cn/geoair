@@ -7,12 +7,19 @@ import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.sql.SqlExecutor;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 数据库的动态高级查询基础操作实现类
@@ -516,5 +523,45 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public Integer bUpdateOrInsert(
             String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
         return getAdvBaseUpdatePxyOpt().bUpdateOrInsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public Integer bUpsert(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys) {
+        return getAdvBaseUpdatePxyOpt().bUpsert( tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+    return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName,entity,conflictKeys,isToUnderlineCase,ignoreNullValue, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys) {
+        return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, Set<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
     }
 }
