@@ -1,11 +1,16 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.hutool.core.bean.copier.BeanCopier;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -75,6 +80,21 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity);
     }
 
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    }
+
 
     @Override
     public Integer bInsertBatch(
@@ -129,7 +149,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
         return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
-
 
 
     // ==================== 删除操作实现（代理调用） ====================
