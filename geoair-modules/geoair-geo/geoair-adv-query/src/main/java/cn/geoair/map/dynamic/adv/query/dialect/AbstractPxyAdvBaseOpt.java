@@ -120,20 +120,36 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, );
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, Set<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }
 
     @Override
     public Integer bInsertIgnoreBatch(
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, );
+        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
 
-    @Override
-    public Integer bInsertOrUpdate(
-            String tableName, Map<String, Object> rowData, Set<String> updateFields) {
-        return getAdvBaseAccessPxyOpt().bInsertOrUpdate(tableName, rowData, updateFields);
-    }
+
 
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {

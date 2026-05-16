@@ -3,9 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.sql.SqlExecutor;
-import java.sql.Connection;
-import java.sql.SQLException;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,7 +16,7 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     }
 
     // PG专属常量
-    private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT DO ";
+    private static final String PG_CONFLICT_CLAUSE = " ON CONFLICT  ";
 
     // PG默认主键字段
     private static final String PG_DEFAULT_PRIMARY_KEY = "id";
@@ -26,32 +24,16 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders) {
-        // PG：ON CONFLICT DO NOTHING
+    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, Set<String> conflictKeys) {
+        String conflictFields = String.join(",", conflictKeys);
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}NOTHING",
-                tableName,
-                fields,
-                placeholders,
-                PG_CONFLICT_CLAUSE);
-    }
-
-    @Override
-    protected String buildInsertOrUpdateSql(
-            String tableName, String fields, String placeholders, Set<String> updateFields) {
-        // PG：ON CONFLICT DO UPDATE + EXCLUDED关键字
-        String updateClause =
-                updateFields
-                        .stream()
-                        .map(field -> StrUtil.format("{} = EXCLUDED.{}", field, field))
-                        .collect(Collectors.joining(","));
-
-        return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}UPDATE SET {}",
+                "INSERT INTO {} ({}) VALUES ({}){}({}) DO NOTHING",
                 tableName,
                 fields,
                 placeholders,
                 PG_CONFLICT_CLAUSE,
-                updateClause);
+                conflictFields );
     }
+
+
 }

@@ -282,18 +282,5 @@ public interface IAdvBaseAccessOpt {
     Integer bInsertIgnoreBatch(
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData, Set<String> conflictKeys);
 
-    /**
-     * 插入或更新（存在则更新指定字段，不存在则插入）
-     *
-     * <p>即UPSERT操作（PostgreSQL：ON CONFLICT DO UPDATE；MySQL：ON DUPLICATE KEY UPDATE），
-     * 适用于需要"插入-更新"一体化的场景
-     *
-     * @param tableName    目标表名
-     * @param rowData      单行数据（包含插入/更新的字段）
-     * @param updateFields 冲突时需要更新的字段集合（为空则更新所有字段） <br>
-     *                     示例：Set.of("age", "update_time")
-     * @return Integer 受影响的行数（插入返回1，更新返回2，无变化返回0）
-     */
-    Integer bInsertOrUpdate(
-            String tableName, Map<String, Object> rowData, Set<String> updateFields);
+
 }
