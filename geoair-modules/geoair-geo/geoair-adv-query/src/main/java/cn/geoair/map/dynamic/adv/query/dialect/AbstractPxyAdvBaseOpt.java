@@ -7,6 +7,8 @@ import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -214,10 +216,15 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseDeletePxyOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseDeletePxyOpt().bDeleteByWhere(tableName, whereFilter);
+    }
 
-
-
-
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseDeletePxyOpt().bDeleteByWhere(tableName, whereFilter);
+    }
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {

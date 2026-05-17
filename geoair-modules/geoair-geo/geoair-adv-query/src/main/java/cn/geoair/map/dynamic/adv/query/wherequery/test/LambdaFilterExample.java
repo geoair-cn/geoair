@@ -37,10 +37,10 @@ public class LambdaFilterExample {
 //        nullCheckExample();
 //
 //        // 示例6：SQL表达式
-//        sqlExpressionExample();
+        sqlExpressionExample();
 
         // 示例7：实际业务场景
-        businessScenarioExample();
+//        businessScenarioExample();
     }
 
     /**
@@ -143,7 +143,10 @@ public class LambdaFilterExample {
                 .exprLike("CONCAT(first_name, ' ', last_name)", "张%");
 
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
-        System.out.println("SQL表达式条件构建完成");
+        ArrayList<Object> objects = new ArrayList<>();
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**
@@ -166,14 +169,16 @@ public class LambdaFilterExample {
         // 转换为原有的WhereFilter
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
         ArrayList<Object> objects = new ArrayList<>();
-        String whereSql = GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects);
+
         System.out.println("业务查询条件：");
         System.out.println("  - 角色：VIP 或 管理员");
         System.out.println("  - 年龄：18-60岁");
         System.out.println("  - 状态：未删除");
         System.out.println("  - 排序：按创建时间倒序");
         System.out.println("  - 限制：10条");
-        System.out.println("  - Where" + whereSql);
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**

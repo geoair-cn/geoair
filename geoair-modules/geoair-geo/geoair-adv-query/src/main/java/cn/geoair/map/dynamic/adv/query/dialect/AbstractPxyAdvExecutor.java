@@ -9,6 +9,8 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -306,9 +308,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getAdvBaseOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
+    }
 
-
-
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
+    }
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
