@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.hutool.extra.spring.SpringUtil;
@@ -48,6 +49,10 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
         return iAdvExecutorPxy;
     }
 
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return getAdvBaseOpt().getConfig();
+    }
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return iAdvExecutorPxy;

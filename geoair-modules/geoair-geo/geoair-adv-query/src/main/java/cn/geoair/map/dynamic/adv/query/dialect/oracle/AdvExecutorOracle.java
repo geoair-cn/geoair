@@ -64,7 +64,7 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new OracleAdvBaseOpt(getDataSourceGetter());
+                    advBaseOpt = new OracleAdvBaseOpt(getDataSourceGetter(),this::getConfig);
                 }
             }
         }

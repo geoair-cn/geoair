@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
@@ -67,6 +68,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public void initProxyObjects() {
 
     }
+
+
 
     // ==================== 数据源初始化与资源管理 ====================
     @Override

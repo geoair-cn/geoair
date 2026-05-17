@@ -10,6 +10,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 数据库的动态高级查询基础操作实现类
@@ -22,9 +23,11 @@ import java.util.function.Consumer;
 public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     protected IDataSourceGetter dataSourceGetter;
+    Supplier<ConfigAdvQuery> configAdvQueryGetter;
 
-    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
+    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<ConfigAdvQuery> configAdvQueryGetter) {
         this.dataSourceGetter = dataSourceGetter;
+        this.configAdvQueryGetter = configAdvQueryGetter;
     }
 
     /**
@@ -58,7 +61,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     @Override
     public ConfigAdvQuery getConfig() {
-        return getAdvBaseSelectPxyOpt().getConfig();
+        return configAdvQueryGetter.get();
     }
 
     // ==================== 插入操作实现（代理调用） ====================
@@ -124,10 +127,12 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
             String tableName, Collection<T> entities, int batchSize) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, batchSize);
     }
+
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseAccessPxyOpt(). bInsertIgnore(tableName, rowData );
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData);
     }
+
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, conflictKeys);
@@ -158,7 +163,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
             String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
         return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
-
 
 
     @Override
@@ -474,13 +478,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
 
-
-
-
-
-
-
-
     @Override
     public Integer bUpdateByCondition(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
@@ -531,7 +528,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys) {
-        return getAdvBaseUpdatePxyOpt().bUpsert( tableName, entity, conflictKeys);
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys);
     }
 
     @Override
@@ -541,12 +538,12 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-    return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
     }
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpsert(tableName,entity,conflictKeys,isToUnderlineCase,ignoreNullValue, ignoreFieldNames);
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }
 
     @Override

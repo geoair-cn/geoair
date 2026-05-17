@@ -76,7 +76,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new MysqlAdvBaseOpt(getDataSourceGetter());
+                    advBaseOpt = new MysqlAdvBaseOpt(getDataSourceGetter(), this::getConfig);
                 }
             }
         }
@@ -124,7 +124,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new MysqlAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(),getGeoOpt());
+                    iAdvWhereSelectOpt = new MysqlAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
                 }
             }
         }
@@ -138,9 +138,10 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
 
     ConfigAdvQuery configAdvQuery = ConfigAdvQuery.of();
+
     @Override
     public ConfigAdvQuery getConfig() {
-        if(configAdvQuery==null){
+        if (configAdvQuery == null) {
             configAdvQuery = ConfigAdvQuery.of();
         }
         return configAdvQuery;

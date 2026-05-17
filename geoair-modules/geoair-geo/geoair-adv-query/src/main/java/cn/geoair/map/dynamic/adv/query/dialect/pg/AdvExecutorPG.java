@@ -62,7 +62,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter());
+                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter(),this::getConfig);
                 }
             }
         }

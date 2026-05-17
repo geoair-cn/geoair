@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
@@ -10,6 +11,8 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseUpdateOpt;
+
+import java.util.function.Supplier;
 
 /**
  * PostgreSQL数据库的动态高级查询基础操作实现类
@@ -21,15 +24,15 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseUpdateOpt;
  */
 public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter) {
-        super(dataSourceGetter);
+    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        super(dataSourceGetter,configAdvQueryGetter);
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt();
+            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt(this::getConfig);
             advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseAccessPxyOpt;
@@ -39,7 +42,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt();
+            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt(this::getConfig);
             advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseSelectPxyOpt;
@@ -49,7 +52,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt();
+            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt(this::getConfig);
             advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseUpdatePxyOpt;
@@ -59,7 +62,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt();
+            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt(this::getConfig);
             advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseDeletePxyOpt;
