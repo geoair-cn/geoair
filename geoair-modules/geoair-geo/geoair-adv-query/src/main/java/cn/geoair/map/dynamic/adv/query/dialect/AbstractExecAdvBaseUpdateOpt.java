@@ -204,7 +204,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     // ========== 通用逻辑：批量更新（按主键） ==========
     @Override
-    public Integer bUpdateBatchByPrimaryKey(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
         return bUpdateBatchWithBatchSize(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
     }
@@ -261,18 +261,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPrimaryKey(
+    public <T> Integer bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
-
-        List<Map<String, Object>> rowsData =
-                entities.stream().map(Entity::parse).collect(Collectors.toList());
-
-        return bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
+        List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
+        for (T entity : entities) {
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
+            rowsDatas.add(rowData);
+        }
+        return bUpdateBatchByPK(tableName, idKey, rowsDatas);
     }
 
     // ========== 通用逻辑：乐观锁更新 ==========
@@ -383,8 +384,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
-        List<String> conflictKeysCopy = new ArrayList<>( );
-        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+        List<String> conflictKeysCopy = new ArrayList<>();
+        if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }

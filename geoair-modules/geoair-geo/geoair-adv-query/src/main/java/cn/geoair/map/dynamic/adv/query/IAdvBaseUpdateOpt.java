@@ -6,7 +6,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 数据更新相关的基础操作接口
@@ -196,7 +195,7 @@ public interface IAdvBaseUpdateOpt {
      *                  示例：[{ "id": 1, "age":25 }, { "id":2, "name":"李四" }]
      * @return Integer 受影响的总行数
      */
-    Integer bUpdateBatchByPrimaryKey(
+    Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData);
 
     /**
@@ -220,7 +219,8 @@ public interface IAdvBaseUpdateOpt {
      * @param <T>       实体类泛型
      * @return Integer 受影响的总行数
      */
-    <T> Integer bUpdateBatchByPrimaryKey(String tableName, String idKey, Collection<T> entities);
+    <T> Integer bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities);
+
 
     // ==================== 特殊场景更新 ====================
 

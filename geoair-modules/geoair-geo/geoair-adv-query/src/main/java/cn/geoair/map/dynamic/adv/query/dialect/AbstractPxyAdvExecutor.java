@@ -572,9 +572,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateBatchByPrimaryKey(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
@@ -584,9 +584,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPrimaryKey(
+    public <T> Integer bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, entities);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
 
     @Override
