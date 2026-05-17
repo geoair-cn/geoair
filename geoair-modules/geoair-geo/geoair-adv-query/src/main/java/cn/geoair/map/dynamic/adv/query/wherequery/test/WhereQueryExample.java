@@ -1,4 +1,4 @@
-package cn.geoair.map.dynamic.adv.query.wherequery;
+package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.MockDataSourceGetter;
@@ -8,6 +8,9 @@ import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 
 import java.util.Arrays;
 import java.util.Date;
