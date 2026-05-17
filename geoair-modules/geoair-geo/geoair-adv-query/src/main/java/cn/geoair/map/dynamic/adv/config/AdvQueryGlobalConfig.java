@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class ConfigAdvQuery {
+public class AdvQueryGlobalConfig {
 
-    public static ConfigAdvQuery of() {
-        return new ConfigAdvQuery();
+    public static AdvQueryGlobalConfig of() {
+        return new AdvQueryGlobalConfig();
     }
 
     /**
@@ -28,9 +28,9 @@ public class ConfigAdvQuery {
     /**
      * 启用 更新的sql日志
      */
-    boolean enableUpdateLog = true;
+     boolean enableUpdateLog = true;
     /**
-     * 启用删除的sql日子
+     * 启用删除的sql日志
      */
     boolean enableDelLog = true;
 

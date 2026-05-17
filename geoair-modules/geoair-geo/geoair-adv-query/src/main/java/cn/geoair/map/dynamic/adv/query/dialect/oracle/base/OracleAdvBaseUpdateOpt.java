@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public OracleAdvBaseUpdateOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public OracleAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(configAdvQueryGetter);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();

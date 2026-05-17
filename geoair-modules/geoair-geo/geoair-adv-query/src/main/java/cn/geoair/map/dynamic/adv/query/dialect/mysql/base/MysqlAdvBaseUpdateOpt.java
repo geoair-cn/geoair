@@ -1,13 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -15,7 +12,7 @@ import java.util.function.Supplier;
  */
 public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public MysqlAdvBaseUpdateOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public MysqlAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(configAdvQueryGetter);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();

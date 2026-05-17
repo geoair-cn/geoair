@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 
@@ -123,12 +123,12 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return OracleDialectTableNameUtil.getInstance();
     }
-    ConfigAdvQuery configAdvQuery = ConfigAdvQuery.of();
+    AdvQueryGlobalConfig advQueryGlobalConfig = AdvQueryGlobalConfig.of();
     @Override
-    public ConfigAdvQuery getConfig() {
-        if(configAdvQuery==null){
-            configAdvQuery = ConfigAdvQuery.of();
+    public AdvQueryGlobalConfig getConfig() {
+        if(advQueryGlobalConfig ==null){
+            advQueryGlobalConfig = AdvQueryGlobalConfig.of();
         }
-        return configAdvQuery;
+        return advQueryGlobalConfig;
     }
 }

@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class OracleAdvBaseSelectOpt extends AbstractExecAdvBaseSelectOpt {
 
     // 初始化表名处理器
-    public OracleAdvBaseSelectOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public OracleAdvBaseSelectOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(configAdvQueryGetter);
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }

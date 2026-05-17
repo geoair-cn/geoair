@@ -4,7 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
@@ -15,7 +15,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
@@ -29,14 +28,14 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
 
-    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseUpdateOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
 
     @Override
-    public ConfigAdvQuery getConfig() {
+    public AdvQueryGlobalConfig getConfig() {
         return configAdvQueryGetter.get();
     }
 

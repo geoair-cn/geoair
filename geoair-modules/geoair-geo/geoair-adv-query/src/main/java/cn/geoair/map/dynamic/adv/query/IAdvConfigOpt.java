@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 
 /**
  * @author ：zhangjun
@@ -9,6 +9,6 @@ import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
  */
 public interface IAdvConfigOpt {
 
-    ConfigAdvQuery getConfig();
+    AdvQueryGlobalConfig getConfig();
 
 }

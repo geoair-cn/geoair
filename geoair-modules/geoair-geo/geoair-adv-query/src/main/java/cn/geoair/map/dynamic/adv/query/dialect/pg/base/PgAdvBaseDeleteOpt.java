@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 
@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /** PostgreSQL删除操作实现类 */
 public class PgAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
-    public PgAdvBaseDeleteOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public PgAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(configAdvQueryGetter);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();

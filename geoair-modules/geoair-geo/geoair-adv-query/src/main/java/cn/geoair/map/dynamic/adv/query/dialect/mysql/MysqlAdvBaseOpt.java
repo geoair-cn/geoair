@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  */
 public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter,configAdvQueryGetter);
     }
 

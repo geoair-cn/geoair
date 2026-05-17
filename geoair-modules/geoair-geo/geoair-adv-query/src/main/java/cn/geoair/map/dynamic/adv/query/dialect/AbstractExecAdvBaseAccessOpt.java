@@ -4,7 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
@@ -45,13 +45,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected abstract String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders, List<String> conflictKeys);
 
-    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseAccessOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public AbstractExecAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
     @Override
-    public ConfigAdvQuery getConfig() {
+    public AdvQueryGlobalConfig getConfig() {
         return configAdvQueryGetter.get();
     }
     @Override

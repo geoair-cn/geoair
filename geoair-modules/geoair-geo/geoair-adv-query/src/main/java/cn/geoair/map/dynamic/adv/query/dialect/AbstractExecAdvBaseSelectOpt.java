@@ -4,7 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseSelectOpt;
@@ -45,14 +45,14 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     // 日志实例
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseSelectOpt.class);
 
-    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseSelectOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public AbstractExecAdvBaseSelectOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
 
     @Override
-    public ConfigAdvQuery getConfig() {
+    public AdvQueryGlobalConfig getConfig() {
         return configAdvQueryGetter.get();
     }
 

@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     protected IDataSourceGetter dataSourceGetter;
-    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
@@ -60,7 +60,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
 
     @Override
-    public ConfigAdvQuery getConfig() {
+    public AdvQueryGlobalConfig getConfig() {
         return configAdvQueryGetter.get();
     }
 
