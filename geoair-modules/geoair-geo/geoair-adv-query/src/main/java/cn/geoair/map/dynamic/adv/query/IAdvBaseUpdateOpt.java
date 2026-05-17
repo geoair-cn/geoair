@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author 张逢吉
  */
-public interface IAdvBaseUpdateOpt {
+public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
 
     /**
      * 设置数据源获取器

@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * @author zhangjun
  * @date Created in 2026/4/16 09:28
  */
-public interface IAdvWhereSelectOpt {
+public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
 
     /**
      * 查询单条记录

@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * <p>覆盖单条插入、批量插入、自定义SQL插入、忽略重复插入、插入并返回主键等全场景
  */
-public interface IAdvBaseAccessOpt {
+public interface IAdvBaseAccessOpt  extends IAdvConfigOpt{
 
     /**
      * 设置数据源获取器

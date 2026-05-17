@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 
 /**
  * @author ：zhangjun
@@ -40,4 +41,6 @@ public interface IAdvExecutor
      * @return 带Schema的标准表名
      */
     String tbGetTableNameWithSchema(String tableName, String schemaName);
+
+
 }

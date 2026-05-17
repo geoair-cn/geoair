@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * <p>覆盖单条删除、批量删除、自定义SQL删除、条件删除、逻辑删除、防误删保护等全场景， 适配PostgreSQL/MySQL等主流数据库，兼顾性能与数据安全
  */
-public interface IAdvBaseDeleteOpt {
+public interface IAdvBaseDeleteOpt extends IAdvConfigOpt{
 
     /**
      * 设置数据源获取器

@@ -10,7 +10,7 @@ import java.util.List;
  * @author ：张逢吉
  * @date ：Created in 2025/10/10 10:34 @description： 简单分页相关操作接口 约定： 以p开头
  */
-public interface IAdvSimplePageOpt {
+public interface IAdvSimplePageOpt extends IAdvConfigOpt {
 
     /**
      * 统计指定SQL的查询结果总数（忽略分页，获取全量数据条数）
