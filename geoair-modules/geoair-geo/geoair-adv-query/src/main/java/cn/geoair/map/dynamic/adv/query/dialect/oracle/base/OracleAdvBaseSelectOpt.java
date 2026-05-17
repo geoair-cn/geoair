@@ -1,8 +1,11 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
+
+import java.util.function.Supplier;
 
 /**
  * PostgreSQL查询操作实现类
@@ -10,7 +13,8 @@ import cn.hutool.core.util.StrUtil;
 public class OracleAdvBaseSelectOpt extends AbstractExecAdvBaseSelectOpt {
 
     // 初始化表名处理器
-    public OracleAdvBaseSelectOpt() {
+    public OracleAdvBaseSelectOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        super(configAdvQueryGetter);
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
 

@@ -1,12 +1,14 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -14,7 +16,8 @@ import java.util.stream.Collectors;
  */
 public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
-    public PgAdvBaseAccessOpt() {
+    public PgAdvBaseAccessOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        super(configAdvQueryGetter);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
     }

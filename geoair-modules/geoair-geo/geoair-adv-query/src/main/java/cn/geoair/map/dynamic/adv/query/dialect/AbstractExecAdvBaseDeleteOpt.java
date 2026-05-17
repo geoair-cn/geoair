@@ -46,7 +46,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     public AbstractExecAdvBaseDeleteOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
-
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return configAdvQueryGetter.get();
+    }
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;

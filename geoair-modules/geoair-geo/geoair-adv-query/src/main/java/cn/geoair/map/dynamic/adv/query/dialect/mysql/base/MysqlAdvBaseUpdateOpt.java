@@ -10,10 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-/** MySQL更新操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑 */
+/**
+ * MySQL更新操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑
+ */
 public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public MysqlAdvBaseUpdateOpt() {
+    public MysqlAdvBaseUpdateOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        super(configAdvQueryGetter);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();
     }
@@ -43,7 +46,6 @@ public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                 MYSQL_DUPLICATE_CLAUSE,
                 updateClause);
     }
-
 
 
 }
