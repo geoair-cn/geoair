@@ -2,8 +2,6 @@ package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.Collection;
 import java.util.List;
@@ -181,7 +179,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      *                  示例：{ "name": "张三", "dept_id": 5 }
      * @return Integer 受影响的行数
      */
-    Integer bUpdateByCondition(
+    Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap);
 
     // ==================== 批量更新 ====================

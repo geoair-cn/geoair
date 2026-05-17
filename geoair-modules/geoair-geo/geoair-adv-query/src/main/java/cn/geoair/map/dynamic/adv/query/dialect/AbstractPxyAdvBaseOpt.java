@@ -465,9 +465,9 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
 
     @Override
-    public Integer bUpdateByCondition(
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByCondition(tableName, rowData, whereMap);
+        return getAdvBaseUpdatePxyOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override

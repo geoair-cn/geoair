@@ -554,9 +554,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateByCondition(
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bUpdateByCondition(tableName, rowData, whereMap);
+        return getAdvBaseOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override

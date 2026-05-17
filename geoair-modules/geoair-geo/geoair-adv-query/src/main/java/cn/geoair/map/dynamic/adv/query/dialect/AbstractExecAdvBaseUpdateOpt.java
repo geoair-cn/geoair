@@ -85,6 +85,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBySql", execSql, jdbcParams, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateBySql", execSql, jdbcParams, e);
             throw new RuntimeException("执行自定义更新SQL失败，SQL：" + execSql, e);
         } finally {
             closeConnection(connection);
@@ -119,6 +120,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
             throw new RuntimeException("按主键更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -179,7 +181,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     // ========== 通用逻辑：条件更新 ==========
     @Override
-    public Integer bUpdateByCondition(
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
         validateTableName(tableName);
         validateUpdateData(rowData);
@@ -205,9 +207,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByCondition", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -324,9 +327,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateOrInsert", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
             throw new RuntimeException("更新或插入失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -465,27 +469,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return StrUtil.format("UPDATE {} SET {} WHERE {}", tableName, setClause, whereClause);
     }
 
-    protected String buildOptimisticLockSetClause(Map<String, Object> rowData, String versionKey) {
-        return rowData.keySet()
-                .stream()
-                .map(field -> {
-                    if (field.equals(versionKey)) {
-                        return StrUtil.format("{} = {} + 1", versionKey, versionKey);
-                    }
-                    return StrUtil.format("{} = ?", field);
-                })
-                .collect(Collectors.joining(","));
-    }
-
-    protected String buildUpdateWithOptimisticLockSql(
-            String tableName, String setClause, String idKey, String versionKey) {
-        return StrUtil.format(
-                "UPDATE {} SET {} WHERE {} = ? AND {} = ?",
-                tableName,
-                setClause,
-                idKey,
-                versionKey);
-    }
 
     protected abstract String buildUpsertFieldClause(String field);
 

@@ -99,6 +99,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertOne", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertOne", execSql,params, e);
             throw new RuntimeException("单条插入失败，表名：" + quoteTableName, e);
         } finally {
             closeConnection(connection);
@@ -239,6 +240,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertIgnore", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertIgnore", execSql,params, e);
             throw new RuntimeException("插入忽略操作失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -317,6 +319,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertBySql", sqlStatement, sqlParamList.toList(), cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertBySql", sqlStatement,sqlParamList, e);
             rollbackConnection(connection);
             throw new RuntimeException("插入失败", e);
         } finally {

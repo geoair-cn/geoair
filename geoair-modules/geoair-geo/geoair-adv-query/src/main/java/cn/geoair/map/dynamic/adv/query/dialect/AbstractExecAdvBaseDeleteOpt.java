@@ -12,6 +12,9 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
@@ -45,10 +48,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     public AbstractExecAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
+
     @Override
     public AdvQueryGlobalConfig getConfig() {
         return configAdvQueryGetter.get();
     }
+
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
@@ -266,9 +271,45 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
 
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
+        if (GutilObject.isEmpty(whereFilter)) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        return bDeleteByWhere(tableName, whereFilter.toWhereFilter());
+    }
 
-
-
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
+        validateTableName(tableName);
+        if (GutilObject.isEmpty(whereFilter)) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        List<Object> params = new ArrayList<>();
+        String whereClause = buildWhereClause(whereFilter, params);
+        if (GutilObject.isEmpty(whereClause)) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
+        StopWatch stopWatch = new StopWatch();
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            stopWatch.start();
+            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
+            stopWatch.stop();
+            long cost = stopWatch.getLastTaskTimeMillis();
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByWhere", execSql, params, cost, result);
+            return result;
+        } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bDeleteByWhere", execSql, params, e);
+            throw new RuntimeException("条件删除失败，表名：" + tableName, e);
+        } finally {
+            closeConnection(connection);
+        }
+    }
 
     // ====================== 原有工具方法不动 ======================
     protected void validateTableName(String tableName) {
@@ -310,6 +351,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return whereMap.keySet().stream()
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(" AND "));
+    }
+
+    protected String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params) {
+        GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
+        String whereSql = sqlBuilder.buildWhereSql(whereFilter, params);
+
+        return whereSql;
     }
 
     protected String getSchemaName() {
@@ -366,15 +414,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return StrUtil.format("DELETE FROM {} WHERE {} LIMIT {}", tableName, whereClause, batchSize);
     }
 
-    protected String buildLogicDeleteSql(String tableName, String deleteKey, String idKey) {
-        return StrUtil.format("UPDATE {} SET {} = ? WHERE {} = ?", tableName, deleteKey, idKey);
-    }
-
-    protected String buildLogicDeleteBatchSql(String tableName, String deleteKey, String idKey, String placeholders) {
-        return StrUtil.format("UPDATE {} SET {} = ? WHERE {} IN ({})", tableName, deleteKey, idKey, placeholders);
-    }
-
-    protected String buildCountByConditionSql(String tableName, String whereClause) {
-        return StrUtil.format("SELECT COUNT(*) FROM {} WHERE {}", tableName, whereClause);
+    protected GirAdvQuerySqlBuilder getSqlBuilder() {
+        return new GirAdvQuerySqlBuilder(dialectTableNameProcessor, dataSourceGetter);
     }
 }

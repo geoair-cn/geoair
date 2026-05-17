@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.Map;
 import java.util.Set;
@@ -113,10 +115,26 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
 
     // ==================== where 条件的删除 ====================
 
-
-//    <T> Integer bDeleteByWhere(String tableName,   GirAdvWhereLambdaFilter<T> whereFilter);
-//
-//    <T> Integer bDeleteByWhere(String tableName,  GirAdvWhereFilter whereFilter);
+    /**
+     * 按条件批量删除
+     *
+     * <p>适用于删除大量数据
+     *
+     * @param tableName 目标表名
+     * @param whereFilter 删除条件
+     * @return Integer 受影响的总行数
+     */
+    <T> Integer bDeleteByWhere(String tableName,   GirAdvWhereLambdaFilter<T> whereFilter);
+    /**
+     * 按条件批量删除
+     *
+     * <p>适用于删除大量数据
+     *
+     * @param tableName 目标表名
+     * @param whereFilter 删除条件
+     * @return Integer 受影响的总行数
+     */
+    <T> Integer bDeleteByWhere(String tableName,  GirAdvWhereFilter whereFilter);
 
 
 }

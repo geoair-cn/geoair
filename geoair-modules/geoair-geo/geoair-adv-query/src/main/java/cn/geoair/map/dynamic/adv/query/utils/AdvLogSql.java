@@ -89,14 +89,19 @@ public class AdvLogSql {
     // ===================== 带Class + 影响行数 =====================
     public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Number rows) {
         if (!logEnable) return;
-        log.debug("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
-                callerClass.getSimpleName(), methodName, wrapSql(sql));
+        try {
+            log.debug("\n" + GRAY + SPLIT_LINE + RESET
+                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
+                            + "\n执行方法：{}.{}"
+                            + "\nSQL 语句："
+                            + "\n" + BOLD + "{}" + RESET
+                            + "\n" + GRAY + SPLIT_LINE + RESET,
+                    getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
+                    callerClass.getSimpleName(), methodName, wrapSql(sql));
+        } catch (Exception e) {
+
+        }
+
     }
 
     // ===================== 带Class + 参数 + 影响行数 =====================
@@ -116,18 +121,21 @@ public class AdvLogSql {
     // ===================== 异常日志：基础版 =====================
     public void logExecuteError(Class callerClass, String methodName, String sql, Exception e) {
         if (!logEnable) return;
-        log.error("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\n【SQL 执行异常】"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n异常信息：" + YELLOW + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(),
-                callerClass.getSimpleName(), methodName,
-                wrapSql(sql),
-                e.getMessage());
+        try {
+            log.error("\n" + GRAY + SPLIT_LINE + RESET
+                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
+                            + "\n执行方法：{}.{}"
+                            + "\n【SQL 执行异常】"
+                            + "\nSQL 语句："
+                            + "\n" + BOLD + "{}" + RESET
+                            + "\n异常信息：" + YELLOW + "{}" + RESET
+                            + "\n" + GRAY + SPLIT_LINE + RESET,
+                    getDatabaseName(), getSchemaName(),
+                    callerClass.getSimpleName(), methodName,
+                    wrapSql(sql),
+                    e.getMessage());
+        }catch (Exception e2) {}
+
     }
 
     // ===================== 异常日志：带耗时 =====================
@@ -169,19 +177,24 @@ public class AdvLogSql {
     // ===================== 异常日志：完整版（打印异常堆栈） =====================
     public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
         if (!logEnable) return;
-        log.error("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\n【SQL 执行异常 - 堆栈】"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n异常堆栈：",
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
-                callerClass.getSimpleName(), methodName,
-                wrapSql(sql),
-                params,
-                e);
+        try {
+            log.error("\n" + GRAY + SPLIT_LINE + RESET
+                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
+                            + "\n执行方法：{}.{}"
+                            + "\n【SQL 执行异常 - 堆栈】"
+                            + "\nSQL 语句："
+                            + "\n" + BOLD + "{}" + RESET
+                            + "\n参数列表：" + GREEN + "{}" + RESET
+                            + "\n异常堆栈：",
+                    getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
+                    callerClass.getSimpleName(), methodName,
+                    wrapSql(sql),
+                    params,
+                    e);
+        } catch (Exception ex) {
+
+        }
+
     }
 
     public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
