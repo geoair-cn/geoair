@@ -288,46 +288,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpdateBatchByPK(tableName, idKey, rowsDatas);
     }
 
-    // ========== 通用逻辑：乐观锁更新 ==========
-    @Override
-    public Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version) {
-        validateTableName(tableName);
-        validateIdKeyAndValue(idKey, id);
-        validateUpdateData(rowData);
-        validateIdKeyAndValue(versionKey, version);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = buildOptimisticLockSetClause(rowData, versionKey);
-        String execSql = buildUpdateWithOptimisticLockSql(quoteTableName, setClause, idKey, versionKey);
 
-        List<Object> params = new ArrayList<>(rowData.values());
-        params.add(id);
-        params.add(version);
-
-        StopWatch stopWatch = new StopWatch();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateWithOptimisticLock", execSql, params, cost, result);
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException("乐观锁更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
-        } finally {
-            closeConnection(connection);
-        }
-    }
 
     // ========== 通用逻辑：更新或插入（UPSERT） ==========
     @Override

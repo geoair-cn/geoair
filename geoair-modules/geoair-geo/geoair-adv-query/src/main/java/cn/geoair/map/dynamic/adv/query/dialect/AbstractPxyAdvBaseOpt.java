@@ -188,13 +188,13 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id) {
-        return getAdvBaseDeletePxyOpt().bDeleteByPrimaryKey(tableName, idKey, id);
+    public Integer bDeleteByPK(String tableName, String idKey, Object id) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPK(tableName, idKey, id);
     }
 
     @Override
-    public Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids) {
-        return getAdvBaseDeletePxyOpt().bDeleteBatchByPrimaryKey(tableName, idKey, ids);
+    public Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids) {
+        return getAdvBaseDeletePxyOpt().bDeleteBatchByPK(tableName, idKey, ids);
     }
 
     @Override
@@ -214,24 +214,10 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseDeletePxyOpt().bDeleteBatchByCondition(tableName, whereMap, batchSize);
     }
 
-    @Override
-    public Integer bLogicDelete(
-            String tableName, String idKey, Object id, String deleteKey, Object deleteValue) {
-        return getAdvBaseDeletePxyOpt().bLogicDelete(tableName, idKey, id, deleteKey, deleteValue);
-    }
 
-    @Override
-    public Integer bLogicDeleteBatch(
-            String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue) {
-        return getAdvBaseDeletePxyOpt()
-                .bLogicDeleteBatch(tableName, idKey, ids, deleteKey, deleteValue);
-    }
 
-    @Override
-    public Integer bSafeDeleteByCondition(
-            String tableName, Map<String, Object> whereMap, int maxDelete) {
-        return getAdvBaseDeletePxyOpt().bSafeDeleteByCondition(tableName, whereMap, maxDelete);
-    }
+
+
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
@@ -503,17 +489,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseUpdatePxyOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
 
-    @Override
-    public Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version) {
-        return getAdvBaseUpdatePxyOpt()
-                .bUpdateWithOptimisticLock(tableName, idKey, id, rowData, versionKey, version);
-    }
+
 
     @Override
     public Integer bUpdateOrInsert(

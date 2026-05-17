@@ -56,7 +56,7 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt{
      * @param id 主键值
      * @return Integer 受影响的行数（成功返回1，无匹配数据返回0）
      */
-    Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id);
+    Integer bDeleteByPK(String tableName, String idKey, Object id);
 
     /**
      * 根据主键集合批量删除数据
@@ -68,7 +68,7 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt{
      * @param ids 主键值集合
      * @return Integer 受影响的行数
      */
-    Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids);
+    Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids);
 
     /**
      * 分批次批量删除主键数据（避免IN子句参数过多）
@@ -112,43 +112,4 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt{
 
     // ==================== 特殊场景删除 ====================
 
-    /**
-     * 逻辑删除（更新删除标记，非物理删除）
-     *
-     * <p>适用于需要保留数据痕迹的场景，更新删除标记字段（如：deleted = 1）
-     *
-     * @param tableName 目标表名
-     * @param idKey 主键字段名
-     * @param id 主键值
-     * @param deleteKey 删除标记字段名（如：deleted）
-     * @param deleteValue 删除标记值（如：1）
-     * @return Integer 受影响的行数
-     */
-    Integer bLogicDelete(
-            String tableName, String idKey, Object id, String deleteKey, Object deleteValue);
-
-    /**
-     * 批量逻辑删除
-     *
-     * @param tableName 目标表名
-     * @param idKey 主键字段名
-     * @param ids 主键值集合
-     * @param deleteKey 删除标记字段名
-     * @param deleteValue 删除标记值
-     * @return Integer 受影响的总行数
-     */
-    Integer bLogicDeleteBatch(
-            String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue);
-
-    /**
-     * 安全删除（带防误删校验）
-     *
-     * <p>当删除行数超过阈值时，自动终止操作，避免误删大量数据
-     *
-     * @param tableName 目标表名
-     * @param whereMap 删除条件
-     * @param maxDelete 最大允许删除的行数阈值
-     * @return Integer 受影响的行数（超过阈值返回-1，操作终止）
-     */
-    Integer bSafeDeleteByCondition(String tableName, Map<String, Object> whereMap, int maxDelete);
 }

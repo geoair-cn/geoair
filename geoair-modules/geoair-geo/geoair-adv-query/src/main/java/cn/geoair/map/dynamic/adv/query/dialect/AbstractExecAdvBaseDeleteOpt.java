@@ -94,7 +94,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     // ========== 通用逻辑：主键删除 ==========
     @Override
-    public Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id) {
+    public Integer bDeleteByPK(String tableName, String idKey, Object id) {
         validateTableName(tableName);
         validateIdKeyAndValue(idKey, id);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
@@ -119,7 +119,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     @Override
-    public Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids) {
+    public Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(ids)) {
@@ -180,7 +180,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (List<Object> idBatch : idBatches) {
-            totalSuccess += bDeleteBatchByPrimaryKey(tableName, idKey, new HashSet<>(idBatch));
+            totalSuccess += bDeleteBatchByPK(tableName, idKey, new HashSet<>(idBatch));
         }
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
@@ -266,120 +266,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
-    // ========== 通用逻辑：特殊场景删除（逻辑删除/安全删除） ==========
-    @Override
-    public Integer bLogicDelete(String tableName, String idKey, Object id, String deleteKey, Object deleteValue) {
-        validateTableName(tableName);
-        validateIdKeyAndValue(idKey, id);
-        validateIdKeyAndValue(deleteKey, deleteValue);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String execSql = buildLogicDeleteSql(quoteTableName, deleteKey, idKey);
 
-        List<Object> params = Arrays.asList(deleteValue, id);
-        StopWatch stopWatch = new StopWatch();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bLogicDelete", execSql, params, cost, result);
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException("逻辑删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
-        } finally {
-            closeConnection(connection);
-        }
-    }
 
-    @Override
-    public Integer bLogicDeleteBatch(String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue) {
-        validateTableName(tableName);
-        validateIdKey(idKey);
-        validateIdKeyAndValue(deleteKey, deleteValue);
-        if (CollUtil.isEmpty(ids)) {
-            return 0;
-        }
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        List<List<Object>> idBatches = splitCollection(ids, getMaxInParams());
-        int totalSuccess = 0;
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            connection.setAutoCommit(false);
-
-            for (List<Object> idBatch : idBatches) {
-                String placeholders = idBatch.stream().map(id -> "?").collect(Collectors.joining(","));
-                String execSql = buildLogicDeleteBatchSql(quoteTableName, deleteKey, idKey, placeholders);
-                List<Object> params = new ArrayList<>();
-                params.add(deleteValue);
-                params.addAll(idBatch);
-                int batchSuccess = SqlExecutor.execute(connection, execSql, params.toArray());
-                totalSuccess += batchSuccess;
-            }
-
-            connection.commit();
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bLogicDeleteBatch 批量逻辑删除完成，表名：{}，删除行数：{}",
-                    getSchemaName(), getDatabaseName(), cost, tableName, totalSuccess);
-            return totalSuccess;
-        } catch (SQLException e) {
-            rollbackConnection(connection);
-            throw new RuntimeException("批量逻辑删除失败，表名：" + tableName, e);
-        } finally {
-            restoreAutoCommit(connection);
-            closeConnection(connection);
-        }
-    }
-
-    @Override
-    public Integer bSafeDeleteByCondition(String tableName, Map<String, Object> whereMap, int maxDelete) {
-        validateTableName(tableName);
-        if (CollUtil.isEmpty(whereMap)) {
-            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
-        }
-        if (maxDelete <= 0) {
-            throw new IllegalArgumentException("最大允许删除行数阈值必须大于0");
-        }
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-
-        String countWhereClause = buildWhereClause(whereMap);
-        String countSql = buildCountByConditionSql(quoteTableName, countWhereClause);
-        List<Object> countParams = new ArrayList<>(whereMap.values());
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            Number count = SqlExecutor.query(connection, countSql, new NumberHandler(), countParams.toArray());
-            int totalCount = count.intValue();
-            if (totalCount > maxDelete) {
-                log.warn("schema:[{}]db:[{}] 安全删除触发阈值限制，表名：{}，符合条件行数：{}，阈值：{}，操作终止",
-                        getSchemaName(), getDatabaseName(), tableName, totalCount, maxDelete);
-                return -1;
-            }
-
-            Integer result = bDeleteByCondition(tableName, whereMap);
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            log.debug("schema:[{}]db:[{}] 耗时:[{}ms] bSafeDeleteByCondition 安全删除完成，表名：{}，删除行数：{}",
-                    getSchemaName(), getDatabaseName(), cost, tableName, result);
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException("安全删除校验失败，表名：" + tableName, e);
-        } finally {
-            closeConnection(connection);
-        }
-    }
 
 
     // ====================== 原有工具方法不动 ======================

@@ -224,26 +224,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
 
     // ==================== 特殊场景更新 ====================
 
-    /**
-     * 乐观锁更新（基于版本号）
-     *
-     * <p>解决并发更新问题，仅当版本号匹配时才更新，适用于高并发场景
-     *
-     * @param tableName  目标表名
-     * @param idKey      主键字段名
-     * @param id         主键值
-     * @param rowData    待更新的字段-值映射
-     * @param versionKey 版本号字段名（如：version）
-     * @param version    当前版本号
-     * @return Integer 受影响的行数（版本匹配返回1，不匹配返回0）
-     */
-    Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version);
+
 
     /**
      * 更新或插入（UPSERT）
