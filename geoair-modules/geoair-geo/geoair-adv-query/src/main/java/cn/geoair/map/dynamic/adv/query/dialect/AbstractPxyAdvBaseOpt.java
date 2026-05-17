@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
@@ -53,6 +54,12 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public abstract IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt();
 
     public abstract IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt();
+
+
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return getAdvBaseSelectPxyOpt().getConfig();
+    }
 
     // ==================== 插入操作实现（代理调用） ====================
     @Override

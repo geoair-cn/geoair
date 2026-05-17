@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -49,7 +50,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     public IAdvBaseOpt getAdvBaseOpt() {
         return baseOpt;
     }
-
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return getAdvBaseOpt().getConfig();
+    }
     /**
      * 创建表名处理器（子类实现：绑定PG/MySQL版本）
      */

@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
@@ -20,6 +21,7 @@ import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +40,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     // 默认分批删除批次大小（通用常量）
     protected static final int DEFAULT_BATCH_SIZE = 1000;
+
+    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+
+    public AbstractExecAdvBaseDeleteOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        this.configAdvQueryGetter = configAdvQueryGetter;
+    }
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {

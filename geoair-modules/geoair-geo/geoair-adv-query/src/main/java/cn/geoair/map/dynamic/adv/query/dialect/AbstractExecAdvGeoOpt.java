@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
@@ -118,7 +119,10 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         }
         return dataFieldsApo;
     }
-
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return getAdvBaseOpt().getConfig();
+    }
     @Override
     public boolean eIsGeomByTable(String tableName) {
         validateTableName(tableName);

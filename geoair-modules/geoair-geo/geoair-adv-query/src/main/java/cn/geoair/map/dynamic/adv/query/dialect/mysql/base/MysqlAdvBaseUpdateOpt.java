@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql.base;
 
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /** MySQL更新操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑 */
 public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {

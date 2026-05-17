@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
@@ -20,12 +21,24 @@ import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现
  */
 public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
+
+    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+
+    public AbstractExecAdvBaseUpdateOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        this.configAdvQueryGetter = configAdvQueryGetter;
+    }
+
+    @Override
+    public ConfigAdvQuery getConfig() {
+        return configAdvQueryGetter.get();
+    }
 
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;

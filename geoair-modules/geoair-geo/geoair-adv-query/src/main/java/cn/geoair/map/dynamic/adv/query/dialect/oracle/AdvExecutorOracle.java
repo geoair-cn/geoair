@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 
@@ -14,6 +15,8 @@ import java.sql.Connection;
  * @date ：Created in 15:36 @description： Oracle数据库的动态高级查询执行器
  */
 public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
+
+
 
     public AdvExecutorOracle(DataSourceApo dataSourceApo) {
         super(dataSourceApo);
@@ -109,7 +112,7 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new OracleAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(),getGeoOpt());
+                    iAdvWhereSelectOpt = new OracleAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
                 }
             }
         }
@@ -119,5 +122,13 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return OracleDialectTableNameUtil.getInstance();
+    }
+    ConfigAdvQuery configAdvQuery = ConfigAdvQuery.of();
+    @Override
+    public ConfigAdvQuery getConfig() {
+        if(configAdvQuery==null){
+            configAdvQuery = ConfigAdvQuery.of();
+        }
+        return configAdvQuery;
     }
 }

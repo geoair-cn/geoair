@@ -7,9 +7,10 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 /**
  * @author ：张俊
  * @date ：Created in 2026/4/16 15:46
- * @description： TODO
+ * @description： WhereSelect的操作实现类
  */
 public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
+
     protected IAdvBaseOpt baseOpt;
     protected IAdvSimplePagePreOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
@@ -44,4 +45,6 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvGeoPreOpt getGeoOpt() {
         return iAdvGeoPreOpt;
     }
+
+
 }

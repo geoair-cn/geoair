@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 
@@ -109,7 +110,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new PgAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(),getGeoOpt());
+                    iAdvWhereSelectOpt = new PgAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
                 }
             }
         }
@@ -119,5 +120,16 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
+    }
+
+
+    ConfigAdvQuery configAdvQuery = ConfigAdvQuery.of();
+
+    @Override
+    public ConfigAdvQuery getConfig() {
+        if (configAdvQuery == null) {
+            configAdvQuery = ConfigAdvQuery.of();
+        }
+        return configAdvQuery;
     }
 }

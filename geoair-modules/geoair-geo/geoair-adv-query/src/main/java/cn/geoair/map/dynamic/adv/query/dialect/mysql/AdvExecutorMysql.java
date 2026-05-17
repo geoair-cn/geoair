@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
@@ -136,5 +137,12 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     }
 
 
-
+    ConfigAdvQuery configAdvQuery = ConfigAdvQuery.of();
+    @Override
+    public ConfigAdvQuery getConfig() {
+        if(configAdvQuery==null){
+            configAdvQuery = ConfigAdvQuery.of();
+        }
+        return configAdvQuery;
+    }
 }

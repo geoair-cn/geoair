@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.ConfigAdvQuery;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
@@ -23,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected abstract String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders, List<String> conflictKeys);
 
+    Supplier<ConfigAdvQuery> configAdvQueryGetter;
+
+    public AbstractExecAdvBaseAccessOpt(Supplier<ConfigAdvQuery> configAdvQueryGetter) {
+        this.configAdvQueryGetter = configAdvQueryGetter;
+    }
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
@@ -179,7 +186,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         } catch (SQLException e) {
             rollbackConnection(connection);
             AdvLogSql.of(dataSourceGetter).logExecuteError(
-                    this.getClass(), "bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),e);
+                    this.getClass(), "bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
         } finally {
             restoreAutoCommit(connection);
@@ -260,8 +267,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
-        List<String> conflictKeysCopy = new ArrayList<>( );
-        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+        List<String> conflictKeysCopy = new ArrayList<>();
+        if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }
