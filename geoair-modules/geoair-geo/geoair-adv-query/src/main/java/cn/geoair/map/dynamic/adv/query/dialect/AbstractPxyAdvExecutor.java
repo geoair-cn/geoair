@@ -285,25 +285,25 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids) {
-        return getAdvBaseOpt().bDeleteBatchByPK(tableName, idKey, ids);
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids);
     }
 
     @Override
-    public Integer bDeleteBatchWithBatchSize(
+    public Integer bDeleteByPKs(
             String tableName, String idKey, Set<Object> ids, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
     }
 
     @Override
-    public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bDeleteByCondition(tableName, whereMap);
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap);
     }
 
     @Override
-    public Integer bDeleteBatchByCondition(
+    public Integer bDeleteByMap(
             String tableName, Map<String, Object> whereMap, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchByCondition(tableName, whereMap, batchSize);
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
 

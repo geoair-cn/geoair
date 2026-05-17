@@ -49,6 +49,8 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
      */
     boolean isToUnderlineCase;
 
+
+
     private GirAdvWhereLambdaFilter(Class<T> entityClass, boolean isToUnderlineCase) {
         this.whereFilter = GirAdvWhereFilter.of();
         this.entityClass = entityClass;

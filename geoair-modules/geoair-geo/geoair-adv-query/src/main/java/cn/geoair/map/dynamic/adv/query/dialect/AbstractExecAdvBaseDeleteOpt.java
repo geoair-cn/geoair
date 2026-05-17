@@ -15,7 +15,6 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.handler.NumberHandler;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
@@ -119,7 +118,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     @Override
-    public Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids) {
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(ids)) {
@@ -164,7 +163,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     @Override
-    public Integer bDeleteBatchWithBatchSize(String tableName, String idKey, Set<Object> ids, int batchSize) {
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids, int batchSize) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(ids)) {
@@ -180,7 +179,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (List<Object> idBatch : idBatches) {
-            totalSuccess += bDeleteBatchByPK(tableName, idKey, new HashSet<>(idBatch));
+            totalSuccess += bDeleteByPKs(tableName, idKey, new HashSet<>(idBatch));
         }
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
@@ -193,7 +192,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     // ========== 通用逻辑：条件删除 ==========
     @Override
-    public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(whereMap)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
@@ -222,7 +221,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     @Override
-    public Integer bDeleteBatchByCondition(String tableName, Map<String, Object> whereMap, int batchSize) {
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap, int batchSize) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(whereMap)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");

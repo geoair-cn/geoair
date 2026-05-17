@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Map;
 /**
  * 数据更新相关的基础操作接口
  *
- * <p>覆盖单条更新、批量更新、自定义SQL更新、条件更新、乐观锁更新、UPSERT等全场景， 适配PostgreSQL/MySQL等主流数据库，保持语义化命名和易用性
+ * <p>覆盖单条更新、批量更新、自定义SQL更新、条件更新、UPSERT等全场景
  *
  * @author 张逢吉
  */
@@ -225,7 +227,6 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     // ==================== 特殊场景更新 ====================
 
 
-
     /**
      * 更新或插入（UPSERT）
      *
@@ -338,18 +339,28 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @return Integer 受影响的行数
      */
     <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys);
+
     /**
      * 更新或插入（UPSERT）忽略为空的字段
      *
      * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
      *
-     * @param tableName    目标表名（如：user）
-     * @param entity       待插入的Java对象（如User实体类）
-     * @param conflictKeys 冲突判定字段（唯一索引/主键）
+     * @param tableName        目标表名（如：user）
+     * @param entity           待插入的Java对象（如User实体类）
+     * @param conflictKeys     冲突判定字段（唯一索引/主键）
      * @param ignoreFieldNames java对象中需要忽略的键
-     * @param <T>          实体类泛型
+     * @param <T>              实体类泛型
      * @return Integer 受影响的行数
      */
-    <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys,List<String> ignoreFieldNames);
+    <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames);
 
+    //==================================where条件的删除=======================================
+
+//    <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter);
+//
+//    <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter);
+//
+//    <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter);
+//
+//    <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter);
 }

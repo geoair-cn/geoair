@@ -193,25 +193,25 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteBatchByPK(String tableName, String idKey, Set<Object> ids) {
-        return getAdvBaseDeletePxyOpt().bDeleteBatchByPK(tableName, idKey, ids);
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPKs(tableName, idKey, ids);
     }
 
     @Override
-    public Integer bDeleteBatchWithBatchSize(
+    public Integer bDeleteByPKs(
             String tableName, String idKey, Set<Object> ids, int batchSize) {
-        return getAdvBaseDeletePxyOpt().bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
+        return getAdvBaseDeletePxyOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
     }
 
     @Override
-    public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
-        return getAdvBaseDeletePxyOpt().bDeleteByCondition(tableName, whereMap);
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
+        return getAdvBaseDeletePxyOpt().bDeleteByMap(tableName, whereMap);
     }
 
     @Override
-    public Integer bDeleteBatchByCondition(
+    public Integer bDeleteByMap(
             String tableName, Map<String, Object> whereMap, int batchSize) {
-        return getAdvBaseDeletePxyOpt().bDeleteBatchByCondition(tableName, whereMap, batchSize);
+        return getAdvBaseDeletePxyOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
 
