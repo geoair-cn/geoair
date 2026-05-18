@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -11,11 +12,13 @@ import java.util.List;
  * @date 2026/4/24
  * @description SQL 日志（智能换行，不截断单词 + 动态长度分割线）
  */
-@Slf4j
+
 public class AdvLogSql {
 
+    GiLogger log = GirLogger.getLoger(AdvLogSql.class);
     // 全局开关
     public static boolean logEnable = true;
+
 
     // 一行最大长度（分割线自动根据这个生成）
     public static final int MAX_LINE_LENGTH = 180;
@@ -24,6 +27,7 @@ public class AdvLogSql {
     private static final String SPLIT_LINE;
 
     static {
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < MAX_LINE_LENGTH; i++) {
             sb.append("=");
@@ -41,6 +45,7 @@ public class AdvLogSql {
     private static final String BLUE = "\u001B[34m";
 
     private final IDataSourceGetter dataSourceGetter;
+
 
     public static AdvLogSql of(IDataSourceGetter dataSourceGetter) {
         return new AdvLogSql(dataSourceGetter);

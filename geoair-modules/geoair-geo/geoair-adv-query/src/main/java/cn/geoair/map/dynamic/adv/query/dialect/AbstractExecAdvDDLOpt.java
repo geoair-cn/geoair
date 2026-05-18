@@ -432,9 +432,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
-            log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, execSql,jdbcParams, e);
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, execSql, jdbcParams, e);
             rollbackConnection(connection, operation, tableName);
             log.error(
                     "{}失败，表名: {}, SQL: {}, 错误: {}",
