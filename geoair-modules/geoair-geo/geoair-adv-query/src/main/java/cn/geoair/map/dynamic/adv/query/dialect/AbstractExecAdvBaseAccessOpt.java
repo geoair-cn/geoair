@@ -256,6 +256,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return bInsertIgnore(tableName, entity, conflictKeys, true,false, ignoreFieldNames);
+    }
+
+    @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
         return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
     }
