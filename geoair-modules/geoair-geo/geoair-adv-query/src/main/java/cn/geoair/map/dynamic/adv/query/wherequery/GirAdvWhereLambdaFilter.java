@@ -2,14 +2,14 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
-import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import static cn.geoair.map.dynamic.adv.query.utils.LambdaUtils.getColumnName;
 
 /**
  * Lambda风格的WHERE条件构建器
@@ -48,7 +48,6 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
      * 是否驼峰转下划线
      */
     boolean isToUnderlineCase;
-
 
 
     private GirAdvWhereLambdaFilter(Class<T> entityClass, boolean isToUnderlineCase) {
@@ -115,120 +114,120 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 等于 =
      */
-    public GirAdvWhereLambdaFilter<T> eq(SFunction<T, ?> column, Object value) {
-        whereFilter.eq(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> eq(Function<T, ?> column, Object value) {
+        whereFilter.eq(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 不等于 !=
      */
-    public GirAdvWhereLambdaFilter<T> ne(SFunction<T, ?> column, Object value) {
-        whereFilter.ne(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> ne(Function<T, ?> column, Object value) {
+        whereFilter.ne(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 大于 >
      */
-    public GirAdvWhereLambdaFilter<T> gt(SFunction<T, ?> column, Object value) {
-        whereFilter.gt(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> gt(Function<T, ?> column, Object value) {
+        whereFilter.gt(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 大于等于 >=
      */
-    public GirAdvWhereLambdaFilter<T> ge(SFunction<T, ?> column, Object value) {
-        whereFilter.ge(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> ge(Function<T, ?> column, Object value) {
+        whereFilter.ge(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 小于 <
      */
-    public GirAdvWhereLambdaFilter<T> lt(SFunction<T, ?> column, Object value) {
-        whereFilter.lt(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> lt(Function<T, ?> column, Object value) {
+        whereFilter.lt(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 小于等于 <=
      */
-    public GirAdvWhereLambdaFilter<T> le(SFunction<T, ?> column, Object value) {
-        whereFilter.le(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> le(Function<T, ?> column, Object value) {
+        whereFilter.le(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * IN条件
      */
-    public GirAdvWhereLambdaFilter<T> in(SFunction<T, ?> column, Collection<?> values) {
-        whereFilter.in(getColumnName(column), values);
+    public GirAdvWhereLambdaFilter<T> in(Function<T, ?> column, Collection<?> values) {
+        whereFilter.in(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
 
     /**
      * IN条件（数组）
      */
-    public GirAdvWhereLambdaFilter<T> in(SFunction<T, ?> column, Object[] values) {
-        whereFilter.in(getColumnName(column), values);
+    public GirAdvWhereLambdaFilter<T> in(Function<T, ?> column, Object[] values) {
+        whereFilter.in(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
 
     /**
      * NOT IN条件
      */
-    public GirAdvWhereLambdaFilter<T> notIn(SFunction<T, ?> column, Collection<?> values) {
-        whereFilter.notIn(getColumnName(column), values);
+    public GirAdvWhereLambdaFilter<T> notIn(Function<T, ?> column, Collection<?> values) {
+        whereFilter.notIn(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
 
     /**
      * LIKE条件（全模糊 %value%）
      */
-    public GirAdvWhereLambdaFilter<T> like(SFunction<T, ?> column, String value) {
-        whereFilter.like(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> like(Function<T, ?> column, String value) {
+        whereFilter.like(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 左模糊匹配 value%
      */
-    public GirAdvWhereLambdaFilter<T> likeLeft(SFunction<T, ?> column, String value) {
-        whereFilter.likeLeft(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> likeLeft(Function<T, ?> column, String value) {
+        whereFilter.likeLeft(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * 右模糊匹配 %value
      */
-    public GirAdvWhereLambdaFilter<T> likeRight(SFunction<T, ?> column, String value) {
-        whereFilter.likeRight(getColumnName(column), value);
+    public GirAdvWhereLambdaFilter<T> likeRight(Function<T, ?> column, String value) {
+        whereFilter.likeRight(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
 
     /**
      * BETWEEN条件
      */
-    public GirAdvWhereLambdaFilter<T> between(SFunction<T, ?> column, Object start, Object end) {
-        whereFilter.between(getColumnName(column), start, end);
+    public GirAdvWhereLambdaFilter<T> between(Function<T, ?> column, Object start, Object end) {
+        whereFilter.between(getColumnName(column, isToUnderlineCase), start, end);
         return this;
     }
 
     /**
      * IS NULL条件
      */
-    public GirAdvWhereLambdaFilter<T> isNull(SFunction<T, ?> column) {
-        whereFilter.isNull(getColumnName(column));
+    public GirAdvWhereLambdaFilter<T> isNull(Function<T, ?> column) {
+        whereFilter.isNull(getColumnName(column, isToUnderlineCase));
         return this;
     }
 
     /**
      * IS NOT NULL条件
      */
-    public GirAdvWhereLambdaFilter<T> isNotNull(SFunction<T, ?> column) {
-        whereFilter.isNotNull(getColumnName(column));
+    public GirAdvWhereLambdaFilter<T> isNotNull(Function<T, ?> column) {
+        whereFilter.isNotNull(getColumnName(column, isToUnderlineCase));
         return this;
     }
 
@@ -246,7 +245,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
      * </pre>
      */
     public GirAdvWhereLambdaFilter<T> and(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
-        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass,isToUnderlineCase);
+        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass, isToUnderlineCase);
         consumer.accept(nestedWrapper);
         whereFilter.group(group -> {
             copyConditionsToGroup(nestedWrapper.getWhereFilter(), group);
@@ -259,7 +258,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
      * <p>组内的条件将作为一个整体与其他条件进行OR连接</p>
      */
     public GirAdvWhereLambdaFilter<T> or(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
-        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass,isToUnderlineCase);
+        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass, isToUnderlineCase);
         consumer.accept(nestedWrapper);
         whereFilter.or().group(group -> {
             copyConditionsToGroup(nestedWrapper.getWhereFilter(), group);
@@ -271,7 +270,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
      * NOT条件组
      */
     public GirAdvWhereLambdaFilter<T> not(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
-        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass,isToUnderlineCase);
+        GirAdvWhereLambdaFilter<T> nestedWrapper = new GirAdvWhereLambdaFilter<>(entityClass, isToUnderlineCase);
         consumer.accept(nestedWrapper);
         whereFilter.notGroup(group -> {
             copyConditionsToGroup(nestedWrapper.getWhereFilter(), group);
@@ -341,54 +340,6 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
         return new GirAdvWhereLambdaFilter<>(entityClass, isToUnderlineCase);
     }
 
-    // ==================== 私有辅助方法 ====================
-
-    /**
-     * 获取Lambda表达式对应的字段名
-     */
-    private String getColumnName(SFunction<T, ?> function) {
-        try {
-            Method method = function.getClass().getDeclaredMethod("writeReplace");
-            method.setAccessible(true);
-            SerializedLambda serializedLambda = (SerializedLambda) method.invoke(function);
-            String implMethodName = serializedLambda.getImplMethodName();
-
-            // 处理getter方法：getXxx -> xxx, isXxx -> xxx
-            String fieldName;
-            if (implMethodName.startsWith("get") && implMethodName.length() > 3) {
-                fieldName = decapitalize(implMethodName.substring(3));
-            } else if (implMethodName.startsWith("is") && implMethodName.length() > 2) {
-                fieldName = decapitalize(implMethodName.substring(2));
-            } else {
-                fieldName = implMethodName;
-            }
-
-            if(isToUnderlineCase){
-                return  StrUtil.toUnderlineCase(fieldName);
-            }else{
-                return fieldName;
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get column name from lambda", e);
-        }
-    }
-
-    /**
-     * 首字母小写
-     */
-    private String decapitalize(String name) {
-        if (name == null || name.isEmpty()) {
-            return name;
-        }
-        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
-                Character.isUpperCase(name.charAt(0))) {
-            return name;
-        }
-        char[] chars = name.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
-    }
 
     /**
      * 复制条件到条件组构建器
@@ -509,19 +460,6 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
                 target.and().expr(column, operator, value);
                 break;
         }
-    }
-
-    // ==================== 内部函数式接口 ====================
-
-    /**
-     * 函数式接口，用于获取属性名称
-     *
-     * @param <T> 实体类型
-     * @param <R> 属性类型
-     */
-    @FunctionalInterface
-    public interface SFunction<T, R> extends Serializable {
-        R apply(T t);
     }
 
 

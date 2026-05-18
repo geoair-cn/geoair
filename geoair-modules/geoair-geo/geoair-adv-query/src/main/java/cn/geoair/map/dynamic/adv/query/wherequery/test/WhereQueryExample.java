@@ -49,8 +49,11 @@ public class WhereQueryExample {
                 ).order(OrderApo.ofASCFunction("create_time1")).order(OrderApo.ofASCFieldName("aaaaa"))
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
-        printResult("示例1：表达式", result);
+//        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
+//        printResult("示例1：表达式", result);
+
+        WhereQueryExample example2 = new WhereQueryExample(dialect, dataSourceGetter);
+        example2.runAllExamples();
     }
 
     public void runAllExamples() {
@@ -228,6 +231,7 @@ public class WhereQueryExample {
                         .or()
                         .group(group -> group
                                 .gt("age", 18)
+                                .eq("vip", 1)
                                 .eq("vip", 1)
                         )
                 )
