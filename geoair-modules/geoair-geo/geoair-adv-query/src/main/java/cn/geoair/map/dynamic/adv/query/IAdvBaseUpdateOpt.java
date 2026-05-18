@@ -362,6 +362,21 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
 
     /**
+     * 更新或插入（UPSERT）- 最完整参数版本（支持指定忽略字段）
+     *
+     * <p>适用于面向对象的UPSERT操作，支持驼峰转换、空值过滤和字段忽略
+     *
+     * @param tableName        目标表名（如：user）
+     * @param entity           待操作的Java对象（如User实体类）
+     * @param conflictKeys     冲突判定字段（唯一索引字段或主键字段列表）
+     * @param ignoreFieldNames 需要忽略的字段名称列表（实体类中的属性名，非数据库字段名）
+     * @param <T>              实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames);
+
+
+    /**
      * 更新或插入（UPSERT）- 选择性更新版本（忽略null值字段）
      *
      * <p>自动忽略实体中值为null的字段，只使用非null字段进行UPSERT操作

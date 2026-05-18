@@ -397,6 +397,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return bUpsert(tableName, entity, conflictKeys, true, false, ignoreFieldNames);
+    }
+
+    @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true);
     }
