@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
@@ -68,31 +69,53 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     @Override
     public Integer bDeleteBySql(String dynamicSql, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(dynamicSql)) {
-            throw new IllegalArgumentException("删除SQL语句不能为空");
+            throw new IllegalArgumentException("更新SQL语句不能为空");
         }
-
         SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
+        return bDeleteBySql(execSql, SqlParamList.ofList(jdbcParams));
+    }
 
+    @Override
+    public Integer bDeleteBySql(String sqlStatement, SqlParamList sqlParam) {
+        if (StrUtil.isEmpty(sqlStatement)) {
+            throw new IllegalArgumentException("删除SQL语句不能为空");
+        }
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
         try {
             stopWatch.start();
             Integer result;
-            if (CollUtil.isEmpty(jdbcParams)) {
-                result = SqlExecutor.execute(connection, execSql);
+            if (CollUtil.isEmpty(sqlParam)) {
+                result = SqlExecutor.execute(connection, sqlStatement);
             } else {
-                result = SqlExecutor.execute(connection, execSql, jdbcParams.toArray());
+                result = SqlExecutor.execute(connection, sqlStatement, sqlParam.toArray());
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteBySql", execSql, jdbcParams, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-            throw new RuntimeException("执行自定义删除SQL失败，SQL：" + execSql, e);
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, e);
+            throw new RuntimeException("执行自定义删除SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    @Override
+    public Integer bDeleteBySql(String sqlStatement, GirSqlParam sqlParam) {
+        if (sqlParam == null) {
+            return bDeleteBySql(sqlStatement);
+        } else if (sqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) sqlParam;
+            return bDeleteBySql(sqlStatement, sqlParamList);
+        } else if (sqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) sqlParam;
+            return bDeleteBySql(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
         }
     }
 
@@ -116,6 +139,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), e);
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -216,9 +240,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByCondition", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bDeleteByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bDeleteByMap", execSql, params, e);
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -289,7 +314,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         List<Object> params = new ArrayList<>();
-        String whereClause= GirAdvSqlUtils.buildWhereClause(whereFilter, params, dialectTableNameProcessor, dataSourceGetter);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereFilter, params, dialectTableNameProcessor, dataSourceGetter);
         if (GutilObject.isEmpty(whereClause)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
@@ -352,7 +377,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(" AND "));
     }
-
 
 
     protected String getSchemaName() {
