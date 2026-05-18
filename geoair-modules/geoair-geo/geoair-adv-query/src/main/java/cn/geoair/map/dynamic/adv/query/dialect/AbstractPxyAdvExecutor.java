@@ -247,6 +247,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }

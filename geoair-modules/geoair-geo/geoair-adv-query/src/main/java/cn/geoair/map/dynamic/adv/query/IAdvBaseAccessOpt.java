@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * <p>覆盖单条插入、批量插入、自定义SQL插入、忽略重复插入、插入并返回主键等全场景
  */
-public interface IAdvBaseAccessOpt  extends IAdvConfigOpt{
+public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
 
     /**
      * 设置数据源获取器
@@ -196,7 +196,7 @@ public interface IAdvBaseAccessOpt  extends IAdvConfigOpt{
 
     // ==================== 特殊场景插入 ====================
 
-    Integer bInsertIgnore(String tableName, Map<String, Object> rowData );
+    Integer bInsertIgnore(String tableName, Map<String, Object> rowData);
 
     /**
      * 插入或忽略（存在则跳过，不存在则插入）
@@ -212,8 +212,6 @@ public interface IAdvBaseAccessOpt  extends IAdvConfigOpt{
     Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys);
 
 
-
-
     /**
      * 插入单条Java对象数据 字段名称默认转下划线
      *
@@ -226,6 +224,20 @@ public interface IAdvBaseAccessOpt  extends IAdvConfigOpt{
      * @return Integer 受影响的行数
      */
     <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys);
+
+    /**
+     * 插入单条Java对象数据 字段名称默认转下划线
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配
+     *
+     * @param tableName        目标表名（如：user）
+     * @param entity           待插入的Java对象（如User实体类）
+     * @param conflictKeys     冲突判定字段（唯一索引/主键）
+     * @param ignoreFieldNames 忽略bean里面的哪些字段
+     * @param <T>              实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
