@@ -289,7 +289,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         List<Object> params = new ArrayList<>();
-        String whereClause = buildWhereClause(whereFilter, params);
+        String whereClause= GirAdvSqlUtils.buildWhereClause(whereFilter, params, dialectTableNameProcessor, dataSourceGetter);
         if (GutilObject.isEmpty(whereClause)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
@@ -353,12 +353,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                 .collect(Collectors.joining(" AND "));
     }
 
-    protected String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params) {
-        GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
-        String whereSql = sqlBuilder.buildWhereSql(whereFilter, params);
 
-        return whereSql;
-    }
 
     protected String getSchemaName() {
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
@@ -414,7 +409,4 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return StrUtil.format("DELETE FROM {} WHERE {} LIMIT {}", tableName, whereClause, batchSize);
     }
 
-    protected GirAdvQuerySqlBuilder getSqlBuilder() {
-        return new GirAdvQuerySqlBuilder(dialectTableNameProcessor, dataSourceGetter);
-    }
 }

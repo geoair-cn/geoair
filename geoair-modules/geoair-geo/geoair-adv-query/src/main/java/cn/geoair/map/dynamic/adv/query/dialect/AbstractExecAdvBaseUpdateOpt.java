@@ -11,6 +11,8 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
@@ -292,7 +294,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
 
-
     // ========== 通用逻辑：更新或插入（UPSERT） ==========
     @Override
     public Integer bUpdateOrInsert(
@@ -384,6 +385,89 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        if (whereFilter == null) {
+            throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
+        }
+        boolean toUnderlineCase = whereFilter.isToUnderlineCase();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, false, ignoreFieldNames);
+        return bUpdateByWhere(tableName, rowData, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return bUpdateByWhere(tableName, entity, whereFilter, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        validateTableName(tableName);
+        validateUpdateData(rowData);
+        List<Object> whereParams = new ArrayList<>();
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereFilter, whereParams, dialectTableNameProcessor, dataSourceGetter);
+        if (GutilObject.isEmpty(whereClause)) {
+            throw new RuntimeException("更新条件不能为空（避免全表更新）");
+        }
+        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String setClause = buildSetClause(rowData);
+        String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
+        List<Object> params = new ArrayList<>(rowData.values());
+        params.addAll(whereParams);
+        StopWatch stopWatch = new StopWatch();
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            stopWatch.start();
+            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
+            stopWatch.stop();
+            long cost = stopWatch.getLastTaskTimeMillis();
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
+            return result;
+        } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
+            throw new RuntimeException("条件更新失败，表名：" + tableName, e);
+        } finally {
+            closeConnection(connection);
+        }
+
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        if (whereFilter == null) {
+            throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
+        }
+        boolean toUnderlineCase = whereFilter.isToUnderlineCase();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+        return bUpdateSelectiveByWhere(tableName, rowData, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return bUpdateSelectiveByWhere(tableName, entity, whereFilter, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        validateUpdateData(rowData);
+        // 过滤掉 value 为 null 的数据（保留空字符串）
+        Map<String, Object> copyRowData;
+        copyRowData = rowData.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return bUpdateByWhere(tableName, copyRowData, whereFilter);
     }
 
     // ====================== 原有工具方法不动 ======================
