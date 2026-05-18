@@ -8,6 +8,8 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
@@ -71,26 +73,48 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
+        return bUpdateBySql(execSql, SqlParamList.ofList(jdbcParams));
+    }
 
+    @Override
+    public Integer bUpdateBySql(String sqlStatement, SqlParamList sqlParam) {
+        if (StrUtil.isEmpty(sqlStatement)) {
+            throw new IllegalArgumentException("更新SQL语句不能为空");
+        }
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
         try {
             stopWatch.start();
             Integer result;
-            if (CollUtil.isEmpty(jdbcParams)) {
-                result = SqlExecutor.execute(connection, execSql);
+            if (GutilObject.isEmpty(sqlParam)) {
+                result = SqlExecutor.execute(connection, sqlStatement);
             } else {
-                result = SqlExecutor.execute(connection, execSql, jdbcParams.toArray());
+                result = SqlExecutor.execute(connection, sqlStatement, sqlParam.toArray());
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBySql", execSql, jdbcParams, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateBySql", execSql, jdbcParams, e);
-            throw new RuntimeException("执行自定义更新SQL失败，SQL：" + execSql, e);
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, e);
+            throw new RuntimeException("执行自定义更新SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    @Override
+    public Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam) {
+        if (sqlParam == null) {
+            return bUpdateBySql(sqlStatement);
+        } else if (sqlParam instanceof SqlParamList) {
+            SqlParamList sqlParamList = (SqlParamList) sqlParam;
+            return bUpdateBySql(sqlStatement, sqlParamList);
+        } else if (sqlParam instanceof SqlParamMap) {
+            SqlParamMap sqlParamMap = (SqlParamMap) sqlParam;
+            return bUpdateBySql(sqlStatement, sqlParamMap);
+        } else {
+            throw new RuntimeException("SqlParam参数不合法！");
         }
     }
 

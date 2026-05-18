@@ -281,6 +281,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public Integer bDeleteBySql(String sqlStatement, SqlParamList sqlParam) {
+        return getAdvBaseOpt().bDeleteBySql(sqlStatement, sqlParam);
+    }
+
+    @Override
+    public Integer bDeleteBySql(String sqlStatement, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bDeleteBySql(sqlStatement, sqlParam);
+    }
+
+    @Override
     public Integer bDeleteByPK(String tableName, String idKey, Object id) {
         return getAdvBaseOpt().bDeleteByPK(tableName, idKey, id);
     }
@@ -517,6 +527,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public Integer bUpdateBySql(String dynamicSql, SqlParamMap sqlParam) {
         return getAdvBaseOpt().bUpdateBySql(dynamicSql, sqlParam);
+    }
+
+    @Override
+    public Integer bUpdateBySql(String sqlStatement, SqlParamList sqlParam) {
+        return getAdvBaseOpt().bUpdateBySql(sqlStatement, sqlParam);
+    }
+
+    @Override
+    public Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bUpdateBySql(sqlStatement, sqlParam);
     }
 
     @Override

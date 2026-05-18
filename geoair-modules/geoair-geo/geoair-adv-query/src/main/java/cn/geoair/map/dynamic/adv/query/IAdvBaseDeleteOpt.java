@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
@@ -70,6 +72,35 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
      * @throws cn.geoair.map.dynamic.adv.query.exception.SqlExecuteException SQL执行异常
      */
     Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam);
+
+
+
+    /**
+     * 执行带参数的自定义删除SQL语句
+     *
+     * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
+     *
+     * @param sqlStatement 自定义更新SQL语句（含参数占位符）
+     *                     示例：DELETE FROM WHERE id =？
+     * @param sqlParam     SQL参数映射 示例：[ 1001]
+     * @return 受影响的行数
+     */
+    Integer bDeleteBySql(String sqlStatement, SqlParamList sqlParam);
+
+    /**
+     * 执行带参数的自定义删除SQL语句
+     *
+     * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
+     *
+     * @param sqlStatement 自定义删除SQL语句（含参数占位符）
+     *                     示例：DELETE FROM WHERE id =？或者DELETE FROM WHERE id = #{id}
+     * @param sqlParam     根据 GirSqlParam 具体类型自动识别
+     * @return 受影响的行数
+     */
+
+    Integer bDeleteBySql(String sqlStatement, GirSqlParam sqlParam);
+
+
 
     // ==================== 主键删除（最常用） ====================
 

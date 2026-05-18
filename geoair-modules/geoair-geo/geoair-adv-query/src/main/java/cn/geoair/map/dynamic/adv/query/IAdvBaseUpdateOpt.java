@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
@@ -43,13 +45,38 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      *
      * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
      *
-     * @param sqlStatement 自定义更新SQL语句（含参数占位符）
-     *                     示例：UPDATE user SET name = #{name} WHERE id = #{id}
-     * @param sqlParam     SQL参数映射（key为占位符名称，value为参数值）
-     *                     示例：{ "name": "张三", "id": 1001 }
+     * @param dynamicSql 自定义更新SQL语句（含参数占位符）
+     *                   示例：UPDATE user SET name = #{name} WHERE id = #{id}
+     * @param sqlParam   SQL参数映射（key为占位符名称，value为参数值）
+     *                   示例：{ "name": "张三", "id": 1001 }
      * @return 受影响的行数
      */
-    Integer bUpdateBySql(String sqlStatement, SqlParamMap sqlParam);
+    Integer bUpdateBySql(String dynamicSql, SqlParamMap sqlParam);
+
+    /**
+     * 执行带参数的自定义更新SQL语句
+     *
+     * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
+     *
+     * @param sqlStatement 自定义更新SQL语句（含参数占位符）
+     *                     示例：UPDATE user SET name = ？ WHERE id =？
+     * @param sqlParam     SQL参数映射 示例：["张三",1001]
+     * @return 受影响的行数
+     */
+    Integer bUpdateBySql(String sqlStatement, SqlParamList sqlParam);
+
+    /**
+     * 执行带参数的自定义更新SQL语句
+     *
+     * <p>解决纯SQL拼接的SQL注入问题，支持动态参数绑定
+     *
+     * @param sqlStatement 自定义更新SQL语句（含参数占位符）
+     *                     示例：UPDATE user SET name = ？ WHERE id =？或者  UPDATE user SET name = #{name} WHERE id = #{id}
+     * @param sqlParam     根据GirSqlParam 具体类型自动识别
+     * @return 受影响的行数
+     */
+
+    Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam);
 
     // ==================== 单条数据更新（标准化） ====================
 
@@ -397,11 +424,11 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * );
      * </pre>
      *
-     * @param tableName       目标表名
-     * @param entity          待更新的实体对象（非null字段参与更新）
-     * @param whereFilter     Lambda条件过滤器（用于构建WHERE条件）
+     * @param tableName        目标表名
+     * @param entity           待更新的实体对象（非null字段参与更新）
+     * @param whereFilter      Lambda条件过滤器（用于构建WHERE条件）
      * @param ignoreFieldNames 需要忽略的字段名称列表
-     * @param <T>             实体类泛型
+     * @param <T>              实体类泛型
      * @return 受影响的行数
      */
     <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames);
@@ -454,11 +481,11 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * <p>自动忽略实体中值为null的字段以及指定的字段，只更新非null且不在忽略列表中的字段。
      * 使用Lambda表达式构建类型安全的WHERE条件。
      *
-     * @param tableName         目标表名
-     * @param entity            待更新的实体对象
-     * @param whereFilter       Lambda条件过滤器
-     * @param ignoreFieldNames  需要忽略的字段名称列表
-     * @param <T>               实体类泛型
+     * @param tableName        目标表名
+     * @param entity           待更新的实体对象
+     * @param whereFilter      Lambda条件过滤器
+     * @param ignoreFieldNames 需要忽略的字段名称列表
+     * @param <T>              实体类泛型
      * @return 受影响的行数
      */
     <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames);
