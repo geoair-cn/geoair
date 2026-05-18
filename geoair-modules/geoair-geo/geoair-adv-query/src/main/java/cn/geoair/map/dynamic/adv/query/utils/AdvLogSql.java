@@ -1,8 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 
 import java.util.List;
 
@@ -11,11 +13,13 @@ import java.util.List;
  * @date 2026/4/24
  * @description SQL 日志（智能换行，不截断单词 + 动态长度分割线）
  */
-@Slf4j
+
 public class AdvLogSql {
 
+    GiLogger log = GirLogger.getLoger(AdvLogSql.class);
     // 全局开关
     public static boolean logEnable = true;
+
 
     // 一行最大长度（分割线自动根据这个生成）
     public static final int MAX_LINE_LENGTH = 180;
@@ -24,6 +28,7 @@ public class AdvLogSql {
     private static final String SPLIT_LINE;
 
     static {
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < MAX_LINE_LENGTH; i++) {
             sb.append("=");
@@ -42,12 +47,17 @@ public class AdvLogSql {
 
     private final IDataSourceGetter dataSourceGetter;
 
-    public static AdvLogSql of(IDataSourceGetter dataSourceGetter) {
-        return new AdvLogSql(dataSourceGetter);
+    private final AdvQueryGlobalConfig advQueryGlobalConfig;
+
+
+    public static AdvLogSql of(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
+        return new AdvLogSql(dataSourceGetter, advQueryGlobalConfig);
     }
 
-    private AdvLogSql(IDataSourceGetter dataSourceGetter) {
+
+    private AdvLogSql(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
         this.dataSourceGetter = dataSourceGetter;
+        this.advQueryGlobalConfig = advQueryGlobalConfig;
     }
 
     private String wrapSql(String sql) {
@@ -76,7 +86,10 @@ public class AdvLogSql {
     // ===================== 带Class =====================
     public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis) {
         if (!logEnable) return;
-        log.debug("\n" + GRAY + SPLIT_LINE + RESET
+        if (!getEnableByClassName(callerClass)) {
+            return;
+        }
+        log.info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -89,8 +102,11 @@ public class AdvLogSql {
     // ===================== 带Class + 影响行数 =====================
     public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Number rows) {
         if (!logEnable) return;
+        if (!getEnableByClassName(callerClass)) {
+            return;
+        }
         try {
-            log.debug("\n" + GRAY + SPLIT_LINE + RESET
+            log.info("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                             + "\n执行方法：{}.{}"
                             + "\nSQL 语句："
@@ -107,7 +123,10 @@ public class AdvLogSql {
     // ===================== 带Class + 参数 + 影响行数 =====================
     public void logExecuteSql(Class callerClass, String methodName, String sql, List<Object> params, long lastTaskTimeMillis, Number rows) {
         if (!logEnable) return;
-        log.debug("\n" + GRAY + SPLIT_LINE + RESET
+        if (!getEnableByClassName(callerClass)) {
+            return;
+        }
+        log.info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -121,6 +140,9 @@ public class AdvLogSql {
     // ===================== 异常日志：基础版 =====================
     public void logExecuteError(Class callerClass, String methodName, String sql, Exception e) {
         if (!logEnable) return;
+        if (!getEnableErrorLog(callerClass)) {
+            return;
+        }
         try {
             log.error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
@@ -134,13 +156,17 @@ public class AdvLogSql {
                     callerClass.getSimpleName(), methodName,
                     wrapSql(sql),
                     e.getMessage());
-        }catch (Exception e2) {}
+        } catch (Exception e2) {
+        }
 
     }
 
     // ===================== 异常日志：带耗时 =====================
     public void logExecuteError(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Exception e) {
         if (!logEnable) return;
+        if (!getEnableErrorLog(callerClass)) {
+            return;
+        }
         log.error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
@@ -158,6 +184,9 @@ public class AdvLogSql {
     // ===================== 异常日志：带参数 + 耗时 =====================
     public void logExecuteErrorSimple(Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
         if (!logEnable) return;
+        if (!getEnableErrorLog(callerClass)) {
+            return;
+        }
         log.error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + RESET
                         + "\n执行方法：{}.{}"
@@ -177,6 +206,9 @@ public class AdvLogSql {
     // ===================== 异常日志：完整版（打印异常堆栈） =====================
     public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
         if (!logEnable) return;
+        if (!getEnableErrorLog(callerClass)) {
+            return;
+        }
         try {
             log.error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
@@ -204,6 +236,9 @@ public class AdvLogSql {
 
     public void logExecuteError(Class<?> callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
         if (!logEnable) return;
+        if (!getEnableErrorLog(callerClass)) {
+            return;
+        }
         log.error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
@@ -272,5 +307,34 @@ public class AdvLogSql {
         if (dataSourceGetter == null) return "";
         String db = dataSourceGetter.getDatabaseName();
         return GutilObject.isEmpty(db) ? "" : db;
+    }
+
+    boolean getEnableByClassName(Class<?> callerClass) {
+        String simpleName = callerClass.getSimpleName();
+        if (simpleName.contains("DeleteOpt")) {
+            return getConfig().isEnableDelLog();
+        }
+        if (simpleName.contains("UpdateOpt")) {
+            return getConfig().isEnableUpdateLog();
+        }
+        if (simpleName.contains("SelectOpt")) {
+            return getConfig().isEnableQueryLog();
+        }
+        if (simpleName.contains("AccessOpt")) {
+            return getConfig().isEnableAccessLog();
+        }
+
+        if (simpleName.contains("DDLOpt")) {
+            return getConfig().isEnableDdlLog();
+        }
+        return true;
+    }
+
+    boolean getEnableErrorLog(Class<?> callerClass) {
+        return getConfig().isEnableErrorLog();
+    }
+
+    public AdvQueryGlobalConfig getConfig() {
+        return advQueryGlobalConfig;
     }
 }

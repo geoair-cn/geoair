@@ -549,6 +549,11 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
     }

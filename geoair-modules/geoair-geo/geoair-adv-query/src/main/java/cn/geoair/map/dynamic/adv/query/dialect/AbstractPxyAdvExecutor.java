@@ -637,6 +637,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
     }

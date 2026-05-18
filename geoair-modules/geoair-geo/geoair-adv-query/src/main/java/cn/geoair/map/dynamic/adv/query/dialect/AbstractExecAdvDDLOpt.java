@@ -336,7 +336,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSql = getMetadataFromSql(fieldQuerySql, tableFields, null);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "dGetColumnsBySQL", fieldQuerySql, cost);
+          AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "dGetColumnsBySQL", fieldQuerySql, cost);
         return metadataFromSql;
     }
 
@@ -361,7 +361,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSqlWithParam = getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
+          AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
         return metadataFromSqlWithParam;
     }
 
@@ -387,10 +387,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), operation, sql, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), operation, sql, cost, result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, sql, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), operation, sql, e);
             rollbackConnection(connection, operation, tableName);
             log.error("{}失败，表名: {}, SQL: {}, 错误: {}", operation, tableName, sql, e.getMessage(), e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
@@ -431,10 +431,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
-            log.debug("{}成功，表名: {}", operation, tableName);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, execSql,jdbcParams, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), operation, execSql, jdbcParams, e);
             rollbackConnection(connection, operation, tableName);
             log.error(
                     "{}失败，表名: {}, SQL: {}, 错误: {}",

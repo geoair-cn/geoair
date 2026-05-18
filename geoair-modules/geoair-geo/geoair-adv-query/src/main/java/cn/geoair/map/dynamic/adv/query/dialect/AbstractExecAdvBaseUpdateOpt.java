@@ -93,10 +93,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, e);
             throw new RuntimeException("执行自定义更新SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
@@ -143,10 +143,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
             throw new RuntimeException("按主键更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -233,10 +233,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -290,7 +290,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             String format = StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize);
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBatchWithBatchSize", format, cost, totalSuccess);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchWithBatchSize", format, cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -352,10 +352,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
             throw new RuntimeException("更新或插入失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -394,6 +394,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         conflictKeys = conflictKeysCopy;
         return bUpsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return bUpsert(tableName, entity, conflictKeys, true, false, ignoreFieldNames);
     }
 
     @Override
@@ -454,10 +459,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
+              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
