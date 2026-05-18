@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
+
 
 import static cn.geoair.map.dynamic.adv.query.utils.LambdaUtils.getColumnName;
 
@@ -114,7 +114,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 等于 =
      */
-    public GirAdvWhereLambdaFilter<T> eq(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> eq(SFunction<T, ?> column, Object value) {
         whereFilter.eq(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -122,7 +122,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 不等于 !=
      */
-    public GirAdvWhereLambdaFilter<T> ne(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> ne(SFunction<T, ?> column, Object value) {
         whereFilter.ne(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -130,7 +130,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 大于 >
      */
-    public GirAdvWhereLambdaFilter<T> gt(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> gt(SFunction<T, ?> column, Object value) {
         whereFilter.gt(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -138,7 +138,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 大于等于 >=
      */
-    public GirAdvWhereLambdaFilter<T> ge(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> ge(SFunction<T, ?> column, Object value) {
         whereFilter.ge(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -146,7 +146,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 小于 <
      */
-    public GirAdvWhereLambdaFilter<T> lt(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> lt(SFunction<T, ?> column, Object value) {
         whereFilter.lt(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -154,7 +154,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 小于等于 <=
      */
-    public GirAdvWhereLambdaFilter<T> le(Function<T, ?> column, Object value) {
+    public GirAdvWhereLambdaFilter<T> le(SFunction<T, ?> column, Object value) {
         whereFilter.le(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -162,7 +162,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * IN条件
      */
-    public GirAdvWhereLambdaFilter<T> in(Function<T, ?> column, Collection<?> values) {
+    public GirAdvWhereLambdaFilter<T> in(SFunction<T, ?> column, Collection<?> values) {
         whereFilter.in(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
@@ -170,7 +170,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * IN条件（数组）
      */
-    public GirAdvWhereLambdaFilter<T> in(Function<T, ?> column, Object[] values) {
+    public GirAdvWhereLambdaFilter<T> in(SFunction<T, ?> column, Object[] values) {
         whereFilter.in(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
@@ -178,7 +178,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * NOT IN条件
      */
-    public GirAdvWhereLambdaFilter<T> notIn(Function<T, ?> column, Collection<?> values) {
+    public GirAdvWhereLambdaFilter<T> notIn(SFunction<T, ?> column, Collection<?> values) {
         whereFilter.notIn(getColumnName(column, isToUnderlineCase), values);
         return this;
     }
@@ -186,7 +186,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * LIKE条件（全模糊 %value%）
      */
-    public GirAdvWhereLambdaFilter<T> like(Function<T, ?> column, String value) {
+    public GirAdvWhereLambdaFilter<T> like(SFunction<T, ?> column, String value) {
         whereFilter.like(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -194,7 +194,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 左模糊匹配 value%
      */
-    public GirAdvWhereLambdaFilter<T> likeLeft(Function<T, ?> column, String value) {
+    public GirAdvWhereLambdaFilter<T> likeLeft(SFunction<T, ?> column, String value) {
         whereFilter.likeLeft(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -202,7 +202,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * 右模糊匹配 %value
      */
-    public GirAdvWhereLambdaFilter<T> likeRight(Function<T, ?> column, String value) {
+    public GirAdvWhereLambdaFilter<T> likeRight(SFunction<T, ?> column, String value) {
         whereFilter.likeRight(getColumnName(column, isToUnderlineCase), value);
         return this;
     }
@@ -210,7 +210,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * BETWEEN条件
      */
-    public GirAdvWhereLambdaFilter<T> between(Function<T, ?> column, Object start, Object end) {
+    public GirAdvWhereLambdaFilter<T> between(SFunction<T, ?> column, Object start, Object end) {
         whereFilter.between(getColumnName(column, isToUnderlineCase), start, end);
         return this;
     }
@@ -218,7 +218,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * IS NULL条件
      */
-    public GirAdvWhereLambdaFilter<T> isNull(Function<T, ?> column) {
+    public GirAdvWhereLambdaFilter<T> isNull(SFunction<T, ?> column) {
         whereFilter.isNull(getColumnName(column, isToUnderlineCase));
         return this;
     }
@@ -226,7 +226,7 @@ public class GirAdvWhereLambdaFilter<T> implements Serializable {
     /**
      * IS NOT NULL条件
      */
-    public GirAdvWhereLambdaFilter<T> isNotNull(Function<T, ?> column) {
+    public GirAdvWhereLambdaFilter<T> isNotNull(SFunction<T, ?> column) {
         whereFilter.isNotNull(getColumnName(column, isToUnderlineCase));
         return this;
     }

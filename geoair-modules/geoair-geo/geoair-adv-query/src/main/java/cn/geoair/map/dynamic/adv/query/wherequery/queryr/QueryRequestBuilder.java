@@ -9,12 +9,11 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
-import cn.geoair.map.dynamic.adv.query.wherequery.test.User;
 import lombok.Getter;
-
+import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
+
 
 import static cn.geoair.map.dynamic.adv.query.utils.LambdaUtils.getColumnName;
 
@@ -194,9 +193,9 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     @SafeVarargs
-    public final QueryRequestBuilder<T> fields(Function<T, ?>... columns) {
+    public final QueryRequestBuilder<T> fields(SFunction<T, ?>... columns) {
         this.columnNames = new ArrayList<>();
-        for (Function<T, ?> column : columns) {
+        for (SFunction<T, ?> column : columns) {
             this.columnNames.add(getColumnName(column, isToUnderlineCase));
         }
         return this;
@@ -231,7 +230,7 @@ public class QueryRequestBuilder<T> {
      * @param alias  字段别名
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> field(Function<T, ?> column, String alias) {
+    public QueryRequestBuilder<T> field(SFunction<T, ?> column, String alias) {
         if (this.columnNames == null) {
             this.columnNames = new ArrayList<>();
         }
@@ -254,11 +253,11 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     @SafeVarargs
-    public final QueryRequestBuilder<T> addFields(Function<T, ?>... columns) {
+    public final QueryRequestBuilder<T> addFields(SFunction<T, ?>... columns) {
         if (this.columnNames == null) {
             this.columnNames = new ArrayList<>();
         }
-        for (Function<T, ?> column : columns) {
+        for (SFunction<T, ?> column : columns) {
             this.columnNames.add(getColumnName(column, isToUnderlineCase));
         }
         return this;
@@ -397,7 +396,7 @@ public class QueryRequestBuilder<T> {
      * @param column 排序字段Lambda表达式
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> orderByAsc(Function<T, ?> column) {
+    public QueryRequestBuilder<T> orderByAsc(SFunction<T, ?> column) {
         this.orders.add(OrderApo.ofASCFieldName(getColumnName(column, isToUnderlineCase)));
         return this;
     }
@@ -408,7 +407,7 @@ public class QueryRequestBuilder<T> {
      * @param column 排序字段Lambda表达式
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> orderByDesc(Function<T, ?> column) {
+    public QueryRequestBuilder<T> orderByDesc(SFunction<T, ?> column) {
         this.orders.add(OrderApo.ofDescFieldName(getColumnName(column, isToUnderlineCase)));
         return this;
     }
@@ -420,14 +419,14 @@ public class QueryRequestBuilder<T> {
      * @param direction 排序方向
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> orderBy(Function<T, ?> column, AdvEnumsOrder direction) {
+    public QueryRequestBuilder<T> orderBy(SFunction<T, ?> column, AdvEnumsOrder direction) {
         this.orders.add(OrderApo.ofFieldName(getColumnName(column, isToUnderlineCase), direction));
         return this;
     }
 
     /**
      * 添加函数排序（升序）
-     * <p>示例：orderByAscFunction("CAST(gtc_id AS numeric)")</p>
+     * <p>示例：orderByAscSFunction("CAST(gtc_id AS numeric)")</p>
      *
      * @param function 排序函数表达式
      * @return Builder实例
