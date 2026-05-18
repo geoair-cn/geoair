@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
@@ -23,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +45,15 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected abstract String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders, List<String> conflictKeys);
 
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
+    public AbstractExecAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        this.configAdvQueryGetter = configAdvQueryGetter;
+    }
+    @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return configAdvQueryGetter.get();
+    }
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
@@ -89,6 +99,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertOne", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertOne", execSql,params, e);
             throw new RuntimeException("单条插入失败，表名：" + quoteTableName, e);
         } finally {
             closeConnection(connection);
@@ -178,6 +189,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
+            AdvLogSql.of(dataSourceGetter).logExecuteError(
+                    this.getClass(), "bInsertBatch", StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
         } finally {
             restoreAutoCommit(connection);
@@ -227,6 +240,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertIgnore", execSql, params, cost, 1);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertIgnore", execSql,params, e);
             throw new RuntimeException("插入忽略操作失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -258,8 +272,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
-        List<String> conflictKeysCopy = new ArrayList<>( );
-        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+        List<String> conflictKeysCopy = new ArrayList<>();
+        if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }
@@ -305,6 +319,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bInsertBySql", sqlStatement, sqlParamList.toList(), cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bInsertBySql", sqlStatement,sqlParamList, e);
             rollbackConnection(connection);
             throw new RuntimeException("插入失败", e);
         } finally {

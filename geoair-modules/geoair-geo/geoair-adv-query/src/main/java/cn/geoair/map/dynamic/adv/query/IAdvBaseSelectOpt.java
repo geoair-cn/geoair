@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  *
  * <p>设计初衷模仿MyBatis-Plus的BaseMapper，提供通用的数据库查询操作封装， 支持传入带MyBatis标签的SQL语句，适配动态查询场景下的各类基础查询需求
  */
-public interface IAdvBaseSelectOpt {
+public interface IAdvBaseSelectOpt extends IAdvConfigOpt{
 
     /**
      * 设置数据源获取器

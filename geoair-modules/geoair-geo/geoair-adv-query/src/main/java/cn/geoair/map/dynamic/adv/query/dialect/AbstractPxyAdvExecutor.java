@@ -9,6 +9,8 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -67,6 +69,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     public void initProxyObjects() {
 
     }
+
 
     // ==================== 数据源初始化与资源管理 ====================
     @Override
@@ -278,48 +281,40 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id) {
-        return getAdvBaseOpt().bDeleteByPrimaryKey(tableName, idKey, id);
+    public Integer bDeleteByPK(String tableName, String idKey, Object id) {
+        return getAdvBaseOpt().bDeleteByPK(tableName, idKey, id);
     }
 
     @Override
-    public Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids) {
-        return getAdvBaseOpt().bDeleteBatchByPrimaryKey(tableName, idKey, ids);
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids);
     }
 
     @Override
-    public Integer bDeleteBatchWithBatchSize(
+    public Integer bDeleteByPKs(
             String tableName, String idKey, Set<Object> ids, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
     }
 
     @Override
-    public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bDeleteByCondition(tableName, whereMap);
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap);
     }
 
     @Override
-    public Integer bDeleteBatchByCondition(
+    public Integer bDeleteByMap(
             String tableName, Map<String, Object> whereMap, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchByCondition(tableName, whereMap, batchSize);
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
     @Override
-    public Integer bLogicDelete(
-            String tableName, String idKey, Object id, String deleteKey, Object deleteValue) {
-        return getAdvBaseOpt().bLogicDelete(tableName, idKey, id, deleteKey, deleteValue);
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
     }
 
     @Override
-    public Integer bLogicDeleteBatch(
-            String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue) {
-        return getAdvBaseOpt().bLogicDeleteBatch(tableName, idKey, ids, deleteKey, deleteValue);
-    }
-
-    @Override
-    public Integer bSafeDeleteByCondition(
-            String tableName, Map<String, Object> whereMap, int maxDelete) {
-        return getAdvBaseOpt().bSafeDeleteByCondition(tableName, whereMap, maxDelete);
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
     }
 
     @Override
@@ -566,15 +561,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateByCondition(
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bUpdateByCondition(tableName, rowData, whereMap);
+        return getAdvBaseOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override
-    public Integer bUpdateBatchByPrimaryKey(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
@@ -584,22 +579,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPrimaryKey(
+    public <T> Integer bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, entities);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
 
-    @Override
-    public Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version) {
-        return getAdvBaseOpt().bUpdateWithOptimisticLock(
-                tableName, idKey, id, rowData, versionKey, version);
-    }
 
     @Override
     public Integer bUpdateOrInsert(
@@ -645,6 +629,36 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, rowData, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, rowData, whereFilter);
     }
 
     // ==================== DDL操作（代理调用PgAdvDDLOpt） ====================

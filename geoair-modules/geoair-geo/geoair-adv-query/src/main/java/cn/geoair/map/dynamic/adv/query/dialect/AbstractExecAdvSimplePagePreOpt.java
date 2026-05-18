@@ -5,6 +5,7 @@ import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
@@ -35,6 +36,11 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     protected abstract IAdvDDLOpt getAdvDDLOpt();
 
     protected abstract IAdvGeoPreOpt getAdvGeoPreOpt();
+
+    @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return getAdvBaseOpt().getConfig();
+    }
 
     // ========== 通用逻辑：带参数的总数统计 ==========
     @Override

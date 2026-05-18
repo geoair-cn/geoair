@@ -126,7 +126,7 @@ public class GirAdvQuerySqlBuilder {
             String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
             String aliasTableName = GutilObject.isEmpty(param.getSqlViewTableNameAlias()) ? dialectProcessor.tbGetTempAliasTableName() : param.getSqlViewTableNameAlias();
             String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
-            String aliasTable = StrUtil.format(format,sqlView , aliasTableName);
+            String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
             sql.append(aliasTable);
         } else {
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
@@ -153,6 +153,12 @@ public class GirAdvQuerySqlBuilder {
         }
 
         return new SqlBuildResult(sql.toString(), params);
+    }
+
+
+    public String buildWhereSql(GirAdvWhereFilter where, List<Object> params) {
+        return buildWhereClause(where.getExpression(), params);
+
     }
 
     /**

@@ -40,4 +40,6 @@ public interface IAdvExecutor
      * @return 带Schema的标准表名
      */
     String tbGetTableNameWithSchema(String tableName, String schemaName);
+
+
 }

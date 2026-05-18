@@ -4,28 +4,42 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现
  */
 public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt {
+
+    Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
+
+    public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        this.configAdvQueryGetter = configAdvQueryGetter;
+    }
+
+    @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return configAdvQueryGetter.get();
+    }
 
     // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
@@ -73,6 +87,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateBySql", execSql, jdbcParams, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateBySql", execSql, jdbcParams, e);
             throw new RuntimeException("执行自定义更新SQL失败，SQL：" + execSql, e);
         } finally {
             closeConnection(connection);
@@ -107,6 +122,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
             throw new RuntimeException("按主键更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -167,7 +183,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     // ========== 通用逻辑：条件更新 ==========
     @Override
-    public Integer bUpdateByCondition(
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
         validateTableName(tableName);
         validateUpdateData(rowData);
@@ -193,9 +209,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByCondition", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -204,7 +221,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     // ========== 通用逻辑：批量更新（按主键） ==========
     @Override
-    public Integer bUpdateBatchByPrimaryKey(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
         return bUpdateBatchWithBatchSize(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
     }
@@ -261,60 +278,21 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPrimaryKey(
+    public <T> Integer bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
-
-        List<Map<String, Object>> rowsData =
-                entities.stream().map(Entity::parse).collect(Collectors.toList());
-
-        return bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
-    }
-
-    // ========== 通用逻辑：乐观锁更新 ==========
-    @Override
-    public Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version) {
-        validateTableName(tableName);
-        validateIdKeyAndValue(idKey, id);
-        validateUpdateData(rowData);
-        validateIdKeyAndValue(versionKey, version);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = buildOptimisticLockSetClause(rowData, versionKey);
-        String execSql = buildUpdateWithOptimisticLockSql(quoteTableName, setClause, idKey, versionKey);
-
-        List<Object> params = new ArrayList<>(rowData.values());
-        params.add(id);
-        params.add(version);
-
-        StopWatch stopWatch = new StopWatch();
-        Connection connection = dataSourceGetter.getConnection();
-        try {
-            stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
-            stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateWithOptimisticLock", execSql, params, cost, result);
-            return result;
-        } catch (SQLException e) {
-            throw new RuntimeException("乐观锁更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
-        } finally {
-            closeConnection(connection);
+        List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
+        for (T entity : entities) {
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
+            rowsDatas.add(rowData);
         }
+        return bUpdateBatchByPK(tableName, idKey, rowsDatas);
     }
+
 
     // ========== 通用逻辑：更新或插入（UPSERT） ==========
     @Override
@@ -350,9 +328,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateOrInsert", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
             throw new RuntimeException("更新或插入失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -383,8 +362,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
         }
-        List<String> conflictKeysCopy = new ArrayList<>( );
-        if(isToUnderlineCase&&GutilObject.isNotEmpty(conflictKeys)){
+        List<String> conflictKeysCopy = new ArrayList<>();
+        if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }
@@ -406,6 +385,89 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        if (whereFilter == null) {
+            throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
+        }
+        boolean toUnderlineCase = whereFilter.isToUnderlineCase();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, false, ignoreFieldNames);
+        return bUpdateByWhere(tableName, rowData, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return bUpdateByWhere(tableName, entity, whereFilter, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        validateTableName(tableName);
+        validateUpdateData(rowData);
+        List<Object> whereParams = new ArrayList<>();
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereFilter, whereParams, dialectTableNameProcessor, dataSourceGetter);
+        if (GutilObject.isEmpty(whereClause)) {
+            throw new RuntimeException("更新条件不能为空（避免全表更新）");
+        }
+        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String setClause = buildSetClause(rowData);
+        String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
+        List<Object> params = new ArrayList<>(rowData.values());
+        params.addAll(whereParams);
+        StopWatch stopWatch = new StopWatch();
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            stopWatch.start();
+            Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
+            stopWatch.stop();
+            long cost = stopWatch.getLastTaskTimeMillis();
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
+            return result;
+        } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
+            throw new RuntimeException("条件更新失败，表名：" + tableName, e);
+        } finally {
+            closeConnection(connection);
+        }
+
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        if (whereFilter == null) {
+            throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
+        }
+        boolean toUnderlineCase = whereFilter.isToUnderlineCase();
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+        return bUpdateSelectiveByWhere(tableName, rowData, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return bUpdateSelectiveByWhere(tableName, entity, whereFilter, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        validateUpdateData(rowData);
+        // 过滤掉 value 为 null 的数据（保留空字符串）
+        Map<String, Object> copyRowData;
+        copyRowData = rowData.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return bUpdateByWhere(tableName, copyRowData, whereFilter);
     }
 
     // ====================== 原有工具方法不动 ======================
@@ -491,27 +553,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return StrUtil.format("UPDATE {} SET {} WHERE {}", tableName, setClause, whereClause);
     }
 
-    protected String buildOptimisticLockSetClause(Map<String, Object> rowData, String versionKey) {
-        return rowData.keySet()
-                .stream()
-                .map(field -> {
-                    if (field.equals(versionKey)) {
-                        return StrUtil.format("{} = {} + 1", versionKey, versionKey);
-                    }
-                    return StrUtil.format("{} = ?", field);
-                })
-                .collect(Collectors.joining(","));
-    }
-
-    protected String buildUpdateWithOptimisticLockSql(
-            String tableName, String setClause, String idKey, String versionKey) {
-        return StrUtil.format(
-                "UPDATE {} SET {} WHERE {} = ? AND {} = ?",
-                tableName,
-                setClause,
-                idKey,
-                versionKey);
-    }
 
     protected abstract String buildUpsertFieldClause(String field);
 

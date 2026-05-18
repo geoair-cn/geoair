@@ -1,11 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
@@ -13,15 +11,7 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder.SqlBuild
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -59,6 +49,11 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
 
     protected abstract IAdvGeoPreOpt getGeoOpt();
+
+    @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return getBaseSelectOpt().getConfig();
+    }
 
     /**
      * 获取SQL构建器

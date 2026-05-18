@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -48,6 +49,11 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     public IAdvBaseOpt getAdvBaseOpt() {
         return baseOpt;
+    }
+
+    @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return getAdvBaseOpt().getConfig();
     }
 
     /**
@@ -330,7 +336,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSql = getMetadataFromSql(fieldQuerySql, tableFields, null);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"dGetColumnsBySQL", fieldQuerySql, cost);
+        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "dGetColumnsBySQL", fieldQuerySql, cost);
         return metadataFromSql;
     }
 
@@ -355,11 +361,12 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSqlWithParam = getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),"dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
+        AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), "dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
         return metadataFromSqlWithParam;
     }
 
     // ========== 通用工具方法（DDL执行模板 + 耗时统计） ==========
+
     /**
      * 通用DDL执行方法（无参数）
      */
@@ -380,9 +387,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, sql, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), operation, sql, cost, result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, sql, e);
             rollbackConnection(connection, operation, tableName);
             log.error("{}失败，表名: {}, SQL: {}, 错误: {}", operation, tableName, sql, e.getMessage(), e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
@@ -423,9 +431,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
-            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(),operation, execSql, jdbcParams, cost,result);
+            AdvLogSql.of(dataSourceGetter).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter).logExecuteError(this.getClass(), operation, execSql,jdbcParams, e);
             rollbackConnection(connection, operation, tableName);
             log.error(
                     "{}失败，表名: {}, SQL: {}, 错误: {}",
@@ -544,21 +553,37 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 差异化抽象方法 ==========
     protected abstract String buildTruncateTableSql(String qualifiedTableName);
+
     protected abstract String buildDropTableSql(String qualifiedTableName);
+
     protected abstract String buildRenameTableSql(String oldQualifiedName, String newQualifiedName);
+
     protected abstract String buildAlterColumnSql(String qualifiedTableName, String oldColumnName, FieldBySchemaApo newField);
+
     protected abstract String buildDropColumnSql(String qualifiedTableName, String columnName);
+
     protected abstract boolean checkConstraintExists(String tableName, String constraintName, String constraintType);
+
     protected abstract String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns);
+
     protected abstract String buildDropPrimaryKeySql(String qualifiedTableName, String constraintName);
+
     protected abstract String buildCreateIndexSql(String qualifiedTableName, String indexName, String columns, boolean isUnique);
+
     protected abstract String buildDropIndexSql(String tableName, String indexName);
+
     protected abstract boolean checkSchemaExists(String schemaName);
+
     protected abstract String buildCreateSchemaSql(String schemaName);
+
     protected abstract String buildDropSchemaSql(String schemaName, boolean cascade);
+
     protected abstract String buildMetadataQuerySql(String sqlView);
+
     protected abstract String getBaseColumnName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+
     protected abstract String getColumnTypeName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+
     protected abstract void setFieldLengthInfo(ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field) throws SQLException;
 
     @Override

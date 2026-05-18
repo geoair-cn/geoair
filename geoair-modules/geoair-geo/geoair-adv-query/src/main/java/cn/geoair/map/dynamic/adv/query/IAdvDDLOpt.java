@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * DDL操作接口 约定：所有的方法都以 d 开头
  */
-public interface IAdvDDLOpt {
+public interface IAdvDDLOpt extends IAdvConfigOpt{
 
     /**
      * 执行DDL语句的通用方法
