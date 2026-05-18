@@ -29,6 +29,11 @@ public class AdvQueryGlobalConfig {
      * 启用 更新的sql日志
      */
     boolean enableUpdateLog = true;
+
+    /**
+     * 启用 插入的sql日志
+     */
+    boolean enableAccessLog = true;
     /**
      * 启用删除的sql日志
      */
