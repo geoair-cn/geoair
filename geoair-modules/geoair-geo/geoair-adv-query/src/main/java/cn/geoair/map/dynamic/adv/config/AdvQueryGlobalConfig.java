@@ -46,16 +46,31 @@ public class AdvQueryGlobalConfig {
 
 
     /**
-     * 重置配置
+     * 打开日志
      *
      * @return
      */
-    public AdvQueryGlobalConfig reset() {
+    public AdvQueryGlobalConfig turnOnLog() {
         enableQueryLog = true;
         enableDdlLog = true;
         enableUpdateLog = true;
         enableDelLog = true;
+        enableAccessLog = true;
         enableErrorLog = true;
+        return this;
+    }
+    /**
+     * 关闭日志
+     *
+     * @return
+     */
+    public AdvQueryGlobalConfig turOffLog() {
+        enableQueryLog = false;
+        enableDdlLog = false;
+        enableUpdateLog = false;
+        enableDelLog = false;
+        enableAccessLog = false;
+        enableErrorLog = false;
         return this;
     }
 
