@@ -256,10 +256,6 @@ public class GirAdvWhereFilter implements Serializable {
         return buildExpression();
     }
 
-    /**
-     * 构建条件表达式
-     * 按照添加顺序，使用每个条件自己的连接符构建扁平的顺序条件树
-     */
     private ConditionExpression buildExpression() {
         if (entries.isEmpty()) {
             return null;
@@ -269,6 +265,26 @@ public class GirAdvWhereFilter implements Serializable {
             return entries.get(0).getExpression();
         }
 
+        // 检查是否所有条件使用相同的逻辑运算符
+        boolean sameConnector = true;
+        AdvLogicOperatorEnums firstConnector = entries.get(0).getConnector();
+        for (int i = 1; i < entries.size(); i++) {
+            if (entries.get(i).getConnector() != firstConnector) {
+                sameConnector = false;
+                break;
+            }
+        }
+
+        // 如果所有连接符相同，构建扁平列表
+        if (sameConnector) {
+            List<ConditionExpression> children = new ArrayList<>();
+            for (ConditionEntry entry : entries) {
+                children.add(entry.getExpression());
+            }
+            return new ConditionExpression(firstConnector, children);
+        }
+
+        // 混合连接符时，保持原来的左深树结构
         ConditionExpression result = null;
         for (ConditionEntry entry : entries) {
             if (result == null) {
@@ -277,13 +293,11 @@ public class GirAdvWhereFilter implements Serializable {
                 List<ConditionExpression> children = new ArrayList<>();
                 children.add(result);
                 children.add(entry.getExpression());
-                // 使用 entry 自己的连接符
                 result = new ConditionExpression(entry.getConnector(), children);
             }
         }
         return result;
     }
-
     /**
      * 添加SQL表达式条件（字段名可以是SQL表达式）
      * <p>适用于需要对字段进行函数计算或复杂表达式比较的场景</p>
@@ -583,17 +597,35 @@ public class GirAdvWhereFilter implements Serializable {
             return this;
         }
 
-        /**
-         * 构建条件表达式（保持扁平的顺序结构）
-         */
         private ConditionExpression build() {
             if (entries.isEmpty()) {
                 return null;
             }
+
             if (entries.size() == 1) {
                 return entries.get(0).getExpression();
             }
 
+            // 检查是否所有条件使用相同的逻辑运算符
+            boolean sameConnector = true;
+            AdvLogicOperatorEnums firstConnector = entries.get(0).getConnector();
+            for (int i = 1; i < entries.size(); i++) {
+                if (entries.get(i).getConnector() != firstConnector) {
+                    sameConnector = false;
+                    break;
+                }
+            }
+
+            // 如果所有连接符相同，构建扁平列表
+            if (sameConnector) {
+                List<ConditionExpression> children = new ArrayList<>();
+                for (ConditionEntry entry : entries) {
+                    children.add(entry.getExpression());
+                }
+                return new ConditionExpression(firstConnector, children);
+            }
+
+            // 混合连接符时，保持原来的左深树结构
             ConditionExpression result = null;
             for (ConditionEntry entry : entries) {
                 if (result == null) {

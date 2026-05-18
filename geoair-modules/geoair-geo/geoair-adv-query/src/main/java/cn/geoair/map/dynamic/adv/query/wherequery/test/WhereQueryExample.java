@@ -53,7 +53,7 @@ public class WhereQueryExample {
 //        printResult("示例1：表达式", result);
 
         WhereQueryExample example2 = new WhereQueryExample(dialect, dataSourceGetter);
-        example2. example7();
+        example2. runAllExamples();
     }
 
     public void runAllExamples() {
