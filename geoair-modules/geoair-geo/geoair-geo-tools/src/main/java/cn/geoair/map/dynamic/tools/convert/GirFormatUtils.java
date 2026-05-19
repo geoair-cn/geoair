@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
@@ -26,26 +27,31 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirFormatUtils INSTANCE;
 
-    // 几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    ToolsConfig advToolsConfig;
 
-    // 私有构造器（防止外部实例化）
-    private GirFormatUtils() {}
+    public GirFormatUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
 
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static GirFormatUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirFormatUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirFormatUtils();
+                    INSTANCE = new GirFormatUtils(new ToolsConfig());
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static GirFormatUtils getInstance(ToolsConfig advToolsConfig) {
+        return new GirFormatUtils(advToolsConfig);
     }
 
     // ==============================geojson转换功能==============================
@@ -57,7 +63,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().read(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -69,7 +75,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readLine(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -82,7 +88,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiLine(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -94,7 +100,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readPolygon(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -107,7 +113,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiPolygon(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -119,7 +125,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readPoint(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -131,7 +137,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try (Reader reader = new StringReader(geojson)) {
             return getGeometryJSON().readMultiPoint(reader);
         } catch (IOException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -158,7 +164,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return getGeometryJSON().toString(jtsGeometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -169,9 +175,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
         }
         try {
-            return WKBWriter.toHex(getWKBWriter().write(jtsGeometry));
+            return WKBWriter.toHex(advToolsConfig.getWkbWriter().write(jtsGeometry));
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -190,7 +196,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             }
             return jtsGeom;
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -215,9 +221,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("wktString");
         }
         try {
-            return getWKTReader().read(wktString);
+            return advToolsConfig.getWktReaderSupplier().get().read(wktString);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -283,9 +289,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("geometry");
         }
         try {
-            return getWKBWriter().write(geometry);
+            return advToolsConfig.getWkbWriter().write(geometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -309,9 +315,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
         try {
             byte[] bytes = WKBReader.hexToBytes(wkbByteString);
-            return getWKBReader().read(bytes);
+            return advToolsConfig.getWkbReaderSupplier().get().read(bytes);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -331,7 +337,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             List<String> split = StrUtil.split(pointString, separator);
             return jtsPointByStringList(split, xFirst, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -351,7 +357,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
                     ? jtsPointByXY(x, y, ifExceptionValueReturnNull)
                     : jtsPointByXY(y, x, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -366,7 +372,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             List<Object> of = ListUtil.of(pointArray[0], pointArray[1]);
             return jtsPointByStringList(of, xFirst, ifExceptionValueReturnNull);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -374,9 +380,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     public Point jtsPointByXY(double x, double y, boolean ifExceptionValueReturnNull) {
         try {
             Coordinate coord = new Coordinate(x, y);
-            return GEOMETRY_FACTORY.createPoint(coord);
+            return advToolsConfig.getGeometryFactory().createPoint(coord);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -387,9 +393,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("wkbBytes");
         }
         try {
-            return getWKBReader().read(wkbBytes);
+            return advToolsConfig.getWkbReaderSupplier().get().read(wkbBytes);
         } catch (ParseException e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
@@ -399,35 +405,30 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
         }
         try {
-            return getWKBWriter().write(jtsGeometry);
+            return advToolsConfig.getWkbWriter().write(jtsGeometry);
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
     @Override
     public WKTReader getWKTReader() {
-        WKTReader wktReader = new WKTReader();
-        wktReader.setIsOldJtsCoordinateSyntaxAllowed(false);
-        return wktReader;
+        return advToolsConfig.getWktReaderSupplier().get();
     }
 
     @Override
     public WKBWriter getWKBWriter() {
-        WKBWriter wkbWriter = new WKBWriter(2, true);
-        return wkbWriter;
+        return advToolsConfig.getWkbWriter();
     }
 
     @Override
     public WKBReader getWKBReader() {
-        WKBReader wkbReader = new WKBReader();
-        return wkbReader;
+        return advToolsConfig.getWkbReaderSupplier().get();
     }
 
     @Override
     public GeometryJSON getGeometryJSON() {
-        GeometryJSON geometryJSON = new GeometryJSON(10);
-        return geometryJSON;
+        return advToolsConfig.getGeometryJSON();
     }
 
     // ==============================私有工具方法==============================
@@ -443,7 +444,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         try {
             return function.apply(geometry);
         } catch (Exception e) {
-            handleException(e, ifExceptionValueReturnNull, null);
+            handleException(e, ifExceptionValueReturnNull);
             return null;
         }
     }
@@ -465,14 +466,14 @@ public class GirFormatUtils implements GirGeoFormatOpt {
                                 + geometry.getGeometryType());
             }
         } catch (Exception e) {
-            return handleException(e, ifExceptionValueReturnNull, null);
+            return handleException(e, ifExceptionValueReturnNull);
         }
     }
 
     /** 异常处理通用方法 */
-    private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull, T nullValue) {
+    private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull) {
         if (ifExceptionValueReturnNull) {
-            return nullValue;
+            return null;
         } else {
             throw new RuntimeException(e);
         }

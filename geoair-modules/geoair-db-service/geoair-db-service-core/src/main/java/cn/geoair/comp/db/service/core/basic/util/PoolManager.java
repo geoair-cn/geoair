@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import java.sql.SQLException;
@@ -19,7 +19,7 @@ public class PoolManager {
     // 所有数据源的连接池存在map里
     static ConcurrentHashMap<String, DruidDataSource> map = new ConcurrentHashMap<>();
 
-    public static DruidDataSource getJdbcConnectionPool(DataSourceApo ds) {
+    public static DruidDataSource getJdbcConnectionPool(DsDataSourceApo ds) {
         if (map.containsKey(ds.getId())) {
             return map.get(ds.getId());
         } else {
@@ -56,7 +56,8 @@ public class PoolManager {
         }
     }
 
-    public static DruidPooledConnection getPooledConnection(DataSourceApo ds) throws SQLException {
+    public static DruidPooledConnection getPooledConnection(DsDataSourceApo ds)
+            throws SQLException {
         DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
         DruidPooledConnection connection = pool.getConnection();
         log.debug("获取连接成功");

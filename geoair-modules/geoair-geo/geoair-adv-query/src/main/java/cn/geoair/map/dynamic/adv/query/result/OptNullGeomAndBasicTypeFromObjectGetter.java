@@ -1,18 +1,14 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
-import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.convert.*;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import java.util.Map;
 import org.locationtech.jts.geom.*;
-import org.postgresql.util.PGobject;
 
 /**
  * @author ：zhangjun
@@ -75,7 +71,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToGeoJson(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToGeoJson(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -91,7 +87,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -107,7 +103,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (geometry == null) {
             return defaultValue;
         }
-        String s = GirAdvTools.getFormatOpt().jtsGeometryToPgGeometryHex(geometry, true);
+        String s = GirGeoTools.me().getFormatOpt().jtsGeometryToPgGeometryHex(geometry, true);
         if (ObjectUtil.isEmpty(s)) {
             return defaultValue;
         }
@@ -126,11 +122,13 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             } catch (Exception e) {
                 try {
                     jtsGeom =
-                            GirAdvTools.getFormatOpt()
+                            GirGeoTools.me()
+                                    .getFormatOpt()
                                     .wktToJtsGeometry((String) value, true); // 不是geojson字符串就是wkt
                 } catch (Exception e1) {
                     jtsGeom =
-                            GirAdvTools.getFormatOpt()
+                            GirGeoTools.me()
+                                    .getFormatOpt()
                                     .wkbToJtsGeometry((String) value, true); // 不是wkt字符串就是wbk
                 }
             }
@@ -138,19 +136,21 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (value instanceof Map) { // 判断是否为json对象
             JSONObject jsonObject = new JSONObject((Map<String, Object>) value);
             jtsGeom =
-                    GirAdvTools.getFormatOpt()
+                    GirGeoTools.me()
+                            .getFormatOpt()
                             .geojsonToJtsGeometry(jsonObject.toJSONString(), true);
         } else if (GirPostGisTran.isOrgConvert() && GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
-        } else if (value instanceof PGobject) { // PGobject 是 PGgeometry的父类
-            /**
-             * 若JDBCURL上面显示指定 currentSchema=onemap_tile_builder 。 然而空间类型的元数据（如类型定义）仅存在于 public 中，
-             * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
-             */
-            PGobject pObject = (PGobject) value;
-            jtsGeom = GirAdvTools.getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
+        } else if (GirPostGisTran.isPostGisAvailable()
+                && GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
+            return GirPostGisJdbcTran.pGobjectToJts(value);
+        } else if (GirMysqlTran.isGeomValue(value)) {
+            return GirMysqlTran.mysqlBinaryToJtsGeom(value);
+        } else if (GirOracleTran.isOracleSpatialAvailable()
+                && GirOracleSpatialTran.isSdoGeometry(value)) {
+            return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
         }
         return jtsGeom;
     }

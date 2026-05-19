@@ -8,11 +8,8 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.hutool.core.util.StrUtil;
 
-/**
- * PG 带参数分页实现类
- */
+/** PG 带参数分页实现类 */
 public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
@@ -24,7 +21,11 @@ public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     protected IAdvDDLOpt advDDLOpt;
 
-    public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
+    public PgAdvSimplePageOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvGeoPreOpt advGeoPreOpt,
+            IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.advDDLOpt = advDDLOpt;
@@ -50,5 +51,4 @@ public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
     protected IAdvGeoPreOpt getAdvGeoPreOpt() {
         return advGeoPreOpt;
     }
-
 }

@@ -1,7 +1,10 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
+import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
+import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
@@ -17,7 +20,16 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
 
-    protected final GirSridConvertOpt sridConvertOpt = GirAdvTools.getSridOpt();
+    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.me().getSridOpt();
+    protected GirGeoFormatOpt formatOpt = GirGeoTools.me().getFormatOpt();
+
+    ToolsConfig advToolsConfig;
+
+    public TileConverterCommon(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+        sridConvertOpt = GirGeoTools.getInstance(advToolsConfig).getSridOpt();
+        formatOpt = GirGeoTools.getInstance(advToolsConfig).getFormatOpt();
+    }
 
     protected abstract Geometry transform(Geometry geometry, int srcSrid);
 
@@ -28,14 +40,13 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         validateXyz(z, x, y);
         ReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
         Geometry geometry =
-                GirAdvTools.getSridOpt()
-                        .convertToGeom(
-                                envelope,
-                                envelope.getCoordinateReferenceSystem()
-                                        .getCoordinateSystem()
-                                        .getDimension(),
-                                targetSrid);
-        return GirAdvTools.getFormatOpt().jtsGeometryToWktString(geometry, false);
+                sridConvertOpt.convertToGeom(
+                        envelope,
+                        envelope.getCoordinateReferenceSystem()
+                                .getCoordinateSystem()
+                                .getDimension(),
+                        targetSrid);
+        return formatOpt.jtsGeometryToWktString(geometry, false);
     }
 
     /**
@@ -203,9 +214,60 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     }
 
     @Override
+    public BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList, int targetSrid) {
+        if (zxyList == null || zxyList.isEmpty()) {
+            throw new IllegalArgumentException("zxyList 不能为空");
+        }
+
+        // 检查并获取统一的 zoom
+        int zoom = -1;
+        long minX = Long.MAX_VALUE;
+        long maxX = Long.MIN_VALUE;
+        long minY = Long.MAX_VALUE;
+        long maxY = Long.MIN_VALUE;
+
+        for (TileZxyApo tile : zxyList) {
+            if (zoom == -1) {
+                zoom = tile.getZ();
+            } else if (zoom != tile.getZ()) {
+                throw new IllegalArgumentException("所有瓦片必须在同一层级");
+            }
+
+            minX = Math.min(minX, tile.getX());
+            maxX = Math.max(maxX, tile.getX());
+            minY = Math.min(minY, tile.getY());
+            maxY = Math.max(maxY, tile.getY());
+        }
+
+        return boundsFromTileRange(minX, maxX, minY, maxY, zoom, targetSrid);
+    }
+
+    @Override
+    public BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo, int targetSrid) {
+        if (rangeApo == null) {
+            throw new IllegalArgumentException("RangeApo 不能为空");
+        }
+
+        int zoom = rangeApo.getZ();
+        if (zoom < 0) {
+            throw new IllegalArgumentException("RangeApo 中未设置 zoom");
+        }
+
+        long minTileX = rangeApo.getMinX();
+        long maxTileX = rangeApo.getMaxX();
+        long minTileY = rangeApo.getMinY();
+        long maxTileY = rangeApo.getMaxY();
+
+        return boundsFromTileRange(minTileX, maxTileX, minTileY, maxTileY, zoom, targetSrid);
+    }
+
+    public abstract BoxReferencedEnvelope boundsFromTileRange(
+            long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid);
+
+    @Override
     public Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ) {
 
-        Geometry geometry = GirAdvTools.getSridOpt().convertToGeom(envelope);
+        Geometry geometry = sridConvertOpt.convertToGeom(envelope);
 
         return zxyListByGeom(geometry, srcSrid, targetZ);
     }

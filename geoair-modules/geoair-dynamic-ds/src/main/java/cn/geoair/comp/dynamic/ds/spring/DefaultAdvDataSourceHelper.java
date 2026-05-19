@@ -2,10 +2,8 @@ package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import java.util.Date;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -25,15 +23,16 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 
     @Override
     public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
+        log.info("创建全新的数据源实例！jdbcUrl:{}", dataSourceApo.getJdbcUrl());
         try {
             // 创建新的Druid数据源
             DruidDataSource dataSourceNew = new DruidDataSource();
             // 设置连接池参数
-            dataSourceNew.setInitialSize(20); // 初始连接数（提升：从5→20）
+            dataSourceNew.setInitialSize(2); // 初始连接数（提升：从5→20）
             // 理由：连接难获取，提前创建足够初始连接，减少首次获取等待
             dataSourceNew.setMaxActive(500); // 最大连接数（适度提升：从300→500）
             // 理由：长耗时SQL会占用连接更久，需更多连接支撑并发，避免连接池耗尽
-            dataSourceNew.setMinIdle(50); // 最小空闲连接（提升：从20→50）
+            dataSourceNew.setMinIdle(2); // 最小空闲连接（提升：从20→50）
             // 理由：保留更多空闲连接，减少重新创建连接的开销（连接难获取场景关键）
             // 理由：限制空闲连接上限，避免闲置连接过多占用资源，同时保证足够复用
 
@@ -61,7 +60,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 
             // 连接失败重试（适配连接难获取）
             dataSourceNew.setConnectionErrorRetryAttempts(3); // 从0→3：连接失败重试3次
-            dataSourceNew.setBreakAfterAcquireFailure(false); // 新增：获取连接失败后不中断，继续重试
+            dataSourceNew.setBreakAfterAcquireFailure(true); // 新增：获取连接失败后不中断，继续重试
             // 理由：连接难获取时，增加重试机会，提升连接获取成功率
 
             // 连接泄露与日志（强化监控）
@@ -73,8 +72,6 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setUrl(url);
             dataSourceNew.setUsername(dataSourceApo.getUsername());
             dataSourceNew.setPassword(dataSourceApo.getPassword());
-//            dataSourceNew.setDriverClassName(dataSourceApo.getDriver());
-
             // 初始化数据源
             dataSourceNew.init();
             return dataSourceNew;

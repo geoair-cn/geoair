@@ -5,17 +5,16 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
@@ -56,19 +55,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         this.initByDataSource(dataSource, dataSourceName);
     }
 
-    public AbstractPxyAdvExecutor() {
-    }
+    public AbstractPxyAdvExecutor() {}
 
     public AbstractPxyAdvExecutor(Connection connection) {
         this.initByConnection(connection);
     }
 
-    /**
-     * 初始化所有功能模块代理对象
-     */
-    public void initProxyObjects() {
-
-    }
+    /** 初始化所有功能模块代理对象 */
+    public void initProxyObjects() {}
 
     // ==================== 数据源初始化与资源管理 ====================
     @Override
@@ -160,13 +154,13 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     // ==================== 基础插入操作（代理调用PgAdvBaseOpt） ====================
     @Override
-    public Integer bInsertBySql(String sqlStatement) {
-        return getAdvBaseOpt().bInsertBySql(sqlStatement);
+    public Integer bInsertBySql(String sql) {
+        return getAdvBaseOpt().bInsertBySql(sql);
     }
 
     @Override
-    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParam) {
-        return getAdvBaseOpt().bInsertBySql(dynamicSql, sqlParam);
+    public Integer bInsertBySql(String dynamicSql, SqlParamMap sqlParamMap) {
+        return getAdvBaseOpt().bInsertBySql(dynamicSql, sqlParamMap);
     }
 
     @Override
@@ -180,18 +174,31 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Long bInsertOneReturnId(String tableName, Map<String, Object> rowData) {
-        return getAdvBaseOpt().bInsertOneReturnId(tableName, rowData);
+    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase);
     }
 
     @Override
-    public <T> Long bInsertOneReturnId(String tableName, T entity) {
-        return getAdvBaseOpt().bInsertOneReturnId(tableName, entity);
+    public <T> Integer bInsertOne(
+            String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(
+            String tableName,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt()
+                .bInsertOne(
+                        tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }
 
     @Override
     public Integer bInsertBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData);
     }
 
@@ -201,18 +208,17 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBatchWithBatchSize(
+    public Integer bInsertBatch(
             String tableName,
-            Set<String> headers,
+            List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, headers, rowsData, batchSize);
+        return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bInsertBatchWithBatchSize(
-            String tableName, Collection<T> entities, int batchSize) {
-        return getAdvBaseOpt().bInsertBatchWithBatchSize(tableName, entities, batchSize);
+    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, int batchSize) {
+        return getAdvBaseOpt().bInsertBatch(tableName, entities, batchSize);
     }
 
     @Override
@@ -221,15 +227,74 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData);
+    public Integer bInsertIgnore(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, rowData, conflictKeys);
     }
 
     @Override
-    public Integer bInsertOrUpdate(
-            String tableName, Map<String, Object> rowData, Set<String> updateFields) {
-        return getAdvBaseOpt().bInsertOrUpdate(tableName, rowData, updateFields);
+    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseOpt()
+                .bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt()
+                .bInsertIgnore(
+                        tableName,
+                        entity,
+                        conflictKeys,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
+    }
+
+    @Override
+    public Integer bInsertIgnoreBatch(
+            String tableName,
+            Set<String> headers,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
@@ -244,53 +309,52 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bDeleteByPrimaryKey(String tableName, String idKey, Object id) {
-        return getAdvBaseOpt().bDeleteByPrimaryKey(tableName, idKey, id);
+    public Integer bDeleteBySql(String sqlStatement, SqlParamList sqlParam) {
+        return getAdvBaseOpt().bDeleteBySql(sqlStatement, sqlParam);
     }
 
     @Override
-    public Integer bDeleteBatchByPrimaryKey(String tableName, String idKey, Set<Object> ids) {
-        return getAdvBaseOpt().bDeleteBatchByPrimaryKey(tableName, idKey, ids);
+    public Integer bDeleteBySql(String sqlStatement, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bDeleteBySql(sqlStatement, sqlParam);
     }
 
     @Override
-    public Integer bDeleteBatchWithBatchSize(
-            String tableName, String idKey, Set<Object> ids, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchWithBatchSize(tableName, idKey, ids, batchSize);
+    public Integer bDeleteByPK(String tableName, String idKey, Object id) {
+        return getAdvBaseOpt().bDeleteByPK(tableName, idKey, id);
     }
 
     @Override
-    public Integer bDeleteByCondition(String tableName, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bDeleteByCondition(tableName, whereMap);
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids);
     }
 
     @Override
-    public Integer bDeleteBatchByCondition(
-            String tableName, Map<String, Object> whereMap, int batchSize) {
-        return getAdvBaseOpt().bDeleteBatchByCondition(tableName, whereMap, batchSize);
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids, int batchSize) {
+        return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
     }
 
     @Override
-    public Integer bLogicDelete(
-            String tableName, String idKey, Object id, String deleteKey, Object deleteValue) {
-        return getAdvBaseOpt().bLogicDelete(tableName, idKey, id, deleteKey, deleteValue);
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap);
     }
 
     @Override
-    public Integer bLogicDeleteBatch(
-            String tableName, String idKey, Set<Object> ids, String deleteKey, Object deleteValue) {
-        return getAdvBaseOpt().bLogicDeleteBatch(tableName, idKey, ids, deleteKey, deleteValue);
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap, int batchSize) {
+        return getAdvBaseOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
     @Override
-    public Integer bSafeDeleteByCondition(
-            String tableName, Map<String, Object> whereMap, int maxDelete) {
-        return getAdvBaseOpt().bSafeDeleteByCondition(tableName, whereMap, maxDelete);
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
     }
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
     }
+
+    @Override
+    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {}
 
     // ==================== 基础查询操作（代理调用PgAdvBaseOpt） ====================
     @Override
@@ -385,7 +449,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         getAdvBaseOpt().bSelectObjListStream(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
-
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseOpt().bSelectOne(sqlStatement, sqlParamList);
@@ -397,12 +460,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseOpt().bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+    public List<List<Object>> bSelectListToValueList(
+            String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseOpt().bSelectListToValueList(sqlStatement, sqlParamList);
     }
 
@@ -422,15 +487,69 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
         return getAdvBaseOpt().bSelectObjList(sqlStatement, sqlParamList, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjListStream(
+            String sqlStatement,
+            SqlParamList sqlParamList,
+            Class<E> clazz,
+            Consumer<E> rowConsumer) {
         getAdvBaseOpt().bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
     }
 
+    // =================================================
+
+    @Override
+    public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
+        return getAdvBaseOpt().bSelectOne(sqlStatement, girSqlParam);
+    }
+
+    @Override
+    public List<GirAdvOneRow> bSelectList(String sqlStatement, GirSqlParam girSqlParam) {
+        return getAdvBaseOpt().bSelectList(sqlStatement, girSqlParam);
+    }
+
+    @Override
+    public void bSelectListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+        getAdvBaseOpt().bSelectListStream(sqlStatement, girSqlParam, rowConsumer);
+    }
+
+    @Override
+    public List<List<Object>> bSelectListToValueList(String sqlStatement, GirSqlParam girSqlParam) {
+        return getAdvBaseOpt().bSelectListToValueList(sqlStatement, girSqlParam);
+    }
+
+    @Override
+    public Number bSelectNumber(String sqlStatement, GirSqlParam girSqlParam) {
+        return getAdvBaseOpt().bSelectNumber(sqlStatement, girSqlParam);
+    }
+
+    @Override
+    public Number bSelectRecordRowCount(String sqlStatement, GirSqlParam girSqlParam) {
+        return getAdvBaseOpt().bSelectRecordRowCount(sqlStatement, girSqlParam);
+    }
+
+    @Override
+    public <E> E bSelectObjOne(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+        return getAdvBaseOpt().bSelectObjOne(sqlStatement, girSqlParam, clazz);
+    }
+
+    @Override
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+        return getAdvBaseOpt().bSelectObjList(sqlStatement, girSqlParam, clazz);
+    }
+
+    @Override
+    public <E> void bSelectObjListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        getAdvBaseOpt().bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
+    }
 
     // ==================== 基础更新操作（代理调用PgAdvBaseOpt） ====================
     @Override
@@ -444,26 +563,88 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateByPrimaryKey(
+    public Integer bUpdateBySql(String sqlStatement, SqlParamList sqlParam) {
+        return getAdvBaseOpt().bUpdateBySql(sqlStatement, sqlParam);
+    }
+
+    @Override
+    public Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bUpdateBySql(sqlStatement, sqlParam);
+    }
+
+    @Override
+    public Integer bUpdateByPK(
             String tableName, String idKey, Object id, Map<String, Object> rowData) {
-        return getAdvBaseOpt().bUpdateByPrimaryKey(tableName, idKey, id, rowData);
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, id, rowData);
     }
 
     @Override
-    public <T> Integer bUpdateByPrimaryKey(String tableName, String idKey, T entity) {
-        return getAdvBaseOpt().bUpdateByPrimaryKey(tableName, idKey, entity);
+    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity);
     }
 
     @Override
-    public Integer bUpdateByCondition(
+    public <T> Integer bUpdateByPK(
+            String tableName,
+            String idKey,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseOpt()
+                .bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(
+            String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(
+            String tableName,
+            String idKey,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt()
+                .bUpdateByPK(
+                        tableName,
+                        idKey,
+                        entity,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(
+            String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(
+            String tableName, String idKey, T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
+    }
+
+    @Override
+    public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
-        return getAdvBaseOpt().bUpdateByCondition(tableName, rowData, whereMap);
+        return getAdvBaseOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override
-    public Integer bUpdateBatchByPrimaryKey(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, rowsData);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
@@ -473,27 +654,126 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPrimaryKey(
-            String tableName, String idKey, Collection<T> entities) {
-        return getAdvBaseOpt().bUpdateBatchByPrimaryKey(tableName, idKey, entities);
-    }
-
-    @Override
-    public Integer bUpdateWithOptimisticLock(
-            String tableName,
-            String idKey,
-            Object id,
-            Map<String, Object> rowData,
-            String versionKey,
-            Integer version) {
-        return getAdvBaseOpt().bUpdateWithOptimisticLock(
-                tableName, idKey, id, rowData, versionKey, version);
+    public <T> Integer bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities) {
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
 
     @Override
     public Integer bUpdateOrInsert(
-            String tableName, Map<String, Object> rowData, Set<String> conflictKeys) {
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseOpt().bUpdateOrInsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public Integer bUpsert(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsert(tableName, rowData, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsert(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseOpt()
+                .bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bUpsert(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsert(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt()
+                .bUpsert(
+                        tableName,
+                        entity,
+                        conflictKeys,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpsert(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpsert(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(
+            String tableName,
+            T entity,
+            GirAdvWhereLambdaFilter<T> whereFilter,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(
+            String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bUpdateByWhere(tableName, rowData, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName,
+            T entity,
+            GirAdvWhereLambdaFilter<T> whereFilter,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseOpt()
+                .bUpdateSelectiveByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, rowData, whereFilter);
     }
 
     // ==================== DDL操作（代理调用PgAdvDDLOpt） ====================
@@ -554,7 +834,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public DataFieldsApo dGetColumnsBySQL(String dynamicSql, SqlParamMap sqlParam) {
+    public DataFieldsApo dGetColumnsBySQL(String dynamicSql, GirSqlParam sqlParam) {
         return getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
     }
 
@@ -641,8 +921,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             PrimaryKeyType pkType,
             Integer pkColumnLength,
             String pkValuePrefix) {
-        getAdvDDLOpt().dAddPrimaryKey(
-                tableName, pkColumnName, constraintName, pkType, pkColumnLength, pkValuePrefix);
+        getAdvDDLOpt()
+                .dAddPrimaryKey(
+                        tableName,
+                        pkColumnName,
+                        constraintName,
+                        pkType,
+                        pkColumnLength,
+                        pkValuePrefix);
     }
 
     @Override
@@ -652,8 +938,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pkColumnLength,
             String constraintName,
             String pkValuePrefix) {
-        getAdvDDLOpt().dAddStringPrimaryKey(
-                tableName, pkColumnName, pkColumnLength, constraintName, pkValuePrefix);
+        getAdvDDLOpt()
+                .dAddStringPrimaryKey(
+                        tableName, pkColumnName, pkColumnLength, constraintName, pkValuePrefix);
     }
 
     @Override
@@ -943,8 +1230,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             String geometry,
             int srid,
             String distanceAlias) {
-        return getGeoOpt().eCalculateDistance(
-                tableName, geomFieldName, geometry, srid, distanceAlias);
+        return getGeoOpt()
+                .eCalculateDistance(tableName, geomFieldName, geometry, srid, distanceAlias);
     }
 
     @Override
@@ -1025,14 +1312,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSql,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
@@ -1059,8 +1347,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
     }
 
     @Override
@@ -1071,8 +1359,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSql,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
@@ -1098,8 +1392,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
     }
 
     @Override
@@ -1110,8 +1404,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
     }
 
     @Override
@@ -1121,8 +1415,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
@@ -1133,8 +1427,32 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran) {
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders,
+                        advEnumsKeyTran);
     }
 
     @Override
@@ -1148,13 +1466,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(dataSourceGetter, tableName);
     }
 
-
     @Override
     public String tbGetTableNameWithSchema(
             IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
         // 代理调用：带指定Schema的完整表名拼接
-        return getDialectTableNameProcessor().tbGetTableNameWithSchema(
-                dataSourceGetter, tableName, schemaName);
+        return getDialectTableNameProcessor()
+                .tbGetTableNameWithSchema(dataSourceGetter, tableName, schemaName);
     }
 
     @Override
@@ -1241,17 +1558,21 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getDialectTableNameProcessor().tbBuildPageSql(noPageSql);
     }
 
+    @Override
+    public String tbBuildAsTable(String startFragment, String aliasTableName) {
+        return getDialectTableNameProcessor().tbBuildAsTable(startFragment, aliasTableName);
+    }
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
         return getGeoOpt().eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return getGeoOpt().eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
@@ -1260,7 +1581,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public GirAdvOneRow eSelectOne(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
         return getGeoOpt().eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
@@ -1268,14 +1589,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
         return getGeoOpt().eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return getGeoOpt().eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldName);
@@ -1284,102 +1605,102 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public List<GirAdvOneRow> eSelectList(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
         return getGeoOpt().eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeoTypeBySql(dynamicSql, sqlParam);
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, String geomFieldName) {
+            String dynamicSql, GirSqlParam sqlParam, String geomFieldName) {
         return getGeoOpt().eGetGeoTypeBySql(dynamicSql, sqlParam, geomFieldName);
     }
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+            String dynamicSql, GirSqlParam sqlParam, List<String> geomFieldNames) {
         return getGeoOpt().eGetGeoTypeBySql(dynamicSql, sqlParam, geomFieldNames);
     }
 
     @Override
-    public boolean eIsGeomBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public boolean eIsGeomBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eIsGeomBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeomColumnNameBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String dynamicSql, SqlParamMap sqlParam) {
+    public List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeomColumnListBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeomColumnBySql(dynamicSql, sqlParam);
     }
 
     @Override
-    public Long pCount(String noPageSqlStatement, SqlParamMap sqlParam) {
+    public Long pCount(String noPageSqlStatement, GirSqlParam sqlParam) {
         return getSimplePageOpt().pCount(noPageSqlStatement, sqlParam);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize) {
+            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize) {
         return getSimplePageOpt().pPage(noPageSqlStatement, sqlParam, pageNum, pageSize);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             List<OrderApo> orders) {
@@ -1389,117 +1710,138 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        orders);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
@@ -1548,7 +1890,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void wSelectObjStream(
+            GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
         getWhereSelectOpt().wSelectObjStream(query, clazz, rowConsumer);
     }
 }

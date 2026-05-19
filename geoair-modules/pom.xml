@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8.1.3</version>
     <relativePath>../geoair-base-parent</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-modules</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J8.1.3</version>
   <packaging>pom</packaging>
   <name>geoair-modules</name>
 

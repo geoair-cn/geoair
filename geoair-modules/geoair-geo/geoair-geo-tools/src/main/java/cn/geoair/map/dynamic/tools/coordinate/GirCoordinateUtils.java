@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.coordinate;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import java.util.Arrays;
@@ -26,22 +27,27 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
     private static final double X_PI = PI * 3000.0 / 180.0;
 
-    // JTS几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    ToolsConfig advToolsConfig;
 
-    // 私有构造器（防止外部实例化）
-    private GirCoordinateUtils() {}
+    public GirCoordinateUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+
+    public static GirCoordinateUtils getInstance(ToolsConfig advToolsConfig) {
+        return new GirCoordinateUtils(advToolsConfig);
+    }
 
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static GirCoordinateUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirCoordinateUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirCoordinateUtils();
+                    INSTANCE = new GirCoordinateUtils(new ToolsConfig());
                 }
             }
         }
@@ -285,7 +291,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] gcj = wgs84ToGcj02(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(gcj[0], gcj[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(gcj[0], gcj[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -300,7 +306,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = gcj02ToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -315,7 +321,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] bd = gcj02ToBd09(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(bd[0], bd[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(bd[0], bd[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -330,7 +336,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] gcj = bd09ToGcj02(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(gcj[0], gcj[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(gcj[0], gcj[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -345,7 +351,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] bd = wgs84ToBd09(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(bd[0], bd[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(bd[0], bd[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -360,7 +366,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = bd09ToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -375,7 +381,7 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] wgs = mercatorToWgs84(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(wgs[0], wgs[1]));
+            return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(wgs[0], wgs[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -390,7 +396,9 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
         try {
             validatePoint(point);
             double[] mercator = wgs84ToMercator(point.getX(), point.getY());
-            return GEOMETRY_FACTORY.createPoint(new Coordinate(mercator[0], mercator[1]));
+            return advToolsConfig
+                    .getGeometryFactory()
+                    .createPoint(new Coordinate(mercator[0], mercator[1]));
         } catch (Exception e) {
             return ifExceptionReturnNull ? null : throwRuntimeException(e);
         }
@@ -621,12 +629,12 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
 
             // 根据原始几何类型创建新对象
             if (geometry instanceof Point) {
-                return GEOMETRY_FACTORY.createPoint(newCoords[0]);
+                return advToolsConfig.getGeometryFactory().createPoint(newCoords[0]);
             } else if (geometry instanceof LineString) {
-                return GEOMETRY_FACTORY.createLineString(newCoords);
+                return advToolsConfig.getGeometryFactory().createLineString(newCoords);
             } else if (geometry instanceof Polygon) {
                 Polygon polygon = (Polygon) geometry;
-                LinearRing shell = GEOMETRY_FACTORY.createLinearRing(newCoords);
+                LinearRing shell = advToolsConfig.getGeometryFactory().createLinearRing(newCoords);
                 LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
                 for (int i = 0; i < holes.length; i++) {
                     Coordinate[] holeCoords = polygon.getInteriorRingN(i).getCoordinates();
@@ -638,14 +646,18 @@ public class GirCoordinateUtils implements GirCoordinateConvertOpt {
                                                 return new Coordinate(nc[0], nc[1]);
                                             })
                                     .toArray(Coordinate[]::new);
-                    holes[i] = GEOMETRY_FACTORY.createLinearRing(newHoleCoords);
+                    holes[i] = advToolsConfig.getGeometryFactory().createLinearRing(newHoleCoords);
                 }
-                return GEOMETRY_FACTORY.createPolygon(shell, holes);
+                return advToolsConfig.getGeometryFactory().createPolygon(shell, holes);
             } else if (geometry instanceof MultiPoint) {
-                return GEOMETRY_FACTORY.createMultiPoint(newCoords);
+                return advToolsConfig.getGeometryFactory().createMultiPointFromCoords(newCoords);
             } else if (geometry instanceof MultiLineString) {
-                return GEOMETRY_FACTORY.createMultiLineString(
-                        new LineString[] {GEOMETRY_FACTORY.createLineString(newCoords)});
+                return advToolsConfig
+                        .getGeometryFactory()
+                        .createMultiLineString(
+                                new LineString[] {
+                                    advToolsConfig.getGeometryFactory().createLineString(newCoords)
+                                });
             } else if (geometry instanceof MultiPolygon) {
                 throw new UnsupportedOperationException("暂不支持MultiPolygon直接转换，请拆分为单个Polygon转换");
             } else {

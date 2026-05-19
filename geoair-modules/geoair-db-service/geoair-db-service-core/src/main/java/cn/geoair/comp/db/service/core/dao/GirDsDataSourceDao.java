@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.core.dao;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import java.util.List;
 
 /**
@@ -11,15 +11,15 @@ import java.util.List;
  */
 public interface GirDsDataSourceDao {
 
-    void accessSelective(DataSourceApo t);
+    void accessSelective(DsDataSourceApo t);
 
-    void updateSelectiveById(DataSourceApo t);
+    void updateSelectiveById(DsDataSourceApo t);
 
     void deleteByPK(String id);
 
-    DataSourceApo getById(String id);
+    DsDataSourceApo getById(String id);
 
-    List<DataSourceApo> searchAll();
+    List<DsDataSourceApo> searchAll();
 
-    List<DataSourceApo> selectBatchIds(List<String> ids);
+    List<DsDataSourceApo> selectBatchIds(List<String> ids);
 }

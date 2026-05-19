@@ -5,7 +5,7 @@ import cn.geoair.base.api.annotation.GaApiAction;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
 import cn.geoair.comp.db.service.core.basic.service.DsApiConfigService;
 import cn.geoair.comp.db.service.core.basic.service.DsDataSourceService;
@@ -304,8 +304,8 @@ public class GirDsApiConfigController {
     public ResponseDto executeSql(String datasourceId, String sql, String params) {
         DruidPooledConnection connection = null;
         try {
-            DataSourceApo dataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSourceApo);
+            DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
+            connection = PoolManager.getPooledConnection(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
             Object data =
@@ -330,8 +330,8 @@ public class GirDsApiConfigController {
         String sql = jo.getString("sql");
         DruidPooledConnection connection = null;
         try {
-            DataSourceApo dataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dataSourceApo);
+            DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
+            connection = PoolManager.getPooledConnection(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
             SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
             Object data =

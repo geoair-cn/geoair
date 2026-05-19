@@ -1,6 +1,6 @@
 package cn.geoair.comp.message.converter.jts.jackson.config;
 
-import cn.geoair.comp.message.converter.jts.jackson.utils.GirJacksonUtils;
+import cn.geoair.comp.message.converter.jts.jackson.utils.GirJtsJacksonUtils;
 import cn.hutool.extra.spring.SpringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class GirJtsJacksonAutoConfig implements InitializingBean {
         if (beansOfType != null) {
             beansOfType.forEach(
                     (name, objectMapper) -> {
-                        GirJacksonUtils.registerModule(objectMapper);
+                        GirJtsJacksonUtils.registerModule(objectMapper);
                     });
         }
     }

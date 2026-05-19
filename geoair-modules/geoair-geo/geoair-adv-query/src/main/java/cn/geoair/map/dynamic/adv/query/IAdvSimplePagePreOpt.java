@@ -1,9 +1,10 @@
 package cn.geoair.map.dynamic.adv.query;
 
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
      * @param noPageSqlStatement 不带分页后缀的原始SQL（支持SELECT语句，无需含LIMIT/OFFSET）
      * @return 全量数据总条数（无数据返回0L，SQL错误抛异常）
      */
-    Long pCount(String noPageSqlStatement, SqlParamMap sqlParam);
+    Long pCount(String noPageSqlStatement, GirSqlParam sqlParam);
 
     /**
      * 全场景分页（自定义起始页+空间操作+字段元数据）
@@ -39,7 +40,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
      */
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -47,26 +48,51 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
             boolean hasFieldsInfo,
             List<OrderApo> orders);
 
+    /**
+     * 全场景分页（自定义起始页+空间操作+字段元数据）
+     *
+     * <p>适用场景：复杂综合场景（如GIS动态表格+前端0开始页码）
+     *
+     * @param noPageSqlStatement 原始SQL（含空间字段）
+     * @param pageNum 页码（按startZero规则）
+     * @param pageSize 每页条数（需>0）
+     * @param pageNumStartZero 页码起始规则（true=0开始，false=1开始）
+     * @param advEnumsGeomOpt 空间操作规则（如转换为空字符串）
+     * @param hasFieldsInfo 是否返回字段元数据（true=返回）
+     * @param orders 排序键
+     * @return 分页结果
+     */
     PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement, SqlParamMap sqlParam, int pageNum, int pageSize);
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran);
+
+    PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize);
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt);
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             List<OrderApo> orders);
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -74,7 +100,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -83,14 +109,14 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero);
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -98,7 +124,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -106,7 +132,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             boolean pageNumStartZero,
@@ -115,7 +141,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
@@ -123,7 +149,7 @@ public interface IAdvSimplePagePreOpt extends IAdvSimplePageOpt {
 
     PageApo<GirAdvOneRow> pPage(
             String noPageSqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,

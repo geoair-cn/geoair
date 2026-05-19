@@ -21,9 +21,8 @@ public class GutilGenericType {
      * @return 泛型数组 找不到为null
      */
     @GaMethodHandDefine(
-        expectClassName = "cn.geoair.spi.util.GenericTypeUtil4Gir",
-        expectMethodName = "resolveTypeArguments"
-    )
+            expectClassName = "cn.geoair.spi.util.GenericTypeUtil4Gir",
+            expectMethodName = "resolveTypeArguments")
     public static Type[] resolveTypeArguments(final Class<?> clazz, final Class<?> genericIfc) {
         return (Type[]) GkMethodHand.invokeSelf(clazz, genericIfc);
     }
@@ -36,10 +35,9 @@ public class GutilGenericType {
      * @return 泛型数组 找不到为null
      */
     @GaMethodHandImpl(
-        implClass = GutilGenericType.class,
-        implMethod = "resolveTypeArguments",
-        type = ImplType.comity
-    )
+            implClass = GutilGenericType.class,
+            implMethod = "resolveTypeArguments",
+            type = ImplType.comity)
     private static Type[] _resolveTypeArguments(Class<?> clazz, Class<?> forClass) {
         if (forClass.isInterface()) {
             Type[] genericInterfaces = clazz.getGenericInterfaces();

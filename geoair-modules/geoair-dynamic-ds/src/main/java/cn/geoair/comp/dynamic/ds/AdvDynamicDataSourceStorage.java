@@ -7,23 +7,19 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Setter;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
+import lombok.Setter;
 
-/**
- * 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作
- */
+/** 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作 */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     private static final GiLogger log = GirLogger.getLoger();
 
     protected static AdvDynamicDataSourceStorage dataSourceManager;
-    @Setter
-    IAdvDataSourceHelper iAdvDataSourceHelper;
+    @Setter IAdvDataSourceHelper iAdvDataSourceHelper;
 
     /**
      * 全局只有一个存储器实例
@@ -39,7 +35,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     public static DynamicDataSourceManager getInstance(IAdvDataSourceHelper iAdvDataSourceHelper) {
         if (dataSourceManager == null) {
-            AdvDynamicDataSourceStorage advDynamicDataSourceStorage = new AdvDynamicDataSourceStorage();
+            AdvDynamicDataSourceStorage advDynamicDataSourceStorage =
+                    new AdvDynamicDataSourceStorage();
             advDynamicDataSourceStorage.setIAdvDataSourceHelper(iAdvDataSourceHelper);
             dataSourceManager = advDynamicDataSourceStorage;
         } else {
@@ -49,7 +46,6 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         }
         return dataSourceManager;
     }
-
 
     public IAdvDataSourceHelper getAdvDataSourceHelper() {
         if (iAdvDataSourceHelper == null) {
@@ -63,9 +59,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return iAdvDataSourceHelper;
     }
 
-    private AdvDynamicDataSourceStorage() {
-
-    }
+    private AdvDynamicDataSourceStorage() {}
 
     // 数据源映射
     private final Map<String, AdvDataSourceWrapper> dataSourceMap = new ConcurrentHashMap<>();
@@ -95,12 +89,15 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             return dataSourceMap.get(dataSourceId);
         } else {
             try {
-                DataSourceApo dataSourceApoById = getAdvDataSourceHelper().getDataSourceApoById(dataSourceId);
-                AdvDataSourceWrapper dataSourceByDataSourceApo = getDataSourceByDataSourceApo(dataSourceApoById);
+                DataSourceApo dataSourceApoById =
+                        getAdvDataSourceHelper().getDataSourceApoById(dataSourceId);
+                AdvDataSourceWrapper dataSourceByDataSourceApo =
+                        getDataSourceByDataSourceApo(dataSourceApoById);
                 dataSourceMap.put(dataSourceId, dataSourceByDataSourceApo);
             } catch (Exception e) {
                 log.error(e, e.getMessage());
-                String format = StrUtil.format("无法找到数据源ID为{}的数据源 message:{}", dataSourceId, e.getMessage());
+                String format =
+                        StrUtil.format("无法找到数据源ID为{}的数据源 message:{}", dataSourceId, e.getMessage());
                 throw new RuntimeException(format);
             }
             return dataSourceMap.get(dataSourceId);
@@ -122,12 +119,13 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 这里由于只有postgresql，故这里简化
      *
-     * @param dataSource 数据源APO对象
+     * @param dataSourceApo 数据源APO对象
      * @return 创建的Druid数据源
      */
     @Override
-    public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSource) {
-        return AdvDataSourceWrapper.wrap(getAdvDataSourceHelper().getDbDataSourceByApo(dataSource));
+    public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo) {
+        return AdvDataSourceWrapper.wrap(
+                getAdvDataSourceHelper().getDbDataSourceByApo(dataSourceApo));
     }
 
     @Override

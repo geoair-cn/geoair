@@ -30,7 +30,7 @@ public interface DialectTableNameProcessor {
     /**
      * （指定Schema）获取带Schema的完整表名
      *
-     * @param tableName  原始表名（可含Schema，也可不含）
+     * @param tableName 原始表名（可含Schema，也可不含）
      * @param schemaName 指定的Schema名（优先级低于表名中提取的Schema）
      * @return 带Schema的标准表名
      */
@@ -85,9 +85,7 @@ public interface DialectTableNameProcessor {
      */
     String tbUnquoteSchemaName(String quotedSchemaName);
 
-    /**
-     * 字段名转义（PG用""，MySQL用`）
-     */
+    /** 字段名转义（PG用""，MySQL用`） */
     String tbQuoteFieldName(String fieldName);
 
     /**
@@ -113,19 +111,23 @@ public interface DialectTableNameProcessor {
      */
     String tbRemoveSqlSpaces(String sqlView);
 
-
     /**
-     * 构建分页SQL
+     * 构建基于sql的 alias语句 之所以有这个方法，是因为 oracle对于这个动作中间是没有as这个字符串的
+     *
+     * @param startFragment 有待定义别名的片段 示例 （select * from user ）
+     * @param aliasTableName 别名 示例 alias_t
+     * @return （select * from user ）as alias_t
      */
+    String tbBuildAsTable(String startFragment, String aliasTableName);
+
+    /** 构建分页SQL */
     String tbBuildPageSql(String noPageSql, int pageSize, long offset);
 
     /**
      * 不进行具体的值填充，只进行 ? 占位符填充
      *
      * @param noPageSql
-     * @return noPageSql  LIMIT ? OFFSET ?
+     * @return noPageSql LIMIT ? OFFSET ?
      */
     String tbBuildPageSql(String noPageSql);
-
-
 }

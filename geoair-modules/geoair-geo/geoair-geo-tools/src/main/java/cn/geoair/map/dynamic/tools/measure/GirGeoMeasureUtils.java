@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.measure;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
 import cn.hutool.core.util.ObjectUtil;
@@ -20,17 +21,24 @@ import org.locationtech.jts.operation.distance.DistanceOp;
  * @date 2024/12/05
  */
 public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
-
     // 单例实例
     private static volatile GirGeoMeasureUtils INSTANCE;
+    ToolsConfig advToolsConfig;
+    private GirFormatUtils formatOpt = GirFormatUtils.getInstance();
+    private GirSridConvertUtils sridConvert = GirSridConvertUtils.getInstance();
 
-    // 几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    public GirGeoMeasureUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+        initUnitFactors();
+        this.formatOpt = GirFormatUtils.getInstance(advToolsConfig);
+        this.sridConvert = GirSridConvertUtils.getInstance(advToolsConfig);
+    }
 
-    private static final GirFormatUtils CONVERT = GirFormatUtils.getInstance();
+    public static GirGeoMeasureUtils getInstance(ToolsConfig advToolsConfig) {
+        return new GirGeoMeasureUtils(advToolsConfig);
+    }
 
     // SRID转换工具
-    private static final GirSridConvertUtils SRID_UTILS = GirSridConvertUtils.getInstance();
 
     // 单位转换系数缓存
     private final Map<String, Double> unitFactorCache = new HashMap<>();
@@ -38,18 +46,13 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     // 锁
     private final Lock cacheLock = new ReentrantLock();
 
-    // 私有构造器
-    private GirGeoMeasureUtils() {
-        // 初始化单位转换系数
-        initUnitFactors();
-    }
-
     /** 获取单例实例 */
+    @Deprecated
     public static GirGeoMeasureUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirGeoMeasureUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeoMeasureUtils();
+                    INSTANCE = new GirGeoMeasureUtils(new ToolsConfig());
                 }
             }
         }
@@ -84,8 +87,8 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                 coordinates = Arrays.copyOf(coordinates, coordinates.length + 1);
                 coordinates[coordinates.length - 1] = coordinates[0];
             }
-            LinearRing ring = GEOMETRY_FACTORY.createLinearRing(coordinates);
-            Polygon polygon = GEOMETRY_FACTORY.createPolygon(ring);
+            LinearRing ring = advToolsConfig.getGeometryFactory().createLinearRing(coordinates);
+            Polygon polygon = advToolsConfig.getGeometryFactory().createPolygon(ring);
             return calculateAreaByUTM(polygon, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("坐标数组转多边形UTM面积计算失败", e);
@@ -95,7 +98,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     @Override
     public double calculateAreaByUTM(String wkt, int srid, String unit) {
         try {
-            Geometry geometry = CONVERT.wktToJtsGeometry(wkt, true);
+            Geometry geometry = formatOpt.wktToJtsGeometry(wkt, true);
             return calculateAreaByUTM(geometry, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("WKT解析UTM面积计算失败", e);
@@ -132,7 +135,8 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                     Arrays.stream(coords)
                             .map(coord -> new Coordinate(coord[0], coord[1]))
                             .toArray(Coordinate[]::new);
-            LineString lineString = GEOMETRY_FACTORY.createLineString(coordinates);
+            LineString lineString =
+                    advToolsConfig.getGeometryFactory().createLineString(coordinates);
             return calculateLengthByUTM(lineString, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("坐标数组转线UTM长度计算失败", e);
@@ -142,7 +146,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     @Override
     public double calculateLengthByUTM(String wkt, int srid, String unit) {
         try {
-            Geometry geometry = CONVERT.wktToJtsGeometry(wkt, true);
+            Geometry geometry = formatOpt.wktToJtsGeometry(wkt, true);
             return calculateLengthByUTM(geometry, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("WKT解析UTM长度计算失败", e);
@@ -205,8 +209,8 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                 coordinates = Arrays.copyOf(coordinates, coordinates.length + 1);
                 coordinates[coordinates.length - 1] = coordinates[0];
             }
-            LinearRing ring = GEOMETRY_FACTORY.createLinearRing(coordinates);
-            Polygon polygon = GEOMETRY_FACTORY.createPolygon(ring);
+            LinearRing ring = advToolsConfig.getGeometryFactory().createLinearRing(coordinates);
+            Polygon polygon = advToolsConfig.getGeometryFactory().createPolygon(ring);
             return calculateArea(polygon, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("坐标数组转多边形计算面积失败", e);
@@ -216,7 +220,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     @Override
     public double calculateArea(String wkt, int srid, String unit) {
         try {
-            Geometry geometry = CONVERT.wktToJtsGeometry(wkt, true);
+            Geometry geometry = formatOpt.wktToJtsGeometry(wkt, true);
             return calculateArea(geometry, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("WKT解析计算面积失败", e);
@@ -252,7 +256,8 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                     Arrays.stream(coords)
                             .map(coord -> new Coordinate(coord[0], coord[1]))
                             .toArray(Coordinate[]::new);
-            LineString lineString = GEOMETRY_FACTORY.createLineString(coordinates);
+            LineString lineString =
+                    advToolsConfig.getGeometryFactory().createLineString(coordinates);
             return calculateLength(lineString, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("坐标数组转线计算长度失败", e);
@@ -262,7 +267,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     @Override
     public double calculateLength(String wkt, int srid, String unit) {
         try {
-            Geometry geometry = CONVERT.wktToJtsGeometry(wkt, true);
+            Geometry geometry = formatOpt.wktToJtsGeometry(wkt, true);
             return calculateLength(geometry, srid, unit);
         } catch (Exception e) {
             throw new RuntimeException("WKT解析计算长度失败", e);
@@ -298,8 +303,14 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     public double calculatePointToPointDistance(
             double[] point1, double[] point2, int srid, String unit) {
         try {
-            Point p1 = GEOMETRY_FACTORY.createPoint(new Coordinate(point1[0], point1[1]));
-            Point p2 = GEOMETRY_FACTORY.createPoint(new Coordinate(point2[0], point2[1]));
+            Point p1 =
+                    advToolsConfig
+                            .getGeometryFactory()
+                            .createPoint(new Coordinate(point1[0], point1[1]));
+            Point p2 =
+                    advToolsConfig
+                            .getGeometryFactory()
+                            .createPoint(new Coordinate(point2[0], point2[1]));
             // 复用Point对象入参的方法
             return calculatePointToPointDistance(p1, p2, srid, unit);
         } catch (Exception e) {
@@ -329,12 +340,15 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     public double calculatePointToLineMinDistance(
             double[] point, double[][] lineCoords, int srid, String unit) {
         try {
-            Point p = GEOMETRY_FACTORY.createPoint(new Coordinate(point[0], point[1]));
+            Point p =
+                    advToolsConfig
+                            .getGeometryFactory()
+                            .createPoint(new Coordinate(point[0], point[1]));
             Coordinate[] lineCoordinates =
                     Arrays.stream(lineCoords)
                             .map(coord -> new Coordinate(coord[0], coord[1]))
                             .toArray(Coordinate[]::new);
-            LineString line = GEOMETRY_FACTORY.createLineString(lineCoordinates);
+            LineString line = advToolsConfig.getGeometryFactory().createLineString(lineCoordinates);
             // 复用Geometry对象入参的方法
             return calculatePointToLineMinDistance(p, line, srid, unit);
         } catch (Exception e) {
@@ -385,13 +399,13 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                     Arrays.stream(line1Coords)
                             .map(coord -> new Coordinate(coord[0], coord[1]))
                             .toArray(Coordinate[]::new);
-            LineString line1 = GEOMETRY_FACTORY.createLineString(line1CoordsArr);
+            LineString line1 = advToolsConfig.getGeometryFactory().createLineString(line1CoordsArr);
 
             Coordinate[] line2CoordsArr =
                     Arrays.stream(line2Coords)
                             .map(coord -> new Coordinate(coord[0], coord[1]))
                             .toArray(Coordinate[]::new);
-            LineString line2 = GEOMETRY_FACTORY.createLineString(line2CoordsArr);
+            LineString line2 = advToolsConfig.getGeometryFactory().createLineString(line2CoordsArr);
 
             // 复用Geometry对象入参的方法
             return calculateLineToLineMinDistance(line1, line2, srid, unit);
@@ -413,12 +427,13 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     }
 
     // ====================== 新增私有工具方法（UTM投影转换） ======================
+
     /** 转换为WGS84地理坐标系（4326） */
     private Geometry convertToWGS84(Geometry geometry, int srcSrid) {
         if (srcSrid == 4326) {
             return geometry;
         }
-        return SRID_UTILS.convert(geometry, srcSrid, 4326);
+        return sridConvert.convert(geometry, srcSrid, 4326);
     }
 
     /** 转换为UTM投影坐标系（高精度） */
@@ -431,10 +446,11 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         double centerLat = (envelope.getMinY() + envelope.getMaxY()) / 2;
         int utmSrid = getUTMSRID(utmZone, centerLat);
         // 转换为UTM投影
-        return SRID_UTILS.convert(wgs84Geom, 4326, utmSrid);
+        return sridConvert.convert(wgs84Geom, 4326, utmSrid);
     }
 
     // ====================== 原有私有工具方法（保持不变） ======================
+
     /** 初始化单位转换系数 */
     private void initUnitFactors() {
         cacheLock.lock();
@@ -504,7 +520,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         if (srcSrid == 3857) {
             return geometry;
         }
-        return SRID_UTILS.convert(geometry, srcSrid, 3857);
+        return sridConvert.convert(geometry, srcSrid, 3857);
     }
 
     /** 校验几何对象类型 */

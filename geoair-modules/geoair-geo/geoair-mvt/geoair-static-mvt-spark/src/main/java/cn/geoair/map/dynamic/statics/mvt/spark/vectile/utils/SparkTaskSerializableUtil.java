@@ -10,7 +10,7 @@ import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
@@ -181,7 +181,6 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
     }
 
-
     /** 瓦片映射函数（可序列化 + 无OOM版本） */
     public static class MapToTileFunction
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
@@ -195,7 +194,8 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
 
         @Override
-        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature) throws Exception {
+        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature)
+                throws Exception {
             if (feature == null) {
                 return Collections.emptyIterator();
             }
@@ -209,7 +209,7 @@ public class SparkTaskSerializableUtil implements Serializable {
                     parameter.getOutGridSrid());
         }
     }
-    /** 瓦片映射函数（可序列化）  */
+    /** 瓦片映射函数（可序列化） */
     @Deprecated
     public static class MapToTileFunction1
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
@@ -320,9 +320,9 @@ public class SparkTaskSerializableUtil implements Serializable {
     static int getTmsY(int zoom, int y, int x, int gridSrid) {
         int tms_y = y;
         if (gridSrid == 3857) {
-            tms_y = GirAdvTools.getTileGrid3857Opt().reverseY(y, zoom);
+            tms_y = GirGeoTools.me().getTileGrid3857Opt().reverseY(y, zoom);
         } else {
-            tms_y = GirAdvTools.getTileGrid4326SeparateOpt().reverseY(y, zoom);
+            tms_y = GirGeoTools.me().getTileGrid4326SeparateOpt().reverseY(y, zoom);
         }
         return tms_y;
     }
@@ -343,7 +343,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Row call(Tuple2<String, PbfInfo> tuple) throws Exception {
             String tileId = tuple._1;
-            TileZxyApo tileZxyApo = GirAdvTools.getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
             int x = tileZxyApo.getX();
@@ -380,7 +380,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         public Row call(Tuple2<String, PbfInfo> tuple) throws Exception {
 
             String tileId = tuple._1;
-            TileZxyApo tileZxyApo = GirAdvTools.getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
 
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
@@ -421,7 +421,7 @@ public class SparkTaskSerializableUtil implements Serializable {
             PbfInfo pbfInfo = tuple._2;
             byte[] bytes = pbfInfo.getDataLabel();
             pbfInfo.setDataLabel(null);
-            TileZxyApo tileZxyApo = GirAdvTools.getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
             int x = tileZxyApo.getX();

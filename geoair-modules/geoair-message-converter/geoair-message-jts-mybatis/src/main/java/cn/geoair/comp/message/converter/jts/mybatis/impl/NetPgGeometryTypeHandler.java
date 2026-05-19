@@ -1,11 +1,10 @@
-package cn.geoair.comp.message.converter.jts.mybatis.typehander;
+package cn.geoair.comp.message.converter.jts.mybatis.impl;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.postgis.jdbc.PGgeometry;
-import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.locationtech.jts.geom.Geometry;
@@ -18,7 +17,7 @@ import org.locationtech.jts.io.WKTReader;
 
 // @MappedTypes(Geometry.class)
 // @MappedJdbcTypes(JdbcType.OTHER)
-public class NetPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
+public class NetPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry> */ {
 
     static NetPgGeometryTypeHandler netPgGeometryTypeHandler;
 
@@ -33,7 +32,6 @@ public class NetPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return netPgGeometryTypeHandler;
     }
 
-    @Override
     public void setNonNullParameter(
             PreparedStatement ps, int i, Geometry parameter, JdbcType jdbcType)
             throws SQLException {
@@ -47,7 +45,6 @@ public class NetPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         ps.setObject(i, pGobject);
     }
 
-    @Override
     public Geometry getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String geom = rs.getString(columnName);
         try {
@@ -58,7 +55,6 @@ public class NetPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return null;
     }
 
-    @Override
     public Geometry getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String geom = rs.getString(columnIndex);
         try {
@@ -69,7 +65,6 @@ public class NetPgGeometryTypeHandler extends BaseTypeHandler<Geometry> {
         return null;
     }
 
-    @Override
     public Geometry getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String geom = cs.getString(columnIndex);
         try {

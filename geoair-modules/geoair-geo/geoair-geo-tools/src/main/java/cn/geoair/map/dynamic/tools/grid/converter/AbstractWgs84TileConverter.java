@@ -1,5 +1,12 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
+import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
+import java.util.ArrayList;
+import java.util.List;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 /** WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算 */
@@ -19,6 +26,17 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     protected static final double MIN_VALID_LAT = -85.0511287798; // 3857有效纬度下限
 
     protected static final double PRECISION = 1e-9; // 浮点精度补偿
+
+    // 地球周长（米）- 用于比例尺计算
+    protected static final double EARTH_CIRCUMFERENCE = 40075016.686;
+    // 墨卡托投影常量（地球半径）
+    private static final double EARTH_RADIUS = 6378137.0;
+
+    public static final double EPSG4326_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360.0;
+
+    public AbstractWgs84TileConverter(ToolsConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
 
     /** 数值范围限制（工具方法） */
     protected double clamp(double value, double min, double max) {
@@ -162,4 +180,169 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
     /** 计算纬度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回180/2^z） */
     protected abstract double calculateTileLatSpan(int z);
+
+    /**
+     * 根据最大分辨率层级获取瓦片元数据（支持自定义瓦片尺寸和DPI）
+     *
+     * @param maxZoom 最大分辨率层级（最大缩放级别）
+     * @param tilePixelSize 瓦片像素尺寸（例如：256、512）
+     * @param dpi 屏幕DPI（例如：72、96、300）
+     * @return 瓦片层级元数据对象
+     */
+    public TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi) {
+        validateXyz(maxZoom, 0, 0);
+
+        double tileCount = Math.pow(2.0, maxZoom + 1);
+
+        // 计算该层级下的瓦片总数
+        long totalTiles = (long) (tileCount * tileCount) / 2;
+
+        // 计算经度和纬度的瓦片跨度（度）
+        double tileLonSpan = calculateTileLonSpan(maxZoom);
+        double tileLatSpan = calculateTileLatSpan(maxZoom);
+
+        // 瓦片的地理尺寸（度）
+        double tileGeoWidth = tileLonSpan;
+
+        // 计算地面分辨率（度/像素）
+        double groundResolutionDegree = getResolution(maxZoom, tilePixelSize);
+
+        double scale = groundResolutionDegree * EPSG4326_TO_METERS / (0.0254 / dpi);
+        // 计算每像素代表的实际长度（毫米）
+        //        double mmPerPixel = groundResolutionDegree * 1000;
+        double mmPerPixel =
+                ((2 * Math.PI * EARTH_RADIUS) / (Math.pow(2, maxZoom) * tilePixelSize)) * 1000;
+        // 全局范围（4326坐标系）
+        Envelope extent = new Envelope(MIN_LON, MAX_LON, MIN_LAT, MAX_LAT);
+
+        return new TileLevelMetadata(
+                maxZoom,
+                tileCount,
+                tileGeoWidth,
+                mmPerPixel,
+                groundResolutionDegree,
+                scale,
+                totalTiles,
+                tilePixelSize,
+                dpi,
+                mmPerPixel,
+                extent,
+                "EPSG:4326");
+    }
+
+    /** 获取指定层级的度/像素分辨率 */
+    public double getResolution(int zoom, int tilePixelSize) {
+        validateXyz(zoom, 0, 0);
+        double tileLonSpan = calculateTileLonSpan(zoom);
+        return tileLonSpan / tilePixelSize;
+    }
+
+    /**
+     * 根据最大分辨率层级获取瓦片元数据（使用默认配置）
+     *
+     * @param maxZoom 最大分辨率层级
+     * @return 瓦片层级元数据对象
+     */
+    public TileLevelMetadata getTileLevelMetadata(int maxZoom) {
+        int defaultTileSize =
+                advToolsConfig.getTilePixelSize() > 0 ? advToolsConfig.getTilePixelSize() : 256;
+        int defaultDpi = advToolsConfig.getDpi() > 0 ? advToolsConfig.getDpi() : 96;
+        return getTileLevelMetadata(maxZoom, defaultTileSize, defaultDpi);
+    }
+
+    /**
+     * 批量获取多个层级的瓦片元数据
+     *
+     * @param minZoom 最小层级
+     * @param maxZoom 最大层级
+     * @param tilePixelSize 瓦片像素尺寸
+     * @param dpi 屏幕DPI
+     * @return 层级元数据列表
+     */
+    public List<TileLevelMetadata> getTileLevelMetadataList(
+            int minZoom, int maxZoom, int tilePixelSize, double dpi) {
+        if (minZoom < 0 || maxZoom < minZoom) {
+            throw new IllegalArgumentException(
+                    "层级参数无效: minZoom=" + minZoom + ", maxZoom=" + maxZoom);
+        }
+
+        List<TileLevelMetadata> metadataList = new ArrayList<>();
+        for (int z = minZoom; z <= maxZoom; z++) {
+            metadataList.add(getTileLevelMetadata(z, tilePixelSize, dpi));
+        }
+        return metadataList;
+    }
+
+    /**
+     * 根据地面分辨率反推合适的瓦片层级
+     *
+     * @param targetResolution 目标地面分辨率（米/像素）
+     * @param tilePixelSize 瓦片像素尺寸
+     * @return 最合适的瓦片层级
+     */
+    public int getZoomByResolution(double targetResolution, int tilePixelSize) {
+        if (targetResolution <= 0) {
+            throw new IllegalArgumentException("分辨率必须大于0");
+        }
+
+        // 计算每个层级的度/像素分辨率，找到最接近的
+        for (int z = 0; z <= 22; z++) {
+            double resolutionDegree = getResolution(z, tilePixelSize); // 度/像素
+
+            if (resolutionDegree <= targetResolution) {
+                return z;
+            }
+        }
+        return 22;
+    }
+
+    /**
+     * 根据比例尺反推合适的瓦片层级
+     *
+     * @param targetScale 目标比例尺（例如：10000 表示 1:10000）
+     * @param tilePixelSize 瓦片像素尺寸
+     * @param dpi 屏幕DPI
+     * @return 最合适的瓦片层级
+     */
+    public int getZoomByScale(double targetScale, int tilePixelSize, double dpi) {
+        if (targetScale <= 0) {
+            throw new IllegalArgumentException("比例尺必须大于0");
+        }
+
+        // 根据比例尺计算地面分辨率
+        // 公式：Resolution = Scale * 0.0254 / DPI
+        double targetResolution = targetScale * 0.0254 / dpi;
+
+        return getZoomByResolution(targetResolution, tilePixelSize);
+    }
+
+    @Override
+    public BoxReferencedEnvelope boundsFromTileRange(
+            long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
+        validateXyz(zoom, (int) minTileX, (int) minTileY);
+        // 计算四个角的瓦片边界
+        // 左下角瓦片
+        double minX = tileXToCoordinateX((int) minTileX, zoom);
+        double minY = tileYToCoordinateY((int) (maxTileY), zoom); // 注意Y轴方向
+
+        // 右上角瓦片
+        double maxX = tileXToCoordinateX((int) (maxTileX), zoom);
+        double maxY = tileYToCoordinateY((int) minTileY, zoom);
+
+        Envelope envelope = new Envelope(minX, maxX, minY, maxY);
+        Envelope converted = sridConvertOpt.convert(envelope, 4326, targetSrid);
+        return new BoxReferencedEnvelope(converted, targetSrid);
+    }
+
+    @Override
+    public RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid) {
+        Envelope convert = sridConvertOpt.convert(tileBox, srcSrid, 4326);
+        return tileRangeByBox(z, convert);
+    }
+
+    @Override
+    public RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid) {
+        Geometry transform = transform(geometry, srcSrid);
+        return tileRangeByGeom(z, transform);
+    }
 }

@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J8.1.2-SNAPSHOT</version>
+    <version>J8.1.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-sdk</artifactId>
-  <version>J8.1.2-SNAPSHOT</version>
+  <version>J8.1.3</version>
   <packaging>jar</packaging>
   <name>geoair-sdk</name>
 

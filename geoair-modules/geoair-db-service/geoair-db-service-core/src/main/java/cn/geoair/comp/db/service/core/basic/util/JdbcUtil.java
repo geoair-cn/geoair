@@ -1,6 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import com.alibaba.fastjson2.JSONObject;
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class JdbcUtil {
         return resultSet;
     }
 
-    public static Connection getConnection(DataSourceApo ds) throws Exception {
+    public static Connection getConnection(DsDataSourceApo ds) throws Exception {
         try {
             Class.forName(ds.getDriver());
             String password =

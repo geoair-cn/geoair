@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -10,7 +11,7 @@ public class GirConvertDemo {
 
     public static void main(String[] args) {
         // 获取单例实例
-        GirFormatUtils geoUtils = GirFormatUtils.getInstance();
+        GirFormatUtils geoUtils = GirFormatUtils.getInstance(new ToolsConfig());
 
         // GeoJSON转JTS Point（便捷方法）
         Point point =

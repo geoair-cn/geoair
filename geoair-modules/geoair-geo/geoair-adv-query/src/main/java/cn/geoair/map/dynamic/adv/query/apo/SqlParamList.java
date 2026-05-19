@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 
 /**
  * 用于保存预编译之后的值
- * <p>封装SQL参数列表，提供便捷的API操作</p>
+ *
+ * <p>使用这个参数的时候，表示前面传的sql是 select * from name == ？ 这样的问号占位符
  *
  * @author 张逢吉
  * @date Created in 17:47
  */
-public class SqlParamList extends ArrayList<Object> implements Serializable {
+public class SqlParamList extends ArrayList<Object> implements Serializable, GirSqlParam {
 
     /**
      * 创建一个空的 SqlParamList
@@ -120,7 +121,7 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
     /**
      * 转换为指定类型的数组
      *
-     * @param a   目标数组
+     * @param a 目标数组
      * @param <T> 数组元素类型
      * @return 转换后的数组
      */
@@ -155,7 +156,7 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
      *
      * @param index 索引位置
      * @param clazz 目标类型
-     * @param <T>   目标类型泛型
+     * @param <T> 目标类型泛型
      * @return 转换后的参数值
      */
     public <T> T getParam(int index, Class<T> clazz) {
@@ -220,11 +221,12 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
         List<Object> removed = new ArrayList<>();
         if (indices != null && indices.length > 0) {
             // 从大到小排序，避免索引错位
-            int[] sortedIndices = Arrays.stream(indices)
-                    .boxed()
-                    .sorted(Comparator.reverseOrder())
-                    .mapToInt(Integer::intValue)
-                    .toArray();
+            int[] sortedIndices =
+                    Arrays.stream(indices)
+                            .boxed()
+                            .sorted(Comparator.reverseOrder())
+                            .mapToInt(Integer::intValue)
+                            .toArray();
             for (int index : sortedIndices) {
                 if (index >= 0 && index < size()) {
                     removed.add(0, super.remove(index));
@@ -308,9 +310,7 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
      * @return 参数字符串
      */
     public String toParamString() {
-        return this.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(", ", "[", "]"));
+        return this.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]"));
     }
 
     /**
@@ -337,10 +337,7 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
 
     @Override
     public String toString() {
-        return "SqlParamList{" +
-                "size=" + size() +
-                ", params=" + toParamString() +
-                '}';
+        return "SqlParamList{" + "size=" + size() + ", params=" + toParamString() + '}';
     }
 
     public static void main(String[] args) {
@@ -366,11 +363,8 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
         System.out.println("从List创建: " + params3);
 
         // 示例5：链式添加参数
-        SqlParamList params4 = SqlParamList.of()
-                .addParam("赵六")
-                .addParam(25)
-                .addParam(4)
-                .addParams("额外", "参数");
+        SqlParamList params4 =
+                SqlParamList.of().addParam("赵六").addParam(25).addParam(4).addParams("额外", "参数");
         System.out.println("链式添加: " + params4);
 
         // 示例6：获取参数
@@ -422,8 +416,5 @@ public class SqlParamList extends ArrayList<Object> implements Serializable {
         SqlParamList params = SqlParamList.of("张三", 18, 1);
         System.out.println("SQL: " + sql);
         System.out.println("参数: " + params.toParamString());
-
-
     }
-
 }

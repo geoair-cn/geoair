@@ -3,13 +3,13 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.lang.reflect.Field;
 import java.util.*;
 
 /**
  * Bean转QueryFilter工具类
- * <p>将JavaBean对象自动转换为查询条件</p>
+ *
+ * <p>将JavaBean对象自动转换为查询条件
  *
  * @author zhangjun
  */
@@ -28,7 +28,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 将Bean转换为QueryFilter
      *
-     * @param bean    Bean对象
+     * @param bean Bean对象
      * @param options 转换配置选项
      * @return QueryFilter实例
      */
@@ -56,25 +56,25 @@ public class BeanToQueryFilterConverter {
     /**
      * 将Bean转换为QueryFilter（带字段映射）
      *
-     * @param bean          Bean对象
+     * @param bean Bean对象
      * @param fieldMappings 字段映射配置
      * @return QueryFilter实例
      */
-    public static GirAdvWhereFilter convertWithMapping(Object bean, Map<String, FieldMapping> fieldMappings) {
+    public static GirAdvWhereFilter convertWithMapping(
+            Object bean, Map<String, FieldMapping> fieldMappings) {
         return convertWithMapping(bean, fieldMappings, ConvertOptions.defaultOptions());
     }
 
     /**
      * 将Bean转换为QueryFilter（带字段映射）
      *
-     * @param bean          Bean对象
+     * @param bean Bean对象
      * @param fieldMappings 字段映射配置
-     * @param options       转换配置选项
+     * @param options 转换配置选项
      * @return QueryFilter实例
      */
-    public static GirAdvWhereFilter convertWithMapping(Object bean,
-                                                       Map<String, FieldMapping> fieldMappings,
-                                                       ConvertOptions options) {
+    public static GirAdvWhereFilter convertWithMapping(
+            Object bean, Map<String, FieldMapping> fieldMappings, ConvertOptions options) {
         GirAdvWhereFilter filter = GirAdvWhereFilter.of();
 
         if (bean == null || fieldMappings == null || fieldMappings.isEmpty()) {
@@ -94,23 +94,28 @@ public class BeanToQueryFilterConverter {
                     continue;
                 }
                 if (options.isThrowOnNull()) {
-                    throw new IllegalArgumentException("Field '" + beanFieldName + "' value is null");
+                    throw new IllegalArgumentException(
+                            "Field '" + beanFieldName + "' value is null");
                 }
             }
 
             // 处理空字符串
-            if (options.isIgnoreEmptyString() && value instanceof String && StrUtil.isBlank((String) value)) {
+            if (options.isIgnoreEmptyString()
+                    && value instanceof String
+                    && StrUtil.isBlank((String) value)) {
                 continue;
             }
 
             // 确定列名
-            String columnName = mapping.getColumnName() != null ? mapping.getColumnName() : beanFieldName;
+            String columnName =
+                    mapping.getColumnName() != null ? mapping.getColumnName() : beanFieldName;
             if (options.isToUnderlineCase() && mapping.getColumnName() == null) {
                 columnName = toUnderlineCase(beanFieldName);
             }
 
             // 确定操作符
-            AdvOperatorEnums operator = mapping.getOperator() != null ? mapping.getOperator() : AdvOperatorEnums.等于;
+            AdvOperatorEnums operator =
+                    mapping.getOperator() != null ? mapping.getOperator() : AdvOperatorEnums.等于;
 
             // 处理特殊操作符的值
             Object processedValue = processValueByOperator(value, operator);
@@ -122,9 +127,7 @@ public class BeanToQueryFilterConverter {
         return filter;
     }
 
-    /**
-     * 提取Bean中的所有字段值
-     */
+    /** 提取Bean中的所有字段值 */
     private static Map<String, Object> extractFieldValues(Object bean, ConvertOptions options) {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
 
@@ -132,7 +135,10 @@ public class BeanToQueryFilterConverter {
             @SuppressWarnings("unchecked")
             Map<String, Object> map = (Map<String, Object>) bean;
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                String key = options.isToUnderlineCase() ? toUnderlineCase(entry.getKey()) : entry.getKey();
+                String key =
+                        options.isToUnderlineCase()
+                                ? toUnderlineCase(entry.getKey())
+                                : entry.getKey();
                 fieldMap.put(key, entry.getValue());
             }
         } else {
@@ -143,12 +149,9 @@ public class BeanToQueryFilterConverter {
         return fieldMap;
     }
 
-    /**
-     * 应用默认条件（等值条件）
-     */
-    private static void applyDefaultConditions(GirAdvWhereFilter filter,
-                                               Map<String, Object> fieldMap,
-                                               ConvertOptions options) {
+    /** 应用默认条件（等值条件） */
+    private static void applyDefaultConditions(
+            GirAdvWhereFilter filter, Map<String, Object> fieldMap, ConvertOptions options) {
         for (Map.Entry<String, Object> entry : fieldMap.entrySet()) {
             String fieldName = entry.getKey();
             Object value = entry.getValue();
@@ -164,12 +167,16 @@ public class BeanToQueryFilterConverter {
             }
 
             // 处理空字符串
-            if (options.isIgnoreEmptyString() && value instanceof String && StrUtil.isBlank((String) value)) {
+            if (options.isIgnoreEmptyString()
+                    && value instanceof String
+                    && StrUtil.isBlank((String) value)) {
                 continue;
             }
 
             // 处理集合为空
-            if (options.isIgnoreEmptyCollection() && value instanceof Collection && ((Collection<?>) value).isEmpty()) {
+            if (options.isIgnoreEmptyCollection()
+                    && value instanceof Collection
+                    && ((Collection<?>) value).isEmpty()) {
                 continue;
             }
 
@@ -184,10 +191,9 @@ public class BeanToQueryFilterConverter {
         }
     }
 
-    /**
-     * 应用字段映射
-     */
-    private static void applyFieldMappings(GirAdvWhereFilter filter, Object bean, ConvertOptions options) {
+    /** 应用字段映射 */
+    private static void applyFieldMappings(
+            GirAdvWhereFilter filter, Object bean, ConvertOptions options) {
         Map<String, FieldMapping> fieldMappings = options.getFieldMappings();
         if (fieldMappings == null || fieldMappings.isEmpty()) {
             applyDefaultConditions(filter, extractFieldValues(bean, options), options);
@@ -206,12 +212,14 @@ public class BeanToQueryFilterConverter {
                 }
             }
 
-            String columnName = mapping.getColumnName() != null ? mapping.getColumnName() : beanFieldName;
+            String columnName =
+                    mapping.getColumnName() != null ? mapping.getColumnName() : beanFieldName;
             if (options.isToUnderlineCase() && mapping.getColumnName() == null) {
                 columnName = toUnderlineCase(beanFieldName);
             }
 
-            AdvOperatorEnums operator = mapping.getOperator() != null ? mapping.getOperator() : AdvOperatorEnums.等于;
+            AdvOperatorEnums operator =
+                    mapping.getOperator() != null ? mapping.getOperator() : AdvOperatorEnums.等于;
             Object processedValue = processValueByOperator(value, operator);
 
             filter.addCondition(columnName, operator, processedValue);
@@ -221,7 +229,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 根据值类型智能检测操作符
      *
-     * @param value   值
+     * @param value 值
      * @param options 转换配置选项
      * @return 操作符枚举
      */
@@ -242,7 +250,6 @@ public class BeanToQueryFilterConverter {
             // 检查通配符位置，智能选择LIKE类型
             boolean hasLeftWildcard = str.startsWith("%");
             boolean hasRightWildcard = str.endsWith("%");
-
 
             // 情况1：用户已经指定了通配符模式
             if (hasLeftWildcard && hasRightWildcard) {
@@ -267,9 +274,7 @@ public class BeanToQueryFilterConverter {
         return AdvOperatorEnums.等于;
     }
 
-    /**
-     * 根据操作符处理值
-     */
+    /** 根据操作符处理值 */
     private static Object processValueByOperator(Object value, AdvOperatorEnums operator) {
         if (value == null) {
             return null;
@@ -294,9 +299,7 @@ public class BeanToQueryFilterConverter {
         }
     }
 
-    /**
-     * 获取Bean中指定字段的值
-     */
+    /** 获取Bean中指定字段的值 */
     private static Object getFieldValue(Object bean, String fieldName) {
         try {
             return BeanUtil.getProperty(bean, fieldName);
@@ -312,9 +315,7 @@ public class BeanToQueryFilterConverter {
         }
     }
 
-    /**
-     * 驼峰转下划线
-     */
+    /** 驼峰转下划线 */
     private static String toUnderlineCase(String camelCase) {
         if (camelCase == null) {
             return null;
@@ -335,6 +336,5 @@ public class BeanToQueryFilterConverter {
     }
 
     // ==================== 内部类 ====================
-
 
 }

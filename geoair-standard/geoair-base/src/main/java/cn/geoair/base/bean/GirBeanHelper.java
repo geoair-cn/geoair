@@ -19,10 +19,9 @@ public class GirBeanHelper {
     }
 
     @GaMethodHandImpl(
-        implClass = GirBeanHelper.class,
-        implMethod = "getProvider",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirBeanHelper.class,
+            implMethod = "getProvider",
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiBeanFactory _getProvider() {
         Gir.log.error("必须有工具提供容器，如spring");
         return null;

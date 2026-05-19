@@ -1,7 +1,9 @@
 package cn.geoair.map.dynamic.tools.array;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import java.util.List;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -12,22 +14,30 @@ import org.locationtech.jts.geom.*;
  */
 public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
-    // 全局默认几何工厂（JTS推荐单例复用）
-    private static final GeometryFactory DEFAULT_GEOMETRY_FACTORY = new GeometryFactory();
-
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
+
+    ToolsConfig advToolsConfig;
+
+    public GirGeom2ArrayUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+
+    public static GirGeom2ArrayUtils getInstance(ToolsConfig advToolsConfig) {
+        return new GirGeom2ArrayUtils(advToolsConfig);
+    }
 
     /**
      * 获取单例实例（双重校验锁）
      *
      * @return 单例对象
      */
+    @Deprecated
     public static GirGeom2ArrayUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirGeom2ArrayUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeom2ArrayUtils();
+                    INSTANCE = new GirGeom2ArrayUtils(new ToolsConfig());
                 }
             }
         }
@@ -102,13 +112,37 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
+    public Point pointByDouble(double x, double y) {
+        return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(x, y));
+    }
+
+    @Override
+    public Point pointByString(String x, String y) {
+        // 1. 空值校验
+        if (x == null || y == null) {
+            return null;
+        }
+        try {
+            // 2. 字符串转 double
+            double longitude = Double.parseDouble(x.trim());
+            double latitude = Double.parseDouble(y.trim());
+
+            // 3. 调用上面的 double 方法创建点
+            return pointByDouble(longitude, latitude);
+        } catch (NumberFormatException e) {
+            // 格式错误返回 null（或抛出异常，看业务需求）
+            return null;
+        }
+    }
+
+    @Override
     public Point doubleArrayToPoint(double[] coords) {
         return doubleArrayToPoint(coords, CoordOrder.X_FIRST);
     }
 
     @Override
     public Point doubleArrayToPoint(double[] coords, CoordOrder order) {
-        return doubleArrayToPoint(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToPoint(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -116,7 +150,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         // 默认值处理
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         GeometryFactory actualFactory =
-                ObjectUtil.isNull(factory) ? DEFAULT_GEOMETRY_FACTORY : factory;
+                ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
 
         // 空值/维度校验
         if (ArrayUtil.isEmpty(coords)) {
@@ -148,7 +182,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
         // 空值处理：空数组返回空Point
         if (ArrayUtil.isEmpty(coords)) {
-            return DEFAULT_GEOMETRY_FACTORY.createPoint();
+            return advToolsConfig.getGeometryFactory().createPoint();
         }
 
         // 快速转换（跳过数值校验，仅维度简单判断）
@@ -159,12 +193,36 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         double x = CoordOrder.X_FIRST == actualOrder ? coords[0] : coords[1];
         double y = CoordOrder.X_FIRST == actualOrder ? coords[1] : coords[0];
 
-        return DEFAULT_GEOMETRY_FACTORY.createPoint(new Coordinate(x, y));
+        return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(x, y));
+    }
+
+    @Override
+    public Point doubleListToPoint(List<Double> coords) {
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
+        return doubleArrayToPoint(doubles);
+    }
+
+    @Override
+    public Point doubleListToPoint(List<Double> coords, CoordOrder order) {
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
+        return doubleArrayToPoint(doubles, order);
+    }
+
+    @Override
+    public Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory) {
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
+        return doubleArrayToPoint(doubles, order, factory);
+    }
+
+    @Override
+    public Point doubleListToPointFast(List<Double> coords, CoordOrder order) {
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
+        return doubleArrayToPointFast(doubles, order);
     }
 
     @Override
     public Geometry doubleArrayToGeometry(Object coords, CoordOrder order) {
-        return doubleArrayToGeometry(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToGeometry(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -193,7 +251,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public LineString doubleArrayToLineString(double[][] coords, CoordOrder order) {
-        return doubleArrayToLineString(coords, order, DEFAULT_GEOMETRY_FACTORY);
+        return doubleArrayToLineString(coords, order, advToolsConfig.getGeometryFactory());
     }
 
     @Override
@@ -202,7 +260,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         // 默认值处理
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         GeometryFactory actualFactory =
-                ObjectUtil.isNull(factory) ? DEFAULT_GEOMETRY_FACTORY : factory;
+                ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
         // 空值处理：空数组返回空LineString
         if (ArrayUtil.isEmpty(coords)) {
             return actualFactory.createLineString();
@@ -239,7 +297,7 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         // 空值处理：空数组返回空LineString
         if (ArrayUtil.isEmpty(coords)) {
-            return DEFAULT_GEOMETRY_FACTORY.createLineString();
+            return advToolsConfig.getGeometryFactory().createLineString();
         }
         // 快速转换（跳过数值校验）
         Coordinate[] jtsCoords = new Coordinate[coords.length];
@@ -249,6 +307,31 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
             double y = CoordOrder.X_FIRST == actualOrder ? point[1] : point[0];
             jtsCoords[i] = new Coordinate(x, y);
         }
-        return DEFAULT_GEOMETRY_FACTORY.createLineString(jtsCoords);
+        return advToolsConfig.getGeometryFactory().createLineString(jtsCoords);
+    }
+
+    @Override
+    public LineString doubleListToLineString(List<double[]> coords) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, CoordOrder.X_FIRST);
+    }
+
+    @Override
+    public LineString doubleListToLineString(List<double[]> coords, CoordOrder order) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, order);
+    }
+
+    @Override
+    public LineString doubleListToLineString(
+            List<double[]> coords, CoordOrder order, GeometryFactory factory) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineString(coordsArray, order, factory);
+    }
+
+    @Override
+    public LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order) {
+        double[][] coordsArray = coords.toArray(new double[0][]);
+        return doubleArrayToLineStringFast(coordsArray, order);
     }
 }

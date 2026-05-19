@@ -1,8 +1,10 @@
 package cn.geoair.map.dynamic.mvt;
 
-import cn.geoair.base.bean.GirBeanHelper;
 import cn.geoair.map.dynamic.mvt.consumer.VectorTileBuilderConsumer;
+import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
+import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+import cn.geoair.map.dynamic.tools.GirService;
 import org.locationtech.jts.geom.Envelope;
 
 /**
@@ -13,7 +15,7 @@ public interface GirRealMvtHelper {
 
     static GirRealMvtHelper getInstance() {
         try {
-            return GirBeanHelper.getProvider().getBean(GirRealMvtHelper.class);
+            return GirService.getPxyBeanC(GirRealMvtHelper.class);
         } catch (Exception e) {
             return new DefaultRealMvtHelper();
         }
@@ -24,4 +26,6 @@ public interface GirRealMvtHelper {
             String layerName,
             int outGridSrid,
             TileGlobalConfig tileGlobalConfig);
+
+    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName);
 }

@@ -107,6 +107,11 @@ public abstract class Gir {
                 }
 
                 @Override
+                public boolean containsProfile(String profile) {
+                    return GirEnvironmentHelper.getEnvironmenter().containsProfile(profile);
+                }
+
+                @Override
                 public boolean isDev() {
 
                     return GirEnvironmentHelper.getEnvironmenter().isDev();

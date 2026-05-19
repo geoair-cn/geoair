@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.mvt.tools;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.*;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.ByteArrayOutputStream;
@@ -63,7 +63,7 @@ public class AdvMvtDensityUtils {
             return featureList;
         }
         double GRID_SCALE = 100.0;
-        if (GirAdvTools.getSridOpt().isGeographicCRS(gridSrid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(gridSrid)) {
             GRID_SCALE = 10.0;
         }
 
@@ -285,7 +285,7 @@ public class AdvMvtDensityUtils {
         // 1. 网格大小（像素转地理坐标，适配瓦片分辨率）
         // 网格越小，密度计算越精细；此处取瓦片范围的1/100作为网格单元
         double GRID_SCALE = 100.0;
-        if (GirAdvTools.getSridOpt().isGeographicCRS(gridSrid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(gridSrid)) {
             GRID_SCALE = 10.0;
         }
 
@@ -503,7 +503,7 @@ public class AdvMvtDensityUtils {
         int srid = Optional.of(pbfParam.getOutGridSrid()).orElse(3857);
 
         // 地理坐标系（4326）纬度修正
-        if (GirAdvTools.getSridOpt().isGeographicCRS(srid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(srid)) {
             double centerLat = (envelope.getMinY() + envelope.getMaxY()) / 2;
             centerLat = Math.max(-89.9, Math.min(89.9, centerLat));
             double latCorrection = Math.cos(Math.toRadians(centerLat));
@@ -925,7 +925,7 @@ public class AdvMvtDensityUtils {
         double baseToleranceMeter = 0.5;
 
         double baseTolerance;
-        if (GirAdvTools.getSridOpt().isGeographicCRS(srid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(srid)) {
             // 地理坐标系（度）：米→度
             double meterPerDegree = getUnitConversionFactor(srid, centerLat);
             baseTolerance = baseToleranceMeter / meterPerDegree;
@@ -939,7 +939,7 @@ public class AdvMvtDensityUtils {
 
         double finalTolerance = levelTolerance * simplifyLevel;
 
-        if (GirAdvTools.getSridOpt().isGeographicCRS(srid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(srid)) {
             // 4326（度）：最小≈0.1米，最大≈50米
             double minTolerance = 0.1 / getUnitConversionFactor(srid, centerLat);
             double maxTolerance = 50.0 / getUnitConversionFactor(srid, centerLat);
@@ -958,7 +958,7 @@ public class AdvMvtDensityUtils {
         double baseAreaMeter = Math.pow(areaFilteringThreshold * Math.pow(2, (4 - zoom)), 2);
         double centerLat = (extent.getMinY() + extent.getMaxY()) / 2;
         double centerLon = (extent.getMinX() + extent.getMaxX()) / 2;
-        if (GirAdvTools.getSridOpt().isGeographicCRS(srid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(srid)) {
             // 米² → 平方度
             return convertSquareMeterToSquareDegree(baseAreaMeter, centerLat);
         } else {
@@ -982,7 +982,7 @@ public class AdvMvtDensityUtils {
     }
 
     public static double getUnitConversionFactor(int srid, double centerLat) {
-        if (GirAdvTools.getSridOpt().isGeographicCRS(srid)) {
+        if (GirGeoTools.me().getSridOpt().isGeographicCRS(srid)) {
             // 4326（度）：计算1度对应的米数（按纬度修正）
             double latRad = Math.toRadians(centerLat);
             return 111319.9 * Math.cos(latRad);

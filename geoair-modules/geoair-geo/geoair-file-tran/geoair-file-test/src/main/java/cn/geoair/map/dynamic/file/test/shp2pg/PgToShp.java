@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.test.shp2pg;
 
+import static cn.geoair.base.Gir.log;
+
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
@@ -14,10 +16,7 @@ import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisReadLinkInfo;
 import cn.geoair.map.dynamic.file.shp.ShpGeoFileWriter;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
-
 import java.io.IOException;
-
-import static cn.geoair.base.Gir.log;
 
 public class PgToShp {
 
@@ -59,6 +58,7 @@ public class PgToShp {
                         .setPostProcessor(
                                 (result, ctx) -> {
                                     log.info("执行后处理：转换完成，归档结果");
+
                                     // 自定义归档逻辑（如写入日志表、发送通知）
                                     log.info("转换结果：{}", result);
                                 })

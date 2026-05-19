@@ -1,12 +1,11 @@
 package cn.geoair.map.dynamic.tools.merge;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.hutool.core.util.ObjectUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
 
@@ -21,24 +20,25 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
     // 单例实例
     private static volatile GirGeoMergeUtils INSTANCE;
 
-    // 几何工厂
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    private final GirFormatUtils formatOpt;
 
-    // WKT解析器
-    private static final GirFormatUtils CONVERT = GirFormatUtils.getInstance();
+    ToolsConfig advToolsConfig;
 
-    // 锁
-    private final Lock lock = new ReentrantLock();
+    public GirGeoMergeUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+        this.formatOpt = GirFormatUtils.getInstance(advToolsConfig);
+    }
 
-    // 私有构造器
-    private GirGeoMergeUtils() {}
+    public static GirGeoMergeUtils getInstance(ToolsConfig advToolsConfig) {
+        return new GirGeoMergeUtils(advToolsConfig);
+    }
 
-    /** 获取单例实例 */
+    @Deprecated
     public static GirGeoMergeUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (GirGeoMergeUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new GirGeoMergeUtils();
+                    INSTANCE = new GirGeoMergeUtils(new ToolsConfig());
                 }
             }
         }
@@ -52,7 +52,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             validateGeometryArray(points, Point.class);
 
             // 合并为MultiLineString
-            return GEOMETRY_FACTORY.createMultiPoint(points);
+            return advToolsConfig.getGeometryFactory().createMultiPoint(points);
         } finally {
 
         }
@@ -65,7 +65,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             // WKT转LineString数组
             Point[] points = new Point[wktList.length];
             for (int i = 0; i < wktList.length; i++) {
-                Geometry geom = CONVERT.wktToJtsGeometry(wktList[i]);
+                Geometry geom = formatOpt.wktToJtsGeometry(wktList[i]);
                 if (!(geom instanceof Point)) {
                     throw new IllegalArgumentException("WKT[" + i + "]不是Point类型");
                 }
@@ -86,7 +86,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             validateGeometryArray(lineStrings, LineString.class);
 
             // 合并为MultiLineString
-            return GEOMETRY_FACTORY.createMultiLineString(lineStrings);
+            return advToolsConfig.getGeometryFactory().createMultiLineString(lineStrings);
         } finally {
 
         }
@@ -103,7 +103,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                         Arrays.stream(coordsList[i])
                                 .map(coord -> new Coordinate(coord[0], coord[1]))
                                 .toArray(Coordinate[]::new);
-                lineStrings[i] = GEOMETRY_FACTORY.createLineString(coords);
+                lineStrings[i] = advToolsConfig.getGeometryFactory().createLineString(coords);
             }
             return mergeToMultiLineString(lineStrings);
         } finally {
@@ -118,7 +118,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             // WKT转LineString数组
             LineString[] lineStrings = new LineString[wktList.length];
             for (int i = 0; i < wktList.length; i++) {
-                Geometry geom = CONVERT.wktToJtsGeometry(wktList[i]);
+                Geometry geom = formatOpt.wktToJtsGeometry(wktList[i]);
                 if (!(geom instanceof LineString)) {
                     throw new IllegalArgumentException("WKT[" + i + "]不是LineString类型");
                 }
@@ -161,7 +161,9 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                         Arrays.asList(Arrays.copyOfRange(currCoords, 1, currCoords.length)));
             }
 
-            return GEOMETRY_FACTORY.createLineString(allCoords.toArray(new Coordinate[0]));
+            return advToolsConfig
+                    .getGeometryFactory()
+                    .createLineString(allCoords.toArray(new Coordinate[0]));
         } finally {
 
         }
@@ -178,7 +180,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                         Arrays.stream(coordsList[i])
                                 .map(coord -> new Coordinate(coord[0], coord[1]))
                                 .toArray(Coordinate[]::new);
-                lineStrings[i] = GEOMETRY_FACTORY.createLineString(coords);
+                lineStrings[i] = advToolsConfig.getGeometryFactory().createLineString(coords);
             }
             return mergeToSingleLineString(lineStrings);
         } finally {
@@ -195,7 +197,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             validateGeometryArray(polygons, Polygon.class);
 
             // 合并为MultiPolygon
-            return GEOMETRY_FACTORY.createMultiPolygon(polygons);
+            return advToolsConfig.getGeometryFactory().createMultiPolygon(polygons);
         } finally {
 
         }
@@ -217,8 +219,8 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                     coords = Arrays.copyOf(coords, coords.length + 1);
                     coords[coords.length - 1] = coords[0];
                 }
-                LinearRing ring = GEOMETRY_FACTORY.createLinearRing(coords);
-                polygons[i] = GEOMETRY_FACTORY.createPolygon(ring);
+                LinearRing ring = advToolsConfig.getGeometryFactory().createLinearRing(coords);
+                polygons[i] = advToolsConfig.getGeometryFactory().createPolygon(ring);
             }
             return mergeToMultiPolygon(polygons);
         } finally {
@@ -233,7 +235,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
             // WKT转Polygon数组
             Polygon[] polygons = new Polygon[wktList.length];
             for (int i = 0; i < wktList.length; i++) {
-                Geometry geom = CONVERT.wktToJtsGeometry(wktList[i]);
+                Geometry geom = formatOpt.wktToJtsGeometry(wktList[i]);
                 if (!(geom instanceof Polygon)) {
                     throw new IllegalArgumentException("WKT[" + i + "]不是Polygon类型");
                 }
@@ -282,8 +284,8 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                     coords = Arrays.copyOf(coords, coords.length + 1);
                     coords[coords.length - 1] = coords[0];
                 }
-                LinearRing ring = GEOMETRY_FACTORY.createLinearRing(coords);
-                polygons[i] = GEOMETRY_FACTORY.createPolygon(ring);
+                LinearRing ring = advToolsConfig.getGeometryFactory().createLinearRing(coords);
+                polygons[i] = advToolsConfig.getGeometryFactory().createPolygon(ring);
             }
             return mergeToSinglePolygon(polygons);
         } finally {

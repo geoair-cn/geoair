@@ -1,21 +1,23 @@
-package cn.geoair.comp.dynamic.ds.datasource;
+package cn.geoair.comp.dynamic.ds;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-
+import cn.geoair.comp.dynamic.ds.datasource.GirDataSourceChange;
+import cn.geoair.comp.dynamic.ds.datasource.GirDataSourceRwTypeEnum;
+import cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource;
+import cn.geoair.comp.dynamic.ds.datasource.GirDynamicStackDataSource;
 import java.lang.reflect.Method;
+import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
  * @author ：zhangjun
  * @date ：Created in 2025/1/7 13:39 @description： 切面拦截后的处理方法
  */
-public interface GirDsAspectDoAroundApi {
-
+public interface GirDsAspectDoAroundApiHelper {
 
     /**
      * 由于 groupName 和 girDataSourceRwTypeEnum 在生成 GirDynamicStackDataSource的时候，是由客户端进行指定的
      * 这里对于这个注解里面的groupName加上girDataSourceRwTypeEnum的组合，我也并不知道它对应多数据源里面的哪个路由键，所以需要客户端再进行实现一下
      *
-     * @param groupName               注解中的组名称
+     * @param groupName 注解中的组名称
      * @param girDataSourceRwTypeEnum 读写类型
      * @return 指向具体的多数据源的路由键
      */
@@ -29,12 +31,14 @@ public interface GirDsAspectDoAroundApi {
      */
     default void doBefore(Method method, ProceedingJoinPoint point) {
         // 1. 先获取两个注解（类上 + 方法上）
-        GirDsDataSource dsAnnotation = method.getDeclaringClass().getAnnotation(GirDsDataSource.class);
+        GirDsDataSource dsAnnotation =
+                method.getDeclaringClass().getAnnotation(GirDsDataSource.class);
         if (dsAnnotation == null) {
             dsAnnotation = method.getAnnotation(GirDsDataSource.class);
         }
 
-        GirDataSourceChange changeAnnotation = method.getDeclaringClass().getAnnotation(GirDataSourceChange.class);
+        GirDataSourceChange changeAnnotation =
+                method.getDeclaringClass().getAnnotation(GirDataSourceChange.class);
         if (changeAnnotation == null) {
             changeAnnotation = method.getAnnotation(GirDataSourceChange.class);
         }
@@ -46,7 +50,8 @@ public interface GirDsAspectDoAroundApi {
         }
         // 3. 判断 GirDataSourceChange 注解
         else if (changeAnnotation != null) {
-            dataSourceKey = getDataSourceKey(changeAnnotation.groupName(), changeAnnotation.rwType());
+            dataSourceKey =
+                    getDataSourceKey(changeAnnotation.groupName(), changeAnnotation.rwType());
         }
 
         // 4. 推入数据源
@@ -70,9 +75,7 @@ public interface GirDsAspectDoAroundApi {
      *
      * @param point
      */
-    default void onError(Exception e, ProceedingJoinPoint point) {
-
-    }
+    default void onError(Exception e, ProceedingJoinPoint point) {}
 
     /**
      * 无论成功与否都执行的方法

@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.bing;
 
 import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import java.util.ArrayList;
@@ -14,15 +15,23 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
     // 1. 私有静态实例（volatile保证可见性，防止指令重排）
     private static volatile BingMapQuadKeyUtils INSTANCE;
 
-    // 2. 私有构造方法（禁止外部实例化）
-    private BingMapQuadKeyUtils() {}
+    ToolsConfig advToolsConfig;
+
+    public BingMapQuadKeyUtils(ToolsConfig advToolsConfig) {
+        this.advToolsConfig = advToolsConfig;
+    }
+
+    public static BingMapQuadKeyUtils getInstance(ToolsConfig advToolsConfig) {
+        return new BingMapQuadKeyUtils(advToolsConfig);
+    }
 
     // 3. 公开静态方法获取单例（双重校验锁）
+    @Deprecated
     public static BingMapQuadKeyUtils getInstance() {
         if (INSTANCE == null) { // 第一次校验（减少锁竞争）
             synchronized (BingMapQuadKeyUtils.class) { // 类锁
                 if (INSTANCE == null) { // 第二次校验（防止多线程并发创建）
-                    INSTANCE = new BingMapQuadKeyUtils();
+                    INSTANCE = new BingMapQuadKeyUtils(new ToolsConfig());
                 }
             }
         }

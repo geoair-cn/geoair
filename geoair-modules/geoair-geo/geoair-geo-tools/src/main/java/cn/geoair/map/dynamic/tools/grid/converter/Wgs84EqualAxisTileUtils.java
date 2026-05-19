@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import java.util.Objects;
@@ -12,16 +13,25 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
     // 单例实例
     private static volatile Wgs84EqualAxisTileUtils INSTANCE;
 
+    public Wgs84EqualAxisTileUtils(ToolsConfig advToolsConfig) {
+        super(advToolsConfig);
+    }
+
     /** 双重校验锁单例 */
+    @Deprecated
     public static Wgs84EqualAxisTileUtils getInstance() {
         if (INSTANCE == null) {
             synchronized (Wgs84EqualAxisTileUtils.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Wgs84EqualAxisTileUtils();
+                    INSTANCE = new Wgs84EqualAxisTileUtils(new ToolsConfig());
                 }
             }
         }
         return INSTANCE;
+    }
+
+    public static Wgs84EqualAxisTileUtils getInstance(ToolsConfig advToolsConfig) {
+        return new Wgs84EqualAxisTileUtils(advToolsConfig);
     }
 
     // ========== 差异化核心方法实现（等轴） ==========
@@ -105,7 +115,7 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
         tileYmin = clamp(tileYmin, 0, maxTileIndex);
         tileYmax = clamp(tileYmax, 0, maxTileIndex);
 
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
     // ========== 瓦片坐标转换（等轴线性逻辑） ==========

@@ -5,13 +5,10 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 数据库方言表名处理器抽象父类 封装所有数据库通用的表名/字段名处理逻辑，差异化逻辑由子类实现
- */
+/** 数据库方言表名处理器抽象父类 封装所有数据库通用的表名/字段名处理逻辑，差异化逻辑由子类实现 */
 public abstract class AbstractExecDialectTableUtil implements DialectTableNameProcessor {
 
     protected static final int TEMP_TABLE_ALIAS_LENGTH = 8;
@@ -61,7 +58,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
                         "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+)\\."
                                 + // Schema/库名部分（兼容中文、横线）
                                 "([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分（兼容中文）
-                );
+                        );
         Matcher matcher = pattern.matcher(processedName);
 
         // 匹配成功：提取表名并去引号；失败：直接去引号返回
@@ -85,7 +82,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
                         "(?:([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+))\\."
                                 + // Schema/库名部分
                                 "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分
-                );
+                        );
         Matcher matcher = pattern.matcher(processedName);
 
         // 匹配成功：提取Schema/库名并去引号；失败：返回null
@@ -128,13 +125,18 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     @Override
     public boolean tbTableIsSqlView(String tableName) {
-        // 通用视图判断逻辑：以SELECT/WITH开头（忽略大小写、空格）
-        String trim = StrUtil.trim(tableName);
-        if (StrUtil.isEmpty(trim)) {
+        // 1. 空值 → 肯定不是 SQL，是表名
+        if (StrUtil.isBlank(tableName)) {
             return false;
         }
-        String lowerCase = trim.toLowerCase();
-        return lowerCase.startsWith("select") || lowerCase.startsWith("with");
+        // 2. 去除首尾空格
+        String trim = tableName.trim();
+        // 3. 包含空格 → 一定是 SQL 表达式，不是表名
+        if (trim.contains(" ")) {
+            return true;
+        }
+        // 4. 不包含空格 → 认为是表名
+        return false;
     }
 
     @Override
@@ -155,19 +157,18 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         return cleanedSql;
     }
 
-    /**
-     * 获取数据库专属的引号字符（PG："，MySQL：`）
-     */
+    @Override
+    public String tbBuildAsTable(String startFragment, String aliasTableName) {
+        return startFragment + " as " + aliasTableName;
+    }
+
+    /** 获取数据库专属的引号字符（PG："，MySQL：`） */
     protected abstract String getQuoteChar();
 
-    /**
-     * 获取数据库默认的Schema/库名（PG：public，MySQL：空）
-     */
+    /** 获取数据库默认的Schema/库名（PG：public，MySQL：空） */
     protected abstract String getDefaultSchemaName();
 
-    /**
-     * 获取数据源对应的Schema/库名（适配PG/MySQL语义）
-     */
+    /** 获取数据源对应的Schema/库名（适配PG/MySQL语义） */
     @Override
     public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
         return ObjectUtil.isEmpty(dataSourceGetter.getSchemaName())

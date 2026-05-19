@@ -9,7 +9,7 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.page.PageConfig;
@@ -272,7 +272,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             }
         } catch (Exception e) {
             log.error("获取瓦片数据列表失败", e);
-            return;
+            throw new RuntimeException(e);
         }
         processGirAdvOneRowList(
                 girAdvOneRows,
@@ -331,7 +331,8 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             Geometry geometry = wkbReader.read(decode);
             // 将geom转到extent坐标系下
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirAdvTools.getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry =
+                        GirGeoTools.me().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
             }
             // 内存裁剪数据
             Geometry finalGeometry = geometry;
@@ -372,53 +373,54 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         Long maxPageSize = tileExecutorConfig.getMaxPageSize();
 
         PageActuator<GirAdvOneRow> pageActuatorOpt =
-                GirAdvTools.getPageActuatorOpt(
-                        new PageConditionDef<GirAdvOneRow>() {
+                GirGeoTools.me()
+                        .getPageActuatorOpt(
+                                new PageConditionDef<GirAdvOneRow>() {
 
-                            @Override
-                            public void setPageConfig(PageConfig pageConfig) {
-                                pageConfig.setMaxPageNo(maxPageNumber);
-                                pageConfig.setPageSize(maxPageSize);
-                                pageConfig.setTotalCount(totalCount);
-                                pageConfig.setPageNumStartByZero(false);
-                                pageConfig.setParallelConsumeRecordIs(true);
-                                pageConfig.setParallelExecPageIs(true);
-                                pageConfig.setSaveResultListIs(true);
-                            }
+                                    @Override
+                                    public void setPageConfig(PageConfig pageConfig) {
+                                        pageConfig.setMaxPageNo(maxPageNumber);
+                                        pageConfig.setPageSize(maxPageSize);
+                                        pageConfig.setTotalCount(totalCount);
+                                        pageConfig.setPageNumStartByZero(false);
+                                        pageConfig.setParallelConsumeRecordIs(true);
+                                        pageConfig.setParallelExecPageIs(true);
+                                        pageConfig.setSaveResultListIs(true);
+                                    }
 
-                            @Override
-                            public boolean handlePageException(
-                                    Integer pageNo, Integer pageSize, Exception e) {
-                                log.warn(
-                                        "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
-                                        pageNo,
-                                        pageSize,
-                                        e.getMessage());
-                                return true;
-                            }
+                                    @Override
+                                    public boolean handlePageException(
+                                            Integer pageNo, Integer pageSize, Exception e) {
+                                        log.warn(
+                                                "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
+                                                pageNo,
+                                                pageSize,
+                                                e.getMessage());
+                                        return true;
+                                    }
 
-                            @Override
-                            public List<GirAdvOneRow> getPageRecords(
-                                    Integer pageNo, Integer pageSize) {
-                                String orderSql =
-                                        iAdvExecutor.pBuildSqlWithOrder(
-                                                excuteSQL,
-                                                ListUtil.of(
-                                                        OrderApo.create(
-                                                                orderFileIdName,
-                                                                AdvEnumsOrder.升序)));
-                                String pageSQL =
-                                        iAdvExecutor.pBuildPageSql(
-                                                orderSql, pageSize, pageNo, false);
-                                List<GirAdvOneRow> girAdvOneRows =
-                                        iAdvExecutor.bSelectList(pageSQL);
-                                return girAdvOneRows
-                                        .stream()
-                                        .parallel()
-                                        .peek(featuresTransform)
-                                        .collect(Collectors.toList());
-                            }
-                        });
+                                    @Override
+                                    public List<GirAdvOneRow> getPageRecords(
+                                            Integer pageNo, Integer pageSize) {
+                                        String orderSql =
+                                                iAdvExecutor.pBuildSqlWithOrder(
+                                                        excuteSQL,
+                                                        ListUtil.of(
+                                                                OrderApo.create(
+                                                                        orderFileIdName,
+                                                                        AdvEnumsOrder.升序)));
+                                        String pageSQL =
+                                                iAdvExecutor.pBuildPageSql(
+                                                        orderSql, pageSize, pageNo, false);
+                                        List<GirAdvOneRow> girAdvOneRows =
+                                                iAdvExecutor.bSelectList(pageSQL);
+                                        return girAdvOneRows
+                                                .stream()
+                                                .parallel()
+                                                .peek(featuresTransform)
+                                                .collect(Collectors.toList());
+                                    }
+                                });
         pageActuatorOpt.execute();
 
         return pageActuatorOpt.getFinalDataList();

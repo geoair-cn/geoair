@@ -100,4 +100,22 @@ public class GirServletUtil extends ServletUtil {
             IoUtil.close(outputStream);
         }
     }
+
+    public static void toResponse(
+            HttpServletResponse response, byte[] re, String contentType, int code) {
+        ServletOutputStream outputStream = null;
+        ByteArrayInputStream byteArrayInputStream = null;
+        response.setContentType(contentType);
+        response.setContentLength(re.length);
+        response.setStatus(code);
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(re);
+            outputStream = response.getOutputStream();
+            IoUtil.copy(byteArrayInputStream, outputStream);
+        } catch (Exception e) {
+        } finally {
+            IoUtil.close(byteArrayInputStream);
+            IoUtil.close(outputStream);
+        }
+    }
 }

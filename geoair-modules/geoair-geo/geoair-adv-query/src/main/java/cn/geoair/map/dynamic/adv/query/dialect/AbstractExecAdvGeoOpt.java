@@ -1,14 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -18,19 +16,15 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * 空间操作抽象基类 封装通用参数校验、结果处理等逻辑，子类只需实现数据库方言相关逻辑
- */
+/** 空间操作抽象基类 封装通用参数校验、结果处理等逻辑，子类只需实现数据库方言相关逻辑 */
 @Slf4j
 public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
@@ -43,41 +37,27 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }
 
-    /**
-     * 获取方言专属的表名处理器
-     */
+    /** 获取方言专属的表名处理器 */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    /**
-     * 获取抽象查询对象
-     */
+    /** 获取抽象查询对象 */
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
-    /**
-     * 抽象查询对象
-     */
+    /** 抽象查询对象 */
     protected abstract IAdvDDLOpt getAdvDDLOpt();
 
-    /**
-     * 将数据库原生几何类型转换为通用枚举
-     */
+    /** 将数据库原生几何类型转换为通用枚举 */
     protected abstract AdvEnumsTypeGeom getTypeGeomEnum(String nativeGeomType);
 
-    /**
-     * 获取查询相交的SQL
-     */
+    /** 获取查询相交的SQL */
     public abstract String getQueryIntersectsSql(
             String qualifiedTableName, String geomFieldName, String geometry, int srid);
 
-    /**
-     * 获取查询边界框内数据的SQL
-     */
+    /** 获取查询边界框内数据的SQL */
     public abstract String getQueryWithinBBoxSql(
             String qualifiedTableName, String geomFieldName, String bboxWkt, int srid);
 
-    /**
-     * 获取计算距离的SQL
-     */
+    /** 获取计算距离的SQL */
     public abstract String getCalculateDistanceSql(
             String geomFieldName,
             String geometry,
@@ -85,26 +65,18 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
             String distanceAlias,
             String qualifiedTableName);
 
-    /**
-     * 获取计算中心点的SQL
-     */
+    /** 获取计算中心点的SQL */
     public abstract String getCentroidSql(
             String geomFieldName, String centerAlias, String qualifiedTableName);
 
-    /**
-     * 获取验证几何体的SQL
-     */
+    /** 获取验证几何体的SQL */
     public abstract String getValidateGeometriesSql(
             String qualifiedTableName, String geomFieldName);
 
-    /**
-     * 获取修复几何体的SQL
-     */
+    /** 获取修复几何体的SQL */
     public abstract String getRepairGeometriesSql(String qualifiedTableName, String geomFieldName);
 
-    /**
-     * 获取获取范围的SQL
-     */
+    /** 获取获取范围的SQL */
     public abstract String getGetExtentSql(
             String geomFieldName, String qualifiedTableName, int srid);
 
@@ -123,6 +95,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
+    public AdvQueryGlobalConfig getConfig() {
+        return getAdvBaseOpt().getConfig();
+    }
+
+    @Override
     public boolean eIsGeomByTable(String tableName) {
         validateTableName(tableName);
         return StrUtil.isNotEmpty(eGetGeomColumnNameByTable(tableName));
@@ -134,7 +111,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public boolean eIsGeomBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public boolean eIsGeomBySql(String dynamicSql, GirSqlParam sqlParam) {
         return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
@@ -162,14 +139,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public AdvEnumsTypeGeom eGetGeoTypeBySql(String dynamicSql, GirSqlParam sqlParam) {
         return eGetGeoTypeBySql(
                 dynamicSql, sqlParam, eGetGeomColumnNameBySql(dynamicSql, sqlParam));
     }
 
     @Override
     public AdvEnumsTypeGeom eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, String geomFieldName) {
+            String dynamicSql, GirSqlParam sqlParam, String geomFieldName) {
         Map<String, AdvEnumsTypeGeom> map =
                 eGetGeoTypeBySql(dynamicSql, sqlParam, ListUtil.of(geomFieldName));
         return MapUtil.isEmpty(map) ? null : map.get(geomFieldName);
@@ -197,7 +174,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
@@ -229,14 +206,13 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
-    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public FieldBySchemaApo eGetGeomColumnBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
         return CollectionUtil.isNotEmpty(fields) ? fields.get(0) : null;
     }
 
     @Override
-    public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String dynamicSql, SqlParamMap sqlParam) {
+    public List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, GirSqlParam sqlParam) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
         return dataFieldsApo.getGeomFields();
     }
@@ -254,11 +230,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         String qualifiedTableName =
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableName)
+                                dataSourceGetter, tableName)
                         : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                tableName,
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql = getQueryIntersectsSql(qualifiedTableName, geomFieldName, geometry, srid);
         return getAdvBaseOpt().bSelectList(sql);
@@ -281,11 +257,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         String qualifiedTableName =
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableName)
+                                dataSourceGetter, tableName)
                         : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                tableName,
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
         String bboxWkt =
                 StrUtil.format(
                         "POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))",
@@ -345,11 +321,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         String qualifiedTableName =
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableName)
+                                dataSourceGetter, tableName)
                         : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                tableName,
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql =
                 getCalculateDistanceSql(
@@ -377,11 +353,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         String qualifiedTableName =
                 getAdvDDLOpt().dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql = getCentroidSql(geomFieldName, centerAlias, qualifiedTableName);
         return getAdvBaseOpt().bSelectList(sql);
@@ -475,11 +451,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         String qualifiedTableName =
                 getAdvDDLOpt().dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         Integer srid = eGetSrid(tableNameOrSqlView, geomFieldName);
 
@@ -492,16 +468,16 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         }
 
         double[] bbox = {
-                row.getDouble("minx", 0.0),
-                row.getDouble("miny", 0.0),
-                row.getDouble("maxx", 0.0),
-                row.getDouble("maxy", 0.0)
+            row.getDouble("minx", 0.0),
+            row.getDouble("miny", 0.0),
+            row.getDouble("maxx", 0.0),
+            row.getDouble("maxy", 0.0)
         };
         double[] bbox4326 = {
-                row.getDouble("minx_gs", 0.0),
-                row.getDouble("miny_gs", 0.0),
-                row.getDouble("maxx_gs", 0.0),
-                row.getDouble("maxy_gs", 0.0)
+            row.getDouble("minx_gs", 0.0),
+            row.getDouble("miny_gs", 0.0),
+            row.getDouble("maxx_gs", 0.0),
+            row.getDouble("maxy_gs", 0.0)
         };
         return new BBoxApo(bbox, bbox4326, srid);
     }
@@ -520,7 +496,12 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt =
+                advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        }
         return eSelectOne(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
@@ -529,7 +510,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
             String sql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         if (ObjectUtil.isNotNull(geomFieldNameList) && ObjectUtil.isNotNull(row)) {
-            GirAdvQueryCommonUtils.transGeometryField(ListUtil.of(row), advEnumsGeomOpt, geomFieldNameList);
+            GirAdvQueryCommonUtils.transGeometryField(
+                    ListUtil.of(row), advEnumsGeomOpt, geomFieldNameList);
         }
         return row;
     }
@@ -542,15 +524,20 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt =
+                advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        }
         return eSelectOne(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public GirAdvOneRow eSelectOne(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return eSelectOne(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
@@ -558,20 +545,27 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public GirAdvOneRow eSelectOne(
-            String sqlStatement,
-            SqlParamMap sqlParam,
+            String dynamicSql,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
-        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sqlStatement, sqlParam);
+        GirAdvOneRow row = null;
+        row = getAdvBaseOpt().bSelectOne(dynamicSql, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList) && ObjectUtil.isNotNull(row)) {
-            GirAdvQueryCommonUtils.transGeometryField(ListUtil.of(row), advEnumsGeomOpt, geomFieldNameList);
+            GirAdvQueryCommonUtils.transGeometryField(
+                    ListUtil.of(row), advEnumsGeomOpt, geomFieldNameList);
         }
         return row;
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(String sql, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt =
+                advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(sql);
+        }
         return eSelectList(sql, advEnumsGeomOpt, geomFieldNameList);
     }
 
@@ -593,15 +587,20 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String dynamicSql, SqlParamMap sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        List<String> geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+            String dynamicSql, GirSqlParam sqlParam, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        List<String> geomFieldNameList = new ArrayList<>();
+        boolean isNotOpt =
+                advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
+        if (!isNotOpt) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(dynamicSql, sqlParam);
+        }
         return eSelectList(dynamicSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
     }
 
     @Override
     public List<GirAdvOneRow> eSelectList(
             String sqlStatement,
-            SqlParamMap sqlParam,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             String geomFieldName) {
         return eSelectList(sqlStatement, sqlParam, advEnumsGeomOpt, ListUtil.of(geomFieldName));
@@ -609,11 +608,11 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     @Override
     public List<GirAdvOneRow> eSelectList(
-            String sqlStatement,
-            SqlParamMap sqlParam,
+            String dynamicSql,
+            GirSqlParam sqlParam,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<String> geomFieldNameList) {
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sqlStatement, sqlParam);
+        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(dynamicSql, sqlParam);
         if (ObjectUtil.isNotNull(geomFieldNameList) && CollectionUtil.isNotEmpty(rows)) {
             GirAdvQueryCommonUtils.transGeometryField(rows, advEnumsGeomOpt, geomFieldNameList);
         }
@@ -668,45 +667,35 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
     // ===================== 校验方法 =====================
 
-    /**
-     * 校验表名非空
-     */
+    /** 校验表名非空 */
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
             throw new IllegalArgumentException("表名不能为空");
         }
     }
 
-    /**
-     * 校验空间字段名非空
-     */
+    /** 校验空间字段名非空 */
     protected void validateGeomFieldName(String geomFieldName) {
         if (StrUtil.isEmpty(geomFieldName)) {
             throw new IllegalArgumentException("空间字段名不能为空");
         }
     }
 
-    /**
-     * 校验SRID合法性
-     */
+    /** 校验SRID合法性 */
     protected void validateSrid(int srid) {
         if (srid <= 0) {
             throw new IllegalArgumentException("SRID必须为正数");
         }
     }
 
-    /**
-     * 校验边界框合法性
-     */
+    /** 校验边界框合法性 */
     protected void validateBbox(double[] bbox) {
         if (bbox == null || bbox.length != 4) {
             throw new IllegalArgumentException("边界框不能为空，且必须包含4个元素[minx, miny, maxx, maxy]");
         }
     }
 
-    /**
-     * 填充空间类型到DataFieldsApo
-     */
+    /** 填充空间类型到DataFieldsApo */
     protected DataFieldsApo fillGeomType(
             DataFieldsApo dataFieldsApo, Map<String, AdvEnumsTypeGeom> typeMaps) {
         if (CollectionUtil.isEmpty(typeMaps)

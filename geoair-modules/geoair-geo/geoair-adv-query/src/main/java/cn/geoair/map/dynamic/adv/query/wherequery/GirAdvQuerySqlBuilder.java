@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
@@ -7,13 +8,13 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-
 import java.util.*;
+import lombok.Getter;
 
 /**
  * SQL生成工具类
- * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理</p>
+ *
+ * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理
  *
  * @author zhangjun
  */
@@ -22,14 +23,13 @@ public class GirAdvQuerySqlBuilder {
     private final DialectTableNameProcessor dialectProcessor;
     private final IDataSourceGetter dataSourceGetter;
 
-    public GirAdvQuerySqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public GirAdvQuerySqlBuilder(
+            DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
         this.dialectProcessor = dialectProcessor;
         this.dataSourceGetter = dataSourceGetter;
     }
 
-    /**
-     * 生成查询SQL
-     */
+    /** 生成查询SQL */
     public SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             return buildCustomSql(param);
@@ -38,9 +38,7 @@ public class GirAdvQuerySqlBuilder {
         }
     }
 
-    /**
-     * 生成分页查询SQL
-     */
+    /** 生成分页查询SQL */
     public SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
         SqlBuildResult result = buildSelectSql(param);
         if (param.hasPagination()) {
@@ -58,13 +56,13 @@ public class GirAdvQuerySqlBuilder {
         return result;
     }
 
-    /**
-     * 生成统计总数SQL
-     */
+    /** 生成统计总数SQL */
     public SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             String customSql = param.getCustomSql();
-            String countSql = "SELECT COUNT(*) FROM (" + customSql + ") t";
+            String countSql =
+                    dialectProcessor.tbBuildAsTable(
+                            "SELECT COUNT(*) FROM (" + customSql + ")", "t");
             return new SqlBuildResult(countSql, new ArrayList<>());
         } else {
             StringBuilder sql = new StringBuilder();
@@ -72,12 +70,21 @@ public class GirAdvQuerySqlBuilder {
 
             sql.append("SELECT COUNT(*) FROM ");
 
-            // 使用方言处理器获取带Schema的表名
-            String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceGetter,
-                    param.getTableOrViewName()
-            );
-            sql.append(tableName);
+            boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+            if (b) {
+                String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+                String aliasTable =
+                        StrUtil.format(
+                                format,
+                                param.getTableOrSqlView(),
+                                dialectProcessor.tbGetTempAliasTableName());
+                sql.append(aliasTable);
+            } else {
+                String tableName =
+                        dialectProcessor.tbGetTableNameWithSchema(
+                                dataSourceGetter, param.getTableOrSqlView());
+                sql.append(tableName);
+            }
 
             GirAdvWhereFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
@@ -91,9 +98,7 @@ public class GirAdvQuerySqlBuilder {
         }
     }
 
-    /**
-     * 构建对象模式SQL
-     */
+    /** 构建对象模式SQL */
     private SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
@@ -112,12 +117,22 @@ public class GirAdvQuerySqlBuilder {
 
         // FROM - 使用方言处理器获取带Schema的表名
         sql.append(" FROM ");
-        String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                dataSourceGetter,
-                param.getTableOrViewName()
-        );
-        sql.append(tableName);
-
+        boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+        if (b) {
+            String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+            String aliasTableName =
+                    GutilObject.isEmpty(param.getSqlViewTableNameAlias())
+                            ? dialectProcessor.tbGetTempAliasTableName()
+                            : param.getSqlViewTableNameAlias();
+            String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
+            String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
+            sql.append(aliasTable);
+        } else {
+            String tableName =
+                    dialectProcessor.tbGetTableNameWithSchema(
+                            dataSourceGetter, param.getTableOrSqlView());
+            sql.append(tableName);
+        }
         // WHERE
         GirAdvWhereFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
@@ -138,9 +153,11 @@ public class GirAdvQuerySqlBuilder {
         return new SqlBuildResult(sql.toString(), params);
     }
 
-    /**
-     * 构建自定义SQL模式
-     */
+    public String buildWhereSql(GirAdvWhereFilter where, List<Object> params) {
+        return buildWhereClause(where.getExpression(), params);
+    }
+
+    /** 构建自定义SQL模式 */
     private SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
         String sql = param.getCustomSql();
         List<Object> params = new ArrayList<>();
@@ -160,10 +177,9 @@ public class GirAdvQuerySqlBuilder {
         return new SqlBuildResult(sql, params);
     }
 
-    /**
-     * 构建WHERE子句
-     */
-    private String buildWhereClause(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+    /** 构建WHERE子句 */
+    private String buildWhereClause(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
         if (expr == null) {
             return "";
         }
@@ -206,19 +222,26 @@ public class GirAdvQuerySqlBuilder {
 
     /**
      * 构建叶子条件
+     *
+     * <p>支持普通字段和SQL表达式两种模式
      */
-    private String buildLeafCondition(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
-        // 字段名转义
-        String column = dialectProcessor.tbQuoteFieldName(expr.getColumn());
+    private String buildLeafCondition(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+        // 获取列名或表达式
+        String column = expr.getColumn();
         AdvOperatorEnums operator = expr.getOperator();
         Object value = expr.getValue();
+        boolean isExpression = expr.isExpression();
+
+        // 如果不是表达式，需要进行字段名转义；表达式原样输出
+        String columnPart = isExpression ? column : dialectProcessor.tbQuoteFieldName(column);
 
         // IS NULL / IS NOT NULL
         if (operator == AdvOperatorEnums.IS_NULL) {
-            return column + " IS NULL";
+            return columnPart + " IS NULL";
         }
         if (operator == AdvOperatorEnums.IS_NOT_NULL) {
-            return column + " IS NOT NULL";
+            return columnPart + " IS NOT NULL";
         }
 
         // IN / NOT IN
@@ -229,7 +252,7 @@ public class GirAdvQuerySqlBuilder {
             }
             String placeholders = String.join(", ", Collections.nCopies(collection.size(), "?"));
             params.addAll(collection);
-            return column + " " + operator.getSqlValue() + " (" + placeholders + ")";
+            return columnPart + " " + operator.getSqlValue() + " (" + placeholders + ")";
         }
 
         // BETWEEN / NOT BETWEEN
@@ -240,7 +263,7 @@ public class GirAdvQuerySqlBuilder {
             }
             params.add(between[0]);
             params.add(between[1]);
-            return column + " " + operator.getSqlValue() + " ? AND ?";
+            return columnPart + " " + operator.getSqlValue() + " ? AND ?";
         }
 
         // EXISTS / NOT EXISTS
@@ -252,17 +275,15 @@ public class GirAdvQuerySqlBuilder {
         if (operator.isLike()) {
             String formattedValue = formatLikeValue(operator, String.valueOf(value));
             params.add(formattedValue);
-            return column + " " + operator.getSqlValue() + " ?";
+            return columnPart + " " + operator.getSqlValue() + " ?";
         }
 
         // 普通比较操作符
         params.add(value);
-        return column + " " + operator.getSqlValue() + " ?";
+        return columnPart + " " + operator.getSqlValue() + " ?";
     }
 
-    /**
-     * 格式化LIKE值
-     */
+    /** 格式化LIKE值 */
     public static String formatLikeValue(AdvOperatorEnums operator, String value) {
         if (value == null) {
             return null;
@@ -318,9 +339,7 @@ public class GirAdvQuerySqlBuilder {
         }
     }
 
-    /**
-     * 判断是否已经被左模糊包装（以%结尾）
-     */
+    /** 判断是否已经被左模糊包装（以%结尾） */
     private static boolean isAlreadyWrappedLeft(String value) {
         if (value == null || value.isEmpty()) {
             return false;
@@ -328,9 +347,7 @@ public class GirAdvQuerySqlBuilder {
         return value.endsWith("%");
     }
 
-    /**
-     * 判断是否已经被右模糊包装（以%开头）
-     */
+    /** 判断是否已经被右模糊包装（以%开头） */
     private static boolean isAlreadyWrappedRight(String value) {
         if (value == null || value.isEmpty()) {
             return false;
@@ -338,9 +355,7 @@ public class GirAdvQuerySqlBuilder {
         return value.startsWith("%");
     }
 
-    /**
-     * 判断是否已经被全模糊包装（以%开头且以%结尾）
-     */
+    /** 判断是否已经被全模糊包装（以%开头且以%结尾） */
     private static boolean isAlreadyWrappedAll(String value) {
         if (value == null || value.isEmpty()) {
             return false;
@@ -348,10 +363,7 @@ public class GirAdvQuerySqlBuilder {
         return value.startsWith("%") && value.endsWith("%");
     }
 
-
-    /**
-     * 构建ORDER BY子句
-     */
+    /** 构建ORDER BY子句 */
     private String buildOrderByClause(List<OrderApo> orders) {
         if (orders == null || orders.isEmpty()) {
             return "";
@@ -371,9 +383,7 @@ public class GirAdvQuerySqlBuilder {
         return String.join(", ", orderItems);
     }
 
-    /**
-     * SQL构建结果
-     */
+    /** SQL构建结果 */
     @Getter
     public static class SqlBuildResult {
         private final String sql;

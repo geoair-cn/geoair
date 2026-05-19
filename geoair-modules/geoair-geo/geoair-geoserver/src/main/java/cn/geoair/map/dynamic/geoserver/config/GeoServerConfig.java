@@ -21,10 +21,9 @@ import org.springframework.context.annotation.ImportResource;
 
 @Slf4j
 @ImportResource(
-    locations = {"classpath*:/applicationContext.xml"
-        // , "classpath*:/applicationContext.xml"
-    }
-)
+        locations = {"classpath*:/applicationContext.xml"
+            // , "classpath*:/applicationContext.xml"
+        })
 @Configuration
 @EnableConfigurationProperties(GirGeoServerProperties.class)
 public class GeoServerConfig

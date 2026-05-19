@@ -3,7 +3,7 @@ package cn.geoair.comp.db.service.core.basic.executor;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.support.GirPager;
-import cn.geoair.comp.db.service.core.basic.apo.DataSourceApo;
+import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.dto.ApiSqlDto;
 import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
 import cn.geoair.comp.db.service.core.basic.service.DsDataSourceService;
@@ -35,7 +35,7 @@ public class GirDsSQLExecutor implements Executor {
 
         SQLTaskDto task = taskJson.toJavaObject(SQLTaskDto.class);
 
-        DataSourceApo datasource = dsDataSourceService.detail(task.getDatasourceId());
+        DsDataSourceApo datasource = dsDataSourceService.detail(task.getDatasourceId());
         if (datasource == null) {
             throw new RuntimeException("Datasource not exists!");
         }
@@ -100,7 +100,7 @@ public class GirDsSQLExecutor implements Executor {
             Connection connection,
             SQLTaskDto task,
             Map<String, Object> sqlParam,
-            DataSourceApo datasource) {
+            DsDataSourceApo datasource) {
         List<Object> dataList = new ArrayList<>();
         List<ApiSqlDto> sqlList = task.getSqlList();
         GiPageParam giPageParam = null;

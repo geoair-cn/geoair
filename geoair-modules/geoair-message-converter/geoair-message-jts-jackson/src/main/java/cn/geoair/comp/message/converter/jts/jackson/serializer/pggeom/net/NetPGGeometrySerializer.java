@@ -1,13 +1,15 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net;
 
+import cn.geoair.comp.message.converter.jts.jackson.utils.GirJtsJacksonUtils;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
-import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 import net.postgis.jdbc.PGgeometry;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.spatial4j.io.jackson.GeometryAsGeoJSONSerializer;
+import org.locationtech.spatial4j.io.jackson.GeometryAsWKTSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,11 @@ public class NetPGGeometrySerializer extends StdSerializer<PGgeometry> {
         }
         try {
             Geometry jtsGeometry = GirPostGisNetTran.toJtsGeometry(pgGeometry);
-            new GeometrySerializer().serialize(jtsGeometry, gen, provider);
+            if (GirJtsJacksonUtils.jtsToWkt) {
+                new GeometryAsWKTSerializer().serialize(jtsGeometry, gen, provider);
+            } else {
+                new GeometryAsGeoJSONSerializer().serialize(jtsGeometry, gen, provider);
+            }
         } catch (Exception e) {
             log.error("PGGeometry 转 JTS Geometry 失败", e);
         }

@@ -1,166 +1,304 @@
 package cn.geoair.map.dynamic.tools.array;
 
+import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 /**
- * 几何对象与坐标数组互转核心接口 定义Point/LineString与double数组的互转规范，支持指定坐标顺序
+ * 几何对象与坐标数组互转核心接口
+ *
+ * <p>定义 Point / LineString 与 double 类型数组、List集合 的互相转换规范； 支持自定义坐标顺序（X在前 / Y在前），支持自定义
+ * GeometryFactory； 提供常规转换（带校验）和快速转换（跳过校验，高性能）两种模式。
  *
  * @author 张逢吉
  * @date 2024/12/06
  */
 public interface GirGeom2ArrayOpt {
 
-    /** 坐标顺序枚举 */
+    /**
+     * 坐标顺序枚举
+     *
+     * <p>用于指定坐标数组中 经度/纬度 或 X/Y 的排列顺序
+     */
     enum CoordOrder {
-
-        /** X在前（经度/平面X），Y在后（纬度/平面Y）- 默认 */
+        /** X在前（经度/平面X），Y在后（纬度/平面Y）- 默认标准顺序 */
         X_FIRST,
+
         /** Y在前（纬度/平面Y），X在后（经度/平面X） */
         Y_FIRST
     }
 
     /**
-     * 一维坐标数组转换为Point（默认X在前）
+     * 根据 X、Y 坐标值创建 Point 点几何对象
      *
-     * @param coords 一维坐标数组 [x, y]
-     * @return JTS Point对象，空数组/非法格式抛出异常
-     * @throws IllegalArgumentException 坐标格式错误时抛出
+     * @param x 经度/平面X坐标
+     * @param y 纬度/平面Y坐标
+     * @return JTS Point 几何对象
+     */
+    Point pointByDouble(double x, double y);
+
+    /**
+     * 根据字符串类型的 X、Y 坐标创建 Point 点几何对象
+     *
+     * @param x 字符串类型经度/平面X坐标
+     * @param y 字符串类型纬度/平面Y坐标
+     * @return JTS Point 几何对象
+     */
+    Point pointByString(String x, String y);
+
+    // ====================== double[] 转 Point ======================
+
+    /**
+     * 一维基本类型坐标数组 转换为 Point 点几何对象（默认X在前）
+     *
+     * <p>数组格式：[x, y]
+     *
+     * @param coords 一维坐标数组，长度必须为2
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标数组为空、长度非法时抛出
      */
     Point doubleArrayToPoint(double[] coords);
 
     /**
-     * 一维坐标数组转换为Point（支持指定坐标顺序）
+     * 一维基本类型坐标数组 转换为 Point 点几何对象（支持指定坐标顺序）
      *
-     * @param coords 一维坐标数组（按order指定的顺序排列）
-     * @param order 坐标顺序（X_FIRST：数组是[x,y]；Y_FIRST：数组是[y,x]）
-     * @return JTS Point对象，空数组/非法格式抛出异常
-     * @throws IllegalArgumentException 坐标格式错误时抛出
+     * @param coords 一维坐标数组，长度必须为2
+     * @param order 坐标顺序：X_FIRST=[x,y]，Y_FIRST=[y,x]
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标数组为空、长度非法时抛出
      */
     Point doubleArrayToPoint(double[] coords, CoordOrder order);
 
     /**
-     * 重载：支持指定几何工厂+坐标顺序
+     * 一维基本类型坐标数组 转换为 Point 点几何对象 支持指定坐标顺序 + 自定义几何工厂
      *
-     * @param coords 一维坐标数组
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @param factory 自定义GeometryFactory（比如指定SRID）
-     * @return Point对象
+     * @param coords 一维坐标数组，长度必须为2
+     * @param order 坐标顺序
+     * @param factory 自定义几何工厂（可指定SRID、精度模型等）
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标数组为空、长度非法时抛出
      */
     Point doubleArrayToPoint(double[] coords, CoordOrder order, GeometryFactory factory);
 
     /**
-     * 快速转换（跳过严格校验，仅用于信任的坐标数据） 性能优先，不校验数值合法性，直接转换
+     * 快速转换：一维坐标数组 → Point 对象
+     *
+     * <p>跳过坐标合法性校验，仅适用于可信坐标数据，性能更高
      *
      * @param coords 一维坐标数组
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return Point对象
+     * @param order 坐标顺序
+     * @return JTS Point 对象
      */
     Point doubleArrayToPointFast(double[] coords, CoordOrder order);
 
+    // ====================== List<Double> 转 Point ======================
+
     /**
-     * 通用坐标数组转换为Geometry（自动识别Point/LineString）
+     * 包装类型坐标集合 转换为 Point 点几何对象（默认X在前）
      *
-     * @param coords 坐标数组（一维=Point，二维=LineString）
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return Point/LineString对象，其他维度抛出异常
-     * @throws IllegalArgumentException 坐标维度错误时抛出
+     * <p>集合格式：[x, y]
+     *
+     * @param coords 一维坐标集合，长度必须为2
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标集合为空、长度非法时抛出
+     */
+    Point doubleListToPoint(List<Double> coords);
+
+    /**
+     * 包装类型坐标集合 转换为 Point 点几何对象（支持指定坐标顺序）
+     *
+     * @param coords 一维坐标集合，长度必须为2
+     * @param order 坐标顺序
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标集合为空、长度非法时抛出
+     */
+    Point doubleListToPoint(List<Double> coords, CoordOrder order);
+
+    /**
+     * 包装类型坐标集合 转换为 Point 点几何对象 支持指定坐标顺序 + 自定义几何工厂
+     *
+     * @param coords 一维坐标集合，长度必须为2
+     * @param order 坐标顺序
+     * @param factory 自定义几何工厂
+     * @return JTS Point 对象
+     * @throws IllegalArgumentException 坐标集合为空、长度非法时抛出
+     */
+    Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory);
+
+    /**
+     * 快速转换：包装类型坐标集合 → Point 对象
+     *
+     * <p>跳过校验，高性能，仅用于可信数据
+     *
+     * @param coords 一维坐标集合
+     * @param order 坐标顺序
+     * @return JTS Point 对象
+     */
+    Point doubleListToPointFast(List<Double> coords, CoordOrder order);
+
+    // ====================== 通用数组转 Geometry ======================
+
+    /**
+     * 通用坐标对象转换为 Geometry 几何对象
+     *
+     * <p>自动识别类型： 一维数组/集合 → Point 二维数组/集合 → LineString
+     *
+     * @param coords 坐标数据（一维/二维）
+     * @param order 坐标顺序
+     * @return 自动识别后的 Point 或 LineString
+     * @throws IllegalArgumentException 坐标维度不支持时抛出
      */
     Geometry doubleArrayToGeometry(Object coords, CoordOrder order);
 
     /**
-     * 通用坐标数组转换为Geometry（指定几何工厂）
+     * 通用坐标对象转换为 Geometry 几何对象（支持自定义几何工厂）
      *
-     * @param coords 坐标数组（一维=Point，二维=LineString）
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @param factory 自定义GeometryFactory
-     * @return Point/LineString对象
+     * @param coords 坐标数据（一维/二维）
+     * @param order 坐标顺序
+     * @param factory 自定义几何工厂
+     * @return 自动识别后的 Point 或 LineString
+     * @throws IllegalArgumentException 坐标维度不支持时抛出
      */
     Geometry doubleArrayToGeometry(Object coords, CoordOrder order, GeometryFactory factory);
 
     // ====================== 几何对象打散为坐标数组 ======================
+
     /**
-     * Point对象打散为一维坐标数组（默认X在前）
+     * Point 对象 转换为 一维基本类型坐标数组（默认X在前）
      *
-     * @param point JTS Point对象（非空）
-     * @return 坐标数组 [x, y]，空对象返回null
+     * @param point JTS Point 对象（非空）
+     * @return 坐标数组 [x, y]，若对象为空返回 null
      */
     double[] pointToDoubleArray(Point point);
 
     /**
-     * Point对象打散为一维坐标数组（支持指定顺序）
+     * Point 对象 转换为 一维基本类型坐标数组（支持指定坐标顺序）
      *
-     * @param point JTS Point对象（非空）
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return 坐标数组，空对象返回null
+     * @param point JTS Point 对象
+     * @param order 坐标顺序
+     * @return 坐标数组，若对象为空返回 null
      */
     double[] pointToDoubleArray(Point point, CoordOrder order);
 
     /**
-     * LineString对象打散为二维坐标数组（默认X在前，严格保留点顺序）
+     * LineString 对象 转换为 二维基本类型坐标数组（默认X在前）
      *
-     * @param lineString JTS LineString对象（非空）
-     * @return 二维坐标数组，空对象返回null
+     * <p>数组格式：[[x1,y1],[x2,y2],...]
+     *
+     * @param lineString JTS线几何对象
+     * @return 二维坐标数组，空对象返回 null
      */
     double[][] lineStringToDoubleArray(LineString lineString);
 
     /**
-     * LineString对象打散为二维坐标数组（支持指定顺序，严格保留点顺序）
+     * LineString 对象 转换为 二维基本类型坐标数组（支持指定坐标顺序）
      *
-     * @param lineString JTS LineString对象（非空）
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return 二维坐标数组，空对象返回null
+     * @param lineString JTS线几何对象
+     * @param order 坐标顺序
+     * @return 二维坐标数组，空对象返回 null
      */
     double[][] lineStringToDoubleArray(LineString lineString, CoordOrder order);
 
     /**
-     * 通用几何对象打散为坐标数组（自动识别Point/LineString，支持指定顺序）
+     * 通用几何对象 转换为 坐标数组
      *
-     * @param geometry JTS几何对象（仅支持Point/LineString）
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return Point返回一维数组，LineString返回二维数组，其他类型返回null
+     * <p>Point → 一维数组 LineString → 二维数组
+     *
+     * @param geometry 几何对象（Point/LineString）
+     * @param order 坐标顺序
+     * @return 一维/二维坐标数组，不支持类型返回 null
      */
     Object geometryToDoubleArray(Geometry geometry, CoordOrder order);
 
-    // ====================== 坐标数组转换为LineString ======================
+    // ====================== double[][] 转 LineString ======================
+
     /**
-     * 二维坐标数组转换为LineString（默认X在前，严格保证点顺序）
+     * 二维基本类型坐标数组 转换为 LineString 线几何对象（默认X在前）
      *
-     * @param coords 二维坐标数组 [[x1,y1], [x2,y2], ...]
-     * @return JTS LineString对象，空数组返回空LineString
-     * @throws IllegalArgumentException 坐标格式错误时抛出
+     * <p>数组格式：[[x1,y1],[x2,y2],...]
+     *
+     * @param coords 二维坐标数组
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标数组格式非法时抛出
      */
     LineString doubleArrayToLineString(double[][] coords);
 
     /**
-     * 二维坐标数组转换为LineString（支持指定坐标顺序，严格保证点顺序）
+     * 二维基本类型坐标数组 转换为 LineString 线几何对象（支持指定坐标顺序）
      *
-     * @param coords 二维坐标数组（按order指定的顺序排列）
-     * @param order 坐标顺序（X_FIRST：数组是[x,y]；Y_FIRST：数组是[y,x]）
-     * @return JTS LineString对象，空数组返回空LineString
-     * @throws IllegalArgumentException 坐标格式错误时抛出
+     * @param coords 二维坐标数组
+     * @param order 坐标顺序
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标数组格式非法时抛出
      */
     LineString doubleArrayToLineString(double[][] coords, CoordOrder order);
 
     /**
-     * 重载：支持指定几何工厂+坐标顺序
+     * 二维基本类型坐标数组 转换为 LineString 线几何对象 支持指定坐标顺序 + 自定义几何工厂
      *
      * @param coords 二维坐标数组
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @param factory 自定义GeometryFactory（比如指定SRID）
-     * @return LineString对象
+     * @param order 坐标顺序
+     * @param factory 自定义几何工厂
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标数组格式非法时抛出
      */
     LineString doubleArrayToLineString(
             double[][] coords, CoordOrder order, GeometryFactory factory);
 
     /**
-     * 快速转换（跳过严格校验，仅用于信任的坐标数据，支持指定顺序） 性能优先，不校验数值合法性，仅保证点顺序
+     * 快速转换：二维坐标数组 → LineString 对象
+     *
+     * <p>跳过校验，高性能，仅用于可信数据
      *
      * @param coords 二维坐标数组
-     * @param order 坐标顺序（X_FIRST/Y_FIRST）
-     * @return LineString对象
+     * @param order 坐标顺序
+     * @return JTS LineString 对象
      */
     LineString doubleArrayToLineStringFast(double[][] coords, CoordOrder order);
+
+    // ====================== List<double[]> 转 LineString ======================
+
+    /**
+     * 基本类型坐标集合 转换为 LineString 线几何对象（默认X在前）
+     *
+     * @param coords 坐标点集合，每个元素为 [x,y] 数组
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标集合格式非法时抛出
+     */
+    LineString doubleListToLineString(List<double[]> coords);
+
+    /**
+     * 基本类型坐标集合 转换为 LineString 线几何对象（支持指定坐标顺序）
+     *
+     * @param coords 坐标点集合
+     * @param order 坐标顺序
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标集合格式非法时抛出
+     */
+    LineString doubleListToLineString(List<double[]> coords, CoordOrder order);
+
+    /**
+     * 基本类型坐标集合 转换为 LineString 线几何对象 支持指定坐标顺序 + 自定义几何工厂
+     *
+     * @param coords 坐标点集合
+     * @param order 坐标顺序
+     * @param factory 自定义几何工厂
+     * @return JTS LineString 对象
+     * @throws IllegalArgumentException 坐标集合格式非法时抛出
+     */
+    LineString doubleListToLineString(
+            List<double[]> coords, CoordOrder order, GeometryFactory factory);
+
+    /**
+     * 快速转换：坐标点集合 → LineString 对象
+     *
+     * <p>跳过校验，高性能，仅用于可信数据
+     *
+     * @param coords 坐标点集合
+     * @param order 坐标顺序
+     * @return JTS LineString 对象
+     */
+    LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order);
 }

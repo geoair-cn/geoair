@@ -3,12 +3,11 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -17,13 +16,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.*;
 import java.util.*;
 
-/**
- * PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑
- */
+/** PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑 */
 public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private static final GiLogger log = GirLogger.getLoger();
@@ -96,7 +92,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
                         : StrUtil.format(
-                        "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
+                                "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
         String sql = StrUtil.format(sqlTemp, schemaFilter);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -276,11 +272,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 pgAdvDDLOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql =
                 StrUtil.format(
@@ -300,11 +296,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 pgAdvDDLOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         StringBuilder sridSelect = new StringBuilder();
         StringBuilder where = new StringBuilder("WHERE ");
@@ -609,7 +605,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(
-            String dynamicSql, SqlParamMap sqlParam, List<String> geomFieldNames) {
+            String dynamicSql, GirSqlParam sqlParam, List<String> geomFieldNames) {
         if (StrUtil.isEmpty(dynamicSql) || CollectionUtil.isEmpty(geomFieldNames)) {
             return MapUtil.empty();
         }
@@ -639,6 +635,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                         fieldsSql.toString(),
                         dynamicSql,
                         whereSql.toString());
+
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql, sqlParam);
 
         Map<String, AdvEnumsTypeGeom> resultMap = new HashMap<>();
@@ -654,7 +651,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String eGetGeomColumnNameBySql(String dynamicSql, SqlParamMap sqlParam) {
+    public String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam) {
         if (StrUtil.isEmpty(dynamicSql)) {
             return null;
         }
@@ -667,7 +664,9 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         try {
             String fieldQuerySql =
                     StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
-            SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
+            SqlMeta sqlMeta =
+                    GirAdvSqlUtils.parseSqlWithParam(
+                            fieldQuerySql, sqlParam, dialectTableNameProcessor);
 
             conn = dataSourceGetter.getConnection();
             if (conn == null) {
