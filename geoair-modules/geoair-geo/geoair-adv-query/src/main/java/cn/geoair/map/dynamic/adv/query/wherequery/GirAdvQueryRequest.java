@@ -167,38 +167,7 @@ public class GirAdvQueryRequest {
     }
 
 
-//    /**
-//     * 私有构造器，使用Builder构建
-//     *
-//     * @param builder 构建器实例
-//     */
-//    public GirAdvQueryRequest(QueryRequestBuilder builder) {
-//        // 模式一参数
-//        this.tableOrSqlView = builder.tableOrSqlView;
-//        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
-//        if (GutilObject.isEmpty(builder.fieldNames)) {
-//            this.fieldNames = ListUtil.of("*");
-//        } else {
-//            this.fieldNames = builder.fieldNames;
-//        }
-//        if (GutilObject.isEmpty(builder.whereOption)) {
-//            this.whereOption = GirAdvWhereFilter.of();
-//        } else {
-//            this.whereOption = builder.whereOption;
-//        }
-//        this.nullHandling = builder.nullHandling;
-//        this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
-//        this.pageNum = builder.pageNum;
-//        this.pageSize = builder.pageSize;
-//        this.pageNumStartZero = builder.pageNumStartZero;
-//
-//        // 模式二参数
-//        this.customSql = builder.customSql;
-//        this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
-//        this.hasFieldsInfo = builder.hasFieldsInfo;
-//        this.advEnumsKeyTran = builder.advEnumsKeyTran;
-//
-//    }
+
 
 
     /**
