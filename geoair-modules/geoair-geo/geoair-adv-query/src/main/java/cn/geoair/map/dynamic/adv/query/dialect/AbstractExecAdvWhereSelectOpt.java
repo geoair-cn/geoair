@@ -80,8 +80,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
         SqlBuildResult result = getSqlBuildResultToPage(query);
         return getSimplePageOpt()
                 .pPage(result.getSql(), result.getParams(),
-                        query.getPageNum(),
-                        query.getPageSize(),
+                        query.getPageNum() == null ? query.getPageNumStartZero() ? 0 : 1 : query.getPageNum(),
+                        query.getPageSize() == null ? 25 : query.getPageSize(),
                         query.getPageNumStartZero(),
                         query.getAdvEnumsGeomOpt(), query.getHasFieldsInfo(), query.getOrders(), query.getAdvEnumsKeyTran());
 
