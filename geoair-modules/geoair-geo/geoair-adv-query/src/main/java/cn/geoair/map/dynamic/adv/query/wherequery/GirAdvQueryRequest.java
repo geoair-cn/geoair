@@ -6,6 +6,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 import cn.hutool.core.collection.ListUtil;
 import lombok.Getter;
 
@@ -144,39 +145,60 @@ public class GirAdvQueryRequest {
      */
     private final String customSql;
 
-
     /**
-     * 私有构造器，使用Builder构建
-     *
-     * @param builder 构建器实例
+     * 从Builder构造
      */
-    private GirAdvQueryRequest(Builder builder) {
-        // 模式一参数
-        this.tableOrSqlView = builder.tableOrSqlView;
-        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
-        if (GutilObject.isEmpty(builder.fieldNames)) {
-            this.fieldNames = ListUtil.of("*");
-        } else {
-            this.fieldNames = builder.fieldNames;
-        }
-        if (GutilObject.isEmpty(builder.whereOption)) {
-            this.whereOption = GirAdvWhereFilter.of();
-        } else {
-            this.whereOption = builder.whereOption;
-        }
-        this.nullHandling = builder.nullHandling;
-        this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
-        this.pageNum = builder.pageNum;
-        this.pageSize = builder.pageSize;
-        this.pageNumStartZero = builder.pageNumStartZero;
+    public <T> GirAdvQueryRequest(QueryRequestBuilder<T> builder) {
+        this.tableOrSqlView = builder.getTableOrSqlView();
+        this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
+        this.fieldNames = builder.getFieldNames() != null ? new ArrayList<>(builder.getFieldNames()) : null;
+        this.whereOption = builder.getWhereOption();
+        this.nullHandling = builder.getNullHandling();
+        this.orders = builder.getOrders() != null ? new ArrayList<>(builder.getOrders()) : new ArrayList<>();
+        this.pageNum = builder.getPageNum();
+        this.pageSize = builder.getPageSize();
+        this.pageNumStartZero = builder.getPageNumStartZero();
 
-        // 模式二参数
-        this.customSql = builder.customSql;
-        this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
-        this.hasFieldsInfo = builder.hasFieldsInfo;
-        this.advEnumsKeyTran = builder.advEnumsKeyTran;
+        this.customSql = builder.getCustomSql();
+        this.advEnumsGeomOpt = builder.getAdvEnumsGeomOpt();
+        this.hasFieldsInfo = builder.getHasFieldsInfo();
+        this.advEnumsKeyTran = builder.getAdvEnumsKeyTran();
 
     }
+
+
+//    /**
+//     * 私有构造器，使用Builder构建
+//     *
+//     * @param builder 构建器实例
+//     */
+//    public GirAdvQueryRequest(QueryRequestBuilder builder) {
+//        // 模式一参数
+//        this.tableOrSqlView = builder.tableOrSqlView;
+//        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
+//        if (GutilObject.isEmpty(builder.fieldNames)) {
+//            this.fieldNames = ListUtil.of("*");
+//        } else {
+//            this.fieldNames = builder.fieldNames;
+//        }
+//        if (GutilObject.isEmpty(builder.whereOption)) {
+//            this.whereOption = GirAdvWhereFilter.of();
+//        } else {
+//            this.whereOption = builder.whereOption;
+//        }
+//        this.nullHandling = builder.nullHandling;
+//        this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
+//        this.pageNum = builder.pageNum;
+//        this.pageSize = builder.pageSize;
+//        this.pageNumStartZero = builder.pageNumStartZero;
+//
+//        // 模式二参数
+//        this.customSql = builder.customSql;
+//        this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
+//        this.hasFieldsInfo = builder.hasFieldsInfo;
+//        this.advEnumsKeyTran = builder.advEnumsKeyTran;
+//
+//    }
 
 
     /**
@@ -266,468 +288,26 @@ public class GirAdvQueryRequest {
      *
      * @return Builder实例
      */
-    public static Builder builder() {
-        return new Builder();
+    public static <T> QueryRequestBuilder<T> builder() {
+        return new QueryRequestBuilder<>(null);
     }
 
     /**
-     * 查询参数构建器类
-     * <p>使用链式调用方式构建SelectQueryParam对象</p>
+     * 创建Builder实例
+     *
+     * @return Builder实例
      */
-    public static class Builder {
-
-        // ==================== 模式一参数 ====================
-
-        /**
-         * 表名或一个一个完整带结果的SQL
-         * table ：user
-         * sqlView：select * from user
-         */
-        private String tableOrSqlView;
-
-        /**
-         * 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
-         */
-        private String sqlViewTableNameAlias;
-
-        /**
-         * 查询字段名列表
-         */
-        private List<String> fieldNames;
-
-        /**
-         * WHERE条件参数映射
-         */
-        private GirAdvWhereFilter whereOption;
-
-        /**
-         * NULL值处理策略（默认INCLUDE）
-         */
-        private AdvNullHandling nullHandling = AdvNullHandling.INCLUDE;
-
-        /**
-         * 排序参数列表
-         */
-        private final List<OrderApo> orders = new ArrayList<>();
-
-        /**
-         * 页码
-         */
-        private Integer pageNum = 1;
-
-        /**
-         * 每页条数
-         */
-        private Integer pageSize = 25;
-
-        /**
-         * 页码起始规则（默认false，从1开始）
-         */
-        private Boolean pageNumStartZero = false;
-
-        // ==================== 模式二参数 ====================
-
-        /**
-         * 自定义SQL语句
-         */
-        private String customSql;
-
-        /**
-         * 空间操作规则
-         */
-        private AdvEnumsGeomOpt advEnumsGeomOpt;
-
-        /**
-         * 是否返回字段元数据（默认false）
-         */
-        private Boolean hasFieldsInfo = false;
-
-
-        /**
-         * key的转换策略
-         */
-        private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
-
-
-        // ==================== 模式一：对象组装SQL方法 ====================
-
-        /**
-         * 表名或一个一个完整带结果的SQL
-         * table ：user
-         * sqlView：select * from user
-         * 不支持的写法 ( select * from user )  as alias
-         *
-         * @param tableOrSqlView 表名或
-         * @return Builder实例
-         */
-        public Builder table(String tableOrSqlView) {
-            this.tableOrSqlView = tableOrSqlView;
-            return this;
-        }
-
-        /**
-         * 表名或一个一个完整带结果的SQL
-         * table ：user
-         * sqlView：select * from user
-         * 不支持的写法 ( select * from user )  as alias
-         *
-         * @param tableOrSqlView        表名或sql
-         * @param sqlViewTableNameAlias 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
-         * @return Builder实例
-         */
-        public Builder table(String tableOrSqlView, String sqlViewTableNameAlias) {
-            this.tableOrSqlView = tableOrSqlView;
-            this.sqlViewTableNameAlias = sqlViewTableNameAlias;
-            return this;
-        }
-
-        /**
-         * 设置查询字段名列表
-         *
-         * @param fieldNames 字段名列表
-         * @return Builder实例
-         */
-        public Builder fields(List<String> fieldNames) {
-            this.fieldNames = fieldNames;
-            return this;
-        }
-
-        /**
-         * 设置查询字段名（可变参数）
-         *
-         * @param fieldNames 字段名数组
-         * @return Builder实例
-         */
-        public Builder fields(String... fieldNames) {
-            this.fieldNames = Arrays.asList(fieldNames);
-            return this;
-        }
-
-        /**
-         * 设置WHERE条件参数映射
-         *
-         * @param whereOption 条件参数映射
-         * @return Builder实例
-         */
-        public Builder where(GirAdvWhereFilter whereOption) {
-            this.whereOption = whereOption;
-            return this;
-        }
-
-        /**
-         * 设置忽略NULL值
-         * <p>当WHERE条件中的值为NULL时，自动忽略该条件</p>
-         *
-         * @return Builder实例
-         */
-        public Builder ignoreNull() {
-            this.nullHandling = AdvNullHandling.IGNORE;
-            return this;
-        }
-
-        /**
-         * 设置NULL值处理策略
-         *
-         * @param nullHandling NULL处理策略枚举
-         * @return Builder实例
-         */
-        public Builder nullHandling(AdvNullHandling nullHandling) {
-            this.nullHandling = nullHandling;
-            return this;
-        }
-
-        // ==================== 排序相关方法 ====================
-
-        /**
-         * 添加字段排序（升序）
-         *
-         * @param fieldName 字段名
-         * @return Builder实例
-         */
-        public Builder orderByAsc(String fieldName) {
-            this.orders.add(OrderApo.ofASCFieldName(fieldName));
-            return this;
-        }
-
-        /**
-         * 添加字段排序（降序）
-         *
-         * @param fieldName 字段名
-         * @return Builder实例
-         */
-        public Builder orderByDesc(String fieldName) {
-            this.orders.add(OrderApo.ofDescFieldName(fieldName));
-            return this;
-        }
-
-        /**
-         * 添加字段排序（自定义方向）
-         *
-         * @param fieldName 字段名
-         * @param direction 排序方向枚举
-         * @return Builder实例
-         */
-        public Builder orderByField(String fieldName, AdvEnumsOrder direction) {
-            this.orders.add(OrderApo.ofFieldName(fieldName, direction));
-            return this;
-        }
-
-        /**
-         * 添加函数排序（升序）
-         * <p>示例：orderByAscFunction("CAST(gtc_id AS numeric)")</p>
-         *
-         * @param function 排序函数表达式
-         * @return Builder实例
-         */
-        public Builder orderByAscFunction(String function) {
-            this.orders.add(OrderApo.ofASCFunction(function));
-            return this;
-        }
-
-        /**
-         * 添加函数排序（降序）
-         * <p>示例：orderByDescFunction("LENGTH(name)")</p>
-         *
-         * @param function 排序函数表达式
-         * @return Builder实例
-         */
-        public Builder orderByDescFunction(String function) {
-            this.orders.add(OrderApo.ofDescFunction(function));
-            return this;
-        }
-
-        /**
-         * 添加函数排序（自定义方向）
-         *
-         * @param function  排序函数表达式
-         * @param direction 排序方向枚举
-         * @return Builder实例
-         */
-        public Builder orderByFunction(String function, AdvEnumsOrder direction) {
-            this.orders.add(OrderApo.ofFunction(function, direction));
-            return this;
-        }
-
-        /**
-         * 直接添加OrderApo排序对象
-         *
-         * @param order OrderApo排序对象
-         * @return Builder实例
-         */
-        public Builder order(OrderApo order) {
-            this.orders.add(order);
-            return this;
-        }
-
-        /**
-         * 批量添加排序条件
-         * <p>会清空之前设置的排序条件</p>
-         *
-         * @param orders 排序参数列表
-         * @return Builder实例
-         */
-        public Builder orders(List<OrderApo> orders) {
-            this.orders.clear();
-            this.orders.addAll(orders);
-            return this;
-        }
-
-        // ==================== 分页相关方法 ====================
-
-        /**
-         * 设置分页参数（页码从1开始）
-         *
-         * @param pageNum  页码（从1开始）
-         * @param pageSize 每页条数
-         * @return Builder实例
-         */
-        public Builder page(int pageNum, int pageSize) {
-            this.pageNum = pageNum;
-            this.pageSize = pageSize;
-            this.pageNumStartZero = false;
-            return this;
-        }
-
-        /**
-         * 设置分页参数（自定义起始页码）
-         *
-         * @param pageNum          页码
-         * @param pageSize         每页条数
-         * @param pageNumStartZero 页码起始规则（true=从0开始，false=从1开始）
-         * @return Builder实例
-         */
-        public Builder page(int pageNum, int pageSize, boolean pageNumStartZero) {
-            this.pageNum = pageNum;
-            this.pageSize = pageSize;
-            this.pageNumStartZero = pageNumStartZero;
-            return this;
-        }
-
-        // ==================== 模式二：自定义SQL方法 ====================
-
-        /**
-         * 设置自定义SQL语句
-         * <p>当设置此参数后，将忽略tableOrViewName、fieldNames、whereOption等对象组装参数</p>
-         *
-         * @param customSql 自定义SQL语句
-         * @return Builder实例
-         */
-        public Builder customSql(String customSql) {
-            this.customSql = customSql;
-            return this;
-        }
-
-        /**
-         * 设置空间操作规则
-         * <p>用于处理空间字段的转换逻辑</p>
-         *
-         * @param advEnumsGeomOpt 空间操作规则枚举
-         * @return Builder实例
-         */
-        public Builder advEnumsGeomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
-            this.advEnumsGeomOpt = advEnumsGeomOpt;
-            return this;
-        }
-
-        /**
-         * 设置是否返回字段元数据
-         *
-         * @param hasFieldsInfo true=返回字段元数据，false=仅返回数据
-         * @return Builder实例
-         */
-        public Builder hasFieldsInfo(boolean hasFieldsInfo) {
-            this.hasFieldsInfo = hasFieldsInfo;
-            return this;
-        }
-
-        /**
-         * 设置key的转换策略
-         *
-         * @param advEnumsKeyTran
-         * @return Builder实例
-         */
-        public Builder advEnumsKeyTran(AdvEnumsKeyTran advEnumsKeyTran) {
-            this.advEnumsKeyTran = advEnumsKeyTran;
-            return this;
-        }
-
-
-        /**
-         * 完整的高级分页配置（自定义SQL模式）
-         * <p>一次性设置自定义SQL模式下的所有分页参数</p>
-         *
-         * @param customSql        自定义SQL语句
-         * @param pageNum          页码
-         * @param pageSize         每页条数
-         * @param pageNumStartZero 页码起始规则（true=从0开始，false=从1开始）
-         * @param advEnumsGeomOpt  空间操作规则
-         * @param hasFieldsInfo    是否返回字段元数据
-         * @param orders           排序参数列表
-         * @return Builder实例
-         */
-        public Builder advancedPage(String customSql,
-                                    int pageNum,
-                                    int pageSize,
-                                    boolean pageNumStartZero,
-                                    AdvEnumsGeomOpt advEnumsGeomOpt,
-                                    boolean hasFieldsInfo,
-                                    List<OrderApo> orders) {
-            this.customSql = customSql;
-            this.pageNum = pageNum;
-            this.pageSize = pageSize;
-            this.pageNumStartZero = pageNumStartZero;
-            this.advEnumsGeomOpt = advEnumsGeomOpt;
-            this.hasFieldsInfo = hasFieldsInfo;
-            if (orders != null) {
-                this.orders.clear();
-                this.orders.addAll(orders);
-            }
-            return this;
-        }
-
-        /**
-         * 构建SelectQueryParam对象
-         * <p>执行参数校验并返回不可变的查询参数对象</p>
-         *
-         * @return SelectQueryParam实例
-         * @throws IllegalArgumentException 当参数校验失败时抛出
-         */
-        public GirAdvQueryRequest build() {
-            // 校验：两种模式至少选一种
-            boolean hasObjectMode = tableOrSqlView != null;
-            boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
-
-            if (!hasObjectMode && !hasCustomSqlMode) {
-                throw new IllegalArgumentException(
-                        "Either (table + fields + where) or customSql must be provided"
-                );
-            }
-
-            // 对象模式校验
-            if (hasObjectMode) {
-                if (tableOrSqlView.trim().isEmpty()) {
-                    throw new IllegalArgumentException("tableOrViewName cannot be empty");
-                }
-            }
-
-            // 分页参数校验
-            if (pageNum != null && pageSize != null && pageSize <= 0) {
-                throw new IllegalArgumentException("pageSize must be greater than 0");
-            }
-
-            return new GirAdvQueryRequest(this);
-        }
+    public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass) {
+        return new QueryRequestBuilder<>(entityClass);
     }
-
     /**
-     * 示例代码
+     * 创建Builder实例
+     *
+     * @return Builder实例
      */
-    public static void main(String[] args) {
-        // 1. 字段排序示例
-        GirAdvQueryRequest query1 = GirAdvQueryRequest.builder()
-                .table("user")
-                .fields("id", "name", "age")
-                .where(GirAdvWhereFilter.of())
-                .ignoreNull()
-                .orderByAsc("name")           // 升序
-                .orderByDesc("age")           // 降序
-                .orderByField("status", AdvEnumsOrder.升序)
-                .page(1, 20)
-                .build();
-
-        // 2. 函数排序示例
-        GirAdvQueryRequest query2 = GirAdvQueryRequest.builder()
-                .table("user")
-                .fields("id", "name", "gtc_id")
-                .where(GirAdvWhereFilter.of())
-                .orderByAscFunction("CAST(gtc_id AS numeric)")     // 函数升序
-                .orderByDescFunction("LENGTH(name)")               // 函数降序
-                .orderByFunction("YEAR(create_time)", AdvEnumsOrder.降序)
-                .build();
-
-        // 3. 混合排序示例
-        GirAdvQueryRequest query3 = GirAdvQueryRequest.builder()
-                .table("user")
-                .fields("id", "name")
-                .where(GirAdvWhereFilter.of())
-                .order(OrderApo.ofASCFieldName("name"))              // 字段升序
-                .order(OrderApo.ofDescFunction("CAST(gtc_id AS numeric)")) // 函数降序
-                .build();
-
-        // 4. 批量添加排序示例
-        List<OrderApo> orderList = Arrays.asList(
-                OrderApo.ofDescFieldName("create_time"),
-                OrderApo.ofASCFieldName("id")
-        );
-        GirAdvQueryRequest query4 = GirAdvQueryRequest.builder()
-                .table("user")
-                .fields("id", "name")
-                .where(GirAdvWhereFilter.of())
-                .orders(orderList)
-                .build();
-
-        // 5. 构建ORDER BY子句示例
-        String orderByClause = query4.buildOrderByClause();
-        // 输出：create_time DESC, id ASC
+    public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass, boolean isToUnderlineCase) {
+        return new QueryRequestBuilder<>(entityClass, isToUnderlineCase);
     }
+
+
 }
