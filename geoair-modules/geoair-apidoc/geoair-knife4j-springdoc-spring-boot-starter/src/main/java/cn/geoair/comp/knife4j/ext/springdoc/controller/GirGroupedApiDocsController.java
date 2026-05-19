@@ -1,24 +1,24 @@
-//package cn.geoair.comp.knife4j.ext.springdoc.controller;
+// package cn.geoair.comp.knife4j.ext.springdoc.controller;
 //
-//import io.swagger.v3.oas.annotations.Operation;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//import org.springframework.web.client.RestTemplate;
-//import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+// import io.swagger.v3.oas.annotations.Operation;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.PathVariable;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.client.RestTemplate;
+// import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 //
-///**
+/// **
 // * GirGroupedApiDocsController class.
 // *
 // * @author Administrator
 // * @version $Id: $Id
 // */
-//@RestController
-//@RequestMapping("/v3/api-docs")
-//public class GirGroupedApiDocsController {
+// @RestController
+// @RequestMapping("/v3/api-docs")
+// public class GirGroupedApiDocsController {
 //
 //    private final RestTemplate restTemplate;
 //
@@ -54,4 +54,4 @@
 //                    .body("Group " + group + " not found");
 //        }
 //    }
-//}
+// }

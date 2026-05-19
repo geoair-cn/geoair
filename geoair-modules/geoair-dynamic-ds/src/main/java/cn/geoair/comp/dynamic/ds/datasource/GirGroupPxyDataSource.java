@@ -5,8 +5,6 @@ import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.db.ds.simple.AbstractDataSource;
-import com.alibaba.druid.pool.DruidDataSource;
-
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -28,7 +26,6 @@ public class GirGroupPxyDataSource extends AbstractDataSource {
     List<String> dataSourceIds = new ArrayList<>();
 
     /**
-     *
      * @param groupName 组名称
      * @param dataSourceIds 这个组对应有哪些数据源，这里传入数据源ID
      */
@@ -54,9 +51,10 @@ public class GirGroupPxyDataSource extends AbstractDataSource {
     public Connection getConnection(String username, String password) throws SQLException {
         int i = RandomUtil.randomInt(dataSourceIds.size());
         String dsId = dataSourceIds.get(i);
-        return AdvDynamicDataSourceStorage.getInstance().getDataSource(dsId).getConnection(username, password);
+        return AdvDynamicDataSourceStorage.getInstance()
+                .getDataSource(dsId)
+                .getConnection(username, password);
     }
-
 
     @Override
     public void close() throws IOException {

@@ -10,6 +10,7 @@ import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +18,7 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+
 import javax.sql.DataSource;
 
 /**
@@ -67,7 +69,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
             if (schemaName == null) {
-                schemaName ="";
+                schemaName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 schemaNameMap.put(dataSourceName, schemaName);
@@ -87,7 +89,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
             if (databaseName == null) {
-                databaseName ="";
+                databaseName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 dataBaseNameMap.put(dataSourceName, databaseName);

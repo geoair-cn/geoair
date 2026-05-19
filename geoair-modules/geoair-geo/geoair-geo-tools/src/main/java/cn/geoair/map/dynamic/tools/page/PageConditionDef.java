@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.hutool.log.StaticLog;
+
 import java.util.List;
 import java.util.function.Consumer;
 

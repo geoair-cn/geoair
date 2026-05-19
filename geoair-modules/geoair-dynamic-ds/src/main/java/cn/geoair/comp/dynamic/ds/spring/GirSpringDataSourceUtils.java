@@ -2,6 +2,7 @@ package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
 
@@ -13,7 +14,6 @@ import java.util.Date;
  * @description： Spring的DataSourceProperties 转换成 DataSourceApo
  */
 public class GirSpringDataSourceUtils {
-
 
     /**
      * 将Spring Boot的DataSourceProperties转换为自定义的DataSourceApo
@@ -28,7 +28,6 @@ public class GirSpringDataSourceUtils {
 
         DataSourceApo apo = new DataSourceApo();
 
-
         // 设置驱动类名
         if (StringUtils.hasText(properties.getDriverClassName())) {
             apo.setDriver(properties.getDriverClassName());
@@ -37,14 +36,13 @@ public class GirSpringDataSourceUtils {
         apo.setJdbcUrl(properties.getUrl());
         apo.setDbName(jdbcUrlSplitter.database);
         if (StringUtils.hasText(jdbcUrlSplitter.port)) {
-            apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));   // 端口是可以为空的，具体的数据源会去补充默认端口
+            apo.setPort(Integer.valueOf(jdbcUrlSplitter.port)); // 端口是可以为空的，具体的数据源会去补充默认端口
         }
         apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));
         apo.setAddress(jdbcUrlSplitter.host);
         // 设置用户名和密码
         apo.setUsername(properties.getUsername());
         apo.setPassword(properties.getPassword());
-
 
         // 设置时间戳
         Date now = new Date();

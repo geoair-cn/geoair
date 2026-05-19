@@ -10,7 +10,9 @@ public class GkNullWrapperBean<T> {
 
     private final Class<T> clazz;
 
-    /** @param clazz null的类型 */
+    /**
+     * @param clazz null的类型
+     */
     public GkNullWrapperBean(Class<T> clazz) {
         this.clazz = clazz;
     }

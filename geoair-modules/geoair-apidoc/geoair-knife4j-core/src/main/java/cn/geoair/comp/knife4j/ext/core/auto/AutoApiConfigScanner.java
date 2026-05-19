@@ -4,9 +4,9 @@ import cn.geoair.base.Gir;
 import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-import java.util.*;
-import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
@@ -17,6 +17,9 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 自动扫描控制器类，并生成DocketInfo列表
@@ -138,8 +141,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         }
 
         List<String> excludeList = Arrays.asList(excludePackages);
-        return allPackages
-                .stream()
+        return allPackages.stream()
                 .filter(pkg -> !excludeList.contains(pkg)) // 精准匹配排除
                 .collect(Collectors.toSet());
     }
@@ -264,7 +266,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         String title = environment.getProperty("geoair.apidoc.title", "API 在线文档");
         String description = environment.getProperty("geoair.apidoc.description", "API文档 V1.0");
         String author = environment.getProperty("geoair.apidoc.author", "geoair");
-        String version = environment.getProperty("geoair.apidoc.version", "J17-dev-SNAPSHOT");
+        String version = environment.getProperty("geoair.apidoc.version", "J17.1.3");
 
         return new ApiModelInfo(title, description, author, version);
     }

@@ -5,6 +5,7 @@ import cn.geoair.base.bean.GirNoSuchBeanException;
 import cn.geoair.base.bean.GirNoUniqueBeanException;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.sp.annotation.GkSP;
+
 import java.lang.reflect.Type;
 
 public class GirBeanFactorySpLoader extends GirCacheSpLoader {

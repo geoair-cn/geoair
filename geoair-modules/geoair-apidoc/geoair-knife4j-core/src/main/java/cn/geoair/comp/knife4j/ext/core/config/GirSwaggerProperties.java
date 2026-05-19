@@ -1,6 +1,7 @@
 package cn.geoair.comp.knife4j.ext.core.config;
 
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class GirSwaggerProperties {
     private boolean enable = false;
 
     /** API版本号，默认为空 */
-    private String version = "J17-dev-SNAPSHOT";
+    private String version = "J17.1.3";
 
     /** API标题，默认为空 */
     private String title = "API 在线文档";
@@ -31,7 +32,7 @@ public class GirSwaggerProperties {
     private String author = "geoair";
 
     /** API描述，默认为空 */
-    private String description = "API文档 VJ17-dev-SNAPSHOT";
+    private String description = "API文档 VJ17.1.3";
 
     /** 手动指定控制器根包（优先级高于从SpringBootApplication自动提取） 示例：com.gtc.gishubteam.editor.wcs.controller */
     private String controllerRootPackage;

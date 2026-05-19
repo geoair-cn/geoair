@@ -1,41 +1,41 @@
-//package cn.geoair.comp.knife4j.ext.springdoc.auto;
+// package cn.geoair.comp.knife4j.ext.springdoc.auto;
 //
-//import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
-//import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
-//import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
-//import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
-//import cn.hutool.core.collection.ListUtil;
-//import io.swagger.v3.oas.models.OpenAPI;
-//import io.swagger.v3.oas.models.info.Contact;
-//import io.swagger.v3.oas.models.info.Info;
+// import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
+// import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
+// import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
+// import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+// import cn.hutool.core.collection.ListUtil;
+// import io.swagger.v3.oas.models.OpenAPI;
+// import io.swagger.v3.oas.models.info.Contact;
+// import io.swagger.v3.oas.models.info.Info;
 //
-//import java.util.*;
+// import java.util.*;
 //
-//import jakarta.annotation.PostConstruct;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springdoc.core.models.GroupedOpenApi;
-//import org.springdoc.core.properties.SpringDocConfigProperties;
-//import org.springdoc.core.properties.SwaggerUiConfigProperties;
-//import org.springframework.beans.BeansException;
-//import org.springframework.beans.factory.config.BeanDefinition;
-//import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-//import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-//import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-//import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-//import org.springframework.context.ApplicationContext;
-//import org.springframework.context.ApplicationContextAware;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Primary;
+// import jakarta.annotation.PostConstruct;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springdoc.core.models.GroupedOpenApi;
+// import org.springdoc.core.properties.SpringDocConfigProperties;
+// import org.springdoc.core.properties.SwaggerUiConfigProperties;
+// import org.springframework.beans.BeansException;
+// import org.springframework.beans.factory.config.BeanDefinition;
+// import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+// import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+// import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+// import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+// import org.springframework.context.ApplicationContext;
+// import org.springframework.context.ApplicationContextAware;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Primary;
 //
-///**
+/// **
 // * GirSpringDocApiRunner class.
 // *
 // * @author Administrator
 // * @version $Id: $Id
 // */
-//@Slf4j
-//public class GirSpringDocApiRunner
+// @Slf4j
+// public class GirSpringDocApiRunner
 //        implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 //
 //    // 1. 保存Spring应用上下文（通过ApplicationContextAware接口）
@@ -107,7 +107,8 @@
 //     * <p>Spring自动注入ApplicationContext，并初始化配置属性
 //     */
 //    @Override
-//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+// {
 //        this.applicationContext = applicationContext;
 //    }
 //
@@ -314,4 +315,4 @@
 //    @Override
 //    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
 //            throws BeansException {}
-//}
+// }

@@ -6,6 +6,7 @@ import cn.geoair.base.sp.annotation.GkSP;
 import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

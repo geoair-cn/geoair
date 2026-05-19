@@ -13,10 +13,7 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilClass;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
@@ -30,6 +27,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 由spring提供bean容器
@@ -46,10 +48,9 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     protected final GiLogger logger = GirLogger.getLoger(SpringContextBean4Gir.class);
 
     @GaMethodHandImpl(
-        implClass = GirBeanHelper.class,
-        implMethod = "getProvider",
-        type = ImplType.expectfirst
-    )
+            implClass = GirBeanHelper.class,
+            implMethod = "getProvider",
+            type = ImplType.expectfirst)
     private static GiBeanFactory getProvider() {
         return beanProvider;
     }

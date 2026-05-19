@@ -2,6 +2,7 @@ package cn.geoair.base.data.model.support;
 
 import cn.geoair.base.data.model.GiTreeModelable;
 import cn.geoair.base.data.model.annotation.GaModelField;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 

@@ -1,17 +1,15 @@
 package cn.geoair.web.util;
 
+import cn.geoair.base.util.GutilStr;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import cn.geoair.base.util.GutilStr;
 import org.springframework.web.servlet.HandlerInterceptor;
-
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 
 public class GirCorsInterceptor implements HandlerInterceptor {
 

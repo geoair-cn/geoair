@@ -2,13 +2,17 @@ package cn.geoair.comp.knife4j.ext.core.config;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilStr;
-import java.util.Map;
-//import jakarta.annotation.Resource;
+
 import jakarta.annotation.Resource;
+
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+// import jakarta.annotation.Resource;
 
 /**
  * GirOpenApiRunnerConfig class.
@@ -23,8 +27,7 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
     // @Resource
     // Environment environment;
 
-    @Resource
-    ApplicationContext applicationContext;
+    @Resource ApplicationContext applicationContext;
 
     /** {@inheritDoc} */
     @Override

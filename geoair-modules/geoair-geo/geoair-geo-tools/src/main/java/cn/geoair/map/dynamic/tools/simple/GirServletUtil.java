@@ -7,12 +7,14 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.Map;
+
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author ：张逢吉
@@ -20,9 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class GirServletUtil extends JakartaServletUtil {
 
-    /**
-     * 设置严格的无缓存响应头（适用于动态内容、API 等）
-     */
+    /** 设置严格的无缓存响应头（适用于动态内容、API 等） */
     public static void setNoCacheHeaders() {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
         // HTTP 1.1
@@ -103,8 +103,8 @@ public class GirServletUtil extends JakartaServletUtil {
         }
     }
 
-
-    public static void toResponse(HttpServletResponse response, byte[] re, String contentType, int code) {
+    public static void toResponse(
+            HttpServletResponse response, byte[] re, String contentType, int code) {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         response.setContentType(contentType);

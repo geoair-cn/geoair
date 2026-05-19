@@ -8,6 +8,7 @@ import cn.geoair.base.log.GirConsoleLog;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.text.GuStrFormatter;
 import cn.geoair.base.util.GutilClass;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +43,9 @@ public class Log4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirLogger.class,
-        implMethod = "getLoger",
-        type = ImplType.expectfirst
-    )
+            implClass = GirLogger.class,
+            implMethod = "getLoger",
+            type = ImplType.expectfirst)
     public static GiLogger getLoger(String name) {
         switch (logType) {
             case APPACHECOMMONS:

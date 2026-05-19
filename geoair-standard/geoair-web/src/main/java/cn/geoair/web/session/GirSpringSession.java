@@ -1,10 +1,11 @@
 package cn.geoair.web.session;
 
 import cn.geoair.web.util.GirHttpServletHelper;
-import java.util.Enumeration;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
 
+import java.util.Enumeration;
 
 @SuppressWarnings("deprecation")
 @GirSessionAn(catalog = " gtc:session:spring-sessions:")
@@ -45,12 +46,10 @@ public class GirSpringSession extends GirHttpSession {
         return getHttpSession(true).getMaxInactiveInterval();
     }
 
-
     @Override
     public Enumeration<String> getAttributeNames() {
         return getHttpSession(true).getAttributeNames();
     }
-
 
     @Override
     public boolean isNew() {
@@ -73,8 +72,6 @@ public class GirSpringSession extends GirHttpSession {
         return null;
     }
 
-
-
     @Override
     public void removeAttribute(String name) {
         HttpSession session = getHttpSession(false);
@@ -82,8 +79,6 @@ public class GirSpringSession extends GirHttpSession {
             session.removeAttribute(name);
         }
     }
-
-
 
     @Override
     public void invalidate() {

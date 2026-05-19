@@ -4,11 +4,13 @@ import cn.geoair.base.gpa.dao.GiUpdateDao;
 import cn.geoair.base.gpa.entity.GiEntityAlterable;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
 import cn.geoair.orm.tkmapper.support.update.UpdateBatchMapper;
-import java.io.Serializable;
-import java.util.List;
+
 import tk.mybatis.mapper.common.base.BaseUpdateMapper;
 import tk.mybatis.mapper.common.example.UpdateByExampleMapper;
 import tk.mybatis.mapper.common.example.UpdateByExampleSelectiveMapper;
+
+import java.io.Serializable;
+import java.util.List;
 
 public interface TkUpdateMapper<T extends GiEntityAlterable<PK>, PK extends Serializable>
         extends MyBatisMapper<T, PK>,

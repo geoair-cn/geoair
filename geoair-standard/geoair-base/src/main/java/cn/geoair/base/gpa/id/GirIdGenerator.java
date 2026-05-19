@@ -3,6 +3,7 @@ package cn.geoair.base.gpa.id;
 import cn.geoair.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GkMethodHand;
+
 import java.util.UUID;
 
 public class GirIdGenerator {
@@ -22,10 +23,9 @@ public class GirIdGenerator {
     }
 
     @GaMethodHandImpl(
-        implClass = GirIdGenerator.class,
-        implMethod = "randomUUID",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirIdGenerator.class,
+            implMethod = "randomUUID",
+            type = GaMethodHandImpl.ImplType.comity)
     private static String _randomUUID() {
         return UUID.randomUUID().toString();
     }
@@ -41,10 +41,9 @@ public class GirIdGenerator {
     }
 
     @GaMethodHandImpl(
-        implClass = GirIdGenerator.class,
-        implMethod = "simpleUUID",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirIdGenerator.class,
+            implMethod = "simpleUUID",
+            type = GaMethodHandImpl.ImplType.comity)
     private static String _simpleUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }

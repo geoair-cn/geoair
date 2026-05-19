@@ -4,6 +4,7 @@ import cn.geoair.base.data.common.GemDatePattern;
 import cn.geoair.base.data.common.GemNull;
 import cn.geoair.base.data.model.applyer.GiModelFieldApplyer;
 import cn.geoair.base.def.annotation.GaParameter;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,6 +25,7 @@ public @interface GaModelField {
     public String text() default NULL; // 文本
 
     public String describe() default NULL; // 一段描述，大白话
+
     // public String describe() default NULL;//一段描述，大白话
 
     public boolean isID() default false; // 是否主键

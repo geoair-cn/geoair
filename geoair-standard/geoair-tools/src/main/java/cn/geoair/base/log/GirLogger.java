@@ -27,10 +27,9 @@ public class GirLogger {
     }
 
     @GaMethodHandImpl(
-        implClass = GirLogger.class,
-        implMethod = "getLoger",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirLogger.class,
+            implMethod = "getLoger",
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiLogger _getLoger(String name) {
         return GirConsoleLog.forName(name);
     }

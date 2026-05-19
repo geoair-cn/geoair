@@ -6,6 +6,7 @@ import cn.geoair.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
 import cn.geoair.orm.tkmapper.support.insert.GirInsertListMapper;
 import cn.geoair.orm.tkmapper.support.insert.GirInsertMapper;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

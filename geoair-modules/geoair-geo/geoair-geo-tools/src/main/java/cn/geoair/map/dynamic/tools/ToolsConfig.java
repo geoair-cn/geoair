@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.io.WKBReader;
@@ -32,7 +33,6 @@ public class ToolsConfig {
     private Supplier<WKTReader> wktReaderSupplier = WKTReader::new;
     private Supplier<WKBReader> wkbReaderSupplier = WKBReader::new;
 
-
-    private int tilePixelSize = 256;  // 默认瓦片尺寸
-    private int dpi = 96;             // 默认DPI（屏幕标准DPI）
+    private int tilePixelSize = 256; // 默认瓦片尺寸
+    private int dpi = 96; // 默认DPI（屏幕标准DPI）
 }

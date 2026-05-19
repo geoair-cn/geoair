@@ -5,10 +5,12 @@ import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.gpa.dao.GiVisualSelectDao;
 import cn.geoair.base.gpa.entity.GiEntityVisuable;
-import java.io.Serializable;
-import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
+
+import java.io.Serializable;
+import java.util.List;
 
 public interface VisualSelectRepository<T extends GiEntityVisuable<PK>, PK extends Serializable>
         extends CrudRepository<T, PK>, JpaSpecificationExecutor<T>, GiVisualSelectDao<T, PK> {

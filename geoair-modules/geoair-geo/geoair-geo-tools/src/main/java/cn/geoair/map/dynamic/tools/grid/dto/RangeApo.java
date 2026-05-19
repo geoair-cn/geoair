@@ -19,7 +19,7 @@ public class RangeApo {
 
     private Envelope envelope;
 
-    public RangeApo(double xMinNum, double xMaxNum, double yMinNum, double yMaxNum,int z) {
+    public RangeApo(double xMinNum, double xMaxNum, double yMinNum, double yMaxNum, int z) {
         Envelope envelope = new Envelope(xMinNum, xMaxNum, yMinNum, yMaxNum);
         this.envelope = envelope;
         this.minX = (int) envelope.getMinX();

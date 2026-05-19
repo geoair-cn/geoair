@@ -11,7 +11,8 @@ import java.util.Base64;
 
 public class StdBlobSerializer extends JsonSerializer<Blob> {
     @Override
-    public void serialize(Blob blob, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(Blob blob, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
         if (blob == null) {
             gen.writeNull();
             return;

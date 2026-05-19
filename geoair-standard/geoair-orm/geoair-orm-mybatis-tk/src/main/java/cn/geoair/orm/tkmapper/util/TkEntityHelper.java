@@ -3,12 +3,14 @@ package cn.geoair.orm.tkmapper.util;
 import cn.geoair.base.Gir;
 import cn.geoair.base.tool.GkConcurrentReferenceHashMap;
 import cn.geoair.base.util.GutilReflection;
-import java.lang.reflect.Field;
-import java.util.Map;
+
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.EntityField;
 import tk.mybatis.mapper.entity.EntityTable;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * 对 TkMapper 实体的工具类

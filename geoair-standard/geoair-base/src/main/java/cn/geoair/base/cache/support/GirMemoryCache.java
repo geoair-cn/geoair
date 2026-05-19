@@ -1,6 +1,7 @@
 package cn.geoair.base.cache.support;
 
 import cn.geoair.base.cache.GiCache;
+
 import java.util.concurrent.Callable;
 
 public class GirMemoryCache implements GiCache {
