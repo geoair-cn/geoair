@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import lombok.Getter;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -537,6 +538,15 @@ public class QueryRequestBuilder<T> {
      * 设置空间操作规则
      */
     public QueryRequestBuilder<T> geomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
+        this.advEnumsGeomOpt = advEnumsGeomOpt;
+        return this;
+    }
+
+    /**
+     * 设置空间操作规则
+     */
+    @Deprecated
+    public QueryRequestBuilder<T> advEnumsGeomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
         this.advEnumsGeomOpt = advEnumsGeomOpt;
         return this;
     }
