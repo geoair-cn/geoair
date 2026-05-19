@@ -101,13 +101,13 @@ public class QueryRequestBuilder<T> {
      * 页码
      */
     @Getter
-    private Integer pageNum = 1;
+    private Integer pageNum;
 
     /**
      * 每页条数
      */
     @Getter
-    private Integer pageSize = 25;
+    private Integer pageSize;
 
     /**
      * 页码起始规则（默认false，从1开始）
