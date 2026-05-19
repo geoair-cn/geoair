@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,14 @@ import java.util.stream.LongStream;
  * @author ：张逢吉
  * @date ：Created in 2025/12/18 13:34 @description： 分页执行器
  */
+@Slf4j
 public class PageActuator<T> {
 
     private final PageConditionDef<T> pageConditionDef;
 
-    /** 分页配置 */
+    /**
+     * 分页配置
+     */
     PageConfig pageConfig = new PageConfig();
 
     @Getter
@@ -57,15 +61,24 @@ public class PageActuator<T> {
         long actualTotalPages;
 
         // 2. 计算实际页大小和总页数
+        boolean byPageSize = false;
+
         if (pageSize != null && pageSize > 0) {
+            byPageSize = true;
+
+        } else if (maxPageNo != null && maxPageNo > 0) {
+
+        } else {
+            pageSize = 25L;
+            log.info("由于没有设置maxPageNo 与pageSize 这里对 pageSize 进行设置默认值为25");
+            byPageSize = true;
+        }
+        if (byPageSize) { // 通过计算分页大小计算总页数，进行每页遍历。数据量大的时候可能有很多页
             actualPageSize = pageSize;
             actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
-        } else if (maxPageNo != null && maxPageNo > 0) {
+        } else { // 通过总页数反着设置每页大小，防止数据量大的时候 ，频繁访问数据库
             actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
             actualTotalPages = maxPageNo;
-        } else {
-            throw new IllegalArgumentException(
-                    "分页参数异常：pageSize（" + pageSize + "）和maxPageNo（" + maxPageNo + "）不能同时为空/小于等于0");
         }
 
         Consumer<T> eachRecordConsumer = pageConditionDef.getEachRecordConsumer();
@@ -82,7 +95,9 @@ public class PageActuator<T> {
         pageConditionDef.onComplete(finalDataList);
     }
 
-    /** 并行消费（原有逻辑，边查边消费） */
+    /**
+     * 并行消费（原有逻辑，边查边消费）
+     */
     private void parallelConsume(
             long actualPageSize, long actualTotalPages, Consumer<T> eachRecordConsumer) {
         LongStream pageNumStream = null;
@@ -120,7 +135,9 @@ public class PageActuator<T> {
                         });
     }
 
-    /** 并行消费（原有逻辑，边查边消费） */
+    /**
+     * 并行消费（原有逻辑，边查边消费）
+     */
     private void serialConsumeByPage(
             long actualPageSize, long actualTotalPages, Consumer<T> eachRecordConsumer) {
         LongStream pageNumStream = LongStream.range(0, actualTotalPages);
