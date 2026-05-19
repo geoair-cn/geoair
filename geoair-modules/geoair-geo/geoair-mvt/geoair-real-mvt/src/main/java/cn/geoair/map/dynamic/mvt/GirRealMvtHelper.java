@@ -27,7 +27,5 @@ public interface GirRealMvtHelper {
             int outGridSrid,
             TileGlobalConfig tileGlobalConfig);
 
-
-    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams,String layerName);
-
+    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName);
 }

@@ -4,9 +4,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import net.postgis.jdbc.PGgeometry;
-import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.locationtech.jts.geom.Geometry;
@@ -34,7 +32,6 @@ public class NetPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry> */ {
         return netPgGeometryTypeHandler;
     }
 
-
     public void setNonNullParameter(
             PreparedStatement ps, int i, Geometry parameter, JdbcType jdbcType)
             throws SQLException {
@@ -48,7 +45,6 @@ public class NetPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry> */ {
         ps.setObject(i, pGobject);
     }
 
-
     public Geometry getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String geom = rs.getString(columnName);
         try {
@@ -59,7 +55,6 @@ public class NetPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry> */ {
         return null;
     }
 
-
     public Geometry getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String geom = rs.getString(columnIndex);
         try {
@@ -69,7 +64,6 @@ public class NetPgGeometryTypeHandler /*extends BaseTypeHandler<Geometry> */ {
         }
         return null;
     }
-
 
     public Geometry getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String geom = cs.getString(columnIndex);

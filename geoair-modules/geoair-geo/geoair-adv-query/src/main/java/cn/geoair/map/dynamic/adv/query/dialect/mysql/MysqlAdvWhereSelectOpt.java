@@ -15,11 +15,11 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvSimplePagePreOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
 
-
-    public MysqlAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter,
-                                  IAdvBaseOpt baseOpt,
-                                  IAdvSimplePagePreOpt pgAdvSimplePageOpt,
-                                  IAdvGeoPreOpt iAdvGeoPreOpt) {
+    public MysqlAdvWhereSelectOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvSimplePagePreOpt pgAdvSimplePageOpt,
+            IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;
@@ -45,6 +45,4 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvGeoPreOpt getGeoOpt() {
         return iAdvGeoPreOpt;
     }
-
-
 }

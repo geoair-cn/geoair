@@ -40,10 +40,9 @@ public class Cache4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirCacheHelper.class,
-        implMethod = "getCache",
-        type = ImplType.expectfirst
-    )
+            implClass = GirCacheHelper.class,
+            implMethod = "getCache",
+            type = ImplType.expectfirst)
     public static GiCache getCache(String name) {
         switch (cacheType) {
             case SPRING:

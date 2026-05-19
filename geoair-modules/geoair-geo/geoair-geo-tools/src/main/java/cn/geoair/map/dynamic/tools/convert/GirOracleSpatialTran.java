@@ -1,21 +1,21 @@
 package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.sql.SQLException;
 import oracle.spatial.util.ByteOrder;
-import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
+import oracle.sql.STRUCT;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
 
-import java.sql.SQLException;
-
 /**
  * Oracle Spatial 几何数据转换工具类
- * <p>使用 Oracle Spatial 的 WKB 工具类进行转换，依赖 orai18n.jar</p>
- * <p>注意：使用此类前请确保 GirOracleTran.isOracleSpatialAvailable() 返回 true</p>
+ *
+ * <p>使用 Oracle Spatial 的 WKB 工具类进行转换，依赖 orai18n.jar
+ *
+ * <p>注意：使用此类前请确保 GirOracleTran.isOracleSpatialAvailable() 返回 true
  *
  * @author zhangjun
  */
@@ -67,7 +67,7 @@ public class GirOracleSpatialTran {
         try {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            return  GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
+            return GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
             return null;
         }
@@ -75,9 +75,10 @@ public class GirOracleSpatialTran {
 
     /**
      * 将 JTS Geometry 对象转换为 Oracle SDO_GEOMETRY (STRUCT)
-     * <p>注意：此方法需要数据库连接，且 JTS Geometry 需要设置 SRID</p>
      *
-     * @param geometry   JTS Geometry 对象
+     * <p>注意：此方法需要数据库连接，且 JTS Geometry 需要设置 SRID
+     *
+     * @param geometry JTS Geometry 对象
      * @param connection 数据库连接（用于创建 STRUCT）
      * @return Oracle STRUCT 对象，转换失败返回 null
      */
@@ -140,7 +141,7 @@ public class GirOracleSpatialTran {
     /**
      * 从 ResultSet 中获取空间字段并转换为 JTS Geometry
      *
-     * @param rs         ResultSet
+     * @param rs ResultSet
      * @param columnName 列名
      * @return JTS Geometry 对象
      */
@@ -156,7 +157,7 @@ public class GirOracleSpatialTran {
     /**
      * 从 ResultSet 中获取空间字段并转换为 WKT
      *
-     * @param rs         ResultSet
+     * @param rs ResultSet
      * @param columnName 列名
      * @return WKT 字符串
      */
@@ -172,11 +173,12 @@ public class GirOracleSpatialTran {
     /**
      * 批量转换 ResultSet 中的多个空间字段
      *
-     * @param rs          ResultSet
+     * @param rs ResultSet
      * @param columnNames 列名数组
      * @return Geometry 数组
      */
-    public static Geometry[] getGeometriesFromResultSet(java.sql.ResultSet rs, String... columnNames) {
+    public static Geometry[] getGeometriesFromResultSet(
+            java.sql.ResultSet rs, String... columnNames) {
         if (columnNames == null || columnNames.length == 0) {
             return null;
         }

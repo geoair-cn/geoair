@@ -9,19 +9,9 @@ import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
-import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
-import cn.hutool.core.util.StrUtil;
-
-import java.util.List;
-import java.util.Objects;
-
-/**
- * Oracle带参数分页实现类
- */
+/** Oracle带参数分页实现类 */
 public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
@@ -31,8 +21,11 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvDDLOpt advDDLOpt;
 
-    public OracleAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
-                                  IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
+    public OracleAdvSimplePageOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvGeoPreOpt advGeoPreOpt,
+            IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.advDDLOpt = advDDLOpt;
@@ -59,11 +52,7 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
         return advGeoPreOpt;
     }
 
-
-
-    /**
-     * 执行带参数的统计SQL（复用父类方法）
-     */
+    /** 执行带参数的统计SQL（复用父类方法） */
     protected Long executeCountSqlWithParam(String countSql, GirSqlParam sqlParam) {
         GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
         return result != null ? result.getLong("COUNT") : 0L;

@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.tools.grid;
 
 import cn.geoair.base.Gir;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
@@ -37,7 +36,8 @@ public class GirGridTest {
         Set<TileZxyApo> tileZxyApos =
                 tileConverterOpt.zxyListByBox(referencedEnvelope, srid, level);
         Gir.log.info("zxyListByBox:{}", tileZxyApos);
-        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
+        Geometry geometry =
+                GirGeoTools.me().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
         Gir.log.info("geometry:{}", geometry);
         Set<TileZxyApo> tileZxyApos1 = tileConverterOpt.zxyListByGeom(geometry, srid, level);
         Gir.log.info("zxyListByGeom:{}", tileZxyApos1);

@@ -46,10 +46,9 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     protected final GiLogger logger = GirLogger.getLoger(SpringContextBean4Gir.class);
 
     @GaMethodHandImpl(
-        implClass = GirBeanHelper.class,
-        implMethod = "getProvider",
-        type = ImplType.expectfirst
-    )
+            implClass = GirBeanHelper.class,
+            implMethod = "getProvider",
+            type = ImplType.expectfirst)
     private static GiBeanFactory getProvider() {
         return beanProvider;
     }

@@ -1,13 +1,11 @@
 package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKBReader;
-import org.locationtech.jts.io.ParseException;
-
 import java.nio.ByteBuffer;
 import java.sql.Blob;
 import java.sql.SQLException;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
 
 /**
  * @author ：张逢吉
@@ -49,15 +47,17 @@ public class GirMysqlTran {
             // 尝试解析几何类型（1-20为有效类型）
             int geomType;
             if (byteOrder == 0x00) { // 大端
-                geomType = ((wkbData[1] & 0xFF) << 24) |
-                        ((wkbData[2] & 0xFF) << 16) |
-                        ((wkbData[3] & 0xFF) << 8) |
-                        (wkbData[4] & 0xFF);
+                geomType =
+                        ((wkbData[1] & 0xFF) << 24)
+                                | ((wkbData[2] & 0xFF) << 16)
+                                | ((wkbData[3] & 0xFF) << 8)
+                                | (wkbData[4] & 0xFF);
             } else { // 小端
-                geomType = (wkbData[1] & 0xFF) |
-                        ((wkbData[2] & 0xFF) << 8) |
-                        ((wkbData[3] & 0xFF) << 16) |
-                        ((wkbData[4] & 0xFF) << 24);
+                geomType =
+                        (wkbData[1] & 0xFF)
+                                | ((wkbData[2] & 0xFF) << 8)
+                                | ((wkbData[3] & 0xFF) << 16)
+                                | ((wkbData[4] & 0xFF) << 24);
             }
 
             // 几何类型范围：1=Point, 2=LineString, 3=Polygon,
@@ -96,9 +96,7 @@ public class GirMysqlTran {
             // 3. 提取标准WKB数据（去除前4字节）
             byte[] wkbData = extractWkbData(mysqlBinary);
 
-
-            jtsGeom =  GirGeoTools.me().getFormatOpt().getWKBReader().read(wkbData);
-
+            jtsGeom = GirGeoTools.me().getFormatOpt().getWKBReader().read(wkbData);
 
             // 5. 设置SRID
             if (jtsGeom != null && srid != 0) {

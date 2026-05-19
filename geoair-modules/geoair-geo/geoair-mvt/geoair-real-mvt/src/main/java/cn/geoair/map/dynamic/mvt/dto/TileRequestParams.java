@@ -4,13 +4,10 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-
 import java.util.List;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,7 +51,6 @@ public class TileRequestParams {
 
     private JSONObject tempVariables = new JSONObject();
 
-
     public static TileRequestParams fromBase32(String baseString) {
         try {
             // 缓存未命中，执行原逻辑
@@ -95,7 +91,7 @@ public class TileRequestParams {
     /**
      * 向临时变量中设置值
      *
-     * @param key   键
+     * @param key 键
      * @param value 值
      */
     public void putTempVariable(String key, Object value) {
@@ -121,7 +117,7 @@ public class TileRequestParams {
     /**
      * 从临时变量中获取指定类型的值
      *
-     * @param key   键
+     * @param key 键
      * @param clazz 类型
      * @return 指定类型的值
      */

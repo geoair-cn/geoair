@@ -8,15 +8,12 @@ import cn.geoair.base.env.support.GirSystemEnvironmentOperater;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
+import java.util.Arrays;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
-/**
- * 读取配置文件
- */
+/** 读取配置文件 */
 @Component
 public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, EnvironmentAware {
 
@@ -27,8 +24,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
     @GaMethodHandImpl(
             implClass = GirPropertyHelper.class,
             implMethod = "getPropertier",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     private static GiPropertier getPropertier() {
         return me;
     }
@@ -36,8 +32,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
     @GaMethodHandImpl(
             implClass = GirEnvironmentHelper.class,
             implMethod = "getEnvironmenter",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     private static GiEnvironmenter getEnvironmenter() {
         return me;
     }

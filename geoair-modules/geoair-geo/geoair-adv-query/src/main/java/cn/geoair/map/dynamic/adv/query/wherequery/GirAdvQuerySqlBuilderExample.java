@@ -31,5 +31,4 @@ public class GirAdvQuerySqlBuilderExample {
         IDataSourceGetter dataSourceGetter = MockDataSourceGetter.getInstance();
         return new GirAdvQuerySqlBuilder(masql, dataSourceGetter);
     }
-
 }

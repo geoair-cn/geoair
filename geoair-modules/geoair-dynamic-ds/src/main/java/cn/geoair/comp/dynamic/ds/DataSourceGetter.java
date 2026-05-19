@@ -67,7 +67,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
             if (schemaName == null) {
-                schemaName ="";
+                schemaName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 schemaNameMap.put(dataSourceName, schemaName);
@@ -87,7 +87,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
             if (databaseName == null) {
-                databaseName ="";
+                databaseName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 dataBaseNameMap.put(dataSourceName, databaseName);

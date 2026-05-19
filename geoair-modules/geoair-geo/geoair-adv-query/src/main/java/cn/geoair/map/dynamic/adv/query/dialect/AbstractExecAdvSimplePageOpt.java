@@ -17,7 +17,6 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,28 +33,18 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }
 
-    /**
-     * 获取方言专属的表名处理器
-     */
+    /** 获取方言专属的表名处理器 */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    /**
-     * 执行统计SQL，返回总数
-     */
+    /** 执行统计SQL，返回总数 */
     protected abstract Long executeCountSql(String countSql);
 
-
-    /**
-     * 获取SQL对应的字段元数据
-     */
+    /** 获取SQL对应的字段元数据 */
     protected abstract DataFieldsApo getColumnsBySQL(String noPageSql);
 
-    /**
-     * 执行分页查询，返回结果列表
-     */
+    /** 执行分页查询，返回结果列表 */
     protected abstract List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList);
-
 
     // ========== 通用逻辑：所有数据库都适用 ==========
     @Override
@@ -300,7 +289,6 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         }
         return (int) ((total + pageSize - 1) / pageSize);
     }
-
 
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders, String tableAlias) {
         if (CollectionUtil.isEmpty(orders)) {

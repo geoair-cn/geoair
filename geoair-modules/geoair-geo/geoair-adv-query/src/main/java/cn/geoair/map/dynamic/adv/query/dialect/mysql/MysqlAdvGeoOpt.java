@@ -15,16 +15,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.*;
 import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * MySQL（Spatial）空间操作实现类 基于MySQL Spatial扩展实现通用空间操作接口 适配MySQL 5.7+/8.0+ Spatial语法特性
- */
+/** MySQL（Spatial）空间操作实现类 基于MySQL Spatial扩展实现通用空间操作接口 适配MySQL 5.7+/8.0+ Spatial语法特性 */
 public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private static final Logger log = LoggerFactory.getLogger(MysqlAdvGeoOpt.class);
@@ -33,7 +29,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private IAdvDDLOpt ddlOpt;
 
-    public MysqlAdvGeoOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
+    public MysqlAdvGeoOpt(
+            IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.ddlOpt = ddlOpt;
@@ -274,11 +271,11 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 ddlOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         // MySQL: ST_SRID获取空间参考系ID
         String sql =
@@ -300,11 +297,11 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedName =
                 ddlOpt.dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameOrSqlView)
+                                dataSourceGetter, tableNameOrSqlView)
                         : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                        dialectTableNameProcessor.tbGetTempAliasTableName());
+                                "({}) as {}",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                                dialectTableNameProcessor.tbGetTempAliasTableName());
 
         StringBuilder sridSelect = new StringBuilder();
         StringBuilder where = new StringBuilder("WHERE ");
@@ -676,7 +673,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String fieldQuerySql =
                     StrUtil.format("SELECT * FROM ({}) AS {} LIMIT 0", dynamicSql, alias);
             // 解析带参数SQL
-            SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(fieldQuerySql, sqlParam, dialectTableNameProcessor);
+            SqlMeta sqlMeta =
+                    GirAdvSqlUtils.parseSqlWithParam(
+                            fieldQuerySql, sqlParam, dialectTableNameProcessor);
             conn = dataSourceGetter.getConnection();
             if (conn == null) {
                 throw new IllegalStateException("无法获取MySQL数据库连接");

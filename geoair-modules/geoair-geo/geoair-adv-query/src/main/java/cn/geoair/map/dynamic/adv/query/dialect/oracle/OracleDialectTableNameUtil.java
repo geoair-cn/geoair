@@ -5,8 +5,10 @@ import cn.hutool.core.util.StrUtil;
 
 /**
  * Oracle方言表名处理器
- * <p>实现Oracle专属的差异化逻辑，复用父类所有通用逻辑</p>
- * <p>注意：Oracle使用双引号作为标识符引用符，默认Schema通常为用户名</p>
+ *
+ * <p>实现Oracle专属的差异化逻辑，复用父类所有通用逻辑
+ *
+ * <p>注意：Oracle使用双引号作为标识符引用符，默认Schema通常为用户名
  *
  * @author zhangjun
  */
@@ -16,7 +18,7 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
     private static final OracleDialectTableNameUtil INSTANCE = new OracleDialectTableNameUtil();
 
     // Oracle专属常量
-    private static final String ORACLE_DEFAULT_SCHEMA = null;  // Oracle默认使用当前用户Schema
+    private static final String ORACLE_DEFAULT_SCHEMA = null; // Oracle默认使用当前用户Schema
 
     private static final String ORACLE_QUOTE_CHAR = "\"";
 
@@ -54,14 +56,17 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
     }
 
     @Override
-    public  String tbBuildAsTable(String startFragment, String aliasTableName){
-        return  startFragment + "  " + aliasTableName;
+    public String tbBuildAsTable(String startFragment, String aliasTableName) {
+        return startFragment + "  " + aliasTableName;
     }
 
     /**
      * Oracle分页SQL（使用ROWNUM方式）
-     * <p>Oracle 9i+ 兼容写法</p>
-     * <p>生成的SQL结构：</p>
+     *
+     * <p>Oracle 9i+ 兼容写法
+     *
+     * <p>生成的SQL结构：
+     *
      * <pre>
      * SELECT * FROM (
      *     SELECT t.*, ROWNUM rn FROM (
@@ -71,8 +76,8 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
      * </pre>
      *
      * @param noPageSql 原始SQL
-     * @param pageSize  每页条数
-     * @param offset    偏移量
+     * @param pageSize 每页条数
+     * @param offset 偏移量
      * @return 分页SQL
      */
     @Override
@@ -83,13 +88,15 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
 
         return StrUtil.format(
                 "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= {}) WHERE rn > {}",
-                noPageSql, endRow, startRow
-        );
+                noPageSql,
+                endRow,
+                startRow);
     }
 
     /**
      * Oracle分页SQL（使用ROWNUM方式，带占位符）
-     * <p>Oracle 12c+ 也支持 OFFSET FETCH 语法，这里使用兼容性更好的 ROWNUM 方式</p>
+     *
+     * <p>Oracle 12c+ 也支持 OFFSET FETCH 语法，这里使用兼容性更好的 ROWNUM 方式
      *
      * @param noPageSql 原始SQL
      * @return 分页SQL（带?占位符）
@@ -98,16 +105,15 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
     public String tbBuildPageSql(String noPageSql) {
         // 使用 ROWNUM 实现分页（兼容 Oracle 9i+）
         // 三层嵌套：内层排序，中层限制最大行数，外层过滤起始行
-        String sql = StrUtil.format(
-                "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= ?) WHERE rn > ?",
-                noPageSql
-        );
+        String sql =
+                StrUtil.format(
+                        "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= ?) WHERE rn > ?",
+                        noPageSql);
         return sql;
     }
 
     /**
-     * Oracle 12c+ 推荐的分页方式（使用 OFFSET FETCH）
-     * 如果确认使用 Oracle 12c+，可以使用此方法
+     * Oracle 12c+ 推荐的分页方式（使用 OFFSET FETCH） 如果确认使用 Oracle 12c+，可以使用此方法
      *
      * @param noPageSql 原始SQL
      * @return 分页SQL（带?占位符）

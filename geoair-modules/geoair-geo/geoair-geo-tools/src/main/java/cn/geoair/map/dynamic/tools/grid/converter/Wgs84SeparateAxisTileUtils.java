@@ -3,15 +3,11 @@ package cn.geoair.map.dynamic.tools.grid.converter;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-
 import java.util.Objects;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
-/**
- * WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z）
- */
+/** WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z） */
 public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
     // 单例实例
@@ -121,7 +117,7 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         tileYmin = clamp(tileYmin, 0, maxTileIndex);
         tileYmax = clamp(tileYmax, 0, maxTileIndex);
 
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax,z);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
     // ========== 瓦片坐标转换（非等轴逻辑） ==========

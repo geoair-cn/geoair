@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg.base;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
-
 import java.util.function.Supplier;
 
 /** PostgreSQL查询操作实现类 */

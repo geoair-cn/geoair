@@ -13,23 +13,19 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-/**
- * 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现
- */
+/** 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现 */
 public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
 
     // 注入数据源获取器
@@ -71,7 +67,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("更新SQL语句不能为空");
         }
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta =
+                GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
         return bDeleteBySql(execSql, SqlParamList.ofList(jdbcParams));
@@ -94,10 +91,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, e);
             throw new RuntimeException("执行自定义删除SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
@@ -126,7 +126,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         validateIdKeyAndValue(idKey, id);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         String execSql = buildDeleteByPrimaryKeySql(quoteTableName, idKey);
 
         StopWatch stopWatch = new StopWatch();
@@ -136,10 +138,23 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bDeleteByPrimaryKey",
+                            execSql,
+                            SqlParamList.of(id),
+                            cost,
+                            result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(
+                            this.getClass(),
+                            "bDeleteByPrimaryKey",
+                            execSql,
+                            SqlParamList.of(id),
+                            e);
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -155,7 +170,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         List<List<Object>> idBatches = splitCollection(ids, getMaxInParams());
         int totalSuccess = 0;
 
@@ -166,8 +183,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.setAutoCommit(false);
 
             for (List<Object> idBatch : idBatches) {
-                String placeholders = idBatch.stream().map(id -> "?").collect(Collectors.joining(","));
-                String execSql = buildDeleteBatchByPrimaryKeySql(quoteTableName, idKey, placeholders);
+                String placeholders =
+                        idBatch.stream().map(id -> "?").collect(Collectors.joining(","));
+                String execSql =
+                        buildDeleteBatchByPrimaryKeySql(quoteTableName, idKey, placeholders);
                 int batchSuccess = SqlExecutor.execute(connection, execSql, idBatch.toArray());
                 totalSuccess += batchSuccess;
             }
@@ -176,13 +195,21 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
 
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
-                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), cost, totalSuccess);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bDeleteBatchByPrimaryKey",
+                            StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess),
+                            cost,
+                            totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(
-                    this.getClass(),
-                    "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(
+                            this.getClass(),
+                            "bDeleteBatchByPrimaryKey",
+                            StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess),
+                            e);
             rollbackConnection(connection);
             throw new RuntimeException("批量主键删除失败，表名：" + tableName, e);
         } finally {
@@ -213,9 +240,14 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
 
-
-          AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
-                "bDeleteBatchWithBatchSize", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
+        AdvLogSql.of(dataSourceGetter, getConfig())
+                .logExecuteSql(
+                        this.getClass(),
+                        "bDeleteBatchWithBatchSize",
+                        StrUtil.format(
+                                "表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                        cost,
+                        totalSuccess);
         return totalSuccess;
     }
 
@@ -228,7 +260,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         String whereClause = buildWhereClause(whereMap);
         String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
         List<Object> params = new ArrayList<>(whereMap.values());
@@ -240,10 +274,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByMap", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(this.getClass(), "bDeleteByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByMap", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), "bDeleteByMap", execSql, params, e);
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -261,7 +297,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 
         int totalSuccess = 0;
         StopWatch stopWatch = new StopWatch();
@@ -272,7 +310,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.setAutoCommit(false);
             while (true) {
                 String whereClause = buildWhereClause(whereMap);
-                String execSql = buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
+                String execSql =
+                        buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
                 List<Object> params = new ArrayList<>(whereMap.values());
                 int batchSuccess = SqlExecutor.execute(connection, execSql, params.toArray());
                 totalSuccess += batchSuccess;
@@ -283,8 +322,14 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
-                    "bDeleteBatchByCondition", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bDeleteBatchByCondition",
+                            StrUtil.format(
+                                    "表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                            cost,
+                            totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -294,7 +339,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             closeConnection(connection);
         }
     }
-
 
     @Override
     public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
@@ -312,9 +356,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         List<Object> params = new ArrayList<>();
-        String whereClause = GirAdvSqlUtils.buildWhereClause(whereFilter, params, dialectTableNameProcessor, dataSourceGetter);
+        String whereClause =
+                GirAdvSqlUtils.buildWhereClause(
+                        whereFilter, params, dialectTableNameProcessor, dataSourceGetter);
         if (GutilObject.isEmpty(whereClause)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
@@ -326,10 +374,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByWhere", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(), "bDeleteByWhere", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByWhere", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), "bDeleteByWhere", execSql, params, e);
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -373,11 +424,11 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     }
 
     protected String buildWhereClause(Map<String, Object> whereMap) {
-        return whereMap.keySet().stream()
+        return whereMap.keySet()
+                .stream()
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(" AND "));
     }
-
 
     protected String getSchemaName() {
         return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
@@ -385,7 +436,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     protected String getDatabaseName() {
         return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName()) ? "" : dataSourceGetter.getDatabaseName()
+                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
+                        ? ""
+                        : dataSourceGetter.getDatabaseName()
                 : "";
     }
 
@@ -421,7 +474,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return StrUtil.format("DELETE FROM {} WHERE {} = ?", tableName, idKey);
     }
 
-    protected String buildDeleteBatchByPrimaryKeySql(String tableName, String idKey, String placeholders) {
+    protected String buildDeleteBatchByPrimaryKeySql(
+            String tableName, String idKey, String placeholders) {
         return StrUtil.format("DELETE FROM {} WHERE {} IN ({})", tableName, idKey, placeholders);
     }
 
@@ -429,8 +483,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return StrUtil.format("DELETE FROM {} WHERE {}", tableName, whereClause);
     }
 
-    protected String buildDeleteBatchByConditionSql(String tableName, String whereClause, int batchSize) {
-        return StrUtil.format("DELETE FROM {} WHERE {} LIMIT {}", tableName, whereClause, batchSize);
+    protected String buildDeleteBatchByConditionSql(
+            String tableName, String whereClause, int batchSize) {
+        return StrUtil.format(
+                "DELETE FROM {} WHERE {} LIMIT {}", tableName, whereClause, batchSize);
     }
-
 }

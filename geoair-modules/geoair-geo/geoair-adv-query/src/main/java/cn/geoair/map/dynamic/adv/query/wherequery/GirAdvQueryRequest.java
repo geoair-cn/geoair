@@ -4,22 +4,21 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 import cn.hutool.core.collection.ListUtil;
-import lombok.Getter;
-
 import java.util.*;
+import lombok.Getter;
 
 /**
  * 查询参数构建器
+ *
  * <p>支持两种查询模式：
+ *
  * <ul>
- *   <li>模式一：对象组装SQL - 通过表名、字段名、条件参数自动构建SQL</li>
- *   <li>模式二：自定义SQL - 直接传入SQL语句，优先级更高</li>
+ *   <li>模式一：对象组装SQL - 通过表名、字段名、条件参数自动构建SQL
+ *   <li>模式二：自定义SQL - 直接传入SQL语句，优先级更高
  * </ul>
- * </p>
  *
  * @author zhangjun
  */
@@ -29,70 +28,52 @@ public class GirAdvQueryRequest {
     // ==================== 模式一：对象组装SQL ====================
 
     /**
-     * 表名或一个sql查询语句。但是必须是完整的sql
-     * -- GETTER --
-     * 获取表名或视图名
-     * table ：user
-     * sqlView：select * from user
-     * 不支持的写法 ( select * from user )  as rere
+     * 表名或一个sql查询语句。但是必须是完整的sql -- GETTER -- 获取表名或视图名 table ：user sqlView：select * from user 不支持的写法
+     * ( select * from user ) as rere
      *
      * @return 表名或视图名
      */
     private final String tableOrSqlView;
-    /**
-     * 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
-     */
+    /** 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名 */
     private final String sqlViewTableNameAlias;
 
     /**
-     * 查询字段名列表（必填）
-     * -- GETTER --
-     * 获取查询字段名列表
+     * 查询字段名列表（必填） -- GETTER -- 获取查询字段名列表
      *
      * @return 字段名列表
      */
     private final List<String> fieldNames;
 
     /**
-     * WHERE条件参数映射（必填，可为空Map）
-     * -- GETTER --
-     * 获取WHERE条件参数映射
+     * WHERE条件参数映射（必填，可为空Map） -- GETTER -- 获取WHERE条件参数映射
      *
      * @return 条件参数映射
      */
     private GirAdvWhereFilter whereOption = GirAdvWhereFilter.of();
 
     /**
-     * NULL值处理策略（可选，默认INCLUDE）
-     * -- GETTER --
-     * 获取NULL值处理策略
+     * NULL值处理策略（可选，默认INCLUDE） -- GETTER -- 获取NULL值处理策略
      *
      * @return NULL处理策略枚举
      */
     private final AdvNullHandling nullHandling;
 
     /**
-     * 排序参数列表（可选）
-     * -- GETTER --
-     * 获取排序参数列表
+     * 排序参数列表（可选） -- GETTER -- 获取排序参数列表
      *
      * @return 排序参数列表
      */
     private final List<OrderApo> orders;
 
     /**
-     * 页码（可选）
-     * -- GETTER --
-     * 获取页码
+     * 页码（可选） -- GETTER -- 获取页码
      *
      * @return 页码
      */
     private final Integer pageNum;
 
     /**
-     * 每页条数（可选）
-     * -- GETTER --
-     * 获取每页条数
+     * 每页条数（可选） -- GETTER -- 获取每页条数
      *
      * @return 每页条数
      */
@@ -100,9 +81,8 @@ public class GirAdvQueryRequest {
 
     /**
      * 页码起始规则（可选，默认false）
-     * <p>true=页码从0开始，false=页码从1开始</p>
-     * -- GETTER --
-     * 获取页码起始规则
+     *
+     * <p>true=页码从0开始，false=页码从1开始 -- GETTER -- 获取页码起始规则
      *
      * @return true=从0开始，false=从1开始
      */
@@ -110,51 +90,49 @@ public class GirAdvQueryRequest {
 
     /**
      * 空间操作规则（可选）
-     * <p>用于处理空间字段的转换，如转换为空字符串等</p>
-     * -- GETTER --
-     * 获取空间操作规则
+     *
+     * <p>用于处理空间字段的转换，如转换为空字符串等 -- GETTER -- 获取空间操作规则
      *
      * @return 空间操作规则枚举
      */
-
     private final AdvEnumsGeomOpt advEnumsGeomOpt;
 
     /**
      * 是否返回字段元数据（可选，默认false）
-     * <p>true=返回字段元数据信息，false=仅返回数据</p>
-     * -- GETTER --
-     * 获取是否返回字段元数据
+     *
+     * <p>true=返回字段元数据信息，false=仅返回数据 -- GETTER -- 获取是否返回字段元数据
      *
      * @return true=返回元数据，false=仅返回数据
      */
     private final Boolean hasFieldsInfo;
 
-    /**
-     * key的转换策略
-     */
+    /** key的转换策略 */
     private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
     // ==================== 模式二：直接传SQL ====================
 
     /**
      * 自定义SQL语句（可选，优先级高于对象模式）
-     * <p>当此字段不为空时，将忽略tableOrViewName、fieldNames、whereOption等参数</p>
-     * -- GETTER --
-     * 获取自定义SQL语句
+     *
+     * <p>当此字段不为空时，将忽略tableOrViewName、fieldNames、whereOption等参数 -- GETTER -- 获取自定义SQL语句
      *
      * @return 自定义SQL
      */
     private final String customSql;
 
-    /**
-     * 从Builder构造
-     */
+    /** 从Builder构造 */
     public <T> GirAdvQueryRequest(QueryRequestBuilder<T> builder) {
         this.tableOrSqlView = builder.getTableOrSqlView();
         this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
-        this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.of("*");
+        this.fieldNames =
+                GutilObject.isNotEmpty(builder.getFieldNames())
+                        ? new ArrayList<>(builder.getFieldNames())
+                        : ListUtil.of("*");
         this.whereOption = builder.getWhereOption();
         this.nullHandling = builder.getNullHandling();
-        this.orders = builder.getOrders() != null ? new ArrayList<>(builder.getOrders()) : new ArrayList<>();
+        this.orders =
+                builder.getOrders() != null
+                        ? new ArrayList<>(builder.getOrders())
+                        : new ArrayList<>();
         this.pageNum = builder.getPageNum();
         this.pageSize = builder.getPageSize();
         this.pageNumStartZero = builder.getPageNumStartZero();
@@ -163,43 +141,40 @@ public class GirAdvQueryRequest {
         this.advEnumsGeomOpt = builder.getAdvEnumsGeomOpt();
         this.hasFieldsInfo = builder.getHasFieldsInfo();
         this.advEnumsKeyTran = builder.getAdvEnumsKeyTran();
-
     }
 
-
-//    /**
-//     * 私有构造器，使用Builder构建
-//     *
-//     * @param builder 构建器实例
-//     */
-//    public GirAdvQueryRequest(QueryRequestBuilder builder) {
-//        // 模式一参数
-//        this.tableOrSqlView = builder.tableOrSqlView;
-//        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
-//        if (GutilObject.isEmpty(builder.fieldNames)) {
-//            this.fieldNames = ListUtil.of("*");
-//        } else {
-//            this.fieldNames = builder.fieldNames;
-//        }
-//        if (GutilObject.isEmpty(builder.whereOption)) {
-//            this.whereOption = GirAdvWhereFilter.of();
-//        } else {
-//            this.whereOption = builder.whereOption;
-//        }
-//        this.nullHandling = builder.nullHandling;
-//        this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
-//        this.pageNum = builder.pageNum;
-//        this.pageSize = builder.pageSize;
-//        this.pageNumStartZero = builder.pageNumStartZero;
-//
-//        // 模式二参数
-//        this.customSql = builder.customSql;
-//        this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
-//        this.hasFieldsInfo = builder.hasFieldsInfo;
-//        this.advEnumsKeyTran = builder.advEnumsKeyTran;
-//
-//    }
-
+    //    /**
+    //     * 私有构造器，使用Builder构建
+    //     *
+    //     * @param builder 构建器实例
+    //     */
+    //    public GirAdvQueryRequest(QueryRequestBuilder builder) {
+    //        // 模式一参数
+    //        this.tableOrSqlView = builder.tableOrSqlView;
+    //        this.sqlViewTableNameAlias = builder.sqlViewTableNameAlias;
+    //        if (GutilObject.isEmpty(builder.fieldNames)) {
+    //            this.fieldNames = ListUtil.of("*");
+    //        } else {
+    //            this.fieldNames = builder.fieldNames;
+    //        }
+    //        if (GutilObject.isEmpty(builder.whereOption)) {
+    //            this.whereOption = GirAdvWhereFilter.of();
+    //        } else {
+    //            this.whereOption = builder.whereOption;
+    //        }
+    //        this.nullHandling = builder.nullHandling;
+    //        this.orders = Collections.unmodifiableList(new ArrayList<>(builder.orders));
+    //        this.pageNum = builder.pageNum;
+    //        this.pageSize = builder.pageSize;
+    //        this.pageNumStartZero = builder.pageNumStartZero;
+    //
+    //        // 模式二参数
+    //        this.customSql = builder.customSql;
+    //        this.advEnumsGeomOpt = builder.advEnumsGeomOpt;
+    //        this.hasFieldsInfo = builder.hasFieldsInfo;
+    //        this.advEnumsKeyTran = builder.advEnumsKeyTran;
+    //
+    //    }
 
     /**
      * 判断是否为自定义SQL模式
@@ -230,7 +205,8 @@ public class GirAdvQueryRequest {
 
     /**
      * 计算分页偏移量
-     * <p>根据页码、每页条数和页码起始规则计算LIMIT子句的偏移量</p>
+     *
+     * <p>根据页码、每页条数和页码起始规则计算LIMIT子句的偏移量
      *
      * @return 偏移量
      */
@@ -259,7 +235,8 @@ public class GirAdvQueryRequest {
 
     /**
      * 构建ORDER BY子句
-     * <p>根据排序参数列表生成SQL的ORDER BY部分</p>
+     *
+     * <p>根据排序参数列表生成SQL的ORDER BY部分
      *
      * @return ORDER BY子句字符串，如果没有排序条件则返回空字符串
      */
@@ -274,10 +251,14 @@ public class GirAdvQueryRequest {
             }
             if (order.isFunction()) {
                 // 函数排序示例：CAST(gtc_id AS numeric) ASC
-                sb.append(order.getFunction()).append(" ").append(order.getAdvEnumsOrder().getValue());
+                sb.append(order.getFunction())
+                        .append(" ")
+                        .append(order.getAdvEnumsOrder().getValue());
             } else {
                 // 字段排序示例：field_name ASC
-                sb.append(order.getFieldName()).append(" ").append(order.getAdvEnumsOrder().getValue());
+                sb.append(order.getFieldName())
+                        .append(" ")
+                        .append(order.getAdvEnumsOrder().getValue());
             }
         }
         return sb.toString();
@@ -306,9 +287,8 @@ public class GirAdvQueryRequest {
      *
      * @return Builder实例
      */
-    public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass, boolean isToUnderlineCase) {
+    public static <T> QueryRequestBuilder<T> builder(
+            Class<T> entityClass, boolean isToUnderlineCase) {
         return new QueryRequestBuilder<>(entityClass, isToUnderlineCase);
     }
-
-
 }

@@ -19,10 +19,9 @@ public class SpringServlet4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getRequest",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getRequest",
+            type = ImplType.expectfirst)
     public static HttpServletRequest getRequest() {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         if (ra != null) {
@@ -34,10 +33,9 @@ public class SpringServlet4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getResponse",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getResponse",
+            type = ImplType.expectfirst)
     public static HttpServletResponse getResponse() {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         if (ra != null) {
@@ -52,10 +50,9 @@ public class SpringServlet4Gir {
             new WeakReference<ServletContext>(null);
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getServletContext",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getServletContext",
+            type = ImplType.expectfirst)
     public static ServletContext getServletContext() {
 
         if (servletContextWarp.get() == null) {

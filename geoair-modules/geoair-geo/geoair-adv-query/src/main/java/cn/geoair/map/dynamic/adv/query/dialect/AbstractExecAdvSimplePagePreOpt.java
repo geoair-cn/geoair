@@ -14,7 +14,6 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +48,13 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             throw new IllegalArgumentException("分页统计SQL不能为空");
         }
         // 空参数初始化，避免NPE
-//        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
+        //        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
 
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
-            String template = dialectTableNameProcessor.tbBuildAsTable(" SELECT COUNT(*) AS count FROM ({})", "{}");
+            String template =
+                    dialectTableNameProcessor.tbBuildAsTable(
+                            " SELECT COUNT(*) AS count FROM ({})", "{}");
             String countSql =
                     StrUtil.format(
                             template,
@@ -69,7 +70,6 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
 
     // ========== 通用逻辑：核心带参数分页方法 ==========
 
-
     // ========== 通用逻辑：核心带参数分页方法 ==========
     @Override
     public PageApo<GirAdvOneRow> pPage(
@@ -81,9 +81,17 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+        return pPage(
+                noPageSqlStatement,
+                sqlParam,
+                pageNum,
+                pageSize,
+                pageNumStartZero,
+                advEnumsGeomOpt,
+                hasFieldsInfo,
+                orders,
+                AdvEnumsKeyTran.不转换);
     }
-
 
     @Override
     public PageApo<GirAdvOneRow> pPage(
@@ -94,10 +102,11 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
-            List<OrderApo> orders, AdvEnumsKeyTran advEnumsKeyTran) {
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
-//        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
+        //        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
 
         // 2. 子类实现：带参数获取字段元数据
         DataFieldsApo dataFieldsApo = null;
@@ -124,21 +133,33 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         String sqlWithOrder = pBuildSqlWithOrder(refactorNoPageSql, orders, tableAlias);
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
         String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
-        Map<String, Object> resultMap = Stream.of("count", "list")
-                .parallel()
-                .map(task -> {
-                    Map<String, Object> map = new HashMap<>();
-                    if ("count".equals(task)) {
-                        map.put("count", pCount(sqlWithOrder, sqlParam));
-                    } else {
-                        map.put("list", getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList));
-                    }
-                    return map;
-                })
-                .flatMap(m -> m.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, Object> resultMap =
+                Stream.of("count", "list")
+                        .parallel()
+                        .map(
+                                task -> {
+                                    Map<String, Object> map = new HashMap<>();
+                                    if ("count".equals(task)) {
+                                        map.put("count", pCount(sqlWithOrder, sqlParam));
+                                    } else {
+                                        map.put(
+                                                "list",
+                                                getAdvGeoPreOpt()
+                                                        .eSelectList(
+                                                                pageSql,
+                                                                sqlParam,
+                                                                advEnumsGeomOpt,
+                                                                geomFieldNameList));
+                                    }
+                                    return map;
+                                })
+                        .flatMap(m -> m.entrySet().stream())
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         Long total = (Long) resultMap.get("count");
-        List<GirAdvOneRow> records = resultMap.get("list") != null ? (List<GirAdvOneRow>) resultMap.get("list") : ListUtil.empty();
+        List<GirAdvOneRow> records =
+                resultMap.get("list") != null
+                        ? (List<GirAdvOneRow>) resultMap.get("list")
+                        : ListUtil.empty();
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
             records = GirAdvOneRow.toCaseInsensitiveList(records);
         }
@@ -356,9 +377,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
                 orders);
     }
 
-    /**
-     * 执行带参数的统计SQL，返回总数
-     */
+    /** 执行带参数的统计SQL，返回总数 */
     protected Long executeCountSqlWithParam(String countSql, GirSqlParam sqlParam) {
         GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
         return result != null ? result.getLong("count") : 0L;
@@ -369,9 +388,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         return executeCountSqlWithParam(countSql, new SqlParamMap());
     }
 
-    /**
-     * 带参数获取SQL字段元数据
-     */
+    /** 带参数获取SQL字段元数据 */
     protected DataFieldsApo getColumnsBySQLWithParam(String noPageSql, GirSqlParam sqlParam) {
         return getAdvDDLOpt().dGetColumnsBySQL(noPageSql, sqlParam);
     }
@@ -381,11 +398,10 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
         return getColumnsBySQLWithParam(noPageSql, new SqlParamMap());
     }
 
-
     @Override
     protected List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return getAdvGeoPreOpt().eSelectList(pageSql, new SqlParamMap(), advEnumsGeomOpt, geomFieldNameList);
-
+        return getAdvGeoPreOpt()
+                .eSelectList(pageSql, new SqlParamMap(), advEnumsGeomOpt, geomFieldNameList);
     }
 }

@@ -2,14 +2,9 @@ package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.DynamicDataSourceManager;
-import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.geoair.map.dynamic.tools.GirService;
-
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉

@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.List;
 import javax.sql.DataSource;
 
@@ -101,8 +100,9 @@ public class CommonRuner {
                         + "\t\t<foreach collection=\"array\" item=\"name\" open=\"(\" separator=\",\" close=\")\">\n"
                         + "\t\t\t#{name}\n"
                         + "\t\t</foreach>";
-        List<GenTable> tableList = executor.bSelectObjList(
-                sql, SqlParamMap.of().addOne("array", tableNames), GenTable.class);
+        List<GenTable> tableList =
+                executor.bSelectObjList(
+                        sql, SqlParamMap.of().addOne("array", tableNames), GenTable.class);
         if (GutilObject.isNotEmpty(tableList)) {
             for (GenTable genTable : tableList) {
                 String tableComment = genTable.getTableComment();

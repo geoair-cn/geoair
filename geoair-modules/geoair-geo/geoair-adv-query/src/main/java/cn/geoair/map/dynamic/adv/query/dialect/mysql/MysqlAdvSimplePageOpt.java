@@ -6,11 +6,8 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.hutool.core.util.StrUtil;
 
-/**
- * MySQL 带参数分页实现类
- */
+/** MySQL 带参数分页实现类 */
 public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     // MySQL专属依赖
@@ -20,7 +17,11 @@ public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
 
     protected IAdvDDLOpt mysqlAdvDDLOpt;
 
-    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt mysqlAdvGeoOpt, IAdvDDLOpt mysqlAdvDDLOpt) {
+    public MysqlAdvSimplePageOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvGeoPreOpt mysqlAdvGeoOpt,
+            IAdvDDLOpt mysqlAdvDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.mysqlAdvDDLOpt = mysqlAdvDDLOpt;
@@ -46,6 +47,4 @@ public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
     protected IAdvGeoPreOpt getAdvGeoPreOpt() {
         return mysqlAdvGeoPreOpt;
     }
-
-
 }

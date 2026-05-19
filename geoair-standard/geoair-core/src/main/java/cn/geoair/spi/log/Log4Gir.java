@@ -42,10 +42,9 @@ public class Log4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirLogger.class,
-        implMethod = "getLoger",
-        type = ImplType.expectfirst
-    )
+            implClass = GirLogger.class,
+            implMethod = "getLoger",
+            type = ImplType.expectfirst)
     public static GiLogger getLoger(String name) {
         switch (logType) {
             case APPACHECOMMONS:

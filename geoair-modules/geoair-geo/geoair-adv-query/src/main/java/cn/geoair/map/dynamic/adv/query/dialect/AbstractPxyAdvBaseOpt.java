@@ -9,7 +9,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -27,29 +26,23 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     protected IDataSourceGetter dataSourceGetter;
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public AbstractPxyAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
 
-    /**
-     * 插入操作代理对象
-     */
+    /** 插入操作代理对象 */
     protected IAdvBaseAccessOpt advBaseAccessPxyOpt;
 
-    /**
-     * 查询操作代理对象
-     */
+    /** 查询操作代理对象 */
     protected IAdvBaseSelectOpt advBaseSelectPxyOpt;
 
-    /**
-     * 更新操作代理对象
-     */
+    /** 更新操作代理对象 */
     protected IAdvBaseUpdateOpt advBaseUpdatePxyOpt;
 
-    /**
-     * 删除操作代理对象
-     */
+    /** 删除操作代理对象 */
     protected IAdvBaseDeleteOpt advBaseDeletePxyOpt;
 
     public abstract IAdvBaseAccessOpt getAdvBaseAccessPxyOpt();
@@ -59,7 +52,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public abstract IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt();
 
     public abstract IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt();
-
 
     @Override
     public AdvQueryGlobalConfig getConfig() {
@@ -93,15 +85,23 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
+    public <T> Integer bInsertOne(
+            String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseAccessPxyOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    public <T> Integer bInsertOne(
+            String tableName,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertOne(
+                        tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
     }
-
 
     @Override
     public Integer bInsertBatch(
@@ -120,13 +120,11 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
             List<String> headers,
             List<Map<String, Object>> rowsData,
             int batchSize) {
-        return getAdvBaseAccessPxyOpt()
-                .bInsertBatch(tableName, headers, rowsData, batchSize);
+        return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bInsertBatch(
-            String tableName, Collection<T> entities, int batchSize) {
+    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, int batchSize) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, batchSize);
     }
 
@@ -136,7 +134,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bInsertIgnore(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, conflictKeys);
     }
 
@@ -146,31 +145,57 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    public <T> Integer bInsertIgnore(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
+    public <T> Integer bInsertIgnore(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
+    public <T> Integer bInsertIgnore(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    public <T> Integer bInsertIgnore(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnore(
+                        tableName,
+                        entity,
+                        conflictKeys,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
     }
 
     @Override
     public Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
+            String tableName,
+            Set<String> headers,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
-
 
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
@@ -181,7 +206,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
         return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
-
 
     // ==================== 删除操作实现（代理调用） ====================
     @Override
@@ -215,8 +239,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteByPKs(
-            String tableName, String idKey, Set<Object> ids, int batchSize) {
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids, int batchSize) {
         return getAdvBaseDeletePxyOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
     }
 
@@ -226,8 +249,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bDeleteByMap(
-            String tableName, Map<String, Object> whereMap, int batchSize) {
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap, int batchSize) {
         return getAdvBaseDeletePxyOpt().bDeleteByMap(tableName, whereMap, batchSize);
     }
 
@@ -339,7 +361,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         getAdvBaseSelectPxyOpt().bSelectObjListStream(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
-
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseSelectPxyOpt().bSelectOne(sqlStatement, sqlParamList);
@@ -351,12 +372,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseSelectPxyOpt().bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+    public List<List<Object>> bSelectListToValueList(
+            String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseSelectPxyOpt().bSelectListToValueList(sqlStatement, sqlParamList);
     }
 
@@ -376,16 +399,22 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
         return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParamList, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(
+            String sqlStatement,
+            SqlParamList sqlParamList,
+            Class<E> clazz,
+            Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt()
+                .bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
     }
 
-    //=============================================================================
+    // =============================================================================
 
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
@@ -398,7 +427,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseSelectPxyOpt().bSelectListStream(sqlStatement, girSqlParam, rowConsumer);
     }
 
@@ -423,15 +453,17 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
         return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, girSqlParam, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt()
+                .bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
     }
-
 
     // ==================== 更新操作实现（代理调用） ====================
     @Override
@@ -466,23 +498,45 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
+    public <T> Integer bUpdateByPK(
+            String tableName,
+            String idKey,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue);
     }
 
     @Override
-    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+    public <T> Integer bUpdateByPK(
+            String tableName, String idKey, T entity, boolean isToUnderlineCase) {
         return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase);
     }
 
     @Override
-    public <T> Integer bUpdateByPK(String tableName, String idKey, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    public <T> Integer bUpdateByPK(
+            String tableName,
+            String idKey,
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateByPK(
+                        tableName,
+                        idKey,
+                        entity,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, boolean isToUnderlineCase) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity, isToUnderlineCase);
+    public <T> Integer bUpdateByPKSelective(
+            String tableName, String idKey, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateByPKSelective(tableName, idKey, entity, isToUnderlineCase);
     }
 
     @Override
@@ -491,10 +545,11 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
+    public <T> Integer bUpdateByPKSelective(
+            String tableName, String idKey, T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
     }
-
 
     @Override
     public Integer bUpdateByMap(
@@ -516,11 +571,9 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPK(
-            String tableName, String idKey, Collection<T> entities) {
+    public <T> Integer bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities) {
         return getAdvBaseUpdatePxyOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
-
 
     @Override
     public Integer bUpdateOrInsert(
@@ -529,7 +582,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bUpsert(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseUpdatePxyOpt().bUpsert(tableName, rowData, conflictKeys);
     }
 
@@ -539,28 +593,51 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
+    public <T> Integer bUpsert(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+    public <T> Integer bUpsert(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase);
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    public <T> Integer bUpsert(
+            String tableName,
+            T entity,
+            List<String> conflictKeys,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpsert(
+                        tableName,
+                        entity,
+                        conflictKeys,
+                        isToUnderlineCase,
+                        ignoreNullValue,
+                        ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+    public <T> Integer bUpsert(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return getAdvBaseUpdatePxyOpt().bUpsert(tableName, entity, conflictKeys, ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
+    public <T> Integer bUpsertSelective(
+            String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpsertSelective(tableName, entity, conflictKeys, isToUnderlineCase);
     }
 
     @Override
@@ -569,37 +646,53 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
+    public <T> Integer bUpsertSelective(
+            String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    public <T> Integer bUpdateByWhere(
+            String tableName,
+            T entity,
+            GirAdvWhereLambdaFilter<T> whereFilter,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(tableName, entity, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(tableName, rowData, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
-        return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter, ignoreFieldNames);
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName,
+            T entity,
+            GirAdvWhereLambdaFilter<T> whereFilter,
+            List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt()
+                .bUpdateSelectiveByWhere(tableName, entity, whereFilter, ignoreFieldNames);
     }
 
     @Override
-    public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(tableName, rowData, whereFilter);
     }
 }

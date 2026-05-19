@@ -7,10 +7,8 @@ import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.Optional;
 import javax.sql.DataSource;
-
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -57,9 +55,7 @@ public class AdvAutoConfiguration {
         return girSpringAdvExecutor;
     }
 
-    /**
-     * 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 修复点：参数注入IAdvExecutor，确保依赖顺序
-     */
+    /** 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 修复点：参数注入IAdvExecutor，确保依赖顺序 */
     @Bean
     @ConditionalOnMissingBean(IAdvExecutorAdapter.class)
     @ConditionalOnBean(IAdvExecutor.class)

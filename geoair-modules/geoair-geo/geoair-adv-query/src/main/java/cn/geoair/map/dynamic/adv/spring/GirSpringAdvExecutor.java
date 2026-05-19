@@ -53,6 +53,7 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
     public AdvQueryGlobalConfig getConfig() {
         return getAdvBaseOpt().getConfig();
     }
+
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return iAdvExecutorPxy;

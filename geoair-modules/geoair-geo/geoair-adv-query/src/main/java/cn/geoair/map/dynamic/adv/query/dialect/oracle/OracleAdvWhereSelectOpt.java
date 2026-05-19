@@ -14,7 +14,12 @@ public class OracleAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvSimplePagePreOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
-    public OracleAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePagePreOpt pgAdvSimplePageOpt, IAdvGeoPreOpt iAdvGeoPreOpt) {
+
+    public OracleAdvWhereSelectOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvSimplePagePreOpt pgAdvSimplePageOpt,
+            IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;

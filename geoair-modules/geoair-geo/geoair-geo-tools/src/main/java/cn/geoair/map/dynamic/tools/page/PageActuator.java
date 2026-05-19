@@ -1,14 +1,13 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
+import lombok.Getter;
 
 /**
  * @author ：张逢吉
@@ -21,8 +20,7 @@ public class PageActuator<T> {
     /** 分页配置 */
     PageConfig pageConfig = new PageConfig();
 
-    @Getter
-    private final List<T> finalDataList = new ArrayList<T>();
+    @Getter private final List<T> finalDataList = new ArrayList<T>();
 
     // 仅用于标记是否终止
     private final AtomicBoolean isTerminate = new AtomicBoolean(false);

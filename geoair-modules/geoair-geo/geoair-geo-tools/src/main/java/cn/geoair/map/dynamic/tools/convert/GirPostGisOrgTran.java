@@ -18,7 +18,7 @@ public class GirPostGisOrgTran {
         Geometry jtsGeom = null;
         if (value instanceof PGgeometry) { // 判断是否为pG的空间对象
             PGgeometry pgGeometry = (PGgeometry) value;
-            jtsGeom =  GirGeoTools.me().getFormatOpt().pgGeometryToJtsGeometry(pgGeometry, true);
+            jtsGeom = GirGeoTools.me().getFormatOpt().pgGeometryToJtsGeometry(pgGeometry, true);
         }
         return jtsGeom;
     }
@@ -30,7 +30,8 @@ public class GirPostGisOrgTran {
     public static Geometry toJtsGeometry(Object pgGeometry) throws Exception {
         org.postgis.Geometry geometry = cast(pgGeometry).getGeometry();
         Geometry jtsGeom =
-                GirGeoTools.me().getFormatOpt()
+                GirGeoTools.me()
+                        .getFormatOpt()
                         .getWKTReader()
                         .read(geometry.getTypeString() + geometry.getValue());
         jtsGeom.setSRID(geometry.getSrid());

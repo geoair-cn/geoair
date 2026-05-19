@@ -68,9 +68,9 @@ public class AdvExecutorFactory {
                 return DialectName.MYSQL;
             } else if (dbProductName.contains("POSTGRESQL") || dbProductName.contains("PG")) {
                 return DialectName.POSTGRESQL;
-            } else if (dbProductName.contains("ORACLE")  ) {
+            } else if (dbProductName.contains("ORACLE")) {
                 return DialectName.ORACLE;
-            }else {
+            } else {
                 throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);
             }
         } catch (SQLException e) {

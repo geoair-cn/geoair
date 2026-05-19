@@ -7,7 +7,6 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
-
 import java.sql.Connection;
 import javax.sql.DataSource;
 
@@ -29,8 +28,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorMysql() {
-    }
+    public AdvExecutorMysql() {}
 
     public AdvExecutorMysql(Connection connection) {
         super(connection);
@@ -89,7 +87,12 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
-                    simplePageOpt = new MysqlAdvSimplePageOpt(getDataSourceGetter(), getAdvBaseOpt(), getGeoOpt(), getAdvDDLOpt());
+                    simplePageOpt =
+                            new MysqlAdvSimplePageOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getGeoOpt(),
+                                    getAdvDDLOpt());
                 }
             }
         }
@@ -101,7 +104,9 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new MysqlAdvGeoOpt(getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
+                    geoOpt =
+                            new MysqlAdvGeoOpt(
+                                    getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
                 }
             }
         }
@@ -113,7 +118,12 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new MysqlAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
+                    iAdvWhereSelectOpt =
+                            new MysqlAdvWhereSelectOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getSimplePageOpt(),
+                                    getGeoOpt());
                 }
             }
         }
@@ -124,7 +134,6 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return PgDialectTableNameUtil.getInstance();
     }
-
 
     AdvQueryGlobalConfig advQueryGlobalConfig = AdvQueryGlobalConfig.of();
 

@@ -7,12 +7,10 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
-
-import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -119,7 +117,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirGeoTools.me().getSridOpt()
+                            GirGeoTools.me()
+                                    .getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");
@@ -215,7 +214,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
 
     private Integer extractPortFromJdbcUrl(String jdbcUrl) {
         String port = AdvJdbcUrlUtil.splitter(jdbcUrl).port;
-        return  port!=null?Integer.parseInt(port):5432;
+        return port != null ? Integer.parseInt(port) : 5432;
     }
 
     private String extractDbNameFromJdbcUrl(String jdbcUrl) {

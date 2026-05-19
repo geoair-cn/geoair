@@ -1,32 +1,32 @@
-//package cn.geoair.map.dynamic.mvt.controller;
+// package cn.geoair.map.dynamic.mvt.controller;
 //
-//import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
-//import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
-//import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
-//import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
-//import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
-//import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
-//import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
-//import cn.hutool.core.io.IoUtil;
-//import cn.hutool.core.util.ObjectUtil;
+// import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
+// import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
+// import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+// import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
+// import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
+// import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
+// import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+// import cn.hutool.core.io.IoUtil;
+// import cn.hutool.core.util.ObjectUtil;
 //
-//import java.io.ByteArrayInputStream;
-//import java.net.URLDecoder;
-//import java.nio.charset.Charset;
-//import java.util.Objects;
-//import javax.servlet.ServletOutputStream;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpSession;
+// import java.io.ByteArrayInputStream;
+// import java.net.URLDecoder;
+// import java.nio.charset.Charset;
+// import java.util.Objects;
+// import javax.servlet.ServletOutputStream;
+// import javax.servlet.http.HttpServletRequest;
+// import javax.servlet.http.HttpServletResponse;
+// import javax.servlet.http.HttpSession;
 //
-//import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 //
-///**
+/// **
 // * @author ：张逢吉
 // * @date ：Created in 2025/10/17 13:42 @description： TODO
 // */
-//@Slf4j
-//public class TileCommon {
+// @Slf4j
+// public class TileCommon {
 //
 //    public static void toResponse(HttpServletResponse response, byte[] re, String contentType) {
 //        ServletOutputStream outputStream = null;
@@ -54,11 +54,13 @@
 //    )
 //            throws Exception {
 //        byte[] data = new byte[0];
-//        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params,layerName);
+//        ParamCheckResult result =
+// GirRealMvtHelper.getInstance().checkTileRequestParams(params,layerName);
 //
 //        if (!result.isSuccess()) {
 //            String message = result.getMessage();
-//            GirServletUtil.toResponse(response, message.getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+//            GirServletUtil.toResponse(response, message.getBytes(Charset.defaultCharset()),
+// "text/plain; charset=utf-8");
 //            return;
 //        }
 //
@@ -110,4 +112,4 @@
 //            }
 //        }
 //    }
-//}
+// }

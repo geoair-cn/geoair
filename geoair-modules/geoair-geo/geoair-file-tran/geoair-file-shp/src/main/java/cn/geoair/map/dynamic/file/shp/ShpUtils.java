@@ -15,13 +15,14 @@ public class ShpUtils {
     private Class<? extends Geometry> getActualGeometryClass(SimpleFeatureType type) {
         if (Point.class.isAssignableFrom(type.getGeometryDescriptor().getType().getBinding())) {
             return Point.class;
-        } else if (LineString.class.isAssignableFrom(type.getGeometryDescriptor().getType().getBinding())) {
+        } else if (LineString.class.isAssignableFrom(
+                type.getGeometryDescriptor().getType().getBinding())) {
             return LineString.class;
-        } else if (Polygon.class.isAssignableFrom(type.getGeometryDescriptor().getType().getBinding())) {
+        } else if (Polygon.class.isAssignableFrom(
+                type.getGeometryDescriptor().getType().getBinding())) {
             return Polygon.class;
         } else {
             return Point.class; // 默认 fallback
         }
     }
 }
-

@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-template-dependencies</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.3</version>
   <packaging>pom</packaging>
   <name>geoair-template-dependencies</name>
   <description>geoair template 模板</description>

@@ -12,14 +12,12 @@ import org.apache.ibatis.plugin.Signature;
 import org.springframework.stereotype.Component;
 
 @Intercepts(
-    value = {
-        @Signature(
-            args = {Statement.class},
-            method = "handleResultSets",
-            type = ResultSetHandler.class
-        )
-    }
-)
+        value = {
+            @Signature(
+                    args = {Statement.class},
+                    method = "handleResultSets",
+                    type = ResultSetHandler.class)
+        })
 @Component
 public class HandleResultPlugin implements Interceptor {
 

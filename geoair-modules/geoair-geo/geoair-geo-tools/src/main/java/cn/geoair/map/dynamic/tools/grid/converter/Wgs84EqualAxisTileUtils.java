@@ -3,18 +3,11 @@ package cn.geoair.map.dynamic.tools.grid.converter;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-
-import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
-/**
- * WGS84（4326）等轴瓦片转换实现类 核心特征：经度/纬度轴使用相同瓦片跨度（均为360/2^z），兼容Mapbox4490逻辑
- */
+/** WGS84（4326）等轴瓦片转换实现类 核心特征：经度/纬度轴使用相同瓦片跨度（均为360/2^z），兼容Mapbox4490逻辑 */
 public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
 
     // 单例实例
@@ -24,9 +17,7 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
         super(advToolsConfig);
     }
 
-    /**
-     * 双重校验锁单例
-     */
+    /** 双重校验锁单例 */
     @Deprecated
     public static Wgs84EqualAxisTileUtils getInstance() {
         if (INSTANCE == null) {
@@ -124,7 +115,7 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
         tileYmin = clamp(tileYmin, 0, maxTileIndex);
         tileYmax = clamp(tileYmax, 0, maxTileIndex);
 
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax,z);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
     // ========== 瓦片坐标转换（等轴线性逻辑） ==========
@@ -141,6 +132,4 @@ public class Wgs84EqualAxisTileUtils extends AbstractWgs84TileConverter {
         double lat = MAX_LAT - y * calculateTileLatSpan(z);
         return clamp(lat, MIN_VALID_LAT, MAX_VALID_LAT);
     }
-
-
 }

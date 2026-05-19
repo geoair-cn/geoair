@@ -21,19 +21,16 @@ import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
 @Slf4j
 public class GirJtsJacksonUtils {
 
-    /**
-     *  jts对象转换为wkt，如果为false，就转换为geojson
-     */
-    public  static  boolean jtsToWkt = false;
-
+    /** jts对象转换为wkt，如果为false，就转换为geojson */
+    public static boolean jtsToWkt = false;
 
     public static void registerModule(ObjectMapper objectMapper) {
         if (jtsToWkt) {
             objectMapper.registerModule(new ShapesAsWKTModule());
-        }else{
+        } else {
             objectMapper.registerModule(new ShapesAsGeoJSONModule());
         }
-//        objectMapper.registerModule(new JtsModule());
+        //        objectMapper.registerModule(new JtsModule());
         log.debug("JtsModule注册");
         objectMapper.registerModule(new JtsExtModule());
         log.debug("JtsExtModule注册");

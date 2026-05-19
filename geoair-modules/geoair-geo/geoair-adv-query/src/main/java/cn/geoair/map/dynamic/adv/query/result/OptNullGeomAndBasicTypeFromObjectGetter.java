@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.*;
 import cn.hutool.core.convert.Convert;
@@ -8,15 +7,13 @@ import cn.hutool.core.getter.OptNullBasicTypeFromObjectGetter;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-
 import java.util.Map;
-
 import org.locationtech.jts.geom.*;
 
 /**
  * @author ：zhangjun
  * @date ：Created in 2025/1/8 15:09 @description： 空间类型的通用get器并适配hutools的
- * OptNullBasicTypeFromObjectGetter
+ *     OptNullBasicTypeFromObjectGetter
  */
 public interface OptNullGeomAndBasicTypeFromObjectGetter
         extends OptNullBasicTypeFromObjectGetter<String> {
@@ -125,11 +122,13 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             } catch (Exception e) {
                 try {
                     jtsGeom =
-                            GirGeoTools.me().getFormatOpt()
+                            GirGeoTools.me()
+                                    .getFormatOpt()
                                     .wktToJtsGeometry((String) value, true); // 不是geojson字符串就是wkt
                 } catch (Exception e1) {
                     jtsGeom =
-                            GirGeoTools.me().getFormatOpt()
+                            GirGeoTools.me()
+                                    .getFormatOpt()
                                     .wkbToJtsGeometry((String) value, true); // 不是wkt字符串就是wbk
                 }
             }
@@ -137,17 +136,20 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         if (value instanceof Map) { // 判断是否为json对象
             JSONObject jsonObject = new JSONObject((Map<String, Object>) value);
             jtsGeom =
-                    GirGeoTools.me().getFormatOpt()
+                    GirGeoTools.me()
+                            .getFormatOpt()
                             .geojsonToJtsGeometry(jsonObject.toJSONString(), true);
         } else if (GirPostGisTran.isOrgConvert() && GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);
         } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
-        } else if (GirPostGisTran.isPostGisAvailable() && GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
+        } else if (GirPostGisTran.isPostGisAvailable()
+                && GirPostGisJdbcTran.isPGobject(value)) { // PGobject 是 PGgeometry的父类
             return GirPostGisJdbcTran.pGobjectToJts(value);
         } else if (GirMysqlTran.isGeomValue(value)) {
             return GirMysqlTran.mysqlBinaryToJtsGeom(value);
-        } else if (GirOracleTran.isOracleSpatialAvailable() && GirOracleSpatialTran.isSdoGeometry(value)) {
+        } else if (GirOracleTran.isOracleSpatialAvailable()
+                && GirOracleSpatialTran.isSdoGeometry(value)) {
             return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
         }
         return jtsGeom;

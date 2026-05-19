@@ -2,29 +2,23 @@ package cn.geoair.base.concurrent;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- * 代理的线程池
- */
+/** 代理的线程池 */
 public class GirPxyExecutorService implements ExecutorService {
     private static final GiLogger log = GirLogger.getLoger(GirPxyExecutorService.class);
 
     protected final ExecutorService delegate;
     protected final List<GirTaskInterceptor> interceptors;
 
-
     public GirPxyExecutorService(ExecutorService delegate, List<GirTaskInterceptor> interceptors) {
         this.delegate = delegate;
         this.interceptors = interceptors != null ? interceptors : getDefault();
     }
-
 
     public ExecutorService getDelegate() {
         return delegate;
@@ -39,11 +33,12 @@ public class GirPxyExecutorService implements ExecutorService {
     /**
      * 静态工厂方法，创建支持任务拦截的线程池包装器
      *
-     * @param delegate    原始线程池
+     * @param delegate 原始线程池
      * @param interceptor 任务拦截器，可为null（使用默认实现）
      * @return 包装后的线程池
      */
-    public static GirPxyExecutorService of(ExecutorService delegate, GirTaskInterceptor interceptor) {
+    public static GirPxyExecutorService of(
+            ExecutorService delegate, GirTaskInterceptor interceptor) {
         ArrayList<GirTaskInterceptor> interceptors = new ArrayList<>();
         interceptors.add(interceptor);
         return new GirPxyExecutorService(delegate, interceptors);
@@ -52,11 +47,12 @@ public class GirPxyExecutorService implements ExecutorService {
     /**
      * 静态工厂方法，创建支持任务拦截的线程池包装器
      *
-     * @param delegate     原始线程池
+     * @param delegate 原始线程池
      * @param interceptors 任务拦截器，可为null（使用默认实现）
      * @return 包装后的线程池
      */
-    public static GirPxyExecutorService of(ExecutorService delegate, List<GirTaskInterceptor> interceptors) {
+    public static GirPxyExecutorService of(
+            ExecutorService delegate, List<GirTaskInterceptor> interceptors) {
         return new GirPxyExecutorService(delegate, interceptors);
     }
 
@@ -81,17 +77,21 @@ public class GirPxyExecutorService implements ExecutorService {
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+            throws InterruptedException {
         return delegate.invokeAll(wrapTasks(tasks));
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
+    public <T> List<Future<T>> invokeAll(
+            Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException {
         return delegate.invokeAll(wrapTasks(tasks), timeout, unit);
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+            throws InterruptedException, ExecutionException {
         return delegate.invokeAny(wrapTasks(tasks));
     }
 
@@ -129,9 +129,7 @@ public class GirPxyExecutorService implements ExecutorService {
         return delegate.awaitTermination(timeout, unit);
     }
 
-    /**
-     * 包装 Callable 任务，支持链式执行所有拦截器
-     */
+    /** 包装 Callable 任务，支持链式执行所有拦截器 */
     protected <T> Callable<T> wrap(Callable<T> task) {
         return () -> {
             // 1. 执行所有拦截器的 beforeTask，收集 taskId（取第一个拦截器返回的ID）
@@ -169,9 +167,7 @@ public class GirPxyExecutorService implements ExecutorService {
         };
     }
 
-    /**
-     * 包装 Runnable 任务，支持链式执行所有拦截器
-     */
+    /** 包装 Runnable 任务，支持链式执行所有拦截器 */
     protected Runnable wrap(Runnable task) {
         return () -> {
             // 1. 执行所有拦截器的 beforeTask
@@ -209,9 +205,8 @@ public class GirPxyExecutorService implements ExecutorService {
         };
     }
 
-    private <T> Collection<? extends Callable<T>> wrapTasks(Collection<? extends Callable<T>> tasks) {
+    private <T> Collection<? extends Callable<T>> wrapTasks(
+            Collection<? extends Callable<T>> tasks) {
         return tasks.stream().map(this::wrap).collect(Collectors.toList());
     }
-
-
 }

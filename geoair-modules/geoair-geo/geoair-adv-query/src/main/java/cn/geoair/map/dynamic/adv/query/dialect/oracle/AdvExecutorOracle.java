@@ -6,17 +6,14 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
+import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 15:36 @description： Oracle数据库的动态高级查询执行器
  */
 public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
-
-
 
     public AdvExecutorOracle(DataSourceApo dataSourceApo) {
         super(dataSourceApo);
@@ -30,13 +27,11 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorOracle() {
-    }
+    public AdvExecutorOracle() {}
 
     public AdvExecutorOracle(Connection connection) {
         super(connection);
     }
-
 
     private volatile IAdvBaseOpt advBaseOpt;
     private volatile IAdvDDLOpt advDDLOpt;
@@ -58,13 +53,12 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         return dataSourceGetter;
     }
 
-
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new OracleAdvBaseOpt(getDataSourceGetter(),this::getConfig);
+                    advBaseOpt = new OracleAdvBaseOpt(getDataSourceGetter(), this::getConfig);
                 }
             }
         }
@@ -88,7 +82,12 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
-                    simplePageOpt = new OracleAdvSimplePageOpt(getDataSourceGetter(), getAdvBaseOpt(), getGeoOpt(), getAdvDDLOpt());
+                    simplePageOpt =
+                            new OracleAdvSimplePageOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getGeoOpt(),
+                                    getAdvDDLOpt());
                 }
             }
         }
@@ -100,7 +99,9 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new OracleAdvGeoOpt(getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
+                    geoOpt =
+                            new OracleAdvGeoOpt(
+                                    getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
                 }
             }
         }
@@ -112,7 +113,12 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new OracleAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
+                    iAdvWhereSelectOpt =
+                            new OracleAdvWhereSelectOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getSimplePageOpt(),
+                                    getGeoOpt());
                 }
             }
         }
@@ -123,10 +129,12 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return OracleDialectTableNameUtil.getInstance();
     }
+
     AdvQueryGlobalConfig advQueryGlobalConfig = AdvQueryGlobalConfig.of();
+
     @Override
     public AdvQueryGlobalConfig getConfig() {
-        if(advQueryGlobalConfig ==null){
+        if (advQueryGlobalConfig == null) {
             advQueryGlobalConfig = AdvQueryGlobalConfig.of();
         }
         return advQueryGlobalConfig;

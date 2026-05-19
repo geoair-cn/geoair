@@ -10,7 +10,6 @@ import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.collection.ListUtil;
@@ -182,7 +181,6 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
     }
 
-
     /** 瓦片映射函数（可序列化 + 无OOM版本） */
     public static class MapToTileFunction
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
@@ -196,7 +194,8 @@ public class SparkTaskSerializableUtil implements Serializable {
         }
 
         @Override
-        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature) throws Exception {
+        public Iterator<Tuple2<String, List<GirAdvOneRow>>> call(GirAdvOneRow feature)
+                throws Exception {
             if (feature == null) {
                 return Collections.emptyIterator();
             }
@@ -210,7 +209,7 @@ public class SparkTaskSerializableUtil implements Serializable {
                     parameter.getOutGridSrid());
         }
     }
-    /** 瓦片映射函数（可序列化）  */
+    /** 瓦片映射函数（可序列化） */
     @Deprecated
     public static class MapToTileFunction1
             implements PairFlatMapFunction<GirAdvOneRow, String, List<GirAdvOneRow>>, Serializable {
