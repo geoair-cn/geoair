@@ -73,7 +73,7 @@ public class PageActuator<T> {
             log.info("由于没有设置maxPageNo 与pageSize 这里对 pageSize 进行设置默认值为25");
             byPageSize = true;
         }
-        if (byPageSize) { // 通过计算分页大小计算总页数，进行每页遍历。数据量大的时候可能有很多页
+        if (byPageSize) { // 通过每页大小计算总页数，进行每页遍历。数据量大的时候可能有很多页
             actualPageSize = pageSize;
             actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
         } else { // 通过总页数反着设置每页大小，防止数据量大的时候 ，频繁访问数据库
