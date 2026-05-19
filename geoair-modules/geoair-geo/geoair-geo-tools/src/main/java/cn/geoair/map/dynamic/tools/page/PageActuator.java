@@ -49,7 +49,7 @@ public class PageActuator<T> {
         pageConditionDef.setPageConfig(pageConfig);
 
         // 1. 基础参数校验
-        Long totalCount = pageConfig.getTotalCount();
+        Long totalCount = pageConditionDef.getTotalRecordCount() == null ? null : pageConfig.getTotalCount();
         if (totalCount == null || totalCount <= 0) {
             Gir.log.info("无数据需处理，直接返回");
             return;

@@ -12,6 +12,7 @@ public class PageConfig {
     /**
      * 符合条件的总记录数
      */
+    @Deprecated
     private Long totalCount;
 
     /**

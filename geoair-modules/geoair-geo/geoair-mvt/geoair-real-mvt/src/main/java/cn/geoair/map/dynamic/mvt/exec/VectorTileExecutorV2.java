@@ -377,10 +377,15 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
                         new PageConditionDef<GirAdvOneRow>() {
 
                             @Override
+                            public Long getTotalRecordCount() {
+                                return totalCount;
+                            }
+
+                            @Override
                             public void setPageConfig(PageConfig pageConfig) {
                                 pageConfig.setMaxPageNo(maxPageNumber);
                                 pageConfig.setPageSize(maxPageSize);
-                                pageConfig.setTotalCount(totalCount);
+//                                pageConfig.setTotalCount(totalCount);
                                 pageConfig.setPageNumStartByZero(false);
                                 pageConfig.setParallelConsumeRecordIs(true);
                                 pageConfig.setParallelExecPageIs(true);
