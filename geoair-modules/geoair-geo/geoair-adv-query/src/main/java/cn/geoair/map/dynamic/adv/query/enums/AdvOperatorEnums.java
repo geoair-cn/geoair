@@ -14,7 +14,14 @@ import cn.geoair.base.data.model.annotation.GaModelField;
  */
 public enum AdvOperatorEnums implements GiVisualValuable<String> {
 
+    /**
+     * 无操作，仅仅只是一个占位符
+     */
+    NOT_OPT("000", " "),
+
     // ==================== 比较操作符 (1xx) ====================
+
+
     /**
      * 大于 >
      */

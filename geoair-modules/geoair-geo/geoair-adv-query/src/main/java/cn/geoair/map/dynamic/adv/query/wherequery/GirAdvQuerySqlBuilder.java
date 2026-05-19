@@ -241,6 +241,10 @@ public class GirAdvQuerySqlBuilder {
         // 如果不是表达式，需要进行字段名转义；表达式原样输出
         String columnPart = isExpression ? column : dialectProcessor.tbQuoteFieldName(column);
 
+        if (operator == AdvOperatorEnums.NOT_OPT) {
+            return columnPart;
+        }
+
         // IS NULL / IS NOT NULL
         if (operator == AdvOperatorEnums.IS_NULL) {
             return columnPart + " IS NULL";
@@ -248,6 +252,7 @@ public class GirAdvQuerySqlBuilder {
         if (operator == AdvOperatorEnums.IS_NOT_NULL) {
             return columnPart + " IS NOT NULL";
         }
+
 
         // IN / NOT IN
         if (operator == AdvOperatorEnums.IN || operator == AdvOperatorEnums.NOT_IN) {

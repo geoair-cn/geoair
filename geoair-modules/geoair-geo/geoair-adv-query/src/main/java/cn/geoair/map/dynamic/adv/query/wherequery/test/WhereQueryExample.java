@@ -40,6 +40,7 @@ public class WhereQueryExample {
         GirAdvWhereFilter filter = GirAdvWhereFilter.of()
                 .expr("YEAR(create_time)", AdvOperatorEnums.等于, 2024)
                 .expr("price * quantity", AdvOperatorEnums.大于, 1000)
+                .expr("ST_Contains(geom, ST_GeomFromText('POINT(120 30)'))" )
                 .eq("status", 1);
         GirAdvQueryRequest query = GirAdvQueryRequest.builder()
 
@@ -49,11 +50,11 @@ public class WhereQueryExample {
                 ).order(OrderApo.ofASCFunction("create_time1")).order(OrderApo.ofASCFieldName("aaaaa"))
                 .build();
 
-//        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
-//        printResult("示例1：表达式", result);
+        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
+        printResult("示例1：表达式", result);
 
-        WhereQueryExample example2 = new WhereQueryExample(dialect, dataSourceGetter);
-        example2. runAllExamples();
+//        WhereQueryExample example2 = new WhereQueryExample(dialect, dataSourceGetter);
+//        example2. runAllExamples();
     }
 
     public void runAllExamples() {
