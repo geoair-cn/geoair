@@ -151,7 +151,7 @@ public class GirAdvQueryRequest {
     public <T> GirAdvQueryRequest(QueryRequestBuilder<T> builder) {
         this.tableOrSqlView = builder.getTableOrSqlView();
         this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
-        this.fieldNames = builder.getFieldNames() != null ? new ArrayList<>(builder.getFieldNames()) : null;
+        this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.of("*");
         this.whereOption = builder.getWhereOption();
         this.nullHandling = builder.getNullHandling();
         this.orders = builder.getOrders() != null ? new ArrayList<>(builder.getOrders()) : new ArrayList<>();
@@ -300,6 +300,7 @@ public class GirAdvQueryRequest {
     public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass) {
         return new QueryRequestBuilder<>(entityClass);
     }
+
     /**
      * 创建Builder实例
      *

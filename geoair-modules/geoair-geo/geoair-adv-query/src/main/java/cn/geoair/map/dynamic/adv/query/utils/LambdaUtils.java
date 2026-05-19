@@ -52,7 +52,7 @@ public class LambdaUtils {
             throw new IllegalArgumentException("SFunction cannot be null");
         }
         try {
-// 获取SerializedLambda
+        // 获取SerializedLambda
             SerializedLambda serializedLambda = getSerializedLambda(function);
 
             // 获取实现的方法名
