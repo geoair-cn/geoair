@@ -1,10 +1,12 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -77,8 +79,19 @@ public class PageActuator<T> {
             actualPageSize = pageSize;
             actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
         } else { // 通过总页数反着设置每页大小，防止数据量大的时候 ，频繁访问数据库
-            actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
-            actualTotalPages = maxPageNo;
+            if (totalCount <= maxPageNo) {
+                actualPageSize = totalCount;
+                actualTotalPages = 1;
+            } else {
+                actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
+                if(actualPageSize<25){ // 如果每页条数少于25条，那么就按照25条每页进行分页
+                    actualPageSize = 25;
+                    actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
+                }else{
+                    actualTotalPages = maxPageNo;
+                }
+
+            }
         }
 
         Consumer<T> eachRecordConsumer = pageConditionDef.getEachRecordConsumer();
@@ -168,4 +181,29 @@ public class PageActuator<T> {
                             }
                         });
     }
+
+    public static void main(String[] args) {
+        GirAdvTools.getPageActuatorOpt(new PageConditionDef<Object>() {
+            @Override
+            public Long getTotalRecordCount() {
+                return 11L;
+            }
+
+            @Override
+            public void setPageConfig(PageConfig pageConfig) {
+                pageConfig.setMaxPageNo(20L);
+            }
+
+            @Override
+            public List<Object> getPageRecords(Integer pageNo, Integer pageSize) {
+                System.out.println(pageNo +"----"+ pageSize);
+               List<Object> pageRecords = new ArrayList<>();
+                for (Integer i = 0; i < pageSize; i++) {
+                    pageRecords.add(new Object());
+                }
+                return pageRecords;
+            }
+        }).execute();
+    }
+
 }
