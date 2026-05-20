@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilArray;
+import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -93,10 +95,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bUpdateBySql", sqlStatement, sqlParam, e);
             throw new RuntimeException("执行自定义更新SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
@@ -143,10 +145,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateByPrimaryKey", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bUpdateByPrimaryKey", execSql, params, e);
             throw new RuntimeException("按主键更新失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -177,7 +179,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
         if (isToUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -233,10 +235,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bUpdateByMap", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -290,7 +292,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             String format = StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize);
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchWithBatchSize", format, cost, totalSuccess);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchWithBatchSize", format, cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
             rollbackConnection(connection);
@@ -325,6 +327,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpsert(tableName, rowData, conflictKeys);
     }
 
+    @Override
+    public <T> Integer bUpsert(T entity) {
+        return bUpsert(null, entity);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bUpsert(tableName, entity, idByAnnotation);
+    }
 
     @Override
     public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
@@ -352,10 +367,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpsert", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bUpsert", execSql, params, e);
             throw new RuntimeException("更新或插入失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -384,7 +399,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
         List<String> conflictKeysCopy = new ArrayList<>();
         if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
@@ -412,6 +427,20 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("插入的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bUpsertSelective(tableName, entity, idByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(T entity) {
+        return bUpsertSelective(null, entity);
+    }
+
+    @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
     }
@@ -424,8 +453,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (whereFilter == null) {
             throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
         }
-        if(GutilObject.isEmpty(tableName)){
-            tableName =GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
         }
         boolean toUnderlineCase = whereFilter.isToUnderlineCase();
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, false, ignoreFieldNames);
@@ -462,10 +491,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateByWhere", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bUpdateByWhere", execSql, params, e);
             throw new RuntimeException("条件更新失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);

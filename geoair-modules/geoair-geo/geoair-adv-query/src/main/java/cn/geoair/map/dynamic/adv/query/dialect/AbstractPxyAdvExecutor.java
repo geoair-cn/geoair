@@ -657,6 +657,26 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bUpsert(T entity) {
+        return getAdvBaseOpt().bUpsert(entity);
+    }
+
+    @Override
+    public <T> Integer bUpsert(String tableName, T entity) {
+        return getAdvBaseOpt().bUpsert(tableName, entity);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(String tableName, T entity) {
+        return getAdvBaseOpt().bUpsertSelective(tableName, entity);
+    }
+
+    @Override
+    public <T> Integer bUpsertSelective(T entity) {
+        return getAdvBaseOpt().bUpsertSelective(entity);
+    }
+
+    @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
         return getAdvBaseOpt().bUpsertSelective(tableName, entity, conflictKeys, ignoreFieldNames);
     }
