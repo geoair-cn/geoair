@@ -8,16 +8,12 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
-import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 
 import jakarta.persistence.Column;
@@ -120,7 +116,7 @@ public class GirAdvSqlUtils {
 
 
     public static String getTableNameByJavax(Class<?> clazz) {
-        Table table = clazz.getAnnotation( Table.class);
+        Table table = clazz.getAnnotation (Table.class);
         if (table != null && StrUtil.isNotBlank(table.name())) {
             return table.name();
         }
