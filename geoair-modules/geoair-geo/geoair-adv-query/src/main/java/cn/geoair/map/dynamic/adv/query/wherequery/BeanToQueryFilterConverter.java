@@ -125,7 +125,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 提取Bean中的所有字段值
      */
-    private static Map<String, Object> extractFieldValues(Object bean, ConvertOptions options) {
+    public static Map<String, Object> extractFieldValues(Object bean, ConvertOptions options) {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
 
         if (bean instanceof Map) {
