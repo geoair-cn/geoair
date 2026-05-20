@@ -98,6 +98,18 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
      * @return Integer 受影响的行数
      */
     <T> Integer bInsertOne(String tableName, T entity);
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
@@ -114,18 +126,6 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
     <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue);
 
 
-    /**
-     * 插入单条Java对象数据（字段名自动映射）
-     *
-     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
-     *
-     * @param tableName         目标表名（如：user）
-     * @param entity            待插入的Java对象（如User实体类）
-     * @param isToUnderlineCase 是否转换为下划线模式
-     * @param <T>               实体类泛型
-     * @return Integer 受影响的行数
-     */
-    <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
@@ -224,6 +224,19 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
      * @return Integer 受影响的行数
      */
     <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys);
+    /**
+     * 插入单条Java对象数据（字段名自动映射）
+     *
+     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
+     *
+     * @param tableName         目标表名（如：user）
+     * @param entity            待插入的Java对象（如User实体类）
+     * @param conflictKeys      冲突判定字段（唯一索引/主键）
+     * @param isToUnderlineCase 是否转换为下划线模式
+     * @param <T>               实体类泛型
+     * @return Integer 受影响的行数
+     */
+    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据 字段名称默认转下划线
@@ -255,19 +268,6 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
     <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue);
 
 
-    /**
-     * 插入单条Java对象数据（字段名自动映射）
-     *
-     * <p>适用于面向对象的单条数据插入，对象属性名需与表字段名匹配（支持驼峰转下划线）
-     *
-     * @param tableName         目标表名（如：user）
-     * @param entity            待插入的Java对象（如User实体类）
-     * @param conflictKeys      冲突判定字段（唯一索引/主键）
-     * @param isToUnderlineCase 是否转换为下划线模式
-     * @param <T>               实体类泛型
-     * @return Integer 受影响的行数
-     */
-    <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
     /**
      * 插入单条Java对象数据（字段名自动映射）
