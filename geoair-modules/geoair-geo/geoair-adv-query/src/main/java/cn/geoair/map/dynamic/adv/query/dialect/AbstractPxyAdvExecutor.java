@@ -333,6 +333,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(whereFilter);
+    }
+
+    @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
     }
 
@@ -704,6 +709,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(entity, whereFilter);
     }
 
     @Override

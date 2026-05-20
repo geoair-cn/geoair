@@ -237,6 +237,11 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
+    public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseDeletePxyOpt().bDeleteByWhere(  whereFilter);
+    }
+
+    @Override
     public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
         return getAdvBaseDeletePxyOpt().bDeleteByWhere(tableName, whereFilter);
     }
@@ -616,6 +621,16 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(entity, whereFilter);
     }
 
     @Override

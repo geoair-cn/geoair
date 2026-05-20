@@ -431,19 +431,20 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      *
      * <p>自动忽略实体中值为null的字段，只使用非null字段进行UPSERT操作
      *
-     * @param tableName    目标表名（如：user）
-     * @param entity       待操作的Java对象（如User实体类）
-     * @param <T>          实体类泛型
+     * @param tableName 目标表名（如：user）
+     * @param entity    待操作的Java对象（如User实体类）
+     * @param <T>       实体类泛型
      * @return 受影响的行数
      */
     <T> Integer bUpsertSelective(String tableName, T entity);
+
     /**
      * 更新或插入（UPSERT）- 选择性更新版本（默认驼峰转下划线）
      *
      * <p>自动忽略实体中值为null的字段，只使用非null字段进行UPSERT操作
      *
-     * @param entity       待操作的Java对象（如User实体类）
-     * @param <T>          实体类泛型
+     * @param entity 待操作的Java对象（如User实体类）
+     * @param <T>    实体类泛型
      * @return 受影响的行数
      */
     <T> Integer bUpsertSelective(T entity);
@@ -549,6 +550,19 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @return 受影响的行数
      */
     <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames);
+    /**
+     * 根据Lambda条件选择性更新实体（忽略null值字段）
+     *
+     * <p>自动忽略实体中值为null的字段，只更新非null字段。
+     * 使用Lambda表达式构建类型安全的WHERE条件。
+     *
+
+     * @param entity      待更新的实体对象
+     * @param whereFilter Lambda条件过滤器
+     * @param <T>         实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames);
 
     /**
      * 根据Lambda条件选择性更新实体（忽略null值字段）
@@ -563,6 +577,20 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @return 受影响的行数
      */
     <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter);
+
+    /**
+     * 根据Lambda条件选择性更新实体（忽略null值字段）
+     *
+     * <p>自动忽略实体中值为null的字段，只更新非null字段。
+     * 使用Lambda表达式构建类型安全的WHERE条件。
+     *
+
+     * @param entity      待更新的实体对象
+     * @param whereFilter Lambda条件过滤器
+     * @param <T>         实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter);
 
     /**
      * 根据Map条件选择性更新（过滤value为空的字段，支持复杂条件）

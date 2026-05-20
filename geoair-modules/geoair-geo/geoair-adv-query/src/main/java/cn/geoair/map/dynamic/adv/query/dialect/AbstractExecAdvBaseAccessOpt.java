@@ -132,6 +132,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName =GirAdvSqlUtils.getTableName(entity.getClass());
         }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
         return bInsertOne(tableName, rowData);
     }
 
@@ -278,6 +281,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
             tableName =GirAdvSqlUtils.getTableName(entity.getClass());
+        }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
         }
         List<String> conflictKeysCopy = new ArrayList<>();
         if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {

@@ -181,6 +181,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
         if (isToUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
         }
@@ -338,6 +341,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("ID不能为空");
+        }
         return bUpsert(tableName, entity, idByAnnotation);
     }
 
@@ -401,6 +407,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(tableName)) {
             tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
         List<String> conflictKeysCopy = new ArrayList<>();
         if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
             for (String conflictKey : conflictKeys) {
@@ -432,6 +441,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("ID不能为空");
+        }
         return bUpsertSelective(tableName, entity, idByAnnotation);
     }
 
@@ -518,6 +530,21 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return bUpdateSelectiveByWhere(tableName, entity, whereFilter, ListUtil.empty());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException(" tableName 不能为空");
+        }
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, true, ignoreFieldNames);
+        return bUpdateSelectiveByWhere(tableName, rowData, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return bUpdateSelectiveByWhere(entity, whereFilter, ListUtil.empty());
     }
 
     @Override

@@ -74,7 +74,6 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
     Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam);
 
 
-
     /**
      * 执行带参数的自定义删除SQL语句
      *
@@ -99,7 +98,6 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
      */
 
     Integer bDeleteBySql(String sqlStatement, GirSqlParam sqlParam);
-
 
 
     // ==================== 主键删除（最常用） ====================
@@ -219,7 +217,7 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
      * @param whereMap  删除条件（key=字段名，value=等值匹配的值）
      *                  示例：{ "dept_id": 5, "status": 0, "name": "张三" }
      * @return 受影响的行数（实际删除的记录数）
-     * @throws IllegalArgumentException 当whereMap为null或空时抛出
+     * @throws IllegalArgumentException                                      当whereMap为null或空时抛出
      * @throws cn.geoair.map.dynamic.adv.query.exception.SqlExecuteException SQL执行异常
      */
     Integer bDeleteByMap(String tableName, Map<String, Object> whereMap);
@@ -324,6 +322,15 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
      * @see GirAdvWhereLambdaFilter 条件构建器详细用法
      */
     <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter);
+
+    /**
+     * 表名从GirAdvWhereLambdaFilter的泛型中拿到
+     *
+     * @param whereFilter 过滤条件
+     * @param <T>
+     * @return
+     */
+    <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter);
 
     /**
      * 按条件删除数据（传统方式，支持复杂条件）

@@ -93,10 +93,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bDeleteBySql", sqlStatement, sqlParam, e);
             throw new RuntimeException("执行自定义删除SQL失败，SQL：" + sqlStatement, e);
         } finally {
             closeConnection(connection);
@@ -135,10 +135,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, id);
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bDeleteByPrimaryKey", execSql, SqlParamList.of(id), e);
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
@@ -175,11 +175,11 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
 
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(),
                     "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(),
                     "bDeleteBatchByPrimaryKey", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), e);
             rollbackConnection(connection);
@@ -213,7 +213,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         long cost = stopWatch.getLastTaskTimeMillis();
 
 
-          AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
+        AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(),
                 "bDeleteBatchWithBatchSize", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
         return totalSuccess;
     }
@@ -239,10 +239,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByMap", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bDeleteByMap", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByMap", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bDeleteByMap", execSql, params, e);
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
@@ -282,7 +282,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(),
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(),
                     "bDeleteBatchByCondition", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
@@ -300,8 +300,21 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (GutilObject.isEmpty(whereFilter)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
-        if(GutilObject.isEmpty(tableName)){
-            tableName =GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
+        }
+        return bDeleteByWhere(tableName, whereFilter.toWhereFilter());
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
+        if (GutilObject.isEmpty(whereFilter)) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        Class<T> entityClass = whereFilter.getEntityClass();
+        String tableName = GirAdvSqlUtils.getTableName(entityClass);
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("表名不能为空");
         }
         return bDeleteByWhere(tableName, whereFilter.toWhereFilter());
     }
@@ -328,10 +341,10 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             Integer result = SqlExecutor.execute(connection, execSql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteSql(this.getClass(), "bDeleteByWhere", execSql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bDeleteByWhere", execSql, params, cost, result);
             return result;
         } catch (SQLException e) {
-              AdvLogSql.of(dataSourceGetter,getConfig()).logExecuteError(this.getClass(), "bDeleteByWhere", execSql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bDeleteByWhere", execSql, params, e);
             throw new RuntimeException("条件删除失败，表名：" + tableName, e);
         } finally {
             closeConnection(connection);
