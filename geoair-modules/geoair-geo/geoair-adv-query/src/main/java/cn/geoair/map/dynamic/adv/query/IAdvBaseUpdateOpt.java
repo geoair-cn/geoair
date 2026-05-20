@@ -305,6 +305,29 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
 
     /**
      * 更新或插入（UPSERT）
+     * ID字段从entity的注解中获取，表名从注解中获取
+     * <p>适用于面向对象的UPSERT操作，对象属性名需与表字段名匹配
+     *
+     * @param entity 待操作的Java对象（如User实体类）
+     * @param <T>    实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpsert(T entity);
+
+    /**
+     * 更新或插入（UPSERT）
+     * ID字段从entity的注解中获取
+     * <p>适用于面向对象的UPSERT操作，对象属性名需与表字段名匹配
+     *
+     * @param tableName 目标表名（如：user）
+     * @param entity    待操作的Java对象（如User实体类）
+     * @param <T>       实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpsert(String tableName, T entity);
+
+    /**
+     * 更新或插入（UPSERT）
      *
      * <p>适用于面向对象的UPSERT操作，对象属性名需与表字段名匹配
      *
@@ -402,6 +425,28 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @return 受影响的行数
      */
     <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys);
+
+    /**
+     * 更新或插入（UPSERT）- 选择性更新版本（默认驼峰转下划线）
+     *
+     * <p>自动忽略实体中值为null的字段，只使用非null字段进行UPSERT操作
+     *
+     * @param tableName    目标表名（如：user）
+     * @param entity       待操作的Java对象（如User实体类）
+     * @param <T>          实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpsertSelective(String tableName, T entity);
+    /**
+     * 更新或插入（UPSERT）- 选择性更新版本（默认驼峰转下划线）
+     *
+     * <p>自动忽略实体中值为null的字段，只使用非null字段进行UPSERT操作
+     *
+     * @param entity       待操作的Java对象（如User实体类）
+     * @param <T>          实体类泛型
+     * @return 受影响的行数
+     */
+    <T> Integer bUpsertSelective(T entity);
 
     /**
      * 更新或插入（UPSERT）- 选择性更新版本（支持指定忽略字段）

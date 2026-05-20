@@ -12,11 +12,15 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.hutool.core.bean.BeanDesc;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -84,13 +88,54 @@ public class GirAdvSqlUtils {
                         })
         ).copy();
 
-        // 可以将表名也存入返回结果
-        if (tableName != null) {
-            rowData.put("_tableName", tableName);
-        }
 
         return rowData;
     }
+
+    public static List<String> getIdByAnnotation(Class<?> clazz) {
+        List<String> ids = new ArrayList<>();
+        BeanDesc beanDesc = BeanUtil.getBeanDesc(clazz);
+        if (GutilObject.isNotEmpty(beanDesc)) {
+            Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
+            if (GutilObject.isNotEmpty(propMap)) {
+                for (Map.Entry<String, PropDesc> stringPropDescEntry : propMap.entrySet()) {
+                    PropDesc value = stringPropDescEntry.getValue();
+                    String fieldName = value.getFieldName();
+                    String idByJavax = getIdByJavax(clazz, fieldName);
+                    if (idByJavax != null) {
+                        ids.add(idByJavax);
+                        continue;
+                    }
+                    String idByGaModel = getIdByGaModel(clazz, fieldName);
+                    if (idByGaModel != null) {
+                        ids.add(idByGaModel);
+                        continue;
+                    }
+
+                }
+                return ids;
+            }
+        }
+        return ids;
+    }
+
+
+    public static String getIdByJavax(Class<?> clazz, String fieldName) {
+        Id id = clazz.getAnnotation(Id.class);
+        if (id != null) {
+            return fieldName;
+        }
+        return null;
+    }
+
+    public static String getIdByGaModel(Class<?> clazz, String fieldName) {
+        GaModelField gaModel = clazz.getAnnotation(GaModelField.class);
+        if (gaModel != null && gaModel.isID()) {
+            return fieldName;
+        }
+        return null;
+    }
+
 
     public static String getTableName(Class<?> clazz) {
         String tableNameByAnnotation = getTableNameByAnnotation(clazz);
@@ -116,7 +161,7 @@ public class GirAdvSqlUtils {
 
 
     public static String getTableNameByJavax(Class<?> clazz) {
-        Table table = clazz.getAnnotation (Table.class);
+        Table table = clazz.getAnnotation(Table.class);
         if (table != null && StrUtil.isNotBlank(table.name())) {
             return table.name();
         }
