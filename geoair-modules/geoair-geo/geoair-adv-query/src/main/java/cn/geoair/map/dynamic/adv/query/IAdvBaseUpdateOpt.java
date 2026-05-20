@@ -304,7 +304,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys);
 
     /**
-     * 更新或插入（UPSERT）- 实体参数版本（默认驼峰转下划线，忽略null值）
+     * 更新或插入（UPSERT）
      *
      * <p>适用于面向对象的UPSERT操作，对象属性名需与表字段名匹配
      *
@@ -317,7 +317,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys);
 
     /**
-     * 更新或插入（UPSERT）- 完整参数版本
+     * 更新或插入（UPSERT）
      *
      * <p>适用于面向对象的UPSERT操作，支持驼峰转换和空值过滤
      *
@@ -346,7 +346,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase);
 
     /**
-     * 更新或插入（UPSERT）- 最完整参数版本（支持指定忽略字段）
+     * 更新或插入（UPSERT）
      *
      * <p>适用于面向对象的UPSERT操作，支持驼峰转换、空值过滤和字段忽略
      *
@@ -362,7 +362,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames);
 
     /**
-     * 更新或插入（UPSERT）- 最完整参数版本（支持指定忽略字段）
+     * 更新或插入（UPSERT）
      *
      * <p>适用于面向对象的UPSERT操作，支持驼峰转换、空值过滤和字段忽略
      *

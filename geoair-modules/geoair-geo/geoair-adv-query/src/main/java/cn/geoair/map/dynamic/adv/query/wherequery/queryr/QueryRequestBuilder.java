@@ -592,7 +592,7 @@ public class QueryRequestBuilder<T> {
      */
     public GirAdvQueryRequest build() {
         // 校验：两种模式至少选一种
-        boolean hasObjectMode = tableOrSqlView != null;
+        boolean hasObjectMode = tableOrSqlView != null||entityClass!=null;
         boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
         if (!hasObjectMode && !hasCustomSqlMode) {
@@ -601,10 +601,6 @@ public class QueryRequestBuilder<T> {
             );
         }
 
-        // 对象模式校验
-        if (hasObjectMode && tableOrSqlView.trim().isEmpty()) {
-            throw new IllegalArgumentException("tableOrViewName cannot be empty");
-        }
 
         // 分页参数校验
         if (pageNum != null && pageSize != null && pageSize <= 0) {

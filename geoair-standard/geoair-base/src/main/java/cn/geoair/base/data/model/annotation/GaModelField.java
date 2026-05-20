@@ -4,6 +4,7 @@ import cn.geoair.base.data.common.GemDatePattern;
 import cn.geoair.base.data.common.GemNull;
 import cn.geoair.base.data.model.applyer.GiModelFieldApplyer;
 import cn.geoair.base.def.annotation.GaParameter;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,7 +18,13 @@ public @interface GaModelField {
 
     public static final String NULL = "";
 
-    public String name() default NULL; // 名称
+    @Deprecated
+    public String name() default NULL;
+
+    /**
+     * 名称 ,如果是PO对象，这个字段描述的就是数据库字段名称
+     */
+    public String columnName() default NULL;
 
     public String alias() default NULL; // 别名
 

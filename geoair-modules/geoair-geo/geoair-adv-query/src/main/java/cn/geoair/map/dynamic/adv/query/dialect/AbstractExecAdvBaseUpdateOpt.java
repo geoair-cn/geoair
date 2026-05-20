@@ -177,7 +177,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
+            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
         }
         if (isToUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -384,7 +384,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
+            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
         }
         List<String> conflictKeysCopy = new ArrayList<>();
         if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {
@@ -423,6 +423,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         if (whereFilter == null) {
             throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
+        }
+        if(GutilObject.isEmpty(tableName)){
+            tableName =GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
         }
         boolean toUnderlineCase = whereFilter.isToUnderlineCase();
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, false, ignoreFieldNames);

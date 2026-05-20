@@ -130,7 +130,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
+            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
         }
         return bInsertOne(tableName, rowData);
     }
@@ -277,7 +277,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName = StrUtil.lowerFirst(entity.getClass().getSimpleName());
+            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
         }
         List<String> conflictKeysCopy = new ArrayList<>();
         if (isToUnderlineCase && GutilObject.isNotEmpty(conflictKeys)) {

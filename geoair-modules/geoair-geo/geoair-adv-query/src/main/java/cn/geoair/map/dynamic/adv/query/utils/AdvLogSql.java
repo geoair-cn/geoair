@@ -21,10 +21,10 @@ public class AdvLogSql {
     public static boolean logEnable = true;
 
 
-    // 一行最大长度（分割线自动根据这个生成）
+    // 一行最大长度
     public static final int MAX_LINE_LENGTH = 180;
 
-    // 动态生成的分割线（只生成一次）
+    // 动态生成的分割线
     private static final String SPLIT_LINE;
 
     static {
@@ -137,7 +137,7 @@ public class AdvLogSql {
                 callerClass.getSimpleName(), methodName, wrapSql(sql), params);
     }
 
-    // ===================== 异常日志：基础版 =====================
+
     public void logExecuteError(Class callerClass, String methodName, String sql, Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {
@@ -203,7 +203,7 @@ public class AdvLogSql {
                 e.getMessage());
     }
 
-    // ===================== 异常日志：完整版（打印异常堆栈） =====================
+    // ===================== 异常日志  =====================
     public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {

@@ -1,7 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.lang.reflect.Field;
@@ -125,7 +127,7 @@ public class BeanToQueryFilterConverter {
     /**
      * 提取Bean中的所有字段值
      */
-    private static Map<String, Object> extractFieldValues(Object bean, ConvertOptions options) {
+    public static Map<String, Object> extractFieldValues(Object bean, ConvertOptions options) {
         Map<String, Object> fieldMap = new LinkedHashMap<>();
 
         if (bean instanceof Map) {
@@ -136,8 +138,7 @@ public class BeanToQueryFilterConverter {
                 fieldMap.put(key, entry.getValue());
             }
         } else {
-
-            BeanUtil.beanToMap(bean, fieldMap, options.isToUnderlineCase(), options.isIgnoreNull());
+            fieldMap = GirAdvSqlUtils.getRowData(bean, options.isToUnderlineCase(), options.isIgnoreNull(), ListUtil.empty());
         }
 
         return fieldMap;
