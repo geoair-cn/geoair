@@ -390,12 +390,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, false);
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, false,ignoreFieldByAnnotation);
     }
 
     @Override
@@ -427,12 +429,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true);
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true,ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys) {
-        return bUpsert(tableName, entity, conflictKeys, true, true);
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsert(tableName, entity, conflictKeys, true, true,ignoreFieldByAnnotation);
     }
 
     @Override
@@ -444,12 +448,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (GutilObject.isEmpty(idByAnnotation)) {
             throw new IllegalArgumentException("ID不能为空");
         }
-        return bUpsertSelective(tableName, entity, idByAnnotation);
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsertSelective(tableName, entity, idByAnnotation,ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsertSelective(T entity) {
-        return bUpsertSelective(null, entity);
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpsertSelective(null, entity,ignoreFieldByAnnotation);
     }
 
     @Override
@@ -475,7 +481,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
-        return bUpdateByWhere(tableName, entity, whereFilter, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -529,7 +536,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
-        return bUpdateSelectiveByWhere(tableName, entity, whereFilter, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpdateSelectiveByWhere(tableName, entity, whereFilter, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -544,7 +552,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
-        return bUpdateSelectiveByWhere(entity, whereFilter, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpdateSelectiveByWhere(entity, whereFilter,ignoreFieldByAnnotation);
     }
 
     @Override
