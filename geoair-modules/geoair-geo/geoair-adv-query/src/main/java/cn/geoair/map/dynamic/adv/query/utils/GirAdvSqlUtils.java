@@ -18,10 +18,11 @@ import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
