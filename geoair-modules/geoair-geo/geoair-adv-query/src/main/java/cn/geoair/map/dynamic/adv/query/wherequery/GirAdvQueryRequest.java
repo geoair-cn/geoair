@@ -6,8 +6,10 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 
 import java.util.*;
@@ -149,7 +151,19 @@ public class GirAdvQueryRequest {
      * 从Builder构造
      */
     public <T> GirAdvQueryRequest(QueryRequestBuilder<T> builder) {
-        this.tableOrSqlView = builder.getTableOrSqlView();
+        if (GutilObject.isEmpty(builder.getTableOrSqlView()) && GutilObject.isNotEmpty(builder.getEntityClass())) {
+            String tableNameByAnnotation = GirAdvSqlUtils.getTableNameByAnnotation(builder.getEntityClass());
+            if (tableNameByAnnotation != null) {
+                tableOrSqlView = tableNameByAnnotation;
+            } else {
+                tableOrSqlView = StrUtil.lowerFirst(builder.getEntityClass().getSimpleName());
+            }
+        } else {
+            this.tableOrSqlView = builder.getTableOrSqlView();
+        }
+        if (GutilObject.isEmpty(tableOrSqlView)&&GutilObject.isEmpty(builder.getCustomSql())) {
+            throw new IllegalArgumentException("tableOrSqlView is empty");
+        }
         this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
         this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.of("*");
         this.whereOption = builder.getWhereOption();
@@ -165,9 +179,6 @@ public class GirAdvQueryRequest {
         this.advEnumsKeyTran = builder.getAdvEnumsKeyTran();
 
     }
-
-
-
 
 
     /**

@@ -1,193 +1,200 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-geo</artifactId>
+        <version>J8-dev-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-geo</artifactId>
+    <artifactId>geoair-adv-query</artifactId>
     <version>J8-dev-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <groupId>cn.geoair.devkit</groupId>
-  <artifactId>geoair-adv-query</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>geoair-adv-query</name>
-  <description>
-    提供基于数据源的完整 CRUD 操作 API，
-    专为动态查询场景设计，内置 MyBatis 标签支持、GIS 空间数据处理、分页查询、
-    DDL 操作等功能。
-    【核心特性】
-    • 动态 SQL 执行 - 支持 MyBatis 风格动态标签（if/where/foreach 等）
-    • 三大参数模式 - 同时支持 SqlParamMap（命名参数）、SqlParamList（位置参数）、
-    GirSqlParam（自适应参数）
-    • 流式查询 - 大数据量场景下避免 OOM，支持逐行处理和对象映射
-    • 空间数据支持 - 完整的 PostGIS/MySQL Spatial 集成，支持几何类型识别、 SRID 转换、空间索引、空间查询（相交/包含/距离计算等）
-    • 类型安全条件构建 - 基于 Lambda 表达式的动态 WHERE 条件，支持复杂嵌套条件
-    • 批量操作优化 - 内置分批次批量插入/更新，支持 1000-5000 条/批次最佳实践
-    • UPSERT 支持 - 完整的 Insert Or Update 语义，支持冲突键配置
-    • DDL 操作 - 表管理（创建/删除/重命名）、字段管理（添加/修改/删除）、
-    索引管理、主键管理（支持自增/字符串主键自动生成）
-    • 分页查询 - 支持物理分页，自动生成 COUNT 查询，适配前端 0 起始和 1 起始页码
-    • Schema 适配 - 自动处理数据库 schema 前缀，支持多数据源动态切换
+    <packaging>jar</packaging>
+    <name>geoair-adv-query</name>
+    <description>
+        提供基于数据源的完整 CRUD 操作 API，
+        专为动态查询场景设计，内置 MyBatis 标签支持、GIS 空间数据处理、分页查询、
+        DDL 操作等功能。
+        【核心特性】
+        • 动态 SQL 执行 - 支持 MyBatis 风格动态标签（if/where/foreach 等）
+        • 三大参数模式 - 同时支持 SqlParamMap（命名参数）、SqlParamList（位置参数）、
+        GirSqlParam（自适应参数）
+        • 流式查询 - 大数据量场景下避免 OOM，支持逐行处理和对象映射
+        • 空间数据支持 - 完整的 PostGIS/MySQL Spatial 集成，支持几何类型识别、 SRID 转换、空间索引、空间查询（相交/包含/距离计算等）
+        • 类型安全条件构建 - 基于 Lambda 表达式的动态 WHERE 条件，支持复杂嵌套条件
+        • 批量操作优化 - 内置分批次批量插入/更新，支持 1000-5000 条/批次最佳实践
+        • UPSERT 支持 - 完整的 Insert Or Update 语义，支持冲突键配置
+        • DDL 操作 - 表管理（创建/删除/重命名）、字段管理（添加/修改/删除）、
+        索引管理、主键管理（支持自增/字符串主键自动生成）
+        • 分页查询 - 支持物理分页，自动生成 COUNT 查询，适配前端 0 起始和 1 起始页码
+        • Schema 适配 - 自动处理数据库 schema 前缀，支持多数据源动态切换
 
-    【接口体系】
-    • IAdvBaseSelectOpt - 基础查询操作（单行/列表/流式/聚合/对象映射）
-    • IAdvBaseAccessOpt - 数据插入操作（单条/批量/忽略重复/自定义 SQL）
-    • IAdvBaseUpdateOpt - 数据更新操作（主键更新/条件更新/批量更新/UPSERT）
-    • IAdvBaseDeleteOpt - 数据删除操作（主键删除/条件删除/批量删除 ）
-    • IAdvDDLOpt - 数据库结构操作（表/字段/索引/主键/Schema 管理）
-    • IAdvGeoOpt / IAdvGeoPreOpt - GIS 空间操作（空间查询/类型识别/坐标系转换）
-    • IAdvWhereSelectOpt - 条件查询（Lambda 条件构建器驱动）
-    • IAdvSimplePageOpt - 分页查询（排序支持/空间字段处理）
+        【接口体系】
+        • IAdvBaseSelectOpt - 基础查询操作（单行/列表/流式/聚合/对象映射）
+        • IAdvBaseAccessOpt - 数据插入操作（单条/批量/忽略重复/自定义 SQL）
+        • IAdvBaseUpdateOpt - 数据更新操作（主键更新/条件更新/批量更新/UPSERT）
+        • IAdvBaseDeleteOpt - 数据删除操作（主键删除/条件删除/批量删除 ）
+        • IAdvDDLOpt - 数据库结构操作（表/字段/索引/主键/Schema 管理）
+        • IAdvGeoOpt / IAdvGeoPreOpt - GIS 空间操作（空间查询/类型识别/坐标系转换）
+        • IAdvWhereSelectOpt - 条件查询（Lambda 条件构建器驱动）
+        • IAdvSimplePageOpt - 分页查询（排序支持/空间字段处理）
 
-    【参数封装】
-    • SqlParamMap - 命名参数映射（#{paramName} 风格）
-    • SqlParamList - 位置参数列表（? 占位符风格）
-    • GirSqlParam - 统一参数接口，自动适配两种风格
+        【参数封装】
+        • SqlParamMap - 命名参数映射（#{paramName} 风格）
+        • SqlParamList - 位置参数列表（? 占位符风格）
+        • GirSqlParam - 统一参数接口，自动适配两种风格
 
-    【适用场景】
-    • 动态报表与数据导出（流式查询 + 对象映射）
-    • GIS 空间数据管理与分析（坐标转换/空间查询/几何验证）
-    • 多租户多数据源动态切换
-    • 大数据批量导入（分批次插入/更新）
-    • 数据库迁移与结构同步（DDL 操作）
-    • 复杂条件业务查询（Lambda 条件构建器）
+        【适用场景】
+        • 动态报表与数据导出（流式查询 + 对象映射）
+        • GIS 空间数据管理与分析（坐标转换/空间查询/几何验证）
+        • 多租户多数据源动态切换
+        • 大数据批量导入（分批次插入/更新）
+        • 数据库迁移与结构同步（DDL 操作）
+        • 复杂条件业务查询（Lambda 条件构建器）
 
-  </description>
+    </description>
 
-  <url>https://github.com/geoair-cn/geoair</url>
-
-  <licenses>
-    <license>
-      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
-      <organization>geoair</organization>
-      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <connection>https://github.com/geoair-cn/geoair.git</connection>
-    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
-  </scm>
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <geotools.version>28.6.1</geotools.version>
-    <lombok.version>1.18.30</lombok.version>
-    <dom4j.version>1.6.1</dom4j.version>
-    <druid.version>1.2.23</druid.version>
-    <net.postgis.version>2025.1.1</net.postgis.version>
-    <org.postgis.version>1.3.3</org.postgis.version>
-    <spring-boot.version>2.7.18</spring-boot.version>
 
-  </properties>
+    <licenses>
+        <license>
+            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
-  <dependencies>
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>1159856928@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-core</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
+    <scm>
+        <connection>https://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
+    </scm>
+    <properties>
+        <java.version>8</java.version>
+        <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <geotools.version>28.6.1</geotools.version>
+        <lombok.version>1.18.30</lombok.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <druid.version>1.2.23</druid.version>
+        <net.postgis.version>2025.1.1</net.postgis.version>
+        <org.postgis.version>1.3.3</org.postgis.version>
+        <spring-boot.version>2.7.18</spring-boot.version>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jdbc</artifactId>
-      <version>${spring-boot.version}</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
+    </properties>
 
-    <!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
-    <!--        <dependency>-->
-    <!--            <groupId>io.github.freakchick</groupId>-->
-    <!--            <artifactId>orange</artifactId>-->
-    <!--            <version>1.0</version>-->
-    <!--        </dependency>-->
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>${dom4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ognl</groupId>
-      <artifactId>ognl</artifactId>
-      <version>2.7.3</version>
-    </dependency>
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-dynamic-ds</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-geo-tools</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
+    <dependencies>
 
-    <dependency>
-      <groupId>net.postgis</groupId>
-      <artifactId>postgis-jdbc</artifactId>
-      <version>${net.postgis.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>cn.geoair.devkit</groupId>
+            <artifactId>geoair-core</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.postgis</groupId>
-      <artifactId>postgis-jdbc</artifactId>
-      <version>${org.postgis.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-jdbc</artifactId>
-      <version>${geotools.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
 
-    <dependency>
-      <groupId>org.geotools.jdbc</groupId>
-      <artifactId>gt-jdbc-postgis</artifactId>
-      <version>${geotools.version}</version>
-      <optional>true</optional>
-    </dependency>
+        <!--        &lt;!&ndash;        mybatis的标签解析工具类&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.github.freakchick</groupId>-->
+        <!--            <artifactId>orange</artifactId>-->
+        <!--            <version>1.0</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.geoair.devkit</groupId>
+            <artifactId>geoair-dynamic-ds</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.geoair.devkit</groupId>
+            <artifactId>geoair-geo-tools</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>druid</artifactId>
-      <version>${druid.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>net.postgis</groupId>
+            <artifactId>postgis-jdbc</artifactId>
+            <version>${net.postgis.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
+        <dependency>
+            <groupId>org.postgis</groupId>
+            <artifactId>postgis-jdbc</artifactId>
+            <version>${org.postgis.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-jdbc</artifactId>
+            <version>${geotools.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
 
-  </dependencies>
+        <dependency>
+            <groupId>org.geotools.jdbc</groupId>
+            <artifactId>gt-jdbc-postgis</artifactId>
+            <version>${geotools.version}</version>
+            <optional>true</optional>
+        </dependency>
 
-  <build>
-    <plugins>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>${javax-persistence.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
 
 
-    </plugins>
-  </build>
+        </plugins>
+    </build>
 
 </project>

@@ -13,7 +13,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
@@ -300,6 +299,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
         if (GutilObject.isEmpty(whereFilter)) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        if(GutilObject.isEmpty(tableName)){
+            tableName =GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
         }
         return bDeleteByWhere(tableName, whereFilter.toWhereFilter());
     }

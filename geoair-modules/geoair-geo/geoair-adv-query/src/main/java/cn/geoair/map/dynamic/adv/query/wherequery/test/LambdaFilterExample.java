@@ -22,7 +22,7 @@ public class LambdaFilterExample {
 
     public static void main(String[] args) {
 //        // 示例1：基础查询
-//        basicQueryExample();
+        basicQueryExample();
 //
 //        // 示例2：复杂嵌套查询
 //        nestedQueryExample();
@@ -55,7 +55,9 @@ public class LambdaFilterExample {
                 .eq(User::getStatus, 1);
 
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
-        System.out.println("查询条件：" + whereFilter);
+
+        ArrayList<Object> objects = new ArrayList<>();
+        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
         // 预期：name = '张三' AND age >= 18 AND status = 1
     }
 

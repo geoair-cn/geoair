@@ -60,7 +60,7 @@ public class GirAdvQueryRequestExample {
         System.out.println("========== 基础查询（字符串方式） ==========");
 
         GirAdvQueryRequest query = GirAdvQueryRequest.builder(User.class)
-                .table("user")
+
                 .fields("id", "name", "age", "email")
                 .where(w -> w
                         .eq("status", 1)
