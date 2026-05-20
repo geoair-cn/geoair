@@ -142,7 +142,15 @@
       <version>${net.postgis.version}</version>
     </dependency>
 
-    <dependency>
+
+      <dependency>
+          <groupId>jakarta.persistence</groupId>
+          <artifactId>jakarta.persistence-api</artifactId>
+          <version>${jakarta-persistence.version}</version>
+      </dependency>
+
+
+      <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-jdbc</artifactId>
       <version>${org.postgis.version}</version>

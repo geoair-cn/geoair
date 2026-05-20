@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
