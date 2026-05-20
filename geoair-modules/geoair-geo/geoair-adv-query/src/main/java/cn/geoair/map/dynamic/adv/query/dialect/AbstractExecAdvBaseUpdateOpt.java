@@ -338,11 +338,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpsert(String tableName, T entity) {
         if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
+            throw new IllegalArgumentException("UPSERT的实体对象不能为空");
         }
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
         if (GutilObject.isEmpty(idByAnnotation)) {
-            throw new IllegalArgumentException("ID不能为空");
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行UPSERT");
         }
         return bUpsert(tableName, entity, idByAnnotation);
     }
@@ -397,13 +397,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, false,ignoreFieldByAnnotation);
+        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, false, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsert(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
+            throw new IllegalArgumentException("UPSERT的实体对象不能为空");
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
@@ -417,8 +417,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }
+            conflictKeys = conflictKeysCopy;
         }
-        conflictKeys = conflictKeysCopy;
         return bUpsert(tableName, rowData, conflictKeys);
     }
 
@@ -430,32 +430,45 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true,ignoreFieldByAnnotation);
+        return bUpsert(tableName, entity, conflictKeys, isToUnderlineCase, true, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity, List<String> conflictKeys) {
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpsert(tableName, entity, conflictKeys, true, true,ignoreFieldByAnnotation);
+        return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsertSelective(String tableName, T entity) {
         if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
+            throw new IllegalArgumentException("UPSERT的实体对象不能为空");
         }
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
         if (GutilObject.isEmpty(idByAnnotation)) {
-            throw new IllegalArgumentException("ID不能为空");
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行UPSERT");
         }
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpsertSelective(tableName, entity, idByAnnotation,ignoreFieldByAnnotation);
+        // 修复：调用正确的方法，传入 conflictKeys 和 ignoreFieldNames
+        return bUpsertSelective(tableName, entity, idByAnnotation, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bUpsertSelective(T entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("UPSERT的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行UPSERT");
+        }
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpsertSelective(null, entity,ignoreFieldByAnnotation);
+        // 修复：获取表名，然后调用正确的方法
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
+        return bUpsertSelective(tableName, entity, idByAnnotation, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -463,10 +476,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpsert(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
     }
 
+    // ========== 条件更新（Lambda表达式版本） ==========
     @Override
     public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
         if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
+            throw new IllegalArgumentException("更新的实体对象不能为空");  // 修复：错误提示
         }
         if (whereFilter == null) {
             throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
@@ -518,13 +532,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         } finally {
             closeConnection(connection);
         }
-
     }
 
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
         if (entity == null) {
-            throw new IllegalArgumentException("插入的实体对象不能为空");
+            throw new IllegalArgumentException("更新的实体对象不能为空");  // 修复：错误提示
         }
         if (whereFilter == null) {
             throw new IllegalArgumentException("更新条件不能为空（避免全表更新）");
@@ -544,7 +557,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
         String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         if (GutilObject.isEmpty(tableName)) {
-            throw new IllegalArgumentException(" tableName 不能为空");
+            throw new IllegalArgumentException("tableName 不能为空");
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, true, ignoreFieldNames);
         return bUpdateSelectiveByWhere(tableName, rowData, whereFilter.toWhereFilter());
@@ -553,7 +566,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
-        return bUpdateSelectiveByWhere(entity, whereFilter,ignoreFieldByAnnotation);
+        return bUpdateSelectiveByWhere(entity, whereFilter, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -567,7 +580,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpdateByWhere(tableName, copyRowData, whereFilter);
     }
 
-    // ====================== 原有工具方法不动 ======================
+    // ====================== 原有工具方法 ======================
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
             throw new IllegalArgumentException("表名不能为空");
@@ -615,7 +628,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 .collect(Collectors.joining(","));
     }
 
-
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
@@ -649,7 +661,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     protected String buildUpdateByConditionSql(String tableName, String setClause, String whereClause) {
         return StrUtil.format("UPDATE {} SET {} WHERE {}", tableName, setClause, whereClause);
     }
-
 
     protected abstract String buildUpsertFieldClause(String field);
 

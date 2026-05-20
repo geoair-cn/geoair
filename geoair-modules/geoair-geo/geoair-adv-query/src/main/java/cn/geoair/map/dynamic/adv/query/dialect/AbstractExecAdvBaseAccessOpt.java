@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑，差异化语法由子类实现
+ * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑
  */
 public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
@@ -115,12 +115,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
-        return bInsertOne(tableName, entity, isToUnderlineCase, false, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bInsertOne(tableName, entity, isToUnderlineCase, false, ignoreFieldByAnnotation);
     }
 
     @Override
     public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -130,14 +132,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
         if (GutilObject.isEmpty(tableName)) {
             throw new IllegalArgumentException("tableName 不能为空");
         }
         return bInsertOne(tableName, rowData);
     }
-
 
     // ========== 通用逻辑：批量插入 ==========
     @Override
@@ -252,7 +253,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys) {
         return bInsertIgnore(tableName, entity, conflictKeys, true);
@@ -260,12 +260,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return bInsertIgnore(tableName, entity, conflictKeys, true,false, ignoreFieldNames);
+        return bInsertIgnore(tableName, entity, conflictKeys, true, false, ignoreFieldNames);
     }
 
     @Override
     public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ListUtil.empty());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldByAnnotation);
     }
 
     @Override
@@ -280,7 +281,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
         if (GutilObject.isEmpty(tableName)) {
-            tableName =GirAdvSqlUtils.getTableName(entity.getClass());
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
         }
         if (GutilObject.isEmpty(tableName)) {
             throw new IllegalArgumentException("tableName 不能为空");
@@ -290,11 +291,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             for (String conflictKey : conflictKeys) {
                 conflictKeysCopy.add(StrUtil.toUnderlineCase(conflictKey));
             }
+        } else {
+            conflictKeysCopy = conflictKeys;
         }
-        conflictKeys = conflictKeysCopy;
-        return bInsertIgnore(tableName, rowData, conflictKeys);
+        return bInsertIgnore(tableName, rowData, conflictKeysCopy);
     }
-
 
     @Override
     public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
@@ -314,7 +315,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bInsertIgnoreBatch", StrUtil.format("表名：{}，总条数：{}", tableName, totalSuccess), cost, totalSuccess);
         return totalSuccess;
     }
-
 
     @Override
     public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
@@ -353,8 +353,95 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         throw new RuntimeException("不支持的sqlParam参数！");
     }
 
+    @Override
+    public <T> Integer bInsertOne(T entity) {
+        return bInsertOne(entity, true, false);
+    }
 
-    // ====================== 原有工具方法不动 ======================
+    @Override
+    public <T> Integer bInsertOne(T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        return bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity) {
+        return bInsertOne(entity, true, true);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity, boolean isToUnderlineCase) {
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        return bInsertOne(tableName, entity, isToUnderlineCase, true, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity) {
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bInsertIgnore(entity, idByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys) {
+        return bInsertIgnore(entity, conflictKeys, true);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, boolean isToUnderlineCase) {
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bInsertIgnore(entity, idByAnnotation, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        return bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity) {
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bInsertSelectiveIgnore(entity, idByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys) {
+        return bInsertSelectiveIgnore(entity, conflictKeys, true);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(String tableName, T entity, List<String> conflictKeys) {
+        return bInsertIgnore(tableName, entity, conflictKeys, true, true);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, true, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, boolean isToUnderlineCase) {
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        return bInsertSelectiveIgnore(entity, idByAnnotation, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        return bInsertIgnore(tableName, entity, conflictKeys, true, true, ignoreFieldNames);
+    }
+
+    // ====================== 原有工具方法 ======================
     protected String buildPlaceholders(int count) {
         return StrUtil.repeatAndJoin("?", count, ",");
     }

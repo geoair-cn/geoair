@@ -182,6 +182,80 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseAccessPxyOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
 
+    @Override
+    public <T> Integer bInsertOne(T entity) {
+        return getAdvBaseAccessPxyOpt().bInsertOne(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseAccessPxyOpt().bInsertOne(entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveOne(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveOne(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnore(entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(String tableName, T entity, List<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnore(entity, conflictKeys, ignoreFieldNames);
+    }
 
     // ==================== 删除操作实现（代理调用） ====================
     @Override
@@ -238,7 +312,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
 
     @Override
     public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
-        return getAdvBaseDeletePxyOpt().bDeleteByWhere(  whereFilter);
+        return getAdvBaseDeletePxyOpt().bDeleteByWhere(whereFilter);
     }
 
     @Override
