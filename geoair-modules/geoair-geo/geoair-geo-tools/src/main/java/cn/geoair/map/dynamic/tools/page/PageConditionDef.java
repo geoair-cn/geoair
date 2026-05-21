@@ -63,6 +63,6 @@ public interface PageConditionDef<T> {
      * 当查询结束的时候。
      */
     default void onComplete(List<T> resultList) {
-        StaticLog.info("查询结束，结果列表大小：{}", resultList.size());
+        StaticLog.trace("查询结束，结果列表大小：{}", resultList.size());
     }
 }
