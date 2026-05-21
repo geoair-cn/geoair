@@ -38,7 +38,7 @@ public interface GirGeoMeasureOpt {
     String UNIT_HECTARE = "hectare";
 
     /**
-     * Geometry对象计算面积（UTM投影版，高精度）
+     * Geometry对象计算面积（使用UTM投影 ）
      *
      * @param geometry 几何对象（仅支持Polygon/MultiPolygon）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -48,7 +48,7 @@ public interface GirGeoMeasureOpt {
     double calculateAreaByUTM(Geometry geometry, int srid, String unit);
 
     /**
-     * 坐标数组计算面积（UTM投影版，高精度）
+     * 坐标数组计算面积（使用UTM投影）
      *
      * @param coords 坐标数组（[[x1,y1],[x2,y2]...]，需闭合，未闭合则自动补全最后一个点）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -58,7 +58,7 @@ public interface GirGeoMeasureOpt {
     double calculateAreaByUTM(double[][] coords, int srid, String unit);
 
     /**
-     * WKT字符串计算面积（UTM投影版，高精度）
+     * WKT字符串计算面积（使用UTM投影）
      *
      * @param wkt WKT字符串（如POLYGON((x1 y1,x2 y2,...))）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -69,7 +69,7 @@ public interface GirGeoMeasureOpt {
 
     // ====================== 长度计算 ======================
     /**
-     * Geometry对象计算长度（UTM投影版，高精度）
+     * Geometry对象计算长度（使用UTM投影）
      *
      * @param geometry 几何对象（支持LineString/MultiLineString/Polygon/MultiPolygon）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -79,7 +79,7 @@ public interface GirGeoMeasureOpt {
     double calculateLengthByUTM(Geometry geometry, int srid, String unit);
 
     /**
-     * 坐标数组计算长度（UTM投影版，高精度）
+     * 坐标数组计算长度（使用UTM投影）
      *
      * @param coords 坐标数组（[[x1,y1],[x2,y2]...]）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -89,7 +89,7 @@ public interface GirGeoMeasureOpt {
     double calculateLengthByUTM(double[][] coords, int srid, String unit);
 
     /**
-     * WKT字符串计算长度（UTM投影版，高精度）
+     * WKT字符串计算长度（使用UTM投影）
      *
      * @param wkt WKT字符串（如LINESTRING(x1 y1,x2 y2,...)、POLYGON((x1 y1,x2 y2,...))）
      * @param srid 源坐标系SRID（4326/4490等地理坐标系）
@@ -152,7 +152,7 @@ public interface GirGeoMeasureOpt {
     // ====================== 长度计算 ======================
 
     /**
-     * Geometry对象计算长度（线/多边形周长，推荐使用）
+     * Geometry对象计算长度（线/多边形周长 ）
      *
      * @param geometry 几何对象（支持LineString/MultiLineString/Polygon/MultiPolygon）
      * @param srid 坐标系SRID
@@ -181,10 +181,10 @@ public interface GirGeoMeasureOpt {
      */
     double calculateLength(String wkt, int srid, String unit);
 
-    // ====================== 距离计算（新增Geometry对象入参 + 保留原数组入参） ======================
+    // ====================== 距离计算======================
 
     /**
-     * 两点最短距离（Point对象入参，推荐使用） 地理坐标系（如4326）使用大地测量计算球面最短距离，投影坐标系计算欧氏距离
+     * 两点最短距离（Point对象入参 ） 地理坐标系（如4326）使用大地测量计算球面最短距离，投影坐标系计算欧氏距离
      *
      * @param point1 点1几何对象（仅支持Point类型）
      * @param point2 点2几何对象（仅支持Point类型）
@@ -195,7 +195,7 @@ public interface GirGeoMeasureOpt {
     double calculatePointToPointDistance(Point point1, Point point2, int srid, String unit);
 
     /**
-     * 两点最短距离（坐标数组入参，兼容旧调用）
+     * 两点最短距离（坐标数组入参 ）
      *
      * @param point1 点1坐标 [x1,y1]
      * @param point2 点2坐标 [x2,y2]
@@ -206,7 +206,7 @@ public interface GirGeoMeasureOpt {
     double calculatePointToPointDistance(double[] point1, double[] point2, int srid, String unit);
 
     /**
-     * 点到线的最近距离（Point+LineString对象入参，推荐使用）
+     * 点到线的最近距离（Point+LineString对象入参 ）
      *
      * @param point 点几何对象（仅支持Point类型）
      * @param line 线几何对象（仅支持LineString/MultiLineString类型）
@@ -217,7 +217,7 @@ public interface GirGeoMeasureOpt {
     double calculatePointToLineMinDistance(Point point, LineString line, int srid, String unit);
 
     /**
-     * 点到线的最近距离（坐标数组入参，兼容旧调用）
+     * 点到线的最近距离（坐标数组入参 ）
      *
      * @param point 点坐标 [x,y]
      * @param lineCoords 线坐标数组 [[x1,y1],[x2,y2]...]
@@ -229,7 +229,7 @@ public interface GirGeoMeasureOpt {
             double[] point, double[][] lineCoords, int srid, String unit);
 
     /**
-     * 点到几何对象的最短距离（保留原方法）
+     * 点到几何对象的最短距离
      *
      * @param point 点几何对象（仅支持Point类型）
      * @param geometry 目标几何对象（支持任意Geometry类型）
@@ -240,7 +240,7 @@ public interface GirGeoMeasureOpt {
     double calculatePointToGeometryDistance(Point point, Geometry geometry, int srid, String unit);
 
     /**
-     * 线到线的最短距离（LineString对象入参，推荐使用）
+     * 线到线的最短距离（LineString对象入参 ）
      *
      * @param line1 线1几何对象（仅支持LineString/MultiLineString类型）
      * @param line2 线2几何对象（仅支持LineString/MultiLineString类型）
@@ -252,7 +252,7 @@ public interface GirGeoMeasureOpt {
             LineString line1, LineString line2, int srid, String unit);
 
     /**
-     * 线到线的最短距离（坐标数组入参，兼容旧调用）
+     * 线到线的最短距离（坐标数组入参 ）
      *
      * @param line1Coords 线1坐标数组 [[x1,y1],[x2,y2]...]
      * @param line2Coords 线2坐标数组 [[x1,y1],[x2,y2]...]
@@ -266,7 +266,7 @@ public interface GirGeoMeasureOpt {
     // ====================== 单位转换 ======================
 
     /**
-     * 单位转换（核心方法）
+     * 单位转换
      *
      * @param value 原始值
      * @param srcUnit 原始单位（长度：m/km/degree/mile；面积：m²/km²/acre/hectare）

@@ -5,7 +5,10 @@ import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirService;
+import cn.geoair.web.GirWeb;
 import org.locationtech.jts.geom.Envelope;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author ：张逢吉
@@ -13,6 +16,11 @@ import org.locationtech.jts.geom.Envelope;
  */
 public interface GirRealMvtHelper {
 
+    /**
+     * 获取一个帮助类实例
+     *
+     * @return
+     */
     static GirRealMvtHelper getInstance() {
         try {
             return GirService.getPxyBeanC(GirRealMvtHelper.class);
@@ -21,13 +29,36 @@ public interface GirRealMvtHelper {
         }
     }
 
+    /**
+     * 获取一个矢量瓦片构建器的消费者
+     *
+     * @param envelope
+     * @param layerName
+     * @param outGridSrid
+     * @param tileGlobalConfig
+     * @return
+     */
     VectorTileBuilderConsumer getVectorTileBuilderConsumer(
             Envelope envelope,
             String layerName,
             int outGridSrid,
             TileGlobalConfig tileGlobalConfig);
 
+    /**
+     * 用于检查tileRequestParams 的参数合法性
+     *
+     * @param tileRequestParams
+     * @param layerName
+     * @return
+     */
+    default ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName) {
+        return ParamCheckResult.of(true);
+    }
 
-    ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams,String layerName);
+    default TileRequestParams getTileRequestParams(String layerName) {
+        HttpServletRequest request = GirWeb.getRequest();
+        String paramTile = request.getParameter("paramTile");
+        return TileRequestParams.fromBase32(paramTile);
+    }
 
 }

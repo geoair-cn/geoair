@@ -18,20 +18,22 @@ public class Log4Gir {
         HUTOOL,
         SLF4J,
         CONSOLE
-    };
+    }
+
+    ;
 
     private static LogType logType;
 
     static {
         GkMethodHand.implFromClass(GirLogger.class);
-        if (GutilClass.isPresent("org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
+        if (GutilClass.isPresent(
+                "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
+            Log4Gir.setLogType(LogType.HUTOOL);
+        } else if (GutilClass.isPresent("org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.SLF4J);
         } else if (GutilClass.isPresent(
                 "org.apache.commons.logging.LogFactory", ApacheCommonsLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.APPACHECOMMONS);
-        } else if (GutilClass.isPresent(
-                "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
-            Log4Gir.setLogType(LogType.HUTOOL);
         } else {
             Log4Gir.setLogType(LogType.CONSOLE);
         }
@@ -42,18 +44,18 @@ public class Log4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirLogger.class,
-        implMethod = "getLoger",
-        type = ImplType.expectfirst
+            implClass = GirLogger.class,
+            implMethod = "getLoger",
+            type = ImplType.expectfirst
     )
     public static GiLogger getLoger(String name) {
         switch (logType) {
+            case SLF4J:
+                return Slf4jLog.createLog(name);
             case APPACHECOMMONS:
                 return ApacheCommonsLog.createLog(name);
             case HUTOOL:
                 return HutoolLog.createLog(name);
-            case SLF4J:
-                return Slf4jLog.createLog(name);
             default:
                 return GirConsoleLog.forName(name);
         }
