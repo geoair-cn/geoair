@@ -216,6 +216,7 @@ public class GirAdvSqlUtils {
     public static String getColumnNameByJavax(Class<?> clazz, String fieldName) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
             Column column = field.getAnnotation(Column.class);
             if (column != null && StrUtil.isNotBlank(column.name())) {
                 return column.name();
@@ -230,6 +231,7 @@ public class GirAdvSqlUtils {
     public static String getColumnNameByGaModelField(Class<?> clazz, String fieldName) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
             GaModelField column = field.getAnnotation(GaModelField.class);
             if (column != null && StrUtil.isNotBlank(column.columnName())) {
                 return column.columnName();

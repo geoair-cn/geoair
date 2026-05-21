@@ -54,4 +54,6 @@ public @interface GaModelField {
     public String tag() default NULL; // 标记
 
     public GaParameter[] cfg() default {}; // 参数
+
+
 }
