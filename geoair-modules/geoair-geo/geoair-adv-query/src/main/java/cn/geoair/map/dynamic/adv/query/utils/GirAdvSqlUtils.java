@@ -4,6 +4,7 @@ import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.anno.GirTransient;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -21,6 +22,7 @@ import cn.hutool.core.util.StrUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 
 import java.lang.reflect.Field;
@@ -64,30 +66,22 @@ public class GirAdvSqlUtils {
      * @param <T>
      * @return
      */
-    public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase,
-                                                     boolean ignoreNullValue,
-                                                     List<String> ignoreFieldNames) {
+    public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         Map<String, Object> rowData = new HashMap<>();
         Class<?> clazz = entity.getClass();
-        String tableName = getTableNameByJavax(clazz);
-        BeanCopier.create(entity, rowData,
-                CopyOptions.create()
-                        .setIgnoreNullValue(ignoreNullValue)
-                        .setTransientSupport(true)
-                        .setFieldNameEditor(fieldName -> {
-                            if (ignoreFieldNames != null && ignoreFieldNames.contains(fieldName)) {
-                                return null;
-                            }
-                            String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(clazz, fieldName);
-                            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
-                                return columnNameByAnnotation;
-                            }
-                            if (isToUnderlineCase) {
-                                return StrUtil.toUnderlineCase(fieldName);
-                            }
-                            return fieldName;
-                        })
-        ).copy();
+        BeanCopier.create(entity, rowData, CopyOptions.create().setIgnoreNullValue(ignoreNullValue).setTransientSupport(true).setFieldNameEditor(fieldName -> {
+            if (ignoreFieldNames != null && ignoreFieldNames.contains(fieldName)) {
+                return null;
+            }
+            String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(clazz, fieldName);
+            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
+                return columnNameByAnnotation;
+            }
+            if (isToUnderlineCase) {
+                return StrUtil.toUnderlineCase(fieldName);
+            }
+            return fieldName;
+        })).copy();
 
 
         return rowData;
@@ -99,15 +93,15 @@ public class GirAdvSqlUtils {
         if (GutilObject.isNotEmpty(beanDesc)) {
             Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
             if (GutilObject.isNotEmpty(propMap)) {
-                for (Map.Entry<String, PropDesc> stringPropDescEntry : propMap.entrySet()) {
-                    PropDesc value = stringPropDescEntry.getValue();
-                    String fieldName = value.getFieldName();
-                    String idByJavax = getIdByJavax(clazz, fieldName);
+                for (Map.Entry<String, PropDesc> propDescEntry : propMap.entrySet()) {
+                    PropDesc value = propDescEntry.getValue();
+                    Field field = value.getField();
+                    String idByJavax = getIdByJavax(field);
                     if (idByJavax != null) {
                         ids.add(idByJavax);
                         continue;
                     }
-                    String idByGaModel = getIdByGaModel(clazz, fieldName);
+                    String idByGaModel = getIdByGaModel(field);
                     if (idByGaModel != null) {
                         ids.add(idByGaModel);
                         continue;
@@ -120,19 +114,47 @@ public class GirAdvSqlUtils {
         return ids;
     }
 
+    public static List<String> getIgnoreFieldByAnnotation(Class<?> clazz) {
+        List<String> ignores = new ArrayList<>();
+        BeanDesc beanDesc = BeanUtil.getBeanDesc(clazz);
+        if (GutilObject.isNotEmpty(beanDesc)) {
+            Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
+            if (GutilObject.isNotEmpty(propMap)) {
+                for (Map.Entry<String, PropDesc> propDescEntry : propMap.entrySet()) {
+                    PropDesc value = propDescEntry.getValue();
+                    Field field = value.getField();
+                    GirTransient girTransient = field.getAnnotation(GirTransient.class);
+                    if (girTransient != null) {
+                        ignores.add(field.getName());
+                        continue;
+                    }
 
-    public static String getIdByJavax(Class<?> clazz, String fieldName) {
-        Id id = clazz.getAnnotation(Id.class);
+                    Transient aTransient = field.getAnnotation(Transient.class);
+                    if (aTransient != null) {
+                        ignores.add(field.getName());
+                        continue;
+                    }
+
+                }
+                return ignores;
+            }
+        }
+        return ignores;
+    }
+
+
+    public static String getIdByJavax(Field field) {
+        Id id = field.getAnnotation(Id.class);
         if (id != null) {
-            return fieldName;
+            return field.getName();
         }
         return null;
     }
 
-    public static String getIdByGaModel(Class<?> clazz, String fieldName) {
-        GaModelField gaModel = clazz.getAnnotation(GaModelField.class);
+    public static String getIdByGaModel(Field field) {
+        GaModelField gaModel = field.getAnnotation(GaModelField.class);
         if (gaModel != null && gaModel.isID()) {
-            return fieldName;
+            return field.getName();
         }
         return null;
     }
