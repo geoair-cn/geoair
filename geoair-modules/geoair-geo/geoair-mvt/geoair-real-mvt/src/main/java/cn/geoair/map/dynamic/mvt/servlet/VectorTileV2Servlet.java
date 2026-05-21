@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.mvt.servlet;
 
 import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
@@ -26,8 +27,8 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         log.info("初始化矢量瓦片 Servlet 完成");
     }
 
-    String  mockPbfUrl = "vectorTileService/v2/real/preview/1/2/3.pbf?paramTile=XXXX";
-    String  mockDebugUrl = "vectorTileService/v2/debug/preview/1/2/3.pbf?paramTile=XXXX";
+    String mockPbfUrl = "vectorTileService/v2/real/preview/1/2/3.pbf?paramTile=XXXX";
+    String mockDebugUrl = "vectorTileService/v2/debug/preview/1/2/3.pbf?paramTile=XXXX";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,18 +63,15 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         int y = Integer.parseInt(yStr);
 
         // 获取参数
-        String paramTile = request.getParameter("paramTile");
+//        String paramTile = request.getParameter("paramTile");
         String minZoomStr = request.getParameter("minZoom");
         String isGeoStr = request.getParameter("isGeo");
 
-        // 参数校验
-        if (ObjectUtil.isEmpty(paramTile)) {
+        TileRequestParams params = GirRealMvtHelper.getInstance().getTileRequestParams(layerName);
+        if (ObjectUtil.isEmpty(params)) {
             toResponse(response, "参数错误001".getBytes(StandardCharsets.UTF_8), "text/plain; charset=utf-8");
             return;
         }
-
-        TileRequestParams params = TileRequestParams.fromBase32(paramTile);
-
         if (minZoomStr != null) {
             params.setMinZoom(Integer.parseInt(minZoomStr));
         }

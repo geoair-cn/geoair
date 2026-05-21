@@ -22,10 +22,8 @@ public class DefaultRealMvtHelper implements GirRealMvtHelper {
                 envelope, layerName, outGridSrid, tileGlobalConfig);
     }
 
-    @Override
-    public ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName) {
-        return ParamCheckResult.of(true);
-    }
+
+
 
 
 }
