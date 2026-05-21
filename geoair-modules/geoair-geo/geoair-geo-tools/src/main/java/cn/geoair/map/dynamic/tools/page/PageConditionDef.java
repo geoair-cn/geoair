@@ -62,7 +62,8 @@ public interface PageConditionDef<T> {
     /**
      * 当查询结束的时候。
      */
-    default void onComplete(List<T> resultList) {
-        StaticLog.trace("查询结束，结果列表大小：{}", resultList.size());
+    default void onComplete(List<T> resultList, long actualPageSize, long totalPages, long countConsume, long totalCount) {
+        StaticLog.info("查询结束，结果列表大小：{},计算后的分页大小 {}，总页数:{} ,消费总条数：{},分页总条数：{}", resultList.size(), actualPageSize, totalPages,
+                countConsume, totalCount);
     }
 }
