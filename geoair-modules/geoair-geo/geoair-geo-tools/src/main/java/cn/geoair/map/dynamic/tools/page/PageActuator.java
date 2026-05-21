@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
 
@@ -93,19 +94,26 @@ public class PageActuator<T> {
 
             }
         }
+        AtomicLong count = new AtomicLong(0);
+        Consumer<T> wapperConsumer = new Consumer<T>() {
+            @Override
+            public void accept(T t) {
+                 count.incrementAndGet();
+                pageConditionDef.getEachRecordConsumer().accept(t);
+            }
+        };
 
-        Consumer<T> eachRecordConsumer = pageConditionDef.getEachRecordConsumer();
         boolean isParallelConsume = pageConfig.isParallelConsumeRecordIs();
 
         // ========== 核心分支：消费模式 ==========
         if (isParallelConsume) {
             // 模式1：并行消费（ 边查边消费）
-            parallelConsume(actualPageSize, actualTotalPages, eachRecordConsumer);
+            parallelConsume(actualPageSize, actualTotalPages, wapperConsumer);
         } else {
             // 模式2：串行消费（主线程逐页查询+逐页消费，无全量堆积）
-            serialConsumeByPage(actualPageSize, actualTotalPages, eachRecordConsumer);
+            serialConsumeByPage(actualPageSize, actualTotalPages, wapperConsumer);
         }
-        pageConditionDef.onComplete(finalDataList);
+        pageConditionDef.onComplete(finalDataList,actualPageSize,actualTotalPages,count.get(),totalCount);
     }
 
     /**
