@@ -273,6 +273,81 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
     }
 
+    @Override
+    public <T> Integer bInsertOne(T entity) {
+        return getAdvBaseOpt().bInsertOne(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertOne(T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
+        return getAdvBaseOpt().bInsertOne(entity, isToUnderlineCase, ignoreNullValue);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity) {
+        return getAdvBaseOpt().bInsertSelectiveOne(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertSelectiveOne(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity) {
+        return getAdvBaseOpt().bInsertIgnore(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertIgnore(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(String tableName, T entity, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(tableName, entity, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys, ignoreFieldNames);
+    }
+
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
     @Override
@@ -330,6 +405,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(whereFilter);
     }
 
     @Override
@@ -704,6 +784,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public <T> Integer bUpdateSelectiveByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, entity, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(entity, whereFilter, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateSelectiveByWhere(T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bUpdateSelectiveByWhere(entity, whereFilter);
     }
 
     @Override
