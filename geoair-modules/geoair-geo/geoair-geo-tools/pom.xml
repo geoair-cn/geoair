@@ -88,23 +88,13 @@
       <artifactId>javax.servlet-api</artifactId>
       <version>${servlet-api.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-opengis</artifactId>
-      <version>${geotools.version}</version>
-      <optional>true</optional>
-    </dependency>
+
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-geojson</artifactId>
       <version>${geotools.version}</version>
-      <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-hsql</artifactId>
@@ -134,9 +124,6 @@
       <version>${net.postgis.version}</version>
     </dependency>
 
-
-
-
     <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-jdbc</artifactId>
@@ -150,17 +137,11 @@
       <version>${net.postgis.version}</version>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-jdbc</artifactId>
-      <version>${geotools.version}</version>
-      <optional>true</optional>
-    </dependency>
+
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
       <version>${geotools.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.alibaba.fastjson2</groupId>
