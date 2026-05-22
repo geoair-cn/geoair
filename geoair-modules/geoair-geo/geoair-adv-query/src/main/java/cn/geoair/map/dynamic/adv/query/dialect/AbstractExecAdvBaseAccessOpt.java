@@ -86,7 +86,16 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String fields = String.join(",", rowData.keySet());
+//        String fields = String.join(",", rowData.keySet());
+
+        Set<String> mapKeySet = rowData.keySet();
+        List<String > dbKeyList = new ArrayList<String >();
+        for (String field : mapKeySet) {
+            String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
+            dbKeyList.add(quoteFieldName);
+        }
+        String fields = String.join(",", dbKeyList);
+
         String placeholders = buildPlaceholders(rowData.keySet().size());
         String execSql = buildInsertSql(quoteTableName, fields, placeholders);
 
@@ -231,7 +240,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String fields = String.join(",", rowData.keySet());
+        Set<String> mapKeySet = rowData.keySet();
+        List<String > dbKeyList = new ArrayList<String >();
+        for (String field : mapKeySet) {
+            String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
+            dbKeyList.add(quoteFieldName);
+        }
+        String fields = String.join(",", dbKeyList);
         String placeholders = buildPlaceholders(rowData.keySet().size());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
 
