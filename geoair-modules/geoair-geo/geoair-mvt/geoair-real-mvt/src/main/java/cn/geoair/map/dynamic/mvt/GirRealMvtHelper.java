@@ -8,7 +8,7 @@ import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.web.GirWeb;
 import org.locationtech.jts.geom.Envelope;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author ：张逢吉
