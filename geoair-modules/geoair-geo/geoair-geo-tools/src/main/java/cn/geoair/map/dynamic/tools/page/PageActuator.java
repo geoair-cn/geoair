@@ -47,7 +47,7 @@ public class PageActuator<T> {
         return new PageActuator<>(pageConditionDef);
     }
 
-    public void execute() {
+    public PageActuator<T> execute() {
 
         pageConditionDef.setPageConfig(pageConfig);
 
@@ -55,7 +55,7 @@ public class PageActuator<T> {
         Long totalCount = pageConditionDef.getTotalRecordCount() == null ? pageConfig.getTotalCount() : pageConditionDef.getTotalRecordCount();
         if (totalCount == null || totalCount <= 0) {
             Gir.log.info("无数据需处理，直接返回");
-            return;
+            return this;
         }
 
         Long pageSize = pageConfig.getPageSize();
@@ -85,10 +85,10 @@ public class PageActuator<T> {
                 actualTotalPages = 1;
             } else {
                 actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
-                if(actualPageSize<25){ // 如果每页条数少于25条，那么就按照25条每页进行分页
+                if (actualPageSize < 25) { // 如果每页条数少于25条，那么就按照25条每页进行分页
                     actualPageSize = 25;
                     actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
-                }else{
+                } else {
                     actualTotalPages = maxPageNo;
                 }
 
@@ -98,7 +98,7 @@ public class PageActuator<T> {
         Consumer<T> wapperConsumer = new Consumer<T>() {
             @Override
             public void accept(T t) {
-                 count.incrementAndGet();
+                count.incrementAndGet();
                 pageConditionDef.getEachRecordConsumer().accept(t);
             }
         };
@@ -113,7 +113,8 @@ public class PageActuator<T> {
             // 模式2：串行消费（主线程逐页查询+逐页消费，无全量堆积）
             serialConsumeByPage(actualPageSize, actualTotalPages, wapperConsumer);
         }
-        pageConditionDef.onComplete(finalDataList,actualPageSize,actualTotalPages,count.get(),totalCount);
+        pageConditionDef.onComplete(finalDataList, actualPageSize, actualTotalPages, count.get(), totalCount);
+        return this;
     }
 
     /**
@@ -204,8 +205,8 @@ public class PageActuator<T> {
 
             @Override
             public List<Object> getPageRecords(Integer pageNo, Integer pageSize) {
-                System.out.println(pageNo +"----"+ pageSize);
-               List<Object> pageRecords = new ArrayList<>();
+                System.out.println(pageNo + "----" + pageSize);
+                List<Object> pageRecords = new ArrayList<>();
                 for (Integer i = 0; i < pageSize; i++) {
                     pageRecords.add(new Object());
                 }
