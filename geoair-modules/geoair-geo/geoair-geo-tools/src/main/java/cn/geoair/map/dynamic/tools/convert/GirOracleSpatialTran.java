@@ -5,7 +5,6 @@ import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
