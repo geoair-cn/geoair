@@ -49,24 +49,25 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     @Override
     public String tbGetTableNameNotSchema(String fullTableName) {
+
         if (StrUtil.isEmpty(fullTableName)) {
             return fullTableName;
         }
 
         // 预处理：去空格
         String processedName = fullTableName.trim();
-        // 通用正则：匹配“Schema.表名”格式（支持带引号/不带引号）
-        Pattern pattern =
-                Pattern.compile(
-                        "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+)\\."
-                                + // Schema/库名部分（兼容中文、横线）
-                                "([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分（兼容中文）
-                );
+
+        // 方案2：更宽松的正则匹配
+        Pattern pattern = Pattern.compile(
+                "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
+                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
+        );
+
         Matcher matcher = pattern.matcher(processedName);
 
         // 匹配成功：提取表名并去引号；失败：直接去引号返回
         if (matcher.matches()) {
-            return tbUnquoteTableName(matcher.group(1));
+            return tbUnquoteTableName(matcher.group(2));
         }
         return tbUnquoteTableName(processedName);
     }
@@ -79,16 +80,15 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
         // 预处理：去空格
         String processedName = fullTableName.trim();
-        // 通用正则：提取Schema/库名（兼容中文、特殊字符）
-        Pattern pattern =
-                Pattern.compile(
-                        "(?:([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+))\\."
-                                + // Schema/库名部分
-                                "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分
-                );
+
+        // 方案2：更宽松的正则：Schema部分和表名部分都允许更多字符
+        Pattern pattern = Pattern.compile(
+                "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
+                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
+        );
+
         Matcher matcher = pattern.matcher(processedName);
 
-        // 匹配成功：提取Schema/库名并去引号；失败：返回null
         if (matcher.matches()) {
             return tbUnquoteSchemaName(matcher.group(1));
         }
