@@ -107,7 +107,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam) {
-        if (sqlParam == null) {
+        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
             return bUpdateBySql(sqlStatement);
         } else if (sqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) sqlParam;

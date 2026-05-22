@@ -66,9 +66,10 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
 
         try {
             String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
+            String template = dialectTableNameProcessor.tbBuildAsTable("SELECT COUNT(*) AS count FROM ({})  ", "{}");
             String countSql =
                     StrUtil.format(
-                            "SELECT COUNT(*) AS count FROM ({}) AS {}",
+                            template,
                             cleanSql,
                             dialectTableNameProcessor.tbGetTempAliasTableName());
             return executeCountSql(countSql);
@@ -215,10 +216,10 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         // 通用：临时表别名
         String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();
 
-        // 通用：重构SQL
+        String template = dialectTableNameProcessor.tbBuildAsTable("SELECT {} FROM ({})  ", "{}");
         String refactorNoPageSql =
                 StrUtil.format(
-                        "SELECT {} FROM ({}) AS {}",
+                        template,
                         quotedFields,
                         dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql),
                         tableAlias);

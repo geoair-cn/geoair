@@ -385,7 +385,7 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
     @Override
     protected List<GirAdvOneRow> executePageSql(
             String pageSql, AdvEnumsGeomOpt advEnumsGeomOpt, List<String> geomFieldNameList) {
-        return getAdvGeoPreOpt().eSelectList(pageSql, new SqlParamMap(), advEnumsGeomOpt, geomFieldNameList);
+        return getAdvGeoPreOpt().eSelectList(pageSql,   advEnumsGeomOpt, geomFieldNameList);
 
     }
 }

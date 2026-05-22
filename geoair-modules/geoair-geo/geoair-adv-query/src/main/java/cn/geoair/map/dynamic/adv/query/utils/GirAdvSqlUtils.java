@@ -43,7 +43,7 @@ public class GirAdvSqlUtils {
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
-        if (sqlParam == null) {
+        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
             return new SqlMeta(dynamicSql, new ArrayList<>());
         }
         if (sqlParam instanceof SqlParamList) {

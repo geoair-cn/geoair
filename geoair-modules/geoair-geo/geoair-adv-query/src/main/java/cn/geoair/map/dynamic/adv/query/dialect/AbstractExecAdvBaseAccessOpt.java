@@ -343,7 +343,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
-        if (sqlParam == null) {
+        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
             return bInsertBySql(sqlStatementOrDynamicSql);
         } else if (sqlParam instanceof SqlParamMap) {
             return bInsertBySql(sqlStatementOrDynamicSql, (SqlParamMap) sqlParam);
