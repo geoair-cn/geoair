@@ -535,7 +535,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectOne(sqlStatement);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -551,7 +551,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public List<GirAdvOneRow> bSelectList(String sqlStatement, GirSqlParam girSqlParam) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectList(sqlStatement);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -566,7 +566,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             bSelectListStream(sqlStatement, rowConsumer);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -581,7 +581,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public List<List<Object>> bSelectListToValueList(String sqlStatement, GirSqlParam girSqlParam) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectListToValueList(sqlStatement);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -596,7 +596,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public Number bSelectNumber(String sqlStatement, GirSqlParam girSqlParam) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectNumber(sqlStatement);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -611,7 +611,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public Number bSelectRecordRowCount(String sqlStatement, GirSqlParam girSqlParam) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectRecordRowCount(sqlStatement);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -626,7 +626,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> E bSelectObjOne(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectObjOne(sqlStatement, clazz);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -641,7 +641,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             return bSelectObjList(sqlStatement, clazz);
         } else if (girSqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) girSqlParam;
@@ -656,7 +656,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
     @Override
     public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        if (girSqlParam == null) {
+        if (girSqlParam == null||GutilObject.isEmpty(girSqlParam)) {
             bSelectObjListStream(sqlStatement, clazz, rowConsumer);
 
         } else if (girSqlParam instanceof SqlParamList) {

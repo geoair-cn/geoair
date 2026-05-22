@@ -107,7 +107,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public Integer bUpdateBySql(String sqlStatement, GirSqlParam sqlParam) {
-        if (sqlParam == null) {
+        if (sqlParam == null || GutilObject.isEmpty(sqlParam)) {
             return bUpdateBySql(sqlStatement);
         } else if (sqlParam instanceof SqlParamList) {
             SqlParamList sqlParamList = (SqlParamList) sqlParam;
@@ -132,7 +132,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = buildSetClause(rowData);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
         String execSql = buildUpdateByPrimaryKeySql(quoteTableName, setClause, idKey);
 
         List<Object> params = new ArrayList<>(rowData.values());
@@ -224,8 +224,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = buildSetClause(rowData);
-        String whereClause = buildWhereClause(whereMap);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData,dialectTableNameProcessor);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
         String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
 
         List<Object> params = new ArrayList<>(rowData.values());
@@ -359,10 +359,21 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String fields = String.join(",", rowData.keySet());
-        String placeholders = rowData.keySet().stream().map(key -> "?").collect(Collectors.joining(","));
-        String conflictFields = String.join(",", conflictKeys);
-        String updateClause = buildUpsertUpdateClause(rowData, conflictKeys);
+        Set<String> mapKeySet = rowData.keySet();
+        List<String> dbKeyList = new ArrayList<String>();
+        for (String field : mapKeySet) {
+            String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
+            dbKeyList.add(quoteFieldName);
+        }
+        String fields = String.join(",", dbKeyList);
+        String placeholders = dbKeyList.stream().map(key -> "?").collect(Collectors.joining(","));
+        List<String> conflictKeysList = new ArrayList<String>();
+        for (String field : conflictKeys) {
+            String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
+            conflictKeysList.add(quoteFieldName);
+        }
+        String conflictFields = String.join(",", conflictKeysList);
+        String updateClause = buildUpsertUpdateClause(rowData, conflictKeysList);
         String execSql = buildUpdateOrInsertSql(quoteTableName, fields, placeholders, conflictFields, updateClause);
 
         List<Object> params = new ArrayList<>(rowData.values());
@@ -513,7 +524,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = buildSetClause(rowData);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData,dialectTableNameProcessor);
         String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
         List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereParams);
@@ -606,23 +617,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
-    protected String buildSetClause(Map<String, Object> rowData) {
-        return rowData.keySet()
-                .stream()
-                .map(field -> StrUtil.format("{} = ?", field))
-                .collect(Collectors.joining(","));
-    }
-
-    protected String buildWhereClause(Map<String, Object> whereMap) {
-        return whereMap.keySet()
-                .stream()
-                .map(field -> StrUtil.format("{} = ?", field))
-                .collect(Collectors.joining(" AND "));
-    }
 
     protected String buildUpsertUpdateClause(Map<String, Object> rowData, List<String> conflictKeys) {
         return rowData.keySet()
                 .stream()
+                .map(field -> dialectTableNameProcessor.tbQuoteFieldName(field))
                 .filter(field -> !conflictKeys.contains(field))
                 .map(this::buildUpsertFieldClause)
                 .collect(Collectors.joining(","));

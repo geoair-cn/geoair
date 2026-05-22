@@ -228,7 +228,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String whereClause = buildWhereClause(whereMap);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
         String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
         List<Object> params = new ArrayList<>(whereMap.values());
 
@@ -270,7 +270,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         try {
             connection.setAutoCommit(false);
             while (true) {
-                String whereClause = buildWhereClause(whereMap);
+                String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
                 String execSql = buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
                 List<Object> params = new ArrayList<>(whereMap.values());
                 int batchSuccess = SqlExecutor.execute(connection, execSql, params.toArray());
@@ -387,11 +387,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return batches;
     }
 
-    protected String buildWhereClause(Map<String, Object> whereMap) {
-        return whereMap.keySet().stream()
-                .map(field -> StrUtil.format("{} = ?", field))
-                .collect(Collectors.joining(" AND "));
-    }
+
 
 
     protected String getSchemaName() {

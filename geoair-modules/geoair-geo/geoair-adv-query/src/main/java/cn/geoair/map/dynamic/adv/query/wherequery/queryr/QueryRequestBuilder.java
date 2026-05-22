@@ -566,7 +566,14 @@ public class QueryRequestBuilder<T> {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
-
+    /**
+     * 设置key的转换策略
+     */
+    @Deprecated
+    public QueryRequestBuilder<T> advEnumsKeyTran(AdvEnumsKeyTran advEnumsKeyTran) {
+        this.advEnumsKeyTran = advEnumsKeyTran;
+        return this;
+    }
     /**
      * 设置字段映射
      */

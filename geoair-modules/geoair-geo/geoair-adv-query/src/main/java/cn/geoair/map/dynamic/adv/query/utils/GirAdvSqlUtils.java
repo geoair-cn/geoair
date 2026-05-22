@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author ：张俊
@@ -44,7 +45,7 @@ public class GirAdvSqlUtils {
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
-        if (sqlParam == null) {
+        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
             return new SqlMeta(dynamicSql, new ArrayList<>());
         }
         if (sqlParam instanceof SqlParamList) {
@@ -252,5 +253,21 @@ public class GirAdvSqlUtils {
 
     public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
         return getSqlBuilder(dialectProcessor, dataSourceGetter).buildWhereSql(whereFilter, params);
+    }
+
+
+    public static String buildWhereClause(Map<String, Object> whereMap,DialectTableNameProcessor dialectProcessor) {
+        return whereMap.keySet().stream()
+                .map(dialectProcessor::tbQuoteFieldName)
+                .map(field -> StrUtil.format("{} = ?", field))
+                .collect(Collectors.joining(" AND "));
+    }
+
+    public  static String buildSetClause(Map<String, Object> rowData,DialectTableNameProcessor dialectProcessor) {
+        return rowData.keySet()
+                .stream()
+                .map(dialectProcessor::tbQuoteFieldName)
+                .map(field -> StrUtil.format("{} = ?", field))
+                .collect(Collectors.joining(","));
     }
 }

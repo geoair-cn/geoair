@@ -119,10 +119,12 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         }
         return dataFieldsApo;
     }
+
     @Override
     public AdvQueryGlobalConfig getConfig() {
         return getAdvBaseOpt().getConfig();
     }
+
     @Override
     public boolean eIsGeomByTable(String tableName) {
         validateTableName(tableName);
@@ -584,7 +586,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         List<String> geomFieldNameList = new ArrayList<>();
         boolean isNotOpt = advEnumsGeomOpt == null || advEnumsGeomOpt.equals(AdvEnumsGeomOpt.不做任何操作);
         if (!isNotOpt) {
-            geomFieldNameList =  eGetGeomColumnNameListBySql(sql);
+            geomFieldNameList = eGetGeomColumnNameListBySql(sql);
         }
         return eSelectList(sql, advEnumsGeomOpt, geomFieldNameList);
     }
