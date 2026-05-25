@@ -57,7 +57,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         // 预处理：去空格
         String processedName = fullTableName.trim();
 
-        // 方案2：更宽松的正则匹配
+
         Pattern pattern = Pattern.compile(
                 "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
                         "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
@@ -65,7 +65,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
         Matcher matcher = pattern.matcher(processedName);
 
-        // 匹配成功：提取表名并去引号；失败：直接去引号返回
+
         if (matcher.matches()) {
             return tbUnquoteTableName(matcher.group(2));
         }
@@ -78,10 +78,10 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
             return null;
         }
 
-        // 预处理：去空格
+
         String processedName = fullTableName.trim();
 
-        // 方案2：更宽松的正则：Schema部分和表名部分都允许更多字符
+
         Pattern pattern = Pattern.compile(
                 "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
                         "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"

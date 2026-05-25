@@ -665,4 +665,31 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
+    @Override
+    protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
+        // MySQL: CREATE TABLE IF NOT EXISTS target SELECT * FROM source
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} SELECT * FROM {}",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
+        // MySQL: CREATE TABLE IF NOT EXISTS target LIKE source
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} LIKE {}",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
+        // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
+                dstTableName, sql);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
+        // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) LIMIT 0
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) LIMIT 0",
+                dstTableName, sql);
+    }
 }

@@ -814,18 +814,28 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void dDelTable(String tableName) {
-        getAdvDDLOpt().dDelTable(tableName);
+    public void dDelTable(String tableNameWithSchema) {
+        getAdvDDLOpt().dDelTable(tableNameWithSchema);
     }
 
     @Override
-    public void dTruncateTable(String tableName) {
-        getAdvDDLOpt().dTruncateTable(tableName);
+    public void dCopyTableBySql(String dstTableName, String sql, boolean dataSync) {
+        getAdvDDLOpt().dCopyTableBySql(dstTableName,sql,dataSync);
     }
 
     @Override
-    public void dDropTable(String tableName) {
-        getAdvDDLOpt().dDropTable(tableName);
+    public void dCopyTableByTableName(String dstTableName, String srcTableName, boolean dataSync) {
+        getAdvDDLOpt().dCopyTableByTableName(dstTableName,srcTableName,dataSync);
+    }
+
+    @Override
+    public void dTruncateTable(String tableNameWithSchema) {
+        getAdvDDLOpt().dTruncateTable(tableNameWithSchema);
+    }
+
+    @Override
+    public void dDropTable(String tableNameWithSchema) {
+        getAdvDDLOpt().dDropTable(tableNameWithSchema);
     }
 
     @Override

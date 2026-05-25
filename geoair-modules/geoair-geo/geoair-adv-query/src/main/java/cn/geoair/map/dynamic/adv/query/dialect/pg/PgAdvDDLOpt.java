@@ -687,4 +687,32 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
+
+    @Override
+    protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
+        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS SELECT * FROM source
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
+        // PostgreSQL: CREATE TABLE IF NOT EXISTS target (LIKE source INCLUDING ALL)
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
+        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
+                dstTableName, sql);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
+        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) WITH NO DATA
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA",
+                dstTableName, sql);
+    }
 }

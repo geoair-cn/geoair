@@ -558,4 +558,31 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             throw new RuntimeException(StrUtil.format("给表[{}]添加主键失败：{}", tableName, e.getMessage()), e);
         }
     }
+    @Override
+    protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
+        // Oracle: CREATE TABLE target AS SELECT * FROM source
+        return StrUtil.format("CREATE TABLE {} AS SELECT * FROM {}",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
+        // Oracle: CREATE TABLE target AS SELECT * FROM source WHERE 1=0
+        return StrUtil.format("CREATE TABLE {} AS SELECT * FROM {} WHERE 1=0",
+                dstTableName, srcTableName);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
+        // Oracle: CREATE TABLE target AS (SELECT ...)
+        return StrUtil.format("CREATE TABLE {} AS ({})",
+                dstTableName, sql);
+    }
+
+    @Override
+    protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
+        // Oracle: CREATE TABLE target AS (SELECT ...) WHERE 1=0
+        return StrUtil.format("CREATE TABLE {} AS ({}) WHERE 1=0",
+                dstTableName, sql);
+    }
 }
