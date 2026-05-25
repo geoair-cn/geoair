@@ -144,6 +144,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, oldTableName);
         String newQualifiedName =
                 dialectTableNameProcessor.tbGetTableNameNotSchema(newTableName);  //  RENAME TO 不支持带模式名称
+
+        newQualifiedName = dialectTableNameProcessor.tbQuoteTableName(newQualifiedName);
+
         String sql = buildRenameTableSql(oldQualifiedName, newQualifiedName);
         dExecuteDDL(sql, oldTableName, "重命名表");
     }
