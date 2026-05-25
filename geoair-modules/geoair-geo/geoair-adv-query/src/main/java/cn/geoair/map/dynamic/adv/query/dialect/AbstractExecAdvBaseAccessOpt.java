@@ -17,7 +17,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.db.Entity;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
@@ -177,8 +176,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         Connection connection = dataSourceGetter.getConnection();
         try {
             connection.setAutoCommit(false);
-            String fields = String.join(",", headers);
-            String placeholders = buildPlaceholders(headers.size());
+            List<String> fieldNames = headers.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
+            String fields = String.join(",", fieldNames);
+            String placeholders = buildPlaceholders(fieldNames.size());
             String execSql = buildInsertSql(quoteTableName, fields, placeholders);
             PreparedStatement pstmt = connection.prepareStatement(execSql);
 
