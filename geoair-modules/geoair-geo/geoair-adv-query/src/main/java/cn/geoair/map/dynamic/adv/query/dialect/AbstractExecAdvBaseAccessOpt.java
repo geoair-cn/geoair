@@ -89,7 +89,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 //        String fields = String.join(",", rowData.keySet());
 
         Set<String> mapKeySet = rowData.keySet();
-        List<String > dbKeyList = new ArrayList<String >();
+        List<String> dbKeyList = new ArrayList<String>();
         for (String field : mapKeySet) {
             String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
             dbKeyList.add(quoteFieldName);
@@ -222,10 +222,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
-
-        List<Map<String, Object>> rowsData = entities.stream().map(Entity::parse).collect(Collectors.toList());
-        Set<String> headers = rowsData.get(0).keySet();
-        return bInsertBatch(tableName, ListUtil.toList(headers), rowsData, batchSize);
+        List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
+        List<String> ignoreFieldByAnnotation = null;
+        for (T entity : entities) {
+            if(ignoreFieldByAnnotation ==null){
+                ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+            }
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ignoreFieldByAnnotation);
+            rowsDatas.add(rowData);
+        }
+        Set<String> headers = rowsDatas.get(0).keySet();
+        return bInsertBatch(tableName, ListUtil.toList(headers), rowsDatas, batchSize);
     }
 
     // ========== 通用逻辑：插入忽略 ==========
@@ -241,7 +248,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
         Set<String> mapKeySet = rowData.keySet();
-        List<String > dbKeyList = new ArrayList<String >();
+        List<String> dbKeyList = new ArrayList<String>();
         for (String field : mapKeySet) {
             String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(field);
             dbKeyList.add(quoteFieldName);
@@ -358,7 +365,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
-        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
+        if (sqlParam == null || GutilObject.isEmpty(sqlParam)) {
             return bInsertBySql(sqlStatementOrDynamicSql);
         } else if (sqlParam instanceof SqlParamMap) {
             return bInsertBySql(sqlStatementOrDynamicSql, (SqlParamMap) sqlParam);

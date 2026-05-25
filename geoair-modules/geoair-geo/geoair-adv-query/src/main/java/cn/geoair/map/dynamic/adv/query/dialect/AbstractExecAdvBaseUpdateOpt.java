@@ -315,7 +315,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             return 0;
         }
         List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
+        List<String> ignoreFieldByAnnotation = null;
         for (T entity : entities) {
+            if(ignoreFieldByAnnotation ==null){
+                ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+            }
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
             rowsDatas.add(rowData);
         }
