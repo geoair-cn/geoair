@@ -44,7 +44,7 @@ public class GirAdvSqlUtils {
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
-        if (sqlParam == null||GutilObject.isEmpty(sqlParam)) {
+        if (sqlParam == null || GutilObject.isEmpty(sqlParam)) {
             return new SqlMeta(dynamicSql, new ArrayList<>());
         }
         if (sqlParam instanceof SqlParamList) {
@@ -186,6 +186,9 @@ public class GirAdvSqlUtils {
     public static String getTableNameByJavax(Class<?> clazz) {
         Table table = clazz.getAnnotation(Table.class);
         if (table != null && StrUtil.isNotBlank(table.name())) {
+            if (StrUtil.isNotBlank(table.schema())) {
+                return table.schema() + "." + table.name();
+            }
             return table.name();
         }
         return null;
@@ -255,14 +258,14 @@ public class GirAdvSqlUtils {
     }
 
 
-    public static String buildWhereClause(Map<String, Object> whereMap,DialectTableNameProcessor dialectProcessor) {
+    public static String buildWhereClause(Map<String, Object> whereMap, DialectTableNameProcessor dialectProcessor) {
         return whereMap.keySet().stream()
                 .map(dialectProcessor::tbQuoteFieldName)
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(" AND "));
     }
 
-    public  static String buildSetClause(Map<String, Object> rowData,DialectTableNameProcessor dialectProcessor) {
+    public static String buildSetClause(Map<String, Object> rowData, DialectTableNameProcessor dialectProcessor) {
         return rowData.keySet()
                 .stream()
                 .map(dialectProcessor::tbQuoteFieldName)
