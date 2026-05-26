@@ -52,155 +52,22 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
      */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    // ========== 通用逻辑：所有数据库都适用 ==========
-    @Override
-    public Long pCount(String noPageSql) {
-        return pCount(noPageSql, new SqlParamMap());
-    }
 
-    @Override
-    public String pBuildPageSql(
-            String noPageSql, int pageSize, int pageNum, boolean pageNumStartZero) {
-        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
-        long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
-        return dialectTableNameProcessor.tbBuildPageSql(cleanSql, pageSize, offset);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize) {
-        return pPage(noPageSql, pageNum, pageSize, false);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
-        return pPage(noPageSql, pageNum, pageSize, pageNumStartZero, 不做任何操作);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            List<OrderApo> orders) {
-        return pPage(noPageSql, pageNum, pageSize, pageNumStartZero, 不做任何操作, false, orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql, int pageNum, int pageSize, List<OrderApo> orders) {
-        return pPage(noPageSql, pageNum, pageSize, false, 不做任何操作, false, orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pPage(noPageSql, pageNum, pageSize, false, advEnumsGeomOpt);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, false);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            List<OrderApo> orders) {
-        return pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, false, orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo) {
-        return pPage(noPageSql, pageNum, pageSize, false, advEnumsGeomOpt, hasFieldsInfo);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo,
-            List<OrderApo> orders) {
-        return pPage(noPageSql, pageNum, pageSize, false, advEnumsGeomOpt, hasFieldsInfo, orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            boolean hasFieldsInfo) {
-        return pPage(noPageSql, pageNum, pageSize, pageNumStartZero, 不做任何操作, false);
-    }
-
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo) {
-        return pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, 不做任何操作, false, ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSql,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo,
-            List<OrderApo> orders) {
-
-        return pPage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders);
-    }
-
-
-    @Override
-    public Long pCount(String noPageSqlStatement, GirSqlParam sqlParam) {
-        if (StrUtil.isEmpty(noPageSqlStatement)) {
-            throw new IllegalArgumentException("分页统计SQL不能为空");
-        }
-        try {
-            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
-            String template = dialectTableNameProcessor.tbBuildAsTable(" SELECT COUNT(*) AS count FROM ({})", "{}");
-            String countSql =
-                    StrUtil.format(
-                            template,
-                            cleanSql,
-                            dialectTableNameProcessor.tbGetTempAliasTableName());
-            // 子类实现：执行带参数的统计查询
-            return executeCountSqlWithParam(countSql, sqlParam);
-        } catch (Exception e) {
-            log.error("带参数分页统计失败，SQL: {}, 参数: {}", noPageSqlStatement, sqlParam, e);
-            throw new RuntimeException("带参数分页统计异常: " + e.getMessage(), e);
-        }
-    }
-
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
+    /**
+     * 核心分页查询实现
+     *
+     * @param noPageSqlStatement 原始SQL（不分页）
+     * @param sqlParam           SQL参数
+     * @param pageNum            页码
+     * @param pageSize           每页大小
+     * @param pageNumStartZero   页码是否从0开始
+     * @param advEnumsGeomOpt    几何对象处理选项
+     * @param hasFieldsInfo      是否包含字段元数据
+     * @param orders             排序规则
+     * @param advEnumsKeyTran    键名转换规则
+     * @return 分页结果
+     */
+    protected PageApo<GirAdvOneRow> corePage(
             String noPageSqlStatement,
             GirSqlParam sqlParam,
             int pageNum,
@@ -208,222 +75,12 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
-            List<OrderApo> orders) {
-        return pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
-    }
-
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                false,
-                不做任何操作,
-                false,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                false,
-                advEnumsGeomOpt,
-                false,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            List<OrderApo> orders) {
-        return pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, false, 不做任何操作, false, orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            boolean hasFieldsInfo) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                不做任何操作,
-                hasFieldsInfo,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                不做任何操作,
-                false,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            List<OrderApo> orders) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                不做任何操作,
-                false,
-                orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                false,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            List<OrderApo> orders) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                false,
-                orders);
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                false,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                ListUtil.empty());
-    }
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo,
-            List<OrderApo> orders) {
-        return pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                false,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
-    }
-
-
-    @Override
-    public PageApo<GirAdvOneRow> pPage(
-            String noPageSqlStatement,
-            GirSqlParam sqlParam,
-            int pageNum,
-            int pageSize,
-            boolean pageNumStartZero,
-            AdvEnumsGeomOpt advEnumsGeomOpt,
-            boolean hasFieldsInfo,
-            List<OrderApo> orders, AdvEnumsKeyTran advEnumsKeyTran) {
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
 
-        // 2. 子类实现：带参数获取字段元数据
+
         DataFieldsApo dataFieldsApo = null;
         try {
             dataFieldsApo = getColumnsBySQLWithParam(noPageSqlStatement, sqlParam);
@@ -432,7 +89,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
             throw new RuntimeException("获取字段信息异常：" + e.getMessage(), e);
         }
 
-        // 3. 通用：重构SQL（字段转义、临时表、排序）
+
         List<String> fieldNames = dataFieldsApo.getFieldList(FieldBySchemaApo::getColumnName, true);
         List<String> geomFieldNameList = dataFieldsApo.getGeomFieldNameList();
         String quotedFields =
@@ -448,6 +105,7 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         String sqlWithOrder = pBuildSqlWithOrder(refactorNoPageSql, orders, tableAlias);
         long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
         String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
+
         Map<String, Object> resultMap = Stream.of("count", "list")
                 .parallel()
                 .map(task -> {
@@ -455,21 +113,28 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
                     if ("count".equals(task)) {
                         map.put("count", pCount(sqlWithOrder, sqlParam));
                     } else {
-                        map.put("list", getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList));
+                        List<GirAdvOneRow> girAdvOneRows = getAdvGeoPreOpt().eSelectList(pageSql, sqlParam, advEnumsGeomOpt, geomFieldNameList);
+                        convertPageOriginalResults(girAdvOneRows);
+                        map.put("list", girAdvOneRows);
                     }
                     return map;
                 })
                 .flatMap(m -> m.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         Long total = (Long) resultMap.get("count");
         List<GirAdvOneRow> records = resultMap.get("list") != null ? (List<GirAdvOneRow>) resultMap.get("list") : ListUtil.empty();
+
+
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成大小写不敏感)) {
             records = GirAdvOneRow.toCaseInsensitiveList(records);
         }
         if (Objects.equals(advEnumsKeyTran, AdvEnumsKeyTran.转换成驼峰)) {
             records = GirAdvOneRow.toCamelCaseList(records);
         }
+
         int lastPageNum = calculateLastPageNum(total, pageSize);
+
         // 8. 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
                 GirAdvQueryCommonUtils.createPageApo(
@@ -482,6 +147,317 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
 
         return pageApo;
     }
+
+
+    @Override
+    public Long pCount(String noPageSql) {
+        return pCount(noPageSql, new SqlParamMap());
+    }
+
+    @Override
+    public String pBuildPageSql(
+            String noPageSql, int pageSize, int pageNum, boolean pageNumStartZero) {
+        String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
+        long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
+        return dialectTableNameProcessor.tbBuildPageSql(cleanSql, pageSize, offset);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(String noPageSql, int pageNum, int pageSize) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, false,
+                不做任何操作, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                不做任何操作, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            List<OrderApo> orders) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                不做任何操作, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql, int pageNum, int pageSize, List<OrderApo> orders) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, false,
+                不做任何操作, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql, int pageNum, int pageSize, AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, false,
+                advEnumsGeomOpt, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            List<OrderApo> orders) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, false,
+                advEnumsGeomOpt, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, false,
+                advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                不做任何操作, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSql,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders) {
+        return corePage(noPageSql, new SqlParamMap(), pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public Long pCount(String noPageSqlStatement, GirSqlParam sqlParam) {
+        if (StrUtil.isEmpty(noPageSqlStatement)) {
+            throw new IllegalArgumentException("分页统计SQL不能为空");
+        }
+        try {
+            String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement);
+            String template = dialectTableNameProcessor.tbBuildAsTable(" SELECT COUNT(*) AS count FROM ({})", "{}");
+            String countSql =
+                    StrUtil.format(
+                            template,
+                            cleanSql,
+                            dialectTableNameProcessor.tbGetTempAliasTableName());
+            return executeCountSqlWithParam(countSql, sqlParam);
+        } catch (Exception e) {
+            log.error("带参数分页统计失败，SQL: {}, 参数: {}", noPageSqlStatement, sqlParam, e);
+            throw new RuntimeException("带参数分页统计异常: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement, GirSqlParam sqlParam, int pageNum, int pageSize) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, false,
+                不做任何操作, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, false,
+                advEnumsGeomOpt, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            List<OrderApo> orders) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, false,
+                不做任何操作, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                不做任何操作, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                不做任何操作, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            List<OrderApo> orders) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                不做任何操作, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, false, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            List<OrderApo> orders) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, false, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, false,
+                advEnumsGeomOpt, hasFieldsInfo, ListUtil.empty(), AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, false,
+                advEnumsGeomOpt, hasFieldsInfo, orders, AdvEnumsKeyTran.不转换);
+    }
+
+    @Override
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran) {
+        return corePage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero,
+                advEnumsGeomOpt, hasFieldsInfo, orders, advEnumsKeyTran);
+    }
+
 
     /**
      * 执行带参数的统计SQL，返回总数
@@ -508,7 +484,6 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         }
         return (int) ((total + pageSize - 1) / pageSize);
     }
-
 
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders, String tableAlias) {
         if (CollectionUtil.isEmpty(orders)) {
@@ -548,6 +523,10 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
 
     public String pBuildSqlWithOrder(String baseSql, List<OrderApo> orders) {
         return pBuildSqlWithOrder(baseSql, orders, null);
+    }
+
+    public void convertPageOriginalResults(List<GirAdvOneRow> records) {
+
     }
 
     protected String quoteFieldName(String fieldName) {
