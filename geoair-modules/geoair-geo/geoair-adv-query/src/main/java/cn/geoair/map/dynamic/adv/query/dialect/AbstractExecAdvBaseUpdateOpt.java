@@ -279,6 +279,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     String updateByPrimaryKeySql = getUpdateByPrimaryKeySql(tableName, idKey, id, updateData);
                     sqls.add(updateByPrimaryKeySql);
                     params.addAll(updateData.values());
+                    params.add(id);
                 }
                 batchSuccess = bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
                 totalSuccess += batchSuccess;
@@ -664,7 +665,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     }
 
     protected String buildUpdateByPrimaryKeySql(String tableName, String setClause, String idKey) {
-        return StrUtil.format("UPDATE {} SET {} WHERE {} = ?", tableName, setClause, idKey);
+        return StrUtil.format("UPDATE {} SET {} WHERE {} = ?", tableName, setClause, dialectTableNameProcessor.tbQuoteFieldName(idKey));
     }
 
     protected String buildUpdateByConditionSql(String tableName, String setClause, String whereClause) {
