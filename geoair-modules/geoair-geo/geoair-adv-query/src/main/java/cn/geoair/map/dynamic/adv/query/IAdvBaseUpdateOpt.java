@@ -500,9 +500,8 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param tableName 目标表名
      * @param idKey     主键字段名
      * @param rowsData  批量更新数据列表（每个Map包含主键和待更新字段）
-     * @return 受影响的总行数
      */
-    Integer bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData);
+    void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData);
 
     /**
      * 分批次批量更新（避免单次数据量过大）
@@ -536,10 +535,9 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param idKey     主键字段名
      * @param rowsData  批量更新数据列表
      * @param batchSize 每批次更新条数（建议1000-5000）
-     * @return 受影响的总行数
      */
-    Integer bUpdateBatchByPK(String tableName, String idKey,
-                             List<Map<String, Object>> rowsData, int batchSize);
+    void bUpdateBatchByPK(String tableName, String idKey,
+                          List<Map<String, Object>> rowsData, int batchSize);
 
     /**
      * 批量更新实体对象列表（按主键）
@@ -576,9 +574,8 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param idKey     主键字段名
      * @param entities  待更新的实体对象集合
      * @param <T>       实体类型
-     * @return 受影响的总行数
      */
-    <T> Integer bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities);
+    <T> void bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities);
 
     // ==================== 6. UPSERT（更新或插入） ====================
 

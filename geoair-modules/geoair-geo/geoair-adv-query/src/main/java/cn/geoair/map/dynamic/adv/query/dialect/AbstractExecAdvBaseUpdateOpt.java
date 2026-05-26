@@ -239,18 +239,18 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     // ========== 通用逻辑：批量更新（按主键） ==========
     @Override
-    public Integer bUpdateBatchByPK(
+    public void bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return bUpdateBatchByPK(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
+        bUpdateBatchByPK(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
     }
 
     @Override
-    public Integer bUpdateBatchByPK(
+    public void bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(rowsData)) {
-            return 0;
+            return;
         }
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
@@ -261,9 +261,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Connection connection = dataSourceGetter.getConnection();
+
         try {
-            connection.setAutoCommit(false);
+
 
             for (List<Map<String, Object>> batch : batches) {
                 int batchSuccess = 0;
@@ -285,28 +285,24 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 totalSuccess += batchSuccess;
             }
 
-            connection.commit();
+
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            String format = StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize);
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchWithBatchSize", format, cost, totalSuccess);
-            return totalSuccess;
-        } catch (SQLException e) {
-            rollbackConnection(connection);
+            String format = StrUtil.format("表名：{}，成功批次数量：{}，单个批次大小：{}", tableName, totalSuccess, batchSize);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchByPK", format, cost, 0L);
+
+        } catch (Exception e) {
             throw new RuntimeException("批量更新失败，表名：" + tableName, e);
-        } finally {
-            restoreAutoCommit(connection);
-            closeConnection(connection);
         }
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPK(
+    public <T> void bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(entities)) {
-            return 0;
+            return;
         }
         List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
         List<String> ignoreFieldByAnnotation = null;
@@ -317,7 +313,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
             rowsDatas.add(rowData);
         }
-        return bUpdateBatchByPK(tableName, idKey, rowsDatas);
+        bUpdateBatchByPK(tableName, idKey, rowsDatas);
     }
 
 
