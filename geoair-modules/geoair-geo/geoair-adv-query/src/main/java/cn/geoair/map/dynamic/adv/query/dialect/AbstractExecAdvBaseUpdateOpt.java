@@ -52,7 +52,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     // 日志实例
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
 
-    protected static final int DEFAULT_BATCH_SIZE = 1000;
+    protected static final int DEFAULT_BATCH_SIZE = 200;
 
     @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
@@ -268,6 +268,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             for (List<Map<String, Object>> batch : batches) {
                 int batchSuccess = 0;
                 List<String> sqls = new ArrayList<>();
+                List<Object> params = new ArrayList<>();
                 for (Map<String, Object> row : batch) {
                     Object id = row.get(idKey);
                     if (id == null) {
@@ -277,11 +278,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     updateData.remove(idKey);
                     String updateByPrimaryKeySql = getUpdateByPrimaryKeySql(tableName, idKey, id, updateData);
                     sqls.add(updateByPrimaryKeySql);
+                    params.addAll(updateData.values());
                 }
-
-                batchSuccess=  bUpdateBySql(StrUtil.join(";", sqls));
-
-
+                batchSuccess = bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
                 totalSuccess += batchSuccess;
             }
 
