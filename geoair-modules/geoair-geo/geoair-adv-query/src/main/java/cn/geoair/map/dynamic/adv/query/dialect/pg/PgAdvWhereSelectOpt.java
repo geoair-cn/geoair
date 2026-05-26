@@ -12,9 +12,9 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 public class PgAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
 
     protected IAdvBaseOpt baseOpt;
-    protected IAdvSimplePagePreOpt simplePagePreOpt;
+    protected IAdvSimplePageOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
-    public PgAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePagePreOpt pgAdvSimplePageOpt,IAdvGeoPreOpt iAdvGeoPreOpt) {
+    public PgAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pgAdvSimplePageOpt,IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;
@@ -32,7 +32,7 @@ public class PgAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         return simplePagePreOpt;
     }
 

@@ -7,12 +7,12 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 
 /**
  * PG 带参数分页实现类
  */
-public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
+public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
 

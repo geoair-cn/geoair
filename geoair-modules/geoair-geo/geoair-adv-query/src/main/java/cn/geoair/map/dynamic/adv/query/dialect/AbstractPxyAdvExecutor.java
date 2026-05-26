@@ -36,7 +36,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     protected abstract IAdvDDLOpt getAdvDDLOpt();
 
-    protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
+    protected abstract IAdvSimplePageOpt getSimplePageOpt();
 
     protected abstract IAdvGeoPreOpt getGeoOpt();
 

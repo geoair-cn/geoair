@@ -56,7 +56,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
     private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
 
-    private volatile IAdvSimplePagePreOpt simplePageOpt;
+    private volatile IAdvSimplePageOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
 
@@ -85,7 +85,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {

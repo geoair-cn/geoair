@@ -8,21 +8,13 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
-import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
-import cn.hutool.core.util.StrUtil;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Oracle带参数分页实现类
  */
-public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
+public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
 
