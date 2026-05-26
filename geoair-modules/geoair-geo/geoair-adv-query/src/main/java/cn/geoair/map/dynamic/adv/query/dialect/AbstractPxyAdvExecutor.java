@@ -678,9 +678,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateBatchWithBatchSize(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
-        return getAdvBaseOpt().bUpdateBatchWithBatchSize(tableName, idKey, rowsData, batchSize);
+        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData, batchSize);
     }
 
     @Override

@@ -2,8 +2,6 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.base.util.GutilArray;
-import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -124,17 +122,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public Integer bUpdateByPK(
             String tableName, String idKey, Object id, Map<String, Object> rowData) {
-        validateTableName(tableName);
-        validateIdKeyAndValue(idKey, id);
-        validateUpdateData(rowData);
-        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
-        String execSql = buildUpdateByPrimaryKeySql(quoteTableName, setClause, idKey);
-
+        String execSql = getUpdateByPrimaryKeySql(tableName, idKey, id, rowData);
         List<Object> params = new ArrayList<>(rowData.values());
         params.add(id);
 
@@ -154,6 +142,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             closeConnection(connection);
         }
     }
+
 
     @Override
     public <T> Integer bUpdateByPK(String tableName, String idKey, T entity) {
@@ -224,8 +213,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData,dialectTableNameProcessor);
-        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
 
         List<Object> params = new ArrayList<>(rowData.values());
@@ -252,11 +241,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     @Override
     public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return bUpdateBatchWithBatchSize(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
+        return bUpdateBatchByPK(tableName, idKey, rowsData, DEFAULT_BATCH_SIZE);
     }
 
     @Override
-    public Integer bUpdateBatchWithBatchSize(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
         validateTableName(tableName);
         validateIdKey(idKey);
@@ -278,16 +267,21 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
             for (List<Map<String, Object>> batch : batches) {
                 int batchSuccess = 0;
+                List<String> sqls = new ArrayList<>();
                 for (Map<String, Object> row : batch) {
                     Object id = row.get(idKey);
                     if (id == null) {
                         throw new IllegalArgumentException("批量更新数据中缺少主键字段[" + idKey + "]的值");
                     }
-
                     Map<String, Object> updateData = new HashMap<>(row);
                     updateData.remove(idKey);
-                    batchSuccess += bUpdateByPK(tableName, idKey, id, updateData);
+                    String updateByPrimaryKeySql = getUpdateByPrimaryKeySql(tableName, idKey, id, updateData);
+                    sqls.add(updateByPrimaryKeySql);
                 }
+
+                batchSuccess=  bUpdateBySql(StrUtil.join(";", sqls));
+
+
                 totalSuccess += batchSuccess;
             }
 
@@ -317,7 +311,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<Map<String, Object>> rowsDatas = new ArrayList<>(entities.size());
         List<String> ignoreFieldByAnnotation = null;
         for (T entity : entities) {
-            if(ignoreFieldByAnnotation ==null){
+            if (ignoreFieldByAnnotation == null) {
                 ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
             }
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
@@ -528,7 +522,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData,dialectTableNameProcessor);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
         String execSql = buildUpdateByConditionSql(quoteTableName, setClause, whereClause);
         List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereParams);
@@ -655,6 +649,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 log.error("恢复自动提交失败", e);
             }
         }
+    }
+
+    private String getUpdateByPrimaryKeySql(String tableName, String idKey, Object id, Map<String, Object> rowData) {
+        validateTableName(tableName);
+        validateIdKeyAndValue(idKey, id);
+        validateUpdateData(rowData);
+        String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        return buildUpdateByPrimaryKeySql(quoteTableName, setClause, idKey);
     }
 
     protected String buildUpdateByPrimaryKeySql(String tableName, String setClause, String idKey) {

@@ -588,10 +588,10 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpdateBatchWithBatchSize(
+    public Integer bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
         return getAdvBaseUpdatePxyOpt()
-                .bUpdateBatchWithBatchSize(tableName, idKey, rowsData, batchSize);
+                .bUpdateBatchByPK(tableName, idKey, rowsData, batchSize);
     }
 
     @Override
