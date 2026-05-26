@@ -46,7 +46,7 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
      */
     protected abstract IAdvBaseSelectOpt getBaseSelectOpt();
 
-    protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
+    protected abstract IAdvSimplePageOpt getSimplePageOpt();
 
     protected abstract IAdvGeoPreOpt getGeoOpt();
 

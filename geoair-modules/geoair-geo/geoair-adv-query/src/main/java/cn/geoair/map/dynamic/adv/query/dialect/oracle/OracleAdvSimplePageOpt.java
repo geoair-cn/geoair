@@ -8,21 +8,16 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
-import cn.geoair.map.dynamic.adv.query.utils.GirAdvQueryCommonUtils;
-import cn.hutool.core.util.StrUtil;
-
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Oracle带参数分页实现类
  */
-public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
+public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     protected static final GiLogger log = GirLogger.getLoger();
 
@@ -60,12 +55,17 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
     }
 
 
-
     /**
      * 执行带参数的统计SQL（复用父类方法）
      */
     protected Long executeCountSqlWithParam(String countSql, GirSqlParam sqlParam) {
         GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
         return result != null ? result.getLong("COUNT") : 0L;
+    }
+
+    public void convertPageOriginalResults(List<GirAdvOneRow> records) {
+        for (GirAdvOneRow record : records) {
+            record.remove("RN_TEMP");
+        }
     }
 }

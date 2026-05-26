@@ -27,7 +27,7 @@ import java.util.Map;
  * <ul>
  *   <li>简单场景使用 {@link #bUpdateByPK} 或 {@link #bUpdateByMap}</li>
  *   <li>复杂条件使用 {@link #bUpdateByWhere} 系列（Lambda类型安全）</li>
- *   <li>高性能批量操作使用 {@link #bUpdateBatchWithBatchSize}</li>
+ *   <li>高性能批量操作使用 {@link #bUpdateBatchByPK}</li>
  *   <li>存在则更新、不存在则插入使用 {@link #bUpsert} 系列</li>
  * </ul>
  *
@@ -462,11 +462,11 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      */
     Integer bUpdateByMap(String tableName, Map<String, Object> rowData, Map<String, Object> whereMap);
 
-    // ==================== 5. 批量更新 ====================
+
 
     /**
      * 批量按主键更新（每条数据可更新不同字段）
-     *
+     * 一次发送多条update语句
      * <p>一次性更新多条记录，每条记录可以有完全不同的更新字段。
      * 框架会根据数据情况选择最优执行策略（CASE WHEN或逐条执行）。
      *
@@ -500,13 +500,12 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param tableName 目标表名
      * @param idKey     主键字段名
      * @param rowsData  批量更新数据列表（每个Map包含主键和待更新字段）
-     * @return 受影响的总行数
      */
-    Integer bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData);
+    void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData);
 
     /**
      * 分批次批量更新（避免单次数据量过大）
-     *
+     * 一次发送多条update语句
      * <p>将大数据量分批执行，每批次独立提交（根据事务配置）。
      * 适用于更新大量数据（如数万条）的场景，可避免SQL过长和内存溢出。
      *
@@ -536,10 +535,9 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param idKey     主键字段名
      * @param rowsData  批量更新数据列表
      * @param batchSize 每批次更新条数（建议1000-5000）
-     * @return 受影响的总行数
      */
-    Integer bUpdateBatchWithBatchSize(String tableName, String idKey,
-                                      List<Map<String, Object>> rowsData, int batchSize);
+    void bUpdateBatchByPK(String tableName, String idKey,
+                          List<Map<String, Object>> rowsData, int batchSize);
 
     /**
      * 批量更新实体对象列表（按主键）
@@ -576,9 +574,8 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @param idKey     主键字段名
      * @param entities  待更新的实体对象集合
      * @param <T>       实体类型
-     * @return 受影响的总行数
      */
-    <T> Integer bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities);
+    <T> void bUpdateBatchByPK(String tableName, String idKey, Collection<T> entities);
 
     // ==================== 6. UPSERT（更新或插入） ====================
 

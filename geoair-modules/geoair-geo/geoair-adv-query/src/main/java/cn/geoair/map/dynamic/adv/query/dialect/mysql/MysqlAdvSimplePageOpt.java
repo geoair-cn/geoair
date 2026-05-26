@@ -5,13 +5,12 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePagePreOpt;
-import cn.hutool.core.util.StrUtil;
+import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 
 /**
  * MySQL 带参数分页实现类
  */
-public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePagePreOpt {
+public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     // MySQL专属依赖
     protected IAdvGeoPreOpt mysqlAdvGeoPreOpt;

@@ -35,7 +35,7 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         return iAdvExecutorPxy;
     }
 

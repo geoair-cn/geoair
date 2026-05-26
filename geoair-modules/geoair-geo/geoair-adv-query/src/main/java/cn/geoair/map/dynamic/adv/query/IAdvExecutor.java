@@ -13,7 +13,6 @@ public interface IAdvExecutor
         IAdvGeoOpt,
         IAdvGeoPreOpt,
         IAdvSimplePageOpt,
-        IAdvSimplePagePreOpt,
         IAdvWhereSelectOpt,
         DialectTableNameProcessor {
 

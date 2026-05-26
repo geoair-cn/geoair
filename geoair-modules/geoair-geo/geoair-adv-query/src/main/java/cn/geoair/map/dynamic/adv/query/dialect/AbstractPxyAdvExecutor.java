@@ -36,7 +36,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     protected abstract IAdvDDLOpt getAdvDDLOpt();
 
-    protected abstract IAdvSimplePagePreOpt getSimplePageOpt();
+    protected abstract IAdvSimplePageOpt getSimplePageOpt();
 
     protected abstract IAdvGeoPreOpt getGeoOpt();
 
@@ -672,21 +672,21 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateBatchByPK(
+    public void bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData) {
-        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
+        getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
-    public Integer bUpdateBatchWithBatchSize(
+    public void bUpdateBatchByPK(
             String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
-        return getAdvBaseOpt().bUpdateBatchWithBatchSize(tableName, idKey, rowsData, batchSize);
+        getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData, batchSize);
     }
 
     @Override
-    public <T> Integer bUpdateBatchByPK(
+    public <T> void bUpdateBatchByPK(
             String tableName, String idKey, Collection<T> entities) {
-        return getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, entities);
+        getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, entities);
     }
 
 
@@ -820,12 +820,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public void dCopyTableBySql(String dstTableName, String sql, boolean dataSync) {
-        getAdvDDLOpt().dCopyTableBySql(dstTableName,sql,dataSync);
+        getAdvDDLOpt().dCopyTableBySql(dstTableName, sql, dataSync);
     }
 
     @Override
     public void dCopyTableByTableName(String dstTableName, String srcTableName, boolean dataSync) {
-        getAdvDDLOpt().dCopyTableByTableName(dstTableName,srcTableName,dataSync);
+        getAdvDDLOpt().dCopyTableByTableName(dstTableName, srcTableName, dataSync);
     }
 
     @Override

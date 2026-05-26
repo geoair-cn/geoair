@@ -42,7 +42,7 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     private volatile IAdvDDLOpt advDDLOpt;
     private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
     private volatile IDataSourceGetter dataSourceGetter;
-    private volatile IAdvSimplePagePreOpt simplePageOpt;
+    private volatile IAdvSimplePageOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
 
@@ -84,7 +84,7 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
