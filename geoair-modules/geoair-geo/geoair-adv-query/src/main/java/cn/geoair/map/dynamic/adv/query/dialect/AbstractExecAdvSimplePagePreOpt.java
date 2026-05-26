@@ -97,7 +97,6 @@ public abstract class AbstractExecAdvSimplePagePreOpt extends AbstractExecAdvSim
             List<OrderApo> orders, AdvEnumsKeyTran advEnumsKeyTran) {
 
         validateFullPageParams(noPageSqlStatement, pageNum, pageSize, pageNumStartZero, orders);
-//        SqlParamMap param = sqlParam == null ? new SqlParamMap() : sqlParam;
 
         // 2. 子类实现：带参数获取字段元数据
         DataFieldsApo dataFieldsApo = null;
