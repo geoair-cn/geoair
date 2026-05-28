@@ -13,21 +13,25 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilClass;
+
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import cn.hutool.core.exceptions.UtilException;
+import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionOverrideException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +41,7 @@ import org.springframework.stereotype.Component;
  * @author Ray
  */
 @Component
-public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextAware {
+public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextAware, BeanFactoryPostProcessor,InitializingBean {
 
     static {
         GkMethodHand.implFromClass(SpringContextBean4Gir.class);
@@ -46,9 +50,9 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     protected final GiLogger logger = GirLogger.getLoger(SpringContextBean4Gir.class);
 
     @GaMethodHandImpl(
-        implClass = GirBeanHelper.class,
-        implMethod = "getProvider",
-        type = ImplType.expectfirst
+            implClass = GirBeanHelper.class,
+            implMethod = "getProvider",
+            type = ImplType.expectfirst
     )
     private static GiBeanFactory getProvider() {
         return beanProvider;
@@ -57,6 +61,17 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     private static ApplicationContext springContext;
 
     private static GiBeanFactory beanProvider;
+    /**
+     * "@PostConstruct"注解标记的类中，由于ApplicationContext还未加载，导致空指针
+     * 因此实现BeanFactoryPostProcessor注入ConfigurableListableBeanFactory实现bean的操作
+     */
+    private static ConfigurableListableBeanFactory beanFactory;
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        beanProvider = this;
+        SpringContextBean4Gir.beanFactory = beanFactory;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -70,13 +85,13 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 
     @Override
     public boolean containsBean(String name) {
-        return getApplicationContext().containsBean(name);
+        return getBeanFactory().containsBean(name);
     }
 
     @Override
     public boolean isSingleton(String name) {
         try {
-            return getApplicationContext().isSingleton(name);
+            return getBeanFactory().isSingleton(name);
         } catch (NoSuchBeanDefinitionException nex) {
             throw new GirNoSuchBeanException(nex);
         }
@@ -85,7 +100,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public boolean isPrototype(String name) {
         try {
-            return getApplicationContext().isPrototype(name);
+            return getBeanFactory().isPrototype(name);
         } catch (NoSuchBeanDefinitionException nex) {
             throw new GirNoSuchBeanException(nex);
         }
@@ -94,7 +109,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public boolean isTypeMatch(String name, Class<?> typeToMatch) {
         try {
-            return getApplicationContext().isTypeMatch(name, typeToMatch);
+            return getBeanFactory().isTypeMatch(name, typeToMatch);
         } catch (NoSuchBeanDefinitionException nex) {
             throw new GirNoSuchBeanException(nex);
         }
@@ -103,7 +118,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public Class<?> getType(String name) {
         try {
-            return getApplicationContext().getType(name);
+            return getBeanFactory().getType(name);
         } catch (NoSuchBeanDefinitionException nex) {
             throw new GirNoSuchBeanException(nex);
         }
@@ -111,13 +126,13 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
 
     @Override
     public String[] getAliases(String name) {
-        return getApplicationContext().getAliases(name);
+        return getBeanFactory().getAliases(name);
     }
 
     @Override
     public Object getBean(String name) {
         try {
-            return getApplicationContext().getBean(name);
+            return getBeanFactory().getBean(name);
         } catch (NoSuchBeanDefinitionException nex) {
             throw new GirNoSuchBeanException(nex);
         } catch (BeansException nex) {
@@ -128,7 +143,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public <T> T getBean(String name, Class<T> requiredType) {
         try {
-            return getApplicationContext().getBean(name, requiredType);
+            return getBeanFactory().getBean(name, requiredType);
         } catch (BeanNotOfRequiredTypeException bne) {
             throw new GirBeanNotOfRequiredTypeException(bne);
         } catch (NoSuchBeanDefinitionException nex) {
@@ -141,7 +156,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public Object getBean(String name, Object... args) {
         try {
-            return getApplicationContext().getBean(name, args);
+            return getBeanFactory().getBean(name, args);
         } catch (BeanDefinitionStoreException ex) {
             throw new GirBeanDefinitionStoreException(ex);
         } catch (NoSuchBeanDefinitionException nex) {
@@ -154,7 +169,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public <T> T getBean(Class<T> requiredType) {
         try {
-            return getApplicationContext().getBean(requiredType);
+            return getBeanFactory().getBean(requiredType);
 
         } catch (NoUniqueBeanDefinitionException nex) {
             throw new GirNoUniqueBeanException(nex);
@@ -168,7 +183,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public <T> T getBean(Class<T> requiredType, Object... args) {
         try {
-            return getApplicationContext().getBean(requiredType, args);
+            return getBeanFactory().getBean(requiredType, args);
         } catch (BeanDefinitionStoreException ex) {
             throw new GirBeanDefinitionStoreException(ex);
         } catch (NoSuchBeanDefinitionException nex) {
@@ -181,7 +196,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public <T> Map<String, T> getBeans(Class<T> clazz) {
         try {
-            return getApplicationContext().getBeansOfType(clazz);
+            return getBeanFactory().getBeansOfType(clazz);
         } catch (BeansException ex) {
             throw new GirBeanException(ex);
         }
@@ -251,5 +266,30 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
         } catch (BeanDefinitionStoreException bse) {
             throw new GirBeanDefinitionStoreException(bse);
         }
+    }
+
+
+    public static ListableBeanFactory getBeanFactory() {
+        final ListableBeanFactory factory = null == beanFactory ? springContext : beanFactory;
+        if (null == factory) {
+            throw new UtilException("No ConfigurableListableBeanFactory or ApplicationContext injected, maybe not in the Spring environment?");
+        }
+        return factory;
+    }
+    public static ConfigurableListableBeanFactory getConfigurableBeanFactory() throws UtilException {
+        final ConfigurableListableBeanFactory factory;
+        if (null != beanFactory) {
+            factory = beanFactory;
+        } else if (springContext instanceof ConfigurableApplicationContext) {
+            factory = ((ConfigurableApplicationContext) springContext).getBeanFactory();
+        } else {
+            throw new UtilException("No ConfigurableListableBeanFactory from context!");
+        }
+        return factory;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        beanProvider = this;
     }
 }
