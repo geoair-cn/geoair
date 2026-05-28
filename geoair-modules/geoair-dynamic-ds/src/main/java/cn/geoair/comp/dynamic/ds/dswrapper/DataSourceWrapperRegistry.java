@@ -11,17 +11,13 @@ public class DataSourceWrapperRegistry {
     private static final List<Class<? extends AdvDataSourceWrapper>> WRAPPER_CLASSES =
             new ArrayList<>();
 
-    // 静态初始化：注册所有常用包装器（按优先级排序）
+    //  注册所有常用包装器
     static {
-        // 高性能连接池优先
         if (DruidDataSourceWrapper.canInit()) registerWrapper(DruidDataSourceWrapper.class);
         if (HikariDataSourceWrapper.canInit()) registerWrapper(HikariDataSourceWrapper.class);
-        // 传统连接池
         if (DBCP2DataSourceWrapper.canInit()) registerWrapper(DBCP2DataSourceWrapper.class);
         if (C3P0DataSourceWrapper.canInit()) registerWrapper(C3P0DataSourceWrapper.class);
         if (BoneCPDataSourceWrapper.canInit()) registerWrapper(BoneCPDataSourceWrapper.class);
-
-        // 简单/非池化数据源
         if (SpringDiverManagerSourceWrapper.canInit())
             registerWrapper(SpringDiverManagerSourceWrapper.class);
         if (AdvSimpleDataSourceWrapper.canInit()) registerWrapper(AdvSimpleDataSourceWrapper.class);

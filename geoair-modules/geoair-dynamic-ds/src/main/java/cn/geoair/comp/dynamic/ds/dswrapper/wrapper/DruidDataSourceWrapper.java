@@ -2,9 +2,12 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import cn.geoair.base.Gir;
 import com.alibaba.druid.pool.DruidDataSource;
+
 import javax.sql.DataSource;
 
-/** Druid数据源包装器 */
+/**
+ * Druid数据源包装器
+ */
 public class DruidDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public DruidDataSourceWrapper(DataSource targetDataSource) {
@@ -45,7 +48,9 @@ public class DruidDataSourceWrapper extends GirAbstractDataSourceWrapper {
     @Override
     public String getSimpleDataSourceName() {
         DruidDataSource druidDataSource = (DruidDataSource) targetDataSource;
-        return druidDataSource.getName();
+        return druidDataSource.getName() == null ?
+                targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode() :
+                druidDataSource.getName();
     }
 
     @Override
@@ -54,7 +59,12 @@ public class DruidDataSourceWrapper extends GirAbstractDataSourceWrapper {
         return druidDataSource.getRawJdbcUrl();
     }
 
-    /** 获取Druid数据源的特有配置（可选扩展） */
+    @Override
+    public Integer getActiveCount() {
+        return getDruidDataSource().getActiveCount();
+    }
+
+
     public DruidDataSource getDruidDataSource() {
         if (isSupport()) {
             return (DruidDataSource) super.targetDataSource;
