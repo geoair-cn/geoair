@@ -141,7 +141,7 @@ public class TileIterator
         }
 
         // 生成当前瓦片的 quadKey
-        String quadKey = GirGeoTools.me().getTileGridBingMapOpt()
+        String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt()
                 .xyzToQuadKey(currentX, currentY, currentZoom);
 
         // 使用 Collections.singletonList 避免创建新的 ArrayList

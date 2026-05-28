@@ -121,15 +121,15 @@ public class VectorTileV2Servlet extends TileCommonServlet {
             int gridSrid = params.isGeo() ? 4326 : 3857;
 
             if (!params.isGeo()) {
-                boxReferencedEnvelope = GirGeoTools.me().getTileGrid3857Opt().xyzToTileBox(z, x, y, 3857);
+                boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(z, x, y, 3857);
             } else {
-                boxReferencedEnvelope = GirGeoTools.me().getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
+                boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
             }
 
-            Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(boxReferencedEnvelope);
+            Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(boxReferencedEnvelope);
             re.put("bbox", geometry.toText());
 
-            Geometry convert = GirGeoTools.me().getSridOpt().convert(geometry, gridSrid, 4326);
+            Geometry convert = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, gridSrid, 4326);
             re.put("bbox4326", convert.toText());
         } catch (Exception ignored) {
         }

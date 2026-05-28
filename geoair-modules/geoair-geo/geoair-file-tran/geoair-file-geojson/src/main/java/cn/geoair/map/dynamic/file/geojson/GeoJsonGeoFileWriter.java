@@ -70,7 +70,7 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             // 覆盖坐标系（如果配置了目标 SRID）
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        GirGeoTools.me().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
                 // 重建要素类型，替换 CRS
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
@@ -137,7 +137,7 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             /** geojson的Writer实在是无解，没办法生成3857的geojson */
             GeoJSONWriter geoJsonWriter = new GeoJSONWriter(fos);
             int outPutSrid = writeConfig.getOutPutSrid();
-            CoordinateReferenceSystem crs = GirGeoTools.me().getSridOpt().getCRS(outPutSrid);
+            CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(outPutSrid);
             GutilReflection.setFieldValue(geoJsonWriter, "outCRS", crs);
             geoJsonWriter.setEncodeFeatureCollectionCRS(false);
             geoJsonWriter.setEncodeFeatureBounds(false);

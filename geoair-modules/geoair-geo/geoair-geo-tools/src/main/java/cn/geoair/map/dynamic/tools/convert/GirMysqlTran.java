@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.ParseException;
 
 import java.nio.ByteBuffer;
@@ -97,7 +96,7 @@ public class GirMysqlTran {
             byte[] wkbData = extractWkbData(mysqlBinary);
 
 
-            jtsGeom =  GirGeoTools.me().getFormatOpt().getWKBReader().read(wkbData);
+            jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(wkbData);
 
 
             // 5. 设置SRID

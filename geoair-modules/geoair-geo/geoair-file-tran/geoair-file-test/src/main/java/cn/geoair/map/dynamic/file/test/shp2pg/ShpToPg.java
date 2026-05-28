@@ -7,14 +7,11 @@ import cn.geoair.map.dynamic.file.core.tran.GeoFileTranImpl;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-import cn.geoair.map.dynamic.file.geojson.GeoJsonGeoFileReader;
-import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisGeoFileWriter;
 import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
 import cn.geoair.map.dynamic.file.shp.ShpGeoFileReader;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
-import cn.geoair.map.dynamic.file.test.GeoToolsUtils;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
@@ -89,7 +86,7 @@ public class ShpToPg {
                                 if (geometry != null) {
                                     if (geometry instanceof Point) {
                                         Point point = (Point) geometry;
-                                        Point point1 = GirGeoTools.me().getCoordinateOpt().wgs84ToBd09(point);
+                                        Point point1 = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToBd09(point);
                                         point1.setSRID(point.getSRID());
                                         girAdvOneRow.put("the_geom", point1);
                                     }
