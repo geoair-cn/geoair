@@ -8,7 +8,6 @@ import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.RandomUtil;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,7 +58,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
 
         refreshDataSourcesFromIds();
 
-        log.info("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+        log.debug("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
                 groupName, dataSourceIds.size(), strategyType.getDescription(), totalWeight);
     }
 
@@ -95,7 +94,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         }
         weightMap.put(dataSourceId, weight);
         totalWeight += weight;
-        log.info("Group [{}] 设置数据源 [{}] 权重为: {}", groupName, dataSourceId, weight);
+        log.debug("Group [{}] 设置数据源 [{}] 权重为: {}", groupName, dataSourceId, weight);
         return this;
     }
 
@@ -121,7 +120,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         // 添加延迟加载包装器
         this.dataSources.add(new LazyDataSourceWrapper(dataSourceId));
         setWeightById(dataSourceId, weight);
-        log.info("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+        log.debug("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
         return this;
     }
 
@@ -146,7 +145,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
                 dataSources.remove(toRemove);
             }
             weightMap.remove(dataSourceId);
-            log.info("Group [{}] 移除数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+            log.debug("Group [{}] 移除数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
         }
         return removed;
     }

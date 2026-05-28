@@ -44,7 +44,7 @@ public class LazyDataSourceWrapper implements DataSource {
                     if (realDataSource == null) {
                         throw new IllegalStateException("数据源不存在: " + dataSourceId);
                     }
-                    log.info("数据源加载完成: {}", dataSourceId);
+                    log.debug("数据源加载完成: {}", dataSourceId);
                 }
             } finally {
                 lock.unlock();

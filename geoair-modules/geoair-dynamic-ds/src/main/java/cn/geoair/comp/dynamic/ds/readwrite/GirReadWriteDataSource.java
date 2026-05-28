@@ -33,7 +33,7 @@ public class GirReadWriteDataSource implements DataSource {
     public GirReadWriteDataSource(DataSource masterDataSource, GirGroupSource slaveGroup) {
         this.masterDataSource = masterDataSource;
         this.slaveGroup = slaveGroup;
-        log.info("读写分离数据源初始化完成，主库: {}, 从库数量: {}",
+        log.debug("读写分离数据源初始化完成，主库: {}, 从库数量: {}",
                 masterDataSource, slaveGroup.size());
     }
 
