@@ -1,4 +1,4 @@
-package cn.geoair.comp.dynamic.ds.datasource.enums;
+package cn.geoair.comp.dynamic.ds.readwrite.enums;
 
 /**
  * @author ：zhangjun

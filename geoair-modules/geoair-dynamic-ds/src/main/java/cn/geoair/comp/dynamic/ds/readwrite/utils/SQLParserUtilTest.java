@@ -1,6 +1,6 @@
-package cn.geoair.comp.dynamic.ds.datasource.utils;
+package cn.geoair.comp.dynamic.ds.readwrite.utils;
 
-import cn.geoair.comp.dynamic.ds.datasource.enums.SQLType;
+import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 
 /**
  * SQL解析工具类测试

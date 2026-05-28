@@ -41,7 +41,7 @@ public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-        return null;
+        return targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
     @Override

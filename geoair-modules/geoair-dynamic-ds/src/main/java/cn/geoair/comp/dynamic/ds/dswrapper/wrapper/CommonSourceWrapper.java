@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 
-/** 通用数据源包装器 基于反射适配所有未显式实现的数据源类型 */
+/**
+ * 通用数据源包装器 基于反射适配所有未显式实现的数据源类型
+ */
 public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
 
     // 常见的数据源名称属性/方法名（按优先级排序）
@@ -47,13 +49,17 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
         return DataSource.class;
     }
 
-    /** 反射获取数据源名称（无则返回null） */
+    /**
+     * 反射获取数据源名称（无则返回null）
+     */
     @Override
     public String getSimpleDataSourceName() {
         return getValueByReflection(targetDataSource, NAME_KEYS);
     }
 
-    /** 反射获取JDBC URL（无则返回null） */
+    /**
+     * 反射获取JDBC URL（无则返回null）
+     */
     @Override
     public String getJdbcUrl() {
         return getValueByReflection(targetDataSource, URL_KEYS);
@@ -68,7 +74,7 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
      * 通用反射获取值的方法
      *
      * @param target 目标对象
-     * @param keys 要尝试的属性/方法名列表
+     * @param keys   要尝试的属性/方法名列表
      * @return 找到的值（字符串），无则返回null
      */
     private String getValueByReflection(Object target, List<String> keys) {
@@ -108,11 +114,12 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
             }
         }
 
-        // 所有方式都失败，返回null
-        return null;
+        return targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
-    /** 递归获取声明的字段（包括父类） */
+    /**
+     * 递归获取声明的字段（包括父类）
+     */
     private Field getDeclaredField(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);

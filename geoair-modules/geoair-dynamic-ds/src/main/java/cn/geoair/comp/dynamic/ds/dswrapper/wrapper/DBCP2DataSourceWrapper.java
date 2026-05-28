@@ -6,7 +6,9 @@ import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp.BasicDataSource;
 
-/** Apache DBCP2 数据源包装器 */
+/**
+ * Apache DBCP2 数据源包装器
+ */
 @Slf4j
 public class DBCP2DataSourceWrapper extends GirAbstractDataSourceWrapper {
 
@@ -45,9 +47,9 @@ public class DBCP2DataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-        BasicDataSource basicDataSource =  getDBCP2DataSource();
+        BasicDataSource basicDataSource = getDBCP2DataSource();
         // DBCP2的name属性是可选的，兜底返回固定标识
-        return basicDataSource.getUrl() != null ? basicDataSource.getUrl() : null;
+        return basicDataSource.getUrl() != null ? basicDataSource.getUrl() : targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
     @Override

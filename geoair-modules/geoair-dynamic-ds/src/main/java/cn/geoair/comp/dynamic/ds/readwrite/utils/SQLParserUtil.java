@@ -1,6 +1,6 @@
-package cn.geoair.comp.dynamic.ds.datasource.utils;
+package cn.geoair.comp.dynamic.ds.readwrite.utils;
 
-import cn.geoair.comp.dynamic.ds.datasource.enums.SQLType;
+import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;

@@ -33,8 +33,7 @@ public class DiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-        DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
-        return dataSource.getUrl();
+        return targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
     @Override
