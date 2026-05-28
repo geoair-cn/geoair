@@ -59,6 +59,11 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
         return getValueByReflection(targetDataSource, URL_KEYS);
     }
 
+    @Override
+    public Integer getActiveCount() {
+        return null;
+    }
+
     /**
      * 通用反射获取值的方法
      *

@@ -1,9 +1,12 @@
 package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import com.jolbox.bonecp.BoneCPDataSource;
+
 import javax.sql.DataSource;
 
-/** BoneCP 数据源包装器（轻量级高性能连接池） */
+/**
+ * BoneCP 数据源包装器（轻量级高性能连接池）
+ */
 public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     private static Boolean canInit = null;
@@ -52,5 +55,20 @@ public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
             return (BoneCPDataSource) targetDataSource;
         }
         throw new IllegalArgumentException("当前数据源不是BoneCP数据源");
+    }
+
+    @Override
+    public Integer getActiveCount() {
+        BoneCPDataSource bcp = getBoneCPDataSource();
+        if (bcp == null) {
+            return 0;
+        }
+        Integer activeCount = null;
+        try {
+            activeCount = bcp.getPool().getTotalLeased();
+        } catch (Exception e) {
+
+        }
+        return activeCount;
     }
 }

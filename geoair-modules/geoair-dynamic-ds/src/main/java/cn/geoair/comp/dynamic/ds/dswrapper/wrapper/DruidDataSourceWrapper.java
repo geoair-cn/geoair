@@ -54,7 +54,12 @@ public class DruidDataSourceWrapper extends GirAbstractDataSourceWrapper {
         return druidDataSource.getRawJdbcUrl();
     }
 
-    /** 获取Druid数据源的特有配置（可选扩展） */
+    @Override
+    public Integer getActiveCount() {
+        return getDruidDataSource().getActiveCount();
+    }
+
+
     public DruidDataSource getDruidDataSource() {
         if (isSupport()) {
             return (DruidDataSource) super.targetDataSource;

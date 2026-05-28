@@ -3,7 +3,7 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import javax.sql.DataSource;
 
-/** HikariCP数据源包装器 */
+
 public class AdvSimpleDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public AdvSimpleDataSourceWrapper(DataSource targetDataSource) {
@@ -11,7 +11,6 @@ public class AdvSimpleDataSourceWrapper extends GirAbstractDataSourceWrapper {
     }
 
     public static boolean canInit() {
-
         return true;
     }
 
@@ -26,13 +25,16 @@ public class AdvSimpleDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-
         return null;
     }
 
     @Override
     public String getJdbcUrl() {
+        return null;
+    }
 
+    @Override
+    public Integer getActiveCount() {
         return null;
     }
 }

@@ -46,4 +46,10 @@ public class SpringDiverManagerSourceWrapper extends GirAbstractDataSourceWrappe
         DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
         return dataSource.getUrl();
     }
+
+    @Override
+    public Integer getActiveCount() {
+        return null;
+    }
+
 }

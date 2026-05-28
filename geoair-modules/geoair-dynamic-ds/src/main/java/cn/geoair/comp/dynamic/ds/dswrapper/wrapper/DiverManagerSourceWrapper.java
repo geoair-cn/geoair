@@ -2,6 +2,7 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
+
 import javax.sql.DataSource;
 
 public class DiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
@@ -41,4 +42,11 @@ public class DiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
         DriverManagerDataSource dataSource = (DriverManagerDataSource) targetDataSource;
         return dataSource.getUrl();
     }
+
+    @Override
+    public Integer getActiveCount() {
+        return null;
+    }
+
+
 }
