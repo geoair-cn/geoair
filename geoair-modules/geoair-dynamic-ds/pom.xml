@@ -130,6 +130,11 @@
             <version>${aspectj.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>4.7</version>
+        </dependency>
         <!-- C3P0 -->
         <dependency>
             <groupId>com.mchange</groupId>
