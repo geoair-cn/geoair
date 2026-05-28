@@ -23,8 +23,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
 
-    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.me().getSridOpt();
-    protected GirGeoFormatOpt formatOpt = GirGeoTools.me().getFormatOpt();
+    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.defaultInstance().getSridOpt();
+    protected GirGeoFormatOpt formatOpt = GirGeoTools.defaultInstance().getFormatOpt();
 
     ToolsConfig advToolsConfig;
 

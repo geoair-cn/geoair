@@ -47,7 +47,12 @@ public class GirGeoTools implements GirGeoToolsInterface {
         return new GirGeoTools(advToolsConfig);
     }
 
-    public static GirGeoTools me() {
+    /**
+     * 获取默认配置实例
+     *
+     * @return
+     */
+    public static GirGeoTools defaultInstance() {
         if (INSTANCE == null) {
             synchronized (GirGeoTools.class) {
                 if (INSTANCE == null) {
@@ -56,6 +61,16 @@ public class GirGeoTools implements GirGeoToolsInterface {
             }
         }
         return INSTANCE;
+    }
+
+    /**
+     * 命名不规范，弃用
+     *
+     * @return
+     */
+    @Deprecated
+    public static GirGeoTools me() {
+        return defaultInstance();
     }
 
 

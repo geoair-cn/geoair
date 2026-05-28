@@ -53,7 +53,7 @@ public class VectorTileCommonUtils {
         }
         // 坐标系转换
         Geometry convertedGeom =
-                GirGeoTools.me().getSridOpt()
+                GirGeoTools.defaultInstance().getSridOpt()
                         .convert(
                                 geometry,
                                 parameter.getSourceDataSrid(),
@@ -94,7 +94,7 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirGeoTools.me().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                    String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
                     // String tileId = zoom + "#" + y + "#" + x;
                     tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
                 }
@@ -149,7 +149,7 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirGeoTools.me().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                    String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
                     // String tileId = zoom + "#" + y + "#" + x;
                     tileMap.put(quadKey, feature);
                 }
@@ -212,7 +212,7 @@ public class VectorTileCommonUtils {
             TileSliceParameter parameter,
             PbfTargetInfo pbfTargetInfo)
             throws Exception {
-        TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
+        TileZxyApo tileZxyApo = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
         int zoom = tileZxyApo.getZ();
         int y = tileZxyApo.getY();
         int x = tileZxyApo.getX();

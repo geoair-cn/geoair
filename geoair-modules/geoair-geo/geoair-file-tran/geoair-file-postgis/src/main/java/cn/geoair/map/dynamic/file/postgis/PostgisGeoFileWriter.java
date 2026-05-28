@@ -65,7 +65,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         try {
             this.featureType = featureType;
             CoordinateReferenceSystem crs =
-                    GirGeoTools.me().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                    GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
             org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                     new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
             typeBuilder.init(featureType);
@@ -119,7 +119,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirGeoTools.me().getSridOpt()
+                            GirGeoTools.defaultInstance().getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");

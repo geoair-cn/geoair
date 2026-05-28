@@ -60,7 +60,7 @@ public class ShpGeoFileWriter implements GeoFileWriter {
 
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        cn.geoair.map.dynamic.tools.GirGeoTools.me().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
 
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder tb =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();

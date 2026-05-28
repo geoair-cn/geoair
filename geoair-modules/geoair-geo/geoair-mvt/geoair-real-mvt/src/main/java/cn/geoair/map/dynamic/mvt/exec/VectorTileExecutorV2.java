@@ -332,7 +332,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             Geometry geometry = wkbReader.read(decode);
             // 将geom转到extent坐标系下
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirGeoTools.me().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
             }
             // 内存裁剪数据
             Geometry finalGeometry = geometry;
@@ -373,7 +373,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         Long maxPageSize = tileExecutorConfig.getMaxPageSize();
 
         PageActuator<GirAdvOneRow> pageActuatorOpt =
-                GirGeoTools.me().getPageActuatorOpt(
+                GirGeoTools.defaultInstance().getPageActuatorOpt(
                         new PageConditionDef<GirAdvOneRow>() {
 
                             @Override

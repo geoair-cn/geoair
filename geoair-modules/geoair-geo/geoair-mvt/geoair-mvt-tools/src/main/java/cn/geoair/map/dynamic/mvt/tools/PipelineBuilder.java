@@ -69,7 +69,7 @@ public class PipelineBuilder {
         Double xmax = extent.getMaxX();
         Double ymin = extent.getMinY();
         Double ymax = extent.getMaxY();
-        CoordinateReferenceSystem sourceCrs = GirGeoTools.me().getSridOpt().getCRS(srid);
+        CoordinateReferenceSystem sourceCrs = GirGeoTools.defaultInstance().getSridOpt().getCRS(srid);
         Rectangle paintArea = new Rectangle(0, 0, 4096, 4096);
         ReferencedEnvelope mapArea = new ReferencedEnvelope(xmin, xmax, ymin, ymax, sourceCrs);
         Context context = new Context();

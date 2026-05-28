@@ -29,7 +29,7 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
     @Override
     public String getResult(Entity entity, String columnName) {
         Object obj = entity.getObj(columnName);
-        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
             throwables.printStackTrace();
         }
 
-        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
@@ -52,18 +52,18 @@ public class OrgPgGeomTypeHandler extends BaseTypeHandler<String> {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
     public String getResult(Map<String, Object> row, String columnName) {
         Object obj = null;
         obj = row.get(columnName);
-        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 
     @Override
     public String getResult(Object obj) {
-        return GirGeoTools.me().getFormatOpt().pgGeometryToWkt(obj, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToWkt(obj, true);
     }
 }

@@ -19,7 +19,7 @@ public class GirGridTest {
     public static void main(String[] args) {}
 
     public static void test4326(int level, int x, int y) {
-        GirTileConverterOpt tileConverterOpt = GirGeoTools.me().getTileGrid4326Opt();
+        GirTileConverterOpt tileConverterOpt = GirGeoTools.defaultInstance().getTileGrid4326Opt();
         int srid = 4326;
         test(level, x, y, tileConverterOpt, srid);
     }
@@ -37,11 +37,11 @@ public class GirGridTest {
         Set<TileZxyApo> tileZxyApos =
                 tileConverterOpt.zxyListByBox(referencedEnvelope, srid, level);
         Gir.log.info("zxyListByBox:{}", tileZxyApos);
-        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
+        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
         Gir.log.info("geometry:{}", geometry);
         Set<TileZxyApo> tileZxyApos1 = tileConverterOpt.zxyListByGeom(geometry, srid, level);
         Gir.log.info("zxyListByGeom:{}", tileZxyApos1);
-        GirBingMapQuadKeyOpt tileGridBingMapOpt = GirGeoTools.me().getTileGridBingMapOpt();
+        GirBingMapQuadKeyOpt tileGridBingMapOpt = GirGeoTools.defaultInstance().getTileGridBingMapOpt();
         List<String> xyzToQuadKeyBatch = tileGridBingMapOpt.xyzToQuadKeyBatch(tileZxyApos1);
         Gir.log.info("xyzToQuadKeyBatch:{}", xyzToQuadKeyBatch);
         String quadKey = tileGridBingMapOpt.xyzToQuadKey(x, y, level);
@@ -57,7 +57,7 @@ public class GirGridTest {
     }
 
     public static void test3857(int level, int x, int y) {
-        GirTileConverterOpt tileConverterOpt = GirGeoTools.me().getTileGrid3857Opt();
+        GirTileConverterOpt tileConverterOpt = GirGeoTools.defaultInstance().getTileGrid3857Opt();
         int srid = 3857;
         test(level, x, y, tileConverterOpt, srid);
     }

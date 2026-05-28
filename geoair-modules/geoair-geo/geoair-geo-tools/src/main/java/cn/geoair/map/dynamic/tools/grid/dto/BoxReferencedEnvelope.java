@@ -20,20 +20,20 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
 
     public BoxReferencedEnvelope(org.locationtech.jts.geom.Envelope envelope, int srid)
             throws MismatchedDimensionException {
-        super(envelope, GirGeoTools.me().getSridOpt().getCRS(srid));
+        super(envelope, GirGeoTools.defaultInstance().getSridOpt().getCRS(srid));
         this.srid = srid;
     }
 
     public String getWktString(int targetSrid) {
-        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(this, srid, targetSrid);
-        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
+        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this, srid, targetSrid);
+        return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
     @Override
     public String toString() {
-        Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(this);
+        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this);
         return this.getSrid()
                 + ";"
-                + GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry, true);
+                + GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 }

@@ -151,7 +151,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
             if (linkInfo.getSrid() > 0 && featureType != null) {
                 SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
-                CoordinateReferenceSystem crs = GirGeoTools.me().getSridOpt().getCRS(linkInfo.getSrid());
+                CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
                 typeBuilder.setCRS(crs);
                 this.featureType = typeBuilder.buildFeatureType();
             }

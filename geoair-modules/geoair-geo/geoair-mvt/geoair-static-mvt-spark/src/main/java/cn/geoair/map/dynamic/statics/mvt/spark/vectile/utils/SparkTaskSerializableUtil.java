@@ -321,9 +321,9 @@ public class SparkTaskSerializableUtil implements Serializable {
     static int getTmsY(int zoom, int y, int x, int gridSrid) {
         int tms_y = y;
         if (gridSrid == 3857) {
-            tms_y = GirGeoTools.me().getTileGrid3857Opt().reverseY(y, zoom);
+            tms_y = GirGeoTools.defaultInstance().getTileGrid3857Opt().reverseY(y, zoom);
         } else {
-            tms_y = GirGeoTools.me().getTileGrid4326SeparateOpt().reverseY(y, zoom);
+            tms_y = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt().reverseY(y, zoom);
         }
         return tms_y;
     }
@@ -344,7 +344,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Row call(Tuple2<String, PbfInfo> tuple) throws Exception {
             String tileId = tuple._1;
-            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
             int x = tileZxyApo.getX();
@@ -381,7 +381,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         public Row call(Tuple2<String, PbfInfo> tuple) throws Exception {
 
             String tileId = tuple._1;
-            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
 
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
@@ -422,7 +422,7 @@ public class SparkTaskSerializableUtil implements Serializable {
             PbfInfo pbfInfo = tuple._2;
             byte[] bytes = pbfInfo.getDataLabel();
             pbfInfo.setDataLabel(null);
-            TileZxyApo tileZxyApo = GirGeoTools.me().getTileGridBingMapOpt().quadKeyToXyz(tileId);
+            TileZxyApo tileZxyApo = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
             int zoom = tileZxyApo.getZ();
             int y = tileZxyApo.getY();
             int x = tileZxyApo.getX();

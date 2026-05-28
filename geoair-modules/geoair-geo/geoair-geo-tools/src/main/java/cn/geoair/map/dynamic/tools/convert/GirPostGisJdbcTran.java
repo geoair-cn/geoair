@@ -28,7 +28,7 @@ public class GirPostGisJdbcTran {
              * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
              */
             PGobject pObject = (PGobject) value;
-            jtsGeom =  GirGeoTools.me().getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
+            jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
 
         }
         return jtsGeom;
