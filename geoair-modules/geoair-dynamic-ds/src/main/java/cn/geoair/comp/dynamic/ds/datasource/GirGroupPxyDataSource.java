@@ -16,14 +16,14 @@ public class GirGroupPxyDataSource extends GirGroupByIdDataSource {
 
     public GirGroupPxyDataSource(String groupName, List<String> dataSourceIds) {
         super(GirGroupByIdDataSource
-                .builder().
+                .builderById().
                 dataSourceIds(dataSourceIds).
                 groupName(groupName));
     }
 
     public GirGroupPxyDataSource(String groupName, List<String> dataSourceIds, LoadStrategyType strategyType) {
         super(GirGroupByIdDataSource
-                .builder().
+                .builderById().
                 dataSourceIds(dataSourceIds).
                 groupName(groupName).
                 strategy(strategyType));

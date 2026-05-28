@@ -240,7 +240,7 @@ public class GirReadWriteDataSourceBuilder {
             log.info("使用 ID 列表创建从库组，延迟加载: {}", enableLazyLoad);
             if (enableLazyLoad) {
                 return GirGroupByIdDataSource
-                        .builder().
+                        .builderById().
                         dataSourceIds(slaveDataSourceIds).strategy(slaveStrategy).groupName(slaveGroupName).build();
             } else {
                 // 立即加载所有数据源

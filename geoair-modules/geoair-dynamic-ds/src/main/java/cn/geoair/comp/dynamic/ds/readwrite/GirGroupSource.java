@@ -11,14 +11,13 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
 /**
  * 数据源组
- * 直接持有 DataSource 列表，提供完整的负载均衡功能
+ * 直接持有 DataSource 列表
  *
  * @author 张俊
  * @date Created in 2025/1/2 18:31
@@ -57,8 +56,6 @@ public class GirGroupSource extends AbstractDataSource {
      */
     protected int totalWeight = 0;
 
-    // ==================== 构造方法 ====================
-
     /**
      * 构造方法（默认随机策略）
      */
@@ -82,6 +79,134 @@ public class GirGroupSource extends AbstractDataSource {
 
         log.info("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
                 groupName, dataSources.size(), strategyType.getDescription());
+    }
+
+
+
+    protected GirGroupSource(Builder builder) {
+        this.groupName = builder.groupName;
+        this.strategyType = builder.strategyType;
+        this.dataSources = new ArrayList<>();
+
+        // 初始化数据源和权重
+        if (builder.dataSources != null && !builder.dataSources.isEmpty()) {
+            for (DataSource ds : builder.dataSources) {
+                this.dataSources.add(ds);
+                int weight = builder.weights.getOrDefault(ds, 1);
+                this.weightMap.put(ds, weight);
+                this.totalWeight += weight;
+            }
+        }
+
+        if (this.dataSources.isEmpty()) {
+            throw new IllegalStateException("数据源组 [" + groupName + "] 数据源列表不能为空");
+        }
+
+        log.info("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+                groupName, dataSources.size(), strategyType.getDescription(), totalWeight);
+    }
+
+
+    // ==================== Builder ====================
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String groupName;
+        private final List<DataSource> dataSources = new ArrayList<>();
+        private final Map<DataSource, Integer> weights = new HashMap<>();
+        private LoadStrategyType strategyType = LoadStrategyType.RANDOM;
+
+        /**
+         * 设置组名
+         */
+        public Builder groupName(String groupName) {
+            this.groupName = groupName;
+            return this;
+        }
+
+        /**
+         * 添加数据源
+         */
+        public Builder addDataSource(DataSource dataSource) {
+            this.dataSources.add(dataSource);
+            return this;
+        }
+
+        /**
+         * 添加数据源并指定权重
+         */
+        public Builder addDataSource(DataSource dataSource, int weight) {
+            this.dataSources.add(dataSource);
+            this.weights.put(dataSource, weight);
+            return this;
+        }
+
+        /**
+         * 批量添加数据源
+         */
+        public Builder dataSources(List<DataSource> dataSources) {
+            this.dataSources.addAll(dataSources);
+            return this;
+        }
+
+        /**
+         * 批量添加数据源（可变参数）
+         */
+        public Builder dataSources(DataSource... dataSources) {
+            this.dataSources.addAll(Arrays.asList(dataSources));
+            return this;
+        }
+
+        /**
+         * 设置权重（单个）
+         */
+        public Builder weight(DataSource dataSource, int weight) {
+            this.weights.put(dataSource, weight);
+            return this;
+        }
+
+        /**
+         * 设置权重（批量）
+         */
+        public Builder weights(Map<DataSource, Integer> weights) {
+            this.weights.putAll(weights);
+            return this;
+        }
+
+        /**
+         * 设置负载策略
+         */
+        public Builder strategy(LoadStrategyType strategyType) {
+            this.strategyType = strategyType;
+            return this;
+        }
+
+        /**
+         * 设置负载策略（通过名称）
+         */
+        public Builder strategy(String strategyName) {
+            LoadStrategyType strategy = LoadStrategyType.fromCode(strategyName);
+            if (strategy != null) {
+                this.strategyType = strategy;
+            }
+            return this;
+        }
+
+        /**
+         * 构建 GirGroupSource
+         */
+        public GirGroupSource build() {
+            if (groupName == null || groupName.trim().isEmpty()) {
+                throw new IllegalStateException("groupName 不能为空");
+            }
+            if (dataSources.isEmpty()) {
+                throw new IllegalStateException("dataSources 不能为空");
+            }
+            return new GirGroupSource(this);
+        }
     }
 
     // ==================== 权重管理 ====================
@@ -201,7 +326,7 @@ public class GirGroupSource extends AbstractDataSource {
      * 获取数据源的活跃连接数
      */
     protected Integer getActiveCount(DataSource dataSource) {
-        // 如果是 AdvDataSourceWrapper，使用其方法
+
         if (dataSource instanceof AdvDataSourceWrapper) {
             return ((AdvDataSourceWrapper) dataSource).getActiveCount();
         }
@@ -218,6 +343,7 @@ public class GirGroupSource extends AbstractDataSource {
                 return (Integer) pool.getClass().getMethod("getActiveConnections").invoke(pool);
             }
         } catch (Exception e) {
+            // 忽略异常
         }
 
         return null;
@@ -229,6 +355,9 @@ public class GirGroupSource extends AbstractDataSource {
     protected String getDataSourceInfo(DataSource ds) {
         if (ds instanceof AdvDataSourceWrapper) {
             return ((AdvDataSourceWrapper) ds).getJdbcUrl();
+        }
+        if (ds instanceof LazyDataSourceWrapper) {
+            return ((LazyDataSourceWrapper) ds).getJdbcUrl();
         }
         return ds.getClass().getSimpleName() + "@" + ds.hashCode();
     }
@@ -272,7 +401,6 @@ public class GirGroupSource extends AbstractDataSource {
     /**
      * 刷新数据源列表
      */
-
     public GirGroupSource refreshDataSources(List<DataSource> newDataSources) {
         if (newDataSources == null || newDataSources.isEmpty()) {
             throw new IllegalArgumentException("数据源列表不能为空");

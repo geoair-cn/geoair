@@ -64,7 +64,6 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     }
 
 
-
     // ==================== 私有方法 ====================
 
     /**
@@ -204,26 +203,13 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         return dataSources.get(0);
     }
 
-    @Override
-    protected String getDataSourceInfo(DataSource ds) {
-        if (ds instanceof LazyDataSourceWrapper) {
-            return ((LazyDataSourceWrapper) ds).getJdbcUrl();
-        }
-        if (ds instanceof AdvDataSourceWrapper) {
-            return ((AdvDataSourceWrapper) ds).getJdbcUrl();
-        }
-        return ds.getClass().getSimpleName() + "@" + ds.hashCode();
-    }
 
-    @Override
-    public void close() throws IOException {
-        log.debug("Group [{}] close called, but no action taken - data sources managed externally", groupName);
-    }
+
 
     // ==================== Builder ====================
 
-    public static Builder builder() {
-        return new Builder();
+    public static GirGroupByIdDataSource.Builder builderById() {
+        return new GirGroupByIdDataSource.Builder();
     }
 
     public static class Builder {
