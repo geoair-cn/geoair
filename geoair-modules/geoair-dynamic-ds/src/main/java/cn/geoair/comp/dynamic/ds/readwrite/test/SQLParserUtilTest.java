@@ -1,6 +1,7 @@
-package cn.geoair.comp.dynamic.ds.readwrite.utils;
+package cn.geoair.comp.dynamic.ds.readwrite.test;
 
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
+import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 
 /**
  * SQL解析工具类测试
@@ -103,15 +104,18 @@ public class SQLParserUtilTest {
 
         // PostgreSQL WITH 语句 (CTE)
         String[] withSQLs = {
-                "WITH temp AS (SELECT id FROM user) SELECT * FROM temp",
-                "WITH recursive cte AS (SELECT 1 UNION ALL SELECT id+1 FROM cte WHERE id<10) SELECT * FROM cte",
-                "WITH user_cte AS (SELECT id, name FROM user WHERE age > 18) SELECT * FROM user_cte",
-                "WITH orders AS (SELECT user_id, COUNT(*) as cnt FROM orders GROUP BY user_id) SELECT u.name, o.cnt FROM users u JOIN orders o ON u.id = o.user_id"
+//                "WITH temp AS (SELECT id FROM user) SELECT * FROM temp",
+//                "WITH recursive cte AS (SELECT 1 UNION ALL SELECT id+1 FROM cte WHERE id<10) SELECT * FROM cte",
+//                "WITH user_cte AS (SELECT id, name FROM user WHERE age > 18) SELECT * FROM user_cte",
+                "WITH moved_rows AS (SELECT FROM users WHERE age < 18 RETURNING *)  INSERT INTO users_archive SELECT * FROM moved_rows;",
+//                "WITH orders AS (SELECT user_id, COUNT(*) as cnt FROM orders GROUP BY user_id) SELECT u.name, o.cnt FROM users u JOIN orders o ON u.id = o.user_id"
         };
 
         for (String sql : withSQLs) {
             boolean isRead = SQLParserUtil.isReadOperation(sql);
             SQLType type = SQLParserUtil.getSQLType(sql);
+            SQLType jSqlParser = SQLParserUtil.parseWithJSqlParser(sql);
+            System.out.println(sql+":"+jSqlParser);
             System.out.printf("%-70s -> %s (%s)\n",
                     sql.length() > 68 ? sql.substring(0, 65) + "..." : sql,
                     isRead ? "读操作 ✓" : "非读操作 ✗", type);

@@ -193,7 +193,7 @@ public class GirReadWriteDataSourceBuilder {
         GirReadWriteDataSource dataSource = new GirReadWriteDataSource(master, slaveGroup);
 
 
-        log.info("读写分离数据源构建完成: master={}, slaveGroupType={}",
+        log.debug("读写分离数据源构建完成: master={}, slaveGroupType={}",
                 getMasterInfo(), getSlaveGroupType());
 
         return dataSource;
@@ -216,19 +216,19 @@ public class GirReadWriteDataSourceBuilder {
             throw new IllegalStateException("从库不能为空，请通过 slave()、slaves()、addSlave() 等方式配置从库");
         }
 
-        log.info("校验通过: master={}", getMasterInfo());
+        log.debug("校验通过: master={}", getMasterInfo());
     }
 
     private GirGroupSource buildSlaveGroup() {
         // 优先级：GirGroupByIdDataSource > GirGroupSource > 单个 DataSource > ID列表
 
         if (slaveGroupByIdDataSource != null) {
-            log.info("使用已配置的 GirGroupByIdDataSource 作为从库组");
+            log.debug("使用已配置的 GirGroupByIdDataSource 作为从库组");
             return slaveGroupByIdDataSource;
         }
 
         if (slaveGroupSource != null) {
-            log.info("使用已配置的 GirGroupSource 作为从库组");
+            log.debug("使用已配置的 GirGroupSource 作为从库组");
             return slaveGroupSource;
         }
 
@@ -237,7 +237,7 @@ public class GirReadWriteDataSourceBuilder {
         }
 
         if (!slaveDataSourceIds.isEmpty()) {
-            log.info("使用 ID 列表创建从库组，延迟加载: {}", enableLazyLoad);
+            log.debug("使用 ID 列表创建从库组，延迟加载: {}", enableLazyLoad);
             if (enableLazyLoad) {
                 return GirGroupByIdDataSource
                         .builderById().

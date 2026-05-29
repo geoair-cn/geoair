@@ -77,7 +77,7 @@ public class GirGroupSource extends AbstractDataSource {
             totalWeight += 1;
         }
 
-        log.info("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
+        log.debug("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
                 groupName, dataSources.size(), strategyType.getDescription());
     }
 
@@ -89,7 +89,7 @@ public class GirGroupSource extends AbstractDataSource {
         this.dataSources = new ArrayList<>();
 
         // 初始化数据源和权重
-        if (builder.dataSources != null && !builder.dataSources.isEmpty()) {
+        if (!builder.dataSources.isEmpty()) {
             for (DataSource ds : builder.dataSources) {
                 this.dataSources.add(ds);
                 int weight = builder.weights.getOrDefault(ds, 1);
@@ -102,7 +102,7 @@ public class GirGroupSource extends AbstractDataSource {
             throw new IllegalStateException("数据源组 [" + groupName + "] 数据源列表不能为空");
         }
 
-        log.info("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+        log.debug("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
                 groupName, dataSources.size(), strategyType.getDescription(), totalWeight);
     }
 
@@ -224,7 +224,7 @@ public class GirGroupSource extends AbstractDataSource {
         }
         weightMap.put(dataSource, weight);
         totalWeight += weight;
-        log.info("Group [{}] 设置数据源权重为: {}", groupName, weight);
+        log.debug("Group [{}] 设置数据源权重为: {}", groupName, weight);
         return this;
     }
 
@@ -369,7 +369,7 @@ public class GirGroupSource extends AbstractDataSource {
      */
     public GirGroupSource setStrategyType(LoadStrategyType strategyType) {
         this.strategyType = strategyType;
-        log.info("Group [{}] 负载策略切换为: {}", groupName, strategyType.getDescription());
+        log.debug("Group [{}] 负载策略切换为: {}", groupName, strategyType.getDescription());
         return this;
     }
 
@@ -419,7 +419,7 @@ public class GirGroupSource extends AbstractDataSource {
         // 重置轮询计数器
         roundRobinCounter.set(0);
 
-        log.info("Group [{}] 刷新数据源列表, 新数量: {}", groupName, dataSources.size());
+        log.debug("Group [{}] 刷新数据源列表, 新数量: {}", groupName, dataSources.size());
         return this;
     }
 
@@ -446,7 +446,7 @@ public class GirGroupSource extends AbstractDataSource {
         weightMap.put(dataSource, weight);
         totalWeight += weight;
 
-        log.info("Group [{}] 添加数据源, 当前数量: {}", groupName, dataSources.size());
+        log.debug("Group [{}] 添加数据源, 当前数量: {}", groupName, dataSources.size());
         return this;
     }
 
@@ -460,7 +460,7 @@ public class GirGroupSource extends AbstractDataSource {
             if (oldWeight != null) {
                 totalWeight -= oldWeight;
             }
-            log.info("Group [{}] 移除数据源, 当前数量: {}", groupName, dataSources.size());
+            log.debug("Group [{}] 移除数据源, 当前数量: {}", groupName, dataSources.size());
         }
         return removed;
     }
