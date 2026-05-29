@@ -2,12 +2,17 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+
 import javax.sql.DataSource;
 
-/** 动态数据源管理器接口 定义动态数据源的添加、获取、移除、清空等操作 */
+/**
+ * 动态数据源管理器接口 定义动态数据源的添加、获取、移除、清空等操作
+ */
 public interface DynamicDataSourceManager {
 
-    /** 清空数据源缓存并释放数据库连接 */
+    /**
+     * 清空数据源缓存并释放数据库连接
+     */
     void cleanCache();
 
     /**
@@ -30,10 +35,19 @@ public interface DynamicDataSourceManager {
     /**
      * 添加数据源到管理器
      *
-     * @param druidDataSource Druid数据源对象
+     * @param dataSource   数据源对象
      * @param dataSourceId 数据源ID
      */
-    void putDataSource(DataSource druidDataSource, String dataSourceId);
+    @Deprecated
+    void putDataSource(DataSource dataSource, String dataSourceId);
+
+    /**
+     * 注册数据源到管理器
+     *
+     * @param dataSource   数据源对象
+     * @param dataSourceId 数据源ID
+     */
+    void registerDataSource(String dataSourceId, DataSource dataSource);
 
     /**
      * 根据数据源APO对象创建Druid数据源

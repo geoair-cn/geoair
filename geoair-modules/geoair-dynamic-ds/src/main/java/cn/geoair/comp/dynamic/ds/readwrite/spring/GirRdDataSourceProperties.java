@@ -20,6 +20,10 @@ import java.util.List;
 public class GirRdDataSourceProperties {
 
     /**
+     * 读库组名称
+     */
+    private String groupName = "defaultRdGroup";
+    /**
      * 读写分离配置
      */
     private ReadWriteConfig readwrite = new ReadWriteConfig();
@@ -29,7 +33,7 @@ public class GirRdDataSourceProperties {
         /**
          * 是否启用
          */
-        private boolean enabled = true;
+        private boolean enabled = false;
 
         /**
          * 读库（从库）URL 列表
@@ -41,10 +45,7 @@ public class GirRdDataSourceProperties {
          */
         private LoadStrategyType readStrategy = LoadStrategyType.RANDOM;
 
-        /**
-         * 读库组名称
-         */
-        private String readGroupName = "defaultSlaveGroup";
+
 
         /**
          * 权重配置（用于 WEIGHT 策略）
