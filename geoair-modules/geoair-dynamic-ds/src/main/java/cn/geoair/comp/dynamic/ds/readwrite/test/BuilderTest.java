@@ -1,15 +1,11 @@
-package cn.geoair.comp.dynamic.ds.readwrite;
+package cn.geoair.comp.dynamic.ds.readwrite.test;
 
+import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
+import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSourceBuilder;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author ：张俊

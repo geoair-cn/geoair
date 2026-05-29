@@ -1,6 +1,7 @@
-package cn.geoair.comp.dynamic.ds.readwrite.utils;
+package cn.geoair.comp.dynamic.ds.readwrite.test;
 
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
+import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 
 /**
  * SQL解析工具类测试
