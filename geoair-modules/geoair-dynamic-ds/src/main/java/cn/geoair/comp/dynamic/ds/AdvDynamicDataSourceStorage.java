@@ -109,6 +109,11 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     @Override
     public void putDataSource(DataSource dataSource, String dataSourceId) {
+        registerDataSource(dataSourceId, dataSource);
+    }
+
+    @Override
+    public void registerDataSource(String dataSourceId, DataSource dataSource) {
         // 只有当数据源不存在时才添加
         AdvDataSourceWrapper existingDataSource = dataSourceMap.get(dataSourceId);
         if (existingDataSource == null) {
