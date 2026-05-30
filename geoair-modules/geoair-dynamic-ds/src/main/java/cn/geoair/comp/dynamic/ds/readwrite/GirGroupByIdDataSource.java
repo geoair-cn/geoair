@@ -58,7 +58,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
 
         refreshDataSourcesFromIds();
 
-        log.debug("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+        log.trace("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
                 groupName, dataSourceIds.size(), strategyType.getDescription(), totalWeight);
     }
 

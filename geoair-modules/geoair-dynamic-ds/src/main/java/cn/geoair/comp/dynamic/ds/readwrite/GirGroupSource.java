@@ -77,7 +77,7 @@ public class GirGroupSource extends AbstractDataSource {
             totalWeight += 1;
         }
 
-        log.debug("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
+        log.trace("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
                 groupName, dataSources.size(), strategyType.getDescription());
     }
 
