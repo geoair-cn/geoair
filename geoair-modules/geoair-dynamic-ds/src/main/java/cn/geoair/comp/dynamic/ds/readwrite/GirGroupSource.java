@@ -82,7 +82,6 @@ public class GirGroupSource extends AbstractDataSource {
     }
 
 
-
     protected GirGroupSource(Builder builder) {
         this.groupName = builder.groupName;
         this.strategyType = builder.strategyType;
@@ -478,7 +477,7 @@ public class GirGroupSource extends AbstractDataSource {
             log.warn("Group [{}] 策略 [{}] 选择数据源 [{}] 获取连接耗时: {}ms",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds), cost);
         } else {
-            log.debug("Group [{}] 策略 [{}] 选择数据源: {}",
+            log.trace("Group [{}] 策略 [{}] 选择数据源: {}",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds));
         }
 

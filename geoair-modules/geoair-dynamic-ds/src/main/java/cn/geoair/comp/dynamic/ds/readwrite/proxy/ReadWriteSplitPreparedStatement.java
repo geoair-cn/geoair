@@ -180,7 +180,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         // 应用已缓存的所有参数
         applyCachedParameters();
 
-        log.debug("创建真实的 PreparedStatement, sql: {}, 路由: {}",
+        log.trace("创建真实的 PreparedStatement, sql: {}, 路由: {}",
                 sql, getTargetDataSourceType());
 
         return realStatement;
@@ -939,7 +939,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
             return JdbcParameterNull.VARCHAR;
         }
 
-        if (x.length() == 0) {
+        if (x.isEmpty()) {
             return JdbcParameterString.empty;
         }
 
