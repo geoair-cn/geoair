@@ -52,8 +52,8 @@ public class GirDsRdAutoConfiguration {
         }
         log.info("开始构建读写分离数据源，组名: {}, 从库数量: {}, 策略: {}",
                 properties.getGroupName(),
-                properties.getReadwrite().getReadUrls() != null ? properties.getReadwrite().getReadUrlList().size() : 0,
-                properties.getReadwrite().getReadStrategy() != null ? properties.getReadwrite().getReadStrategy().getDescription() : "RANDOM");
+                properties.getReadwrite().getReadDataSourceConfigs() != null ? properties.getReadwrite().getReadUrlList().size() : 0,
+                properties.getReadwrite().getReadStrategy() != null ? properties.getReadwrite().getReadStrategy().getDescription() : "轮询策略");
 
         GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, dataSourceHelper)
                 .build();
