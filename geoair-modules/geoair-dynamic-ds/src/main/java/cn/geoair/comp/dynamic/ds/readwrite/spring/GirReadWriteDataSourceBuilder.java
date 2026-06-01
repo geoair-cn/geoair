@@ -17,8 +17,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 读写分离数据源构建工具类
@@ -66,7 +64,7 @@ public class GirReadWriteDataSourceBuilder {
         GirReadWriteDataSource readWriteDataSource = new GirReadWriteDataSource(masterDataSource, slaveGroup);
 
         log.info("读写分离数据源构建完成，从库数量: {}, 策略: {}",
-                properties.getReadwrite().getValidDataSources().size(),
+                properties.getReadwrite().findValidDataSources().size(),
                 properties.getReadwrite().getReadStrategy().getDescription());
 
         return readWriteDataSource;
@@ -118,7 +116,7 @@ public class GirReadWriteDataSourceBuilder {
      */
     private GirGroupSource createSlaveGroup() {
         GirRdDataSourceProperties.ReadWriteConfig config = properties.getReadwrite();
-        List<ReadDataSourceConfig> validDataSources = config.getValidDataSources();
+        List<ReadDataSourceConfig> validDataSources = config.findValidDataSources();
         LoadStrategyType strategy = config.getReadStrategy();
         String groupName = properties.getGroupName();
 

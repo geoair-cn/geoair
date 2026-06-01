@@ -474,7 +474,7 @@ public class GirGroupSource extends AbstractDataSource {
         Connection conn = ds.getConnection();
         long cost = System.currentTimeMillis() - startTime;
 
-        if (cost > 100) {
+        if (cost > 200) {
             log.warn("Group [{}] 策略 [{}] 选择数据源 [{}] 获取连接耗时: {}ms",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds), cost);
         } else {
