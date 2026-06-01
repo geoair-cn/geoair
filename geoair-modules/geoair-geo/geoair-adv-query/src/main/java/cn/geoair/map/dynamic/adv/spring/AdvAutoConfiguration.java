@@ -38,7 +38,7 @@ public class AdvAutoConfiguration {
     @ConditionalOnMissingBean(IAdvExecutor.class)
     @ConditionalOnBean(DataSource.class)
     public IAdvExecutor springAdvExecutor(DataSource dataSource) { // 注入DataSource，自动保证顺序
-        Gir.log.info("开始自动装配IAdvExecutor，检测数据源类型...");
+        Gir.log.info("开始自动装配springAdvExecutor，检测数据源类型...");
         Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
         String dataSourceName = null;
         if (wrapper.isPresent()) {
@@ -49,10 +49,9 @@ public class AdvAutoConfiguration {
         }
         IAdvExecutor advExecutorByDataSource =
                 AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
-        GirSpringAdvExecutor girSpringAdvExecutor =
-                new GirSpringAdvExecutor(advExecutorByDataSource);
+        GirSpringAdvExecutor girSpringAdvExecutor = new GirSpringAdvExecutor(advExecutorByDataSource);
         Gir.log.info(
-                "自动装配IAdvExecutor，IAdvExecutor类型：{}",
+                "自动装配SpringIAdvExecutor，IAdvExecutor的数据库类型：{}",
                 advExecutorByDataSource.getClass().getSimpleName());
         return girSpringAdvExecutor;
     }
