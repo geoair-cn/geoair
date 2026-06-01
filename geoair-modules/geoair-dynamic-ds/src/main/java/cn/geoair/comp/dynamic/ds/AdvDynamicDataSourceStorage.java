@@ -24,6 +24,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     protected static AdvDynamicDataSourceStorage dataSourceManager;
     @Setter
     IAdvDataSourceHelper iAdvDataSourceHelper;
+    @Setter
+    IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
 
     /**
      * 全局只有一个存储器实例
@@ -61,6 +63,18 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             }
         }
         return iAdvDataSourceHelper;
+    }
+
+    public IAdvDataSourceInitHelper getAdvDataSourceInitHelper() {
+        if (iAdvDataSourceInitHelper == null) {
+            try {
+                iAdvDataSourceInitHelper = Gir.beans.getBean(IAdvDataSourceInitHelper.class);
+            } catch (Exception e) {
+                log.error(e, e.getMessage());
+                throw new RuntimeException("无法找到 IAdvDataSourceGetterHelper 的实现类!" + e.getMessage());
+            }
+        }
+        return iAdvDataSourceInitHelper;
     }
 
     private AdvDynamicDataSourceStorage() {
@@ -145,7 +159,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
      */
     @Override
     public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo) {
-        return AdvDataSourceWrapper.wrap(getAdvDataSourceHelper().getDbDataSourceByApo(dataSourceApo));
+        return AdvDataSourceWrapper.wrap(getAdvDataSourceInitHelper().getDbDataSourceByApo(dataSourceApo));
     }
 
     @Override
