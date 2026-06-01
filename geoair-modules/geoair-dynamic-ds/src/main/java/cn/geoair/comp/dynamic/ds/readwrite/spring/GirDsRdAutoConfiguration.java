@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(GirRdDataSourceProperties.class)
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
-@ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class GirDsRdAutoConfiguration {
     private static final GiLogger log = GirLogger.getLoger(GirDsRdAutoConfiguration.class);
 
