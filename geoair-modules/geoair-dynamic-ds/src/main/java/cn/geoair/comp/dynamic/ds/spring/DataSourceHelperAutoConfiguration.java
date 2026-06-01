@@ -2,13 +2,18 @@ package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
+import cn.geoair.comp.dynamic.ds.readwrite.spring.GirDsRdAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/10/9 15:28 @description： spring的自动装配
  */
+@AutoConfigureBefore({GirDsRdAutoConfiguration.class})
 public class DataSourceHelperAutoConfiguration {
 
     @Bean
