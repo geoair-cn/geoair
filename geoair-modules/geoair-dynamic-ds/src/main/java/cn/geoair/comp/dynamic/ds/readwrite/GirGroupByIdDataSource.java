@@ -163,7 +163,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
      * 获取数据源ID对应的实际数据源
      */
     public AdvDataSourceWrapper getDataSourceById(String dataSourceId) {
-        return AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
+        return AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
     }
 
     /**
