@@ -71,7 +71,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
                 iAdvDataSourceInitHelper = Gir.beans.getBean(IAdvDataSourceInitHelper.class);
             } catch (Exception e) {
                 log.error(e, e.getMessage());
-                throw new RuntimeException("无法找到 IAdvDataSourceGetterHelper 的实现类!" + e.getMessage());
+                throw new RuntimeException("无法找到 iAdvDataSourceInitHelper 的实现类!" + e.getMessage());
             }
         }
         return iAdvDataSourceInitHelper;
