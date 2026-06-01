@@ -35,7 +35,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @Configuration
 public class AdvAutoConfiguration {
     public AdvAutoConfiguration() {
-        Gir.log.info("AdvSpringAutoConfiguration initialized");
+        Gir.log.info("springAdvExecutor 自动装配逻辑初始化  ");
     }
 
     @Bean
@@ -44,7 +44,7 @@ public class AdvAutoConfiguration {
         DataSource dataSource = dataSourceProvider.getIfAvailable();
 
         if (dataSource == null) {
-            Gir.log.warn("DataSource Bean 不存在，跳过 IAdvExecutor 创建");
+            Gir.log.warn("DataSource Bean 不存在，跳过 springAdvExecutor 创建");
             return null;
         }
         Gir.log.info("开始自动装配springAdvExecutor，检测数据源类型...");
@@ -60,7 +60,7 @@ public class AdvAutoConfiguration {
                 AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
         GirSpringAdvExecutor girSpringAdvExecutor = new GirSpringAdvExecutor(advExecutorByDataSource);
         Gir.log.info(
-                "自动装配SpringIAdvExecutor，IAdvExecutor的数据库类型：{}",
+                "自动装配SpringIAdvExecutor，springAdvExecutor的数据库类型：{}",
                 advExecutorByDataSource.getClass().getSimpleName());
         return girSpringAdvExecutor;
     }
@@ -73,8 +73,7 @@ public class AdvAutoConfiguration {
     @ConditionalOnBean(IAdvExecutor.class)
     public IAdvExecutorAdapter advExecutorAdapter(
             IAdvExecutor advExecutor) { // 注入IAdvExecutor，自动保证顺序
-        Gir.log.info("自动装配IAdvExecutorAdapter  ");
-        CommonAdvExecutorAdapter adapter = new CommonAdvExecutorAdapter();
-        return adapter;
+        Gir.log.info("自动装配IAdvExecutor的获取器 ");
+        return new CommonAdvExecutorAdapter();
     }
 }
