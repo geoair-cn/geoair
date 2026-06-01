@@ -33,6 +33,10 @@ import javax.sql.DataSource;
 public class GirDsRdAutoConfiguration {
     private static final GiLogger log = GirLogger.getLoger(GirDsRdAutoConfiguration.class);
 
+    public GirDsRdAutoConfiguration() {
+        log.info("GirDsRdAutoConfiguration initialized");
+    }
+
     @Bean
     @Primary
     @ConditionalOnBean({IAdvDataSourceHelper.class, DataSourceProperties.class})
