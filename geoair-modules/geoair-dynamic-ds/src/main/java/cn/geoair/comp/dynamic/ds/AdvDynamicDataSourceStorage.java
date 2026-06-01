@@ -91,6 +91,19 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     @Override
     public AdvDataSourceWrapper getDataSource(String dataSourceId) {
+        return getOrCreateDataSource(dataSourceId);
+    }
+
+    @Override
+    public AdvDataSourceWrapper getDataSourceById(String dataSourceId) {
+        if (containsDataSource(dataSourceId)) {
+            return dataSourceMap.get(dataSourceId);
+        }
+        return null;
+    }
+
+    @Override
+    public AdvDataSourceWrapper getOrCreateDataSource(String dataSourceId) {
         if (containsDataSource(dataSourceId)) {
             return dataSourceMap.get(dataSourceId);
         } else {

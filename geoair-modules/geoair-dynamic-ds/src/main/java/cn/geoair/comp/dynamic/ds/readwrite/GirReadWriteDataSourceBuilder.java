@@ -246,7 +246,7 @@ public class GirReadWriteDataSourceBuilder {
                 // 立即加载所有数据源
                 List<DataSource> loadedDataSources = new ArrayList<>();
                 for (String dsId : slaveDataSourceIds) {
-                    AdvDataSourceWrapper ds = AdvDynamicDataSourceStorage.getInstance().getDataSource(dsId);
+                    AdvDataSourceWrapper ds = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dsId);
                     if (ds != null) {
                         loadedDataSources.add(ds);
                     } else {
@@ -267,7 +267,7 @@ public class GirReadWriteDataSourceBuilder {
         if (enableLazyLoad) {
             return new LazyDataSourceWrapper(masterDataSourceId);
         } else {
-            AdvDataSourceWrapper ds = AdvDynamicDataSourceStorage.getInstance().getDataSource(masterDataSourceId);
+            AdvDataSourceWrapper ds = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(masterDataSourceId);
             if (ds == null) {
                 throw new IllegalStateException("主库数据源不存在: " + masterDataSourceId);
             }

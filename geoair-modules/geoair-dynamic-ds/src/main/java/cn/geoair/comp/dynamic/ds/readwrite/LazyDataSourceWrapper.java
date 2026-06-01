@@ -31,6 +31,18 @@ public class LazyDataSourceWrapper implements DataSource {
         this.dataSourceId = dataSourceId;
     }
 
+
+    /**
+     * 直接进行初始化真实数据源，这一步非必要不用执行，因为数据源真正使用的时候会进行懒加载的。
+     *
+     * @return 获取真实数据源的包装对象
+     */
+    public LazyDataSourceWrapper init() {
+        getRealDataSource();
+        return this;
+
+    }
+
     /**
      * 获取真实的数据源（延迟加载）
      */
@@ -40,7 +52,7 @@ public class LazyDataSourceWrapper implements DataSource {
             try {
                 if (realDataSource == null) {
                     log.debug("延迟加载数据源: {}", dataSourceId);
-                    realDataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
+                    realDataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
                     if (realDataSource == null) {
                         throw new IllegalStateException("数据源不存在: " + dataSourceId);
                     }

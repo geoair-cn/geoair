@@ -110,7 +110,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
-            dataSource = AdvDynamicDataSourceStorage.getInstance().getDataSource(dataSourceId);
+            dataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
         } else {
             dataSource =
                     AdvDynamicDataSourceStorage.getInstance()
