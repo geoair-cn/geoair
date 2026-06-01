@@ -10,40 +10,16 @@ import java.util.stream.Collectors;
 
 /**
  * 读写分离数据源配置
- * <p>
- * 配置前缀：<code>spring.datasource.geoair</code>
- * <p>
- * 配置模板文件位置：
+ * 配置前缀：spring.datasource.geoair
+ *
+ * <p>配置模板文件：<code>META-INF/template.yml</code>
+ * <p>可从以下路径获取模板：
  * <ul>
- *     <li>源码位置：<code>src/main/resources/cn/geoair/comp/dynamic/ds/readwrite/spring/template.yml</code></li>
+ *     <li>源码位置：<code>src/main/resources/META-INF/template.yml</code></li>
+ *     <li>源码位置：<code>src/main/resources/META-INF/template.properties</code></li>
+
  * </ul>
  *
- * <h3>YAML 配置示例</h3>
- * <pre>
- * spring:
- *   datasource:
- *     geoair:
- *       group-name: "orderRdGroup"
- *       master-data-source-id: "master_db_01"
- *       readwrite:
- *         enabled: true
- *         read-strategy: WEIGHT
- *         read-data-sources:
- *           - id: beijing_slave
- *             url: jdbc:postgresql://192.168.0.104:5432/ybls_address
- *             weight: 50
- *             enabled: true
- * </pre>
- *
- * <h3>Properties 配置示例</h3>
- * <pre>
- * spring.datasource.geoair.group-name=orderRdGroup
- * spring.datasource.geoair.readwrite.enabled=true
- * spring.datasource.geoair.readwrite.read-data-sources[0].id=beijing_slave
- * spring.datasource.geoair.readwrite.read-data-sources[0].url=jdbc:postgresql://...
- * </pre>
- *
- * @see org.springframework.boot.context.properties.ConfigurationProperties
  * @author 张俊
  * @date Created in 2023/5/31 15:27
  */
