@@ -75,7 +75,7 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
             dataSourceNew.setUsername(dataSourceApo.getUsername());
             dataSourceNew.setPassword(dataSourceApo.getPassword());
             // 初始化数据源
-//            dataSourceNew.init();
+            dataSourceNew.init();
             return dataSourceNew;
         } catch (Exception e) {
             log.error("加载动态连接池错误", e);
