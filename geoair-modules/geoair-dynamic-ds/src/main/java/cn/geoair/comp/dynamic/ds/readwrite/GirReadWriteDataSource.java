@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 
+import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWritePxyConnection;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWriteSplitConnection;
 import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 import lombok.Getter;
@@ -54,13 +55,13 @@ public class GirReadWriteDataSource implements DataSource {
         SQLType sqlType = SQLParserUtil.getSQLType(sql);
 
         if (sqlType == SQLType.WRITE) {
-            log.debug("写操作，路由到主库: {}", sql);
+            log.trace("写操作，路由到主库: {}", sql);
             return masterDataSource;
         } else if (sqlType == SQLType.READ) {
-            log.debug("读操作，路由到从库组: {}", sql);
+            log.trace("读操作，路由到从库组: {}", sql);
             return slaveGroup;
         } else {
-            log.warn("SQL类型未知，默认路由到主库: {}", sql);
+            log.debug("SQL类型未知，默认路由到主库: {}", sql);
             return masterDataSource;
         }
     }
@@ -103,4 +104,25 @@ public class GirReadWriteDataSource implements DataSource {
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return iface.isInstance(this) || masterDataSource.isWrapperFor(iface);
     }
+
+
+    public Connection getMasterConnection() throws SQLException {
+        DataSource masterDataSource = this.getMasterDataSource();
+        return new ReadWritePxyConnection(masterDataSource.getConnection(), false, masterDataSource);
+
+    }
+
+    public Connection getMasterConnection(String username, String password) throws SQLException {
+        DataSource masterDataSource = this.getMasterDataSource();
+        return new ReadWritePxyConnection(masterDataSource.getConnection(username, password), false, masterDataSource);
+    }
+
+    public Connection getSlaveConnection() throws SQLException {
+        return this.getSlaveGroup().getConnection();
+    }
+
+    public Connection getSlaveConnection(String username, String password) throws SQLException {
+        return this.getSlaveGroup().getConnection(username, password);
+    }
+
 }
