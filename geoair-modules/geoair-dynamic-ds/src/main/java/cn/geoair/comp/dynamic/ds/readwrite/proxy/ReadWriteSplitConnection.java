@@ -65,7 +65,7 @@ public class ReadWriteSplitConnection implements Connection {
         // 根据SQL类型选择数据源
         DataSource targetDs = dataSource.getDataSourceBySQL(sql);
 
-        if (targetDs instanceof GirGroupByIdDataSource) {
+        if (targetDs instanceof GirGroupSource) {
             return getSlaveConnection();
         } else {
             return getMasterConnection();
