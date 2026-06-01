@@ -5,6 +5,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,11 +36,11 @@ public class GirRdDataSourceProperties {
          * 是否启用
          */
         private boolean enabled = false;
-
         /**
-         * 读库（从库）URL 列表
+         * 读库的数据源列表，用逗号分割
          */
-        private List<String> readUrls;
+        private String readUrls;
+
 
         /**
          * 读库负载策略
@@ -46,11 +48,17 @@ public class GirRdDataSourceProperties {
         private LoadStrategyType readStrategy = LoadStrategyType.RANDOM;
 
 
-
         /**
          * 权重配置（用于 WEIGHT 策略）
          * 格式：url:weight
          */
         private java.util.Map<String, Integer> weights;
+
+        public List<String> getReadUrlList() {
+            if (readUrls == null || readUrls.trim().isEmpty()) {
+                return Collections.emptyList();
+            }
+            return Arrays.asList(readUrls.split(","));
+        }
     }
 }
