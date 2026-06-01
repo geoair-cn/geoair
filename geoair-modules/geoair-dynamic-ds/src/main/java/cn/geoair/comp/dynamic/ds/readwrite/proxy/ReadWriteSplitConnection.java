@@ -2,7 +2,6 @@ package cn.geoair.comp.dynamic.ds.readwrite.proxy;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 
