@@ -28,7 +28,7 @@ public class DataSourceHelperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(IAdvDataSourceInitHelper.class)
     IAdvDataSourceInitHelper advDataSourceGetterHelper() {
-        Gir.log.info("自动装配IAdvDataSourceGetterHelper");
+        Gir.log.info("自动装配iAdvDataSourceInitHelper");
         return new DefaultAdvDataSourceInitHelper();
     }
 }
