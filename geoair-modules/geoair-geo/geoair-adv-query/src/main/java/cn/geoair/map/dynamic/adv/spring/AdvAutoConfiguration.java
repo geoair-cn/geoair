@@ -35,12 +35,11 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @Configuration
 public class AdvAutoConfiguration {
     public AdvAutoConfiguration() {
-        Gir.log.info("AdvAutoConfiguration initialized");
+        Gir.log.info("AdvSpringAutoConfiguration initialized");
     }
 
     @Bean
     @ConditionalOnMissingBean(IAdvExecutor.class)
-
     public IAdvExecutor springAdvExecutor(ObjectProvider<DataSource> dataSourceProvider) {
         DataSource dataSource = dataSourceProvider.getIfAvailable();
 
