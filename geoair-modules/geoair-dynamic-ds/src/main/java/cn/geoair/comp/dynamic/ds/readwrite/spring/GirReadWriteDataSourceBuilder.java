@@ -130,14 +130,14 @@ public class GirReadWriteDataSourceBuilder {
                     DataSource slaveDs = createSlaveDataSource(url, slaveId);
                     AdvDynamicDataSourceStorage.getInstance()
                             .registerDataSource(slaveId, slaveDs);
-                    log.info("创建并注册从库数据源: {} -> {}", slaveId, url);
+                    log.info("创建并注册从库数据源完成: {} -> {}", slaveId, url);
                 }
             } catch (Exception e) {
                 log.error("注册从库数据源失败: {}", slaveId, e);
             }
         }
 
-        // 创建 GirGroupByIdDataSource
+
         GirGroupByIdDataSource slaveGroup = GirGroupByIdDataSource.builderById()
                 .groupName(groupName)
                 .dataSourceIds(slaveIds)
@@ -170,7 +170,7 @@ public class GirReadWriteDataSourceBuilder {
         DataSourceApo dataSourceApo = GirSpringDataSourceUtils.convertToDataSourceApo(propertiesSlave);
         dataSourceApo.setId(slaveId);
         DataSource dbDataSourceByApo = iAdvDataSourceHelper.getDbDataSourceByApo(dataSourceApo);
-        log.debug("创建从库数据源: URL={}, Driver={}", slaveUrl, springDataSourceProperties.getDriverClassName());
+        log.debug("创建从库数据源完成: URL={}, Driver={}", slaveUrl, springDataSourceProperties.getDriverClassName());
         return dbDataSourceByApo;
     }
 }
