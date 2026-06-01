@@ -95,6 +95,11 @@ public class DataSourceApo implements Serializable {
 
     private Integer removeAbandonedTimeout = 1800; // 回收连接的超时时间
 
+
+    private Integer connectionErrorRetryAttempts = 3;  // 链接获取失败的时候重试次数
+
+    private String validationQuery; // 验证链接的SQL
+
     public void setJdbcUrl(String jdbcUrl) {
         AdvJdbcUrlUtil splitter = AdvJdbcUrlUtil.splitter(jdbcUrl);
         setDbName(splitter.getDatabase());
