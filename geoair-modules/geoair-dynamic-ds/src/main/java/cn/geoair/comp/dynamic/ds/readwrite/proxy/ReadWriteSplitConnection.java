@@ -97,7 +97,7 @@ public class ReadWriteSplitConnection implements Connection {
                 }
                 // 设置事务状态
                 currentConnection.setAutoCommit(autoCommit);
-                log.debug("创建主库连接");
+                log.trace("创建主库连接成功");
             }
             return currentConnection;
         } catch (SQLException e) {
