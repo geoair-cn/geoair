@@ -72,7 +72,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         return rootPackages;
     }
 
-    /** 核心：找到@SpringBootApplication标注的启动类，提取扫描根包 */
+    /**  找到@SpringBootApplication标注的启动类，提取扫描根包 */
     private String getSpringBootRootPackage() {
         Map<String, Object> bootBeans =
                 applicationContext.getBeansWithAnnotation(SpringBootApplication.class);

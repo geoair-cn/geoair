@@ -34,7 +34,7 @@ public class GaModelFieldConverter implements ModelConverter {
         }
 
         Type type = annotatedType.getType();
-        Class<?> clazz = TypeUtil.getClass(type); // 核心：Hutool一键解析类型
+        Class<?> clazz = TypeUtil.getClass(type); //  Hutool一键解析类型
         if (clazz != null) {
             GaModel gaModel = AnnotationUtils.findAnnotation(clazz, GaModel.class);
             if (gaModel != null) {

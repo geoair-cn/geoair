@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(AdvAutoConfiguration.class) // 核心：自动导入你的自动配置类
+@Import(AdvAutoConfiguration.class) //  自动导入你的自动配置类
 public @interface EnableGirAdvDynamic {
 }

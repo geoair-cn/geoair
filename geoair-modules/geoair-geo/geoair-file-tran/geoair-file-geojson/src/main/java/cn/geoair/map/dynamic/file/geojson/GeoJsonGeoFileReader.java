@@ -52,7 +52,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         }
     }
 
-    /** 改造核心：返回 SimpleFeatureType（替代原 List<Pair>） */
+    /** 改造 返回 SimpleFeatureType（替代原 List<Pair>） */
     @Override
     public SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer) {
         try {
