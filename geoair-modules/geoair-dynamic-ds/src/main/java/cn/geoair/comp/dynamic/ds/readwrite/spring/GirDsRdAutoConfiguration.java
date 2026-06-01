@@ -2,6 +2,7 @@ package cn.geoair.comp.dynamic.ds.readwrite.spring;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -34,12 +35,14 @@ public class GirDsRdAutoConfiguration {
     @Bean
     @Primary
     @ConditionalOnBean({IAdvDataSourceHelper.class, DataSourceProperties.class})
-    @ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "read-urls")
     public GirReadWriteDataSource girReadWriteDataSource(
             GirRdDataSourceProperties properties,
             DataSourceProperties dataSourceProperties,
             IAdvDataSourceHelper dataSourceHelper) {
 
+        if (GutilObject.isEmpty(properties.getReadwrite().getReadUrlList())) {
+            throw new RuntimeException("readwrite readUrlList is empty!");
+        }
         log.info("开始构建读写分离数据源，组名: {}, 从库数量: {}, 策略: {}",
                 properties.getGroupName(),
                 properties.getReadwrite().getReadUrls() != null ? properties.getReadwrite().getReadUrlList().size() : 0,
@@ -51,8 +54,6 @@ public class GirDsRdAutoConfiguration {
         log.info("读写分离数据源构建完成");
         return dataSource;
     }
-
-
 
 
 }
