@@ -4,9 +4,8 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
-import cn.geoair.comp.dynamic.ds.readwrite.proxy.druid.JdbcParameter;
-import cn.geoair.comp.dynamic.ds.readwrite.proxy.druid.JdbcParameterImpl;
-import cn.geoair.comp.dynamic.ds.readwrite.proxy.druid.JdbcParameterNull;
+import cn.geoair.comp.dynamic.ds.readwrite.proxy.druid.*;
+
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -314,91 +313,97 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
     }
 
 
-
     @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
-        setParameter(parameterIndex, JdbcParameterNull.valueOf(sqlType));
+        setParameter(parameterIndex, createParameterNull(sqlType));
     }
 
     @Override
     public void setBoolean(int parameterIndex, boolean x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.BOOLEAN, x));
+        setParameter(parameterIndex, createParameter(Types.BOOLEAN, x));
     }
 
     @Override
     public void setByte(int parameterIndex, byte x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.TINYINT, x));
+        setParameter(parameterIndex, createParameter(Types.TINYINT, x));
     }
 
     @Override
     public void setShort(int parameterIndex, short x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.SMALLINT, x));
+        setParameter(parameterIndex, createParameter(Types.SMALLINT, x));
     }
 
     @Override
     public void setInt(int parameterIndex, int x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.INTEGER, x));
+        setParameter(
+                parameterIndex,
+                createParemeter(x)
+        );
     }
 
     @Override
     public void setLong(int parameterIndex, long x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.BIGINT, x));
+        setParameter(
+                parameterIndex,
+                createParameter(x)
+        );
     }
 
     @Override
     public void setFloat(int parameterIndex, float x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.FLOAT, x));
+        setParameter(parameterIndex, createParameter(Types.FLOAT, x));
     }
 
     @Override
     public void setDouble(int parameterIndex, double x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.DOUBLE, x));
+        setParameter(parameterIndex, createParameter(Types.DOUBLE, x));
     }
 
     @Override
     public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.DECIMAL, x));
+        setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setString(int parameterIndex, String x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.VARCHAR, x));
+        setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setBytes(int parameterIndex, byte[] x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.VARBINARY, x));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BYTES, x));
     }
 
     @Override
     public void setDate(int parameterIndex, java.sql.Date x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.DATE, x));
+        setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x));
+        setParameter(parameterIndex, createParameter(Types.TIME, x));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
+        setParameter(parameterIndex, createParameter(Types.TIMESTAMP, x));
+
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, x, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x, length));
     }
 
     @Override
     @Deprecated
     public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, x, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.UnicodeStream, x, length));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARBINARY, x, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x, length));
     }
 
     @Override
@@ -416,41 +421,39 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(targetSqlType, x));
+        setParameter(parameterIndex, createParameter(targetSqlType, x));
     }
+
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
-        if (x == null) {
-            setNull(parameterIndex, Types.NULL);
-        } else {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.JAVA_OBJECT, x));
-        }
+        setObjectParameter(parameterIndex, x);
     }
+
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, reader, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.CharacterInputStream, reader, length));
     }
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.REF, x));
+        setParameter(parameterIndex, createParameter(Types.REF, x));
     }
 
     @Override
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.BLOB, x));
+        setParameter(parameterIndex, createParameter(Types.BLOB, x));
     }
 
     @Override
     public void setClob(int parameterIndex, Clob x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.CLOB, x));
+        setParameter(parameterIndex, createParameter(Types.CLOB, x));
     }
 
     @Override
     public void setArray(int parameterIndex, Array x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.ARRAY, x));
+        setParameter(parameterIndex, createParameter(Types.ARRAY, x));
     }
 
     @Override
@@ -460,17 +463,17 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     @Override
     public void setDate(int parameterIndex, java.sql.Date x, Calendar cal) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.DATE, x, cal));
+        setParameter(parameterIndex, createParameter(Types.DATE, x, cal));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x, cal));
+        setParameter(parameterIndex, createParameter(Types.TIME, x, cal));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x, cal));
+        setParameter(parameterIndex, createParameter(Types.TIMESTAMP, x, cal));
     }
 
     @Override
@@ -480,7 +483,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     @Override
     public void setURL(int parameterIndex, URL x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.DATALINK, x));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.URL, x));
     }
 
     @Override
@@ -490,97 +493,100 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.ROWID, x));
+        setParameter(parameterIndex, createParameter(Types.ROWID, x));
     }
 
     @Override
     public void setNString(int parameterIndex, String value) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NVARCHAR, value));
+        setParameter(parameterIndex, createParameter(Types.NVARCHAR, value));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NVARCHAR, value, length));
+        setParameter(
+                parameterIndex,
+                createParameter(JdbcParameter.TYPE.NCharacterInputStream, value, length)
+        );
     }
 
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NCLOB, value));
+        setParameter(parameterIndex, createParameter(Types.NCLOB, value));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.CLOB, reader, length));
+        setParameter(parameterIndex, createParameter(Types.CLOB, reader, length));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.BLOB, inputStream, length));
+        setParameter(parameterIndex, createParameter(Types.BLOB, inputStream, length));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NCLOB, reader, length));
+        setParameter(parameterIndex, createParameter(Types.NCLOB, reader, length));
     }
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.SQLXML, xmlObject));
+        setParameter(parameterIndex, createParameter(Types.SQLXML, xmlObject));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(targetSqlType, x, -1, null, scaleOrLength));
+        setParameter(parameterIndex, createParameter(x, targetSqlType, scaleOrLength));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, x, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x, length));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARBINARY, x, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x, length));
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, reader, length));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.CharacterInputStream, reader, length));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, x));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARBINARY, x));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x));
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.LONGVARCHAR, reader));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.CharacterInputStream, reader));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NVARCHAR, value));
+        setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.NCharacterInputStream, value));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.CLOB, reader));
+        setParameter(parameterIndex, createParameter(Types.CLOB, reader));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.BLOB, inputStream));
+        setParameter(parameterIndex, createParameter(Types.BLOB, inputStream));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
-        setParameter(parameterIndex, new JdbcParameterImpl(Types.NCLOB, reader));
+        setParameter(parameterIndex, createParameter(Types.NCLOB, reader));
     }
 
     // ==================== 执行方法 ====================
@@ -775,5 +781,208 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
             return realStatement.unwrap(iface);
         }
         throw new SQLException("No statement available");
+    }
+
+    private void setObjectParameter(int parameterIndex, Object x) {
+        if (x == null) {
+            setParameter(parameterIndex, createParameterNull(Types.OTHER));
+            return;
+        }
+
+        Class<?> clazz = x.getClass();
+        if (clazz == Byte.class) {
+            setParameter(parameterIndex, createParameter(Types.TINYINT, x));
+            return;
+        }
+
+        if (clazz == Short.class) {
+            setParameter(parameterIndex, createParameter(Types.SMALLINT, x));
+            return;
+        }
+
+        if (clazz == Integer.class) {
+            setParameter(parameterIndex, createParemeter((Integer) x));
+            return;
+        }
+
+        if (clazz == Long.class) {
+            setParameter(parameterIndex, createParameter((Long) x));
+            return;
+        }
+
+        if (clazz == String.class) {
+            setParameter(parameterIndex, createParameter((String) x));
+            return;
+        }
+
+        if (clazz == BigDecimal.class) {
+            setParameter(parameterIndex, createParameter((BigDecimal) x));
+            return;
+        }
+
+        if (clazz == Float.class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.FLOAT, x));
+            return;
+        }
+
+        if (clazz == Double.class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.DOUBLE, x));
+            return;
+        }
+
+        if (clazz == java.sql.Date.class || clazz == java.util.Date.class) {
+            setParameter(parameterIndex, createParameter((java.util.Date) x));
+            return;
+        }
+
+        if (clazz == java.sql.Timestamp.class) {
+            setParameter(parameterIndex, createParameter((java.sql.Timestamp) x));
+            return;
+        }
+
+        if (clazz == java.sql.Time.class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x));
+            return;
+        }
+
+        if (clazz == Boolean.class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.BOOLEAN, x));
+            return;
+        }
+
+        if (clazz == byte[].class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(JdbcParameter.TYPE.BYTES, x));
+            return;
+        }
+
+        if (x instanceof InputStream) {
+            setParameter(parameterIndex, new JdbcParameterImpl(JdbcParameter.TYPE.BinaryInputStream, x));
+            return;
+        }
+
+        if (x instanceof Reader) {
+            setParameter(parameterIndex, new JdbcParameterImpl(JdbcParameter.TYPE.CharacterInputStream, x));
+            return;
+        }
+
+        if (x instanceof NClob) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.NCLOB, x));
+            return;
+        }
+
+        if (x instanceof Clob) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.CLOB, x));
+            return;
+        }
+
+        if (x instanceof Blob) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.BLOB, x));
+            return;
+        }
+
+        String className = x.getClass().getName();
+
+        if (className.equals("java.time.LocalTime")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x));
+            return;
+        }
+
+        if (className.equals("java.time.LocalDate")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.DATE, x));
+            return;
+        }
+
+        if (className.equals("java.time.LocalDateTime")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
+            return;
+        }
+
+        if (className.equals("java.time.ZonedDateTime")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
+            return;
+        }
+
+        setParameter(parameterIndex, createParameter(Types.OTHER, null));
+    }
+
+    private JdbcParameter createParemeter(int x) {
+        return JdbcParameterInt.valueOf(x);
+    }
+
+    private JdbcParameter createParameter(long x) {
+        return JdbcParameterLong.valueOf(x);
+    }
+
+    private JdbcParameter createParameterNull(int sqlType) {
+        return JdbcParameterNull.valueOf(sqlType);
+
+    }
+
+    private JdbcParameter createParameter(java.util.Date x) {
+        if (x == null) {
+            return JdbcParameterNull.DATE;
+        }
+
+        return new JdbcParameterDate(x);
+    }
+
+    private JdbcParameter createParameter(BigDecimal x) {
+        if (x == null) {
+            return JdbcParameterNull.DECIMAL;
+        }
+
+        return JdbcParameterDecimal.valueOf(x);
+    }
+
+    private JdbcParameter createParameter(String x) {
+        if (x == null) {
+            return JdbcParameterNull.VARCHAR;
+        }
+
+        if (x.length() == 0) {
+            return JdbcParameterString.empty;
+        }
+
+        return new JdbcParameterString(x);
+    }
+
+    private JdbcParameter createParameter(Timestamp x) {
+        if (x == null) {
+            return JdbcParameterNull.TIMESTAMP;
+        }
+
+        return new JdbcParameterTimestamp(x);
+    }
+
+    private JdbcParameter createParameter(Object x, int sqlType, int scaleOrLength) {
+        if (x == null) {
+            return JdbcParameterNull.valueOf(sqlType);
+        }
+
+        return new JdbcParameterImpl(sqlType, x, -1, null, scaleOrLength);
+    }
+
+    private JdbcParameter createParameter(int sqlType, Object value, long length) {
+        if (value == null) {
+            return JdbcParameterNull.valueOf(sqlType);
+        }
+
+        return new JdbcParameterImpl(sqlType, value, length);
+    }
+
+    private JdbcParameter createParameter(int sqlType, Object value) {
+        if (value == null) {
+            return JdbcParameterNull.valueOf(sqlType);
+        }
+
+        return new JdbcParameterImpl(sqlType, value);
+    }
+
+    public JdbcParameter createParameter(int sqlType, Object value, Calendar calendar) {
+        if (value == null) {
+            return JdbcParameterNull.valueOf(sqlType);
+        }
+
+        return new JdbcParameterImpl(sqlType, value, calendar);
     }
 }

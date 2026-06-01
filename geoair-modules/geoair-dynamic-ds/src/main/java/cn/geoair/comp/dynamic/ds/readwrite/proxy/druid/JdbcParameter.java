@@ -10,15 +10,22 @@ import java.util.Calendar;
  */
 public interface JdbcParameter {
 
-    // 特殊类型常量
-    int BINARY_STREAM = 10001;
-    int ASCII_STREAM = 10002;
-    int CHARACTER_STREAM = 10003;
-    int NCHARACTER_STREAM = 10004;
-    int URL = 10005;
-    int UNICODE_STREAM = 10006;
-    int BYTES = 10007;
+    public static final int BinaryInputStream = 10001;
+    public static final int AsciiInputStream = 10002;
+    public static final int CharacterInputStream = 10003;
+    public static final int NCharacterInputStream = 10004;
+    public static final int URL = 10005;
 
+    public static interface TYPE {
+        public static final int BinaryInputStream = 10001;
+        public static final int AsciiInputStream = 10002;
+        public static final int CharacterInputStream = 10003;
+        public static final int NCharacterInputStream = 10004;
+        public static final int URL = 10005;
+        public static final int UnicodeStream = 10006;
+        public static final int BYTES = 10007;
+
+    }
     /**
      * 获取参数值
      */
