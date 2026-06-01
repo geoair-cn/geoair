@@ -57,7 +57,7 @@ public class AdvAutoConfiguration {
     }
 
     /**
-     * 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 修复点：参数注入IAdvExecutor，确保依赖顺序
+     * 自动装配执行器适配器（依赖上面的IAdvExecutor Bean）   参数注入IAdvExecutor，确保依赖顺序
      */
     @Bean
     @ConditionalOnMissingBean(IAdvExecutorAdapter.class)
