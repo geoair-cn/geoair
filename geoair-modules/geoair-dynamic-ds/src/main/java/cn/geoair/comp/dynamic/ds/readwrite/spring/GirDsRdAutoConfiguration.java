@@ -27,14 +27,14 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(GirRdDataSourceProperties.class)
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
-@ConditionalOnProperty(prefix = "spring.datasource.gir.readwrite", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class GirDsRdAutoConfiguration {
     private static final GiLogger log = GirLogger.getLoger(GirDsRdAutoConfiguration.class);
 
     @Bean
     @Primary
     @ConditionalOnBean({IAdvDataSourceHelper.class, DataSourceProperties.class})
-    @ConditionalOnProperty(prefix = "spring.datasource.gir.readwrite", name = "read-urls")
+    @ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "read-urls")
     public GirReadWriteDataSource girReadWriteDataSource(
             GirRdDataSourceProperties properties,
             DataSourceProperties dataSourceProperties,
@@ -52,21 +52,7 @@ public class GirDsRdAutoConfiguration {
         return dataSource;
     }
 
-//    /**
-//     * 当没有配置 read-urls 时，返回原始主库数据源
-//     */
-//    @Bean
-//    @Primary
-//    @ConditionalOnMissingBean(name = "girReadWriteDataSource")
-//    @ConditionalOnBean({IAdvDataSourceHelper.class, DataSourceProperties.class})
-//    public DataSource originalDataSource(
-//            DataSourceProperties dataSourceProperties,
-//            IAdvDataSourceHelper dataSourceHelper) {
-//
-//        return dataSourceHelper.getDbDataSourceByApo(
-//                GirSpringDataSourceUtils.convertToDataSourceApo(dataSourceProperties)
-//        );
-//    }
+
 
 
 }
