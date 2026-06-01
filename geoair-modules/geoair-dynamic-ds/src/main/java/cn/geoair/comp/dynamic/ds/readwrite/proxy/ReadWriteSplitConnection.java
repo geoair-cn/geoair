@@ -91,13 +91,13 @@ public class ReadWriteSplitConnection implements Connection {
 
             if (currentConnection == null) {
                 if (username != null) {
-                    currentConnection = dataSource.getMasterDataSource().getConnection(username, password);
+                    currentConnection = dataSource.getMasterConnection(username, password);
                 } else {
-                    currentConnection = dataSource.getMasterDataSource().getConnection();
+                    currentConnection = dataSource.getMasterConnection();
                 }
                 // 设置事务状态
                 currentConnection.setAutoCommit(autoCommit);
-                log.debug("创建主库连接");
+                log.trace("创建主库连接成功");
             }
             return currentConnection;
         } catch (SQLException e) {
@@ -116,12 +116,12 @@ public class ReadWriteSplitConnection implements Connection {
 
             if (currentConnection == null) {
                 if (username != null) {
-                    currentConnection = dataSource.getSlaveGroup().getConnection(username, password);
+                    currentConnection = dataSource.getSlaveConnection(username, password);
                 } else {
-                    currentConnection = dataSource.getSlaveGroup().getConnection();
+                    currentConnection = dataSource.getSlaveConnection();
                 }
                 currentConnection.setAutoCommit(autoCommit);
-                log.debug("创建从库连接");
+                log.trace("创建从库连接成功");
             }
             return currentConnection;
         } catch (SQLException e) {
@@ -131,8 +131,13 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     private boolean isMasterConnection() {
-        return currentConnection != null &&
-                !(dataSource.getSlaveGroup().getClass().isInstance(currentConnection));
+        if (currentConnection != null) {
+            if (currentConnection instanceof ReadWritePxyConnection) {
+                ReadWritePxyConnection pxy = (ReadWritePxyConnection) currentConnection;
+                return !pxy.slaveIs;
+            }
+        }
+        return true;
     }
 
     private void closeCurrentConnection() {
@@ -191,7 +196,7 @@ public class ReadWriteSplitConnection implements Connection {
         } else {
             // 开启事务，等待第一个SQL确定数据源
             if (transactionUsedMaster == null) {
-                log.debug("事务开始（setAutoCommit(false)），等待第一个SQL确定数据源");
+                log.trace("事务开始（setAutoCommit(false)），等待第一个SQL确定数据源");
             }
         }
 
@@ -510,7 +515,7 @@ public class ReadWriteSplitConnection implements Connection {
     public void markTransactionStart(boolean useMaster) {
         if (transactionUsedMaster == null) {
             transactionUsedMaster = useMaster;
-            log.debug("事务开始，使用数据源类型: {}", useMaster ? "主库" : "从库");
+            log.trace("事务开始，使用数据源类型: {}", useMaster ? "主库" : "从库");
         }
     }
 

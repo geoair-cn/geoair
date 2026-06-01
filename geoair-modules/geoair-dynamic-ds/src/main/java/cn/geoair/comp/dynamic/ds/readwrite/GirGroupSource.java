@@ -2,8 +2,10 @@ package cn.geoair.comp.dynamic.ds.readwrite;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.comp.dynamic.ds.dswrapper.ConnectionWrapper;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWritePxyConnection;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.db.ds.simple.AbstractDataSource;
 
@@ -464,7 +466,6 @@ public class GirGroupSource extends AbstractDataSource {
         return removed;
     }
 
-    // ==================== Connection 获取方法 ====================
 
     @Override
     public Connection getConnection() throws SQLException {
@@ -480,14 +481,15 @@ public class GirGroupSource extends AbstractDataSource {
             log.trace("Group [{}] 策略 [{}] 选择数据源: {}",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds));
         }
-
-        return conn;
+        return new ReadWritePxyConnection(conn, true, ds);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         DataSource ds = selectDataSource();
-        return ds.getConnection(username, password);
+        Connection connection = ds.getConnection(username, password);
+        return new ReadWritePxyConnection(connection, true, ds);
+
     }
 
     @Override
