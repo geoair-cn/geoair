@@ -6,6 +6,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +27,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableConfigurationProperties(GirRdDataSourceProperties.class)
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@AutoConfigureBefore(DataSourceAutoConfiguration.class)
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
 @ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class GirDsRdAutoConfiguration {
