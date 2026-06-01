@@ -16,7 +16,7 @@ import java.util.List;
  * @author 张俊
  * @date Created in 2023/5/31 15:27
  */
-@Component
+
 @ConfigurationProperties(prefix = "spring.datasource.geoair")
 @Data
 public class GirRdDataSourceProperties {
