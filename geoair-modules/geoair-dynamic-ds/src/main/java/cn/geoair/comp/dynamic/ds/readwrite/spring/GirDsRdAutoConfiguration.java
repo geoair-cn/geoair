@@ -5,9 +5,8 @@ import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -27,7 +26,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableConfigurationProperties(GirRdDataSourceProperties.class)
-@AutoConfigureBefore(DataSourceAutoConfiguration.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
 @ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class GirDsRdAutoConfiguration {
@@ -39,12 +38,15 @@ public class GirDsRdAutoConfiguration {
 
     @Bean
     @Primary
-    @ConditionalOnBean({IAdvDataSourceHelper.class, DataSourceProperties.class})
     public GirReadWriteDataSource girReadWriteDataSource(
             GirRdDataSourceProperties properties,
             DataSourceProperties dataSourceProperties,
-            IAdvDataSourceHelper dataSourceHelper) {
-
+            ObjectProvider<IAdvDataSourceHelper> dataSourceHelperProvider) {
+        IAdvDataSourceHelper dataSourceHelper = dataSourceHelperProvider.getIfAvailable();
+        if (dataSourceHelper == null) {
+            log.warn("IAdvDataSourceHelper not available, skip creating readwrite datasource");
+            return null;
+        }
         if (GutilObject.isEmpty(properties.getReadwrite().getReadUrlList())) {
             throw new RuntimeException("readwrite readUrlList is empty!");
         }
