@@ -312,7 +312,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 dExecuteDDL(addPkSql, tableName, "添加字符串主键约束[" + pkConstraintName + "]");
             }
 
-            // ========== 分支2：整数自增主键（MySQL 核心：AUTO_INCREMENT） ==========
+            // ========== 分支2：整数自增主键（MySQL  AUTO_INCREMENT） ==========
             else if (PrimaryKeyType.INT_AUTO.equals(pkType)) {
                 // MySQL 自增主键：INT + AUTO_INCREMENT + 主键（一步到位）
                 String addColumnSql =

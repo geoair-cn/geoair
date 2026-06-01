@@ -56,7 +56,7 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
         this.writeConfig = writeConfig;
     }
 
-    /** 改造核心：入参为 SimpleFeatureType（替代原空参/ExceptionConsumer 入参） */
+    /** 改造 入参为 SimpleFeatureType（替代原空参/ExceptionConsumer 入参） */
     @Override
     public GeoFileWriter writeHeader(
             SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {

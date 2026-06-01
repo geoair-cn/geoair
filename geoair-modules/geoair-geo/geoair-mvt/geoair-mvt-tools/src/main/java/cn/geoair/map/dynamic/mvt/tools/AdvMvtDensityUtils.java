@@ -217,7 +217,7 @@ public class AdvMvtDensityUtils {
                 continue;
             }
 
-            // 计算聚合格网中心（核心：将点归到格网中心）
+            // 计算聚合格网中心（ 将点归到格网中心）
             double aggX = Math.round(coord.x / coalesceGeo) * coalesceGeo;
             double aggY = Math.round(coord.y / coalesceGeo) * coalesceGeo;
             String aggKey = aggX + "_" + aggY;

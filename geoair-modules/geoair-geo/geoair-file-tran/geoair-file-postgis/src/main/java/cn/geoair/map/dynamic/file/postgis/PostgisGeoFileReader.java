@@ -34,7 +34,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
 
     private DataStore postgisDataStore;
 
-    private SimpleFeatureType featureType; // 核心：返回的要素类型
+    private SimpleFeatureType featureType; //  返回的要素类型
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
@@ -143,7 +143,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
         }
     }
 
-    /** 改造核心：返回 SimpleFeatureType（替代原 List<Pair>） */
+    /** 改造 返回 SimpleFeatureType（替代原 List<Pair>） */
     @Override
     public SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer) {
         try {

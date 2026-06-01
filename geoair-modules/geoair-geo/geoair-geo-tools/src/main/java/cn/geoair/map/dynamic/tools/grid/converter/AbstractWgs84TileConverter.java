@@ -96,7 +96,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         double equalLatSpan = 360.0 / (1 << zoom); // 等轴纬度跨度：360/2^z
         double equalAxisY = (MAX_LAT - lat) / equalLatSpan; // 反向计算等轴Y索引
 
-        // 4. 根据业务需求取整（核心：不同取整方式适配不同场景）
+        // 4. 根据业务需求取整（ 不同取整方式适配不同场景）
         int finalEqualY;
         switch (roundingType) {
             case FLOOR:

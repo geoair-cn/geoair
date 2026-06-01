@@ -53,7 +53,7 @@ public class GeoServerSecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth.antMatchers("/geoserver/**")
-                                        .permitAll() // 核心：/geoserver/**
+                                        .permitAll() //  /geoserver/**
                                         // 无需登录
                                         .anyRequest()
                                         .permitAll() // 其他路径也允许匿名
