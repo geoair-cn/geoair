@@ -11,6 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.Optional;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -33,11 +34,20 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @Order(100)
 @Configuration
 public class AdvAutoConfiguration {
+    public AdvAutoConfiguration() {
+        Gir.log.info("AdvAutoConfiguration initialized");
+    }
 
     @Bean
     @ConditionalOnMissingBean(IAdvExecutor.class)
-    @ConditionalOnBean(DataSource.class)
-    public IAdvExecutor springAdvExecutor(DataSource dataSource) {
+
+    public IAdvExecutor springAdvExecutor(ObjectProvider<DataSource> dataSourceProvider) {
+        DataSource dataSource = dataSourceProvider.getIfAvailable();
+
+        if (dataSource == null) {
+            Gir.log.warn("DataSource Bean 不存在，跳过 IAdvExecutor 创建");
+            return null;
+        }
         Gir.log.info("开始自动装配springAdvExecutor，检测数据源类型...");
         Optional<AdvDataSourceWrapper> wrapper = DataSourceWrapperRegistry.getWrapper(dataSource);
         String dataSourceName = null;
