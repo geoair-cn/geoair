@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
  * 读写分离数据源配置
  * 配置前缀：spring.datasource.geoair
  *
+ * 参见 template.yml 进行配置
+ *
  * @author 张俊
  * @date Created in 2023/5/31 15:27
  */
@@ -74,7 +76,7 @@ public class GirRdDataSourceProperties {
         /**
          * 获取有效的读数据源配置（启用的）
          */
-        public List<ReadDataSourceConfig> getValidDataSources() {
+        public List<ReadDataSourceConfig> findValidDataSources() {
             return getReadDataSourceConfigs().stream()
                     .filter(config -> config.getEnabled() != null && config.getEnabled())
                     .collect(Collectors.toList());
@@ -83,8 +85,8 @@ public class GirRdDataSourceProperties {
         /**
          * 获取读库 URL 列表
          */
-        public List<String> getReadUrlList() {
-            return getValidDataSources().stream()
+        public List<String> findReadUrlList() {
+            return findValidDataSources().stream()
                     .map(ReadDataSourceConfig::getUrl)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
@@ -93,7 +95,7 @@ public class GirRdDataSourceProperties {
         /**
          * 获取数据源ID列表
          */
-        public List<String> getReadDataSourceIds() {
+        public List<String> findReadDataSourceIds() {
             return getReadDataSourceConfigs().stream()
                     .map(ReadDataSourceConfig::getId)
                     .filter(Objects::nonNull)
@@ -103,7 +105,7 @@ public class GirRdDataSourceProperties {
         /**
          * 根据数据源ID获取配置
          */
-        public ReadDataSourceConfig getByDataSourceId(String dataSourceId) {
+        public ReadDataSourceConfig findByDataSourceId(String dataSourceId) {
             return getReadDataSourceConfigs().stream()
                     .filter(config -> dataSourceId.equals(config.getId()))
                     .findFirst()
@@ -113,7 +115,7 @@ public class GirRdDataSourceProperties {
         /**
          * 根据URL获取配置
          */
-        public ReadDataSourceConfig getByUrl(String url) {
+        public ReadDataSourceConfig findByUrl(String url) {
             return getReadDataSourceConfigs().stream()
                     .filter(config -> url.equals(config.getUrl()))
                     .findFirst()
@@ -123,7 +125,7 @@ public class GirRdDataSourceProperties {
         /**
          * 获取数据源数量
          */
-        public int getDataSourceCount() {
+        public int findDataSourceCount() {
             return getReadDataSourceConfigs().size();
         }
 
@@ -131,7 +133,7 @@ public class GirRdDataSourceProperties {
          * 检查是否有可用的数据源
          */
         public boolean hasAvailableDataSources() {
-            return !getValidDataSources().isEmpty();
+            return !findValidDataSources().isEmpty();
         }
     }
 }
