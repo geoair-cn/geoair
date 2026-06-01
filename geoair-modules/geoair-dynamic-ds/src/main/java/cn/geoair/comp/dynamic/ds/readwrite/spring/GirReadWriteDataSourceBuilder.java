@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
+import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupSource;
@@ -33,22 +34,22 @@ public class GirReadWriteDataSourceBuilder {
 
     private final DataSourceProperties springDataSourceProperties;
 
-    private final IAdvDataSourceHelper iAdvDataSourceHelper;
+    private final IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
 
 
     public GirReadWriteDataSourceBuilder(GirRdDataSourceProperties properties,
                                          DataSourceProperties springDataSourceProperties,
-                                         IAdvDataSourceHelper iAdvDataSourceHelper) {
+                                         IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
         this.properties = properties;
         this.springDataSourceProperties = springDataSourceProperties;
-        this.iAdvDataSourceHelper = iAdvDataSourceHelper;
+        this.iAdvDataSourceInitHelper = iAdvDataSourceInitHelper;
     }
 
 
     public static GirReadWriteDataSourceBuilder builder(GirRdDataSourceProperties properties,
                                                         DataSourceProperties springDataSourceProperties,
-                                                        IAdvDataSourceHelper iAdvDataSourceHelper) {
-        return new GirReadWriteDataSourceBuilder(properties, springDataSourceProperties, iAdvDataSourceHelper);
+                                                        IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
+        return new GirReadWriteDataSourceBuilder(properties, springDataSourceProperties, iAdvDataSourceInitHelper);
     }
 
     /**
@@ -104,7 +105,7 @@ public class GirReadWriteDataSourceBuilder {
             masterDataSourceId = properties.getGroupName() + "_master";
         }
         dataSourceApo.setId(masterDataSourceId);
-        DataSource dbDataSourceByApo = iAdvDataSourceHelper.getDbDataSourceByApo(dataSourceApo);
+        DataSource dbDataSourceByApo = iAdvDataSourceInitHelper.getDbDataSourceByApo(dataSourceApo);
         AdvDynamicDataSourceStorage.getInstance()
                 .registerDataSource(masterDataSourceId, dbDataSourceByApo);
         log.info("创建主数据源: ID={}, URL={}, Driver={}", masterDataSourceId, props.getUrl(), props.getDriverClassName());
@@ -185,7 +186,7 @@ public class GirReadWriteDataSourceBuilder {
         DataSourceApo dataSourceApo = GirSpringDataSourceUtils.convertToDataSourceApo(propertiesSlave);
         dataSourceApo.setId(slaveId);
 
-        DataSource dbDataSourceByApo = iAdvDataSourceHelper.getDbDataSourceByApo(dataSourceApo);
+        DataSource dbDataSourceByApo = iAdvDataSourceInitHelper.getDbDataSourceByApo(dataSourceApo);
 
         log.debug("创建从库数据源完成: ID={}, URL={}, Driver={}",
                 slaveId, slaveUrl, springDataSourceProperties.getDriverClassName());

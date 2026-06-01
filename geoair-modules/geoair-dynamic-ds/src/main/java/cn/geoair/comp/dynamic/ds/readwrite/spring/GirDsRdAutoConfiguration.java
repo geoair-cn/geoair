@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
+import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -41,10 +42,10 @@ public class GirDsRdAutoConfiguration {
     public GirReadWriteDataSource girReadWriteDataSource(
             GirRdDataSourceProperties properties,
             DataSourceProperties dataSourceProperties,
-            ObjectProvider<IAdvDataSourceHelper> dataSourceHelperProvider) {
-        IAdvDataSourceHelper dataSourceHelper = dataSourceHelperProvider.getIfAvailable();
-        if (dataSourceHelper == null) {
-            log.warn("IAdvDataSourceHelper not available, skip creating readwrite datasource");
+            ObjectProvider<IAdvDataSourceInitHelper> provider) {
+        IAdvDataSourceInitHelper initHelper = provider.getIfAvailable();
+        if (initHelper == null) {
+            log.warn("IAdvDataSourceInitHelper not available, skip creating readwrite datasource");
             return null;
         }
         if (GutilObject.isEmpty(properties.getReadwrite().findReadUrlList())) {
@@ -55,7 +56,7 @@ public class GirDsRdAutoConfiguration {
                 GutilObject.isNotEmpty(properties.getReadwrite().findValidDataSources()) ? properties.getReadwrite().findReadUrlList().size() : 0,
                 properties.getReadwrite().getReadStrategy() != null ? properties.getReadwrite().getReadStrategy().getDescription() : "轮询策略");
 
-        GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, dataSourceHelper)
+        GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
                 .build();
 
         log.info("读写分离数据源构建完成");
