@@ -16,6 +16,7 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
@@ -228,7 +229,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
         List<Object> params = new ArrayList<>(whereMap.values());
 
@@ -270,7 +271,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         try {
             connection.setAutoCommit(false);
             while (true) {
-                String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap,dialectTableNameProcessor);
+                String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
                 String execSql = buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
                 List<Object> params = new ArrayList<>(whereMap.values());
                 int batchSuccess = SqlExecutor.execute(connection, execSql, params.toArray());
@@ -351,6 +352,44 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
+    @Override
+    public <T> Integer bDeleteByPK(T entity) {
+        return bDeleteByPK(entity, true);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, boolean isToUnderlineCase) {
+        return bDeleteByPK(null, entity, true);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity) {
+        return bDeleteByPK(tableName, entity, true);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity, boolean isToUnderlineCase) {
+        if (entity == null) {
+            throw new IllegalArgumentException("删除的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行Delete");
+        }
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+            if (GutilObject.isEmpty(tableName)) {
+                throw new IllegalArgumentException("tableName 不能为空");
+            }
+        }
+        String idKey = idByAnnotation.get(0);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, isToUnderlineCase, true, ListUtil.empty());
+        Object idValue = rowData.get(idKey);
+        return bDeleteByPK(tableName, idKey, idValue);
+    }
+
+
+
     // ====================== 原有工具方法不动 ======================
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
@@ -386,8 +425,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
         return batches;
     }
-
-
 
 
     protected String getSchemaName() {
@@ -429,10 +466,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     protected abstract int getMaxInParams();
 
     protected String buildDeleteByPrimaryKeySql(String tableName, String idKey) {
+        idKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         return StrUtil.format("DELETE FROM {} WHERE {} = ?", tableName, idKey);
     }
 
     protected String buildDeleteBatchByPrimaryKeySql(String tableName, String idKey, String placeholders) {
+        idKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         return StrUtil.format("DELETE FROM {} WHERE {} IN ({})", tableName, idKey, placeholders);
     }
 

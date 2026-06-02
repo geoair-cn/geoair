@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -371,4 +372,16 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
      * @see GirAdvWhereFilter 条件构建器详细用法
      */
     <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter);
+
+
+    <T> Integer bDeleteByPK(T entity);
+
+    <T> Integer bDeleteByPK(T entity, boolean isToUnderlineCase);
+
+    <T> Integer bDeleteByPK(String tableName, T entity);
+
+    <T> Integer bDeleteByPK(String tableName, T entity, boolean isToUnderlineCase);
+
+
+
 }

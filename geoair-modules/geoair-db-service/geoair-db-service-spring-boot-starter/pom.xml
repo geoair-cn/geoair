@@ -58,11 +58,7 @@
       <artifactId>geoair-adv-query</artifactId>
       <version>${geoair.version}</version>
     </dependency>
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-orm-mybatis-tk</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
