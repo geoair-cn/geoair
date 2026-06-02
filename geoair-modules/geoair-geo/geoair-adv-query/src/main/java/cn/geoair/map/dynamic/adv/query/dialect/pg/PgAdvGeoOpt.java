@@ -493,6 +493,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "CREATE INDEX {} ON {} USING GIST ({});",
