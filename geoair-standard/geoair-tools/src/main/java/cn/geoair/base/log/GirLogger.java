@@ -5,6 +5,10 @@ import cn.geoair.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 
+/**
+ *  因为命名上跟不上主流的slf4j，导致有歧义，故给废弃了，还请移步 GirLoggerFactory
+ */
+@Deprecated
 public class GirLogger {
 
     private GirLogger() {}
@@ -23,7 +27,7 @@ public class GirLogger {
     }
 
     public static GiLogger getLoger() {
-        return getLoger(GkCallerUtil.getCallerName());
+        return getLoger(GkCallerUtil.getCallerCallerName());
     }
 
     @GaMethodHandImpl(
