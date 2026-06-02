@@ -50,9 +50,14 @@ public class GirServletUtil extends JakartaServletUtil {
         } else {
             property = "";
         }
-//        int originPort = getOriginPort(request);
+        if (!host.contains(":")) {
+            Integer originPort = getOriginPort(request);
+            if (originPort != null) {
+                host = host + ":" + originPort;
+            }
+        }
 
-        return "http://" + host +"/" + property;
+        return "http://" + host + "/" + property;
     }
 
     /**
@@ -61,7 +66,7 @@ public class GirServletUtil extends JakartaServletUtil {
      * @param request
      * @return
      */
-    public static int getOriginPort(HttpServletRequest request) {
+    public static Integer getOriginPort(HttpServletRequest request) {
         // 可能的代理端口头信息，按优先级排序
         String[] portHeaders = {
                 "x-forwarded-port",
@@ -79,8 +84,7 @@ public class GirServletUtil extends JakartaServletUtil {
                 }
             }
         }
-        // 如果没有获取到代理传递的端口，则返回本地服务端口
-        return request.getServerPort();
+        return null;
     }
 
 
