@@ -156,6 +156,8 @@ public class GirDsSystemController {
         config.put(
                 "byCurrentContextPath",
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
+        config.put(
+                "byServerPathByRequest", GirServletUtil.getServerPathByRequest());
         config.put("loginPage", "");
         return config;
     }

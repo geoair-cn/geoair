@@ -37,7 +37,7 @@ public class RdLog extends GirLogWrapper {
     ConsoleColorLogFactory consoleColorLogFactory = null;
 
     protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo) {
-        if (minLogLevel.isGreaterOrEqual(level)) {
+        if (level.isGreaterOrEqual(minLogLevel)) {
             if (useIndependentLog) {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
@@ -52,7 +52,7 @@ public class RdLog extends GirLogWrapper {
 
 
     protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo) {
-        if (minLogLevel.isGreaterOrEqual(level)) {
+        if (level.isGreaterOrEqual(minLogLevel)) {
             if (useIndependentLog) {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
