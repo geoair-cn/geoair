@@ -50,8 +50,9 @@ public class GirServletUtil extends JakartaServletUtil {
         } else {
             property = "";
         }
-        int originPort = getOriginPort(request);
-        return "http://" + host + ":" + originPort + "/" + property;
+//        int originPort = getOriginPort(request);
+
+        return "http://" + host +"/" + property;
     }
 
     /**
