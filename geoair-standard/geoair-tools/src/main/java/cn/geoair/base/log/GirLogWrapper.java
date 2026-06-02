@@ -1,8 +1,6 @@
 package cn.geoair.base.log;
 
 
-import cn.geoair.base.text.GuStrFormatter;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -76,24 +74,24 @@ public abstract class GirLogWrapper implements GiLogger {
      * @param message    日志消息
      * @param loggerInfo Logger信息（包含调用位置等）
      */
-    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo) {
+    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
         if (level.equals(GemLogLevel.TRACE)) {
-            loggerInfo.logger.trace(message);
+            loggerInfo.logger.trace(message, arguments);
         }
         if (level.equals(GemLogLevel.DEBUG)) {
-            loggerInfo.logger.debug(message);
+            loggerInfo.logger.debug(message, arguments);
         }
         if (level.equals(GemLogLevel.INFO)) {
-            loggerInfo.logger.info(message);
+            loggerInfo.logger.info(message, arguments);
         }
         if (level.equals(GemLogLevel.WARN)) {
-            loggerInfo.logger.warn(message);
+            loggerInfo.logger.warn(message, arguments);
         }
         if (level.equals(GemLogLevel.ERROR)) {
-            loggerInfo.logger.error(message);
+            loggerInfo.logger.error(message, arguments);
         }
         if (level.equals(GemLogLevel.FATAL)) {
-            loggerInfo.logger.fatal(message);
+            loggerInfo.logger.fatal(message, arguments);
         }
     }
 
@@ -105,24 +103,24 @@ public abstract class GirLogWrapper implements GiLogger {
      * @param t          异常信息
      * @param loggerInfo Logger信息（包含调用位置等）
      */
-    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo) {
+    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo, Object... arguments) {
         if (level.equals(GemLogLevel.TRACE)) {
-            loggerInfo.logger.trace(t, message);
+            loggerInfo.logger.trace(t, message, arguments);
         }
         if (level.equals(GemLogLevel.DEBUG)) {
-            loggerInfo.logger.debug(t, message);
+            loggerInfo.logger.debug(t, message, arguments);
         }
         if (level.equals(GemLogLevel.INFO)) {
-            loggerInfo.logger.info(t, message);
+            loggerInfo.logger.info(t, message, arguments);
         }
         if (level.equals(GemLogLevel.WARN)) {
-            loggerInfo.logger.warn(t, message);
+            loggerInfo.logger.warn(t, message, arguments);
         }
         if (level.equals(GemLogLevel.ERROR)) {
-            loggerInfo.logger.error(t, message);
+            loggerInfo.logger.error(t, message, arguments);
         }
         if (level.equals(GemLogLevel.FATAL)) {
-            loggerInfo.logger.fatal(t, message);
+            loggerInfo.logger.fatal(t, message, arguments);
         }
     }
 
@@ -136,8 +134,7 @@ public abstract class GirLogWrapper implements GiLogger {
     public void trace(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
         if (info.logger.isTraceEnabled()) {
-            String message = GuStrFormatter.format(format, arguments);
-            recordLog(GemLogLevel.TRACE, message, info);
+            recordLog(GemLogLevel.TRACE, format, info, arguments);
         }
     }
 
@@ -150,8 +147,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void trace(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.TRACE, message, t, info);
+        recordLogWithThrowable(GemLogLevel.TRACE, format, t, info, arguments);
     }
 
 
@@ -164,8 +160,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void debug(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLog(GemLogLevel.DEBUG, message, info);
+        recordLog(GemLogLevel.DEBUG, format, info, arguments);
     }
 
     @Override
@@ -177,8 +172,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void debug(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.DEBUG, message, t, info);
+        recordLogWithThrowable(GemLogLevel.DEBUG, format, t, info, arguments);
     }
 
 
@@ -191,8 +185,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void info(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLog(GemLogLevel.INFO, message, info);
+        recordLog(GemLogLevel.INFO, format, info, arguments);
     }
 
     @Override
@@ -204,8 +197,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void info(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.INFO, message, t, info);
+        recordLogWithThrowable(GemLogLevel.INFO, format, t, info, arguments);
     }
 
 
@@ -218,8 +210,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void warn(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLog(GemLogLevel.WARN, message, info);
+        recordLog(GemLogLevel.WARN, format, info, arguments);
     }
 
     @Override
@@ -231,8 +222,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void warn(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.WARN, message, t, info);
+        recordLogWithThrowable(GemLogLevel.WARN, format, t, info, arguments);
     }
 
 
@@ -245,8 +235,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void fatal(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLog(GemLogLevel.FATAL, message, info);
+        recordLog(GemLogLevel.FATAL, format, info, arguments);
     }
 
     @Override
@@ -258,8 +247,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void fatal(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.FATAL, message, t, info);
+        recordLogWithThrowable(GemLogLevel.FATAL, format, t, info, arguments);
     }
 
     @Override
@@ -271,8 +259,8 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void error(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLog(GemLogLevel.ERROR, message, info);
+
+        recordLog(GemLogLevel.ERROR, format, info, arguments);
     }
 
     @Override
@@ -284,7 +272,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void error(Throwable t, String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        String message = GuStrFormatter.format(format, arguments);
-        recordLogWithThrowable(GemLogLevel.ERROR, message, t, info);
+
+        recordLogWithThrowable(GemLogLevel.ERROR, format, t, info, arguments);
     }
 }
