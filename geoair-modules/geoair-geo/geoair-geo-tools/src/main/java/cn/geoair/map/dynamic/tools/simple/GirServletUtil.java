@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools.simple;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
@@ -50,8 +51,38 @@ public class GirServletUtil extends ServletUtil {
         } else {
             property = "";
         }
-        return "http://" + host + "/" + property;
+        int originPort = getOriginPort(request);
+        return "http://" + host + ":" + originPort + "/" + property;
     }
+
+    /**
+     * 获取服务的真实端口
+     *
+     * @param request
+     * @return
+     */
+    public static int getOriginPort(HttpServletRequest request) {
+        // 可能的代理端口头信息，按优先级排序
+        String[] portHeaders = {
+                "x-forwarded-port",
+                "X-Real-PORT"
+        };
+
+        // 遍历所有可能的端口头，获取第一个有效的端口
+        for (String header : portHeaders) {
+            String portStr = request.getHeader(header);
+            if (portStr != null && !portStr.isEmpty() && !"unknown".equalsIgnoreCase(portStr)) {
+                try {
+                    return Integer.parseInt(portStr);
+                } catch (NumberFormatException e) {
+                    // 端口格式不正确，继续尝试下一个头
+                }
+            }
+        }
+        // 如果没有获取到代理传递的端口，则返回本地服务端口
+        return request.getServerPort();
+    }
+
 
     /**
      * 获取自己这台服务器的地址，通过httpRequest
@@ -64,6 +95,7 @@ public class GirServletUtil extends ServletUtil {
         String requestHost = headerMap.get("host");
         Map<String, String> infoMap = new HashMap<>();
         infoMap.put("requestHost", requestHost);
+        infoMap.put("originPort", getOriginPort(request) + "");
         infoMap.put("serverPathBySpring", getServerPathBySpring());
         infoMap.put("serverPathByRequest", getServerPathByRequest());
         infoMap.put("contextPath", request.getContextPath());
