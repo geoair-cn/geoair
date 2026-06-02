@@ -29,7 +29,7 @@ public class DsApiDataSourceMapper implements GirDsDataSourceDao {
     @Override
     public void updateSelectiveById(DsDataSourceApo t) {
         DsApiDataSourcePo po = DsApiDataSourceDto.toPo(t);
-        GirSpringAdvExecutor.getInstance().bUpsertSelective(po);
+        GirSpringAdvExecutor.getInstance().bUpdateByPKSelective(po);
     }
 
     @Override

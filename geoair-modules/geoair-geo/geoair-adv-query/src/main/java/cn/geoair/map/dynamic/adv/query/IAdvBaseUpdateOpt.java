@@ -243,6 +243,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      */
     <T> Integer bUpdateByPK(String tableName, String idKey, T entity);
 
+
     /**
      * 根据主键更新单条实体对象（简化参数版本）
      *
@@ -416,6 +417,21 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      */
     <T> Integer bUpdateByPKSelective(String tableName, String idKey, T entity, List<String> ignoreFieldNames);
 
+
+    <T> Integer bUpdateByPKSelective(T entity);
+
+    <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames);
+
+
+    <T> Integer bUpdateByPKSelective(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames);
+
+    <T> Integer bUpdateByPK(T entity);
+
+    <T> Integer bUpdateByPK(T entity, List<String> ignoreFieldNames);
+
+
+    <T> Integer bUpdateByPK(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames);
+
     // ==================== 4. 简单条件更新（仅等值匹配） ====================
 
     /**
@@ -461,7 +477,6 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @throws IllegalArgumentException 当whereMap为null或空时抛出
      */
     Integer bUpdateByMap(String tableName, Map<String, Object> rowData, Map<String, Object> whereMap);
-
 
 
     /**

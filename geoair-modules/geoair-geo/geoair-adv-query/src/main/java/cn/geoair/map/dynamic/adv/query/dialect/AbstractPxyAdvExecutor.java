@@ -687,6 +687,36 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bUpdateByPKSelective(T entity) {
+        return getAdvBaseOpt().bUpdateByPKSelective(entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPKSelective(entity, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPKSelective(entity, isToUnderlineCase, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity) {
+        return getAdvBaseOpt().bUpdateByPK(entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPK(entity, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        return getAdvBaseOpt().bUpdateByPK(entity, isToUnderlineCase, ignoreFieldNames);
+    }
+
+    @Override
     public Integer bUpdateByMap(
             String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
         return getAdvBaseOpt().bUpdateByMap(tableName, rowData, whereMap);

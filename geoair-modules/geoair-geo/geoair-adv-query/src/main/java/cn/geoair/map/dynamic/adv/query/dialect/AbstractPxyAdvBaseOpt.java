@@ -594,6 +594,35 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(tableName, idKey, entity, ignoreFieldNames);
     }
 
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(entity, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPKSelective(entity, isToUnderlineCase, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(entity);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(entity, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        return getAdvBaseUpdatePxyOpt().bUpdateByPK(entity, isToUnderlineCase, ignoreFieldNames);
+    }
 
     @Override
     public Integer bUpdateByMap(
