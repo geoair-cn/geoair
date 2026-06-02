@@ -150,7 +150,7 @@ public class GirDsSystemController {
         }
 
         Map<String, Object> config = MapUtil.newHashMap();
-        config.put("baseUrl", baseUrl);
+//        config.put("baseUrl", baseUrl);
         config.put("byGirServlet", GirServletUtil.getClientIP(request));
         config.put("byServerInfoByRequest", GirServletUtil.getServerInfoByRequest());
         config.put(
@@ -158,6 +158,7 @@ public class GirDsSystemController {
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
         config.put(
                 "byServerPathByRequest", GirServletUtil.getServerPathByRequest());
+        config.put("baseUrl", GirServletUtil.getServerPathByRequest());
         config.put("loginPage", "");
         return config;
     }
