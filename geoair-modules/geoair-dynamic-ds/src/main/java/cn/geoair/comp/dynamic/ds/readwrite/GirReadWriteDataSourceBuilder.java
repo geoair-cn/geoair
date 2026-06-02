@@ -78,8 +78,16 @@ public class GirReadWriteDataSourceBuilder {
     /**
      * 设置从库组（直接传入 GirGroupSource）
      */
-    public GirReadWriteDataSourceBuilder slaves(GirGroupSource dataSources) {
+    public GirReadWriteDataSourceBuilder slave(GirGroupSource dataSources) {
         this.slaveGroupSource = dataSources;
+        return this;
+    }
+
+    /**
+     * 设置从库组（直接传入 GirGroupByIdDataSource）
+     */
+    public GirReadWriteDataSourceBuilder slave(GirGroupByIdDataSource dataSources) {
+        this.slaveGroupByIdDataSource = dataSources;
         return this;
     }
 
@@ -90,7 +98,6 @@ public class GirReadWriteDataSourceBuilder {
         this.slaveGroupByIdDataSource = dataSources;
         return this;
     }
-
     // ==================== 从库配置方法（辅助方法，用于快速构建） ====================
 
     /**
