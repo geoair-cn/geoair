@@ -1,12 +1,12 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class GirReadWriteDataSourceBuilder {
 
-    private static final GiLogger log = GirLogger.getLoger(GirReadWriteDataSourceBuilder.class);
 
     // 主库配置
     private String masterDataSourceId;
@@ -152,7 +151,7 @@ public class GirReadWriteDataSourceBuilder {
         if (strategy != null) {
             this.slaveStrategy = strategy;
         } else {
-            log.warn("未知的负载策略: {}, 使用默认 RANDOM", strategyName);
+            RdLog.getInstance().warn("未知的负载策略: {}, 使用默认 RANDOM", strategyName);
         }
         return this;
     }
@@ -193,7 +192,7 @@ public class GirReadWriteDataSourceBuilder {
         GirReadWriteDataSource dataSource = new GirReadWriteDataSource(master, slaveGroup);
 
 
-        log.debug("读写分离数据源构建完成: master={}, slaveGroupType={}",
+        RdLog.getInstance().debug("读写分离数据源构建完成: master={}, slaveGroupType={}",
                 getMasterInfo(), getSlaveGroupType());
 
         return dataSource;
@@ -216,19 +215,19 @@ public class GirReadWriteDataSourceBuilder {
             throw new IllegalStateException("从库不能为空，请通过 slave()、slaves()、addSlave() 等方式配置从库");
         }
 
-        log.debug("校验通过: master={}", getMasterInfo());
+        RdLog.getInstance().debug("校验通过: master={}", getMasterInfo());
     }
 
     private GirGroupSource buildSlaveGroup() {
         // 优先级：GirGroupByIdDataSource > GirGroupSource > 单个 DataSource > ID列表
 
         if (slaveGroupByIdDataSource != null) {
-            log.debug("使用已配置的 GirGroupByIdDataSource 作为从库组");
+            RdLog.getInstance().debug("使用已配置的 GirGroupByIdDataSource 作为从库组");
             return slaveGroupByIdDataSource;
         }
 
         if (slaveGroupSource != null) {
-            log.debug("使用已配置的 GirGroupSource 作为从库组");
+            RdLog.getInstance().debug("使用已配置的 GirGroupSource 作为从库组");
             return slaveGroupSource;
         }
 
@@ -237,7 +236,7 @@ public class GirReadWriteDataSourceBuilder {
         }
 
         if (!slaveDataSourceIds.isEmpty()) {
-            log.debug("使用 ID 列表创建从库组，延迟加载: {}", enableLazyLoad);
+            RdLog.getInstance().debug("使用 ID 列表创建从库组，延迟加载: {}", enableLazyLoad);
             if (enableLazyLoad) {
                 return GirGroupByIdDataSource
                         .builderById().
@@ -250,7 +249,7 @@ public class GirReadWriteDataSourceBuilder {
                     if (ds != null) {
                         loadedDataSources.add(ds);
                     } else {
-                        log.warn("数据源不存在: {}", dsId);
+                        RdLog.getInstance().warn("数据源不存在: {}", dsId);
                     }
                 }
                 return new GirGroupSource(slaveGroupName, loadedDataSources, slaveStrategy);

@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.dswrapper.ConnectionWrapper;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWritePxyConnection;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.db.ds.simple.AbstractDataSource;
@@ -26,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GirGroupSource extends AbstractDataSource {
 
-    protected final GiLogger log = GirLogger.getLoger(GirGroupSource.class);
 
     /**
      * 组名
@@ -79,7 +79,7 @@ public class GirGroupSource extends AbstractDataSource {
             totalWeight += 1;
         }
 
-        log.trace("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
+        RdLog.getInstance().trace("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}",
                 groupName, dataSources.size(), strategyType.getDescription());
     }
 
@@ -103,7 +103,7 @@ public class GirGroupSource extends AbstractDataSource {
             throw new IllegalStateException("数据源组 [" + groupName + "] 数据源列表不能为空");
         }
 
-        log.debug("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+        RdLog.getInstance().debug("初始化数据源组 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
                 groupName, dataSources.size(), strategyType.getDescription(), totalWeight);
     }
 
@@ -225,7 +225,7 @@ public class GirGroupSource extends AbstractDataSource {
         }
         weightMap.put(dataSource, weight);
         totalWeight += weight;
-        log.debug("Group [{}] 设置数据源权重为: {}", groupName, weight);
+        RdLog.getInstance().debug("Group [{}] 设置数据源权重为: {}", groupName, weight);
         return this;
     }
 
@@ -316,7 +316,7 @@ public class GirGroupSource extends AbstractDataSource {
                     selected = ds;
                 }
             } else {
-                log.warn("数据源 [{}] 无法获取活跃连接数，降级为随机策略", getDataSourceInfo(ds));
+                RdLog.getInstance().warn("数据源 [{}] 无法获取活跃连接数，降级为随机策略", getDataSourceInfo(ds));
                 return randomSelect();
             }
         }
@@ -370,7 +370,7 @@ public class GirGroupSource extends AbstractDataSource {
      */
     public GirGroupSource setStrategyType(LoadStrategyType strategyType) {
         this.strategyType = strategyType;
-        log.debug("Group [{}] 负载策略切换为: {}", groupName, strategyType.getDescription());
+        RdLog.getInstance().debug("Group [{}] 负载策略切换为: {}", groupName, strategyType.getDescription());
         return this;
     }
 
@@ -420,7 +420,7 @@ public class GirGroupSource extends AbstractDataSource {
         // 重置轮询计数器
         roundRobinCounter.set(0);
 
-        log.debug("Group [{}] 刷新数据源列表, 新数量: {}", groupName, dataSources.size());
+        RdLog.getInstance().debug("Group [{}] 刷新数据源列表, 新数量: {}", groupName, dataSources.size());
         return this;
     }
 
@@ -447,7 +447,7 @@ public class GirGroupSource extends AbstractDataSource {
         weightMap.put(dataSource, weight);
         totalWeight += weight;
 
-        log.debug("Group [{}] 添加数据源, 当前数量: {}", groupName, dataSources.size());
+        RdLog.getInstance().debug("Group [{}] 添加数据源, 当前数量: {}", groupName, dataSources.size());
         return this;
     }
 
@@ -461,7 +461,7 @@ public class GirGroupSource extends AbstractDataSource {
             if (oldWeight != null) {
                 totalWeight -= oldWeight;
             }
-            log.debug("Group [{}] 移除数据源, 当前数量: {}", groupName, dataSources.size());
+            RdLog.getInstance().debug("Group [{}] 移除数据源, 当前数量: {}", groupName, dataSources.size());
         }
         return removed;
     }
@@ -475,10 +475,10 @@ public class GirGroupSource extends AbstractDataSource {
         long cost = System.currentTimeMillis() - startTime;
 
         if (cost > 200) {
-            log.warn("Group [{}] 策略 [{}] 选择数据源 [{}] 获取连接耗时: {}ms",
+            RdLog.getInstance().warn("Group [{}] 策略 [{}] 选择数据源 [{}] 获取连接耗时: {}ms",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds), cost);
         } else {
-            log.trace("Group [{}] 策略 [{}] 选择数据源: {}",
+            RdLog.getInstance().trace("Group [{}] 策略 [{}] 选择数据源: {}",
                     groupName, strategyType.getDescription(), getDataSourceInfo(ds));
         }
         return new ReadWritePxyConnection(conn, true, ds);
@@ -494,6 +494,6 @@ public class GirGroupSource extends AbstractDataSource {
 
     @Override
     public void close() throws IOException {
-        log.debug("Group [{}] close called, but no action taken - data sources managed externally", groupName);
+        RdLog.getInstance().debug("Group [{}] close called, but no action taken - data sources managed externally", groupName);
     }
 }

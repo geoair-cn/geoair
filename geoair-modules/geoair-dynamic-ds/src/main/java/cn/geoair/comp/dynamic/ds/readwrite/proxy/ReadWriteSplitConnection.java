@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -20,7 +21,6 @@ import java.util.concurrent.Executor;
  */
 public class ReadWriteSplitConnection implements Connection {
 
-    private static final GiLogger log = GirLogger.getLoger(ReadWriteSplitConnection.class);
 
     private final GirReadWriteDataSource dataSource;
     private Connection currentConnection;
@@ -96,11 +96,11 @@ public class ReadWriteSplitConnection implements Connection {
                 }
                 // 设置事务状态
                 currentConnection.setAutoCommit(autoCommit);
-                log.trace("创建主库连接成功");
+                RdLog.getInstance().debug("创建主库连接成功");
             }
             return currentConnection;
         } catch (SQLException e) {
-            log.error("获取主库连接失败", e);
+            RdLog.getInstance().error("获取主库连接失败", e);
             throw new RuntimeException(e);
         }
     }
@@ -109,7 +109,7 @@ public class ReadWriteSplitConnection implements Connection {
         try {
             if (currentConnection != null && isMasterConnection()) {
                 // 当前是主库连接，不能切换到从库（防止事务内主从切换）
-                log.debug("当前事务已使用主库，继续使用主库");
+                RdLog.getInstance().debug("当前事务已使用主库，继续使用主库");
                 return currentConnection;
             }
 
@@ -120,11 +120,11 @@ public class ReadWriteSplitConnection implements Connection {
                     currentConnection = dataSource.getSlaveConnection();
                 }
                 currentConnection.setAutoCommit(autoCommit);
-                log.trace("创建从库连接成功");
+                RdLog.getInstance().debug("创建从库连接成功");
             }
             return currentConnection;
         } catch (SQLException e) {
-            log.error("获取从库连接失败", e);
+            RdLog.getInstance().error("获取从库连接失败", e);
             throw new RuntimeException(e);
         }
     }
@@ -145,7 +145,7 @@ public class ReadWriteSplitConnection implements Connection {
                 currentConnection.close();
             }
         } catch (SQLException e) {
-            log.warn("关闭连接失败", e);
+            RdLog.getInstance().warn("关闭连接失败", e);
         } finally {
             currentConnection = null;
         }
@@ -190,12 +190,12 @@ public class ReadWriteSplitConnection implements Connection {
             // 关闭事务
             if (transactionUsedMaster != null) {
                 transactionUsedMaster = null;
-                log.debug("事务结束（setAutoCommit(true)）");
+                RdLog.getInstance().debug("事务结束（setAutoCommit(true)）");
             }
         } else {
             // 开启事务，等待第一个SQL确定数据源
             if (transactionUsedMaster == null) {
-                log.trace("事务开始（setAutoCommit(false)），等待第一个SQL确定数据源");
+                RdLog.getInstance().trace("事务开始（setAutoCommit(false)），等待第一个SQL确定数据源");
             }
         }
 
@@ -514,7 +514,7 @@ public class ReadWriteSplitConnection implements Connection {
     public void markTransactionStart(boolean useMaster) {
         if (transactionUsedMaster == null) {
             transactionUsedMaster = useMaster;
-            log.trace("事务开始，使用数据源类型: {}", useMaster ? "主库" : "从库");
+            RdLog.getInstance().debug("事务开始，使用数据源类型: {}", useMaster ? "主库" : "从库");
         }
     }
 

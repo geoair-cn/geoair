@@ -1,6 +1,7 @@
 package cn.geoair.comp.dynamic.ds.readwrite.utils;
 
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -8,8 +9,7 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
  * SQL解析工具类
@@ -20,12 +20,9 @@ import org.slf4j.LoggerFactory;
  */
 public class SQLParserUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(SQLParserUtil.class);
 
-    /**
-     * 是否启用调试日志（生产环境设为false）
-     */
-    private static boolean debugEnabled = false;
+
+
 
     /**
      * 获取SQL操作类型
@@ -35,9 +32,7 @@ public class SQLParserUtil {
      */
     public static SQLType getSQLType(String sql) {
         if (sql == null || sql.trim().isEmpty()) {
-            if (debugEnabled) {
-                log.debug("SQL为空，返回UNKNOWN");
-            }
+            RdLog.getInstance().debug("SQL为空，返回UNKNOWN");
             return SQLType.UNKNOWN;
         }
 
@@ -62,14 +57,14 @@ public class SQLParserUtil {
         try {
             Statement statement = CCJSqlParserUtil.parse(sql);
             SQLType type = getTypeFromStatement(statement);
-            if (debugEnabled) {
-                log.debug("JSqlParser解析成功，SQL类型: {}, SQL: {}", type, sql);
-            }
+
+                RdLog.getInstance().debug("JSqlParser解析成功，SQL类型: {}, SQL: {}", type, sql);
+
             return type;
         } catch (JSQLParserException e) {
-            if (debugEnabled) {
-                log.debug("JSqlParser解析失败，降级使用关键词匹配。SQL: {}", sql);
-            }
+
+                RdLog.getInstance().debug("JSqlParser解析失败，降级使用关键词匹配。SQL: {}", sql);
+
             return fastMatch(sql);
         }
     }
@@ -160,9 +155,9 @@ public class SQLParserUtil {
             return SQLType.READ;
 
         } catch (Exception e) {
-            if (debugEnabled) {
-                log.debug("WITH 语句解析异常: {}", e.getMessage());
-            }
+
+                RdLog.getInstance().debug("WITH 语句解析异常: {}", e.getMessage());
+
             // 降级：检查是否包含写操作关键词
             String upperSql = sql.toUpperCase();
             if (upperSql.contains(" INSERT ") ||
@@ -413,10 +408,4 @@ public class SQLParserUtil {
     }
 
 
-    /**
-     * 设置是否启用调试日志
-     */
-    public static void setDebugEnabled(boolean enabled) {
-        debugEnabled = enabled;
-    }
 }

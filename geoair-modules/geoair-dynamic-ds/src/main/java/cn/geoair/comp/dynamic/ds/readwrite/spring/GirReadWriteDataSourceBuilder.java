@@ -11,6 +11,7 @@ import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.spring.GirSpringDataSourceUtils;
 import cn.hutool.core.bean.BeanUtil;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -64,7 +65,7 @@ public class GirReadWriteDataSourceBuilder {
 
         GirReadWriteDataSource readWriteDataSource = new GirReadWriteDataSource(masterDataSource, slaveGroup);
 
-        log.info("读写分离数据源构建完成，从库数量: {}, 策略: {}",
+        RdLog.getInstance().info("读写分离数据源构建完成，从库数量: {}, 策略: {}",
                 properties.getReadwrite().findValidDataSources().size(),
                 properties.getReadwrite().getReadStrategy().getDescription());
 
@@ -108,7 +109,7 @@ public class GirReadWriteDataSourceBuilder {
         DataSource dbDataSourceByApo = iAdvDataSourceInitHelper.getDbDataSourceByApo(dataSourceApo);
         AdvDynamicDataSourceStorage.getInstance()
                 .registerDataSource(masterDataSourceId, dbDataSourceByApo);
-        log.info("创建主数据源: ID={}, URL={}, Driver={}", masterDataSourceId, props.getUrl(), props.getDriverClassName());
+        RdLog.getInstance().info("创建主数据源: ID={}, URL={}, Driver={}", masterDataSourceId, props.getUrl(), props.getDriverClassName());
         return dbDataSourceByApo;
     }
 
@@ -144,10 +145,10 @@ public class GirReadWriteDataSourceBuilder {
                     DataSource slaveDs = createSlaveDataSource(url, id);
                     AdvDynamicDataSourceStorage.getInstance()
                             .registerDataSource(id, slaveDs);
-                    log.info("创建并注册从库数据源: ID={}, URL={}, 权重={}", id, url, dsConfig.getWeight());
+                    RdLog.getInstance().info("创建并注册从库数据源: ID={}, URL={}, 权重={}", id, url, dsConfig.getWeight());
                 }
             } catch (Exception e) {
-                log.error("注册从库数据源失败: ID={}, URL={}", id, url, e);
+                RdLog.getInstance().error("注册从库数据源失败: ID={}, URL={}", id, url, e);
                 throw new RuntimeException("注册从库数据源失败: " + id, e);
             }
         }
@@ -166,12 +167,12 @@ public class GirReadWriteDataSourceBuilder {
                 Integer weight = dsConfig.getWeight();
                 if (weight != null && weight > 0) {
                     slaveGroup.setWeightById(id, weight);
-                    log.info("设置从库权重: ID={}, 权重={}, URL={}", id, weight, dsConfig.getUrl());
+                    RdLog.getInstance().info("设置从库权重: ID={}, 权重={}, URL={}", id, weight, dsConfig.getUrl());
                 }
             }
         }
 
-        log.info("创建从库组: groupName={}, 数量={}, 策略={}", groupName, slaveIds.size(), strategy.getDescription());
+        RdLog.getInstance().info("创建从库组: groupName={}, 数量={}, 策略={}", groupName, slaveIds.size(), strategy.getDescription());
         return slaveGroup;
     }
 
@@ -188,7 +189,7 @@ public class GirReadWriteDataSourceBuilder {
 
         DataSource dbDataSourceByApo = iAdvDataSourceInitHelper.getDbDataSourceByApo(dataSourceApo);
 
-        log.debug("创建从库数据源完成: ID={}, URL={}, Driver={}",
+        RdLog.getInstance().debug("创建从库数据源完成: ID={}, URL={}, Driver={}",
                 slaveId, slaveUrl, springDataSourceProperties.getDriverClassName());
 
         return dbDataSourceByApo;
