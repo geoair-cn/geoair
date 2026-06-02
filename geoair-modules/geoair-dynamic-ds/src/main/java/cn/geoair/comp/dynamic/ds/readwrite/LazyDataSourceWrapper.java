@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -25,10 +26,20 @@ public class LazyDataSourceWrapper implements DataSource {
     private volatile AdvDataSourceWrapper realDataSource;
     private final ReentrantLock lock = new ReentrantLock();
 
+    /**
+     * 当数据源初始化的时候，进行调用这个消费者对外进行回调
+     */
+    Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer = t -> {
+    };
+
     public LazyDataSourceWrapper(String dataSourceId) {
         this.dataSourceId = dataSourceId;
     }
 
+    public LazyDataSourceWrapper(String dataSourceId, Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+        this.dataSourceId = dataSourceId;
+        this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
+    }
 
     /**
      * 直接进行初始化真实数据源，这一步非必要不用执行，因为数据源真正使用的时候会进行懒加载的。
@@ -41,6 +52,11 @@ public class LazyDataSourceWrapper implements DataSource {
 
     }
 
+    public LazyDataSourceWrapper setDataSourceWrapperConsumer(Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+        this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
+        return this;
+    }
+
     /**
      * 获取真实的数据源（延迟加载）
      */
@@ -51,6 +67,7 @@ public class LazyDataSourceWrapper implements DataSource {
                 if (realDataSource == null) {
                     RdLog.getInstance().debug("延迟加载数据源: {}", dataSourceId);
                     realDataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
+                    dataSourceWrapperConsumer.accept(realDataSource);
                     if (realDataSource == null) {
                         throw new IllegalStateException("数据源不存在: " + dataSourceId);
                     }
