@@ -199,6 +199,65 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpdateByPK(tableName, idKey, entity, true, true, ignoreFieldNames);
     }
 
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity) {
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpdateByPKSelective(entity, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames) {
+        return bUpdateByPKSelective(entity, true, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPKSelective(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("删除的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行Delete");
+        }
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
+        String idKey = idByAnnotation.get(0);
+        return bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, true, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity) {
+        List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
+        return bUpdateByPK(entity, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, List<String> ignoreFieldNames) {
+        return bUpdateByPK(entity, true, ignoreFieldNames);
+    }
+
+    @Override
+    public <T> Integer bUpdateByPK(T entity, boolean isToUnderlineCase, List<String> ignoreFieldNames) {
+        if (entity == null) {
+            throw new IllegalArgumentException("删除的实体对象不能为空");
+        }
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        if (GutilObject.isEmpty(idByAnnotation)) {
+            throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行Delete");
+        }
+        String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
+        String idKey = idByAnnotation.get(0);
+        return bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, false, ignoreFieldNames);
+    }
+
+
+
+
     // ========== 通用逻辑：条件更新 ==========
     @Override
     public Integer bUpdateByMap(
@@ -289,7 +348,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             String format = StrUtil.format("表名：{}，成功批次数量：{}，单个批次大小：{}", tableName, totalSuccess, batchSize);
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchByPK", format, cost );
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bUpdateBatchByPK", format, cost);
 
         } catch (Exception e) {
             throw new RuntimeException("批量更新失败，表名：" + tableName, e);
