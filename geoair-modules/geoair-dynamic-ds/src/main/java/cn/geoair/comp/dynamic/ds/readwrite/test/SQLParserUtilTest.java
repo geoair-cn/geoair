@@ -14,7 +14,7 @@ public class SQLParserUtilTest {
 
     public static void main(String[] args) {
         // 关闭调试日志
-        SQLParserUtil.setDebugEnabled(false);
+
 
         System.out.println("========== SQL解析工具类测试（支持PostgreSQL） ==========\n");
 

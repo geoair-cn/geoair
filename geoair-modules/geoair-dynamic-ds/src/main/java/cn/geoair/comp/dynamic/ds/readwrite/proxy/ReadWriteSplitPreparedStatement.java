@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.druid.*;
 
 
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement implements PreparedStatement {
 
-    private static final GiLogger log = GirLogger.getLoger(ReadWriteSplitPreparedStatement.class);
+
 
     private final String sql;
     private JdbcParameter[] parameters;
@@ -180,7 +181,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         // 应用已缓存的所有参数
         applyCachedParameters();
 
-        log.trace("创建真实的 PreparedStatement, sql: {}, 路由: {}",
+        RdLog.getInstance().debug("创建真实的 PreparedStatement, sql: {}, 路由: {}",
                 sql, getTargetDataSourceType());
 
         return realStatement;

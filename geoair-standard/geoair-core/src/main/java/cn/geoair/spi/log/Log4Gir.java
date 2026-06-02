@@ -6,6 +6,7 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirConsoleLog;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.text.GuStrFormatter;
 import cn.geoair.base.util.GutilClass;
 import org.slf4j.Logger;
@@ -20,12 +21,12 @@ public class Log4Gir {
         CONSOLE
     }
 
-    ;
 
     private static LogType logType;
 
     static {
         GkMethodHand.implFromClass(GirLogger.class);
+        GkMethodHand.implFromClass(GirLoggerFactory.class);
         if (GutilClass.isPresent(
                 "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.HUTOOL);
@@ -49,6 +50,16 @@ public class Log4Gir {
             type = ImplType.expectfirst
     )
     public static GiLogger getLoger(String name) {
+        return getLogger(name);
+    }
+
+
+    @GaMethodHandImpl(
+            implClass = GirLoggerFactory.class,
+            implMethod = "getLogger",
+            type = ImplType.expectfirst
+    )
+    public static GiLogger getLogger(String name) {
         switch (logType) {
             case SLF4J:
                 return Slf4jLog.createLog(name);

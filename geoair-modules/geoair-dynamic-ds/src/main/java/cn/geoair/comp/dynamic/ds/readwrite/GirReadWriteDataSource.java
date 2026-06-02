@@ -1,9 +1,9 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWritePxyConnection;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWriteSplitConnection;
 import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 @Getter
 public class GirReadWriteDataSource implements DataSource {
 
-    private static final GiLogger log = GirLogger.getLoger(GirReadWriteDataSource.class);
+
 
     private final DataSource masterDataSource;           // 主库
     private final GirGroupSource slaveGroup;      // 从库组
@@ -34,7 +34,7 @@ public class GirReadWriteDataSource implements DataSource {
     public GirReadWriteDataSource(DataSource masterDataSource, GirGroupSource slaveGroup) {
         this.masterDataSource = masterDataSource;
         this.slaveGroup = slaveGroup;
-        log.trace("读写分离数据源初始化完成，主库: {}, 从库数量: {}",
+        RdLog.getInstance().trace("读写分离数据源初始化完成，主库: {}, 从库数量: {}",
                 masterDataSource, slaveGroup.size());
     }
 
@@ -55,13 +55,13 @@ public class GirReadWriteDataSource implements DataSource {
         SQLType sqlType = SQLParserUtil.getSQLType(sql);
 
         if (sqlType == SQLType.WRITE) {
-            log.trace("写操作，路由到主库: {}", sql);
+            RdLog.getInstance().debug("写操作，路由到主库: {}", sql);
             return masterDataSource;
         } else if (sqlType == SQLType.READ) {
-            log.trace("读操作，路由到从库组: {}", sql);
+            RdLog.getInstance().debug("读操作，路由到从库组: {}", sql);
             return slaveGroup;
         } else {
-            log.debug("SQL类型未知，默认路由到主库: {}", sql);
+            RdLog.getInstance().debug("SQL类型未知，默认路由到主库: {}", sql);
             return masterDataSource;
         }
     }

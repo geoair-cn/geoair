@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.hutool.core.util.RandomUtil;
 
 import javax.sql.DataSource;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GirGroupByIdDataSource extends GirGroupSource {
 
-    protected final GiLogger log = GirLogger.getLoger(GirGroupByIdDataSource.class);
+
 
     /**
      * 该组下对应的数据源Id列表
@@ -58,7 +59,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
 
         refreshDataSourcesFromIds();
 
-        log.trace("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+        RdLog.getInstance().debug("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
                 groupName, dataSourceIds.size(), strategyType.getDescription(), totalWeight);
     }
 
@@ -94,7 +95,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         }
         weightMap.put(dataSourceId, weight);
         totalWeight += weight;
-        log.debug("Group [{}] 设置数据源 [{}] 权重为: {}", groupName, dataSourceId, weight);
+        RdLog.getInstance().debug("Group [{}] 设置数据源 [{}] 权重为: {}", groupName, dataSourceId, weight);
         return this;
     }
 
@@ -120,7 +121,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         // 添加延迟加载包装器
         this.dataSources.add(new LazyDataSourceWrapper(dataSourceId));
         setWeightById(dataSourceId, weight);
-        log.debug("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+        RdLog.getInstance().debug("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
         return this;
     }
 
@@ -145,7 +146,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
                 dataSources.remove(toRemove);
             }
             weightMap.remove(dataSourceId);
-            log.debug("Group [{}] 移除数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+            RdLog.getInstance().debug("Group [{}] 移除数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
         }
         return removed;
     }

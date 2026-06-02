@@ -1,9 +1,8 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -21,7 +20,6 @@ import java.util.logging.Logger;
  */
 public class LazyDataSourceWrapper implements DataSource {
 
-    private static final GiLogger log = GirLogger.getLoger(LazyDataSourceWrapper.class);
 
     private final String dataSourceId;
     private volatile AdvDataSourceWrapper realDataSource;
@@ -51,12 +49,12 @@ public class LazyDataSourceWrapper implements DataSource {
             lock.lock();
             try {
                 if (realDataSource == null) {
-                    log.debug("延迟加载数据源: {}", dataSourceId);
+                    RdLog.getInstance().debug("延迟加载数据源: {}", dataSourceId);
                     realDataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
                     if (realDataSource == null) {
                         throw new IllegalStateException("数据源不存在: " + dataSourceId);
                     }
-                    log.debug("数据源加载完成: {}", dataSourceId);
+                    RdLog.getInstance().debug("数据源加载完成: {}", dataSourceId);
                 }
             } finally {
                 lock.unlock();

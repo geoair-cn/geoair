@@ -14,8 +14,7 @@ import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 public class WithStatementTest {
 
     public static void main(String[] args) {
-        // 开启调试日志
-        SQLParserUtil.setDebugEnabled(true);
+
 
         System.out.println("========== WITH 语句测试用例 ==========\n");
 
