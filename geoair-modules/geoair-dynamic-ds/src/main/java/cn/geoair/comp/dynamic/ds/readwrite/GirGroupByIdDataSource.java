@@ -11,6 +11,7 @@ import cn.hutool.core.util.RandomUtil;
 import javax.sql.DataSource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -36,7 +37,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     /**
      * 当数据源初始化的时候，进行调用这个消费者对外进行回调
      */
-    Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer = t -> {
+    BiConsumer<String ,AdvDataSourceWrapper> dataSourceWrapperConsumer =(dataSourceId, dataSourceWrapper)-> {
     };
 
     // ==================== 私有构造方法 ====================

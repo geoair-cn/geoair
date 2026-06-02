@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -29,14 +30,14 @@ public class LazyDataSourceWrapper implements DataSource {
     /**
      * 当数据源初始化的时候，进行调用这个消费者对外进行回调
      */
-    Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer = t -> {
+    BiConsumer<String ,AdvDataSourceWrapper> dataSourceWrapperConsumer = (dataSourceId, dataSourceWrapper) -> {
     };
 
     public LazyDataSourceWrapper(String dataSourceId) {
         this.dataSourceId = dataSourceId;
     }
 
-    public LazyDataSourceWrapper(String dataSourceId, Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+    public LazyDataSourceWrapper(String dataSourceId, BiConsumer<String ,AdvDataSourceWrapper>  dataSourceWrapperConsumer) {
         this.dataSourceId = dataSourceId;
         this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
     }
@@ -52,7 +53,7 @@ public class LazyDataSourceWrapper implements DataSource {
 
     }
 
-    public LazyDataSourceWrapper setDataSourceWrapperConsumer(Consumer<AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+    public LazyDataSourceWrapper setDataSourceWrapperConsumer(BiConsumer<String ,AdvDataSourceWrapper>  dataSourceWrapperConsumer) {
         this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
         return this;
     }
@@ -67,7 +68,7 @@ public class LazyDataSourceWrapper implements DataSource {
                 if (realDataSource == null) {
                     RdLog.getInstance().debug("延迟加载数据源: {}", dataSourceId);
                     realDataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
-                    dataSourceWrapperConsumer.accept(realDataSource);
+                    dataSourceWrapperConsumer.accept(dataSourceId,realDataSource);
                     if (realDataSource == null) {
                         throw new IllegalStateException("数据源不存在: " + dataSourceId);
                     }
