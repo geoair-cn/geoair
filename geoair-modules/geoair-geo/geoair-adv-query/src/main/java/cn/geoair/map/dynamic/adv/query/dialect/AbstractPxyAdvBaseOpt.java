@@ -321,6 +321,26 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
+    public <T> Integer bDeleteByPK(T entity) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPK(entity);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPK(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPK(tableName, entity);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseDeletePxyOpt().bDeleteByPK(tableName, entity, isToUnderlineCase);
+    }
+
+    @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }

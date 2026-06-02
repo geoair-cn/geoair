@@ -413,6 +413,27 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bDeleteByPK(T entity) {
+        return getAdvBaseOpt().bDeleteByPK(entity);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bDeleteByPK(entity, isToUnderlineCase);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity) {
+        return getAdvBaseOpt().bDeleteByPK(tableName, entity);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(String tableName, T entity, boolean isToUnderlineCase) {
+        return getAdvBaseOpt().bDeleteByPK(tableName, entity, isToUnderlineCase);
+    }
+
+
+    @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
     }
 
