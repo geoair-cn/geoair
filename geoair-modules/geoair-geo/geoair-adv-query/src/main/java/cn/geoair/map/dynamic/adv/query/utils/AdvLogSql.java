@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.utils;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class AdvLogSql {
 
-    GiLogger log = GirLogger.getLoger(AdvLogSql.class);
+
     // 全局开关
     public static boolean logEnable = true;
 
@@ -89,7 +90,7 @@ public class AdvLogSql {
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        log.info("\n" + GRAY + SPLIT_LINE + RESET
+        GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -106,7 +107,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            log.info("\n" + GRAY + SPLIT_LINE + RESET
+            GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                             + "\n执行方法：{}.{}"
                             + "\nSQL 语句："
@@ -126,7 +127,7 @@ public class AdvLogSql {
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        log.info("\n" + GRAY + SPLIT_LINE + RESET
+        GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -144,7 +145,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            log.error("\n" + GRAY + SPLIT_LINE + RESET
+            GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
                             + "\n执行方法：{}.{}"
                             + "\n【SQL 执行异常】"
@@ -167,7 +168,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        log.error("\n" + GRAY + SPLIT_LINE + RESET
+        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
@@ -187,7 +188,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        log.error("\n" + GRAY + SPLIT_LINE + RESET
+        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
@@ -210,7 +211,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            log.error("\n" + GRAY + SPLIT_LINE + RESET
+            GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                             + "\n执行方法：{}.{}"
                             + "\n【SQL 执行异常 - 堆栈】"
@@ -239,7 +240,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        log.error("\n" + GRAY + SPLIT_LINE + RESET
+        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
