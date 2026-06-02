@@ -149,7 +149,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         newQualifiedName = dialectTableNameProcessor.tbQuoteTableName(newQualifiedName);
 
         String sql = buildRenameTableSql(oldQualifiedName, newQualifiedName);
-        dExecuteDDL(sql, oldTableName, "重命名表");
+        dExecuteDDL(sql, oldTableName, StrUtil.format(" 将表{}重命名为{} ", oldQualifiedName, newQualifiedName));
     }
 
     // ========== 通用逻辑：字段操作 ==========
