@@ -25,11 +25,17 @@ public class ReadWritePxyConnection extends ConnectionWrapper {
     DataSource fromDataSource;
 
 
-
-
     public ReadWritePxyConnection(Connection connection, boolean slaveIs, DataSource fromDataSource) {
         super(connection);
         this.slaveIs = slaveIs;
         this.fromDataSource = fromDataSource;
+    }
+
+    @Override
+    public String toString() {
+        return "ReadWritePxyConnection{" +
+                "slaveIs=" + slaveIs +
+                ", fromDataSource=" + fromDataSource.getClass().getSimpleName() +
+                "} ";
     }
 }

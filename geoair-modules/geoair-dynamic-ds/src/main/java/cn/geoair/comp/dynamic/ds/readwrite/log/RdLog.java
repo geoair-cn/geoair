@@ -2,7 +2,6 @@ package cn.geoair.comp.dynamic.ds.readwrite.log;
 
 import cn.geoair.base.log.GemLogLevel;
 import cn.geoair.base.log.GirLogWrapper;
-import cn.hutool.log.StaticLog;
 import cn.hutool.log.dialect.console.ConsoleColorLogFactory;
 import cn.hutool.log.level.Level;
 
