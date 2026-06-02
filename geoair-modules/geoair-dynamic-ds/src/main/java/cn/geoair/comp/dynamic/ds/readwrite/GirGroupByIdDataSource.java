@@ -11,6 +11,8 @@ import cn.hutool.core.util.RandomUtil;
 import javax.sql.DataSource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 数据源组代理（基于数据源ID）
@@ -22,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GirGroupByIdDataSource extends GirGroupSource {
 
 
-
     /**
      * 该组下对应的数据源Id列表
      */
@@ -32,6 +33,12 @@ public class GirGroupByIdDataSource extends GirGroupSource {
      * 权重配置（数据源Id -> weight）
      */
     protected Map<String, Integer> weightMap = new ConcurrentHashMap<>();
+
+    /**
+     * 当数据源初始化的时候，进行调用这个消费者对外进行回调
+     */
+    BiConsumer<String ,AdvDataSourceWrapper> dataSourceWrapperConsumer =(dataSourceId, dataSourceWrapper)-> {
+    };
 
     // ==================== 私有构造方法 ====================
 
@@ -72,7 +79,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     private void refreshDataSourcesFromIds() {
         List<DataSource> newDataSources = new ArrayList<>();
         for (String dsId : dataSourceIds) {
-            newDataSources.add(new LazyDataSourceWrapper(dsId));
+            newDataSources.add(new LazyDataSourceWrapper(dsId,dataSourceWrapperConsumer));
         }
         if (newDataSources.isEmpty()) {
             throw new IllegalStateException("数据源组 [" + groupName + "] 没有可用的数据源");
@@ -119,7 +126,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     public GirGroupByIdDataSource addDataSourceById(String dataSourceId, int weight) {
         this.dataSourceIds.add(dataSourceId);
         // 添加延迟加载包装器
-        this.dataSources.add(new LazyDataSourceWrapper(dataSourceId));
+        this.dataSources.add(new LazyDataSourceWrapper(dataSourceId, dataSourceWrapperConsumer));
         setWeightById(dataSourceId, weight);
         RdLog.getInstance().debug("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
         return this;
@@ -202,8 +209,6 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         }
         return dataSources.get(0);
     }
-
-
 
 
     // ==================== Builder ====================
