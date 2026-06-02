@@ -37,7 +37,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     /**
      * 当数据源初始化的时候，进行调用这个消费者对外进行回调
      */
-    BiConsumer<String ,AdvDataSourceWrapper> dataSourceWrapperConsumer =(dataSourceId, dataSourceWrapper)-> {
+    BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer = (dataSourceId, dataSourceWrapper) -> {
     };
 
     // ==================== 私有构造方法 ====================
@@ -48,6 +48,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     protected GirGroupByIdDataSource(Builder builder) {
         super(builder.groupName, new ArrayList<>(), builder.strategyType);
         this.dataSourceIds = new ArrayList<>(builder.dataSourceIds);
+        this.dataSourceWrapperConsumer = builder.dataSourceWrapperConsumer;
 
         // 设置权重
         if (builder.weights != null) {
@@ -79,7 +80,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
     private void refreshDataSourcesFromIds() {
         List<DataSource> newDataSources = new ArrayList<>();
         for (String dsId : dataSourceIds) {
-            newDataSources.add(new LazyDataSourceWrapper(dsId,dataSourceWrapperConsumer));
+            newDataSources.add(new LazyDataSourceWrapper(dsId, dataSourceWrapperConsumer));
         }
         if (newDataSources.isEmpty()) {
             throw new IllegalStateException("数据源组 [" + groupName + "] 没有可用的数据源");
@@ -222,6 +223,8 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         private List<String> dataSourceIds = new ArrayList<>();
         private Map<String, Integer> weights = new HashMap<>();
         private LoadStrategyType strategyType = LoadStrategyType.RANDOM;
+        BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer = (dataSourceId, dataSourceWrapper) -> {
+        };
 
         /**
          * 设置组名
@@ -287,6 +290,11 @@ public class GirGroupByIdDataSource extends GirGroupSource {
             if (strategy != null) {
                 this.strategyType = strategy;
             }
+            return this;
+        }
+
+        public Builder consumer(BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+            this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
             return this;
         }
 
