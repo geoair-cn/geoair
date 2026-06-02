@@ -41,7 +41,7 @@ public class DsApiApiGroupMapper implements GirDsApiGroupDao {
 
     public GroupApo updateSelectiveById(GroupApo t) {
         DsApiGroupPo po = DsApiGroupDto.toPo(t);
-        GirSpringAdvExecutor.getInstance().bUpdateByPK(po);
+        GirSpringAdvExecutor.getInstance().bUpdateByPKSelective(po);
         return DsApiGroupDto.fromPo(po);
     }
 

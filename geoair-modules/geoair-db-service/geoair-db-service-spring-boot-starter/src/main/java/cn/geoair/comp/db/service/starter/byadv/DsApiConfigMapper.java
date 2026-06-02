@@ -126,7 +126,7 @@ public class DsApiConfigMapper implements GirDsApiConfigDao {
     @Override
     public void updateSelectiveById(ApiConfigApo t) {
         DsApiConfigPo po = DsApiConfigDto.toPo(t);
-        GirSpringAdvExecutor.getInstance().bUpdateByPK(po);
+        GirSpringAdvExecutor.getInstance().bUpdateByPKSelective(po);
     }
 
     @Override
