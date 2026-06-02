@@ -21,6 +21,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现
@@ -169,7 +170,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildAlterColumnSql(qualifiedTableName, oldColumnName, newField);
+        String sql = buildAlterColumnSql(qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(oldColumnName), newField);
         dExecuteDDL(sql, tableName, "修改字段[" + oldColumnName + "→" + newField.getColumnName() + "]");
     }
 
@@ -195,7 +196,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildDropColumnSql(qualifiedTableName, columnName);
+        String sql = buildDropColumnSql(qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(columnName));
         dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
     }
 
@@ -217,7 +218,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        columnNames = columnNames.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
+
         String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
         dExecuteDDL(sql, tableName, "添加主键约束[" + pkConstraintName + "]");
     }
@@ -296,6 +299,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        columnNames = columnNames.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
         String sql = buildCreateIndexSql(qualifiedTableName, indexName, columns, isUnique);
         dExecuteDDL(sql, tableName, "创建" + (isUnique ? "唯一" : "") + "索引[" + indexName + "]");
