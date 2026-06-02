@@ -41,9 +41,9 @@ public class RdLog extends GirLogWrapper {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
                 }
-                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), message);
+                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), message,arguments);
             } else {
-                super.recordLog(level, message, loggerInfo);
+                super.recordLog(level, message, loggerInfo,arguments);
             }
 
         }
@@ -56,9 +56,9 @@ public class RdLog extends GirLogWrapper {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
                 }
-                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), t, message);
+                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), t, message,arguments);
             } else {
-                super.recordLogWithThrowable(level, message, t, loggerInfo);
+                super.recordLogWithThrowable(level, message, t, loggerInfo,arguments);
             }
         }
     }
