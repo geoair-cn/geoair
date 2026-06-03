@@ -1,6 +1,8 @@
 package cn.geoair.base.log;
 
 
+import cn.geoair.base.lang.caller.GkCallerUtil;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +22,7 @@ public abstract class GirLogWrapper implements GiLogger {
      *
      * @return 目标Logger实例
      */
-    private LoggerInfo getTargetLoggerInfo() {
+    protected LoggerInfo getTargetLoggerInfo() {
         // 获取调用栈信息
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
@@ -29,11 +31,24 @@ public abstract class GirLogWrapper implements GiLogger {
         int lineNumber = callerElement.getLineNumber();
         String fileName = callerElement.getFileName();
 
+
         // 从缓存获取或创建Logger
         GiLogger logger = loggerCache.computeIfAbsent(callerClassName, GirLoggerFactory::getLogger);
 
         // 返回Logger及调用位置信息
         return new LoggerInfo(logger, callerClassName, fileName, lineNumber);
+    }
+
+    /**
+     * 带缓存的动态Logger获取，并提取调用位置信息
+     *
+     * @return 目标Logger实例
+     */
+    protected LoggerInfo getTargetLoggerInfo(String callerClassName) {
+        // 从缓存获取或创建Logger
+        GiLogger logger = loggerCache.computeIfAbsent(callerClassName, GirLoggerFactory::getLogger);
+        // 返回Logger及调用位置信息
+        return new LoggerInfo(logger, callerClassName, "", 0);
     }
 
     // 内部类用于封装Logger及调用位置信息

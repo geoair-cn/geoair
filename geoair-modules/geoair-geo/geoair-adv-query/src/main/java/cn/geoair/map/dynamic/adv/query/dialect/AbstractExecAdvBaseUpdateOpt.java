@@ -747,7 +747,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
                 stopWatch.stop();
                 totalSuccess += execute;
-                log.debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
             // 全量批次执行完统一提交事务

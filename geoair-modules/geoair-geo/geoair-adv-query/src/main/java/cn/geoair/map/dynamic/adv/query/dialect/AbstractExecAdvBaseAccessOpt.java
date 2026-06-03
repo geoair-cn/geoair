@@ -557,7 +557,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
                 stopWatch.stop();
                 totalSuccess += execute;
-                log.debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
             connection.commit();
