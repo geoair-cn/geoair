@@ -741,8 +741,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 }
                 stopWatch.start();
                 // 批量执行
-                List<Object[]> listO = new ArrayList<>();
-                listO.add(currentBatchParamList.toArray());
                 int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
 
                 stopWatch.stop();
