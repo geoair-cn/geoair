@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
+import cn.geoair.base.Gir;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilObject;
@@ -25,6 +26,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -272,4 +275,26 @@ public class GirAdvSqlUtils {
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(","));
     }
+
+    public static void rollbackConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                Gir.log.error("批量插入回滚失败", e);
+            }
+        }
+    }
+
+    public static void restoreAutoCommit(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                Gir.log.error("恢复自动提交失败", e);
+            }
+        }
+    }
+
+
 }

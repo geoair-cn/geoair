@@ -713,7 +713,7 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
+    public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
         getAdvBaseUpdatePxyOpt().bUpsertBatch(tableName, rowsData, conflictKeys, batchSize);
     }
 

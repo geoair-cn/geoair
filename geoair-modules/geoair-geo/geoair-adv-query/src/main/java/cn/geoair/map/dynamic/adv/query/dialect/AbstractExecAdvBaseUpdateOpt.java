@@ -30,6 +30,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.restoreAutoCommit;
+import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.rollbackConnection;
+
 /**
  * 数据库更新操作抽象父类 封装所有数据库通用的更新逻辑，差异化语法由子类实现
  */
@@ -708,29 +711,65 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     // ==================== 批量 UPSERT ====================
 
     @Override
-    public void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
-
-        // todo 缺少事务处理 后期参考 bInsertBatch
-
+    public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(rowsData)) {
-            return;
+            return 0;
         }
         if (CollUtil.isEmpty(conflictKeys)) {
             throw new IllegalArgumentException("冲突判定字段不能为空");
         }
-        List<List<Map<String, Object>>> split = CollUtil.split(rowsData, batchSize);
 
-        for (List<Map<String, Object>> maps : split) {
-            List<String> sqls = new ArrayList<>();
-            List<Object> params = new ArrayList<>();
-            for (Map<String, Object> rowData : maps) {
-                Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
-                sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
-                params.addAll(upsertSql.getValue());
+        // 拆分批次
+        List<List<Map<String, Object>>> batchGroupParams = CollUtil.split(rowsData, batchSize);
+        StopWatch stopWatch = new StopWatch();
+        int totalSuccess = 0;
+        int batchNum = 1;
+        Connection connection = dataSourceGetter.getConnection();
+
+        try {
+            connection.setAutoCommit(false);
+            for (List<Map<String, Object>> currentBatchData : batchGroupParams) {
+                List<String> currentBatchSqls = new ArrayList<>();
+                List<Object> currentBatchParamList = new ArrayList<>();
+                for (Map<String, Object> rowData : currentBatchData) {
+                    Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+                    // 表名去除空格处理
+                    String sql = dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey());
+                    currentBatchSqls.add(sql);
+                    currentBatchParamList.addAll(upsertSql.getValue());
+                }
+                stopWatch.start();
+                // 批量执行
+                List<Object[]> listO = new ArrayList<>();
+                listO.add(currentBatchParamList.toArray());
+                int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", currentBatchSqls), listO);
+                int sum = Arrays.stream(ints).sum();
+                stopWatch.stop();
+                totalSuccess += sum;
+                log.debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}", batchNum, sum, stopWatch.getLastTaskTimeMillis());
+                batchNum++;
             }
-            bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
+            // 全量批次执行完统一提交事务
+            connection.commit();
+            long cost = stopWatch.getTotalTimeMillis();
+            // 执行成功日志
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
+                    this.getClass(), "bUpsertBatch",
+                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                    cost, totalSuccess);
+        } catch (SQLException e) {
+            // 异常回滚
+            rollbackConnection(connection);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
+                    this.getClass(), "bUpsertBatch",
+                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
+            throw new RuntimeException("批量upsert失败，表名：" + tableName, e);
+        } finally {
+            restoreAutoCommit(connection);
+            closeConnection(connection);
         }
+        return totalSuccess;
     }
 
     @Override
