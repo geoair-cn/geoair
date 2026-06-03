@@ -1986,8 +1986,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T, R> R wSelectObjOne(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
-        return getWhereSelectOpt().wSelectObjOne(resultClass, consumer);
+    public <T> T wSelectObjOne(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjOne(entityClass, consumer);
     }
 
     @Override
@@ -2001,8 +2001,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T, R> List<R> wSelectObjList(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
-        return getWhereSelectOpt().wSelectObjList(resultClass, consumer);
+    public <T> List<T> wSelectObjList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjList(entityClass, consumer);
     }
 
     @Override
@@ -2016,8 +2016,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T, R> void wSelectObjStream(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer) {
-        getWhereSelectOpt().wSelectObjStream(resultClass, consumer, rowConsumer);
+    public <T> void wSelectObjStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<T> rowConsumer) {
+        getWhereSelectOpt().wSelectObjStream(entityClass, consumer, rowConsumer);
     }
 
     @Override
