@@ -21,7 +21,6 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -491,30 +490,34 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities) {
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
         AccessStrategy strategy = new AccessStrategy()
                 .setToUnderlineCase(true)
-                .setIgnoreNullValue(false)
-                .setConflictKeys(conflictKeys);
-        return bInsertIgnoreBatch(entities, conflictKeys, strategy);
+                .setIgnoreNullValue(false);
+        return bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
-        // todo 缺少事务处理 后期参考 bInsertBatch
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+        // todo 缺少事务处理 后期参考 bInsertBatch 已完成
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
         if (strategy == null) {
-            return bInsertIgnoreBatch(entities, conflictKeys);
+            return bInsertIgnoreBatch(entities);
         }
+        List<String> conflictKeys = strategy.getConflictKeys();
         String tableName = strategy.getTableName();
         if (GutilObject.isEmpty(tableName)) {
             T first = entities.iterator().next();
             tableName = GirAdvSqlUtils.getTableName(first.getClass());
+        }
+        if (GutilObject.isEmpty(conflictKeys)) {
+            T first = entities.iterator().next();
+            conflictKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
         }
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
@@ -570,40 +573,39 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
         }
-        return bInsertIgnoreBatch(entities, conflictKeys, strategy);
+        return bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities) {
         AccessStrategy strategy = new AccessStrategy()
                 .setToUnderlineCase(true)
-                .setIgnoreNullValue(true)
-                .setConflictKeys(conflictKeys);
-        return bInsertIgnoreBatch(entities, conflictKeys, strategy);
+                .setIgnoreNullValue(true);
+        return bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
         if (strategy == null) {
-            return bInsertSelectiveIgnoreBatch(entities, conflictKeys);
+            return bInsertSelectiveIgnoreBatch(entities);
         }
         strategy.setIgnoreNullValue(true);
-        return bInsertIgnoreBatch(entities, conflictKeys, strategy);
+        return bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
         }
         strategy.setIgnoreNullValue(true);
-        return bInsertIgnoreBatch(entities, conflictKeys, strategy);
+        return bInsertIgnoreBatch(entities, strategy);
     }
 
     // ====================== 工具方法 ======================

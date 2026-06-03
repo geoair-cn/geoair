@@ -211,33 +211,33 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, conflictKeys);
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities);
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, conflictKeys, strategy);
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, conflictKeys, strategyConsumer);
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, strategyConsumer);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys);
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
-        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys, strategy);
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
-        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys, strategyConsumer);
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, strategyConsumer);
     }
 // ==================== 删除操作实现（代理调用） ====================
 
