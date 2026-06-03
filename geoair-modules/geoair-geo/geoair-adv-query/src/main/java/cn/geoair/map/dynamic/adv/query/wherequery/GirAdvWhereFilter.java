@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.wherequery;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.hutool.core.collection.ListUtil;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -141,7 +142,7 @@ public class GirAdvWhereFilter implements Serializable {
      * IN条件（数组）
      */
     public GirAdvWhereFilter in(String column, Object[] values) {
-        return addCondition(column, AdvOperatorEnums.IN, Arrays.asList(values));
+        return addCondition(column, AdvOperatorEnums.IN, ListUtil.toList(values));
     }
 
     /**
@@ -588,7 +589,7 @@ public class GirAdvWhereFilter implements Serializable {
 
         public ConditionGroupBuilder in(String column, Object[] values) {
             if (values != null && values.length > 0) {
-                addEntry(new ConditionExpression(column, AdvOperatorEnums.IN, Arrays.asList(values)));
+                addEntry(new ConditionExpression(column, AdvOperatorEnums.IN, ListUtil.toList(values)));
             }
             return this;
         }
