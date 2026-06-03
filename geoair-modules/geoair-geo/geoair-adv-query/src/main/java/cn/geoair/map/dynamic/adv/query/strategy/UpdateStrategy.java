@@ -1,0 +1,76 @@
+package cn.geoair.map.dynamic.adv.query.strategy;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 实体类更新的策略配置
+ *
+ * @author 张俊
+ * @date 2026/6/3
+ */
+@Data
+@Accessors(chain = true)
+public class UpdateStrategy {
+
+    /**
+     * 主键字段名（优先级高于注解）
+     */
+    String idKey;
+
+    /**
+     * 表名（优先级高于注解）
+     */
+    String tableName;
+
+    /**
+     * 需要忽略的字段列表（实体属性名）
+     */
+    List<String> ignoreFieldNames = new ArrayList<>();
+
+    /**
+     * 是否对实体类进行驼峰转下划线
+     */
+    boolean toUnderlineCase = true;
+
+    /**
+     * 是否忽略null值字段
+     */
+    boolean ignoreNullValue = true;
+
+    /**
+     * 是否忽略空字符串
+     */
+    boolean ignoreEmptyString = true;
+
+
+    /**
+     * 获取策略的副本
+     */
+    public UpdateStrategy copy() {
+        UpdateStrategy copy = new UpdateStrategy();
+        copy.idKey = this.idKey;
+        copy.tableName = this.tableName;
+        copy.ignoreFieldNames = new ArrayList<>(this.ignoreFieldNames);
+        copy.toUnderlineCase = this.toUnderlineCase;
+        copy.ignoreNullValue = this.ignoreNullValue;
+        copy.ignoreEmptyString = this.ignoreEmptyString;
+
+        return copy;
+    }
+
+    /**
+     * 添加忽略字段
+     */
+    public UpdateStrategy ignoreField(String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            this.ignoreFieldNames.add(fieldName);
+        }
+        return this;
+    }
+
+
+}

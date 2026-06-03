@@ -4,12 +4,15 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+
+import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 数据更新基础操作接口
@@ -419,6 +422,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
 
 
     <T> Integer bUpdateByPKSelective(T entity);
+
 
     <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames);
 
@@ -846,6 +850,11 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
      * @return 受影响的行数
      */
     <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter);
+
+
+    <T> Integer bUpdateByWhere(String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer);
+
+    <T> Integer bUpdateByWhere(T entity, Consumer<UpdateStrategy> updateStrategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer);
 
     /**
      * 根据Lambda条件更新实体（支持指定忽略字段）

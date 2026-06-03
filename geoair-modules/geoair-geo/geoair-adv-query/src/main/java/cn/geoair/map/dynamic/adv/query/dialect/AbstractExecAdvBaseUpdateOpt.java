@@ -24,6 +24,7 @@ import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -205,6 +206,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return bUpdateByPKSelective(entity, ignoreFieldByAnnotation);
     }
 
+
     @Override
     public <T> Integer bUpdateByPKSelective(T entity, List<String> ignoreFieldNames) {
         return bUpdateByPKSelective(entity, true, ignoreFieldNames);
@@ -254,8 +256,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String idKey = idByAnnotation.get(0);
         return bUpdateByPK(tableName, idKey, entity, isToUnderlineCase, false, ignoreFieldNames);
     }
-
-
 
 
     // ========== 通用逻辑：条件更新 ==========
@@ -561,6 +561,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     public <T> Integer bUpdateByWhere(String tableName, T entity, GirAdvWhereLambdaFilter<T> whereFilter) {
         List<String> ignoreFieldByAnnotation = GirAdvSqlUtils.getIgnoreFieldByAnnotation(entity.getClass());
         return bUpdateByWhere(tableName, entity, whereFilter, ignoreFieldByAnnotation);
+    }
+
+    @Override
+    public <T> Integer bUpdateByWhere(String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        Class<T> entityClass = (Class<T>) entity.getClass();
+        GirAdvWhereLambdaFilter<T> lambdaFilter = GirAdvWhereLambdaFilter.of(entityClass, true);
+        consumer.accept(lambdaFilter);
+        return bUpdateByWhere(tableName, entity, lambdaFilter);
     }
 
     @Override
