@@ -29,6 +29,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.restoreAutoCommit;
+import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.rollbackConnection;
+
 /**
  * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑
  */
@@ -545,19 +548,19 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             connection.setAutoCommit(false);
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
                 List<String> currentBatchSqls = new ArrayList<>();
-                List<Object[]> currentBatchParamList = new ArrayList<>();
+                List<Object> currentBatchParamList = new ArrayList<>();
                 for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
-                    SqlParamList objects = SqlParamList.of(sqlStatement.getValue());
-                    Object[] arrayValue = objects.toArrayValue();
-                    currentBatchParamList.add(arrayValue);
+                    currentBatchParamList.addAll(sqlStatement.getValue());
                     currentBatchSqls.add(sqlStatement.getKey());
                 }
                 stopWatch.start();
-                int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList);
+                List<Object[]> listO = new ArrayList<>();
+                listO.add(currentBatchParamList.toArray());
+                int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", currentBatchSqls), listO);
                 int sum = Arrays.stream(ints).sum();
                 stopWatch.stop();
                 totalSuccess += sum;
-                log.debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, sum,stopWatch.getLastTaskTimeMillis());
+                log.debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, sum, stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
             connection.commit();
@@ -675,23 +678,5 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    protected void rollbackConnection(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                log.error("批量插入回滚失败", e);
-            }
-        }
-    }
 
-    protected void restoreAutoCommit(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException e) {
-                log.error("恢复自动提交失败", e);
-            }
-        }
-    }
 }
