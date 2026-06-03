@@ -106,7 +106,7 @@ public class GirAdvSqlComposer {
 
     /**
      * 生成带GROUP BY的统计总数SQL
-     * 统计分组后的记录数
+     * 统计分组后的记录数（即分组数量）
      */
     private SqlBuildResult buildGroupByCountSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
@@ -114,20 +114,7 @@ public class GirAdvSqlComposer {
 
         // 构建子查询
         sql.append("SELECT COUNT(*) FROM (");
-
-        // SELECT - 添加DISTINCT和GROUP BY字段
-        sql.append("SELECT ");
-        if (param.hasDistinct()) {
-            sql.append("DISTINCT ");
-        }
-
-        // GROUP BY字段列表
-        List<String> groupByFields = param.getGroupByFields();
-        List<String> escapedGroupFields = new ArrayList<>();
-        for (String field : groupByFields) {
-            escapedGroupFields.add(dialectProcessor.tbQuoteFieldName(field));
-        }
-        sql.append(String.join(", ", escapedGroupFields));
+        sql.append("SELECT 1");
 
         // FROM
         sql.append(" FROM ");
@@ -157,15 +144,23 @@ public class GirAdvSqlComposer {
         }
 
         // GROUP BY
-        sql.append(" GROUP BY ").append(String.join(", ", escapedGroupFields));
+        if (param.hasGroupBy()) {
+            List<String> groupByFields = param.getGroupByFields();
+            List<String> escapedGroupFields = new ArrayList<>();
+            for (String field : groupByFields) {
+                escapedGroupFields.add(quoteFieldOrExpression(field));
+            }
+            sql.append(" GROUP BY ").append(String.join(", ", escapedGroupFields));
+        }
 
-        // HAVING
+        // HAVING - 注意：HAVING 的参数需要单独处理
         GirAdvWhereFilter having = param.getHavingFilter();
         if (having != null && having.hasExpression()) {
             List<Object> havingParams = new ArrayList<>();
             String havingClause = buildWhereClause(having.getExpression(), havingParams);
             if (StrUtil.isNotBlank(havingClause)) {
                 sql.append(" HAVING ").append(havingClause);
+                // HAVING 的参数也需要添加到总参数列表中
                 params.addAll(havingParams);
             }
         }
@@ -188,15 +183,12 @@ public class GirAdvSqlComposer {
             sql.append("DISTINCT ");
         }
 
-        List<String> escapedFields = new ArrayList<>();
-        for (String field : param.getFieldNames()) {
-            escapedFields.add(dialectProcessor.tbQuoteFieldName(field));
+        // 构建 SELECT 字段列表
+        List<String> selectFields = buildSelectFields(param);
+        if (GutilObject.isEmpty(selectFields)) {
+            selectFields.add("*");
         }
-        escapedFields.addAll(param.getExprColumnNames());
-        if (GutilObject.isEmpty(escapedFields)) {
-            escapedFields.add("*");
-        }
-        sql.append(String.join(", ", escapedFields));
+        sql.append(String.join(", ", selectFields));
 
         // FROM - 使用方言处理器获取带Schema的表名
         sql.append(" FROM ");
@@ -215,6 +207,7 @@ public class GirAdvSqlComposer {
             );
             sql.append(tableName);
         }
+
         // WHERE
         GirAdvWhereFilter where = param.getWhereOption();
         if (where != null && where.hasExpression()) {
@@ -228,12 +221,12 @@ public class GirAdvSqlComposer {
         if (param.hasGroupBy()) {
             List<String> escapedGroupFields = new ArrayList<>();
             for (String field : param.getGroupByFields()) {
-                escapedGroupFields.add(dialectProcessor.tbQuoteFieldName(field));
+                escapedGroupFields.add(quoteFieldOrExpression(field));
             }
             sql.append(" GROUP BY ").append(String.join(", ", escapedGroupFields));
         }
 
-        // HAVING（新增）
+        // HAVING
         GirAdvWhereFilter having = param.getHavingFilter();
         if (having != null && having.hasExpression()) {
             List<Object> havingParams = new ArrayList<>();
@@ -254,6 +247,82 @@ public class GirAdvSqlComposer {
 
         return new SqlBuildResult(sql.toString(), params);
     }
+
+    /**
+     * 构建 SELECT 字段列表
+     * <p>正确处理普通字段、表达式字段、GROUP BY 字段的关系</p>
+     */
+    private List<String> buildSelectFields(GirAdvQueryRequest param) {
+        List<String> selectFields = new ArrayList<>();
+
+        // 1. 添加普通字段（需要转义）
+        for (String field : param.getFieldNames()) {
+            if (isSqlExpression(field)) {
+                // 表达式字段直接添加
+                selectFields.add(field);
+            } else {
+                // 普通字段需要转义
+                selectFields.add(dialectProcessor.tbQuoteFieldName(field));
+            }
+        }
+
+        // 2. 添加表达式字段（如 COUNT(*)、SUM(amount) 等）
+        if (param.getExprColumnNames() != null) {
+            selectFields.addAll(param.getExprColumnNames());
+        }
+
+        // 3. 如果有 GROUP BY 但没有指定任何字段，自动添加 GROUP BY 字段到 SELECT
+        if (param.hasGroupBy() && selectFields.isEmpty()) {
+            for (String groupField : param.getGroupByFields()) {
+                selectFields.add(quoteFieldOrExpression(groupField));
+            }
+        }
+
+        return selectFields;
+    }
+
+    /**
+     * 对字段或表达式进行引用处理
+     * <p>如果是表达式则原样返回，如果是普通字段则添加引号</p>
+     */
+    private String quoteFieldOrExpression(String field) {
+        if (field == null || field.isEmpty()) {
+            return field;
+        }
+        if (isSqlExpression(field)) {
+            return field;
+        }
+        return dialectProcessor.tbQuoteFieldName(field);
+    }
+
+    /**
+     * 判断是否为SQL表达式
+     */
+    private boolean isSqlExpression(String field) {
+        if (field == null || field.isEmpty()) {
+            return false;
+        }
+
+        String trimmed = field.trim();
+        // 包含空格或运算符
+        if (trimmed.contains(" ")) {
+            return true;
+        }
+
+        // 函数调用模式：字母开头+括号
+        if (trimmed.matches("^[A-Za-z_][A-Za-z0-9_]*\\(.*\\)$")) {
+            String funcName = trimmed.substring(0, trimmed.indexOf('(')).toUpperCase();
+            Set<String> sqlFunctions = new HashSet<>(Arrays.asList(
+                    "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR",
+                    "LENGTH", "NOW", "DATE", "YEAR", "MONTH", "DAY", "TRIM",
+                    "COALESCE", "NULLIF", "CAST", "CONVERT"
+            ));
+            return sqlFunctions.contains(funcName);
+        }
+
+        return false;
+    }
+
 
     /**
      * 构建自定义SQL模式
