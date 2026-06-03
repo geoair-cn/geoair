@@ -130,18 +130,18 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
     /**
      * 批量插入或忽略实体数据
      */
-    <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys);
+    <T> Integer bInsertIgnoreBatch(Collection<T> entities);
 
-    <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy);
+    <T> Integer bInsertIgnoreBatch(Collection<T> entities, AccessStrategy strategy);
 
-    <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer);
+    <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer);
 
     /**
      * 批量选择性插入或忽略实体数据（自动过滤null值）
      */
-    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys);
+    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities);
 
-    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy);
+    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy);
 
-    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer);
+    <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer);
 }
