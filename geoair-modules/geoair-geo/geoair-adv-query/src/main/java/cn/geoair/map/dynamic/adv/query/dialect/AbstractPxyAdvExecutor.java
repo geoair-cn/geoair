@@ -808,7 +808,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
-        getAdvBaseOpt().bUpsertBatch(tableName, rowsData, conflictKeys,batchSize );
+      return   getAdvBaseOpt().bUpsertBatch(tableName, rowsData, conflictKeys,batchSize );
     }
 
     @Override
