@@ -51,7 +51,10 @@ public class UpdateStrategy {
      * 是否忽略空字符串
      */
     boolean ignoreEmptyString = true;
-
+    /**
+     *  批量更新的时候，一个批次提交的大小
+     */
+    int batchSize = 1000;
     /**
      * 辅助方法：添加忽略字段
      */
