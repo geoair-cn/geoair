@@ -377,6 +377,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         String fields = String.join(",", dbKeyList);
         String placeholders = buildPlaceholders(rowData.keySet().size());
+        conflictKeys = conflictKeys.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
         execSql = dialectTableNameProcessor.tbRemoveSqlSpaces(execSql);
         List<Object> params = new ArrayList<>(rowData.values());
