@@ -537,25 +537,31 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
             sqlStatements.add(insertIgnoreSql);
         }
-        List<List<Pair<String, List<Object>>>> split = CollUtil.split(sqlStatements, strategy.getBatchSize());
+        List<List<Pair<String, List<Object>>>> batchGroupParams = CollUtil.split(sqlStatements, strategy.getBatchSize());
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        int batchNum = 1;
         Connection connection = dataSourceGetter.getConnection();
         try {
             connection.setAutoCommit(false);
-            for (List<Pair<String, List<Object>>> pairs : split) {
-                for (Pair<String, List<Object>> sqlStatement : pairs) {
+            for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
+                List<String> currentBatchSqls = new ArrayList<>();
+                List<Object[]> currentBatchParamList = new ArrayList<>();
+                for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
                     SqlParamList objects = SqlParamList.of(sqlStatement.getValue());
                     Object[] arrayValue = objects.toArrayValue();
-                    List<Object[]> list = new ArrayList<>();
-                    list.add(arrayValue);
-                    int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", sqlStatement.getKey()), list);
-                    totalSuccess += Arrays.stream(ints).sum();
+                    currentBatchParamList.add(arrayValue);
+                    currentBatchSqls.add(sqlStatement.getKey());
                 }
+                stopWatch.start();
+                int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList);
+                int sum = Arrays.stream(ints).sum();
+                stopWatch.stop();
+                totalSuccess += sum;
+                log.debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, sum,stopWatch.getLastTaskTimeMillis());
+                batchNum++;
             }
-            stopWatch.stop();
             connection.commit();
-            long cost = stopWatch.getLastTaskTimeMillis();
+            long cost = stopWatch.getTotalTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
                     this.getClass(), "bInsertIgnoreBatch",
                     StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
