@@ -32,6 +32,11 @@ public class UpdateStrategy {
     List<String> ignoreFieldNames = new ArrayList<>();
 
     /**
+     * 冲突判定字段列表（UPSERT时使用，通常是主键或唯一索引）
+     */
+    List<String> conflictKeys = new ArrayList<>();
+
+    /**
      * 是否对实体类进行驼峰转下划线
      */
     boolean toUnderlineCase = true;
@@ -46,24 +51,8 @@ public class UpdateStrategy {
      */
     boolean ignoreEmptyString = true;
 
-
     /**
-     * 获取策略的副本
-     */
-    public UpdateStrategy copy() {
-        UpdateStrategy copy = new UpdateStrategy();
-        copy.idKey = this.idKey;
-        copy.tableName = this.tableName;
-        copy.ignoreFieldNames = new ArrayList<>(this.ignoreFieldNames);
-        copy.toUnderlineCase = this.toUnderlineCase;
-        copy.ignoreNullValue = this.ignoreNullValue;
-        copy.ignoreEmptyString = this.ignoreEmptyString;
-
-        return copy;
-    }
-
-    /**
-     * 添加忽略字段
+     * 辅助方法：添加忽略字段
      */
     public UpdateStrategy ignoreField(String... fieldNames) {
         for (String fieldName : fieldNames) {
@@ -72,5 +61,13 @@ public class UpdateStrategy {
         return this;
     }
 
-
+    /**
+     * 辅助方法：添加冲突键
+     */
+    public UpdateStrategy conflictKey(String... keys) {
+        for (String key : keys) {
+            this.conflictKeys.add(key);
+        }
+        return this;
+    }
 }
