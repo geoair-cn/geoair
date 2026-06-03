@@ -52,6 +52,12 @@ public class AccessStrategy {
      */
     boolean ignoreEmptyString = true;
 
+
+    /**
+     *  批量插入的时候，一个批次提交的大小
+     */
+    int batchSize = 1000;
+
     /**
      * 辅助方法：添加忽略字段
      */
@@ -80,6 +86,7 @@ public class AccessStrategy {
         this.ignoreNullValue = true;
         return this;
     }
+
     public AccessStrategy idKey(String idKey) {
         this.idKey = idKey;
         return this;

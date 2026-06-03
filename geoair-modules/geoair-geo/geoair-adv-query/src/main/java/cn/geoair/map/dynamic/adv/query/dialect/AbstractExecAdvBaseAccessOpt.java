@@ -311,7 +311,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
 
         Set<String> headers = rowsData.get(0).keySet();
-        return bInsertBatch(tableName, ListUtil.toList(headers), rowsData);
+        return bInsertBatch(tableName, ListUtil.toList(headers), rowsData, strategy.getBatchSize());
     }
 
     @Override
@@ -508,20 +508,16 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (strategy == null) {
             return bInsertIgnoreBatch(entities, conflictKeys);
         }
-
         String tableName = strategy.getTableName();
         if (GutilObject.isEmpty(tableName)) {
             T first = entities.iterator().next();
             tableName = GirAdvSqlUtils.getTableName(first.getClass());
         }
-
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
-
         int totalSuccess = 0;
-        List<String> sqls = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
+        List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
             List<String> finalConflictKeys = conflictKeys;
@@ -532,10 +528,39 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 }
             }
             Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
-            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(insertIgnoreSql.getKey()));
-            params.addAll(insertIgnoreSql.getValue());
+            sqlStatements.add(insertIgnoreSql);
         }
-        bInsertBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
+        List<List<Pair<String, List<Object>>>> split = CollUtil.split(sqlStatements, strategy.getBatchSize());
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            for (List<Pair<String, List<Object>>> pairs : split) {
+                for (Pair<String, List<Object>> sqlStatement : pairs) {
+                    SqlParamList objects = SqlParamList.of(sqlStatement.getValue());
+                    Object[] arrayValue = objects.toArrayValue();
+                    int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", sqlStatement.getKey()), (Iterable<Object[]>) ListUtil.toList(arrayValue));
+                    totalSuccess += Arrays.stream(ints).sum();
+                }
+            }
+            stopWatch.stop();
+            connection.commit();
+            long cost = stopWatch.getLastTaskTimeMillis();
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
+                    this.getClass(), "bInsertIgnoreBatch",
+                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
+                    cost, totalSuccess);
+        } catch (SQLException e) {
+            rollbackConnection(connection);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
+                    this.getClass(), "bInsertIgnoreBatch",
+                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()), e);
+            throw new RuntimeException("批量插入失败，表名：" + tableName, e);
+        } finally {
+            restoreAutoCommit(connection);
+            closeConnection(connection);
+        }
         return totalSuccess;
     }
 

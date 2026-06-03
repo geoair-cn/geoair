@@ -289,6 +289,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
+        // todo 缺少事务处理 后期参考 bInsertBatch
         validateTableName(tableName);
         validateIdKey(idKey);
         if (CollUtil.isEmpty(rowsData)) {
@@ -370,7 +371,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     strategy.isToUnderlineCase(), strategy.isIgnoreNullValue(), strategy.getIgnoreFieldNames());
             rowsData.add(rowData);
         }
-        bUpdateBatchByPK(tableName, idKey, rowsData);
+        bUpdateBatchByPK(tableName, idKey, rowsData, strategy.getBatchSize());
     }
 
     @Override
@@ -707,7 +708,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     // ==================== 批量 UPSERT ====================
 
     @Override
-    public void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
+    public void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
+
+        // todo 缺少事务处理 后期参考 bInsertBatch
+
         validateTableName(tableName);
         if (CollUtil.isEmpty(rowsData)) {
             return;
@@ -715,14 +719,18 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (CollUtil.isEmpty(conflictKeys)) {
             throw new IllegalArgumentException("冲突判定字段不能为空");
         }
-        List<String> sqls = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
-        for (Map<String, Object> rowData : rowsData) {
-            Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
-            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
-            params.addAll(upsertSql.getValue());
+        List<List<Map<String, Object>>> split = CollUtil.split(rowsData, batchSize);
+
+        for (List<Map<String, Object>> maps : split) {
+            List<String> sqls = new ArrayList<>();
+            List<Object> params = new ArrayList<>();
+            for (Map<String, Object> rowData : maps) {
+                Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+                sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
+                params.addAll(upsertSql.getValue());
+            }
+            bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
         }
-        bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
     }
 
     @Override
@@ -785,7 +793,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
             allRows.add(rowData);
         }
-        bUpsertBatch(tableName, allRows, finalConflictKeys);
+        bUpsertBatch(tableName, allRows, finalConflictKeys, strategy.getBatchSize());
     }
 
     @Override

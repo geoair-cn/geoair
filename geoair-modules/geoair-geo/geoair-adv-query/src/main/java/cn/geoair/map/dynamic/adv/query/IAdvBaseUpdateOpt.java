@@ -153,7 +153,7 @@ public interface IAdvBaseUpdateOpt extends IAdvConfigOpt {
     <T> Integer bUpsertSelective(T entity, Consumer<UpdateStrategy> strategyConsumer);
 
     // 批量 UPSERT
-    void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys);
+    void bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize);
 
     <T> void bUpsertBatch(Collection<T> entities, List<String> conflictKeys);
 
