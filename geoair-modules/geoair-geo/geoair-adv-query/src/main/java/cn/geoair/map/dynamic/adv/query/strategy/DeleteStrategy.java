@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,9 +42,7 @@ public class DeleteStrategy {
      * 辅助方法：添加忽略字段
      */
     public DeleteStrategy ignoreField(String... fieldNames) {
-        for (String fieldName : fieldNames) {
-            this.ignoreFieldNames.add(fieldName);
-        }
+        this.ignoreFieldNames.addAll(Arrays.asList(fieldNames));
         return this;
     }
 

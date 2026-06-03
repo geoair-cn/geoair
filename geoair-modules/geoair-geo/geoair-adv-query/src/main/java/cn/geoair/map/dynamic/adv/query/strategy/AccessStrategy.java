@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,9 +56,7 @@ public class AccessStrategy {
      * 辅助方法：添加忽略字段
      */
     public AccessStrategy ignoreField(String... fieldNames) {
-        for (String fieldName : fieldNames) {
-            this.ignoreFieldNames.add(fieldName);
-        }
+        this.ignoreFieldNames.addAll(Arrays.asList(fieldNames));
         return this;
     }
 
@@ -65,9 +64,7 @@ public class AccessStrategy {
      * 辅助方法：添加冲突键
      */
     public AccessStrategy conflictKey(String... keys) {
-        for (String key : keys) {
-            this.conflictKeys.add(key);
-        }
+        this.conflictKeys.addAll(Arrays.asList(keys));
         return this;
     }
 
