@@ -19,6 +19,7 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
@@ -564,6 +565,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+        Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+        return executeUpdate(upsertSql.getKey(), upsertSql.getValue(), "bUpsert");
+    }
+
+
+    public Pair<String, List<Object>> getUpsertSql(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         validateTableName(tableName);
         validateUpdateData(rowData);
         if (CollUtil.isEmpty(conflictKeys)) {
@@ -590,10 +597,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String conflictFields = String.join(",", conflictKeysList);
         String updateClause = buildUpsertUpdateClause(rowData, conflictKeysList);
         String execSql = buildUpdateOrInsertSql(quoteTableName, fields, placeholders, conflictFields, updateClause);
-
         List<Object> params = new ArrayList<>(rowData.values());
-
-        return executeUpdate(execSql, params, "bUpsert");
+        return Pair.of(execSql, params);
     }
 
     @Override
@@ -710,11 +715,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (CollUtil.isEmpty(conflictKeys)) {
             throw new IllegalArgumentException("冲突判定字段不能为空");
         }
-
-        // 逐条执行 UPSERT（或者可以优化为批量SQL，取决于数据库支持）
+        List<String> sqls = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
         for (Map<String, Object> rowData : rowsData) {
-            bUpsert(tableName, rowData, conflictKeys);
+            Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
+            params.addAll(upsertSql.getValue());
         }
+        bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
     }
 
     @Override
@@ -765,20 +773,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
-
+        List<Map<String, Object>> allRows = new ArrayList<>();
+        List<String> finalConflictKeys = conflictKeys;
+        if (toUnderlineCase) {
+            finalConflictKeys = new ArrayList<>();
+            for (String key : conflictKeys) {
+                finalConflictKeys.add(StrUtil.toUnderlineCase(key));
+            }
+        }
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
-
-            List<String> finalConflictKeys = conflictKeys;
-            if (toUnderlineCase) {
-                finalConflictKeys = new ArrayList<>();
-                for (String key : conflictKeys) {
-                    finalConflictKeys.add(StrUtil.toUnderlineCase(key));
-                }
-            }
-
-            bUpsert(tableName, rowData, finalConflictKeys);
+            allRows.add(rowData);
         }
+        bUpsertBatch(tableName, allRows, finalConflictKeys);
     }
 
     @Override
