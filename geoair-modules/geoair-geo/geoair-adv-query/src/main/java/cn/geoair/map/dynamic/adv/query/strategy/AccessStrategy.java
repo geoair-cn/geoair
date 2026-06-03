@@ -68,11 +68,20 @@ public class AccessStrategy {
         return this;
     }
 
+    public AccessStrategy tableName(String tableName) {
+        this.tableName = tableName;
+        return this;
+    }
+
     /**
      * 设置为选择性插入（自动过滤null）
      */
     public AccessStrategy selective() {
         this.ignoreNullValue = true;
+        return this;
+    }
+    public AccessStrategy idKey(String idKey) {
+        this.idKey = idKey;
         return this;
     }
 }

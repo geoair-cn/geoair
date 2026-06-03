@@ -67,6 +67,17 @@ public class UpdateStrategy {
         this.conflictKeys.addAll(Arrays.asList(keys));
         return this;
     }
+
+    public UpdateStrategy tableName(String tableName) {
+        this.tableName = tableName;
+        return this;
+    }
+
+    public UpdateStrategy idKey(String idKey) {
+        this.idKey = idKey;
+        return this;
+    }
+
     /**
      * 设置为选择性插入（自动过滤null）
      */
