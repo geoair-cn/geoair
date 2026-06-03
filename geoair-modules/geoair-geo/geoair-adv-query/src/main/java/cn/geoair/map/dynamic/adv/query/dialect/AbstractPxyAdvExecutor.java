@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -1892,8 +1893,28 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> GirAdvOneRow wSelectOne(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectOne(consumer);
+    }
+
+    @Override
+    public <T> GirAdvOneRow wSelectOne(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectOne(entityClass, consumer);
+    }
+
+    @Override
     public List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query) {
         return getWhereSelectOpt().wSelectList(query);
+    }
+
+    @Override
+    public <T> List<GirAdvOneRow> wSelectList(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectList(consumer);
+    }
+
+    @Override
+    public <T> List<GirAdvOneRow> wSelectList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectList(entityClass, consumer);
     }
 
     @Override
@@ -1902,8 +1923,28 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> PageApo<GirAdvOneRow> wSelectPage(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectPage(consumer);
+    }
+
+    @Override
+    public <T> PageApo<GirAdvOneRow> wSelectPage(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectPage(entityClass, consumer);
+    }
+
+    @Override
     public void wSelectStream(GirAdvQueryRequest query, Consumer<GirAdvOneRow> rowConsumer) {
         getWhereSelectOpt().wSelectStream(query, rowConsumer);
+    }
+
+    @Override
+    public <T> void wSelectStream(Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+        getWhereSelectOpt().wSelectStream(consumer, rowConsumer);
+    }
+
+    @Override
+    public <T> void wSelectStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+        getWhereSelectOpt().wSelectStream(entityClass, consumer, rowConsumer);
     }
 
     @Override
@@ -1912,8 +1953,28 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Number wSelectCount(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectCount(consumer);
+    }
+
+    @Override
+    public <T> Number wSelectCount(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectCount(entityClass, consumer);
+    }
+
+    @Override
     public List<List<Object>> wSelectListToValueList(GirAdvQueryRequest query) {
         return getWhereSelectOpt().wSelectListToValueList(query);
+    }
+
+    @Override
+    public <T> List<List<Object>> wSelectListToValueList(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectListToValueList(consumer);
+    }
+
+    @Override
+    public <T> List<List<Object>> wSelectListToValueList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectListToValueList(entityClass, consumer);
     }
 
     @Override
@@ -1922,8 +1983,28 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Number wSelectNumber(Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectNumber(consumer);
+    }
+
+    @Override
+    public <T> Number wSelectNumber(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectNumber(entityClass, consumer);
+    }
+
+    @Override
     public <E> E wSelectObjOne(GirAdvQueryRequest query, Class<E> clazz) {
         return getWhereSelectOpt().wSelectObjOne(query, clazz);
+    }
+
+    @Override
+    public <T, R> R wSelectObjOne(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjOne(resultClass, consumer);
+    }
+
+    @Override
+    public <T, R> R wSelectObjOne(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjOne(entityClass, resultClass, consumer);
     }
 
     @Override
@@ -1932,7 +2013,27 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T, R> List<R> wSelectObjList(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjList(resultClass, consumer);
+    }
+
+    @Override
+    public <T, R> List<R> wSelectObjList(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+        return getWhereSelectOpt().wSelectObjList(entityClass, resultClass, consumer);
+    }
+
+    @Override
     public <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
         getWhereSelectOpt().wSelectObjStream(query, clazz, rowConsumer);
+    }
+
+    @Override
+    public <T, R> void wSelectObjStream(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer) {
+        getWhereSelectOpt().wSelectObjStream(resultClass, consumer, rowConsumer);
+    }
+
+    @Override
+    public <T, R> void wSelectObjStream(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer) {
+        getWhereSelectOpt().wSelectObjStream(entityClass, resultClass, consumer, rowConsumer);
     }
 }

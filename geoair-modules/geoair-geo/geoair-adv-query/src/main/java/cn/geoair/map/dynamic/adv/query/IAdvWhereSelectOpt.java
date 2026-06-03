@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
+import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,6 +29,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
     GirAdvOneRow wSelectOne(GirAdvQueryRequest query);
 
     /**
+     * 查询单条记录（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 单行查询结果
+     */
+    <T> GirAdvOneRow wSelectOne(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询单条记录（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 单行查询结果
+     */
+    <T> GirAdvOneRow wSelectOne(Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
      * 查询多条记录列表
      *
      * <p>根据查询条件返回所有匹配的记录列表，适用于常规列表查询场景</p>
@@ -39,6 +58,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
     List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query);
 
     /**
+     * 查询多条记录列表（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 多行查询结果列表
+     */
+    <T> List<GirAdvOneRow> wSelectList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询多条记录列表（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 多行查询结果列表
+     */
+    <T> List<GirAdvOneRow> wSelectList(Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
      * 分页查询
      *
      * <p>根据查询条件返回分页结果，包含总记录数和当前页数据，适用于列表分页展示场景</p>
@@ -47,6 +85,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
      * @return 分页结果对象，包含数据列表、总记录数、当前页码、每页大小等信息
      */
     PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query);
+
+    /**
+     * 分页查询（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 分页结果对象
+     */
+    <T> PageApo<GirAdvOneRow> wSelectPage(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 分页查询（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 分页结果对象
+     */
+    <T> PageApo<GirAdvOneRow> wSelectPage(Consumer<QueryRequestBuilder<T>> consumer);
 
     /**
      * 流式查询多条记录
@@ -61,6 +118,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
     void wSelectStream(GirAdvQueryRequest query, Consumer<GirAdvOneRow> rowConsumer);
 
     /**
+     * 流式查询多条记录（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param rowConsumer 行数据消费器
+     * @param <T> 实体类型
+     */
+    <T> void wSelectStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer);
+
+    /**
+     * 流式查询多条记录（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param rowConsumer 行数据消费器
+     * @param <T> 实体类型
+     */
+    <T> void wSelectStream(Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer);
+
+    /**
      * 查询记录总数
      *
      * <p>根据查询条件返回匹配的记录总数，适用于分页查询前获取总记录数</p>
@@ -70,6 +146,24 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
      */
     Number wSelectCount(GirAdvQueryRequest query);
 
+    /**
+     * 查询记录总数（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 记录总数
+     */
+    <T> Number wSelectCount(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询记录总数（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 记录总数
+     */
+    <T> Number wSelectCount(Consumer<QueryRequestBuilder<T>> consumer);
 
     /**
      * 查询并返回纯值列表结果
@@ -84,6 +178,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
     List<List<Object>> wSelectListToValueList(GirAdvQueryRequest query);
 
     /**
+     * 查询并返回纯值列表结果（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 纯值列表结果
+     */
+    <T> List<List<Object>> wSelectListToValueList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询并返回纯值列表结果（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 纯值列表结果
+     */
+    <T> List<List<Object>> wSelectListToValueList(Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
      * 执行聚合查询并返回单个数值结果
      *
      * <p>适用于COUNT、SUM、AVG、MAX、MIN等聚合函数查询，返回单个数值结果</p>
@@ -93,6 +206,25 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
      * @return 聚合查询的数值结果（Integer/Long/BigDecimal等）；无结果时返回null
      */
     Number wSelectNumber(GirAdvQueryRequest query);
+
+    /**
+     * 执行聚合查询并返回单个数值结果（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 聚合查询的数值结果
+     */
+    <T> Number wSelectNumber(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 执行聚合查询并返回单个数值结果（泛型版本）
+     *
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @return 聚合查询的数值结果
+     */
+    <T> Number wSelectNumber(Consumer<QueryRequestBuilder<T>> consumer);
 
     /**
      * 查询并将单行结果映射为指定类型的Java对象
@@ -108,6 +240,29 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
     <E> E wSelectObjOne(GirAdvQueryRequest query, Class<E> clazz);
 
     /**
+     * 查询并将单行结果映射为指定类型的Java对象（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型（用于构建查询条件）
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     * @return 映射后的单行Java对象
+     */
+    <T, R> R wSelectObjOne(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询并将单行结果映射为指定类型的Java对象（泛型版本）
+     *
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     * @return 映射后的单行Java对象
+     */
+    <T, R> R wSelectObjOne(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
      * 查询并将多行结果映射为指定类型的Java对象列表
      *
      * <p>适合小数据量场景，结果一次性映射为对象列表，字段名需与目标类属性匹配</p>
@@ -119,6 +274,29 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
      * @return 映射后的多行Java对象列表；无结果时返回空列表
      */
     <E> List<E> wSelectObjList(GirAdvQueryRequest query, Class<E> clazz);
+
+    /**
+     * 查询并将多行结果映射为指定类型的Java对象列表（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型（用于构建查询条件）
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     * @return 映射后的多行Java对象列表
+     */
+    <T, R> List<R> wSelectObjList(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer);
+
+    /**
+     * 查询并将多行结果映射为指定类型的Java对象列表（泛型版本）
+     *
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     * @return 映射后的多行Java对象列表
+     */
+    <T, R> List<R> wSelectObjList(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer);
 
     /**
      * 流式查询并将结果逐行映射为指定类型的Java对象
@@ -133,4 +311,27 @@ public interface IAdvWhereSelectOpt extends IAdvConfigOpt {
      * @param <E>         目标对象的泛型类型
      */
     <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer);
+
+    /**
+     * 流式查询并将结果逐行映射为指定类型的Java对象（泛型版本-带实体类）
+     *
+     * @param entityClass 实体类类型（用于构建查询条件）
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param rowConsumer 行对象消费器
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     */
+    <T, R> void wSelectObjStream(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer);
+
+    /**
+     * 流式查询并将结果逐行映射为指定类型的Java对象（泛型版本）
+     *
+     * @param resultClass 结果对象类型
+     * @param consumer 查询构建器消费者
+     * @param rowConsumer 行对象消费器
+     * @param <T> 实体类型
+     * @param <R> 结果类型
+     */
+    <T, R> void wSelectObjStream(Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer);
 }
