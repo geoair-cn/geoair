@@ -46,4 +46,13 @@ public class DeleteStrategy {
         return this;
     }
 
+    public DeleteStrategy tableName(String tableName) {
+        this.tableName = tableName;
+        return this;
+    }
+
+    public DeleteStrategy idKey(String idKey) {
+        this.idKey = idKey;
+        return this;
+    }
 }
