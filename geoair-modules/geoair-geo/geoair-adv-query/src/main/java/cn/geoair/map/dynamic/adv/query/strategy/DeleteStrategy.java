@@ -7,32 +7,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author ：张俊
- * @date ：Created in 2026/6/3 09:39
- * @description： 实体类更新的实体类处理策略
+ * 实体类删除的策略配置
+ *
+ * @author 张俊
+ * @date 2026/6/3
  */
 @Data
 @Accessors(chain = true)
 public class DeleteStrategy {
 
     /**
-     * ID字段的名称
+     * 主键字段名（优先级高于注解）
      */
     String idKey;
+
     /**
-     * 表的名称
+     * 表名（优先级高于注解）
      */
     String tableName;
 
-
     /**
-     * 需要忽略哪些字段
+     * 需要忽略的字段列表（实体属性名，用于逻辑删除时排除某些字段）
      */
     List<String> ignoreFieldNames = new ArrayList<>();
-
 
     /**
      * 是否对实体类进行驼峰转下划线
      */
-    boolean isToUnderlineCase = true;
+    boolean toUnderlineCase = true;
+
+
+    /**
+     * 辅助方法：添加忽略字段
+     */
+    public DeleteStrategy ignoreField(String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            this.ignoreFieldNames.add(fieldName);
+        }
+        return this;
+    }
+
 }

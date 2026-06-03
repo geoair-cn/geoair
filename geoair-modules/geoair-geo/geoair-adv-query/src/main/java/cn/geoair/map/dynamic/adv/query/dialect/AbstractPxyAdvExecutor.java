@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -352,14 +353,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
+
     @Override
     public Integer bDeleteBySql(String sqlStatement) {
         return getAdvBaseOpt().bDeleteBySql(sqlStatement);
     }
 
     @Override
-    public Integer bDeleteBySql(String dynamicSql, SqlParamMap sqlParam) {
-        return getAdvBaseOpt().bDeleteBySql(dynamicSql, sqlParam);
+    public Integer bDeleteBySql(String sqlStatement, SqlParamMap sqlParam) {
+        return getAdvBaseOpt().bDeleteBySql(sqlStatement, sqlParam);
     }
 
     @Override
@@ -378,14 +380,43 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public <T> Integer bDeleteByPK(T entity) {
+        return getAdvBaseOpt().bDeleteByPK(entity);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, DeleteStrategy strategy) {
+        return getAdvBaseOpt().bDeleteByPK(entity, strategy);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, Consumer<DeleteStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bDeleteByPK(entity, strategyConsumer);
+    }
+
+    @Override
     public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids) {
         return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids);
     }
 
     @Override
-    public Integer bDeleteByPKs(
-            String tableName, String idKey, Set<Object> ids, int batchSize) {
+    public Integer bDeleteByPKs(String tableName, String idKey, Set<Object> ids, int batchSize) {
         return getAdvBaseOpt().bDeleteByPKs(tableName, idKey, ids, batchSize);
+    }
+
+    @Override
+    public <T> void bDeleteBatchByPK(Collection<T> entities) {
+        getAdvBaseOpt().bDeleteBatchByPK(entities);
+    }
+
+    @Override
+    public <T> void bDeleteBatchByPK(Collection<T> entities, DeleteStrategy strategy) {
+        getAdvBaseOpt().bDeleteBatchByPK(entities, strategy);
+    }
+
+    @Override
+    public <T> void bDeleteBatchByPK(Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
+        getAdvBaseOpt().bDeleteBatchByPK(entities, strategyConsumer);
     }
 
     @Override
@@ -394,9 +425,33 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bDeleteByMap(
-            String tableName, Map<String, Object> whereMap, int batchSize) {
+    public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap, int batchSize) {
         return getAdvBaseOpt().bDeleteByMap(tableName, whereMap, batchSize);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+        return getAdvBaseOpt().bDeleteByWhere(strategy, whereFilter);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        return getAdvBaseOpt().bDeleteByWhere(strategy, consumer);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        return getAdvBaseOpt().bDeleteByWhere(consumer);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(Consumer<DeleteStrategy> strategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        return getAdvBaseOpt().bDeleteByWhere(strategyConsumer, consumer);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        return getAdvBaseOpt().bDeleteByWhere(tableName, consumer);
     }
 
     @Override
@@ -405,38 +460,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
-        return getAdvBaseOpt().bDeleteByWhere(tableName, whereFilter);
-    }
-
-    @Override
-    public <T> Integer bDeleteByWhere(GirAdvWhereLambdaFilter<T> whereFilter) {
-        return getAdvBaseOpt().bDeleteByWhere(whereFilter);
-    }
-
-    @Override
-    public <T> Integer bDeleteByPK(T entity) {
-        return getAdvBaseOpt().bDeleteByPK(entity);
-    }
-
-    @Override
-    public <T> Integer bDeleteByPK(T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bDeleteByPK(entity, isToUnderlineCase);
-    }
-
-    @Override
-    public <T> Integer bDeleteByPK(String tableName, T entity) {
-        return getAdvBaseOpt().bDeleteByPK(tableName, entity);
-    }
-
-    @Override
-    public <T> Integer bDeleteByPK(String tableName, T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bDeleteByPK(tableName, entity, isToUnderlineCase);
-    }
-
-
-    @Override
     public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+        getAdvBaseOpt().setDataSourceGetter(dataSourceGetter);
     }
 
     // ==================== 基础查询操作（代理调用PgAdvBaseOpt） ====================
