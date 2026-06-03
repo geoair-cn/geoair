@@ -10,6 +10,7 @@ import cn.geoair.map.dynamic.adv.query.utils.LambdaUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
@@ -256,7 +257,7 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     public QueryRequestBuilder<T> fields(String... columnNames) {
-        this.columnNames = Arrays.asList(columnNames);
+        this.columnNames = ListUtil.toList(columnNames);
         return this;
     }
 
@@ -332,7 +333,7 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     public QueryRequestBuilder<T> fieldExpr(String... sqlExpressions) {
-        this.exprColumnNames = Arrays.asList(sqlExpressions);
+        this.exprColumnNames = ListUtil.toList(sqlExpressions);
         return this;
     }
 
@@ -687,7 +688,7 @@ public class QueryRequestBuilder<T> {
         if (this.groupByFields == null) {
             this.groupByFields = new ArrayList<>();
         }
-        this.groupByFields.addAll(Arrays.asList(groupByFields));
+        this.groupByFields.addAll(ListUtil.toList(groupByFields));
         return this;
     }
 

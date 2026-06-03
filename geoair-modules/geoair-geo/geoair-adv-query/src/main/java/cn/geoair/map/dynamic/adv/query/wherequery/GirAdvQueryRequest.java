@@ -175,7 +175,7 @@ public class GirAdvQueryRequest {
             throw new IllegalArgumentException("tableOrSqlView is empty");
         }
         this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
-        this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.of("*");
+        this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.empty();
         this.exprColumnNames = GutilObject.isNotEmpty(builder.getExprFieldNames()) ? new ArrayList<>(builder.getExprFieldNames()) : ListUtil.empty();
         this.whereOption = builder.getWhereOption();
         this.nullHandling = builder.getNullHandling();
