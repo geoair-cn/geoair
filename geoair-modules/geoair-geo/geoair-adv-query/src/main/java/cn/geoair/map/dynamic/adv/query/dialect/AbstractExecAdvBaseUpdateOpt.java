@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
@@ -292,42 +293,83 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     @Override
     public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
-        // todo 缺少事务处理 后期参考 bInsertBatch
-        validateTableName(tableName);
-        validateIdKey(idKey);
         if (CollUtil.isEmpty(rowsData)) {
             return;
         }
-        if (batchSize <= 0) {
-            batchSize = DEFAULT_BATCH_SIZE;
-        }
+        validateTableName(tableName);
+        validateIdKey(idKey);
+        int totalSuccess = 0;
+        // 存储每条update：sql + 对应参数列表
+        List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
 
-        List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, batchSize);
-
-        for (List<Map<String, Object>> batch : batches) {
-            List<String> sqls = new ArrayList<>();
-            List<Object> params = new ArrayList<>();
-            for (Map<String, Object> row : batch) {
-                Object id = row.get(idKey);
-                if (id == null) {
-                    throw new IllegalArgumentException("批量更新数据中缺少主键字段[" + idKey + "]的值");
-                }
-                Map<String, Object> updateData = new HashMap<>(row);
-                updateData.remove(idKey);
-
-                String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-                String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-                String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-                String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor);
-                String sql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?",
-                        quoteTableName, setClause, dialectTableNameProcessor.tbQuoteFieldName(idKey));
-                sqls.add(sql);
-                params.addAll(updateData.values());
-                params.add(id);
+        // 循环组装每条update sql与参数
+        for (Map<String, Object> row : rowsData) {
+            Object id = row.get(idKey);
+            if (id == null) {
+                throw new IllegalArgumentException("批量更新数据中缺少主键字段[" + idKey + "]的值");
             }
-            bUpdateBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
+            Map<String, Object> updateData = new HashMap<>(row);
+            updateData.remove(idKey);
+
+            // 表名处理
+            String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+            String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+            String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
+                    dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor);
+            String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
+            String sql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?", quoteTableName, setClause, quotedIdKey);
+            // 参数：更新字段值 + 主键id
+            List<Object> singleParams = new ArrayList<>(updateData.values());
+            singleParams.add(id);
+            sqlStatements.add(Pair.of(sql, singleParams));
         }
+
+        // 按批次大小分组
+        List<List<Pair<String, List<Object>>>> batchGroupParams = CollUtil.split(sqlStatements, batchSize);
+        StopWatch stopWatch = new StopWatch();
+        int batchNum = 1;
+        Connection connection = dataSourceGetter.getConnection();
+        try {
+            connection.setAutoCommit(false);
+            // 循环每一批执行
+            for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
+                List<String> currentBatchSqls = new ArrayList<>();
+                List<Object> currentBatchParamList = new ArrayList<>();
+                for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
+                    currentBatchParamList.addAll(sqlStatement.getValue());
+                    currentBatchSqls.add(sqlStatement.getKey());
+                }
+                stopWatch.start();
+                // 多条sql用;分隔执行
+                String batchSql = StrUtil.join("; \n", currentBatchSqls);
+                int execute = SqlExecutor.execute(connection, batchSql, currentBatchParamList.toArray());
+                stopWatch.stop();
+                totalSuccess += execute;
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}",
+                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                batchNum++;
+            }
+            // 整批全部无异常统一提交
+            connection.commit();
+            long cost = stopWatch.getTotalTimeMillis();
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
+                    this.getClass(), "bUpdateBatchByPK",
+                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                    cost, totalSuccess);
+        } catch (SQLException e) {
+            // 异常回滚
+            rollbackConnection(connection);
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
+                    this.getClass(), "bUpdateBatchByPK",
+                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
+            throw new RuntimeException("批量更新失败，表名：" + tableName, e);
+        } finally {
+            // 恢复自动提交、关闭连接（和insert模板统一）
+            restoreAutoCommit(connection);
+            closeConnection(connection);
+        }
+
     }
 
     @Override
