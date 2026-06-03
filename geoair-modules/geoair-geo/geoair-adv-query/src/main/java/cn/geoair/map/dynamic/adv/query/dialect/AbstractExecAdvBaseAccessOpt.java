@@ -21,6 +21,7 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -378,6 +379,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         String fields = String.join(",", dbKeyList);
         String placeholders = buildPlaceholders(rowData.keySet().size());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
+        execSql = dialectTableNameProcessor.tbRemoveSqlSpaces(execSql);
         List<Object> params = new ArrayList<>(rowData.values());
         return Pair.of(execSql, params);
     }
@@ -502,6 +504,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
+        // todo 缺少事务处理 后期参考 bInsertBatch
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
@@ -540,7 +543,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 for (Pair<String, List<Object>> sqlStatement : pairs) {
                     SqlParamList objects = SqlParamList.of(sqlStatement.getValue());
                     Object[] arrayValue = objects.toArrayValue();
-                    int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", sqlStatement.getKey()), (Iterable<Object[]>) ListUtil.toList(arrayValue));
+                    List<Object[]> list = new ArrayList<>();
+                    list.add(arrayValue);
+                    int[] ints = SqlExecutor.executeBatch(connection, StrUtil.join("; \n", sqlStatement.getKey()), list);
                     totalSuccess += Arrays.stream(ints).sum();
                 }
             }
