@@ -765,20 +765,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
-
+        List<Map<String, Object>> allRows = new ArrayList<>();
+        List<String> finalConflictKeys = conflictKeys;
+        if (toUnderlineCase) {
+            finalConflictKeys = new ArrayList<>();
+            for (String key : conflictKeys) {
+                finalConflictKeys.add(StrUtil.toUnderlineCase(key));
+            }
+        }
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
-
-            List<String> finalConflictKeys = conflictKeys;
-            if (toUnderlineCase) {
-                finalConflictKeys = new ArrayList<>();
-                for (String key : conflictKeys) {
-                    finalConflictKeys.add(StrUtil.toUnderlineCase(key));
-                }
-            }
-
-            bUpsert(tableName, rowData, finalConflictKeys);
+            allRows.add(rowData);
         }
+        bUpsertBatch(tableName, allRows, finalConflictKeys);
     }
 
     @Override
