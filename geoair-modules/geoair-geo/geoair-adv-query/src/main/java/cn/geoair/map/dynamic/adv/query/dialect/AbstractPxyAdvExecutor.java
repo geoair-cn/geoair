@@ -8,6 +8,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
@@ -174,34 +175,73 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
+    }
+
+    @Override
+    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
+        return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
+    }
+
+    @Override
     public Integer bInsertOne(String tableName, Map<String, Object> rowData) {
         return getAdvBaseOpt().bInsertOne(tableName, rowData);
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity) {
-        return getAdvBaseOpt().bInsertOne(tableName, entity);
+    public <T> Integer bInsertOne(T entity) {
+        return getAdvBaseOpt().bInsertOne(entity);
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase);
+    public <T> Integer bInsertOne(T entity, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertOne(entity, strategy);
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue);
+    public <T> Integer bInsertOne(T entity, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertOne(entity, strategyConsumer);
     }
 
     @Override
-    public <T> Integer bInsertOne(String tableName, T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertOne(tableName, entity, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
+    public <T> Integer bInsertSelectiveOne(T entity) {
+        return getAdvBaseOpt().bInsertSelectiveOne(entity);
     }
 
     @Override
-    public Integer bInsertBatch(
-            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
+    public <T> Integer bInsertSelectiveOne(T entity, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertSelectiveOne(entity, strategy);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveOne(T entity, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertSelectiveOne(entity, strategyConsumer);
+    }
+
+    @Override
+    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData);
+    }
+
+    @Override
+    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData, int batchSize) {
+        return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
+    }
+
+    @Override
+    public <T> Integer bInsertBatch(Collection<T> entities) {
+        return getAdvBaseOpt().bInsertBatch(entities);
+    }
+
+    @Override
+    public <T> Integer bInsertBatch(Collection<T> entities, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertBatch(entities, strategy);
+    }
+
+    @Override
+    public <T> Integer bInsertBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertBatch(entities, strategyConsumer);
     }
 
     @Override
@@ -210,18 +250,13 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBatch(
-            String tableName,
-            List<String> headers,
-            List<Map<String, Object>> rowsData,
-            int batchSize) {
-        return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
+    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertBatch(tableName, entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertBatch(
-            String tableName, Collection<T> entities, int batchSize) {
-        return getAdvBaseOpt().bInsertBatch(tableName, entities, batchSize);
+    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertBatch(tableName, entities, strategyConsumer);
     }
 
     @Override
@@ -235,90 +270,18 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, ignoreFieldNames);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(String tableName, T entity, List<String> conflictKeys, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertIgnore(tableName, entity, conflictKeys, isToUnderlineCase, ignoreNullValue, ignoreFieldNames);
-    }
-
-    @Override
-    public Integer bInsertIgnoreBatch(
-            String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
-    }
-
-
-    @Override
-    public Integer bInsertBySql(String sqlStatement, SqlParamList sqlParamList) {
-        return getAdvBaseOpt().bInsertBySql(sqlStatement, sqlParamList);
-    }
-
-    @Override
-    public Integer bInsertBySql(String sqlStatementOrDynamicSql, GirSqlParam sqlParam) {
-        return getAdvBaseOpt().bInsertBySql(sqlStatementOrDynamicSql, sqlParam);
-    }
-
-    @Override
-    public <T> Integer bInsertOne(T entity) {
-        return getAdvBaseOpt().bInsertOne(entity);
-    }
-
-    @Override
-    public <T> Integer bInsertOne(T entity, boolean isToUnderlineCase, boolean ignoreNullValue) {
-        return getAdvBaseOpt().bInsertOne(entity, isToUnderlineCase, ignoreNullValue);
-    }
-
-    @Override
-    public <T> Integer bInsertSelectiveOne(T entity) {
-        return getAdvBaseOpt().bInsertSelectiveOne(entity);
-    }
-
-    @Override
-    public <T> Integer bInsertSelectiveOne(T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertSelectiveOne(entity, isToUnderlineCase);
-    }
-
-    @Override
     public <T> Integer bInsertIgnore(T entity) {
         return getAdvBaseOpt().bInsertIgnore(entity);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys);
+    public <T> Integer bInsertIgnore(T entity, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertIgnore(entity, strategy);
     }
 
     @Override
-    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys, isToUnderlineCase);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertIgnore(entity, isToUnderlineCase);
-    }
-
-    @Override
-    public <T> Integer bInsertIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertIgnore(entity, conflictKeys, ignoreFieldNames);
+    public <T> Integer bInsertIgnore(T entity, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertIgnore(entity, strategyConsumer);
     }
 
     @Override
@@ -327,30 +290,49 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys);
+    public <T> Integer bInsertSelectiveIgnore(T entity, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnore(String tableName, T entity, List<String> conflictKeys) {
-        return getAdvBaseOpt().bInsertSelectiveIgnore(tableName, entity, conflictKeys);
+    public <T> Integer bInsertSelectiveIgnore(T entity, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, strategyConsumer);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys, isToUnderlineCase);
+    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnore(T entity, boolean isToUnderlineCase) {
-        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, isToUnderlineCase);
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(entities, conflictKeys);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnore(T entity, List<String> conflictKeys, List<String> ignoreFieldNames) {
-        return getAdvBaseOpt().bInsertSelectiveIgnore(entity, conflictKeys, ignoreFieldNames);
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(entities, conflictKeys, strategy);
     }
 
+    @Override
+    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertIgnoreBatch(entities, conflictKeys, strategyConsumer);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys) {
+        return getAdvBaseOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, AccessStrategy strategy) {
+        return getAdvBaseOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys, strategy);
+    }
+
+    @Override
+    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, List<String> conflictKeys, Consumer<AccessStrategy> strategyConsumer) {
+        return getAdvBaseOpt().bInsertSelectiveIgnoreBatch(entities, conflictKeys, strategyConsumer);
+    }
 
     // ==================== 基础删除操作（代理调用PgAdvBaseOpt） ====================
 

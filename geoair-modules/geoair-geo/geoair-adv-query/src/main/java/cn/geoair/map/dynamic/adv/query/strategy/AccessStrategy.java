@@ -7,37 +7,75 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author ：张俊
- * @date ：Created in 2026/6/3 09:39
- * @description： 实体类更新的实体类处理策略
+ * 实体类插入的策略配置
+ *
+ * @author 张俊
+ * @date 2026/6/3
  */
 @Data
 @Accessors(chain = true)
 public class AccessStrategy {
 
     /**
-     * ID字段的名称
+     * 主键字段名（优先级高于注解）
      */
     String idKey;
+
     /**
-     * 表的名称
+     * 表名（优先级高于注解）
      */
     String tableName;
 
-
     /**
-     * 需要忽略哪些字段
+     * 需要忽略的字段列表（实体属性名）
      */
     List<String> ignoreFieldNames = new ArrayList<>();
 
+    /**
+     * 冲突判定字段列表（INSERT IGNORE时使用）
+     */
+    List<String> conflictKeys = new ArrayList<>();
 
     /**
      * 是否对实体类进行驼峰转下划线
      */
-    boolean isToUnderlineCase = true;
+    boolean toUnderlineCase = true;
 
     /**
-     * 是否忽略空值
+     * 是否忽略空值字段
      */
     boolean ignoreNullValue = true;
+
+    /**
+     * 是否忽略空字符串
+     */
+    boolean ignoreEmptyString = true;
+
+    /**
+     * 辅助方法：添加忽略字段
+     */
+    public AccessStrategy ignoreField(String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            this.ignoreFieldNames.add(fieldName);
+        }
+        return this;
+    }
+
+    /**
+     * 辅助方法：添加冲突键
+     */
+    public AccessStrategy conflictKey(String... keys) {
+        for (String key : keys) {
+            this.conflictKeys.add(key);
+        }
+        return this;
+    }
+
+    /**
+     * 设置为选择性插入（自动过滤null）
+     */
+    public AccessStrategy selective() {
+        this.ignoreNullValue = true;
+        return this;
+    }
 }

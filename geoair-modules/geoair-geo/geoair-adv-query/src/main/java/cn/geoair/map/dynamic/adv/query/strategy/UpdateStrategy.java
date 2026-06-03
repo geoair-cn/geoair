@@ -70,4 +70,11 @@ public class UpdateStrategy {
         }
         return this;
     }
+    /**
+     * 设置为选择性插入（自动过滤null）
+     */
+    public UpdateStrategy selective() {
+        this.ignoreNullValue = true;
+        return this;
+    }
 }
