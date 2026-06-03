@@ -17,6 +17,7 @@ import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
@@ -359,8 +360,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
-        validateTableNameAndData(tableName, rowData);
+        Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, conflictKeys);
+        return executeUpdate(insertIgnoreSql.getKey(), insertIgnoreSql.getValue(), "bInsertIgnore");
+    }
 
+
+    public Pair<String, List<Object>> getInsertIgnoreSql(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+        validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
@@ -372,9 +378,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         String fields = String.join(",", dbKeyList);
         String placeholders = buildPlaceholders(rowData.keySet().size());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
-
         List<Object> params = new ArrayList<>(rowData.values());
-        return executeUpdate(execSql, params, "bInsertIgnore");
+        return Pair.of(execSql, params);
     }
 
     @Override
@@ -515,6 +520,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
         int totalSuccess = 0;
+        List<String> sqls = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
             List<String> finalConflictKeys = conflictKeys;
@@ -524,9 +531,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     finalConflictKeys.add(StrUtil.toUnderlineCase(key));
                 }
             }
-            totalSuccess += bInsertIgnore(tableName, rowData, finalConflictKeys);
+            Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
+            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(insertIgnoreSql.getKey()));
+            params.addAll(insertIgnoreSql.getValue());
         }
-
+        bInsertBySql(StrUtil.join("; \n", sqls), SqlParamList.of(params));
         return totalSuccess;
     }
 
