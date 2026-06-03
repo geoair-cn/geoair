@@ -1,20 +1,17 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder.SqlBuildResult;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer.SqlBuildResult;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
-import cn.geoair.map.dynamic.adv.query.wherequery.test.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -62,8 +59,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     /**
      * 获取SQL构建器
      */
-    protected GirAdvQuerySqlBuilder getSqlBuilder() {
-        return new GirAdvQuerySqlBuilder(getDialectTableNameProcessor(), dataSourceGetter);
+    protected GirAdvSqlComposer getSqlBuilder() {
+        return new GirAdvSqlComposer(getDialectTableNameProcessor(), dataSourceGetter);
     }
 
 
@@ -275,12 +272,12 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     private SqlBuildResult getSqlBuildResult(GirAdvQueryRequest query) {
-        GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
+        GirAdvSqlComposer sqlBuilder = getSqlBuilder();
         return sqlBuilder.buildPageSql(query);
     }
 
     private SqlBuildResult getSqlBuildResultToPage(GirAdvQueryRequest query) {
-        GirAdvQuerySqlBuilder sqlBuilder = getSqlBuilder();
+        GirAdvSqlComposer sqlBuilder = getSqlBuilder();
         return sqlBuilder.buildSelectSql(query);
     }
 }

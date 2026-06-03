@@ -41,6 +41,7 @@ public class GirAdvQueryRequest {
      * @return 表名或视图名
      */
     private final String tableOrSqlView;
+
     /**
      * 如果tableOrSqlView是一个 SqlView，这里你可以指定对他的别名，如果你没有写别名，那么我就会随机生成别名
      */
@@ -56,20 +57,20 @@ public class GirAdvQueryRequest {
     private final List<String> fieldNames;
 
     /**
+     * 表达式字段名称
+     * 类似于这样的函数表达式
+     * "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR",
+     * "LENGTH", "NOW", "DATE", "YEAR", "MONTH", "DAY", "TRIM"
+     */
+    private List<String> exprColumnNames;
+
+    /**
      * WHERE条件参数映射（必填，可为空Map）
-     * -- GETTER --
-     * 获取WHERE条件参数映射
-     *
-     * @return 条件参数映射
      */
     private GirAdvWhereFilter whereOption = GirAdvWhereFilter.of();
 
     /**
      * NULL值处理策略（可选，默认INCLUDE）
-     * -- GETTER --
-     * 获取NULL值处理策略
-     *
-     * @return NULL处理策略枚举
      */
     private final AdvNullHandling nullHandling;
 
@@ -84,19 +85,11 @@ public class GirAdvQueryRequest {
 
     /**
      * 页码（可选）
-     * -- GETTER --
-     * 获取页码
-     *
-     * @return 页码
      */
     private final Integer pageNum;
 
     /**
      * 每页条数（可选）
-     * -- GETTER --
-     * 获取每页条数
-     *
-     * @return 每页条数
      */
     private final Integer pageSize;
 
@@ -118,7 +111,6 @@ public class GirAdvQueryRequest {
      *
      * @return 空间操作规则枚举
      */
-
     private final AdvEnumsGeomOpt advEnumsGeomOpt;
 
     /**
@@ -135,6 +127,24 @@ public class GirAdvQueryRequest {
      * key的转换策略
      */
     private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
+
+    // ==================== 新增：分组相关 ====================
+
+    /**
+     * 是否去重查询
+     */
+    private final Boolean distinct;
+
+    /**
+     * GROUP BY字段列表
+     */
+    private final List<String> groupByFields;
+
+    /**
+     * HAVING条件过滤器
+     */
+    private final GirAdvWhereFilter havingFilter;
+
     // ==================== 模式二：直接传SQL ====================
 
     /**
@@ -161,11 +171,12 @@ public class GirAdvQueryRequest {
         } else {
             this.tableOrSqlView = builder.getTableOrSqlView();
         }
-        if (GutilObject.isEmpty(tableOrSqlView)&&GutilObject.isEmpty(builder.getCustomSql())) {
+        if (GutilObject.isEmpty(tableOrSqlView) && GutilObject.isEmpty(builder.getCustomSql())) {
             throw new IllegalArgumentException("tableOrSqlView is empty");
         }
         this.sqlViewTableNameAlias = builder.getSqlViewTableNameAlias();
         this.fieldNames = GutilObject.isNotEmpty(builder.getFieldNames()) ? new ArrayList<>(builder.getFieldNames()) : ListUtil.of("*");
+        this.exprColumnNames = GutilObject.isNotEmpty(builder.getExprFieldNames()) ? new ArrayList<>(builder.getExprFieldNames()) : ListUtil.empty();
         this.whereOption = builder.getWhereOption();
         this.nullHandling = builder.getNullHandling();
         this.orders = builder.getOrders() != null ? new ArrayList<>(builder.getOrders()) : new ArrayList<>();
@@ -178,8 +189,11 @@ public class GirAdvQueryRequest {
         this.hasFieldsInfo = builder.getHasFieldsInfo();
         this.advEnumsKeyTran = builder.getAdvEnumsKeyTran();
 
+        // 新增字段赋值
+        this.distinct = builder.getDistinct();
+        this.groupByFields = builder.getGroupByFields() != null ? new ArrayList<>(builder.getGroupByFields()) : new ArrayList<>();
+        this.havingFilter = builder.getHavingFilter();
     }
-
 
     /**
      * 判断是否为自定义SQL模式
@@ -201,11 +215,30 @@ public class GirAdvQueryRequest {
 
     /**
      * 判断是否有排序条件
-     *
-     * @return true=有排序条件，false=无排序条件
      */
     public boolean hasOrders() {
         return orders != null && !orders.isEmpty();
+    }
+
+    /**
+     * 判断是否需要去重
+     */
+    public boolean hasDistinct() {
+        return distinct != null && distinct;
+    }
+
+    /**
+     * 判断是否有GROUP BY
+     */
+    public boolean hasGroupBy() {
+        return groupByFields != null && !groupByFields.isEmpty();
+    }
+
+    /**
+     * 判断是否有HAVING条件
+     */
+    public boolean hasHaving() {
+        return havingFilter != null;
     }
 
     /**
@@ -249,7 +282,7 @@ public class GirAdvQueryRequest {
         }
         StringBuilder sb = new StringBuilder();
         for (OrderApo order : orders) {
-            if (sb.length() > 0) {
+            if (!sb.isEmpty()) {
                 sb.append(", ");
             }
             if (order.isFunction()) {
@@ -264,9 +297,24 @@ public class GirAdvQueryRequest {
     }
 
     /**
+     * 构建GROUP BY子句
+     */
+    public String buildGroupByClause() {
+        if (!hasGroupBy()) {
+            return "";
+        }
+        return String.join(", ", groupByFields);
+    }
+
+    /**
+     * 获取DISTINCT前缀
+     */
+    public String getDistinctPrefix() {
+        return hasDistinct() ? "DISTINCT " : "";
+    }
+
+    /**
      * 创建Builder实例
-     *
-     * @return Builder实例
      */
     public static <T> QueryRequestBuilder<T> builder() {
         return new QueryRequestBuilder<>(null);
@@ -274,8 +322,6 @@ public class GirAdvQueryRequest {
 
     /**
      * 创建Builder实例
-     *
-     * @return Builder实例
      */
     public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass) {
         return new QueryRequestBuilder<>(entityClass);
@@ -283,12 +329,8 @@ public class GirAdvQueryRequest {
 
     /**
      * 创建Builder实例
-     *
-     * @return Builder实例
      */
     public static <T> QueryRequestBuilder<T> builder(Class<T> entityClass, boolean isToUnderlineCase) {
         return new QueryRequestBuilder<>(entityClass, isToUnderlineCase);
     }
-
-
 }

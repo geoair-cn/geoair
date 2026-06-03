@@ -6,9 +6,11 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 
+import cn.geoair.map.dynamic.adv.query.utils.LambdaUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
+import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
 
@@ -78,6 +80,15 @@ public class QueryRequestBuilder<T> {
      * 查询字段名列表
      */
     private List<String> columnNames;
+
+
+    /**
+     * 表达式字段名称
+     * 类似于这样的函数表达式
+     * "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR",
+     * "LENGTH", "NOW", "DATE", "YEAR", "MONTH", "DAY", "TRIM"
+     */
+    private List<String> exprColumnNames;
 
     /**
      * WHERE条件参数映射
@@ -149,6 +160,25 @@ public class QueryRequestBuilder<T> {
     private Map<String, String> fieldMapping;
 
 
+    /**
+     * 是否去重查询
+     */
+    @Getter
+    private Boolean distinct;
+
+    /**
+     * GROUP BY字段列表
+     */
+    @Getter
+    private List<String> groupByFields;
+
+    /**
+     * HAVING条件过滤器
+     */
+    @Getter
+    private GirAdvWhereFilter havingFilter;
+
+
     // ==================== 构造函数 ====================
 
     public QueryRequestBuilder(Class<T> entityClass) {
@@ -171,6 +201,11 @@ public class QueryRequestBuilder<T> {
      */
     public QueryRequestBuilder<T> table(String tableName) {
         this.tableOrSqlView = tableName;
+        return this;
+    }
+
+    public QueryRequestBuilder<T> sqlViewTableNameAlias(String sqlViewTableNameAlias) {
+        this.sqlViewTableNameAlias = sqlViewTableNameAlias;
         return this;
     }
 
@@ -213,6 +248,7 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+
     /**
      * 设置查询字段名（可变参数）
      *
@@ -223,6 +259,7 @@ public class QueryRequestBuilder<T> {
         this.columnNames = Arrays.asList(columnNames);
         return this;
     }
+
 
     /**
      * 设置查询字段（带别名）
@@ -271,11 +308,31 @@ public class QueryRequestBuilder<T> {
      * @param alias         别名
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> fieldExpr(String sqlExpression, String alias) {
-        if (this.columnNames == null) {
-            this.columnNames = new ArrayList<>();
+    public QueryRequestBuilder<T> fieldExprAs(String sqlExpression, String alias) {
+        if (this.exprColumnNames == null) {
+            this.exprColumnNames = new ArrayList<>();
         }
-        this.columnNames.add(sqlExpression + " AS " + alias);
+        this.exprColumnNames.add(sqlExpression + " AS " + alias);
+        return this;
+    }
+
+    /**
+     * 添加SQL表达式字段
+     *
+     * @return Builder实例
+     */
+    public QueryRequestBuilder<T> fieldExpr(List<String> sqlExpressions) {
+        this.exprColumnNames = sqlExpressions;
+        return this;
+    }
+
+    /**
+     * 添加SQL表达式字段
+     *
+     * @return Builder实例
+     */
+    public QueryRequestBuilder<T> fieldExpr(String... sqlExpressions) {
+        this.exprColumnNames = Arrays.asList(sqlExpressions);
         return this;
     }
 
@@ -484,6 +541,12 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+
+    public QueryRequestBuilder<T> pageNumStartZero(boolean pageNumStartZero) {
+        this.pageNumStartZero = pageNumStartZero;
+        return this;
+    }
+
     /**
      * 设置分页参数（自定义起始页码）
      *
@@ -566,6 +629,7 @@ public class QueryRequestBuilder<T> {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
+
     /**
      * 设置key的转换策略
      */
@@ -574,6 +638,7 @@ public class QueryRequestBuilder<T> {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
+
     /**
      * 设置字段映射
      */
@@ -593,13 +658,103 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+    /**
+     * 设置去重查询
+     *
+     * @param distinct true=去重查询，false=不去重
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> distinct(boolean distinct) {
+        this.distinct = distinct;
+        return this;
+    }
+
+    /**
+     * 启用去重查询
+     */
+    public QueryRequestBuilder<T> distinct() {
+        this.distinct = true;
+        return this;
+    }
+
+    /**
+     * 设置GROUP BY字段
+     *
+     * @param groupByFields 分组字段列表
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> groupBy(String... groupByFields) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        this.groupByFields.addAll(Arrays.asList(groupByFields));
+        return this;
+    }
+
+    /**
+     * 设置GROUP BY字段（Lambda表达式版本，需要配合实体类使用）
+     *
+     * @param groupByFunctions 分组字段的Lambda表达式
+     * @return 当前Builder实例
+     */
+    @SafeVarargs
+    public final QueryRequestBuilder<T> groupBy(SFunction<T, ?>... groupByFunctions) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        for (SFunction<T, ?> function : groupByFunctions) {
+            String fieldName = LambdaUtils.getColumnName(function);
+            if (isToUnderlineCase && fieldName != null) {
+                fieldName = StrUtil.toUnderlineCase(fieldName);
+            }
+            this.groupByFields.add(fieldName);
+        }
+        return this;
+    }
+
+    /**
+     * 添加GROUP BY字段
+     *
+     * @param groupByField 分组字段
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> addGroupBy(String groupByField) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        this.groupByFields.add(groupByField);
+        return this;
+    }
+
+    /**
+     * 设置HAVING条件（通过Consumer方式）
+     *
+     * @param consumer HAVING条件构建器
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> having(Consumer<GirAdvWhereFilter> consumer) {
+        this.havingFilter = GirAdvWhereFilter.of();
+        consumer.accept(this.havingFilter);
+        return this;
+    }
+
+    /**
+     * 设置HAVING条件（直接传入Filter）
+     *
+     * @param havingFilter HAVING过滤器
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> having(GirAdvWhereFilter havingFilter) {
+        this.havingFilter = havingFilter;
+        return this;
+    }
 
     /**
      * 构建GirAdvQueryRequest对象
      */
     public GirAdvQueryRequest build() {
         // 校验：两种模式至少选一种
-        boolean hasObjectMode = tableOrSqlView != null||entityClass!=null;
+        boolean hasObjectMode = tableOrSqlView != null || entityClass != null;
         boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
         if (!hasObjectMode && !hasCustomSqlMode) {
@@ -620,6 +775,10 @@ public class QueryRequestBuilder<T> {
 
     public List<String> getFieldNames() {
         return columnNames;
+    }
+
+    public List<String> getExprFieldNames() {
+        return exprColumnNames;
     }
 
 

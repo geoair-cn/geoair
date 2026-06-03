@@ -383,6 +383,15 @@ public class GirAdvWhereFilter implements Serializable {
         return expr(sqlExpr, AdvOperatorEnums.等于, value);
     }
 
+
+    public GirAdvWhereFilter exprExists(String sqlExpr) {
+        return expr(null, AdvOperatorEnums.EXISTS, sqlExpr);
+    }
+
+    public GirAdvWhereFilter exprNotExists(String sqlExpr) {
+        return expr(null, AdvOperatorEnums.NOT_EXISTS, sqlExpr);
+    }
+
     /**
      * 添加SQL表达式条件（大于查询）
      *
