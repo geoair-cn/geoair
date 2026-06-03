@@ -52,7 +52,7 @@ public interface GiDeleteDao<M extends GiEntityRemovable<PK>, PK extends Seriali
      * @param pos
      */
     default void gtcDeleteAll(List<M> pos) {
-        if (pos != null && pos.size() > 0) {
+        if (pos != null && !pos.isEmpty()) {
             List<PK> ids = new ArrayList<>();
             for (M m : pos) {
                 ids.add(m.id());
