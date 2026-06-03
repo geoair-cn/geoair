@@ -282,7 +282,7 @@ public class GirAdvQueryRequest {
         }
         StringBuilder sb = new StringBuilder();
         for (OrderApo order : orders) {
-            if (!sb.isEmpty()) {
+            if (!StrUtil.isEmpty(sb)) {
                 sb.append(", ");
             }
             if (order.isFunction()) {
