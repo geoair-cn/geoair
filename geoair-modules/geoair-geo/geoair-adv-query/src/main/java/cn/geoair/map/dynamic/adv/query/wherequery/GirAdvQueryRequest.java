@@ -111,6 +111,7 @@ public class GirAdvQueryRequest {
      *
      * @return 空间操作规则枚举
      */
+
     private final AdvEnumsGeomOpt advEnumsGeomOpt;
 
     /**
@@ -195,6 +196,7 @@ public class GirAdvQueryRequest {
         this.havingFilter = builder.getHavingFilter();
     }
 
+
     /**
      * 判断是否为自定义SQL模式
      *
@@ -215,6 +217,8 @@ public class GirAdvQueryRequest {
 
     /**
      * 判断是否有排序条件
+     *
+     * @return true=有排序条件，false=无排序条件
      */
     public boolean hasOrders() {
         return orders != null && !orders.isEmpty();
@@ -282,7 +286,7 @@ public class GirAdvQueryRequest {
         }
         StringBuilder sb = new StringBuilder();
         for (OrderApo order : orders) {
-            if (!sb.isEmpty()) {
+            if (!StrUtil.isEmpty(sb)) {
                 sb.append(", ");
             }
             if (order.isFunction()) {
