@@ -1,11 +1,13 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
-import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.lang.caller.GkCallerUtil;
+import cn.geoair.base.log.*;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
+import cn.hutool.core.lang.caller.CallerUtil;
+import cn.hutool.log.dialect.console.ConsoleColorLogFactory;
+import cn.hutool.log.level.Level;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
  * @description SQL 日志（智能换行，不截断单词 + 动态长度分割线）
  */
 
-public class AdvLogSql {
+public class AdvLogSql extends GirLogWrapper {
 
 
     // 全局开关
@@ -35,6 +37,23 @@ public class AdvLogSql {
             sb.append("=");
         }
         SPLIT_LINE = sb.toString();
+    }
+
+    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
+        Class<?> caller = GkCallerUtil.getCaller(3);
+        if (!getEnableByClassName(caller)) {
+            return;
+        }
+        super.recordLog(level, message, loggerInfo, arguments);
+    }
+
+
+    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo, Object... arguments) {
+        Class<?> caller = GkCallerUtil.getCaller(3);
+        if (!getEnableByClassName(caller)) {
+            return;
+        }
+        super.recordLogWithThrowable(level, message, t, loggerInfo, arguments);
     }
 
     // ===================== 颜色 =====================
@@ -90,7 +109,7 @@ public class AdvLogSql {
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
+        super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -107,7 +126,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
+            super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                             + "\n执行方法：{}.{}"
                             + "\nSQL 语句："
@@ -127,7 +146,7 @@ public class AdvLogSql {
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        GirLoggerFactory.getLogger(callerClass).info("\n" + GRAY + SPLIT_LINE + RESET
+        super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
                         + "\n执行方法：{}.{}"
                         + "\nSQL 语句："
@@ -145,7 +164,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
+            super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
                             + "\n执行方法：{}.{}"
                             + "\n【SQL 执行异常】"
@@ -168,7 +187,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
+        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
@@ -188,7 +207,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
+        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
@@ -211,7 +230,7 @@ public class AdvLogSql {
             return;
         }
         try {
-            GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
+            super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
                             + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                             + "\n执行方法：{}.{}"
                             + "\n【SQL 执行异常 - 堆栈】"
@@ -240,7 +259,7 @@ public class AdvLogSql {
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        GirLoggerFactory.getLogger(callerClass).error("\n" + GRAY + SPLIT_LINE + RESET
+        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
                         + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
                         + "\n执行方法：{}.{}"
                         + "\n【SQL 执行异常】"
