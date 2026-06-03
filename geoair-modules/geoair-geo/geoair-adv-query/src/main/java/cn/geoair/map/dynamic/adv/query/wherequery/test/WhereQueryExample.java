@@ -9,7 +9,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 
 import java.util.Arrays;
@@ -24,10 +24,10 @@ import java.util.List;
  */
 public class WhereQueryExample {
 
-    private final GirAdvQuerySqlBuilder sqlBuilder;
+    private final GirAdvSqlComposer sqlBuilder;
 
     public WhereQueryExample(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
-        this.sqlBuilder = new GirAdvQuerySqlBuilder(dialectProcessor, dataSourceGetter);
+        this.sqlBuilder = new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
     public static void main(String[] args) {
@@ -50,7 +50,7 @@ public class WhereQueryExample {
                 ).order(OrderApo.ofASCFunction("create_time1")).order(OrderApo.ofASCFieldName("aaaaa"))
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = example.sqlBuilder.buildSelectSql(query);
         printResult("示例1：表达式", result);
 
 //        WhereQueryExample example2 = new WhereQueryExample(dialect, dataSourceGetter);
@@ -120,7 +120,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例1：简单等值查询", result);
     }
 
@@ -139,7 +139,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例2：比较运算符查询", result);
     }
 
@@ -157,7 +157,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例3：IN和BETWEEN查询", result);
     }
 
@@ -176,7 +176,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例4：模糊查询", result);
     }
 
@@ -194,7 +194,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例5：NULL判断查询", result);
     }
 
@@ -215,7 +215,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例6：AND条件组", result);
     }
 
@@ -238,7 +238,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例7：OR条件组", result);
     }
 
@@ -265,7 +265,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例8：复杂嵌套查询", result);
     }
 
@@ -283,7 +283,7 @@ public class WhereQueryExample {
                 .page(2, 10)
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildPageSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildPageSql(query);
         printResult("示例9：带排序的分页查询", result);
     }
 
@@ -298,7 +298,7 @@ public class WhereQueryExample {
                 .page(1, 20)
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildPageSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildPageSql(query);
         printResult("示例10：自定义SQL模式", result);
     }
 
@@ -317,7 +317,7 @@ public class WhereQueryExample {
                 .nullHandling(AdvNullHandling.IGNORE)
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例11：忽略NULL值查询", result);
     }
 
@@ -338,7 +338,7 @@ public class WhereQueryExample {
                 .orders(orders)
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例12：使用OrderApo排序", result);
     }
 
@@ -371,7 +371,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例13：多层嵌套复杂场景", result);
     }
 
@@ -389,7 +389,7 @@ public class WhereQueryExample {
                 )
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);
         printResult("示例14：NOT条件组", result);
     }
 
@@ -429,11 +429,11 @@ public class WhereQueryExample {
                 .page(1, 15)
                 .build();
 
-        GirAdvQuerySqlBuilder.SqlBuildResult result = sqlBuilder.buildPageSql(query);
+        GirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildPageSql(query);
         printResult("示例15：组合所有特性", result);
     }
 
-    private static void printResult(String title, GirAdvQuerySqlBuilder.SqlBuildResult result) {
+    private static void printResult(String title, GirAdvSqlComposer.SqlBuildResult result) {
         System.out.println("【" + title + "】");
         System.out.println("SQL: " + result.getSql());
         System.out.println("参数: " + result.getParams());

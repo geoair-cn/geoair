@@ -1,13 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
-import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
-import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilderExample;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerProvider;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +54,7 @@ public class LambdaFilterExample {
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
 
         ArrayList<Object> objects = new ArrayList<>();
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
         // 预期：name = '张三' AND age >= 18 AND status = 1
     }
 
@@ -146,9 +143,9 @@ public class LambdaFilterExample {
 
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
         ArrayList<Object> objects = new ArrayList<>();
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**
@@ -178,9 +175,9 @@ public class LambdaFilterExample {
         System.out.println("  - 状态：未删除");
         System.out.println("  - 排序：按创建时间倒序");
         System.out.println("  - 限制：10条");
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**

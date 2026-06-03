@@ -11,7 +11,7 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.hutool.core.bean.BeanDesc;
 import cn.hutool.core.bean.BeanUtil;
@@ -245,11 +245,11 @@ public class GirAdvSqlUtils {
         return null;
     }
 
-    public static GirAdvQuerySqlBuilder getSqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
-        return new GirAdvQuerySqlBuilder(dialectProcessor, dataSourceGetter);
+    public static GirAdvSqlComposer getSqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+        return new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
-    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, GirAdvQuerySqlBuilder sqlBuilder) {
+    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, GirAdvSqlComposer sqlBuilder) {
         return sqlBuilder.buildWhereSql(whereFilter, params);
     }
 
