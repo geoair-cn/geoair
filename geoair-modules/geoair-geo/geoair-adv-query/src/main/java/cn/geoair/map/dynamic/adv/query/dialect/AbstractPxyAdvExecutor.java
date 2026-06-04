@@ -164,8 +164,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public GirDsJdbcTxBuilder builder() {
-        return this.getDataSourceGetter().builder();
+    public GirDsJdbcTxBuilder txBuilder() {
+        return this.getDataSourceGetter().txBuilder();
     }
 
     @Override
@@ -209,13 +209,13 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
-        this.getDataSourceGetter().setTxHolder(jdbcTxHolder);
+    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+        this.getDataSourceGetter().setTransactionConnectionHolder(transactionConnectionHolder);
     }
 
     @Override
-    public IDsTransactionConnectionHolder getTxHolder() {
-        return this.getDataSourceGetter().getTxHolder();
+    public IDsTransactionConnectionHolder getTransactionConnectionHolder() {
+        return this.getDataSourceGetter().getTransactionConnectionHolder();
     }
 
     @Override

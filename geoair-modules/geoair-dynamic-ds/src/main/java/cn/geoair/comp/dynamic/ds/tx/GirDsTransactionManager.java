@@ -104,13 +104,13 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     }
 
     @Override
-    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
-        dsTransactionTemplate.setTxHolder(jdbcTxHolder);
+    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+        dsTransactionTemplate.setTransactionConnectionHolder(transactionConnectionHolder);
     }
 
     @Override
-    public IDsTransactionConnectionHolder getTxHolder() {
-        return dsTransactionTemplate.getTxHolder();
+    public IDsTransactionConnectionHolder getTransactionConnectionHolder() {
+        return dsTransactionTemplate.getTransactionConnectionHolder();
     }
 
     @Override
@@ -159,8 +159,8 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     }
 
     @Override
-    public GirDsJdbcTxBuilder builder() {
-        return dsTransactionTemplate.builder();
+    public GirDsJdbcTxBuilder txBuilder() {
+        return dsTransactionTemplate.txBuilder();
     }
 
     @Override

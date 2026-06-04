@@ -85,6 +85,6 @@ public final class GirDsJdbcTxKit {
      * 获取事务构建器（链式调用）
      */
     public GirDsJdbcTxBuilder builder() {
-        return TEMPLATE.builder();
+        return TEMPLATE.txBuilder();
     }
 }
