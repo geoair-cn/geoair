@@ -4,7 +4,7 @@ import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
@@ -27,11 +27,11 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
 
     protected static final GiLogger log = GirLogger.getLoger();
 
-    protected IDsDataSourceManger dataSourceGetter;
+    protected IDataSourceGetter dataSourceGetter;
 
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
-    public AbstractExecAdvSimplePageOpt(IDsDataSourceManger dataSourceGetter) {
+    public AbstractExecAdvSimplePageOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }

@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -18,14 +18,14 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     // ========== 通用逻辑：子类无需重写 ==========
     @Override
-    public String tbGetTableNameWithSchema(IDsDataSourceManger dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
         return tbGetTableNameWithSchema(
                 dataSourceGetter, tableName, dataSourceGetter.getSchemaName());
     }
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDsDataSourceManger dataSourceGetter, String tableName, String schemaName) {
+            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
         // Step1：确定最终Schema/库名（表名提取 > 传入库名 > 默认值）
         String extractedSchema = tbExtractSchemaName(tableName);
         if (StrUtil.isNotEmpty(extractedSchema)) {
@@ -161,8 +161,8 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
     }
 
     @Override
-    public  String tbBuildAsTable(String startFragment, String aliasTableName){
-        return  startFragment + " as " + aliasTableName;
+    public String tbBuildAsTable(String startFragment, String aliasTableName) {
+        return startFragment + " as " + aliasTableName;
     }
 
     /**
@@ -179,7 +179,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
      * 获取数据源对应的Schema/库名（适配PG/MySQL语义）
      */
     @Override
-    public String tbGetSchemaNameForSql(IDsDataSourceManger dataSourceGetter) {
+    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
         return ObjectUtil.isEmpty(dataSourceGetter.getSchemaName())
                 ? getDefaultSchemaName()
                 : dataSourceGetter.getSchemaName();

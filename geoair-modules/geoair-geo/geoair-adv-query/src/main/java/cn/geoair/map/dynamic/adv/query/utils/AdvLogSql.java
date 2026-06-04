@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.utils;
 import cn.geoair.base.lang.caller.GkCallerUtil;
 import cn.geoair.base.log.*;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 
 import java.util.List;
@@ -62,17 +62,17 @@ public class AdvLogSql extends GirLogWrapper {
     private static final String GRAY = "\u001B[90m";
     private static final String BLUE = "\u001B[34m";
 
-    private final IDsDataSourceManger dataSourceGetter;
+    private final IDataSourceGetter dataSourceGetter;
 
     private final AdvQueryGlobalConfig advQueryGlobalConfig;
 
 
-    public static AdvLogSql of(IDsDataSourceManger dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
+    public static AdvLogSql of(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
         return new AdvLogSql(dataSourceGetter, advQueryGlobalConfig);
     }
 
 
-    private AdvLogSql(IDsDataSourceManger dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
+    private AdvLogSql(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
         this.dataSourceGetter = dataSourceGetter;
         this.advQueryGlobalConfig = advQueryGlobalConfig;
     }

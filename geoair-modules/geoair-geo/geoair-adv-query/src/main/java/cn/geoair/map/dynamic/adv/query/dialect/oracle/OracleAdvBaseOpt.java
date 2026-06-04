@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  */
 public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public OracleAdvBaseOpt(IDsDataSourceManger dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public OracleAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter,configAdvQueryGetter);
     }
 

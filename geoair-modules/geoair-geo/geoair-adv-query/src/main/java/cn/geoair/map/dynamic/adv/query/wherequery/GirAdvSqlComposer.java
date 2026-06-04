@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
@@ -21,9 +21,9 @@ import java.util.*;
 public class GirAdvSqlComposer {
 
     private final DialectTableNameProcessor dialectProcessor;
-    private final IDsDataSourceManger dataSourceGetter;
+    private final IDataSourceGetter dataSourceGetter;
 
-    public GirAdvSqlComposer(DialectTableNameProcessor dialectProcessor, IDsDataSourceManger dataSourceGetter) {
+    public GirAdvSqlComposer(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
         this.dialectProcessor = dialectProcessor;
         this.dataSourceGetter = dataSourceGetter;
     }

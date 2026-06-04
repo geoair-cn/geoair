@@ -12,9 +12,9 @@ import java.util.function.Supplier;
  * @author ：zhangjun
  * @date ： 模拟的DataSourceGetter,用于调试使用
  */
-public class MockDataSourceManger implements IDsDataSourceManger {
+public class MockDataSourceManger implements IDataSourceGetter {
 
-    public static IDsDataSourceManger getInstance() {
+    public static IDataSourceGetter getInstance() {
         return new MockDataSourceManger();
     }
 

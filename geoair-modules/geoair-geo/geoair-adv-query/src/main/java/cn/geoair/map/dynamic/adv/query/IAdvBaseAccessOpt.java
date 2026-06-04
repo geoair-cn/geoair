@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -22,7 +22,7 @@ public interface IAdvBaseAccessOpt extends IAdvConfigOpt {
     /**
      * 设置数据源获取器
      */
-    void setDataSourceGetter(IDsDataSourceManger dataSourceGetter);
+    void setDataSourceGetter(IDataSourceGetter dataSourceGetter);
 
     // ==================== 1. 自定义SQL插入 ====================
 

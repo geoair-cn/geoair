@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 
@@ -14,7 +14,7 @@ public class OracleAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvSimplePageOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
-    public OracleAdvWhereSelectOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pgAdvSimplePageOpt, IAdvGeoPreOpt iAdvGeoPreOpt) {
+    public OracleAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pgAdvSimplePageOpt, IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;

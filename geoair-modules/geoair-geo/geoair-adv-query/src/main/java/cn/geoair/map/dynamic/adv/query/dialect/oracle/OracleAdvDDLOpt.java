@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
-    public OracleAdvDDLOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt) {
+    public OracleAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         super(dataSourceGetter, baseOpt);
     }
 

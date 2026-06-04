@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -25,7 +25,7 @@ import java.util.List;
 public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
 
-    public MysqlAdvDDLOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt) {
+    public MysqlAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         super(dataSourceGetter, baseOpt);
 
     }

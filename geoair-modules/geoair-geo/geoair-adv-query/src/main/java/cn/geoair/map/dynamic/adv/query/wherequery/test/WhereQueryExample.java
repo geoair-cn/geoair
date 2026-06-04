@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.MockDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
@@ -26,14 +26,14 @@ public class WhereQueryExample {
 
     private final GirAdvSqlComposer sqlBuilder;
 
-    public WhereQueryExample(DialectTableNameProcessor dialectProcessor, IDsDataSourceManger dataSourceGetter) {
+    public WhereQueryExample(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
         this.sqlBuilder = new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
     public static void main(String[] args) {
         DialectTableNameProcessor dialect = PgDialectTableNameUtil.getInstance();
         DialectTableNameProcessor masql = MysqlDialectTableNameUtil.getInstance();
-        IDsDataSourceManger dataSourceGetter = MockDataSourceManger.getInstance();
+        IDataSourceGetter dataSourceGetter = MockDataSourceManger.getInstance();
         WhereQueryExample example = new WhereQueryExample(masql, dataSourceGetter);
 
 //        example.runAllExamples();

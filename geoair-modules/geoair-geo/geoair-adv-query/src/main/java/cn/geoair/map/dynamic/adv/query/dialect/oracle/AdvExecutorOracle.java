@@ -1,7 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
+import cn.geoair.comp.dynamic.ds.GirDsTransactionManager;
 import cn.geoair.comp.dynamic.ds.RealDataSourceManger;
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -42,25 +43,21 @@ public class AdvExecutorOracle extends AbstractPxyAdvExecutor {
     private volatile IAdvBaseOpt advBaseOpt;
     private volatile IAdvDDLOpt advDDLOpt;
     private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
-    private volatile IDsDataSourceManger dataSourceGetter;
+    private volatile IDataSourceGetter dataSourceGetter;
     private volatile IAdvSimplePageOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
 
     @Override
-    protected IDsDataSourceManger getDataSourceGetter() {
+    protected IDataSourceGetter getDataSourceGetter() {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new RealDataSourceManger();
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceManger());
                 }
             }
         }
         return dataSourceGetter;
-    }
-    @Override
-    protected IDsTxTemplate getAdvTxTemplate() {
-        return getDataSourceGetter();
     }
 
     @Override

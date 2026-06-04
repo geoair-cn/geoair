@@ -12,9 +12,9 @@ import java.util.function.Supplier;
  */
 public interface IDsTxTemplate {
 
-    void setJdbcTxHolder(IDsTxHolder jdbcTxHolder);
+    void setTxHolder(IDsTxHolder jdbcTxHolder);
 
-    IDsTxHolder getJdbcTxHolder();
+    IDsTxHolder getTxHolder();
 
     Connection getCurrentConnection() throws SQLException;
 

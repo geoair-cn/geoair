@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  */
 public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public PgAdvBaseOpt(IDsDataSourceManger dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter,configAdvQueryGetter);
     }
 

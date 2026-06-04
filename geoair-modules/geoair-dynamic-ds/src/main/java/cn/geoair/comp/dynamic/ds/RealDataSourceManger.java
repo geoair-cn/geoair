@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import javax.sql.DataSource;
 
 /**
- * 包裹了事务的数据源获取器
+ * 真实的数据源管理器实现
  */
 public class RealDataSourceManger implements IDsDataSourceManger {
 
@@ -41,20 +41,18 @@ public class RealDataSourceManger implements IDsDataSourceManger {
     protected String dataSourceId = null;
 
 
-    GirDsTransactionManager simpleDataSourceGetter = new GirDsTransactionManager();
-
     public RealDataSourceManger() {
 
     }
 
     @Override
     public String getSchemaName() {
-        return simpleDataSourceGetter.getSchemaName();
+        return schemaName;
     }
 
     @Override
     public String getDatabaseName() {
-        return simpleDataSourceGetter.getDatabaseName();
+        return databaseName;
     }
 
     @Override

@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // 注入数据源获取器
-    protected IDsDataSourceManger dataSourceGetter;
+    protected IDataSourceGetter dataSourceGetter;
 
     // 表名处理器（差异化）
     protected DialectTableNameProcessor dialectTableNameProcessor;
@@ -40,7 +40,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
-    public AbstractExecAdvDDLOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt) {
+    public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         this.dataSourceGetter = dataSourceGetter;
         this.baseOpt = baseOpt;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();

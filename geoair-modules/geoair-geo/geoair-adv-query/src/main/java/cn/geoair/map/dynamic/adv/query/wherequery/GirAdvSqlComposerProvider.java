@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.MockDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
@@ -16,19 +16,19 @@ public class GirAdvSqlComposerProvider {
 
     public static GirAdvSqlComposer provideMysql() {
         DialectTableNameProcessor masql = MysqlDialectTableNameUtil.getInstance();
-        IDsDataSourceManger dataSourceGetter = MockDataSourceManger.getInstance();
+        IDataSourceGetter dataSourceGetter = MockDataSourceManger.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceGetter);
     }
 
     public static GirAdvSqlComposer providePostgresql() {
         DialectTableNameProcessor masql = PgDialectTableNameUtil.getInstance();
-        IDsDataSourceManger dataSourceGetter = MockDataSourceManger.getInstance();
+        IDataSourceGetter dataSourceGetter = MockDataSourceManger.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceGetter);
     }
 
     public static GirAdvSqlComposer provideOracle() {
         DialectTableNameProcessor masql = OracleDialectTableNameUtil.getInstance();
-        IDsDataSourceManger dataSourceGetter = MockDataSourceManger.getInstance();
+        IDataSourceGetter dataSourceGetter = MockDataSourceManger.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceGetter);
     }
 

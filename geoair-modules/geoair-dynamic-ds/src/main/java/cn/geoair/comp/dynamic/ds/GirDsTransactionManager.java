@@ -14,10 +14,12 @@ import java.sql.Statement;
 import java.util.function.Supplier;
 
 /**
+ * 事务管理器
+ *
  * @author ：zhangjun
  * @date ：Created in 2025/10/9 10:38
  */
-public class GirDsTransactionManager implements IDsDataSourceManger, IDsConnectionManager, IDsTxTemplate {
+public class GirDsTransactionManager implements IDataSourceGetter {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
@@ -31,7 +33,13 @@ public class GirDsTransactionManager implements IDsDataSourceManger, IDsConnecti
         this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
     }
 
-    public GirDsTransactionManager(ConnectionManager connectionManager, IDsDataSourceManger dataSourceManger, IDsTxTemplate txTemplate) {
+    public GirDsTransactionManager(IDsDataSourceManger dataSourceManger) {
+        this.connectionManager = new ConnectionManager(dataSourceManger);
+        this.dataSourceManger = dataSourceManger;
+        this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
+    }
+
+    public GirDsTransactionManager(IDsConnectionManager connectionManager, IDsDataSourceManger dataSourceManger, IDsTxTemplate txTemplate) {
         this.connectionManager = connectionManager;
         this.dataSourceManger = dataSourceManger;
         this.txTemplate = txTemplate;
@@ -93,13 +101,13 @@ public class GirDsTransactionManager implements IDsDataSourceManger, IDsConnecti
     }
 
     @Override
-    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
-        txTemplate.setJdbcTxHolder(jdbcTxHolder);
+    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
+        txTemplate.setTxHolder(jdbcTxHolder);
     }
 
     @Override
-    public IDsTxHolder getJdbcTxHolder() {
-        return txTemplate.getJdbcTxHolder();
+    public IDsTxHolder getTxHolder() {
+        return txTemplate.getTxHolder();
     }
 
     @Override
@@ -163,7 +171,6 @@ public class GirDsTransactionManager implements IDsDataSourceManger, IDsConnecti
 
     @Override
     public void connectionClose(Connection connection) {
-        // todo 争议点，这里需不需要关闭连接？？？还是退出
         connectionManager.connectionClose(connection);
     }
 

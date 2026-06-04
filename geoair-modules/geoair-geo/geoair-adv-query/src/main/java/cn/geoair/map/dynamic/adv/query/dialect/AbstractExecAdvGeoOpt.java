@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -32,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
 
-    protected final IDsDataSourceManger dataSourceGetter;
+    protected final IDataSourceGetter dataSourceGetter;
 
     protected final DialectTableNameProcessor dialectTableNameProcessor;
 
-    public AbstractExecAdvGeoOpt(IDsDataSourceManger dataSourceGetter) {
+    public AbstractExecAdvGeoOpt(IDataSourceGetter dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
     }

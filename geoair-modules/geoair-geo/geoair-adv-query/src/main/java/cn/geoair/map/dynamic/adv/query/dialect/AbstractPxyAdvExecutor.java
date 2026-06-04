@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.*;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
@@ -20,6 +20,7 @@ import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.function.Consumer;
@@ -36,9 +37,7 @@ import javax.sql.DataSource;
  */
 public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
-    protected abstract IDsDataSourceManger getDataSourceGetter();
-
-    protected abstract IDsTxTemplate getAdvTxTemplate();
+    protected abstract IDataSourceGetter getDataSourceGetter();
 
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
@@ -165,52 +164,62 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public GirDsJdbcTxBuilder builder() {
-        return this.getAdvTxTemplate().builder();
+        return this.getDataSourceGetter().builder();
     }
 
     @Override
     public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
-        return this.getAdvTxTemplate().txReturn(level, func, param);
+        return this.getDataSourceGetter().txReturn(level, func, param);
     }
 
     @Override
     public <P, R> R txReturn(TxFunc<P, R> func, P param) {
-        return this.getAdvTxTemplate().txReturn(func, param);
+        return this.getDataSourceGetter().txReturn(func, param);
     }
 
     @Override
     public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
-        this.getAdvTxTemplate().tx(level, action, param);
+        this.getDataSourceGetter().tx(level, action, param);
     }
 
     @Override
     public <P> void tx(TxAction<P> action, P param) {
-        this.getAdvTxTemplate().tx(action, param);
+        this.getDataSourceGetter().tx(action, param);
     }
 
     @Override
     public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
-        return this.getAdvTxTemplate().txReturn(level, supplier);
+        return this.getDataSourceGetter().txReturn(level, supplier);
     }
 
     @Override
     public <T> T txReturn(Supplier<T> supplier) {
-        return this.getAdvTxTemplate().txReturn(supplier);
+        return this.getDataSourceGetter().txReturn(supplier);
     }
 
     @Override
     public void tx(IsolationLevel level, Runnable action) {
-        this.getAdvTxTemplate().tx(level, action);
+        this.getDataSourceGetter().tx(level, action);
     }
 
     @Override
     public void tx(Runnable action) {
-        this.getAdvTxTemplate().tx(action);
+        this.getDataSourceGetter().tx(action);
     }
 
     @Override
-    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
-        this.getAdvTxTemplate().setJdbcTxHolder(jdbcTxHolder);
+    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
+        this.getDataSourceGetter().setTxHolder(jdbcTxHolder);
+    }
+
+    @Override
+    public IDsTxHolder getTxHolder() {
+        return this.getDataSourceGetter().getTxHolder();
+    }
+
+    @Override
+    public Connection getCurrentConnection() throws SQLException {
+        return this.getDataSourceGetter().getCurrentConnection();
     }
 
     // ==================== 基础插入操作（代理调用PgAdvBaseOpt） ====================
@@ -492,7 +501,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setDataSourceGetter(IDsDataSourceManger dataSourceGetter) {
+    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
         getAdvBaseOpt().setDataSourceGetter(dataSourceGetter);
     }
 
@@ -1557,12 +1566,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public String tbGetSchemaNameForSql(IDsDataSourceManger dataSourceGetter) {
+    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
         return getDialectTableNameProcessor().tbGetSchemaNameForSql(dataSourceGetter);
     }
 
     @Override
-    public String tbGetTableNameWithSchema(IDsDataSourceManger dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
         // 代理调用：带默认Schema的完整表名拼接
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(dataSourceGetter, tableName);
     }
@@ -1570,7 +1579,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDsDataSourceManger dataSourceGetter, String tableName, String schemaName) {
+            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
         // 代理调用：带指定Schema的完整表名拼接
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(
                 dataSourceGetter, tableName, schemaName);

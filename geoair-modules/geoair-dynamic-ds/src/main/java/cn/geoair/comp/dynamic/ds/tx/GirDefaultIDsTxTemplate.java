@@ -29,12 +29,12 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
     }
 
     @Override
-    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
+    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
         this.jdbcTxHolder = jdbcTxHolder;
     }
 
     @Override
-    public IDsTxHolder getJdbcTxHolder() {
+    public IDsTxHolder getTxHolder() {
         return this.jdbcTxHolder;
     }
 

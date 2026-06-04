@@ -14,16 +14,16 @@ import java.sql.Statement;
  */
 public class ConnectionManager implements IDsConnectionManager {
 
-    IDsDataSourceManger dataSourceGetter;
+    IDsDataSourceManger dataSourceManger;
 
-    public ConnectionManager(IDsDataSourceManger dataSourceGetter) {
-        this.dataSourceGetter = dataSourceGetter;
+    public ConnectionManager(IDsDataSourceManger sourceManger) {
+        this.dataSourceManger = sourceManger;
     }
 
     @Override
     public Connection getConnection() {
         try {
-            return dataSourceGetter.getDataSource().getConnection();
+            return dataSourceManger.getDataSource().getConnection();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

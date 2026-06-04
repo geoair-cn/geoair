@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
-import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -26,7 +26,7 @@ import org.postgresql.jdbc.PgResultSetMetaData;
  */
 public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
-    public PgAdvDDLOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt) {
+    public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         super(dataSourceGetter, baseOpt);
     }
 
