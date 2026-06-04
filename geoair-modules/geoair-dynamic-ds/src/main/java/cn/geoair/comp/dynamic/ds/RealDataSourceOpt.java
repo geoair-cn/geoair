@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 /**
  * 真实的数据源管理器实现
  */
-public class RealDataSourceManger implements IDsDataSourceManger {
+public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
@@ -41,7 +41,7 @@ public class RealDataSourceManger implements IDsDataSourceManger {
     protected String dataSourceId = null;
 
 
-    public RealDataSourceManger() {
+    public RealDataSourceOpt() {
 
     }
 

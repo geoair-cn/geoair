@@ -23,23 +23,23 @@ public class GirDsTransactionManager implements IDataSourceGetter {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
-    IDsConnectionManager connectionManager;
-    IDsDataSourceManger dataSourceManger;
+    IDsConnectionOpt connectionManager;
+    IDsDataSourceOpt dataSourceManger;
     IDsTxTemplate txTemplate;
 
-    public GirDsTransactionManager(IDsConnectionManager connectionManager, IDsDataSourceManger dataSourceManger) {
+    public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger) {
         this.connectionManager = connectionManager;
         this.dataSourceManger = dataSourceManger;
         this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
     }
 
-    public GirDsTransactionManager(IDsDataSourceManger dataSourceManger) {
-        this.connectionManager = new ConnectionManager(dataSourceManger);
+    public GirDsTransactionManager(IDsDataSourceOpt dataSourceManger) {
+        this.connectionManager = new RealConnectionOpt(dataSourceManger);
         this.dataSourceManger = dataSourceManger;
         this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
     }
 
-    public GirDsTransactionManager(IDsConnectionManager connectionManager, IDsDataSourceManger dataSourceManger, IDsTxTemplate txTemplate) {
+    public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger, IDsTxTemplate txTemplate) {
         this.connectionManager = connectionManager;
         this.dataSourceManger = dataSourceManger;
         this.txTemplate = txTemplate;

@@ -14,7 +14,7 @@ import javax.sql.DataSource;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDsDataSourceManger {
+public interface IDsDataSourceOpt {
 
     /**
      * 通过数据源描述对象初始化

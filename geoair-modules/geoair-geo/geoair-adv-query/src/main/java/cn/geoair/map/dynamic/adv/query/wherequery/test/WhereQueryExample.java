@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.comp.dynamic.ds.MockDataSourceManger;
+import cn.geoair.comp.dynamic.ds.MockDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
@@ -33,7 +33,7 @@ public class WhereQueryExample {
     public static void main(String[] args) {
         DialectTableNameProcessor dialect = PgDialectTableNameUtil.getInstance();
         DialectTableNameProcessor masql = MysqlDialectTableNameUtil.getInstance();
-        IDataSourceGetter dataSourceGetter = MockDataSourceManger.getInstance();
+        IDataSourceGetter dataSourceGetter = MockDataSourceGetter.getInstance();
         WhereQueryExample example = new WhereQueryExample(masql, dataSourceGetter);
 
 //        example.runAllExamples();

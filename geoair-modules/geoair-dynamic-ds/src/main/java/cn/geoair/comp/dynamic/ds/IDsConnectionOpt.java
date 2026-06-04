@@ -10,7 +10,7 @@ import java.sql.Statement;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDsConnectionManager {
+public interface IDsConnectionOpt {
 
 
     /**

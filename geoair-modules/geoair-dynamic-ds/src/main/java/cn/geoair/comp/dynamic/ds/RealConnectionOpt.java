@@ -12,11 +12,11 @@ import java.sql.Statement;
  * @date ：Created in 2026/6/4 12:12
  * @description： 链接管理
  */
-public class ConnectionManager implements IDsConnectionManager {
+public class RealConnectionOpt implements IDsConnectionOpt {
 
-    IDsDataSourceManger dataSourceManger;
+    IDsDataSourceOpt dataSourceManger;
 
-    public ConnectionManager(IDsDataSourceManger sourceManger) {
+    public RealConnectionOpt(IDsDataSourceOpt sourceManger) {
         this.dataSourceManger = sourceManger;
     }
 

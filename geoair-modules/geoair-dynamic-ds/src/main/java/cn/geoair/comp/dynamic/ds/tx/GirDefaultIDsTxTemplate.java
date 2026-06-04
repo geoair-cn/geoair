@@ -1,6 +1,6 @@
 package cn.geoair.comp.dynamic.ds.tx;
 
-import cn.geoair.comp.dynamic.ds.IDsConnectionManager;
+import cn.geoair.comp.dynamic.ds.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
 
@@ -14,16 +14,16 @@ import java.util.function.Supplier;
  */
 public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
 
-    IDsConnectionManager connectionManager;
+    IDsConnectionOpt connectionManager;
 
     IDsTxHolder jdbcTxHolder;
 
-    public GirDefaultIDsTxTemplate(IDsConnectionManager connectionManager) {
+    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionManager) {
         this.connectionManager = connectionManager;
         this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDefaultIDsTxTemplate(IDsConnectionManager connectionManager, IDsTxHolder jdbcTxHolder) {
+    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionManager, IDsTxHolder jdbcTxHolder) {
         this.connectionManager = connectionManager;
         this.jdbcTxHolder = jdbcTxHolder;
     }

@@ -12,10 +12,10 @@ import java.util.function.Supplier;
  * @author ：zhangjun
  * @date ： 模拟的DataSourceGetter,用于调试使用
  */
-public class MockDataSourceManger implements IDataSourceGetter {
+public class MockDataSourceGetter implements IDataSourceGetter {
 
     public static IDataSourceGetter getInstance() {
-        return new MockDataSourceManger();
+        return new MockDataSourceGetter();
     }
 
     private static final GiLogger log = GirLogger.getLoger();

@@ -1,17 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
 import cn.geoair.comp.dynamic.ds.GirDsTransactionManager;
-import cn.geoair.comp.dynamic.ds.RealDataSourceManger;
+import cn.geoair.comp.dynamic.ds.RealDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import javax.sql.DataSource;
 
 /**
@@ -44,7 +42,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceManger());
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceOpt());
                 }
             }
         }

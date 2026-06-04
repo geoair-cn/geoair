@@ -1,14 +1,6 @@
 package cn.geoair.comp.dynamic.ds;
 
-import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.function.Supplier;
 
 /**
  * 数据源获取器接口
@@ -18,6 +10,6 @@ import java.util.function.Supplier;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDataSourceGetter extends IDsDataSourceManger, IDsConnectionManager, IDsTxTemplate {
+public interface IDataSourceGetter extends IDsDataSourceOpt, IDsConnectionOpt, IDsTxTemplate {
 
 }
