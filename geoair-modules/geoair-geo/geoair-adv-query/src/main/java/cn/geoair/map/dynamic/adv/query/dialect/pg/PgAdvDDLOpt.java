@@ -8,7 +8,6 @@ import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvDDLOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;

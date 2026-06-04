@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;

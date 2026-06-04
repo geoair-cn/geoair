@@ -1,31 +1,28 @@
-package cn.geoair.comp.dynamic.ds;
+package cn.geoair.comp.dynamic.ds.base;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 
 /**
- * @author ：zhangjun
- * @date ：Created in 2025/10/9 10:38 @description： 数据源获取器
+ * 真实的数据源管理器实现
  */
-public class DataSourceGetter implements IDataSourceGetter {
+public class RealDataSourceOpt implements IDsDataSourceOpt {
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     static ConcurrentHashMap<String, String> dataBaseNameMap = new ConcurrentHashMap<>();
     static ConcurrentHashMap<String, String> schemaNameMap = new ConcurrentHashMap<>();
@@ -43,6 +40,11 @@ public class DataSourceGetter implements IDataSourceGetter {
     Supplier<String> databaseNameGetterFunction;
 
     protected String dataSourceId = null;
+
+
+    public RealDataSourceOpt() {
+
+    }
 
     @Override
     public String getSchemaName() {
@@ -67,7 +69,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
             if (schemaName == null) {
-                schemaName ="";
+                schemaName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 schemaNameMap.put(dataSourceName, schemaName);
@@ -87,7 +89,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
             if (databaseName == null) {
-                databaseName ="";
+                databaseName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 dataBaseNameMap.put(dataSourceName, databaseName);
@@ -146,29 +148,12 @@ public class DataSourceGetter implements IDataSourceGetter {
         initByDataSource(simpleDataSource);
     }
 
-    @Override
-    public Connection getConnection() {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public DataSource getDataSource() {
         return dataSource;
     }
 
-    // @Override
-    // public DataStore getGeoToolsDataStore() {
-    // return dataStore;
-    // }
-
-    @Override
-    public void connectionClose(Connection connection) {
-        IoUtil.close(connection);
-    }
 
     @Override
     public DataSourceApo getDataSourceApo() {
@@ -180,11 +165,4 @@ public class DataSourceGetter implements IDataSourceGetter {
         return apo;
     }
 
-    /** 关闭数据库资源 */
-    @Override
-    public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
-        IoUtil.close(rs);
-        IoUtil.close(stmt);
-        IoUtil.close(conn);
-    }
 }

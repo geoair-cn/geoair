@@ -12,7 +12,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Oracle带参数分页实现类

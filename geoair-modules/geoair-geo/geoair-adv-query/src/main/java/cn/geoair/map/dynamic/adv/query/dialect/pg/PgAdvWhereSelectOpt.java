@@ -14,7 +14,7 @@ public class PgAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvSimplePageOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
-    public PgAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pgAdvSimplePageOpt,IAdvGeoPreOpt iAdvGeoPreOpt) {
+    public PgAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pgAdvSimplePageOpt, IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = pgAdvSimplePageOpt;

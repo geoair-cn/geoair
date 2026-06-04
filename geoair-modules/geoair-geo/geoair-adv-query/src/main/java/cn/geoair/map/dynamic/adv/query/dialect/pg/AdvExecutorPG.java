@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
+import cn.geoair.comp.dynamic.ds.tx.GirDsTransactionManager;
+import cn.geoair.comp.dynamic.ds.base.RealDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -49,7 +50,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new DataSourceGetter();
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceOpt());
                 }
             }
         }
@@ -62,7 +63,7 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter(),this::getConfig);
+                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter(), this::getConfig);
                 }
             }
         }

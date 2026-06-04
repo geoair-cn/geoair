@@ -1,13 +1,14 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.tx.IDsTransactionTemplate;
 
 /**
  * @author ：zhangjun
  * @date ：Created in 2025/10/9 11:07 @description： 集合执行器，空接口，只继承上游接口
  */
 public interface IAdvExecutor
-        extends IDataSourceGetter,
+        extends IDataSourceGetter, IDsTransactionTemplate,
         IAdvBaseOpt,
         IAdvDDLOpt,
         IAdvGeoOpt,

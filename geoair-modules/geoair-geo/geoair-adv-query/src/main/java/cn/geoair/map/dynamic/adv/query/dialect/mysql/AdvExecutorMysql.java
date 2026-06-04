@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
+import cn.geoair.comp.dynamic.ds.tx.GirDsTransactionManager;
+import cn.geoair.comp.dynamic.ds.base.RealDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -41,12 +42,14 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new DataSourceGetter();
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceOpt());
                 }
             }
         }
         return dataSourceGetter;
     }
+
+
 
     private volatile IAdvBaseOpt advBaseOpt;
 
@@ -135,4 +138,6 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         }
         return advQueryGlobalConfig;
     }
+
+
 }
