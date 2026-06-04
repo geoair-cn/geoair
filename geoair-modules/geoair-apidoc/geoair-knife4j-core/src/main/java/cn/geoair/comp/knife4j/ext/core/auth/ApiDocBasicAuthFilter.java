@@ -2,13 +2,12 @@ package cn.geoair.comp.knife4j.ext.core.auth;
 
 
 import cn.geoair.base.Gir;
+import cn.hutool.core.codec.Base64;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 
 public class ApiDocBasicAuthFilter implements Filter {
@@ -36,7 +35,7 @@ public class ApiDocBasicAuthFilter implements Filter {
 
             if (authHeader != null && authHeader.startsWith("Basic ")) {
                 String base64Credentials = authHeader.substring(6);
-                String credentials = new String(DatatypeConverter.parseBase64Binary(base64Credentials), StandardCharsets.UTF_8);
+                String credentials = Base64.decodeStr(base64Credentials);
                 String[] values = credentials.split(":", 2);
 
                 String USERNAME = Gir.property.getProperty("geoair.apidoc.auth.username");
