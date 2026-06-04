@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
@@ -50,14 +49,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         return configAdvQueryGetter.get();
     }
 
-    protected IDataSourceGetter dataSourceGetter;
+    protected IDsDataSourceManger dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 200;
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    public void setDataSourceGetter(IDsDataSourceManger dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }
 

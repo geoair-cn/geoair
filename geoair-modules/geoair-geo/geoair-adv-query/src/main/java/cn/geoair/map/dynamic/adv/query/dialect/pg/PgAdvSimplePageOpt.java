@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
@@ -23,7 +23,7 @@ public class PgAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     protected IAdvDDLOpt advDDLOpt;
 
-    public PgAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
+    public PgAdvSimplePageOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.advDDLOpt = advDDLOpt;

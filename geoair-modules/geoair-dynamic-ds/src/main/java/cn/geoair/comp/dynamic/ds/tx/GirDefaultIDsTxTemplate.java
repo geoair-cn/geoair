@@ -1,6 +1,6 @@
 package cn.geoair.comp.dynamic.ds.tx;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsConnectionManager;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
 
@@ -14,23 +14,28 @@ import java.util.function.Supplier;
  */
 public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
 
-    IDataSourceGetter iDataSourceGetter;
+    IDsConnectionManager connectionManager;
 
     IDsTxHolder jdbcTxHolder;
 
-    public GirDefaultIDsTxTemplate(IDataSourceGetter iDataSourceGetter) {
-        this.iDataSourceGetter = iDataSourceGetter;
+    public GirDefaultIDsTxTemplate(IDsConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
         this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDefaultIDsTxTemplate(IDataSourceGetter iDataSourceGetter, IDsTxHolder jdbcTxHolder) {
-        this.iDataSourceGetter = iDataSourceGetter;
+    public GirDefaultIDsTxTemplate(IDsConnectionManager connectionManager, IDsTxHolder jdbcTxHolder) {
+        this.connectionManager = connectionManager;
         this.jdbcTxHolder = jdbcTxHolder;
     }
 
     @Override
     public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
         this.jdbcTxHolder = jdbcTxHolder;
+    }
+
+    @Override
+    public IDsTxHolder getJdbcTxHolder() {
+        return this.jdbcTxHolder;
     }
 
     @Override
@@ -145,7 +150,7 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
             }
 
             // 开启新事务（只有 REQUIRED、REQUIRES_NEW、NESTED无事务时 能走到这里）
-            currConn = getConnection();
+            currConn = getCurrentConnection();
             if (level != null) {
                 currConn.setTransactionIsolation(level.code);
             }
@@ -246,12 +251,12 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
     /**
      * 获取数据库连接（优先从当前事务获取）
      */
-    public Connection getConnection() throws SQLException {
+    public Connection getCurrentConnection() throws SQLException {
         Connection txConn = jdbcTxHolder.get();
         if (txConn != null && !txConn.isClosed()) {
             return txConn;
         }
-        return iDataSourceGetter.getConnection();
+        return connectionManager.getConnection();
     }
 
     /**

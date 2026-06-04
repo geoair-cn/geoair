@@ -3,6 +3,8 @@ package cn.geoair.comp.dynamic.ds.tx;
 
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.function.Supplier;
 
 /**
@@ -11,6 +13,10 @@ import java.util.function.Supplier;
 public interface IDsTxTemplate {
 
     void setJdbcTxHolder(IDsTxHolder jdbcTxHolder);
+
+    IDsTxHolder getJdbcTxHolder();
+
+    Connection getCurrentConnection() throws SQLException;
 
     void tx(Runnable action);
 

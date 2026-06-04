@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
@@ -19,7 +19,7 @@ public class MysqlAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
     protected IAdvDDLOpt mysqlAdvDDLOpt;
 
-    public MysqlAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt mysqlAdvGeoOpt, IAdvDDLOpt mysqlAdvDDLOpt) {
+    public MysqlAdvSimplePageOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt, IAdvGeoPreOpt mysqlAdvGeoOpt, IAdvDDLOpt mysqlAdvDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.mysqlAdvDDLOpt = mysqlAdvDDLOpt;

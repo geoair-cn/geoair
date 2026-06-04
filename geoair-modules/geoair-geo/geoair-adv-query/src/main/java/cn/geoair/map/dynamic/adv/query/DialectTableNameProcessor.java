@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 
 /**
  * 数据库方言表名处理器接口 定义表名、Schema相关的通用操作规范，适配不同数据库方言实现 约定 ：以tb开头
@@ -17,7 +17,7 @@ public interface DialectTableNameProcessor {
      *
      * @return 处理后的Schema名
      */
-    String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter);
+    String tbGetSchemaNameForSql(IDsDataSourceManger dataSourceGetter);
 
     /**
      * （默认Schema）获取带Schema的完整表名
@@ -25,7 +25,7 @@ public interface DialectTableNameProcessor {
      * @param tableName 原始表名（可含Schema，也可不含）
      * @return 带Schema的标准表名（如 "public"."user"）
      */
-    String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName);
+    String tbGetTableNameWithSchema(IDsDataSourceManger dataSourceGetter, String tableName);
 
     /**
      * （指定Schema）获取带Schema的完整表名
@@ -35,7 +35,7 @@ public interface DialectTableNameProcessor {
      * @return 带Schema的标准表名
      */
     String tbGetTableNameWithSchema(
-            IDataSourceGetter dataSourceGetter, String tableName, String schemaName);
+            IDsDataSourceManger dataSourceGetter, String tableName, String schemaName);
 
     /**
      * 从完整表名中提取纯表名（去除Schema与多余引号）

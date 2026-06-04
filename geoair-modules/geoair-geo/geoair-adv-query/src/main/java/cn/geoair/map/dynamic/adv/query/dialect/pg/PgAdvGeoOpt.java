@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -35,7 +35,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     private IAdvDDLOpt pgAdvDDLOpt;
 
-    public PgAdvGeoOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
+    public PgAdvGeoOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt, IAdvDDLOpt ddlOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.pgAdvDDLOpt = ddlOpt;

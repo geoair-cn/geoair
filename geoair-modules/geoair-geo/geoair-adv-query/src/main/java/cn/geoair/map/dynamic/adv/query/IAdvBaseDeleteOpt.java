@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -9,7 +9,6 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -24,7 +23,7 @@ public interface IAdvBaseDeleteOpt extends IAdvConfigOpt {
     /**
      * 设置数据源获取器
      */
-    void setDataSourceGetter(IDataSourceGetter dataSourceGetter);
+    void setDataSourceGetter(IDsDataSourceManger dataSourceGetter);
 
     // ==================== 1. 自定义SQL删除 ====================
 

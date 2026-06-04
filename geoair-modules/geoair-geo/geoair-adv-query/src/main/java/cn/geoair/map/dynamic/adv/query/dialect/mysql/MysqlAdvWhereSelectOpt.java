@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 
@@ -16,7 +16,7 @@ public class MysqlAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
 
 
-    public MysqlAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter,
+    public MysqlAdvWhereSelectOpt(IDsDataSourceManger dataSourceGetter,
                                   IAdvBaseOpt baseOpt,
                                   IAdvSimplePageOpt pgAdvSimplePageOpt,
                                   IAdvGeoPreOpt iAdvGeoPreOpt) {

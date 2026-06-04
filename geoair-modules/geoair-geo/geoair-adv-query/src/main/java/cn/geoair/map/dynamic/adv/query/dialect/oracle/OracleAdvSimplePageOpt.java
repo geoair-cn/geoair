@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
@@ -12,7 +12,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Oracle带参数分页实现类
@@ -26,7 +25,7 @@ public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvDDLOpt advDDLOpt;
 
-    public OracleAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
+    public OracleAdvSimplePageOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt,
                                   IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;

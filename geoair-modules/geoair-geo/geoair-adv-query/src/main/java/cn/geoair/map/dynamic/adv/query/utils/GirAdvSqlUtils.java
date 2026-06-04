@@ -4,7 +4,7 @@ import cn.geoair.base.Gir;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.anno.GirTransient;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
@@ -248,7 +248,7 @@ public class GirAdvSqlUtils {
         return null;
     }
 
-    public static GirAdvSqlComposer getSqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public static GirAdvSqlComposer getSqlBuilder(DialectTableNameProcessor dialectProcessor, IDsDataSourceManger dataSourceGetter) {
         return new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
@@ -256,7 +256,7 @@ public class GirAdvSqlUtils {
         return sqlBuilder.buildWhereSql(whereFilter, params);
     }
 
-    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, DialectTableNameProcessor dialectProcessor, IDsDataSourceManger dataSourceGetter) {
         return getSqlBuilder(dialectProcessor, dataSourceGetter).buildWhereSql(whereFilter, params);
     }
 

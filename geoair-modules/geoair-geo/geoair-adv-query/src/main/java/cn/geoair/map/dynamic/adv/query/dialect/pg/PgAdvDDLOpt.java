@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -8,7 +8,6 @@ import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.IndexApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvDDLOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
@@ -27,7 +26,7 @@ import org.postgresql.jdbc.PgResultSetMetaData;
  */
 public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
-    public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
+    public PgAdvDDLOpt(IDsDataSourceManger dataSourceGetter, IAdvBaseOpt baseOpt) {
         super(dataSourceGetter, baseOpt);
     }
 

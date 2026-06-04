@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -37,7 +37,7 @@ import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.rollbackConne
  */
 public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
-    protected IDataSourceGetter dataSourceGetter;
+    protected IDsDataSourceManger dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
     protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseAccessOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
@@ -54,7 +54,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    public void setDataSourceGetter(IDsDataSourceManger dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }
 

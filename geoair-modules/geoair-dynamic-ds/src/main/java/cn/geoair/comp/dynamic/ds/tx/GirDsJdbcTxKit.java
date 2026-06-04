@@ -1,6 +1,6 @@
 package cn.geoair.comp.dynamic.ds.tx;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsConnectionManager;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
 import java.util.function.Supplier;
@@ -10,20 +10,21 @@ import java.util.function.Supplier;
  */
 public final class GirDsJdbcTxKit {
 
-    IDataSourceGetter iDataSourceGetter;
+
+    IDsConnectionManager iDsConnectionManager;
 
     private final GirDefaultIDsTxTemplate TEMPLATE;
 
-    public GirDsJdbcTxKit(IDataSourceGetter iDataSourceGetter) {
-        this.iDataSourceGetter = iDataSourceGetter;
-        this.TEMPLATE = new GirDefaultIDsTxTemplate(iDataSourceGetter);
+    public GirDsJdbcTxKit(IDsConnectionManager iDsConnectionManager) {
+        this.iDsConnectionManager = iDsConnectionManager;
+        this.TEMPLATE = new GirDefaultIDsTxTemplate(iDsConnectionManager);
     }
 
     /**
      * 获取事务工具实例
      */
-    public static GirDsJdbcTxKit getInstance(IDataSourceGetter iDataSourceGetter) {
-        return new GirDsJdbcTxKit(iDataSourceGetter);
+    public static GirDsJdbcTxKit getInstance(IDsConnectionManager iDsConnectionManager) {
+        return new GirDsJdbcTxKit(iDsConnectionManager);
     }
 
     /**

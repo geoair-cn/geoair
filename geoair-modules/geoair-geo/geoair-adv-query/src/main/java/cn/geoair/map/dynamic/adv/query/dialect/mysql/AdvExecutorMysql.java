@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.RealDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -38,11 +38,11 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     }
 
     @Override
-    protected IDataSourceGetter getDataSourceGetter() {
+    protected IDsDataSourceManger getDataSourceGetter() {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new DataSourceGetter();
+                    dataSourceGetter = new RealDataSourceManger();
                 }
             }
         }
@@ -56,7 +56,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
     private volatile IAdvBaseOpt advBaseOpt;
 
-    private volatile IDataSourceGetter dataSourceGetter;
+    private volatile IDsDataSourceManger dataSourceGetter;
 
     private volatile IAdvDDLOpt advDDLOpt;
 

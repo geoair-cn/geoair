@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.PageApo;
@@ -26,14 +26,14 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
 
     private static final Logger log = LoggerFactory.getLogger(AbstractExecAdvWhereSelectOpt.class);
 
-    protected IDataSourceGetter dataSourceGetter;
+    protected IDsDataSourceManger dataSourceGetter;
 
     /**
      * 构造函数
      *
      * @param dataSourceGetter 数据源获取器
      */
-    public AbstractExecAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter) {
+    public AbstractExecAdvWhereSelectOpt(IDsDataSourceManger dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }
 

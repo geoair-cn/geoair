@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.RealDataSourceManger;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -40,17 +40,17 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
     private volatile IAdvBaseOpt advBaseOpt;
     private volatile IAdvDDLOpt advDDLOpt;
     private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
-    private volatile IDataSourceGetter dataSourceGetter;
+    private volatile IDsDataSourceManger dataSourceGetter;
     private volatile IAdvSimplePageOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
 
     @Override
-    protected IDataSourceGetter getDataSourceGetter() {
+    protected IDsDataSourceManger getDataSourceGetter() {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new DataSourceGetter();
+                    dataSourceGetter = new RealDataSourceManger();
                 }
             }
         }

@@ -1,11 +1,8 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 
@@ -17,7 +14,7 @@ import javax.sql.DataSource;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDataSourceGetter extends IDsTxTemplate {
+public interface IDsDataSourceManger {
 
     /**
      * 通过数据源描述对象初始化
@@ -101,14 +98,6 @@ public interface IDataSourceGetter extends IDsTxTemplate {
      */
     String getDataSourceId();
 
-    /**
-     * 获取数据库连接
-     *
-     * <p>从数据源中获取一个数据库连接对象。
-     *
-     * @return 数据库连接对象
-     */
-    Connection getConnection();
 
     /**
      * 获取数据源的描述对象
@@ -128,29 +117,5 @@ public interface IDataSourceGetter extends IDsTxTemplate {
      */
     DataSource getDataSource();
 
-    // /**
-    // * 获取geotools封装的dataStore
-    // * @return
-    // */
-    // DataStore getGeoToolsDataStore();
 
-    /**
-     * 关闭数据库连接
-     *
-     * <p>关闭指定的数据库连接，释放资源。
-     *
-     * @param connection 需要关闭的数据库连接
-     */
-    void connectionClose(Connection connection);
-
-    /**
-     * 关闭数据库资源
-     *
-     * <p>关闭结果集、语句和连接等数据库资源，释放系统资源。
-     *
-     * @param rs   结果集对象
-     * @param stmt 语句对象
-     * @param conn 连接对象
-     */
-    void closeResources(ResultSet rs, Statement stmt, Connection conn);
 }

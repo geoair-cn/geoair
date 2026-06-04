@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.*;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
@@ -36,7 +36,7 @@ import javax.sql.DataSource;
  */
 public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
-    protected abstract IDataSourceGetter getDataSourceGetter();
+    protected abstract IDsDataSourceManger getDataSourceGetter();
 
     protected abstract IDsTxTemplate getAdvTxTemplate();
 
@@ -492,7 +492,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    public void setDataSourceGetter(IDsDataSourceManger dataSourceGetter) {
         getAdvBaseOpt().setDataSourceGetter(dataSourceGetter);
     }
 
@@ -1557,12 +1557,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
+    public String tbGetSchemaNameForSql(IDsDataSourceManger dataSourceGetter) {
         return getDialectTableNameProcessor().tbGetSchemaNameForSql(dataSourceGetter);
     }
 
     @Override
-    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDsDataSourceManger dataSourceGetter, String tableName) {
         // 代理调用：带默认Schema的完整表名拼接
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(dataSourceGetter, tableName);
     }
@@ -1570,7 +1570,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
+            IDsDataSourceManger dataSourceGetter, String tableName, String schemaName) {
         // 代理调用：带指定Schema的完整表名拼接
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(
                 dataSourceGetter, tableName, schemaName);

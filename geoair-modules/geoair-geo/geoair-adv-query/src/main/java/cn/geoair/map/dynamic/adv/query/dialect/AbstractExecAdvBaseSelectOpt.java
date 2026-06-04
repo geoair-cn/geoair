@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.IDsDataSourceManger;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt {
 
     // 注入数据源获取器
-    protected IDataSourceGetter dataSourceGetter;
+    protected IDsDataSourceManger dataSourceGetter;
 
     // 表名处理器（差异化）
     protected DialectTableNameProcessor dialectTableNameProcessor;
@@ -57,7 +57,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     }
 
     @Override
-    public void setDataSourceGetter(IDataSourceGetter dataSourceGetter) {
+    public void setDataSourceGetter(IDsDataSourceManger dataSourceGetter) {
         this.dataSourceGetter = dataSourceGetter;
     }
 
