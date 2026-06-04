@@ -38,7 +38,7 @@ public class GirAdvQueryRequestExample {
 
     }
 
-    private static GirAdvSqlComposer sqlBuilder = GirAdvSqlComposerProvider.providePostgresql();
+    private static GirAdvSqlComposer sqlBuilder = GirAdvSqlComposerMockProvider.getMockPostgresql();
 
 
 

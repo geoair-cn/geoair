@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerProvider;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerMockProvider;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 
@@ -54,7 +54,7 @@ public class LambdaFilterExample {
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
 
         ArrayList<Object> objects = new ArrayList<>();
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildWhereSql(whereFilter, objects));
         // 预期：name = '张三' AND age >= 18 AND status = 1
     }
 
@@ -143,9 +143,9 @@ public class LambdaFilterExample {
 
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
         ArrayList<Object> objects = new ArrayList<>();
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideOracle().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideMysql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**
@@ -175,9 +175,9 @@ public class LambdaFilterExample {
         System.out.println("  - 状态：未删除");
         System.out.println("  - 排序：按创建时间倒序");
         System.out.println("  - 限制：10条");
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.providePostgresql().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideOracle().buildWhereSql(whereFilter, objects));
-        System.out.println("  - Where条件：" + GirAdvSqlComposerProvider.provideMysql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockOracle().buildWhereSql(whereFilter, objects));
+        System.out.println("  - Where条件：" + GirAdvSqlComposerMockProvider.getMockMysql().buildWhereSql(whereFilter, objects));
     }
 
     /**

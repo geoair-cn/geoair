@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerProvider;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerMockProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +69,7 @@ public class GirAdvQueryRequest1Example {
         System.out.println("字段: " + query.getFieldNames());
         System.out.println("是否分页: " + query.hasPagination());
         System.out.println("偏移量: " + query.getOffset());
-        System.out.println("  - ALL：" + GirAdvSqlComposerProvider.providePostgresql().buildSelectSql(query));
+        System.out.println("  - ALL：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildSelectSql(query));
     }
 
     /**
@@ -92,7 +92,7 @@ public class GirAdvQueryRequest1Example {
                 .build();
 
         System.out.println("Lambda查询1构建成功");
-        System.out.println("  - ALL：" + GirAdvSqlComposerProvider.providePostgresql().buildSelectSql(query1));
+        System.out.println("  - ALL：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildSelectSql(query1));
         // 方式2：带驼峰转下划线
         GirAdvQueryRequest query2 = GirAdvQueryRequest.builder(User.class, true)
                 .table("user")
@@ -128,7 +128,7 @@ public class GirAdvQueryRequest1Example {
 
         System.out.println("复杂条件查询构建成功");
         System.out.println("是否有WHERE条件: " + query.getWhereOption().hasExpression());
-        System.out.println("  - ALL：" + GirAdvSqlComposerProvider.providePostgresql().buildSelectSql(query));
+        System.out.println("  - ALL：" + GirAdvSqlComposerMockProvider.getMockPostgresql().buildSelectSql(query));
     }
 
     /**
