@@ -23,6 +23,12 @@ public class GirSwaggerProperties {
      */
     private boolean enable = false;
 
+
+    /**
+     * 鉴权处理
+     */
+    ApiDocAuth auth = new ApiDocAuth();
+
     /**
      * API版本号，默认为空
      */
@@ -78,4 +84,24 @@ public class GirSwaggerProperties {
      * 是否启用分组序号（true：1-Web；false：Web）
      */
     private boolean enableGroupIndex = true;
+
+
+    @Data
+    public static class ApiDocAuth {
+        /**
+         * 是否启用swagger的鉴权
+         */
+        private boolean enableAuth = false;
+
+        /**
+         * 接口文档的认证用户名
+         */
+        private String username = "admin";
+        /**
+         * 接口文档的认证密码
+         */
+        private String password = "admin";
+    }
+
+
 }

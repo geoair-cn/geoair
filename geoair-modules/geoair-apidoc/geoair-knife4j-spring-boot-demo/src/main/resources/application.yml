@@ -8,6 +8,10 @@ geoair:
   apidoc:
     enable: true
     version: 6666
+    auth:
+      enable-auth: true
+      username:
+      password:
 
 server:
   port: 8080
