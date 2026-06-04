@@ -304,6 +304,9 @@ public class GirAdvSqlComposer {
         }
 
         String trimmed = field.trim();
+        if (trimmed.equals("*")) {
+            return true;
+        }
         // 包含空格或运算符
         if (trimmed.contains(" ")) {
             return true;
