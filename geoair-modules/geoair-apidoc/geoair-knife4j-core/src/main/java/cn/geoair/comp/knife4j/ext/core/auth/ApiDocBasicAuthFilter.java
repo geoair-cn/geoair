@@ -4,9 +4,9 @@ package cn.geoair.comp.knife4j.ext.core.auth;
 import cn.geoair.base.Gir;
 import cn.hutool.core.codec.Base64;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 
