@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.tx.*;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
@@ -1566,23 +1567,23 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
-        return getDialectTableNameProcessor().tbGetSchemaNameForSql(dataSourceGetter);
+    public String tbGetSchemaNameForSql(IDsDataSourceOpt dataSourceOpt) {
+        return getDialectTableNameProcessor().tbGetSchemaNameForSql(dataSourceOpt);
     }
 
     @Override
-    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDsDataSourceOpt dsDataSourceOpt, String tableName) {
         // 代理调用：带默认Schema的完整表名拼接
-        return getDialectTableNameProcessor().tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        return getDialectTableNameProcessor().tbGetTableNameWithSchema(dsDataSourceOpt, tableName);
     }
 
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
+            IDsDataSourceOpt dsDataSourceOpt, String tableName, String schemaName) {
         // 代理调用：带指定Schema的完整表名拼接
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(
-                dataSourceGetter, tableName, schemaName);
+                dsDataSourceOpt, tableName, schemaName);
     }
 
     @Override

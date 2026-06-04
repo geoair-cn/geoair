@@ -1,5 +1,7 @@
 package cn.geoair.comp.dynamic.ds;
 
+import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 
 /**

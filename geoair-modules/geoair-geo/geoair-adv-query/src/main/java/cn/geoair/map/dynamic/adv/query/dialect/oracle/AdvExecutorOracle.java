@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
-import cn.geoair.comp.dynamic.ds.GirDsTransactionManager;
-import cn.geoair.comp.dynamic.ds.RealDataSourceOpt;
+import cn.geoair.comp.dynamic.ds.tx.GirDsTransactionManager;
+import cn.geoair.comp.dynamic.ds.base.RealDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;

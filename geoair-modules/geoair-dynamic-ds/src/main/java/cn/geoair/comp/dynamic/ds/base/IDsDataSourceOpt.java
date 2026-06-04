@@ -1,4 +1,4 @@
-package cn.geoair.comp.dynamic.ds;
+package cn.geoair.comp.dynamic.ds.base;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 

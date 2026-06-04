@@ -1,9 +1,12 @@
-package cn.geoair.comp.dynamic.ds;
+package cn.geoair.comp.dynamic.ds.tx;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.tx.*;
+import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
+import cn.geoair.comp.dynamic.ds.base.RealConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
 import javax.sql.DataSource;

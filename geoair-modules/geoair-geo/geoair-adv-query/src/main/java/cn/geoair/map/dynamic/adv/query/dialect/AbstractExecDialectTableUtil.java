@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -18,20 +18,20 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     // ========== 通用逻辑：子类无需重写 ==========
     @Override
-    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDsDataSourceOpt dsDataSourceOpt, String tableName) {
         return tbGetTableNameWithSchema(
-                dataSourceGetter, tableName, dataSourceGetter.getSchemaName());
+                dsDataSourceOpt, tableName, dsDataSourceOpt.getSchemaName());
     }
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
+            IDsDataSourceOpt dsDataSourceOpt, String tableName, String schemaName) {
         // Step1：确定最终Schema/库名（表名提取 > 传入库名 > 默认值）
         String extractedSchema = tbExtractSchemaName(tableName);
         if (StrUtil.isNotEmpty(extractedSchema)) {
             schemaName = extractedSchema;
         } else if (ObjectUtil.isEmpty(schemaName)) {
-            schemaName = tbGetSchemaNameForSql(dataSourceGetter);
+            schemaName = tbGetSchemaNameForSql(dsDataSourceOpt);
         }
 
         // Step2：处理Schema/库名引号
@@ -179,9 +179,9 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
      * 获取数据源对应的Schema/库名（适配PG/MySQL语义）
      */
     @Override
-    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
-        return ObjectUtil.isEmpty(dataSourceGetter.getSchemaName())
+    public String tbGetSchemaNameForSql(IDsDataSourceOpt dataSourceOpt) {
+        return ObjectUtil.isEmpty(dataSourceOpt.getSchemaName())
                 ? getDefaultSchemaName()
-                : dataSourceGetter.getSchemaName();
+                : dataSourceOpt.getSchemaName();
     }
 }

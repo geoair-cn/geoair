@@ -1,6 +1,6 @@
 package cn.geoair.comp.dynamic.ds.tx;
 
-import cn.geoair.comp.dynamic.ds.IDsConnectionOpt;
+import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
 import java.util.function.Supplier;

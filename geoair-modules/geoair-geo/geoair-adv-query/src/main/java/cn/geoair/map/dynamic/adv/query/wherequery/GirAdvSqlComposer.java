@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
@@ -21,11 +21,11 @@ import java.util.*;
 public class GirAdvSqlComposer {
 
     private final DialectTableNameProcessor dialectProcessor;
-    private final IDataSourceGetter dataSourceGetter;
+    private final IDsDataSourceOpt dataSourceOpt;
 
-    public GirAdvSqlComposer(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public GirAdvSqlComposer(DialectTableNameProcessor dialectProcessor, IDsDataSourceOpt dataSourceOpt) {
         this.dialectProcessor = dialectProcessor;
-        this.dataSourceGetter = dataSourceGetter;
+        this.dataSourceOpt = dataSourceOpt;
     }
 
     /**
@@ -85,7 +85,7 @@ public class GirAdvSqlComposer {
                 sql.append(aliasTable);
             } else {
                 String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                        dataSourceGetter,
+                        dataSourceOpt,
                         param.getTableOrSqlView()
                 );
                 sql.append(tableName);
@@ -128,7 +128,7 @@ public class GirAdvSqlComposer {
             sql.append(aliasTable);
         } else {
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceGetter,
+                    dataSourceOpt,
                     param.getTableOrSqlView()
             );
             sql.append(tableName);
@@ -202,7 +202,7 @@ public class GirAdvSqlComposer {
             sql.append(aliasTable);
         } else {
             String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceGetter,
+                    dataSourceOpt,
                     param.getTableOrSqlView()
             );
             sql.append(tableName);

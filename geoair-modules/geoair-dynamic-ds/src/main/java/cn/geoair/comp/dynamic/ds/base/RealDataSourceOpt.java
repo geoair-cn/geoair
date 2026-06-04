@@ -1,8 +1,9 @@
-package cn.geoair.comp.dynamic.ds;
+package cn.geoair.comp.dynamic.ds.base;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;

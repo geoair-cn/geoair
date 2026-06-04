@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -12,9 +13,9 @@ import java.util.function.Supplier;
  * @author ：zhangjun
  * @date ： 模拟的DataSourceGetter,用于调试使用
  */
-public class MockDataSourceGetter implements IDataSourceGetter {
+public class MockDataSourceGetter implements IDsDataSourceOpt {
 
-    public static IDataSourceGetter getInstance() {
+    public static IDsDataSourceOpt getInstance() {
         return new MockDataSourceGetter();
     }
 
