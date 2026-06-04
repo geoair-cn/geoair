@@ -2,10 +2,12 @@ package cn.geoair.comp.dynamic.ds.utils;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.sql.DataSource;
 
 @Data
+@Accessors(chain = true)
 public class DataSourceDruidFastCreate {
 
     private String url;
