@@ -4,12 +4,12 @@ import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilClass;
 
 public class Json4Gir {
 
-    private static GiLogger logger = GirLogger.getLoger(Json4Gir.class);
+    private static GiLogger logger = GirLoggerFactory.getLogger(Json4Gir.class);
 
     public enum JsonUtilSupport {
         FASTJSON,

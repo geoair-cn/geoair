@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.shp;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class ShpGeoFileWriter implements GeoFileWriter {
 
-    private static final GiLogger log = GirLogger.getLoger(ShpGeoFileWriter.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(ShpGeoFileWriter.class);
 
     private ShpLinkInfo linkInfo;
     private WriteConfig writeConfig;

@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -52,7 +52,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     protected IDataSourceGetter dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseUpdateOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 200;
 
     @Override

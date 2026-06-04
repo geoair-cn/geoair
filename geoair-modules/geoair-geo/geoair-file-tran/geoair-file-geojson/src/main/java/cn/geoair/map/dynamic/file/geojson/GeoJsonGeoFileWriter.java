@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.file.geojson;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
@@ -27,7 +27,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class GeoJsonGeoFileWriter implements GeoFileWriter {
 
-    private static GiLogger log = GirLogger.getLoger(GeoJsonGeoFileWriter.class);
+    private static GiLogger log = GirLoggerFactory.getLogger(GeoJsonGeoFileWriter.class);
 
     private GeoJsonLinkInfo linkInfo;
 

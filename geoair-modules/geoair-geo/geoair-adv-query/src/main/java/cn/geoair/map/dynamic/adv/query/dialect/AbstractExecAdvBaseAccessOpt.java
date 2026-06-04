@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -29,9 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.restoreAutoCommit;
-import static cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils.rollbackConnection;
-
 /**
  * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑
  */
@@ -39,7 +36,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     protected IDataSourceGetter dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseAccessOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseAccessOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;

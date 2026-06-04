@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
@@ -37,7 +37,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     protected IAdvBaseOpt baseOpt;
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
     public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {

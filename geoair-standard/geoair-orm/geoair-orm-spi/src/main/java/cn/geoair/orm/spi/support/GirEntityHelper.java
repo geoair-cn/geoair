@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description： TODO
  */
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.orm.spi.GirEntityResolve;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
 import cn.geoair.orm.spi.entity.GirEntityTable;
@@ -24,7 +24,7 @@ import cn.geoair.orm.spi.jpa.GirJpaGirEntityResolve;
  */
 public class GirEntityHelper {
 
-	private static GiLogger logger = GirLogger.getLoger(GirEntityHelper.class);
+	private static GiLogger logger = GirLoggerFactory.getLogger(GirEntityHelper.class);
 
 	/**
 	 * 实体类 => 表对象

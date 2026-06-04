@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds.readwrite.spring;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
 @ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class GirDsRdAutoConfiguration {
-    private static final GiLogger log = GirLogger.getLoger(GirDsRdAutoConfiguration.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirDsRdAutoConfiguration.class);
 
     public GirDsRdAutoConfiguration() {
         log.info("GirDsRdAutoConfiguration initialized");

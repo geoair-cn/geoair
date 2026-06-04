@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple.executor;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /** 代理的线程池 */
 public abstract class GirExecutorService implements ScheduledExecutorService {
 
-    private static final GiLogger log = GirLogger.getLoger(GirExecutorService.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirExecutorService.class);
 
     private final ExecutorService delegate;
 

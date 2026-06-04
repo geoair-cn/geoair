@@ -1,7 +1,7 @@
 package cn.geoair.base.concurrent;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  * 代理的定时任务线程池
  */
 public class GirScheduledPxyExecutorService extends GirPxyExecutorService implements ScheduledExecutorService {
-    private static final GiLogger log = GirLogger.getLoger(GirScheduledPxyExecutorService.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirScheduledPxyExecutorService.class);
 
 
     public GirScheduledPxyExecutorService(ExecutorService delegate, List<GirTaskInterceptor> interceptors) {

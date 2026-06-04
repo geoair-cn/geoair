@@ -2,7 +2,7 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
@@ -19,7 +19,7 @@ import javax.sql.DataSource;
  */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     protected static AdvDynamicDataSourceStorage dataSourceManager;
     @Setter

@@ -17,7 +17,7 @@
 //
 //
 //
-// public static GiLogger logger = GirLogger.getLoger(GiWebPermissionUser.class);
+// public static GiLogger logger = GirLoggerFactory.getLogger(GiWebPermissionUser.class);
 //
 //
 // /**

@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class OracleAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
 
-    protected static final GiLogger log = GirLogger.getLoger();
+    protected static final GiLogger log = GirLoggerFactory.getLogger();
 
     // Oracle专属的依赖类
     protected IAdvGeoPreOpt advGeoPreOpt;
