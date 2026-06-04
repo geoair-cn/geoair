@@ -3,8 +3,6 @@ package cn.geoair.comp.dynamic.ds.tx;
 import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
-import java.util.function.Supplier;
-
 /**
  * 事务静态调用入口
  */
@@ -13,11 +11,11 @@ public final class GirDsJdbcTxKit {
 
     IDsConnectionOpt iDsConnectionManager;
 
-    private final GirDefaultIDsTxTemplate TEMPLATE;
+    private final GirDsTransactionTemplate TEMPLATE;
 
     public GirDsJdbcTxKit(IDsConnectionOpt iDsConnectionManager) {
         this.iDsConnectionManager = iDsConnectionManager;
-        this.TEMPLATE = new GirDefaultIDsTxTemplate(iDsConnectionManager);
+        this.TEMPLATE = new GirDsTransactionTemplate(iDsConnectionManager);
     }
 
     /**
@@ -30,28 +28,28 @@ public final class GirDsJdbcTxKit {
     /**
      * 执行事务（无返回值）
      */
-    public void tx(Runnable action) {
+    public void tx(TxActionNp action) {
         TEMPLATE.tx(action);
     }
 
     /**
      * 执行事务（无返回值，指定隔离级别）
      */
-    public void tx(IsolationLevel level, Runnable action) {
+    public void tx(IsolationLevel level, TxActionNp action) {
         TEMPLATE.tx(level, action);
     }
 
     /**
      * 执行事务（带返回值）
      */
-    public <T> T txReturn(Supplier<T> supplier) {
+    public <T> T txReturn(TxFuncNp<T> supplier) {
         return TEMPLATE.txReturn(supplier);
     }
 
     /**
      * 执行事务（带返回值，指定隔离级别）
      */
-    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
+    public <T> T txReturn(IsolationLevel level, TxFuncNp<T> supplier) {
         return TEMPLATE.txReturn(level, supplier);
     }
 

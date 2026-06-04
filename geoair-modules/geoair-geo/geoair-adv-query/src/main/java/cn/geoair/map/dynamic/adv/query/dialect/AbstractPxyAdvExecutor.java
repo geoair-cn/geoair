@@ -189,22 +189,22 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
-        return this.getDataSourceGetter().txReturn(level, supplier);
+    public <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp) {
+        return this.getDataSourceGetter().txReturn(level, txFuncNp);
     }
 
     @Override
-    public <T> T txReturn(Supplier<T> supplier) {
-        return this.getDataSourceGetter().txReturn(supplier);
+    public <T> T txReturn(TxFuncNp<T> txFuncNp) {
+        return this.getDataSourceGetter().txReturn(txFuncNp);
     }
 
     @Override
-    public void tx(IsolationLevel level, Runnable action) {
+    public void tx(IsolationLevel level, TxActionNp action) {
         this.getDataSourceGetter().tx(level, action);
     }
 
     @Override
-    public void tx(Runnable action) {
+    public void tx(TxActionNp action) {
         this.getDataSourceGetter().tx(action);
     }
 

@@ -7,23 +7,22 @@ import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
 import java.sql.Connection;
 import java.sql.Savepoint;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 /**
  * 事务操作实现
  */
-public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
+public class GirDsTransactionTemplate implements IDsTxTemplate {
 
     IDsConnectionOpt connectionOpt;
 
     IDsTxHolder jdbcTxHolder;
 
-    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionOpt) {
+    public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt) {
         this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionOpt, IDsTxHolder jdbcTxHolder) {
+    public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt, IDsTxHolder jdbcTxHolder) {
         this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = jdbcTxHolder;
     }
@@ -39,23 +38,23 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
     }
 
     @Override
-    public void tx(Runnable action) {
+    public void tx(TxActionNp action) {
         builder().run(action);
     }
 
     @Override
-    public void tx(IsolationLevel level, Runnable action) {
+    public void tx(IsolationLevel level, TxActionNp action) {
         builder().isolation(level).run(action);
     }
 
     @Override
-    public <T> T txReturn(Supplier<T> supplier) {
-        return builder().call(supplier);
+    public <T> T txReturn(TxFuncNp<T> txFuncNp) {
+        return builder().call(txFuncNp);
     }
 
     @Override
-    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
-        return builder().isolation(level).call(supplier);
+    public <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp) {
+        return builder().isolation(level).call(txFuncNp);
     }
 
     @Override
@@ -208,11 +207,11 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private <T, P> T exec(Object execObj, P param) {
-        if (execObj instanceof Runnable) {
-            ((Runnable) execObj).run();
+        if (execObj instanceof TxActionNp) {
+            ((TxActionNp) execObj).run();
             return null;
-        } else if (execObj instanceof Supplier) {
-            return (T) ((Supplier<?>) execObj).get();
+        } else if (execObj instanceof TxFuncNp) {
+            return (T) ((TxFuncNp<?>) execObj).apply();
         } else if (execObj instanceof TxAction) {
             ((TxAction<P>) execObj).run(param);
             return null;

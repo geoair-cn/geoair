@@ -6,14 +6,14 @@ import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
 import java.util.function.Supplier;
 
 public class GirDsJdbcTxBuilder {
-    private final GirDefaultIDsTxTemplate template;
+    private final GirDsTransactionTemplate template;
     private Propagation propagation = Propagation.REQUIRED;
     private IsolationLevel isolation = IsolationLevel.REPEATABLE_READ;
     private boolean readOnly = false;
     private Class<? extends Throwable>[] rollFor = new Class[]{RuntimeException.class};
     private Class<? extends Throwable>[] noRollFor = new Class[0];
 
-    public GirDsJdbcTxBuilder(GirDefaultIDsTxTemplate template) {
+    public GirDsJdbcTxBuilder(GirDsTransactionTemplate template) {
         this.template = template;
     }
 
@@ -45,7 +45,7 @@ public class GirDsJdbcTxBuilder {
     }
 
     // 无参无返回
-    public void run(Runnable action) {
+    public void run(TxActionNp action) {
         template.doTx(propagation, isolation, readOnly, rollFor, noRollFor, action, null);
     }
 
@@ -55,7 +55,7 @@ public class GirDsJdbcTxBuilder {
     }
 
     // 无参有返回
-    public <T> T call(Supplier<T> supplier) {
+    public <T> T call(TxFuncNp<T> supplier) {
         return template.doTx(propagation, isolation, readOnly, rollFor, noRollFor, supplier, null);
     }
 

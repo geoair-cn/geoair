@@ -5,7 +5,6 @@ import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 /**
  * JDBC事务操作标准接口
@@ -20,13 +19,13 @@ public interface IDsTxTemplate {
 
     void connectionClose(Connection connection);
 
-    void tx(Runnable action);
+    void tx(TxActionNp action);
 
-    void tx(IsolationLevel level, Runnable action);
+    void tx(IsolationLevel level, TxActionNp action);
 
-    <T> T txReturn(Supplier<T> supplier);
+    <T> T txReturn(TxFuncNp<T> txFuncNp);
 
-    <T> T txReturn(IsolationLevel level, Supplier<T> supplier);
+    <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp);
 
 
     <P> void tx(TxAction<P> action, P param);

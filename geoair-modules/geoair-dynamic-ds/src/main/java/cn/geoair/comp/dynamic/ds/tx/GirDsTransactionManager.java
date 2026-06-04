@@ -33,13 +33,13 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger) {
         this.connectionManager = connectionManager;
         this.dataSourceManger = dataSourceManger;
-        this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
+        this.txTemplate = new GirDsTransactionTemplate(connectionManager);
     }
 
     public GirDsTransactionManager(IDsDataSourceOpt dataSourceManger) {
         this.connectionManager = new RealConnectionOpt(dataSourceManger);
         this.dataSourceManger = dataSourceManger;
-        this.txTemplate = new GirDefaultIDsTxTemplate(connectionManager);
+        this.txTemplate = new GirDsTransactionTemplate(connectionManager);
     }
 
     public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger, IDsTxTemplate txTemplate) {
@@ -119,23 +119,23 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     }
 
     @Override
-    public void tx(Runnable action) {
+    public void tx(TxActionNp action) {
         txTemplate.tx(action);
     }
 
     @Override
-    public void tx(IsolationLevel level, Runnable action) {
+    public void tx(IsolationLevel level, TxActionNp action) {
         txTemplate.tx(level, action);
     }
 
     @Override
-    public <T> T txReturn(Supplier<T> supplier) {
-        return txTemplate.txReturn(supplier);
+    public <T> T txReturn(TxFuncNp<T> txFuncNp) {
+        return txTemplate.txReturn(txFuncNp);
     }
 
     @Override
-    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
-        return txTemplate.txReturn(level, supplier);
+    public <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp) {
+        return txTemplate.txReturn(level, txFuncNp);
     }
 
     @Override
@@ -174,7 +174,8 @@ public class GirDsTransactionManager implements IDataSourceGetter {
 
     @Override
     public void connectionClose(Connection connection) {
-        connectionManager.connectionClose(connection);
+         // 这里调用的是事务的关闭连接
+        txTemplate.connectionClose(connection);
     }
 
     @Override
