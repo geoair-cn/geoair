@@ -82,6 +82,7 @@ public class DataSourceDruidFastCreate {
             dataSource.setRemoveAbandonedTimeout(removeAbandonedTimeout);
         }
         if (connectionErrorRetryAttempts != null) {
+            dataSource.setBreakAfterAcquireFailure(true);
             dataSource.setConnectionErrorRetryAttempts(connectionErrorRetryAttempts);
         }
         if (validationQuery != null) {

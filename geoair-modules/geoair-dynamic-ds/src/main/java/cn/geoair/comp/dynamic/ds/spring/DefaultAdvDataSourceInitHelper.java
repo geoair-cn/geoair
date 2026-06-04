@@ -4,7 +4,6 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
-import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -48,7 +47,6 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
                 fastCreate.setQueryTimeout(15); // 默认15秒
             }
 
-            // 其他 Druid 特定配置（如果 DataSourceApo 中有的话）
             if (GutilObject.isNotEmpty(dataSourceApo.getRemoveAbandonedTimeout())) {
                 fastCreate.setRemoveAbandonedTimeout(dataSourceApo.getRemoveAbandonedTimeout());
             }
@@ -57,15 +55,8 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
                 fastCreate.setConnectionErrorRetryAttempts(dataSourceApo.getConnectionErrorRetryAttempts());
             }
 
-            // 创建数据源
-            DruidDataSource dataSource = (DruidDataSource) fastCreate.toDataSource();
-            dataSource.setBreakAfterAcquireFailure(true);
-            dataSource.setValidationQuery(DataSourceApo.getValidationQuery(dataSourceApo.getDbType()));
 
-            log.info("数据源创建成功 - url: {}, username: {}, maxActive: {}",
-                    dataSourceApo.getJdbcUrl(), dataSourceApo.getUsername(), dataSource.getMaxActive());
-
-            return dataSource;
+            return fastCreate.toDataSource();
 
         } catch (Exception e) {
             log.error("加载动态连接池错误", e);
