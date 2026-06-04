@@ -10,23 +10,24 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.PgDialectTableNameUtil;
 /**
  * @author ：张俊
  * @date ：Created in 2026/4/17 18:20
- * @description： 快速获取创建器，基于不同的数据库类型
+ * @description： 快速获取创建器，但是这只是一个简单地测试用的示例
+ * 基于不同的数据库类型
  */
-public class GirAdvSqlComposerProvider {
+public class GirAdvSqlComposerMockProvider {
 
-    public static GirAdvSqlComposer provideMysql() {
+    public static GirAdvSqlComposer getMockMysql() {
         DialectTableNameProcessor masql = MysqlDialectTableNameUtil.getInstance();
         IDsDataSourceOpt dataSourceOpt = MockDataSourceGetter.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceOpt);
     }
 
-    public static GirAdvSqlComposer providePostgresql() {
+    public static GirAdvSqlComposer getMockPostgresql() {
         DialectTableNameProcessor masql = PgDialectTableNameUtil.getInstance();
         IDsDataSourceOpt dataSourceOpt = MockDataSourceGetter.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceOpt);
     }
 
-    public static GirAdvSqlComposer provideOracle() {
+    public static GirAdvSqlComposer getMockOracle() {
         DialectTableNameProcessor masql = OracleDialectTableNameUtil.getInstance();
         IDsDataSourceOpt dataSourceOpt = MockDataSourceGetter.getInstance();
         return new GirAdvSqlComposer(masql, dataSourceOpt);
