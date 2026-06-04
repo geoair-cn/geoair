@@ -28,57 +28,57 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
     }
 
     @Override
-    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
-        this.jdbcTxHolder = jdbcTxHolder;
+    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+        this.jdbcTxHolder = transactionConnectionHolder;
     }
 
     @Override
-    public IDsTransactionConnectionHolder getTxHolder() {
+    public IDsTransactionConnectionHolder getTransactionConnectionHolder() {
         return this.jdbcTxHolder;
     }
 
     @Override
     public void tx(TxActionNp action) {
-        builder().run(action);
+        txBuilder().run(action);
     }
 
     @Override
     public void tx(IsolationLevel level, TxActionNp action) {
-        builder().isolation(level).run(action);
+        txBuilder().isolation(level).run(action);
     }
 
     @Override
     public <T> T txReturn(TxFuncNp<T> txFuncNp) {
-        return builder().call(txFuncNp);
+        return txBuilder().call(txFuncNp);
     }
 
     @Override
     public <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp) {
-        return builder().isolation(level).call(txFuncNp);
+        return txBuilder().isolation(level).call(txFuncNp);
     }
 
     @Override
     public <P> void tx(TxAction<P> action, P param) {
-        builder().run(action, param);
+        txBuilder().run(action, param);
     }
 
     @Override
     public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
-        builder().isolation(level).run(action, param);
+        txBuilder().isolation(level).run(action, param);
     }
 
     @Override
     public <P, R> R txReturn(TxFunc<P, R> func, P param) {
-        return builder().call(func, param);
+        return txBuilder().call(func, param);
     }
 
     @Override
     public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
-        return builder().isolation(level).call(func, param);
+        return txBuilder().isolation(level).call(func, param);
     }
 
     @Override
-    public GirDsJdbcTxBuilder builder() {
+    public GirDsJdbcTxBuilder txBuilder() {
         return new GirDsJdbcTxBuilder(this);
     }
 
