@@ -11,29 +11,29 @@ import java.sql.SQLException;
 /**
  * 事务操作实现
  */
-public class GirDsTransactionTemplate implements IDsTxTemplate {
+public class GirDsTransactionTemplate implements IDsTransactionTemplate {
 
     IDsConnectionOpt connectionOpt;
 
-    IDsTxHolder jdbcTxHolder;
+    IDsTransactionConnectionHolder jdbcTxHolder;
 
     public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt) {
         this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt, IDsTxHolder jdbcTxHolder) {
+    public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt, IDsTransactionConnectionHolder jdbcTxHolder) {
         this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = jdbcTxHolder;
     }
 
     @Override
-    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
+    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
         this.jdbcTxHolder = jdbcTxHolder;
     }
 
     @Override
-    public IDsTxHolder getTxHolder() {
+    public IDsTransactionConnectionHolder getTxHolder() {
         return this.jdbcTxHolder;
     }
 

@@ -6,7 +6,7 @@ import java.sql.Connection;
  * 线程事务连接持有器接口
  * 用于管理当前线程的事务连接，支持连接挂起和恢复
  */
-public interface IDsTxHolder {
+public interface IDsTransactionConnectionHolder {
 
     /**
      * 绑定连接到当前线程

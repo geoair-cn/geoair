@@ -2,7 +2,7 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
-import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
+import cn.geoair.comp.dynamic.ds.tx.IDsTransactionTemplate;
 
 /**
  * 数据源获取器接口
@@ -12,6 +12,6 @@ import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDataSourceGetter extends IDsDataSourceOpt, IDsConnectionOpt, IDsTxTemplate {
+public interface IDataSourceGetter extends IDsDataSourceOpt, IDsConnectionOpt, IDsTransactionTemplate {
 
 }

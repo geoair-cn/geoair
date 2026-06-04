@@ -8,7 +8,7 @@ import java.util.Deque;
 /**
  * 线程事务连接持有器实现：Deque结构用于REQUIRES_NEW挂起上层连接
  */
-public class GirDsDefaultJdbcTxHolder implements IDsTxHolder {
+public class GirDsDefaultJdbcTxHolder implements IDsTransactionConnectionHolder {
 
     public static GirDsDefaultJdbcTxHolder getInstance() {
         return new GirDsDefaultJdbcTxHolder();

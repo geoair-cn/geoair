@@ -9,11 +9,11 @@ import java.sql.SQLException;
 /**
  * JDBC事务操作标准接口
  */
-public interface IDsTxTemplate {
+public interface IDsTransactionTemplate {
 
-    void setTxHolder(IDsTxHolder jdbcTxHolder);
+    void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder);
 
-    IDsTxHolder getTxHolder();
+    IDsTransactionConnectionHolder getTxHolder();
 
     Connection getCurrentConnection() throws SQLException;
 

@@ -209,12 +209,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
+    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
         this.getDataSourceGetter().setTxHolder(jdbcTxHolder);
     }
 
     @Override
-    public IDsTxHolder getTxHolder() {
+    public IDsTransactionConnectionHolder getTxHolder() {
         return this.getDataSourceGetter().getTxHolder();
     }
 

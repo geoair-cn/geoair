@@ -26,141 +26,141 @@ public class GirDsTransactionManager implements IDataSourceGetter {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
-    IDsConnectionOpt connectionManager;
-    IDsDataSourceOpt dataSourceManger;
-    IDsTxTemplate txTemplate;
+    IDsConnectionOpt connectionOpt;
+    IDsDataSourceOpt dsDataSourceOpt;
+    IDsTransactionTemplate dsTransactionTemplate;
 
-    public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger) {
-        this.connectionManager = connectionManager;
-        this.dataSourceManger = dataSourceManger;
-        this.txTemplate = new GirDsTransactionTemplate(connectionManager);
+    public GirDsTransactionManager(IDsConnectionOpt connectionOpt, IDsDataSourceOpt dsDataSourceOpt) {
+        this.connectionOpt = connectionOpt;
+        this.dsDataSourceOpt = dsDataSourceOpt;
+        this.dsTransactionTemplate = new GirDsTransactionTemplate(connectionOpt);
     }
 
-    public GirDsTransactionManager(IDsDataSourceOpt dataSourceManger) {
-        this.connectionManager = new RealConnectionOpt(dataSourceManger);
-        this.dataSourceManger = dataSourceManger;
-        this.txTemplate = new GirDsTransactionTemplate(connectionManager);
+    public GirDsTransactionManager(IDsDataSourceOpt dsDataSourceOpt) {
+        this.connectionOpt = new RealConnectionOpt(dsDataSourceOpt);
+        this.dsDataSourceOpt = dsDataSourceOpt;
+        this.dsTransactionTemplate = new GirDsTransactionTemplate(connectionOpt);
     }
 
-    public GirDsTransactionManager(IDsConnectionOpt connectionManager, IDsDataSourceOpt dataSourceManger, IDsTxTemplate txTemplate) {
-        this.connectionManager = connectionManager;
-        this.dataSourceManger = dataSourceManger;
-        this.txTemplate = txTemplate;
+    public GirDsTransactionManager(IDsConnectionOpt connectionOpt, IDsDataSourceOpt dsDataSourceOpt, IDsTransactionTemplate dsTransactionTemplate) {
+        this.connectionOpt = connectionOpt;
+        this.dsDataSourceOpt = dsDataSourceOpt;
+        this.dsTransactionTemplate = dsTransactionTemplate;
     }
 
     @Override
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {
-        dataSourceManger.initByDataSourceApo(dataSourceApo);
+        dsDataSourceOpt.initByDataSourceApo(dataSourceApo);
     }
 
     @Override
     public void initByDataSource(DataSource dataSource) {
-        dataSourceManger.initByDataSource(dataSource);
+        dsDataSourceOpt.initByDataSource(dataSource);
     }
 
     @Override
     public void initByDataSource(DataSource dataSource, String dataSourceName) {
-        dataSourceManger.initByDataSource(dataSource, dataSourceName);
+        dsDataSourceOpt.initByDataSource(dataSource, dataSourceName);
     }
 
     @Override
     public void initByConnection(Connection connection) {
-        dataSourceManger.initByConnection(connection);
+        dsDataSourceOpt.initByConnection(connection);
     }
 
     @Override
     public String getSchemaName() {
-        return dataSourceManger.getSchemaName();
+        return dsDataSourceOpt.getSchemaName();
     }
 
     @Override
     public String getDatabaseName() {
-        return dataSourceManger.getDatabaseName();
+        return dsDataSourceOpt.getDatabaseName();
     }
 
     @Override
     public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
-        dataSourceManger.setSchemaNameGetterFunction(schemaNameGetterFunction);
+        dsDataSourceOpt.setSchemaNameGetterFunction(schemaNameGetterFunction);
     }
 
     @Override
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
-        dataSourceManger.setDatabaseNameGetterFunction(databaseNameGetterFunction);
+        dsDataSourceOpt.setDatabaseNameGetterFunction(databaseNameGetterFunction);
     }
 
     @Override
     public String getDataSourceId() {
-        return dataSourceManger.getDataSourceId();
+        return dsDataSourceOpt.getDataSourceId();
     }
 
     @Override
     public DataSourceApo getDataSourceApo() {
-        return dataSourceManger.getDataSourceApo();
+        return dsDataSourceOpt.getDataSourceApo();
     }
 
     @Override
     public DataSource getDataSource() {
-        return dataSourceManger.getDataSource();
+        return dsDataSourceOpt.getDataSource();
     }
 
     @Override
-    public void setTxHolder(IDsTxHolder jdbcTxHolder) {
-        txTemplate.setTxHolder(jdbcTxHolder);
+    public void setTxHolder(IDsTransactionConnectionHolder jdbcTxHolder) {
+        dsTransactionTemplate.setTxHolder(jdbcTxHolder);
     }
 
     @Override
-    public IDsTxHolder getTxHolder() {
-        return txTemplate.getTxHolder();
+    public IDsTransactionConnectionHolder getTxHolder() {
+        return dsTransactionTemplate.getTxHolder();
     }
 
     @Override
     public Connection getCurrentConnection() throws SQLException {
-        return txTemplate.getCurrentConnection();
+        return dsTransactionTemplate.getCurrentConnection();
     }
 
     @Override
     public void tx(TxActionNp action) {
-        txTemplate.tx(action);
+        dsTransactionTemplate.tx(action);
     }
 
     @Override
     public void tx(IsolationLevel level, TxActionNp action) {
-        txTemplate.tx(level, action);
+        dsTransactionTemplate.tx(level, action);
     }
 
     @Override
     public <T> T txReturn(TxFuncNp<T> txFuncNp) {
-        return txTemplate.txReturn(txFuncNp);
+        return dsTransactionTemplate.txReturn(txFuncNp);
     }
 
     @Override
     public <T> T txReturn(IsolationLevel level, TxFuncNp<T> txFuncNp) {
-        return txTemplate.txReturn(level, txFuncNp);
+        return dsTransactionTemplate.txReturn(level, txFuncNp);
     }
 
     @Override
     public <P> void tx(TxAction<P> action, P param) {
-        txTemplate.tx(action, param);
+        dsTransactionTemplate.tx(action, param);
     }
 
     @Override
     public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
-        txTemplate.tx(action, param);
+        dsTransactionTemplate.tx(action, param);
     }
 
     @Override
     public <P, R> R txReturn(TxFunc<P, R> func, P param) {
-        return txTemplate.txReturn(func, param);
+        return dsTransactionTemplate.txReturn(func, param);
     }
 
     @Override
     public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
-        return txTemplate.txReturn(level, func, param);
+        return dsTransactionTemplate.txReturn(level, func, param);
     }
 
     @Override
     public GirDsJdbcTxBuilder builder() {
-        return txTemplate.builder();
+        return dsTransactionTemplate.builder();
     }
 
     @Override
@@ -175,11 +175,11 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     @Override
     public void connectionClose(Connection connection) {
          // 这里调用的是事务的关闭连接
-        txTemplate.connectionClose(connection);
+        dsTransactionTemplate.connectionClose(connection);
     }
 
     @Override
     public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
-        connectionManager.closeResources(rs, stmt, conn);
+        connectionOpt.closeResources(rs, stmt, conn);
     }
 }
