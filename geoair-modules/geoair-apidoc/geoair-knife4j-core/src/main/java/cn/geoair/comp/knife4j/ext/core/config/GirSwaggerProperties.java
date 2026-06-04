@@ -99,7 +99,7 @@ public class GirSwaggerProperties {
         /**
          * 接口文档的认证密码
          */
-        private String password = "admin";
+        private String password = "123456";
     }
 
 
