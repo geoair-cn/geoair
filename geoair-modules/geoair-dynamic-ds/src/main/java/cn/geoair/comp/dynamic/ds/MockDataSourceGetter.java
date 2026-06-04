@@ -2,22 +2,17 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
-import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
-import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.geoair.comp.dynamic.ds.tx.IDsTxHolder;
+import cn.geoair.comp.dynamic.ds.tx.GirDsJdbcTxBuilder;
+import cn.geoair.comp.dynamic.ds.tx.TxAction;
+import cn.geoair.comp.dynamic.ds.tx.TxFunc;
+import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -101,5 +96,55 @@ public class MockDataSourceGetter implements IDataSourceGetter {
     @Override
     public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
 
+    }
+
+    @Override
+    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
+
+    }
+
+    @Override
+    public void tx(Runnable action) {
+
+    }
+
+    @Override
+    public void tx(IsolationLevel level, Runnable action) {
+
+    }
+
+    @Override
+    public <T> T txReturn(Supplier<T> supplier) {
+        return null;
+    }
+
+    @Override
+    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
+        return null;
+    }
+
+    @Override
+    public <P> void tx(TxAction<P> action, P param) {
+
+    }
+
+    @Override
+    public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
+
+    }
+
+    @Override
+    public <P, R> R txReturn(TxFunc<P, R> func, P param) {
+        return null;
+    }
+
+    @Override
+    public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
+        return null;
+    }
+
+    @Override
+    public GirDsJdbcTxBuilder builder() {
+        return null;
     }
 }

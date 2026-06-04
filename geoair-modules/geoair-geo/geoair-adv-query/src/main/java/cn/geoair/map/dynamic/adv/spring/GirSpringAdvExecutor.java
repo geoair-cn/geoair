@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.spring;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
@@ -23,6 +24,12 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
     protected IDataSourceGetter getDataSourceGetter() {
         return iAdvExecutorPxy;
     }
+
+    @Override
+    protected IDsTxTemplate getAdvTxTemplate() {
+        return iAdvExecutorPxy;
+    }
+
 
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {

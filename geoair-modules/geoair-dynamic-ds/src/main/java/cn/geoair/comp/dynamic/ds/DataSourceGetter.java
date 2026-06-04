@@ -1,15 +1,18 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
+import cn.geoair.comp.dynamic.ds.tx.*;
+import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +28,7 @@ import javax.sql.DataSource;
  */
 public class DataSourceGetter implements IDataSourceGetter {
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     static ConcurrentHashMap<String, String> dataBaseNameMap = new ConcurrentHashMap<>();
     static ConcurrentHashMap<String, String> schemaNameMap = new ConcurrentHashMap<>();
@@ -43,6 +46,10 @@ public class DataSourceGetter implements IDataSourceGetter {
     Supplier<String> databaseNameGetterFunction;
 
     protected String dataSourceId = null;
+
+
+    GirDefaultIDsTxTemplate jdbcTxTemplate = new GirDefaultIDsTxTemplate(this);
+
 
     @Override
     public String getSchemaName() {
@@ -67,7 +74,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (schemaNameGetterFunction != null) {
             schemaName = schemaNameGetterFunction.get();
             if (schemaName == null) {
-                schemaName ="";
+                schemaName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 schemaNameMap.put(dataSourceName, schemaName);
@@ -87,7 +94,7 @@ public class DataSourceGetter implements IDataSourceGetter {
         if (databaseNameGetterFunction != null) {
             databaseName = databaseNameGetterFunction.get();
             if (databaseName == null) {
-                databaseName ="";
+                databaseName = "";
             }
             if (GutilObject.isNotEmpty(dataSourceName)) {
                 dataBaseNameMap.put(dataSourceName, databaseName);
@@ -180,11 +187,63 @@ public class DataSourceGetter implements IDataSourceGetter {
         return apo;
     }
 
-    /** 关闭数据库资源 */
+    /**
+     * 关闭数据库资源
+     */
     @Override
     public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
         IoUtil.close(rs);
         IoUtil.close(stmt);
         IoUtil.close(conn);
+    }
+
+    @Override
+    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
+        jdbcTxTemplate.setJdbcTxHolder(jdbcTxHolder);
+    }
+
+    @Override
+    public void tx(Runnable action) {
+        jdbcTxTemplate.tx(action);
+    }
+
+    @Override
+    public void tx(IsolationLevel level, Runnable action) {
+        jdbcTxTemplate.tx(level, action);
+    }
+
+    @Override
+    public <T> T txReturn(Supplier<T> supplier) {
+        return jdbcTxTemplate.txReturn(supplier);
+    }
+
+    @Override
+    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
+        return jdbcTxTemplate.txReturn(level, supplier);
+    }
+
+    @Override
+    public <P> void tx(TxAction<P> action, P param) {
+        jdbcTxTemplate.tx(action, param);
+    }
+
+    @Override
+    public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
+        jdbcTxTemplate.tx(level, action, param);
+    }
+
+    @Override
+    public <P, R> R txReturn(TxFunc<P, R> func, P param) {
+        return jdbcTxTemplate.txReturn(func, param);
+    }
+
+    @Override
+    public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
+        return jdbcTxTemplate.txReturn(level, func, param);
+    }
+
+    @Override
+    public GirDsJdbcTxBuilder builder() {
+        return jdbcTxTemplate.builder();
     }
 }

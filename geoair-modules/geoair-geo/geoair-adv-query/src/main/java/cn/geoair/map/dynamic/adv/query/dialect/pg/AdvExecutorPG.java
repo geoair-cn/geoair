@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
@@ -56,13 +57,17 @@ public class AdvExecutorPG extends AbstractPxyAdvExecutor {
         return dataSourceGetter;
     }
 
+    @Override
+    protected IDsTxTemplate getAdvTxTemplate() {
+        return getDataSourceGetter();
+    }
 
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {
         if (advBaseOpt == null) {
             synchronized (this) {
                 if (advBaseOpt == null) {
-                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter(),this::getConfig);
+                    advBaseOpt = new PgAdvBaseOpt(getDataSourceGetter(), this::getConfig);
                 }
             }
         }

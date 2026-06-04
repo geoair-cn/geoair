@@ -1,6 +1,8 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.tx.IDsTxTemplate;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -15,7 +17,7 @@ import javax.sql.DataSource;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDataSourceGetter {
+public interface IDataSourceGetter extends IDsTxTemplate {
 
     /**
      * 通过数据源描述对象初始化
@@ -40,7 +42,7 @@ public interface IDataSourceGetter {
      *
      * <p>使用已有的 {@link DataSource} 对象初始化数据源获取器。
      *
-     * @param dataSource 数据源对象
+     * @param dataSource     数据源对象
      * @param dataSourceName 数据源的名称
      */
     void initByDataSource(DataSource dataSource, String dataSourceName);
@@ -146,7 +148,7 @@ public interface IDataSourceGetter {
      *
      * <p>关闭结果集、语句和连接等数据库资源，释放系统资源。
      *
-     * @param rs 结果集对象
+     * @param rs   结果集对象
      * @param stmt 语句对象
      * @param conn 连接对象
      */

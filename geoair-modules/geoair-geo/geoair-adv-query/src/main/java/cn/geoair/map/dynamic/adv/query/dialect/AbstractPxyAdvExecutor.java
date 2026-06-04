@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.tx.*;
+import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.apo.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
@@ -35,6 +37,8 @@ import javax.sql.DataSource;
 public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     protected abstract IDataSourceGetter getDataSourceGetter();
+
+    protected abstract IDsTxTemplate getAdvTxTemplate();
 
     protected abstract IAdvBaseOpt getAdvBaseOpt();
 
@@ -148,10 +152,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return this.getDataSourceGetter().getDataSource();
     }
 
-    // @Override
-    // public DataStore getGeoToolsDataStore() {
-    // return this.getDataSourceGetterPxy().getGeoToolsDataStore();
-    // }
 
     @Override
     public void connectionClose(Connection connection) {
@@ -161,6 +161,56 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     @Override
     public void closeResources(ResultSet rs, Statement stmt, Connection conn) {
         this.getDataSourceGetter().closeResources(rs, stmt, conn);
+    }
+
+    @Override
+    public GirDsJdbcTxBuilder builder() {
+        return this.getAdvTxTemplate().builder();
+    }
+
+    @Override
+    public <P, R> R txReturn(IsolationLevel level, TxFunc<P, R> func, P param) {
+        return this.getAdvTxTemplate().txReturn(level, func, param);
+    }
+
+    @Override
+    public <P, R> R txReturn(TxFunc<P, R> func, P param) {
+        return this.getAdvTxTemplate().txReturn(func, param);
+    }
+
+    @Override
+    public <P> void tx(IsolationLevel level, TxAction<P> action, P param) {
+        this.getAdvTxTemplate().tx(level, action, param);
+    }
+
+    @Override
+    public <P> void tx(TxAction<P> action, P param) {
+        this.getAdvTxTemplate().tx(action, param);
+    }
+
+    @Override
+    public <T> T txReturn(IsolationLevel level, Supplier<T> supplier) {
+        return this.getAdvTxTemplate().txReturn(level, supplier);
+    }
+
+    @Override
+    public <T> T txReturn(Supplier<T> supplier) {
+        return this.getAdvTxTemplate().txReturn(supplier);
+    }
+
+    @Override
+    public void tx(IsolationLevel level, Runnable action) {
+        this.getAdvTxTemplate().tx(level, action);
+    }
+
+    @Override
+    public void tx(Runnable action) {
+        this.getAdvTxTemplate().tx(action);
+    }
+
+    @Override
+    public void setJdbcTxHolder(IDsTxHolder jdbcTxHolder) {
+        this.getAdvTxTemplate().setJdbcTxHolder(jdbcTxHolder);
     }
 
     // ==================== 基础插入操作（代理调用PgAdvBaseOpt） ====================
@@ -808,7 +858,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
 
     @Override
     public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
-      return   getAdvBaseOpt().bUpsertBatch(tableName, rowsData, conflictKeys,batchSize );
+        return getAdvBaseOpt().bUpsertBatch(tableName, rowsData, conflictKeys, batchSize);
     }
 
     @Override
