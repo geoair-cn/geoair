@@ -54,22 +54,21 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
 
         Gir.log.info("");
         Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-
         Gir.log.info("                    📖 API 接口文档服务                            ");
-        Gir.log.info("══════════════════════════════════════════════════════════════════");
-        Gir.log.info("  状态：{}", String.format("%-46s", isEnabled ? "✅ 已启用" : "❌ 未启用"));
-        Gir.log.info("  地址：{}", String.format("%-46s", baseUrl + "/doc.html") + "");
+        Gir.log.info("--------------------------------------------------------------------");
+        Gir.log.info("  状态：{}", isEnabled ? "✅ 已启用" : "❌ 未启用");
+        Gir.log.info("  地址：{}", baseUrl + "/doc.html");
 
         if ("true".equals(enableAuth)) {
             String username = Gir.property.getProperty("geoair.apidoc.auth.username", "admin");
             String password = Gir.property.getProperty("geoair.apidoc.auth.password", "123456");
-            Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-            Gir.log.info("  🔐 认证信息（Basic Auth）                                       ");
-            Gir.log.info("  用户名：{}", String.format("%-42s", username));
-            Gir.log.info("  密码    ：{}", String.format("%-42s", password));
+            Gir.log.info("--------------------------------------------------------------------");
+            Gir.log.info("  🔐 认证信息（Basic Auth）");
+            Gir.log.info("  用户名：{}", username);
+            Gir.log.info("  密码：  {}", password);
         }
 
-        Gir.log.info("══════════════════════════════════════════════════════════════════");
+        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         Gir.log.info("");
     }
 }
