@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;

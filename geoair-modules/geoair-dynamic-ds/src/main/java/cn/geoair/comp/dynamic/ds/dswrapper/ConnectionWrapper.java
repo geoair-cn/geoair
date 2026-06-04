@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds.dswrapper;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 import java.sql.*;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executor;
  */
 public class ConnectionWrapper implements Connection {
 
-    private static final GiLogger log = GirLogger.getLoger(ConnectionWrapper.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(ConnectionWrapper.class);
 
     private Connection pxyConnection;
 

@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -52,7 +52,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     protected IDataSourceGetter dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
 
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseUpdateOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseUpdateOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 200;
 
     @Override
@@ -297,6 +297,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         validateTableName(tableName);
         validateIdKey(idKey);
+
         int totalSuccess = 0;
         // 存储每条update：sql + 对应参数列表
         List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
@@ -328,27 +329,37 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<List<Pair<String, List<Object>>>> batchGroupParams = CollUtil.split(sqlStatements, batchSize);
         StopWatch stopWatch = new StopWatch();
         int batchNum = 1;
-        Connection connection = dataSourceGetter.getConnection();
+        Connection connection = null;
+        boolean originalAutoCommit = true;
+
         try {
+            connection = dataSourceGetter.getConnection();
+            // 保存原始 autoCommit 状态
+            originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
+
             // 循环每一批执行
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
                 List<String> currentBatchSqls = new ArrayList<>();
                 List<Object> currentBatchParamList = new ArrayList<>();
+
                 for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
                     currentBatchParamList.addAll(sqlStatement.getValue());
                     currentBatchSqls.add(sqlStatement.getKey());
                 }
+
                 stopWatch.start();
                 // 多条sql用;分隔执行
                 String batchSql = StrUtil.join("; \n", currentBatchSqls);
                 int execute = SqlExecutor.execute(connection, batchSql, currentBatchParamList.toArray());
                 stopWatch.stop();
+
                 totalSuccess += execute;
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}",
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
                         batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
+
             // 整批全部无异常统一提交
             connection.commit();
             long cost = stopWatch.getTotalTimeMillis();
@@ -356,19 +367,32 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     this.getClass(), "bUpdateBatchByPK",
                     StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
                     cost, totalSuccess);
+
         } catch (SQLException e) {
             // 异常回滚
-            rollbackConnection(connection);
+            try {
+                connection.rollback();
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+            } catch (SQLException ex) {
+                AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
+            }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bUpdateBatchByPK",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
+                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
             throw new RuntimeException("批量更新失败，表名：" + tableName, e);
-        } finally {
-            // 恢复自动提交、关闭连接（和insert模板统一）
-            restoreAutoCommit(connection);
-            closeConnection(connection);
-        }
 
+        } finally {
+            // 恢复原始 autoCommit 状态（重要：防止连接池污染）
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (SQLException e) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
+                }
+                // 关闭连接
+                closeConnection(connection);
+            }
+        }
     }
 
     @Override
@@ -766,13 +790,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         StopWatch stopWatch = new StopWatch();
         int totalSuccess = 0;
         int batchNum = 1;
-        Connection connection = dataSourceGetter.getConnection();
+        Connection connection = null;
+        boolean originalAutoCommit = true;
 
         try {
+            connection = dataSourceGetter.getConnection();
+            // 保存原始 autoCommit 状态
+            originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
+
             for (List<Map<String, Object>> currentBatchData : batchGroupParams) {
                 List<String> currentBatchSqls = new ArrayList<>();
                 List<Object> currentBatchParamList = new ArrayList<>();
+
                 for (Map<String, Object> rowData : currentBatchData) {
                     Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
                     // 表名去除空格处理
@@ -780,15 +810,18 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     currentBatchSqls.add(sql);
                     currentBatchParamList.addAll(upsertSql.getValue());
                 }
-                stopWatch.start();
-                // 批量执行
-                int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
 
+                stopWatch.start();
+
+                int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
                 stopWatch.stop();
+
                 totalSuccess += execute;
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
+                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
+
             // 全量批次执行完统一提交事务
             connection.commit();
             long cost = stopWatch.getTotalTimeMillis();
@@ -797,17 +830,31 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     this.getClass(), "bUpsertBatch",
                     StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
                     cost, totalSuccess);
+
         } catch (SQLException e) {
             // 异常回滚
-            rollbackConnection(connection);
+            try {
+                connection.rollback();
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+            } catch (SQLException ex) {
+                AdvLogSql.of(dataSourceGetter, getConfig()).error("事务回滚失败，表名：{}", tableName, ex);
+            }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bUpsertBatch",
                     StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
             throw new RuntimeException("批量upsert失败，表名：" + tableName, e);
+
         } finally {
-            restoreAutoCommit(connection);
-            closeConnection(connection);
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (SQLException e) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
+                }
+                dataSourceGetter.connectionClose(connection);
+            }
         }
+
         return totalSuccess;
     }
 

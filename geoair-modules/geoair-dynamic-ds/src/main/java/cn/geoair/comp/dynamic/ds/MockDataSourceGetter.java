@@ -1,7 +1,7 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 
@@ -19,7 +19,7 @@ public class MockDataSourceGetter implements IDsDataSourceOpt {
         return new MockDataSourceGetter();
     }
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
 
     @Override

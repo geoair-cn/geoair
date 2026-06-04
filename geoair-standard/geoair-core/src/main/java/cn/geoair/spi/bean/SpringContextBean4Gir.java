@@ -11,7 +11,7 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilClass;
 
 import java.lang.reflect.Type;
@@ -47,7 +47,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
         GkMethodHand.implFromClass(SpringContextBean4Gir.class);
     }
 
-    protected final GiLogger logger = GirLogger.getLoger(SpringContextBean4Gir.class);
+    protected final GiLogger logger = GirLoggerFactory.getLogger(SpringContextBean4Gir.class);
 
     @GaMethodHandImpl(
             implClass = GirBeanHelper.class,

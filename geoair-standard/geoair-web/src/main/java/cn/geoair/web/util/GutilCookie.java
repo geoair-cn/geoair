@@ -1,7 +1,7 @@
 package cn.geoair.web.util;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /** Cookie 工具类 */
 public final class GutilCookie {
 
-    protected static final GiLogger logger = GirLogger.getLoger(GutilCookie.class);
+    protected static final GiLogger logger = GirLoggerFactory.getLogger(GutilCookie.class);
 
     /**
      * 添加Cookie

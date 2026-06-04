@@ -3,7 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect;
 import static cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt.不做任何操作;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt {
 
-    protected static final GiLogger log = GirLogger.getLoger();
+    protected static final GiLogger log = GirLoggerFactory.getLogger();
 
     protected IDataSourceGetter dataSourceGetter;
 

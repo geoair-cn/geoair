@@ -1,7 +1,7 @@
 package ${packageName}.service.${moduleName};
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.util.GutilObject;
@@ -37,7 +37,7 @@ import java.util.*;
     #end
 @Transactional(rollbackFor = Exception.class)
 public class ${ClassName}ServiceImpl implements ${ClassName}Service {
-    private static final GiLogger log = GirLogger.getLoger(${ClassName}ServiceImpl.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(${ClassName}ServiceImpl.class);
     @Resource
     private ${ClassName}Dao ${className}Dao;
 

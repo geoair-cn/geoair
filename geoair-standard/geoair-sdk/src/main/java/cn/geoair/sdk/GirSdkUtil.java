@@ -29,14 +29,14 @@ import cn.geoair.base.Gir;
 // import com.alibaba.fastjson.JSONObject;
 import cn.geoair.base.cache.support.GirMemoryCache;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
 import cn.geoair.sdk.body.GiRequestBody;
 import cn.geoair.sdk.body.GirMultipartBody;
 
 public class GirSdkUtil {
 
-	private static final GiLogger log = GirLogger.getLoger(GirSdkUtil.class);
+	private static final GiLogger log = GirLoggerFactory.getLogger(GirSdkUtil.class);
 
 	public static Charset CharsetName = StandardCharsets.UTF_8;
 

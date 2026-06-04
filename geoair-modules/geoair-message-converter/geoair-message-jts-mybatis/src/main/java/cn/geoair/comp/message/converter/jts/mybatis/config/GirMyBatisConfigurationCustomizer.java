@@ -1,7 +1,7 @@
 // package cn.geoair.comp.message.converter.jts.mybatis.config;
 //
 // import cn.geoair.base.log.GiLogger;
-// import cn.geoair.base.log.GirLogger;
+// import cn.geoair.base.log.GirLoggerFactory;
 // import
 // cn.geoair.comp.message.converter.jts.mybatis.typehander.impl.NetPgGeometryTypeHandler;
 // import
@@ -20,7 +20,7 @@
 //
 // @Component
 // public class GirMyBatisConfigurationCustomizer implements ConfigurationCustomizer {
-// GiLogger log = GirLogger.getLoger(GirMyBatisConfigurationCustomizer.class);
+// GiLogger log = GirLoggerFactory.getLogger(GirMyBatisConfigurationCustomizer.class);
 //
 // @Override
 // public void customize(Configuration configuration) {

@@ -13,7 +13,7 @@ import cn.geoair.base.env.property.GirPropertyHelper;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.lang.caller.GkCallerUtil;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.tool.GkConsole;
 import cn.geoair.base.tool.GkConsoleTable;
 import java.lang.reflect.Type;
@@ -130,132 +130,132 @@ public abstract class Gir {
 
                 @Override
                 public boolean isFatalEnabled() {
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isFatalEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isFatalEnabled();
                 }
 
                 @Override
                 public boolean isErrorEnabled() {
 
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isErrorEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isErrorEnabled();
                 }
 
                 @Override
                 public boolean isWarnEnabled() {
 
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isWarnEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isWarnEnabled();
                 }
 
                 @Override
                 public boolean isInfoEnabled() {
 
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isInfoEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isInfoEnabled();
                 }
 
                 @Override
                 public boolean isDebugEnabled() {
 
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isDebugEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isDebugEnabled();
                 }
 
                 @Override
                 public boolean isTraceEnabled() {
 
-                    return GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).isTraceEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isTraceEnabled();
                 }
 
                 @Override
                 public void fatal(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).fatal(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).fatal(format, arguments);
                 }
 
                 @Override
                 public void fatal(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).fatal(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).fatal(t);
                 }
 
                 @Override
                 public void fatal(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .fatal(t, format, arguments);
                 }
 
                 @Override
                 public void error(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).error(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).error(format, arguments);
                 }
 
                 @Override
                 public void error(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).error(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).error(t);
                 }
 
                 @Override
                 public void error(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .error(t, format, arguments);
                 }
 
                 @Override
                 public void warn(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).warn(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).warn(format, arguments);
                 }
 
                 @Override
                 public void warn(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).warn(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).warn(t);
                 }
 
                 @Override
                 public void warn(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .warn(t, format, arguments);
                 }
 
                 @Override
                 public void info(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).info(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).info(format, arguments);
                 }
 
                 @Override
                 public void info(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).info(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).info(t);
                 }
 
                 @Override
                 public void info(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .info(t, format, arguments);
                 }
 
                 @Override
                 public void debug(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).debug(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).debug(format, arguments);
                 }
 
                 @Override
                 public void debug(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).debug(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).debug(t);
                 }
 
                 @Override
                 public void debug(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .debug(t, format, arguments);
                 }
 
                 @Override
                 public void trace(String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).trace(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).trace(format, arguments);
                 }
 
                 @Override
                 public void trace(Throwable t) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName()).trace(t);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).trace(t);
                 }
 
                 @Override
                 public void trace(Throwable t, String format, Object... arguments) {
-                    GirLogger.getLoger(GkCallerUtil.getCallerCallerName())
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
                             .trace(t, format, arguments);
                 }
             };

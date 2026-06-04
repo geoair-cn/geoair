@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -43,7 +43,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
     private static final String COUNT_ALIAS_PREFIX = "count_query_";
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseSelectOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseSelectOpt.class);
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
