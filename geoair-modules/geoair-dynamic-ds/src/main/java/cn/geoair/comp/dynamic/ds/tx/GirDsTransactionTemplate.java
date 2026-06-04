@@ -3,6 +3,8 @@ package cn.geoair.comp.dynamic.ds.tx;
 import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.Savepoint;
@@ -13,28 +15,29 @@ import java.sql.SQLException;
  */
 public class GirDsTransactionTemplate implements IDsTransactionTemplate {
 
-    IDsConnectionOpt connectionOpt;
+    private static final Logger log = LoggerFactory.getLogger(GirDsTransactionTemplate.class);
 
-    IDsTransactionConnectionHolder jdbcTxHolder;
+    IDsConnectionOpt connectionOpt;
+    IDsTransactionConnectionHolder transactionConnectionHolder;
 
     public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt) {
         this.connectionOpt = connectionOpt;
-        this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
+        this.transactionConnectionHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
     public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt, IDsTransactionConnectionHolder jdbcTxHolder) {
         this.connectionOpt = connectionOpt;
-        this.jdbcTxHolder = jdbcTxHolder;
+        this.transactionConnectionHolder = jdbcTxHolder;
     }
 
     @Override
     public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
-        this.jdbcTxHolder = transactionConnectionHolder;
+        this.transactionConnectionHolder = transactionConnectionHolder;
     }
 
     @Override
     public IDsTransactionConnectionHolder getTransactionConnectionHolder() {
-        return this.jdbcTxHolder;
+        return this.transactionConnectionHolder;
     }
 
     @Override
@@ -97,18 +100,24 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         Connection currConn = null;
         Savepoint savepoint = null;
 
+        // 保存原始连接状态，用于恢复
+        boolean needRestoreState = false;
+        boolean originalAutoCommit = true;
+        int originalIsolationLevel = Connection.TRANSACTION_READ_COMMITTED;
+        boolean originalReadOnly = false;
+
         try {
             // 传播行为处理
             switch (propagation) {
                 case REQUIRED:
-                    if (jdbcTxHolder.isInTx()) {
+                    if (transactionConnectionHolder.isInTx()) {
                         return exec(execObj, param);
                     }
                     // 无事务，开启新事务
                     break;
                 case REQUIRES_NEW:
-                    if (jdbcTxHolder.isInTx()) {
-                        suspendConn = jdbcTxHolder.pop();
+                    if (transactionConnectionHolder.isInTx()) {
+                        suspendConn = transactionConnectionHolder.pop();
                     }
                     // 开启新事务
                     break;
@@ -117,27 +126,31 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
                 case NOT_SUPPORTED:
                 case NEVER:
                     // 这些分支不需要开启新事务，直接执行
-                    if (propagation == Propagation.MANDATORY && !jdbcTxHolder.isInTx()) {
+                    if (propagation == Propagation.MANDATORY && !transactionConnectionHolder.isInTx()) {
                         throw new GirDsJdbcTxException("MANDATORY传播：当前无可用事务，禁止执行");
                     }
-                    if (propagation == Propagation.NEVER && jdbcTxHolder.isInTx()) {
+                    if (propagation == Propagation.NEVER && transactionConnectionHolder.isInTx()) {
                         throw new GirDsJdbcTxException("NEVER传播：禁止在事务内部执行");
                     }
-                    if (propagation == Propagation.NOT_SUPPORTED && jdbcTxHolder.isInTx()) {
-                        suspendConn = jdbcTxHolder.pop();
+                    if (propagation == Propagation.NOT_SUPPORTED && transactionConnectionHolder.isInTx()) {
+                        suspendConn = transactionConnectionHolder.pop();
                     }
                     return exec(execObj, param);
                 case NESTED:
-                    if (jdbcTxHolder.isInTx()) {
+                    if (transactionConnectionHolder.isInTx()) {
                         // 有外部事务，使用保存点
-                        currConn = jdbcTxHolder.get();
+                        currConn = transactionConnectionHolder.get();
                         savepoint = currConn.setSavepoint();
                         try {
                             T result = exec(execObj, param);
                             return result;
                         } catch (Throwable e) {
                             if (savepoint != null) {
-                                currConn.rollback(savepoint);
+                                try {
+                                    currConn.rollback(savepoint);
+                                } catch (SQLException ex) {
+                                    log.warn("回滚保存点失败", ex);
+                                }
                             }
                             throw e;
                         }
@@ -150,14 +163,27 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
 
             // 开启新事务（只有 REQUIRED、REQUIRES_NEW、NESTED无事务时 能走到这里）
             currConn = getCurrentConnection();
+
+            // 保存原始连接状态
+            originalAutoCommit = currConn.getAutoCommit();
+            originalIsolationLevel = currConn.getTransactionIsolation();
+            originalReadOnly = currConn.isReadOnly();
+            needRestoreState = true;
+
+            // 设置事务属性
             if (level != null) {
                 currConn.setTransactionIsolation(level.code);
             }
             currConn.setReadOnly(readOnly);
             currConn.setAutoCommit(false);
-            jdbcTxHolder.bind(currConn);
 
+            // 绑定到当前线程
+            transactionConnectionHolder.bind(currConn);
+
+            // 执行业务逻辑
             T result = exec(execObj, param);
+
+            // 提交事务
             currConn.commit();
 
             return result;
@@ -166,15 +192,18 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
             // 判断是否需要回滚
             boolean needRoll = shouldRollback(e, rollFor, noRollFor);
 
-            // 只有当前方法开启了事务才需要处理提交/回滚
+            // 只有当前方法开启了事务才需要处理回滚
             if (currConn != null && savepoint == null) {
                 try {
                     if (needRoll) {
                         currConn.rollback();
+                        log.debug("事务回滚成功");
                     } else {
                         currConn.commit();
+                        log.debug("事务提交成功（不回滚异常）");
                     }
                 } catch (SQLException ex) {
+                    log.error("事务提交/回滚异常", ex);
                     throw new GirDsJdbcTxException("事务提交/回滚异常", ex);
                 }
             }
@@ -189,15 +218,33 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
             }
 
         } finally {
-            // 清理当前方法开启的事务（有 savepoint 说明是嵌套事务，不在此关闭）
+            // 恢复连接状态并清理当前方法开启的事务（有 savepoint 说明是嵌套事务，不在此关闭）
             if (currConn != null && savepoint == null) {
-                jdbcTxHolder.pop();
+                try {
+                    // 恢复原始连接状态（重要：防止连接池污染）
+                    if (needRestoreState) {
+                        currConn.setAutoCommit(originalAutoCommit);
+                        currConn.setTransactionIsolation(originalIsolationLevel);
+                        currConn.setReadOnly(originalReadOnly);
+                    }
+                } catch (SQLException e) {
+                    log.warn("恢复连接状态失败", e);
+                }
+
+                // 从当前线程解绑
+                transactionConnectionHolder.pop();
+
+                // 关闭连接（归还连接池）
                 connectionOpt.connectionClose(currConn);
             }
 
             // 恢复挂起的事务
             if (suspendConn != null) {
-                jdbcTxHolder.bind(suspendConn);
+                try {
+                    transactionConnectionHolder.bind(suspendConn);
+                } catch (Exception e) {
+                    log.warn("恢复挂起事务失败", e);
+                }
             }
         }
     }
@@ -227,7 +274,7 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
     private boolean shouldRollback(Throwable e,
                                    Class<? extends Throwable>[] rollFor,
                                    Class<? extends Throwable>[] noRollFor) {
-        // noRollFor 优先
+        // noRollFor 优先（这些异常不回滚）
         if (noRollFor != null) {
             for (Class<?> clz : noRollFor) {
                 if (clz.isInstance(e)) {
@@ -251,7 +298,7 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
      * 获取数据库连接（优先从当前事务获取）
      */
     public Connection getCurrentConnection() throws SQLException {
-        Connection txConn = jdbcTxHolder.get();
+        Connection txConn = transactionConnectionHolder.get();
         if (txConn != null && !txConn.isClosed()) {
             return txConn;
         }
@@ -259,16 +306,14 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
     }
 
     /**
-     * 获取数据库连接（优先从当前事务获取）
+     * 关闭连接（非事务中才真正关闭）
      */
     public void connectionClose(Connection connection) {
-        boolean inTx = jdbcTxHolder.isInTx();
+        boolean inTx = transactionConnectionHolder.isInTx();
         if (inTx) {
             return;
         } else {
             connectionOpt.connectionClose(connection);
         }
     }
-
-
 }

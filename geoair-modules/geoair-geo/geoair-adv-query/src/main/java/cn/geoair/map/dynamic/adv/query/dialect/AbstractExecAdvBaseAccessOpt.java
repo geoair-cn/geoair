@@ -232,17 +232,25 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         int totalSuccess = 0;
 
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Connection connection = dataSourceGetter.getConnection();
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        boolean originalAutoCommit = true;
+
         try {
+            connection = dataSourceGetter.getConnection();
+            // 保存原始 autoCommit 状态
+            originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
+
             List<String> fieldNames = headers.stream()
                     .map(dialectTableNameProcessor::tbQuoteFieldName)
                     .collect(Collectors.toList());
             String fields = String.join(",", fieldNames);
             String placeholders = buildPlaceholders(fieldNames.size());
             String execSql = buildInsertSql(quoteTableName, fields, placeholders);
-            PreparedStatement pstmt = connection.prepareStatement(execSql);
+            pstmt = connection.prepareStatement(execSql);
+
+            stopWatch.start();
 
             for (List<Map<String, Object>> batch : batches) {
                 for (Map<String, Object> row : batch) {
@@ -259,21 +267,47 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
             connection.commit();
             stopWatch.stop();
-            long cost = stopWatch.getLastTaskTimeMillis();
+
+            long cost = stopWatch.getTotalTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
                     this.getClass(), "bInsertBatch",
                     StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
                     cost, totalSuccess);
             return totalSuccess;
+
         } catch (SQLException e) {
-            rollbackConnection(connection);
+            // 异常回滚
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+                } catch (SQLException ex) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
+                }
+            }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bInsertBatch",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
+                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
+
         } finally {
-            restoreAutoCommit(connection);
-            closeConnection(connection);
+            // 关闭 PreparedStatement
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("关闭 PreparedStatement 失败", e);
+                }
+            }
+            // 恢复原始 autoCommit 状态（重要：防止连接池污染）
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (SQLException e) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
+                }
+                dataSourceGetter.connectionClose(connection);
+            }
         }
     }
 
@@ -506,7 +540,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
-        // todo 缺少事务处理 后期参考 bInsertBatch 已完成
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
@@ -523,11 +556,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             T first = entities.iterator().next();
             conflictKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
         }
+
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
+
         int totalSuccess = 0;
         List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
+
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
             List<String> finalConflictKeys = conflictKeys;
@@ -540,42 +576,70 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
             sqlStatements.add(insertIgnoreSql);
         }
+
         List<List<Pair<String, List<Object>>>> batchGroupParams = CollUtil.split(sqlStatements, strategy.getBatchSize());
         StopWatch stopWatch = new StopWatch();
         int batchNum = 1;
-        Connection connection = dataSourceGetter.getConnection();
+        Connection connection = null;
+        boolean originalAutoCommit = true;
+
         try {
+            connection = dataSourceGetter.getConnection();
+            // 保存原始 autoCommit 状态
+            originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
+
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
                 List<String> currentBatchSqls = new ArrayList<>();
                 List<Object> currentBatchParamList = new ArrayList<>();
+
                 for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
                     currentBatchParamList.addAll(sqlStatement.getValue());
                     currentBatchSqls.add(sqlStatement.getKey());
                 }
+
                 stopWatch.start();
                 int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
                 stopWatch.stop();
+
                 totalSuccess += execute;
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功 ，成功条数量：{}  当前批次耗时：{}", batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
+                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
+
             connection.commit();
             long cost = stopWatch.getTotalTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
                     this.getClass(), "bInsertIgnoreBatch",
                     StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
                     cost, totalSuccess);
+
         } catch (SQLException e) {
-            rollbackConnection(connection);
+            // 异常回滚
+            try {
+                connection.rollback();
+                AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+            } catch (SQLException ex) {
+                AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
+            }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bInsertIgnoreBatch",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()), e);
+                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()), e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
+
         } finally {
-            restoreAutoCommit(connection);
-            closeConnection(connection);
+            // 恢复原始 autoCommit 状态（重要：防止连接池污染）
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(originalAutoCommit);
+                } catch (SQLException e) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
+                }
+                dataSourceGetter.connectionClose(connection);
+            }
         }
+
         return totalSuccess;
     }
 
