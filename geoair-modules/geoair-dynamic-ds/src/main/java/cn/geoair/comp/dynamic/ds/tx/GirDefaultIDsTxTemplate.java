@@ -14,17 +14,17 @@ import java.util.function.Supplier;
  */
 public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
 
-    IDsConnectionOpt connectionManager;
+    IDsConnectionOpt connectionOpt;
 
     IDsTxHolder jdbcTxHolder;
 
-    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionManager) {
-        this.connectionManager = connectionManager;
+    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionOpt) {
+        this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionManager, IDsTxHolder jdbcTxHolder) {
-        this.connectionManager = connectionManager;
+    public GirDefaultIDsTxTemplate(IDsConnectionOpt connectionOpt, IDsTxHolder jdbcTxHolder) {
+        this.connectionOpt = connectionOpt;
         this.jdbcTxHolder = jdbcTxHolder;
     }
 
@@ -193,7 +193,7 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
             // 清理当前方法开启的事务（有 savepoint 说明是嵌套事务，不在此关闭）
             if (currConn != null && savepoint == null) {
                 jdbcTxHolder.pop();
-                closeConnection(currConn);
+                connectionOpt.connectionClose(currConn);
             }
 
             // 恢复挂起的事务
@@ -256,21 +256,20 @@ public class GirDefaultIDsTxTemplate implements IDsTxTemplate {
         if (txConn != null && !txConn.isClosed()) {
             return txConn;
         }
-        return connectionManager.getConnection();
+        return connectionOpt.getConnection();
     }
 
     /**
-     * 关闭数据库连接
+     * 获取数据库连接（优先从当前事务获取）
      */
-    public static void closeConnection(Connection conn) {
-        if (conn != null) {
-            try {
-                if (!conn.isClosed()) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new GirDsJdbcTxException("关闭连接异常", e);
-            }
+    public void connectionClose(Connection connection) {
+        boolean inTx = jdbcTxHolder.isInTx();
+        if (inTx) {
+            return;
+        } else {
+            connectionOpt.connectionClose(connection);
         }
     }
+
+
 }

@@ -18,6 +18,8 @@ public interface IDsTxTemplate {
 
     Connection getCurrentConnection() throws SQLException;
 
+    void connectionClose(Connection connection);
+
     void tx(Runnable action);
 
     void tx(IsolationLevel level, Runnable action);

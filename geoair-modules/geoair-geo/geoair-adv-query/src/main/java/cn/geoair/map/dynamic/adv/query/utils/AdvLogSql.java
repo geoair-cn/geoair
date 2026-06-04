@@ -4,6 +4,7 @@ import cn.geoair.base.lang.caller.GkCallerUtil;
 import cn.geoair.base.log.*;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 
 import java.util.List;
@@ -62,18 +63,18 @@ public class AdvLogSql extends GirLogWrapper {
     private static final String GRAY = "\u001B[90m";
     private static final String BLUE = "\u001B[34m";
 
-    private final IDataSourceGetter dataSourceGetter;
+    private final IDsDataSourceOpt dsDataSourceOpt;
 
     private final AdvQueryGlobalConfig advQueryGlobalConfig;
 
 
-    public static AdvLogSql of(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
-        return new AdvLogSql(dataSourceGetter, advQueryGlobalConfig);
+    public static AdvLogSql of(IDsDataSourceOpt dsDataSourceOpt, AdvQueryGlobalConfig advQueryGlobalConfig) {
+        return new AdvLogSql(dsDataSourceOpt, advQueryGlobalConfig);
     }
 
 
-    private AdvLogSql(IDataSourceGetter dataSourceGetter, AdvQueryGlobalConfig advQueryGlobalConfig) {
-        this.dataSourceGetter = dataSourceGetter;
+    private AdvLogSql(IDsDataSourceOpt dsDataSourceOpt, AdvQueryGlobalConfig advQueryGlobalConfig) {
+        this.dsDataSourceOpt = dsDataSourceOpt;
         this.advQueryGlobalConfig = advQueryGlobalConfig;
     }
 
@@ -315,14 +316,14 @@ public class AdvLogSql extends GirLogWrapper {
 
     // ===================== 工具方法 =====================
     protected String getSchemaName() {
-        if (dataSourceGetter == null) return "";
-        String schema = dataSourceGetter.getSchemaName();
+        if (dsDataSourceOpt == null) return "";
+        String schema = dsDataSourceOpt.getSchemaName();
         return GutilObject.isEmpty(schema) ? "" : schema;
     }
 
     protected String getDatabaseName() {
-        if (dataSourceGetter == null) return "";
-        String db = dataSourceGetter.getDatabaseName();
+        if (dsDataSourceOpt == null) return "";
+        String db = dsDataSourceOpt.getDatabaseName();
         return GutilObject.isEmpty(db) ? "" : db;
     }
 
