@@ -28,7 +28,8 @@ public class PageActuator<T> {
      */
     PageConfig pageConfig = new PageConfig();
 
-    @Getter
+    boolean executeIs = false;
+
     private final List<T> finalDataList = new ArrayList<T>();
 
     // 仅用于标记是否终止
@@ -47,8 +48,15 @@ public class PageActuator<T> {
         return new PageActuator<>(pageConditionDef);
     }
 
-    public PageActuator<T> execute() {
+    public List<T> getFinalDataList() {
+        if (!executeIs) {
+            execute();
+        }
+        return finalDataList;
+    }
 
+    public PageActuator<T> execute() {
+        executeIs = true;
         pageConditionDef.setPageConfig(pageConfig);
 
         // 1. 基础参数校验
