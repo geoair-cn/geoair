@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -126,6 +127,42 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     }
 
     @Override
+    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName) {
+        boolean sqlViewIs = dialectTableNameProcessor.tbTableIsSqlView(sqlViewOrTableName);
+        AdvEnumsTypeGeom advEnumsTypeGeom = null;
+        if (sqlViewIs) {
+            advEnumsTypeGeom = eGetGeoTypeBySql(sqlViewOrTableName);
+        } else {
+            advEnumsTypeGeom = eGetGeoTypeByTable(sqlViewOrTableName);
+        }
+        return advEnumsTypeGeom;
+    }
+
+    @Override
+    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, String geomFieldName) {
+        boolean sqlViewIs = dialectTableNameProcessor.tbTableIsSqlView(sqlViewOrTableName);
+        AdvEnumsTypeGeom advEnumsTypeGeom = null;
+        if (sqlViewIs) {
+            advEnumsTypeGeom = eGetGeoTypeBySql(sqlViewOrTableName, geomFieldName);
+        } else {
+            advEnumsTypeGeom = eGetGeoTypeByTable(sqlViewOrTableName, geomFieldName);
+        }
+        return advEnumsTypeGeom;
+    }
+
+    @Override
+    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, List<String> geomFieldNames) {
+        boolean sqlViewIs = dialectTableNameProcessor.tbTableIsSqlView(sqlViewOrTableName);
+        Map<String, AdvEnumsTypeGeom> advEnumsTypeGeomMap = null;
+        if (sqlViewIs) {
+            advEnumsTypeGeomMap = eGetGeoTypeBySql(sqlViewOrTableName, geomFieldNames);
+        } else {
+            advEnumsTypeGeomMap = eGetGeoTypeByTable(sqlViewOrTableName, geomFieldNames);
+        }
+        return advEnumsTypeGeomMap;
+    }
+
+    @Override
     public boolean eIsGeomByTable(String tableName) {
         validateTableName(tableName);
         return StrUtil.isNotEmpty(eGetGeomColumnNameByTable(tableName));
@@ -134,6 +171,18 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public boolean eIsGeomBySql(String sqlView) {
         return StrUtil.isNotEmpty(eGetGeomColumnNameBySql(sqlView));
+    }
+
+    @Override
+    public boolean eIsGeomBySqlOrTable(String sqlViewOrTableName) {
+        boolean sqlViewIs = dialectTableNameProcessor.tbTableIsSqlView(sqlViewOrTableName);
+        boolean geomIs = false;
+        if (sqlViewIs) {
+            geomIs = eIsGeomBySql(sqlViewOrTableName);
+        } else {
+            geomIs = eIsGeomByTable(sqlViewOrTableName);
+        }
+        return geomIs;
     }
 
     @Override
@@ -197,6 +246,18 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
         return dataFieldsApo.getFieldNameList();
+    }
+
+    @Override
+    public List<String> eGetGeomColumnNameListBySqlOrTable(String sqlViewOrTableName) {
+        boolean sqlViewIs = dialectTableNameProcessor.tbTableIsSqlView(sqlViewOrTableName);
+        List<String> geomFieldNameList = null;
+        if (sqlViewIs) {
+            geomFieldNameList = eGetGeomColumnNameListBySql(sqlViewOrTableName);
+        } else {
+            geomFieldNameList = eGetGeomColumnNameListByTable(sqlViewOrTableName);
+        }
+        return geomFieldNameList;
     }
 
     @Override

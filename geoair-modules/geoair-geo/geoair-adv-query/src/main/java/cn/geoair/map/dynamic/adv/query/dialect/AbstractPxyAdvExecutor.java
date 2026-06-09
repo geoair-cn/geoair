@@ -1214,8 +1214,33 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, List<String> geomFieldNames) {
+        return getGeoOpt().eGetGeoTypeBySqlOrTable(sqlViewOrTableName, geomFieldNames);
+    }
+
+    @Override
+    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, String geomFieldName) {
+        return getGeoOpt().eGetGeoTypeBySqlOrTable(sqlViewOrTableName, geomFieldName);
+    }
+
+    @Override
+    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName) {
+        return getGeoOpt().eGetGeoTypeBySqlOrTable(sqlViewOrTableName);
+    }
+
+    @Override
     public boolean eIsGeomBySql(String sqlView) {
         return getGeoOpt().eIsGeomBySql(sqlView);
+    }
+
+    @Override
+    public List<String> eGetGeomColumnNameListBySqlOrTable(String sqlViewOrTableName) {
+        return getGeoOpt().eGetGeomColumnNameListBySqlOrTable(sqlViewOrTableName);
+    }
+
+    @Override
+    public boolean eIsGeomBySqlOrTable(String sqlViewOrTableName) {
+        return getGeoOpt().eIsGeomBySqlOrTable(sqlViewOrTableName);
     }
 
     @Override
