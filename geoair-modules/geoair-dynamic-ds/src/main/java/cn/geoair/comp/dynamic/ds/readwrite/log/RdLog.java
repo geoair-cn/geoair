@@ -23,7 +23,7 @@ public class RdLog extends GirLogWrapper {
      * 输出的最小的日志级别 , 这里只是标记输出的最小级别，
      * 这只是第一道拦截器，具体的日志级别还需要看具体的日志实现
      */
-    public static GemLogLevel minLogLevel = GemLogLevel.DEBUG;
+    public static GemLogLevel minLogLevel = GemLogLevel.INFO;
 
     /**
      * 是否使用独立日志实现，不依托于全局的日志实现
