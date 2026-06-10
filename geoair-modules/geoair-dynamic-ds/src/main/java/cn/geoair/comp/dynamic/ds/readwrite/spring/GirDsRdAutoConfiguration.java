@@ -6,6 +6,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
+import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -58,6 +59,9 @@ public class GirDsRdAutoConfiguration {
 
         GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
                 .build();
+
+        RdLog.minLogLevel = properties.minLogLevel;
+        RdLog.useIndependentLog = properties.useIndependentLog;
 
         log.info("读写分离数据源构建完成");
         return dataSource;

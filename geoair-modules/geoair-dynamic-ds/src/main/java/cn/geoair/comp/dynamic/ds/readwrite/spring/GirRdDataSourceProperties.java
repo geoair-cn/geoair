@@ -1,5 +1,6 @@
 package cn.geoair.comp.dynamic.ds.readwrite.spring;
 
+import cn.geoair.base.log.GemLogLevel;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import lombok.Data;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  * <ul>
  *     <li>源码位置：<code>src/main/resources/META-INF/template.yml</code></li>
  *     <li>源码位置：<code>src/main/resources/META-INF/template.properties</code></li>
-
+ *
  * </ul>
  *
  * @author 张俊
@@ -36,6 +37,21 @@ public class GirRdDataSourceProperties {
      * 主节点的数据源Id
      */
     private String masterDataSourceId;
+
+    /**
+     * /**
+     * 输出的最小的日志级别 , 这里只是标记输出的最小级别，
+     * 这只是第一道拦截器，具体的日志级别还需要看具体的日志实现
+     */
+    public GemLogLevel minLogLevel = GemLogLevel.INFO;
+
+    /**
+     * 是否使用独立日志实现，不依托于全局的日志实现
+     * <p>
+     * true: 使用独立的日志实现（如自定义的日志处理逻辑）<br>
+     * false: 使用默认的日志实现（如 Slf4j、Log4j 等）
+     */
+    public boolean useIndependentLog = false;
 
     /**
      * 读写分离配置
