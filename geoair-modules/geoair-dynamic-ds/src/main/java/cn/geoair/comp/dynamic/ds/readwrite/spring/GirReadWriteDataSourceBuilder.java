@@ -4,7 +4,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
-import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
