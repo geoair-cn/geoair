@@ -72,8 +72,14 @@ public class GirAdvSqlUtils {
     public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         Map<String, Object> rowData = new HashMap<>();
         Class<?> clazz = entity.getClass();
+
+        if (GutilObject.isEmpty(ignoreFieldNames)) {
+            List<String> ignoreFieldByAnnotation = getIgnoreFieldByAnnotation(clazz);
+            ignoreFieldNames.addAll(ignoreFieldByAnnotation);
+        }
+
         BeanCopier.create(entity, rowData, CopyOptions.create().setIgnoreNullValue(ignoreNullValue).setTransientSupport(true).setFieldNameEditor(fieldName -> {
-            if (ignoreFieldNames != null && ignoreFieldNames.contains(fieldName)) {
+            if (ignoreFieldNames.contains(fieldName)) {
                 return null;
             }
             String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(clazz, fieldName);
