@@ -71,15 +71,19 @@ public class TileConverter3857Utils extends TileConverterCommon {
             throw new IllegalArgumentException("地理范围Envelope不能为空");
         }
         validateXyz(z, 0, 0);
+        // 通过分辨率计算，geowebcache就是这样的计算方式
+//        TileLevelMetadata tileLevelMetadata = getTileLevelMetadata(z);
+//        double resolution = tileLevelMetadata.getResolution();
+//        double width = resolution * 256;
+//        double height = resolution * 256;
+//        double[] tileOrigin = {-20037508.3427892, 20037508.3427892};
+//        long minX = (long) Math.floor((tileBox.getMinX() - tileOrigin[0]) / width);
+//        long maxX = (long) Math.ceil(((tileBox.getMaxX() - tileOrigin[0]) / width));
+//        long minY = (long) Math.floor((tileOrigin[1] - tileBox.getMaxY()) / height);
+//        long maxY = (long) Math.ceil((tileOrigin[1] - tileBox.getMinY()) / height);
+//        long[] ret = {minX, minY, maxX - 1, maxY - 1, z};
 
-        // 1. 计算当前层级瓦片尺寸（3857平面坐标，单位：米）
         double tileSize = 2 * MAX_MERCATOR / Math.pow(2, z);
-        TileLevelMetadata tileLevelMetadata = getTileLevelMetadata(z);
-
-        double resolution = tileLevelMetadata.getResolution();
-//        double width = resolution* getTileWidth();
-//        double height = resolution* getTileHeight();
-        // 2. 直接基于3857坐标计算瓦片索引
         double tileXmin = Math.floor((tileBox.getMinX() + MAX_MERCATOR) / tileSize);
         double tileXmax = Math.ceil((tileBox.getMaxX() + MAX_MERCATOR) / tileSize);
         double tileYmin = Math.floor((MAX_MERCATOR - tileBox.getMaxY()) / tileSize);
