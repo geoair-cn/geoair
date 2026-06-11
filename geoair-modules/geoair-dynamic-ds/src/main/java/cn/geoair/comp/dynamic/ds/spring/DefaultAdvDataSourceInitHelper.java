@@ -18,7 +18,9 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
 
     @Override
     public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
-        log.info("创建全新的数据源实例！jdbcUrl:{}", dataSourceApo.getJdbcUrl());
+        log.debug("正在使用Druid创建的数据源实例， 如果不想使用Druid，请自己实现IAdvDataSourceInitHelper接口");
+
+        log.info("使用Druid创建全新的数据源实例！jdbcUrl:{}", dataSourceApo.getJdbcUrl());
         try {
 
             DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();

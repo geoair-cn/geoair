@@ -24,8 +24,7 @@ public interface AdvDeleteOrmOpt<T extends GiEntityRemovable<PK>, PK extends Ser
     default int gtcDeleteBy(T t) {
         GirAdvWhereFilter whereFilter = GirAdvWhereFilter.ofBean(t);
         String tableName = GirAdvSqlUtils.getTableName(t.getClass());
-        GirSpringAdvExecutor.getInstance().bDeleteByWhere(tableName, whereFilter);
-        return 0;
+        return GirSpringAdvExecutor.getInstance().bDeleteByWhere(tableName, whereFilter);
     }
 
     /**
