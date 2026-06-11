@@ -11,7 +11,8 @@ import org.locationtech.jts.geom.Envelope;
 @Data
 public class TileLevelMetadata {
     private final int zoom;                 // 缩放级别
-    private final double tileCount;          // 每行/列的瓦片数量
+    private final int tileWidth;          // 每行的瓦片数量
+    private final int tileHeight;          // 每列的瓦片数量
     private final double tileSizeM;           // 每个瓦片的地理尺寸（米 ）
     private final double groundResolution;   // 地面分辨率（米/像素 ）
     private final double resolution;   //  分辨率
@@ -23,12 +24,10 @@ public class TileLevelMetadata {
     private final Envelope extent;           // 全局范围
     private final String gridSetName;   // 坐标系
 
-    public TileLevelMetadata(int zoom, double tileCount, double tileSizeM,
-                             double groundResolution, double resolution, double scale,
-                             long totalTiles, int tilePixelSize, double dpi,
-                             double mmPerPixel, Envelope extent, String gridSetName) {
+    public TileLevelMetadata(int zoom, int tileWidth, int tileHeight, double tileSizeM, double groundResolution, double resolution, double scale, long totalTiles, int tilePixelSize, double dpi, double mmPerPixel, Envelope extent, String gridSetName) {
         this.zoom = zoom;
-        this.tileCount = tileCount;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
         this.tileSizeM = tileSizeM;
         this.groundResolution = groundResolution;
         this.resolution = resolution;

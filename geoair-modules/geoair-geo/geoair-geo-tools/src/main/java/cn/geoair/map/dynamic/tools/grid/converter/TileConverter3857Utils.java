@@ -74,7 +74,11 @@ public class TileConverter3857Utils extends TileConverterCommon {
 
         // 1. 计算当前层级瓦片尺寸（3857平面坐标，单位：米）
         double tileSize = 2 * MAX_MERCATOR / Math.pow(2, z);
+        TileLevelMetadata tileLevelMetadata = getTileLevelMetadata(z);
 
+        double resolution = tileLevelMetadata.getResolution();
+//        double width = resolution* getTileWidth();
+//        double height = resolution* getTileHeight();
         // 2. 直接基于3857坐标计算瓦片索引
         double tileXmin = Math.floor((tileBox.getMinX() + MAX_MERCATOR) / tileSize);
         double tileXmax = Math.ceil((tileBox.getMaxX() + MAX_MERCATOR) / tileSize);
@@ -158,20 +162,22 @@ public class TileConverter3857Utils extends TileConverterCommon {
     /**
      * 根据最大分辨率层级获取瓦片元数据（支持自定义瓦片尺寸和DPI）
      *
-     * @param maxZoom       最大分辨率层级（最大缩放级别）
+     * @param thisZoom      最大分辨率层级（最大缩放级别）
      * @param tilePixelSize 瓦片像素尺寸（例如：256、512）
      * @param dpi           屏幕DPI（例如：72、96、300）
      * @return 瓦片层级元数据对象
      */
-    public TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi) {
-        validateXyz(maxZoom, 0, 0);
+    public TileLevelMetadata getTileLevelMetadata(int thisZoom, int tilePixelSize, double dpi) {
+        validateXyz(thisZoom, 0, 0);
 
-        double tileCount = Math.pow(2.0, maxZoom);
-        double tileSize = 2 * MAX_MERCATOR / tileCount;  // 每个瓦片的实际地理尺寸（米）
-        double totalWidth = 2 * MAX_MERCATOR;             // 整个3857平面的总宽度（米）
+        Double tileWidth = Math.pow(2.0, thisZoom);
+        Double tileHeight = Math.pow(2.0, thisZoom);
+
+        double tileSize = 2 * MAX_MERCATOR / tileWidth;  // 每个瓦片的实际地理尺寸（米）
+
 
         // 计算该层级下的瓦片总数
-        long totalTiles = (long) (tileCount * tileCount);
+        long totalTiles = (long) (tileWidth * tileHeight);
 
         // 计算该层级的地面分辨率（每像素代表的米数）
         double groundResolution = tileSize / tilePixelSize;
@@ -185,8 +191,9 @@ public class TileConverter3857Utils extends TileConverterCommon {
         double mmPerPixel = groundResolution * 1000;
 
         return new TileLevelMetadata(
-                maxZoom,
-                tileCount,
+                thisZoom,
+                tileWidth.intValue(),
+                tileHeight.intValue(),
                 tileSize,
                 groundResolution,
                 groundResolution,
@@ -202,15 +209,15 @@ public class TileConverter3857Utils extends TileConverterCommon {
     /**
      * 根据最大分辨率层级获取瓦片元数据（使用默认配置）
      *
-     * @param maxZoom 最大分辨率层级
+     * @param thisZoom 最大分辨率层级
      * @return 瓦片层级元数据对象
      */
-    public TileLevelMetadata getTileLevelMetadata(int maxZoom) {
+    public TileLevelMetadata getTileLevelMetadata(int thisZoom) {
         int defaultTileSize = advToolsConfig.getTilePixelSize() > 0
                 ? advToolsConfig.getTilePixelSize() : 256;
         int defaultDpi = advToolsConfig.getDpi() > 0
                 ? advToolsConfig.getDpi() : 96;
-        return getTileLevelMetadata(maxZoom, defaultTileSize, defaultDpi);
+        return getTileLevelMetadata(thisZoom, defaultTileSize, defaultDpi);
     }
 
     /**
@@ -285,10 +292,10 @@ public class TileConverter3857Utils extends TileConverterCommon {
         // 计算四个角的瓦片边界
         // 左下角瓦片
         double minX = tileXToCoordinateX((int) minTileX, zoom);
-        double minY = tileYToCoordinateY((int) (maxTileY  ), zoom);  // 注意Y轴方向
+        double minY = tileYToCoordinateY((int) (maxTileY), zoom);  // 注意Y轴方向
 
         // 右上角瓦片
-        double maxX = tileXToCoordinateX((int) (maxTileX  ), zoom);
+        double maxX = tileXToCoordinateX((int) (maxTileX), zoom);
         double maxY = tileYToCoordinateY((int) minTileY, zoom);
 
         Envelope envelope3857 = new Envelope(minX, maxX, minY, maxY);
