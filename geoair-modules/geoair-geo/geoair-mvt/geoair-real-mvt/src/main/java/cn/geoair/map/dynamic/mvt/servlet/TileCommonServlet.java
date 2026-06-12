@@ -8,12 +8,13 @@ import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.io.IoUtil;
+
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
@@ -22,9 +23,7 @@ import java.util.Objects;
 @Slf4j
 public class TileCommonServlet extends HttpServlet {
 
-    /**
-     * 输出响应内容
-     */
+    /** 输出响应内容 */
     public static void toResponse(HttpServletResponse response, byte[] re, String contentType) {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream in = null;
@@ -42,9 +41,7 @@ public class TileCommonServlet extends HttpServlet {
         }
     }
 
-    /**
-     * 核心 MVT 瓦片生成逻辑
-     */
+    /** 核心 MVT 瓦片生成逻辑 */
     public void doMvt(
             String layerName,
             TileRequestParams params,
@@ -52,14 +49,16 @@ public class TileCommonServlet extends HttpServlet {
             int col,
             int row,
             HttpServletResponse response,
-            HttpServletRequest request
-    ) throws Exception {
+            HttpServletRequest request)
+            throws Exception {
         byte[] data = new byte[0];
-        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params, layerName);
+        ParamCheckResult result =
+                GirRealMvtHelper.getInstance().checkTileRequestParams(params, layerName);
 
         if (!result.isSuccess()) {
             String msg = result.getMessage();
-            GirServletUtil.toResponse(response, msg.getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+            GirServletUtil.toResponse(
+                    response, msg.getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
             return;
         }
 

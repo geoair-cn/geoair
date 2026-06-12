@@ -1,24 +1,22 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import org.locationtech.jts.geom.Geometry;
+
 import scala.Tuple2;
 import scala.Tuple4;
 
 import java.io.Serializable;
 import java.util.*;
 
-
 /**
  * @author ：张俊
  * @date ：Created in 2026/4/1 12:03
  * @description： 瓦片迭代器：懒加载，逐个瓦片返回，避免一次性创建所有对象
  */
-public class TileIterator
-        implements Iterator<Tuple2<String, List<GirAdvOneRow>>> , Serializable {
+public class TileIterator implements Iterator<Tuple2<String, List<GirAdvOneRow>>>, Serializable {
 
     private final GirAdvOneRow feature;
     private final Geometry geom;
@@ -37,8 +35,8 @@ public class TileIterator
     private boolean hasNext;
     private boolean initialized;
 
-    public TileIterator(GirAdvOneRow feature, Geometry geom,
-                        int minZoom, int maxZoom, int outGridSrid) {
+    public TileIterator(
+            GirAdvOneRow feature, Geometry geom, int minZoom, int maxZoom, int outGridSrid) {
         this.feature = feature;
         this.geom = geom;
         this.minZoom = minZoom;
@@ -49,9 +47,7 @@ public class TileIterator
         this.initialized = false;
     }
 
-    /**
-     * 初始化当前 zoom 级别的瓦片范围
-     */
+    /** 初始化当前 zoom 级别的瓦片范围 */
     private void initCurrentZoom() {
         if (initialized) {
             return;
@@ -74,9 +70,7 @@ public class TileIterator
         }
     }
 
-    /**
-     * 移动到下一个 zoom 级别
-     */
+    /** 移动到下一个 zoom 级别 */
     private void moveToNextZoom() {
         currentZoom++;
         initialized = false;
@@ -86,9 +80,7 @@ public class TileIterator
         }
     }
 
-    /**
-     * 移动到下一个瓦片位置
-     */
+    /** 移动到下一个瓦片位置 */
     private void moveToNextTile() {
         currentX++;
 
@@ -122,8 +114,7 @@ public class TileIterator
                 return false;
             }
 
-            if (currentX >= xMin && currentX <= xMax &&
-                    currentY >= yMin && currentY <= yMax) {
+            if (currentX >= xMin && currentX <= xMax && currentY >= yMin && currentY <= yMax) {
                 return true;
             }
 
@@ -141,16 +132,17 @@ public class TileIterator
         }
 
         // 生成当前瓦片的 quadKey
-        String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt()
-                .xyzToQuadKey(currentX, currentY, currentZoom);
+        String quadKey =
+                GirGeoTools.defaultInstance()
+                        .getTileGridBingMapOpt()
+                        .xyzToQuadKey(currentX, currentY, currentZoom);
 
         // 使用 Collections.singletonList 避免创建新的 ArrayList
         // 注意：这个 List 是不可变的，如果下游需要修改，需要改为 new ArrayList<>(1)
-        List<GirAdvOneRow> singleList =  Collections.singletonList(feature);
+        List<GirAdvOneRow> singleList = Collections.singletonList(feature);
 
         // 创建结果 Tuple2
-        Tuple2<String, List<GirAdvOneRow>> result =
-                new Tuple2<>(quadKey, singleList);
+        Tuple2<String, List<GirAdvOneRow>> result = new Tuple2<>(quadKey, singleList);
 
         // 移动到下一个瓦片
         moveToNextTile();

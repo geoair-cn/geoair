@@ -6,9 +6,10 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.web.GirWeb;
-import org.locationtech.jts.geom.Envelope;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.locationtech.jts.geom.Envelope;
 
 /**
  * @author ：张逢吉
@@ -51,7 +52,8 @@ public interface GirRealMvtHelper {
      * @param layerName
      * @return
      */
-    default ParamCheckResult checkTileRequestParams(TileRequestParams tileRequestParams, String layerName) {
+    default ParamCheckResult checkTileRequestParams(
+            TileRequestParams tileRequestParams, String layerName) {
         return ParamCheckResult.of(true);
     }
 
@@ -60,5 +62,4 @@ public interface GirRealMvtHelper {
         String paramTile = request.getParameter("paramTile");
         return TileRequestParams.fromBase32(paramTile);
     }
-
 }

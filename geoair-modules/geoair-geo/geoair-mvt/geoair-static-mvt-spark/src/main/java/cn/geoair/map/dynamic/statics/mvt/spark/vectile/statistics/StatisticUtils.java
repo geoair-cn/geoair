@@ -9,10 +9,11 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUti
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
+
 import com.alibaba.fastjson2.JSON;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
@@ -21,7 +22,11 @@ import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
+
 import scala.Tuple2;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class StatisticUtils {

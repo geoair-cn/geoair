@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.hutool.core.bean.BeanUtil;
+
 import lombok.Data;
 
 /**

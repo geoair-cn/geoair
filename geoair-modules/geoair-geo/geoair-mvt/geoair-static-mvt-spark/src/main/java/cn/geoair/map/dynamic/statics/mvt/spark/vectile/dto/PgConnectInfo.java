@@ -2,12 +2,15 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.hutool.core.util.StrUtil;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.sql.DataSource;
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉

@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.test.shp2pg;
 
+import static cn.geoair.base.Gir.log;
+
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTran;
@@ -12,17 +14,15 @@ import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
 import cn.geoair.map.dynamic.file.shp.ShpGeoFileReader;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
+
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 
 import java.io.IOException;
 import java.util.function.Consumer;
-
-import static cn.geoair.base.Gir.log;
 
 public class ShpToPg {
 
@@ -71,30 +71,40 @@ public class ShpToPg {
 
         // 3. 构建转换处理器
         GeoFileTran tran =
-                new GeoFileTranImpl().setHeadConsumer(new Consumer<SimpleFeatureType>() {
-                            @Override
-                            public void accept(SimpleFeatureType simpleFeatureType) {
-//                                GeoToolsUtils.addFieldToFeatureType(simpleFeatureType,"oldGeomWkt",String.class);
-//                                GeoToolsUtils.addFieldToFeatureType(simpleFeatureType,"oldGeom",Geometry.class);
-                            }
-                        })
-
-                        .setGirAdvOneRowConsumer(new Consumer<GirAdvOneRow>() {
-                            @Override
-                            public void accept(GirAdvOneRow girAdvOneRow) {
-                                Geometry geometry = girAdvOneRow.getGeometry("the_geom");
-                                if (geometry != null) {
-                                    if (geometry instanceof Point) {
-                                        Point point = (Point) geometry;
-                                        Point point1 = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToBd09(point);
-                                        point1.setSRID(point.getSRID());
-                                        girAdvOneRow.put("the_geom", point1);
+                new GeoFileTranImpl()
+                        .setHeadConsumer(
+                                new Consumer<SimpleFeatureType>() {
+                                    @Override
+                                    public void accept(SimpleFeatureType simpleFeatureType) {
+                                        //
+                                        // GeoToolsUtils.addFieldToFeatureType(simpleFeatureType,"oldGeomWkt",String.class);
+                                        //
+                                        // GeoToolsUtils.addFieldToFeatureType(simpleFeatureType,"oldGeom",Geometry.class);
                                     }
-//                                    girAdvOneRow.put("oldGeomWkt", GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry,true));
-//                                    girAdvOneRow.put("oldGeom", geometry);
-                                }
-                            }
-                        })
+                                })
+                        .setGirAdvOneRowConsumer(
+                                new Consumer<GirAdvOneRow>() {
+                                    @Override
+                                    public void accept(GirAdvOneRow girAdvOneRow) {
+                                        Geometry geometry = girAdvOneRow.getGeometry("the_geom");
+                                        if (geometry != null) {
+                                            if (geometry instanceof Point) {
+                                                Point point = (Point) geometry;
+                                                Point point1 =
+                                                        GirGeoTools.defaultInstance()
+                                                                .getCoordinateOpt()
+                                                                .wgs84ToBd09(point);
+                                                point1.setSRID(point.getSRID());
+                                                girAdvOneRow.put("the_geom", point1);
+                                            }
+                                            //
+                                            // girAdvOneRow.put("oldGeomWkt",
+                                            // GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(geometry,true));
+                                            //
+                                            // girAdvOneRow.put("oldGeom", geometry);
+                                        }
+                                    }
+                                })
                         // 全局异常处理器
                         .setExceptionConsumer(
                                 e -> {
