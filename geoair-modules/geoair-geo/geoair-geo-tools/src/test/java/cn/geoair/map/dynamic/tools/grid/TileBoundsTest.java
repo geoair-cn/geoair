@@ -52,6 +52,9 @@ public class TileBoundsTest {
 
             // 4. 包含关系判断
             boolean contains = box2.getJtsEnvelope().contains(box1.getJtsEnvelope());
+
+            System.out.println(box1.getWktString(4326)+";"+box2.getWktString(4326));
+
             System.out.println("瓦片包围是否包含原始范围: " + contains);
 
         } catch (Exception e) {
