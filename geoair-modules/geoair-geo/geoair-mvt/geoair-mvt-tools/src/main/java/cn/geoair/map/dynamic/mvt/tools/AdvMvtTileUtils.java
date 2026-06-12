@@ -11,8 +11,6 @@ import org.locationtech.jts.geom.Geometry;
 
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 
-
-// import geotrellis.vector.Extent;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
