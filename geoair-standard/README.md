@@ -83,7 +83,7 @@ ORM 相关模块，提供了多种 ORM 框架的集成：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.4</version>
     <type>pom</type>
 </dependency>
 ```
@@ -97,14 +97,14 @@ ORM 相关模块，提供了多种 ORM 框架的集成：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.4</version>
 </dependency>
 
 <!-- ORM 模块 -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm-mybatis</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.4</version>
 </dependency>
 ```
 
@@ -123,7 +123,7 @@ ORM 相关模块，提供了多种 ORM 框架的集成：
 
 ## 版本历史
 
-- J17-dev-SNAPSHOT：当前开发版本
+- J17.1.4：当前开发版本
 
 ## 贡献指南
 

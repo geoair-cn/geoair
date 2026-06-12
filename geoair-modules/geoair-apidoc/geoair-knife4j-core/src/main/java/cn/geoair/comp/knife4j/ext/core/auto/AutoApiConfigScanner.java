@@ -264,7 +264,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         String title = environment.getProperty("geoair.apidoc.title", "API 在线文档");
         String description = environment.getProperty("geoair.apidoc.description", "API文档 V1.0");
         String author = environment.getProperty("geoair.apidoc.author", "geoair");
-        String version = environment.getProperty("geoair.apidoc.version", "J17-dev-SNAPSHOT");
+        String version = environment.getProperty("geoair.apidoc.version", "J17.1.4");
 
         return new ApiModelInfo(title, description, author, version);
     }

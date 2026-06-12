@@ -24,7 +24,7 @@ public class GirSwaggerProperties {
     private boolean enable = false;
 
     /** API版本号，默认为空 */
-    private String version = "J17-dev-SNAPSHOT";
+    private String version = "J17.1.4";
 
     /**
      * 鉴权处理
