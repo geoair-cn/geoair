@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
-import javafx.geometry.BoundingBox;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
