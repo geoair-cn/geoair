@@ -6,8 +6,8 @@ import lombok.Getter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.geometry.BoundingBox;
-import org.opengis.geometry.MismatchedDimensionException;
+import org.geotools.api.geometry.BoundingBox;
+
 import org.geotools.api.geometry.MismatchedDimensionException;
 
 /**
@@ -37,7 +37,7 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
         return this;
     }
 
-    public org.opengis.geometry.Envelope getOpenGisEnvelope() {
+    public org.geotools.api.geometry.Bounds getOpenGisEnvelope() {
         return this;
     }
 
