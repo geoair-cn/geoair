@@ -42,16 +42,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     @Override
     public String xyzToWkt(int z, int x, int y, int targetSrid) {
         validateXyz(z, x, y);
-        ReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
-        Geometry geometry =
-                sridConvertOpt
-                        .convertToGeom(
-                                envelope,
-                                envelope.getCoordinateReferenceSystem()
-                                        .getCoordinateSystem()
-                                        .getDimension(),
-                                targetSrid);
-        return formatOpt.jtsGeometryToWktString(geometry, false);
+        BoxReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
+        return envelope.getWktString(targetSrid);
     }
 
     /**
@@ -266,8 +258,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
         return boundsFromTileRange(minTileX, maxTileX, minTileY, maxTileY, zoom, targetSrid);
     }
-    public abstract BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom,int targetSrid);
 
+    public abstract BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid);
 
 
     @Override

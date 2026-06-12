@@ -75,12 +75,13 @@ public class GirAdvSqlUtils {
         Class<?> clazz = entity.getClass();
 
         if (GutilObject.isEmpty(ignoreFieldNames)) {
+            ignoreFieldNames = new ArrayList<>();
             List<String> ignoreFieldByAnnotation = getIgnoreFieldByAnnotation(clazz);
             ignoreFieldNames.addAll(ignoreFieldByAnnotation);
         }
-
+        List<String> finalIgnoreFieldNames = ignoreFieldNames;
         BeanCopier.create(entity, rowData, CopyOptions.create().setIgnoreNullValue(ignoreNullValue).setTransientSupport(true).setFieldNameEditor(fieldName -> {
-            if (ignoreFieldNames.contains(fieldName)) {
+            if (finalIgnoreFieldNames.contains(fieldName)) {
                 return null;
             }
             String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(clazz, fieldName);
