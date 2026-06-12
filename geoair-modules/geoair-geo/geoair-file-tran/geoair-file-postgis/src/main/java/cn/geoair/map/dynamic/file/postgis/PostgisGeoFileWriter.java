@@ -7,24 +7,24 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Logger;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureStore;
 import org.geotools.api.data.Transaction;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class PostgisGeoFileWriter implements GeoFileWriter {
 
@@ -123,7 +123,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirGeoTools.defaultInstance().getSridOpt()
+                            GirGeoTools.defaultInstance()
+                                    .getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");
@@ -219,7 +220,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
 
     private Integer extractPortFromJdbcUrl(String jdbcUrl) {
         String port = AdvJdbcUrlUtil.splitter(jdbcUrl).port;
-        return  port!=null?Integer.parseInt(port):5432;
+        return port != null ? Integer.parseInt(port) : 5432;
     }
 
     private String extractDbNameFromJdbcUrl(String jdbcUrl) {

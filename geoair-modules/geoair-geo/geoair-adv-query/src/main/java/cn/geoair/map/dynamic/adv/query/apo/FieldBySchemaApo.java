@@ -4,8 +4,10 @@ import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.adv.dbmeta.DefaultJavaType;
 import cn.geoair.map.dynamic.adv.dbmeta.PostgreSqlType;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-import java.io.Serializable;
+
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 数据库表的信息流水表(TableSchema)实体类
@@ -88,10 +90,11 @@ public class FieldBySchemaApo implements Serializable {
     }
 
     public boolean isGeometryFieldIs() {
-        geometryFieldIs = udtName.equals("geometry")
-                || udtName.equals("geography")
-                || udtName.equals("SDO_GEOMETRY")
-                || udtName.equals("\"public\".\"geometry\"");
+        geometryFieldIs =
+                udtName.equals("geometry")
+                        || udtName.equals("geography")
+                        || udtName.equals("SDO_GEOMETRY")
+                        || udtName.equals("\"public\".\"geometry\"");
         return geometryFieldIs;
     }
 }

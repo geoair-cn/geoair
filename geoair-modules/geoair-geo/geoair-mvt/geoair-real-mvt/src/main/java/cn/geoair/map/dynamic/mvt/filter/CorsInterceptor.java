@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.mvt.filter;
 
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+
 import java.util.Set;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

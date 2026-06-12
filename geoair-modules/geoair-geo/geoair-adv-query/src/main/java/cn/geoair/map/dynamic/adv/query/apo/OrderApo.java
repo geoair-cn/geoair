@@ -6,28 +6,19 @@ import cn.hutool.core.util.ObjectUtil;
 
 import java.io.Serializable;
 
-/**
- * 创建人: 张逢吉 创建时间: 2025/10/10 12:48 描述: 排序 条件接收参数
- */
+/** 创建人: 张逢吉 创建时间: 2025/10/10 12:48 描述: 排序 条件接收参数 */
 public class OrderApo implements Serializable {
 
-    /**
-     * 字段名称
-     */
+    /** 字段名称 */
     String fieldName;
 
-    /**
-     * 排序函数 类似于这样 CAST(gtc_id AS numeric)
-     */
+    /** 排序函数 类似于这样 CAST(gtc_id AS numeric) */
     String function;
 
-    /**
-     * 条件
-     */
+    /** 条件 */
     AdvEnumsOrder advEnumsOrder;
 
-    public OrderApo() {
-    }
+    public OrderApo() {}
 
     public static OrderApo empty() {
         return new OrderApo();
@@ -75,7 +66,6 @@ public class OrderApo implements Serializable {
         return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(advEnumsOrder);
     }
 
-
     public static OrderApo ofFunction(String function, AdvEnumsOrder advEnumsOrder) {
         return new OrderApo().setFunction(function).setAdvEnumsOrder(advEnumsOrder);
     }
@@ -99,6 +89,4 @@ public class OrderApo implements Serializable {
     public static OrderApo ofASCFieldName(String fieldName) {
         return new OrderApo().setFieldName(fieldName).setAdvEnumsOrder(AdvEnumsOrder.升序);
     }
-
-
 }

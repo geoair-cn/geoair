@@ -11,15 +11,20 @@ import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
+
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSONObject;
+
+import jakarta.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @program: dbApi
@@ -42,11 +47,11 @@ public class GirDsTableController {
         DsDataSourceApo dsDataSourceApo = girDsDataSourceDao.getById(sourceId);
         IAdvExecutor iAdvExecutor =
                 GirAdvQuery.getIAdvExecutor(
-                        PoolManager.getJdbcConnectionPool(dsDataSourceApo), dsDataSourceApo.getUrl());
+                        PoolManager.getJdbcConnectionPool(dsDataSourceApo),
+                        dsDataSourceApo.getUrl());
         List<SchemaTableApo> schemaTableApos = iAdvExecutor.dGetTableAndViewBySchema();
         List<String> tablesBySchema =
-                schemaTableApos
-                        .stream()
+                schemaTableApos.stream()
                         .filter(
                                 s ->
                                         s.getType().equals(AdvSchemaTableTypeOpt.表)

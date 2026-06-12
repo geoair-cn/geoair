@@ -6,24 +6,24 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureSource;
-
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.Property;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ShpGeoFileReader implements GeoFileReader {
 
@@ -47,15 +47,15 @@ public class ShpGeoFileReader implements GeoFileReader {
         initShpReader();
     }
 
-    /**
-     * 初始化 Shapefile 读取器
-     */
+    /** 初始化 Shapefile 读取器 */
     private void initShpReader() {
         try {
             File shpFile = new File(linkInfo.getShpFilePath());
             Map<String, Object> params = new HashMap<>();
             params.put(ShapefileDataStoreFactory.URLP.key, shpFile.toURI().toURL());
-            params.put(ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
+            params.put(
+                    ShapefileDataStoreFactory.DBFCHARSET.key,
+                    Charset.forName(linkInfo.getCharset()));
 
             dataStore = DataStoreFinder.getDataStore(params);
             if (dataStore == null) {
@@ -74,9 +74,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         }
     }
 
-    /**
-     * 读取表头 = SimpleFeatureType
-     */
+    /** 读取表头 = SimpleFeatureType */
     @Override
     public SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer) {
         try {
@@ -90,9 +88,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         }
     }
 
-    /**
-     * 读取单行（和 GeoJSON 逻辑完全一致）
-     */
+    /** 读取单行（和 GeoJSON 逻辑完全一致） */
     @Override
     public GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
         try {
@@ -127,9 +123,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         }
     }
 
-    /**
-     * 行迭代器（完全复用原逻辑）
-     */
+    /** 行迭代器（完全复用原逻辑） */
     @Override
     public Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer) {
         resetIterator();
@@ -185,9 +179,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         };
     }
 
-    /**
-     * 分页读取（逻辑不变）
-     */
+    /** 分页读取（逻辑不变） */
     @Override
     public GirPager<GirAdvOneRow> readRowPage(GirPageParam param, ExceptionConsumer consumer) {
         GirPager<GirAdvOneRow> pager = new GirPager<>();
@@ -221,18 +213,14 @@ public class ShpGeoFileReader implements GeoFileReader {
         return pager;
     }
 
-    /**
-     * 重置迭代器
-     */
+    /** 重置迭代器 */
     private void resetIterator() {
         if (featureIterator != null) featureIterator.close();
         initShpReader();
         currentRow.set(0);
     }
 
-    /**
-     * 关闭资源
-     */
+    /** 关闭资源 */
     @Override
     public void close() {
         if (featureIterator != null) featureIterator.close();

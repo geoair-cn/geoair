@@ -12,17 +12,21 @@ import cn.geoair.comp.db.service.core.basic.util.PoolManager;
 import cn.geoair.comp.db.service.core.basic.util.SqlEngineUtil;
 import cn.geoair.comp.db.service.core.dialect.BaseDialect;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSONObject;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

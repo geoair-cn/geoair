@@ -1,14 +1,16 @@
 package cn.geoair.map.dynamic.file.postgis;
 
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /** PostGIS 链接信息类 包含数据库连接、排序字段、几何字段等核心配置 */
 @Data

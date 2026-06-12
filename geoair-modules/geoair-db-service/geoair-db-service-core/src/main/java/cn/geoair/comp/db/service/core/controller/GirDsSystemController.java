@@ -10,14 +10,19 @@ import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+
 import com.alibaba.fastjson2.JSONObject;
-import java.util.Map;
+
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -150,14 +155,13 @@ public class GirDsSystemController {
         }
 
         Map<String, Object> config = MapUtil.newHashMap();
-//        config.put("baseUrl", baseUrl);
+        //        config.put("baseUrl", baseUrl);
         config.put("byGirServlet", GirServletUtil.getClientIP(request));
         config.put("byServerInfoByRequest", GirServletUtil.getServerInfoByRequest());
         config.put(
                 "byCurrentContextPath",
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
-        config.put(
-                "byServerPathByRequest", GirServletUtil.getServerPathByRequest());
+        config.put("byServerPathByRequest", GirServletUtil.getServerPathByRequest());
         config.put("baseUrl", GirServletUtil.getServerPathByRequest());
         config.put("loginPage", "");
         return config;

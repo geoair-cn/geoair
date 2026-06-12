@@ -2,18 +2,21 @@ package cn.geoair.map.dynamic.mvt.tools;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.*;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-import java.io.ByteArrayOutputStream;
-import java.util.*;
-import java.util.zip.GZIPOutputStream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import no.ecc.vectortile.VectorTileEncoder;
+
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
+
+import java.io.ByteArrayOutputStream;
+import java.util.*;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author ：张逢吉

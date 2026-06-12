@@ -16,34 +16,23 @@ public class AdvQueryGlobalConfig {
         return new AdvQueryGlobalConfig();
     }
 
-    /**
-     * 启用查询的sql日志
-     */
+    /** 启用查询的sql日志 */
     boolean enableQueryLog = true;
-    /**
-     * 启用ddl操作sql日志
-     */
+
+    /** 启用ddl操作sql日志 */
     boolean enableDdlLog = true;
 
-    /**
-     * 启用 更新的sql日志
-     */
+    /** 启用 更新的sql日志 */
     boolean enableUpdateLog = true;
 
-    /**
-     * 启用 插入的sql日志
-     */
+    /** 启用 插入的sql日志 */
     boolean enableAccessLog = true;
-    /**
-     * 启用删除的sql日志
-     */
+
+    /** 启用删除的sql日志 */
     boolean enableDelLog = true;
 
-    /**
-     * 执行异常的日志是否展示
-     */
+    /** 执行异常的日志是否展示 */
     boolean enableErrorLog = true;
-
 
     /**
      * 打开日志
@@ -59,6 +48,7 @@ public class AdvQueryGlobalConfig {
         enableErrorLog = true;
         return this;
     }
+
     /**
      * 关闭日志
      *
@@ -73,6 +63,4 @@ public class AdvQueryGlobalConfig {
         enableErrorLog = false;
         return this;
     }
-
-
 }

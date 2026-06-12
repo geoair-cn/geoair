@@ -20,13 +20,13 @@ import java.util.function.Supplier;
  */
 public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(dataSourceGetter,configAdvQueryGetter);
+    public MysqlAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        super(dataSourceGetter, configAdvQueryGetter);
     }
 
-    /**
-     * 获取插入操作代理对象（懒加载+数据源注入）
-     */
+    /** 获取插入操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
@@ -36,9 +36,7 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
         return advBaseAccessPxyOpt;
     }
 
-    /**
-     * 获取查询操作代理对象（懒加载+数据源注入）
-     */
+    /** 获取查询操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
@@ -48,9 +46,7 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
         return advBaseSelectPxyOpt;
     }
 
-    /**
-     * 获取更新操作代理对象（懒加载+数据源注入）
-     */
+    /** 获取更新操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
@@ -60,9 +56,7 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
         return advBaseUpdatePxyOpt;
     }
 
-    /**
-     * 获取删除操作代理对象（懒加载+数据源注入）
-     */
+    /** 获取删除操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
@@ -71,6 +65,4 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
         }
         return advBaseDeletePxyOpt;
     }
-
-
 }

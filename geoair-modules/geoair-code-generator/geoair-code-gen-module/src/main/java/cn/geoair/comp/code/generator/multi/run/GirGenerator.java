@@ -10,15 +10,18 @@ import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
 import cn.hutool.core.map.MapUtil;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
-import javax.sql.DataSource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 public class GirGenerator {
 

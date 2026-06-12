@@ -24,7 +24,6 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
         return iAdvExecutorPxy;
     }
 
-
     @Override
     protected IAdvBaseOpt getAdvBaseOpt() {
         return iAdvExecutorPxy;

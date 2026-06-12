@@ -3,9 +3,11 @@ package cn.geoair.comp.code.generator.demo;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
 import cn.geoair.comp.code.generator.multi.run.GirGenerator;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
-import javax.sql.DataSource;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.sql.DataSource;
 
 @SpringBootApplication
 // @ComponentScan(value = "com.gir")

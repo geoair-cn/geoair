@@ -20,11 +20,11 @@ import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -41,10 +41,11 @@ import java.util.stream.Collectors;
  * @description： 查询的相关通用处理逻辑
  */
 public class GirAdvSqlUtils {
-    /**
-     * 解析带参数的SQL语句，生成可执行的SQL和参数列表
-     */
-    public static SqlMeta parseSqlWithParam(String dynamicSql, GirSqlParam sqlParam, DialectTableNameProcessor dialectTableNameProcessor) {
+    /** 解析带参数的SQL语句，生成可执行的SQL和参数列表 */
+    public static SqlMeta parseSqlWithParam(
+            String dynamicSql,
+            GirSqlParam sqlParam,
+            DialectTableNameProcessor dialectTableNameProcessor) {
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
@@ -59,7 +60,6 @@ public class GirAdvSqlUtils {
         return SqlEngineUtil.getEngine().parse(cleanSql, (SqlParamMap) sqlParam);
     }
 
-
     /**
      * bean对象转换成 键值对的map
      *
@@ -70,7 +70,11 @@ public class GirAdvSqlUtils {
      * @param <T>
      * @return
      */
-    public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
+    public static <T> Map<String, Object> getRowData(
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames) {
         Map<String, Object> rowData = new HashMap<>();
         Class<?> clazz = entity.getClass();
 
@@ -80,20 +84,29 @@ public class GirAdvSqlUtils {
             ignoreFieldNames.addAll(ignoreFieldByAnnotation);
         }
         List<String> finalIgnoreFieldNames = ignoreFieldNames;
-        BeanCopier.create(entity, rowData, CopyOptions.create().setIgnoreNullValue(ignoreNullValue).setTransientSupport(true).setFieldNameEditor(fieldName -> {
-            if (finalIgnoreFieldNames.contains(fieldName)) {
-                return null;
-            }
-            String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(clazz, fieldName);
-            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
-                return columnNameByAnnotation;
-            }
-            if (isToUnderlineCase) {
-                return StrUtil.toUnderlineCase(fieldName);
-            }
-            return fieldName;
-        })).copy();
-
+        BeanCopier.create(
+                        entity,
+                        rowData,
+                        CopyOptions.create()
+                                .setIgnoreNullValue(ignoreNullValue)
+                                .setTransientSupport(true)
+                                .setFieldNameEditor(
+                                        fieldName -> {
+                                            if (finalIgnoreFieldNames.contains(fieldName)) {
+                                                return null;
+                                            }
+                                            String columnNameByAnnotation =
+                                                    GirAdvSqlUtils.getColumnNameByAnnotation(
+                                                            clazz, fieldName);
+                                            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
+                                                return columnNameByAnnotation;
+                                            }
+                                            if (isToUnderlineCase) {
+                                                return StrUtil.toUnderlineCase(fieldName);
+                                            }
+                                            return fieldName;
+                                        }))
+                .copy();
 
         return rowData;
     }
@@ -117,7 +130,6 @@ public class GirAdvSqlUtils {
                         ids.add(idByGaModel);
                         continue;
                     }
-
                 }
                 return ids;
             }
@@ -145,14 +157,12 @@ public class GirAdvSqlUtils {
                         ignores.add(field.getName());
                         continue;
                     }
-
                 }
                 return ignores;
             }
         }
         return ignores;
     }
-
 
     public static String getIdByJavax(Field field) {
         Id id = field.getAnnotation(Id.class);
@@ -169,7 +179,6 @@ public class GirAdvSqlUtils {
         }
         return null;
     }
-
 
     public static String getTableName(Class<?> clazz) {
         String tableNameByAnnotation = getTableNameByAnnotation(clazz);
@@ -192,7 +201,6 @@ public class GirAdvSqlUtils {
         }
         return null;
     }
-
 
     public static String getTableNameByJavax(Class<?> clazz) {
         Table table = clazz.getAnnotation(Table.class);
@@ -218,13 +226,13 @@ public class GirAdvSqlUtils {
         if (GutilObject.isNotEmpty(columnNameByJavax)) {
             return columnNameByJavax;
         }
-        String columnNameByGaModelField = GirAdvSqlUtils.getColumnNameByGaModelField(clazz, fieldName);
+        String columnNameByGaModelField =
+                GirAdvSqlUtils.getColumnNameByGaModelField(clazz, fieldName);
         if (GutilObject.isNotEmpty(columnNameByGaModelField)) {
             return columnNameByGaModelField;
         }
         return null;
     }
-
 
     // 获取字段对应的列名
     public static String getColumnNameByJavax(Class<?> clazz, String fieldName) {
@@ -241,7 +249,6 @@ public class GirAdvSqlUtils {
         return null;
     }
 
-
     public static String getColumnNameByGaModelField(Class<?> clazz, String fieldName) {
         try {
             Field field = clazz.getDeclaredField(fieldName);
@@ -256,29 +263,35 @@ public class GirAdvSqlUtils {
         return null;
     }
 
-    public static GirAdvSqlComposer getSqlBuilder(DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public static GirAdvSqlComposer getSqlBuilder(
+            DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
         return new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
-    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, GirAdvSqlComposer sqlBuilder) {
+    public static String buildWhereClause(
+            GirAdvWhereFilter whereFilter, List<Object> params, GirAdvSqlComposer sqlBuilder) {
         return sqlBuilder.buildWhereSql(whereFilter, params);
     }
 
-    public static String buildWhereClause(GirAdvWhereFilter whereFilter, List<Object> params, DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
+    public static String buildWhereClause(
+            GirAdvWhereFilter whereFilter,
+            List<Object> params,
+            DialectTableNameProcessor dialectProcessor,
+            IDataSourceGetter dataSourceGetter) {
         return getSqlBuilder(dialectProcessor, dataSourceGetter).buildWhereSql(whereFilter, params);
     }
 
-
-    public static String buildWhereClause(Map<String, Object> whereMap, DialectTableNameProcessor dialectProcessor) {
+    public static String buildWhereClause(
+            Map<String, Object> whereMap, DialectTableNameProcessor dialectProcessor) {
         return whereMap.keySet().stream()
                 .map(dialectProcessor::tbQuoteFieldName)
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(" AND "));
     }
 
-    public static String buildSetClause(Map<String, Object> rowData, DialectTableNameProcessor dialectProcessor) {
-        return rowData.keySet()
-                .stream()
+    public static String buildSetClause(
+            Map<String, Object> rowData, DialectTableNameProcessor dialectProcessor) {
+        return rowData.keySet().stream()
                 .map(dialectProcessor::tbQuoteFieldName)
                 .map(field -> StrUtil.format("{} = ?", field))
                 .collect(Collectors.joining(","));
@@ -303,6 +316,4 @@ public class GirAdvSqlUtils {
             }
         }
     }
-
-
 }

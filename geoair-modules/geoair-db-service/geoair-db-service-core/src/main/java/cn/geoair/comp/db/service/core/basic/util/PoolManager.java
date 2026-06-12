@@ -1,11 +1,14 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
+
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @program: api
@@ -56,7 +59,8 @@ public class PoolManager {
         }
     }
 
-    public static DruidPooledConnection getPooledConnection(DsDataSourceApo ds) throws SQLException {
+    public static DruidPooledConnection getPooledConnection(DsDataSourceApo ds)
+            throws SQLException {
         DruidDataSource pool = PoolManager.getJdbcConnectionPool(ds);
         DruidPooledConnection connection = pool.getConnection();
         log.debug("获取连接成功");

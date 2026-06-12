@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.file.core.tran.model;
 
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 

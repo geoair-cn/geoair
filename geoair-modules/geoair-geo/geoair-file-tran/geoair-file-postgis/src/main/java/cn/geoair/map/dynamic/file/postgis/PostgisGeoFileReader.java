@@ -7,16 +7,19 @@ import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
-import java.io.IOException;
-import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureSource;
 import org.geotools.api.data.Query;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
@@ -25,10 +28,9 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.VirtualTable;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.Property;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+
+import java.io.IOException;
+import java.util.*;
 
 /** 改造后的 PostGIS 读取器 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑 基于 GeoTools 实现，统一要素类型标准 */
 @Slf4j
@@ -155,7 +157,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
             if (linkInfo.getSrid() > 0 && featureType != null) {
                 SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
-                CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
+                CoordinateReferenceSystem crs =
+                        GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
                 typeBuilder.setCRS(crs);
                 this.featureType = typeBuilder.buildFeatureType();
             }
@@ -363,7 +366,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
 
     private Integer extractPortFromJdbcUrl(String jdbcUrl) {
         String port = AdvJdbcUrlUtil.splitter(jdbcUrl).port;
-        return  port!=null?Integer.parseInt(port):5432;
+        return port != null ? Integer.parseInt(port) : 5432;
     }
 
     private String extractDbNameFromJdbcUrl(String jdbcUrl) {

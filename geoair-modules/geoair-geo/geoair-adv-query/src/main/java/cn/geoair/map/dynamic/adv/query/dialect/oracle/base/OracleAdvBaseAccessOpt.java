@@ -20,19 +20,20 @@ public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
 
-
-
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         // Oracle 使用子查询判断：不存在则插入
         String[] fieldArray = fields.split(",");
         String pkField = fieldArray[0].trim();
 
         return StrUtil.format(
-                "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS " +
-                        "(SELECT 1 FROM {} WHERE {} = ?)",
-                tableName, fields, placeholders, tableName, pkField);
+                "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS "
+                        + "(SELECT 1 FROM {} WHERE {} = ?)",
+                tableName,
+                fields,
+                placeholders,
+                tableName,
+                pkField);
     }
-
-
 }
