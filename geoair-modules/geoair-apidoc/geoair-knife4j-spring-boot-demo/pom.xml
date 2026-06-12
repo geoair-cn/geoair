@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-apidoc</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.4</version>
   <packaging>jar</packaging>
   <name>geoair-knife4j-spring-boot-demo</name>
 

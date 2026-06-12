@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-dependencies</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.4</version>
   <packaging>pom</packaging>
   <name>geoair-spring-dependencies</name>
   <description>geoair spring 相关的依赖声明</description>
@@ -42,7 +42,7 @@
 
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J8.1.4</geoair.version>
     <redisson.version>3.18.0</redisson.version>
     <spring-boot.version>2.7.18</spring-boot.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

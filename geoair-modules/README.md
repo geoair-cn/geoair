@@ -61,7 +61,7 @@ goair-modules/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
     <type>pom</type>
 </dependency>
 ```
@@ -75,14 +75,14 @@ goair-modules/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
 </dependency>
 
 <!-- 代码生成 -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-code-gen-module</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
 </dependency>
 ```
 
@@ -93,7 +93,7 @@ goair-modules/
 
 ## 版本历史
 
-- J8-dev-SNAPSHOT：当前开发版本
+- J8.1.4：当前开发版本
 
 ## 贡献指南
 

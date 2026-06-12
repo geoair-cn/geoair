@@ -137,7 +137,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-base-parent</artifactId>
-            <version>J8-dev-SNAPSHOT</version>
+            <version>J8.1.4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -154,7 +154,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>J8-dev-SNAPSHOT</version>
+            <version>J8.1.4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -169,7 +169,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-spring-dependencies</artifactId>
-            <version>J8-dev-SNAPSHOT</version>
+            <version>J8.1.4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -185,7 +185,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>J8-dev-SNAPSHOT</version>
+            <version>J8.1.4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -194,7 +194,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-openapi-dependencies</artifactId>
-            <version>J8-dev-SNAPSHOT</version>
+            <version>J8.1.4</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -219,5 +219,5 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ---
 **最后更新**: 2026-03-14  
-**当前版本**: J8-dev-SNAPSHOT
+**当前版本**: J8.1.4
 ```

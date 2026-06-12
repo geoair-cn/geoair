@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-mvt</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-real-mvt</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.4</version>
   <packaging>jar</packaging>
   <name>geoair-real-mvt</name>
 
@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J8.1.4</geoair.version>
     <geotrellis.version>3.7.1</geotrellis.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
