@@ -83,14 +83,6 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     List<String> eGetAllGeoLayerName();
 
     /**
-     * 判断指定表是否包含空间字段
-     *
-     * @param tableName 表名称，支持带schema的格式（如"schema.table"）
-     * @return 包含空间字段返回true，否则返回false
-     */
-    boolean eIsGeomByTable(String tableName);
-
-    /**
      * 获取指定表的空间字段类型
      *
      * @param tableName 表名称，支持带schema的格式（如"schema.table"）
@@ -143,12 +135,49 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlView, List<String> geomFieldNames);
 
     /**
+     * 获取SQL视图结果中包含的空间字段类型
+     *
+     * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
+     * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
+     */
+    AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName);
+
+    /**
+     * 获取SQL视图结果中包含的空间字段类型
+     *
+     * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
+     * @param geomFieldName 空间字段名称
+     * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
+     */
+    AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, String geomFieldName);
+
+    /**
+     * 获取SQL视图结果中包含的空间字段类型
+     *
+     * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
+     * @param geomFieldNames 空间字段名称列表
+     * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
+     */
+    Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(
+            String sqlViewOrTableName, List<String> geomFieldNames);
+
+    /**
+     * 判断指定表是否包含空间字段
+     *
+     * @param tableName 表名称，支持带schema的格式（如"schema.table"）
+     * @return 包含空间字段返回true，否则返回false
+     */
+    boolean eIsGeomByTable(String tableName);
+
+    /**
      * 判断SQL视图结果是否包含空间字段
      *
      * @param sqlView 用于生成视图的SQL语句
      * @return 包含空间字段返回true，否则返回false
      */
     boolean eIsGeomBySql(String sqlView);
+
+    boolean eIsGeomBySqlOrTable(String sqlViewOrTableName);
 
     /**
      * 获取指定表中的空间字段名称 存在多个，返回一个
@@ -197,6 +226,14 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * @return 空间字段名称，若视图不包含空间字段则返回null
      */
     List<String> eGetGeomColumnNameListBySql(String sqlView);
+
+    /**
+     * 获取SQL视图结果中的空间字段名称
+     *
+     * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
+     * @return 空间字段名称，若视图不包含空间字段则返回null
+     */
+    List<String> eGetGeomColumnNameListBySqlOrTable(String sqlViewOrTableName);
 
     /**
      * 获取SQL视图结果中的空间字段列表

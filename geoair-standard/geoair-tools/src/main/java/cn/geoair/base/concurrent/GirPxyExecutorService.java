@@ -1,7 +1,7 @@
 package cn.geoair.base.concurrent;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /** 代理的线程池 */
 public class GirPxyExecutorService implements ExecutorService {
-    private static final GiLogger log = GirLogger.getLoger(GirPxyExecutorService.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirPxyExecutorService.class);
 
     protected final ExecutorService delegate;
     protected final List<GirTaskInterceptor> interceptors;

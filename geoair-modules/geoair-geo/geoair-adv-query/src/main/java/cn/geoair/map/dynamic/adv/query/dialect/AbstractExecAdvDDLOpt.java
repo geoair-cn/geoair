@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
@@ -20,6 +20,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /** 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现 */
 public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
@@ -33,7 +34,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     protected IAdvBaseOpt baseOpt;
 
     // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvDDLOpt.class);
+    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvDDLOpt.class);
 
     // ========== 通用初始化 ==========
     public AbstractExecAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
@@ -58,30 +59,74 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // ========== 通用逻辑：表操作 ==========
     @Override
-    public void dDelTable(String tableName) {
-        dTruncateTable(tableName);
+    public void dDelTable(String tableNameWithSchema) {
+        dTruncateTable(tableNameWithSchema);
     }
 
     @Override
-    public void dTruncateTable(String tableName) {
-        if (StrUtil.isEmpty(tableName)) {
+    public void dCopyTableByTableName(String dstTableName, String srcTableName, boolean dataSync) {
+        if (StrUtil.isEmpty(dstTableName) || StrUtil.isEmpty(srcTableName)) {
+            throw new IllegalArgumentException("源表名和目标表名不能为空");
+        }
+        String qualifiedDstTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, dstTableName);
+        String qualifiedSrcTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, srcTableName);
+
+        if (dataSync) {
+            // 复制表结构及数据
+            String createSql =
+                    buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
+            dExecuteDDL(createSql, dstTableName, "复制表结构及数据");
+        } else {
+            // 仅复制表结构
+            String createSql =
+                    buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
+            dExecuteDDL(createSql, dstTableName, "复制表结构");
+        }
+    }
+
+    @Override
+    public void dCopyTableBySql(String dstTableName, String sql, boolean dataSync) {
+        if (StrUtil.isEmpty(dstTableName) || StrUtil.isEmpty(sql)) {
+            throw new IllegalArgumentException("目标表名和SQL不能为空");
+        }
+        String qualifiedDstTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, dstTableName);
+
+        if (dataSync) {
+            // 根据SQL创建表并插入数据
+            String createSql = buildCreateTableFromSqlSql(qualifiedDstTableName, sql);
+            dExecuteDDL(createSql, dstTableName, "根据SQL复制表结构及数据");
+        } else {
+            // 仅根据SQL创建表结构（不插入数据）
+            String createSql = buildCreateTableFromSqlWithNoDataSql(qualifiedDstTableName, sql);
+            dExecuteDDL(createSql, dstTableName, "根据SQL复制表结构");
+        }
+    }
+
+    @Override
+    public void dTruncateTable(String tableNameWithSchema) {
+        if (StrUtil.isEmpty(tableNameWithSchema)) {
             throw new IllegalArgumentException("表名不能为空");
         }
         String qualifiedTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameWithSchema);
         String sql = buildTruncateTableSql(qualifiedTableName);
-        dExecuteDDL(sql, tableName, "清空表数据");
+        dExecuteDDL(sql, tableNameWithSchema, "清空表数据");
     }
 
     @Override
-    public void dDropTable(String tableName) {
-        if (StrUtil.isEmpty(tableName)) {
+    public void dDropTable(String tableNameWithSchema) {
+        if (StrUtil.isEmpty(tableNameWithSchema)) {
             throw new IllegalArgumentException("表名不能为空");
         }
         String qualifiedTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameWithSchema);
         String sql = buildDropTableSql(qualifiedTableName);
-        dExecuteDDL(sql, tableName, "删除表");
+        dExecuteDDL(sql, tableNameWithSchema, "删除表");
     }
 
     @Override
@@ -98,9 +143,16 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         String oldQualifiedName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, oldTableName);
         String newQualifiedName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, newTableName);
+                dialectTableNameProcessor.tbGetTableNameNotSchema(
+                        newTableName); //  RENAME TO 不支持带模式名称
+
+        newQualifiedName = dialectTableNameProcessor.tbQuoteTableName(newQualifiedName);
+
         String sql = buildRenameTableSql(oldQualifiedName, newQualifiedName);
-        dExecuteDDL(sql, oldTableName, "重命名表");
+        dExecuteDDL(
+                sql,
+                oldTableName,
+                StrUtil.format(" 将表{}重命名为{} ", oldQualifiedName, newQualifiedName));
     }
 
     // ========== 通用逻辑：字段操作 ==========
@@ -124,7 +176,11 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildAlterColumnSql(qualifiedTableName, oldColumnName, newField);
+        String sql =
+                buildAlterColumnSql(
+                        qualifiedTableName,
+                        dialectTableNameProcessor.tbQuoteFieldName(oldColumnName),
+                        newField);
         dExecuteDDL(sql, tableName, "修改字段[" + oldColumnName + "→" + newField.getColumnName() + "]");
     }
 
@@ -152,7 +208,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildDropColumnSql(qualifiedTableName, columnName);
+        String sql =
+                buildDropColumnSql(
+                        qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(columnName));
         dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
     }
 
@@ -174,7 +232,13 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        columnNames =
+                columnNames
+                        .stream()
+                        .map(dialectTableNameProcessor::tbQuoteFieldName)
+                        .collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
+
         String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
         dExecuteDDL(sql, tableName, "添加主键约束[" + pkConstraintName + "]");
     }
@@ -253,6 +317,11 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        columnNames =
+                columnNames
+                        .stream()
+                        .map(dialectTableNameProcessor::tbQuoteFieldName)
+                        .collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
         String sql = buildCreateIndexSql(qualifiedTableName, indexName, columns, isUnique);
         dExecuteDDL(sql, tableName, "创建" + (isUnique ? "唯一" : "") + "索引[" + indexName + "]");
@@ -601,6 +670,43 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     protected abstract void setFieldLengthInfo(
             ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field)
             throws SQLException;
+
+    /**
+     * 构建复制表结构及数据的SQL（根据源表名）
+     *
+     * @param dstTableName 目标表名（已包含schema）
+     * @param srcTableName 源表名（已包含schema）
+     * @return 复制表结构及数据的SQL
+     */
+    protected abstract String buildCreateTableFromTableSql(
+            String dstTableName, String srcTableName);
+
+    /**
+     * 构建仅复制表结构的SQL（根据源表名）
+     *
+     * @param dstTableName 目标表名（已包含schema）
+     * @param srcTableName 源表名（已包含schema）
+     * @return 仅复制表结构的SQL
+     */
+    protected abstract String buildCreateTableLikeSql(String dstTableName, String srcTableName);
+
+    /**
+     * 根据自定义SQL构建创建表并插入数据的SQL
+     *
+     * @param dstTableName 目标表名（已包含schema）
+     * @param sql 源数据查询SQL
+     * @return 创建表并插入数据的SQL
+     */
+    protected abstract String buildCreateTableFromSqlSql(String dstTableName, String sql);
+
+    /**
+     * 根据自定义SQL构建仅创建表结构（不插入数据）的SQL
+     *
+     * @param dstTableName 目标表名（已包含schema）
+     * @param sql 源数据查询SQL
+     * @return 仅创建表结构的SQL
+     */
+    protected abstract String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql);
 
     @Override
     public void dCreateTable(String tableName, List<FieldBySchemaApo> fields, String primaryKey) {

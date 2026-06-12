@@ -22,22 +22,27 @@ public class DsRunerConfig implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        String path = "localhost:{}";
         String port = environment.getProperty("server.port");
         if (port == null) {
             port = "8080";
         }
-        String context_path = environment.getProperty("server.servlet.context-path");
-        boolean notBlank = GutilStr.isNotBlank(context_path);
-        if (notBlank) {
-            path = path + context_path;
-        }
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        String contextPath = environment.getProperty("server.servlet.context-path");
+        boolean hasContextPath = GutilStr.isNotBlank(contextPath);
+
+        String baseUrl =
+                String.format("http://localhost:%s%s", port, hasContextPath ? contextPath : "");
+        String dsViewUrl = baseUrl + "/dsView/index.html";
+        boolean isLoginEnabled = girDsServiceProperties.isEnableLogin();
+
+        Gir.log.info("");
         Gir.log.info(
-                "dsApi服务地址：" + path + "{}，登录启用状态：{}",
-                port,
-                "/dsView/index.html",
-                girDsServiceProperties.isEnableLogin());
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info("              📊 DS Api 服务启动成功");
+        Gir.log.info("");
+        Gir.log.info("  🌐 访问地址：{}", dsViewUrl);
+        Gir.log.info("  🔐 登录认证：{}", isLoginEnabled ? "✅ 开启" : "❌ 关闭");
+        Gir.log.info(
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info("");
     }
 }

@@ -50,9 +50,12 @@ public class GirCorsFilter implements Filter {
         String origin = request.getHeader("Origin");
         if (GutilStr.isNotBlank(origin)) {
             response.setHeader("Access-Control-Allow-Origin", origin);
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+        } else {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Credentials", "false");
         }
 
-        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
 

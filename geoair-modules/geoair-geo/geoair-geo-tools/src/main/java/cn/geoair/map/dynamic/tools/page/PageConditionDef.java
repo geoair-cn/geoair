@@ -12,6 +12,13 @@ import java.util.function.Consumer;
 public interface PageConditionDef<T> {
 
     /**
+     * 获取总条数，用于计算分页信息
+     *
+     * @param
+     */
+    Long getTotalRecordCount();
+
+    /**
      * 设置分页配置
      *
      * @param pageConfig 分页配置
@@ -51,7 +58,18 @@ public interface PageConditionDef<T> {
     List<T> getPageRecords(Integer pageNo, Integer pageSize);
 
     /** 当查询结束的时候。 */
-    default void onComplete(List<T> resultList) {
-        StaticLog.info("查询结束，结果列表大小：{}", resultList.size());
+    default void onComplete(
+            List<T> resultList,
+            long actualPageSize,
+            long totalPages,
+            long countConsume,
+            long totalCount) {
+        StaticLog.info(
+                "查询结束，结果列表大小：{},计算后的分页大小 {}，总页数:{} ,消费总条数：{},分页总条数：{}",
+                resultList.size(),
+                actualPageSize,
+                totalPages,
+                countConsume,
+                totalCount);
     }
 }

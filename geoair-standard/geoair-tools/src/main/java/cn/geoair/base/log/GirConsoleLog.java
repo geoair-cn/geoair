@@ -62,7 +62,7 @@ public class GirConsoleLog implements GiLogger {
 
     // -------------------------------------------------------------------------
     public void log(GemLogLevel level, Throwable t, String format, Object... arguments) {
-        if (false == isEnabled(level)) {
+        if (!isEnabled(level)) {
             return;
         }
         Map<String, Object> map = new HashMap<>();

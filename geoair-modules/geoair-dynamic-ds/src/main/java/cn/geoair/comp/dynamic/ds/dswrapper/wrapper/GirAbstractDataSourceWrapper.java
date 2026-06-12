@@ -19,6 +19,7 @@ public abstract class GirAbstractDataSourceWrapper implements AdvDataSourceWrapp
     }
 
     /** 获取包装的原始数据源 */
+    @Override
     public DataSource getTargetDataSource() {
         return targetDataSource;
     }

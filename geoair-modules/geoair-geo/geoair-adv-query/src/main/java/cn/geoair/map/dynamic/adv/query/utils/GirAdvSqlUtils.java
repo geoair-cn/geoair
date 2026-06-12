@@ -1,21 +1,37 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
+import cn.geoair.base.Gir;
+import cn.geoair.base.data.model.annotation.GaModel;
+import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.anno.GirTransient;
 import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilder;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+import cn.hutool.core.bean.BeanDesc;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * @author ：张俊
@@ -31,7 +47,7 @@ public class GirAdvSqlUtils {
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("SQL语句不能为空");
         }
-        if (sqlParam == null) {
+        if (sqlParam == null || GutilObject.isEmpty(sqlParam)) {
             return new SqlMeta(dynamicSql, new ArrayList<>());
         }
         if (sqlParam instanceof SqlParamList) {
@@ -58,6 +74,14 @@ public class GirAdvSqlUtils {
             boolean ignoreNullValue,
             List<String> ignoreFieldNames) {
         Map<String, Object> rowData = new HashMap<>();
+        Class<?> clazz = entity.getClass();
+
+        if (GutilObject.isEmpty(ignoreFieldNames)) {
+            ignoreFieldNames = new ArrayList<>();
+            List<String> ignoreFieldByAnnotation = getIgnoreFieldByAnnotation(clazz);
+            ignoreFieldNames.addAll(ignoreFieldByAnnotation);
+        }
+        List<String> finalIgnoreFieldNames = ignoreFieldNames;
         BeanCopier.create(
                         entity,
                         rowData,
@@ -65,27 +89,185 @@ public class GirAdvSqlUtils {
                                 .setIgnoreNullValue(ignoreNullValue)
                                 .setTransientSupport(true)
                                 .setFieldNameEditor(
-                                        key -> {
-                                            if (ignoreFieldNames != null
-                                                    && ignoreFieldNames.contains(key)) {
+                                        fieldName -> {
+                                            if (finalIgnoreFieldNames.contains(fieldName)) {
                                                 return null;
                                             }
-                                            if (isToUnderlineCase) {
-                                                return StrUtil.toUnderlineCase(key);
+                                            String columnNameByAnnotation =
+                                                    GirAdvSqlUtils.getColumnNameByAnnotation(
+                                                            clazz, fieldName);
+                                            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
+                                                return columnNameByAnnotation;
                                             }
-                                            return key;
+                                            if (isToUnderlineCase) {
+                                                return StrUtil.toUnderlineCase(fieldName);
+                                            }
+                                            return fieldName;
                                         }))
                 .copy();
+
         return rowData;
     }
 
-    public static GirAdvQuerySqlBuilder getSqlBuilder(
+    public static List<String> getIdByAnnotation(Class<?> clazz) {
+        List<String> ids = new ArrayList<>();
+        BeanDesc beanDesc = BeanUtil.getBeanDesc(clazz);
+        if (GutilObject.isNotEmpty(beanDesc)) {
+            Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
+            if (GutilObject.isNotEmpty(propMap)) {
+                for (Map.Entry<String, PropDesc> propDescEntry : propMap.entrySet()) {
+                    PropDesc value = propDescEntry.getValue();
+                    Field field = value.getField();
+                    String idByJavax = getIdByJavax(field);
+                    if (idByJavax != null) {
+                        ids.add(idByJavax);
+                        continue;
+                    }
+                    String idByGaModel = getIdByGaModel(field);
+                    if (idByGaModel != null) {
+                        ids.add(idByGaModel);
+                        continue;
+                    }
+                }
+                return ids;
+            }
+        }
+        return ids;
+    }
+
+    public static List<String> getIgnoreFieldByAnnotation(Class<?> clazz) {
+        List<String> ignores = new ArrayList<>();
+        BeanDesc beanDesc = BeanUtil.getBeanDesc(clazz);
+        if (GutilObject.isNotEmpty(beanDesc)) {
+            Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
+            if (GutilObject.isNotEmpty(propMap)) {
+                for (Map.Entry<String, PropDesc> propDescEntry : propMap.entrySet()) {
+                    PropDesc value = propDescEntry.getValue();
+                    Field field = value.getField();
+                    GirTransient girTransient = field.getAnnotation(GirTransient.class);
+                    if (girTransient != null) {
+                        ignores.add(field.getName());
+                        continue;
+                    }
+
+                    Transient aTransient = field.getAnnotation(Transient.class);
+                    if (aTransient != null) {
+                        ignores.add(field.getName());
+                        continue;
+                    }
+                }
+                return ignores;
+            }
+        }
+        return ignores;
+    }
+
+    public static String getIdByJavax(Field field) {
+        Id id = field.getAnnotation(Id.class);
+        if (id != null) {
+            return field.getName();
+        }
+        return null;
+    }
+
+    public static String getIdByGaModel(Field field) {
+        GaModelField gaModel = field.getAnnotation(GaModelField.class);
+        if (gaModel != null && gaModel.isID()) {
+            return field.getName();
+        }
+        return null;
+    }
+
+    public static String getTableName(Class<?> clazz) {
+        String tableNameByAnnotation = getTableNameByAnnotation(clazz);
+
+        if (GutilObject.isNotEmpty(tableNameByAnnotation)) {
+            return tableNameByAnnotation;
+        }
+        return StrUtil.lowerFirst(clazz.getSimpleName());
+    }
+
+    public static String getTableNameByAnnotation(Class<?> clazz) {
+        String tableNameByJavax = getTableNameByJavax(clazz);
+
+        if (GutilObject.isNotEmpty(tableNameByJavax)) {
+            return tableNameByJavax;
+        }
+        String tableNameByGaModel = getTableNameByGaModel(clazz);
+        if (GutilObject.isNotEmpty(tableNameByGaModel)) {
+            return tableNameByGaModel;
+        }
+        return null;
+    }
+
+    public static String getTableNameByJavax(Class<?> clazz) {
+        Table table = clazz.getAnnotation(Table.class);
+        if (table != null && StrUtil.isNotBlank(table.name())) {
+            if (StrUtil.isNotBlank(table.schema())) {
+                return table.schema() + "." + table.name();
+            }
+            return table.name();
+        }
+        return null;
+    }
+
+    public static String getTableNameByGaModel(Class<?> clazz) {
+        GaModel gaModel = clazz.getAnnotation(GaModel.class);
+        if (gaModel != null && StrUtil.isNotBlank(gaModel.tableName())) {
+            return gaModel.tableName();
+        }
+        return null;
+    }
+
+    public static String getColumnNameByAnnotation(Class<?> clazz, String fieldName) {
+        String columnNameByJavax = GirAdvSqlUtils.getColumnNameByJavax(clazz, fieldName);
+        if (GutilObject.isNotEmpty(columnNameByJavax)) {
+            return columnNameByJavax;
+        }
+        String columnNameByGaModelField =
+                GirAdvSqlUtils.getColumnNameByGaModelField(clazz, fieldName);
+        if (GutilObject.isNotEmpty(columnNameByGaModelField)) {
+            return columnNameByGaModelField;
+        }
+        return null;
+    }
+
+    // 获取字段对应的列名
+    public static String getColumnNameByJavax(Class<?> clazz, String fieldName) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Column column = field.getAnnotation(Column.class);
+            if (column != null && StrUtil.isNotBlank(column.name())) {
+                return column.name();
+            }
+        } catch (NoSuchFieldException e) {
+
+        }
+        return null;
+    }
+
+    public static String getColumnNameByGaModelField(Class<?> clazz, String fieldName) {
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            GaModelField column = field.getAnnotation(GaModelField.class);
+            if (column != null && StrUtil.isNotBlank(column.columnName())) {
+                return column.columnName();
+            }
+        } catch (NoSuchFieldException e) {
+
+        }
+        return null;
+    }
+
+    public static GirAdvSqlComposer getSqlBuilder(
             DialectTableNameProcessor dialectProcessor, IDataSourceGetter dataSourceGetter) {
-        return new GirAdvQuerySqlBuilder(dialectProcessor, dataSourceGetter);
+        return new GirAdvSqlComposer(dialectProcessor, dataSourceGetter);
     }
 
     public static String buildWhereClause(
-            GirAdvWhereFilter whereFilter, List<Object> params, GirAdvQuerySqlBuilder sqlBuilder) {
+            GirAdvWhereFilter whereFilter, List<Object> params, GirAdvSqlComposer sqlBuilder) {
         return sqlBuilder.buildWhereSql(whereFilter, params);
     }
 
@@ -95,5 +277,43 @@ public class GirAdvSqlUtils {
             DialectTableNameProcessor dialectProcessor,
             IDataSourceGetter dataSourceGetter) {
         return getSqlBuilder(dialectProcessor, dataSourceGetter).buildWhereSql(whereFilter, params);
+    }
+
+    public static String buildWhereClause(
+            Map<String, Object> whereMap, DialectTableNameProcessor dialectProcessor) {
+        return whereMap.keySet()
+                .stream()
+                .map(dialectProcessor::tbQuoteFieldName)
+                .map(field -> StrUtil.format("{} = ?", field))
+                .collect(Collectors.joining(" AND "));
+    }
+
+    public static String buildSetClause(
+            Map<String, Object> rowData, DialectTableNameProcessor dialectProcessor) {
+        return rowData.keySet()
+                .stream()
+                .map(dialectProcessor::tbQuoteFieldName)
+                .map(field -> StrUtil.format("{} = ?", field))
+                .collect(Collectors.joining(","));
+    }
+
+    public static void rollbackConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                Gir.log.error("批量插入回滚失败", e);
+            }
+        }
+    }
+
+    public static void restoreAutoCommit(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                Gir.log.error("恢复自动提交失败", e);
+            }
+        }
     }
 }

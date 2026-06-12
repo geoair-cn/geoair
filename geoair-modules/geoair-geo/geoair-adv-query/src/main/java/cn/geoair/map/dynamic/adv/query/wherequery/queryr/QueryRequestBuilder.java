@@ -7,10 +7,13 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+import cn.geoair.map.dynamic.adv.query.utils.LambdaUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.StrUtil;
 import java.util.*;
 import java.util.function.Consumer;
 import lombok.Getter;
@@ -67,6 +70,12 @@ public class QueryRequestBuilder<T> {
     /** 查询字段名列表 */
     private List<String> columnNames;
 
+    /**
+     * 表达式字段名称 类似于这样的函数表达式 "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR", "LENGTH", "NOW",
+     * "DATE", "YEAR", "MONTH", "DAY", "TRIM"
+     */
+    private List<String> exprColumnNames;
+
     /** WHERE条件参数映射 */
     @Getter private GirAdvWhereFilter whereOption;
 
@@ -77,10 +86,10 @@ public class QueryRequestBuilder<T> {
     @Getter private final List<OrderApo> orders = new ArrayList<>();
 
     /** 页码 */
-    @Getter private Integer pageNum = 1;
+    @Getter private Integer pageNum;
 
     /** 每页条数 */
-    @Getter private Integer pageSize = 25;
+    @Getter private Integer pageSize;
 
     /** 页码起始规则（默认false，从1开始） */
     @Getter private Boolean pageNumStartZero = false;
@@ -101,6 +110,15 @@ public class QueryRequestBuilder<T> {
 
     /** 字段映射（数据库字段名 -> 返回字段名） */
     @Getter private Map<String, String> fieldMapping;
+
+    /** 是否去重查询 */
+    @Getter private Boolean distinct;
+
+    /** GROUP BY字段列表 */
+    @Getter private List<String> groupByFields;
+
+    /** HAVING条件过滤器 */
+    @Getter private GirAdvWhereFilter havingFilter;
 
     // ==================== 构造函数 ====================
 
@@ -123,6 +141,11 @@ public class QueryRequestBuilder<T> {
      */
     public QueryRequestBuilder<T> table(String tableName) {
         this.tableOrSqlView = tableName;
+        return this;
+    }
+
+    public QueryRequestBuilder<T> sqlViewTableNameAlias(String sqlViewTableNameAlias) {
+        this.sqlViewTableNameAlias = sqlViewTableNameAlias;
         return this;
     }
 
@@ -172,7 +195,7 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     public QueryRequestBuilder<T> fields(String... columnNames) {
-        this.columnNames = Arrays.asList(columnNames);
+        this.columnNames = ListUtil.toList(columnNames);
         return this;
     }
 
@@ -222,11 +245,31 @@ public class QueryRequestBuilder<T> {
      * @param alias 别名
      * @return Builder实例
      */
-    public QueryRequestBuilder<T> fieldExpr(String sqlExpression, String alias) {
-        if (this.columnNames == null) {
-            this.columnNames = new ArrayList<>();
+    public QueryRequestBuilder<T> fieldExprAs(String sqlExpression, String alias) {
+        if (this.exprColumnNames == null) {
+            this.exprColumnNames = new ArrayList<>();
         }
-        this.columnNames.add(sqlExpression + " AS " + alias);
+        this.exprColumnNames.add(sqlExpression + " AS " + alias);
+        return this;
+    }
+
+    /**
+     * 添加SQL表达式字段
+     *
+     * @return Builder实例
+     */
+    public QueryRequestBuilder<T> fieldExpr(List<String> sqlExpressions) {
+        this.exprColumnNames = sqlExpressions;
+        return this;
+    }
+
+    /**
+     * 添加SQL表达式字段
+     *
+     * @return Builder实例
+     */
+    public QueryRequestBuilder<T> fieldExpr(String... sqlExpressions) {
+        this.exprColumnNames = ListUtil.toList(sqlExpressions);
         return this;
     }
 
@@ -431,6 +474,11 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+    public QueryRequestBuilder<T> pageNumStartZero(boolean pageNumStartZero) {
+        this.pageNumStartZero = pageNumStartZero;
+        return this;
+    }
+
     /**
      * 设置分页参数（自定义起始页码）
      *
@@ -479,6 +527,13 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+    /** 设置空间操作规则 */
+    @Deprecated
+    public QueryRequestBuilder<T> advEnumsGeomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
+        this.advEnumsGeomOpt = advEnumsGeomOpt;
+        return this;
+    }
+
     /** 设置是否返回字段元数据 */
     public QueryRequestBuilder<T> hasFieldsInfo(boolean hasFieldsInfo) {
         this.hasFieldsInfo = hasFieldsInfo;
@@ -487,6 +542,13 @@ public class QueryRequestBuilder<T> {
 
     /** 设置key的转换策略 */
     public QueryRequestBuilder<T> keyTran(AdvEnumsKeyTran advEnumsKeyTran) {
+        this.advEnumsKeyTran = advEnumsKeyTran;
+        return this;
+    }
+
+    /** 设置key的转换策略 */
+    @Deprecated
+    public QueryRequestBuilder<T> advEnumsKeyTran(AdvEnumsKeyTran advEnumsKeyTran) {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
@@ -506,20 +568,104 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
+    /**
+     * 设置去重查询
+     *
+     * @param distinct true=去重查询，false=不去重
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> distinct(boolean distinct) {
+        this.distinct = distinct;
+        return this;
+    }
+
+    /** 启用去重查询 */
+    public QueryRequestBuilder<T> distinct() {
+        this.distinct = true;
+        return this;
+    }
+
+    /**
+     * 设置GROUP BY字段
+     *
+     * @param groupByFields 分组字段列表
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> groupBy(String... groupByFields) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        this.groupByFields.addAll(ListUtil.toList(groupByFields));
+        return this;
+    }
+
+    /**
+     * 设置GROUP BY字段（Lambda表达式版本，需要配合实体类使用）
+     *
+     * @param groupByFunctions 分组字段的Lambda表达式
+     * @return 当前Builder实例
+     */
+    @SafeVarargs
+    public final QueryRequestBuilder<T> groupBy(SFunction<T, ?>... groupByFunctions) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        for (SFunction<T, ?> function : groupByFunctions) {
+            String fieldName = LambdaUtils.getColumnName(function);
+            if (isToUnderlineCase && fieldName != null) {
+                fieldName = StrUtil.toUnderlineCase(fieldName);
+            }
+            this.groupByFields.add(fieldName);
+        }
+        return this;
+    }
+
+    /**
+     * 添加GROUP BY字段
+     *
+     * @param groupByField 分组字段
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> addGroupBy(String groupByField) {
+        if (this.groupByFields == null) {
+            this.groupByFields = new ArrayList<>();
+        }
+        this.groupByFields.add(groupByField);
+        return this;
+    }
+
+    /**
+     * 设置HAVING条件（通过Consumer方式）
+     *
+     * @param consumer HAVING条件构建器
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> having(Consumer<GirAdvWhereFilter> consumer) {
+        this.havingFilter = GirAdvWhereFilter.of();
+        consumer.accept(this.havingFilter);
+        return this;
+    }
+
+    /**
+     * 设置HAVING条件（直接传入Filter）
+     *
+     * @param havingFilter HAVING过滤器
+     * @return 当前Builder实例
+     */
+    public QueryRequestBuilder<T> having(GirAdvWhereFilter havingFilter) {
+        this.havingFilter = havingFilter;
+        return this;
+    }
+
     /** 构建GirAdvQueryRequest对象 */
     public GirAdvQueryRequest build() {
         // 校验：两种模式至少选一种
-        boolean hasObjectMode = tableOrSqlView != null;
+        boolean hasObjectMode = tableOrSqlView != null || entityClass != null;
         boolean hasCustomSqlMode = customSql != null && !customSql.trim().isEmpty();
 
         if (!hasObjectMode && !hasCustomSqlMode) {
             throw new IllegalArgumentException(
                     "Either (table + fields + where) or customSql must be provided");
-        }
-
-        // 对象模式校验
-        if (hasObjectMode && tableOrSqlView.trim().isEmpty()) {
-            throw new IllegalArgumentException("tableOrViewName cannot be empty");
         }
 
         // 分页参数校验
@@ -532,5 +678,9 @@ public class QueryRequestBuilder<T> {
 
     public List<String> getFieldNames() {
         return columnNames;
+    }
+
+    public List<String> getExprFieldNames() {
+        return exprColumnNames;
     }
 }

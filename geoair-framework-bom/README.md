@@ -55,7 +55,7 @@ geoair-framework-bom/
 <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework-bom</artifactId>
-    <version>J8.1.3</version>
+    <version>J8.1.4</version>
 </parent>
 ```
 
@@ -83,7 +83,7 @@ Apache License 2.0
 
 ## 版本信息
 
-当前版本：J8.1.3
+当前版本：J8.1.4
 
 ## 贡献指南
 

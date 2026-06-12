@@ -88,7 +88,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         double equalLatSpan = 360.0 / (1 << zoom); // 等轴纬度跨度：360/2^z
         double equalAxisY = (MAX_LAT - lat) / equalLatSpan; // 反向计算等轴Y索引
 
-        // 4. 根据业务需求取整（核心：不同取整方式适配不同场景）
+        // 4. 根据业务需求取整（ 不同取整方式适配不同场景）
         int finalEqualY;
         switch (roundingType) {
             case FLOOR:
@@ -192,18 +192,14 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     public TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi) {
         validateXyz(maxZoom, 0, 0);
 
-        double tileCount = Math.pow(2.0, maxZoom + 1);
-
-        // 计算该层级下的瓦片总数
-        long totalTiles = (long) (tileCount * tileCount) / 2;
+        Double tileWidth = Math.pow(2, maxZoom);
+        Double tileHeight = tileWidth / 2;
+        Double totalTiles = tileHeight * tileWidth;
 
         // 计算经度和纬度的瓦片跨度（度）
         double tileLonSpan = calculateTileLonSpan(maxZoom);
-        double tileLatSpan = calculateTileLatSpan(maxZoom);
-
         // 瓦片的地理尺寸（度）
         double tileGeoWidth = tileLonSpan;
-
         // 计算地面分辨率（度/像素）
         double groundResolutionDegree = getResolution(maxZoom, tilePixelSize);
 
@@ -217,12 +213,13 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
         return new TileLevelMetadata(
                 maxZoom,
-                tileCount,
+                tileWidth.intValue(),
+                tileHeight.intValue(),
                 tileGeoWidth,
                 mmPerPixel,
                 groundResolutionDegree,
                 scale,
-                totalTiles,
+                totalTiles.intValue(),
                 tilePixelSize,
                 dpi,
                 mmPerPixel,

@@ -46,7 +46,8 @@ public class GirOracleSpatialTran {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             // 将 STRUCT 转换为字节数组
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            Geometry jtsGeom = GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
+            Geometry jtsGeom =
+                    GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
             return jtsGeom.toText();
         } catch (Exception e) {
             return "无法解析空间数据：" + e.getMessage();
@@ -67,7 +68,7 @@ public class GirOracleSpatialTran {
         try {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            return GirGeoTools.me().getFormatOpt().getWKBReader().read(bytes);
+            return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
             return null;
         }

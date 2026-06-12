@@ -1,9 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
+import cn.geoair.base.data.model.annotation.GaModelField;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "test_user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,9 +34,11 @@ public class User implements Serializable {
     private String username;
 
     /** 姓名 */
+    @Column(name = "u_name")
     private String name;
 
     /** 年龄 */
+    @GaModelField(columnName = "c_age")
     private Integer age;
 
     /** 邮箱 */

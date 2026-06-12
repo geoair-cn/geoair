@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.shp;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
@@ -26,7 +26,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class ShpGeoFileWriter implements GeoFileWriter {
 
-    private static final GiLogger log = GirLogger.getLoger(ShpGeoFileWriter.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(ShpGeoFileWriter.class);
 
     private ShpLinkInfo linkInfo;
     private WriteConfig writeConfig;
@@ -59,7 +59,7 @@ public class ShpGeoFileWriter implements GeoFileWriter {
 
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        cn.geoair.map.dynamic.tools.GirGeoTools.me()
+                        cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance()
                                 .getSridOpt()
                                 .getCRS(writeConfig.getOutPutSrid());
 

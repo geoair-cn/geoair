@@ -1,7 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.wherequery;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.hutool.core.collection.ListUtil;
 import java.io.Serializable;
 import java.util.*;
 import lombok.Getter;
@@ -39,6 +41,7 @@ public class GirAdvWhereFilter implements Serializable {
         ConvertOptions options = ConvertOptions.defaultOptions();
         return BeanToQueryFilterConverter.convert(bean, options);
     }
+
     /**
      * 通过bean或者map创建查询条件
      *
@@ -118,7 +121,7 @@ public class GirAdvWhereFilter implements Serializable {
 
     /** IN条件（数组） */
     public GirAdvWhereFilter in(String column, Object[] values) {
-        return addCondition(column, AdvOperatorEnums.IN, Arrays.asList(values));
+        return addCondition(column, AdvOperatorEnums.IN, ListUtil.toList(values));
     }
 
     /** NOT IN条件 */
@@ -261,6 +264,7 @@ public class GirAdvWhereFilter implements Serializable {
         }
         return result;
     }
+
     /**
      * 添加SQL表达式条件（字段名可以是SQL表达式）
      *
@@ -297,6 +301,45 @@ public class GirAdvWhereFilter implements Serializable {
     }
 
     /**
+     * 添加原始SQL表达式作为查询条件
+     *
+     * <p>适用于数据库函数或表达式直接返回布尔值的场景，例如空间函数、JSON函数、数学函数等
+     *
+     * <p>注意：该方法不会对SQL表达式进行任何转义或参数化处理，请谨慎使用，避免SQL注入风险
+     *
+     * <p>使用示例：
+     *
+     * <pre>
+     * // 空间包含查询
+     * filter.expr("ST_Contains(geom, ST_GeomFromText('POINT(120 30)'))");
+     *
+     * // JSON字段判断
+     * filter.expr("JSON_EXTRACT(attributes, '$.age') > 18");
+     *
+     * // 字符串函数判断
+     * filter.expr("CHAR_LENGTH(username) > 5");
+     *
+     * // 数学表达式
+     * filter.expr("price * quantity > 1000");
+     * </pre>
+     *
+     * @param sqlExpr SQL表达式（完整的条件表达式，如 "ST_Contains(the_geom, 'POINT(120 30)')"）
+     * @return 当前实例，支持链式调用
+     * @throws IllegalArgumentException 如果sqlExpr为null或空字符串
+     * @see ConditionExpression
+     * @see AdvOperatorEnums#NOT_OPT
+     */
+    public GirAdvWhereFilter expr(String sqlExpr) {
+        if (GutilObject.isEmpty(sqlExpr)) {
+            return this;
+        }
+        ConditionExpression expr =
+                new ConditionExpression(sqlExpr, AdvOperatorEnums.NOT_OPT, null, true);
+        addEntry(expr);
+        return this;
+    }
+
+    /**
      * 添加SQL表达式条件（等值查询）
      *
      * @param sqlExpr SQL表达式
@@ -305,6 +348,14 @@ public class GirAdvWhereFilter implements Serializable {
      */
     public GirAdvWhereFilter exprEq(String sqlExpr, Object value) {
         return expr(sqlExpr, AdvOperatorEnums.等于, value);
+    }
+
+    public GirAdvWhereFilter exprExists(String sqlExpr) {
+        return expr(null, AdvOperatorEnums.EXISTS, sqlExpr);
+    }
+
+    public GirAdvWhereFilter exprNotExists(String sqlExpr) {
+        return expr(null, AdvOperatorEnums.NOT_EXISTS, sqlExpr);
     }
 
     /**
@@ -500,7 +551,7 @@ public class GirAdvWhereFilter implements Serializable {
             if (values != null && values.length > 0) {
                 addEntry(
                         new ConditionExpression(
-                                column, AdvOperatorEnums.IN, Arrays.asList(values)));
+                                column, AdvOperatorEnums.IN, ListUtil.toList(values)));
             }
             return this;
         }

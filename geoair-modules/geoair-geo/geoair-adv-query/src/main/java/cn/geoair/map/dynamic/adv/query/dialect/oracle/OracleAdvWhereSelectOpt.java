@@ -12,13 +12,13 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvWhereSelectOpt;
 public class OracleAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
 
     protected IAdvBaseOpt baseOpt;
-    protected IAdvSimplePagePreOpt simplePagePreOpt;
+    protected IAdvSimplePageOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
 
     public OracleAdvWhereSelectOpt(
             IDataSourceGetter dataSourceGetter,
             IAdvBaseOpt baseOpt,
-            IAdvSimplePagePreOpt pgAdvSimplePageOpt,
+            IAdvSimplePageOpt pgAdvSimplePageOpt,
             IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
@@ -37,7 +37,7 @@ public class OracleAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         return simplePagePreOpt;
     }
 

@@ -89,7 +89,7 @@ public class ShpToPg {
                                             if (geometry instanceof Point) {
                                                 Point point = (Point) geometry;
                                                 Point point1 =
-                                                        GirGeoTools.me()
+                                                        GirGeoTools.defaultInstance()
                                                                 .getCoordinateOpt()
                                                                 .wgs84ToBd09(point);
                                                 point1.setSRID(point.getSRID());

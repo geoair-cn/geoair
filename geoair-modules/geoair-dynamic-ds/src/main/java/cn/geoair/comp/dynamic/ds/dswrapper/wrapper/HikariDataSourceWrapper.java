@@ -3,8 +3,10 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 import cn.geoair.base.Gir;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
 
 /** HikariCP数据源包装器 */
+@Slf4j
 public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     public HikariDataSourceWrapper(DataSource targetDataSource) {
@@ -54,7 +56,21 @@ public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
         return dataSource.getJdbcUrl();
     }
 
-    /** 获取Hikari数据源的特有配置（可选扩展） */
+    @Override
+    public Integer getActiveCount() {
+        HikariDataSource hikari = getHikariDataSource();
+        if (hikari == null) {
+            return null;
+        }
+        try {
+            // HikariCP: 通过 MXBean 获取
+            return hikari.getHikariPoolMXBean().getActiveConnections();
+        } catch (Exception e) {
+            log.error("获取HikariCP活跃连接数失败", e);
+            return null;
+        }
+    }
+
     public HikariDataSource getHikariDataSource() {
         if (isSupport()) {
             return (HikariDataSource) super.targetDataSource;

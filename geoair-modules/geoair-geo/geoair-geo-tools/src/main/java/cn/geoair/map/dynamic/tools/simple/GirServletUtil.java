@@ -47,7 +47,38 @@ public class GirServletUtil extends ServletUtil {
         } else {
             property = "";
         }
+        if (!host.contains(":")) {
+            Integer originPort = getOriginPort(request);
+            if (originPort != null) {
+                host = host + ":" + originPort;
+            }
+        }
+
         return "http://" + host + "/" + property;
+    }
+
+    /**
+     * 获取服务的真实端口
+     *
+     * @param request
+     * @return
+     */
+    public static Integer getOriginPort(HttpServletRequest request) {
+        // 可能的代理端口头信息，按优先级排序
+        String[] portHeaders = {"x-forwarded-port", "X-Real-PORT"};
+
+        // 遍历所有可能的端口头，获取第一个有效的端口
+        for (String header : portHeaders) {
+            String portStr = request.getHeader(header);
+            if (portStr != null && !portStr.isEmpty() && !"unknown".equalsIgnoreCase(portStr)) {
+                try {
+                    return Integer.parseInt(portStr);
+                } catch (NumberFormatException e) {
+                    // 端口格式不正确，继续尝试下一个头
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -61,6 +92,7 @@ public class GirServletUtil extends ServletUtil {
         String requestHost = headerMap.get("host");
         Map<String, String> infoMap = new HashMap<>();
         infoMap.put("requestHost", requestHost);
+        infoMap.put("originPort", getOriginPort(request) + "");
         infoMap.put("serverPathBySpring", getServerPathBySpring());
         infoMap.put("serverPathByRequest", getServerPathByRequest());
         infoMap.put("contextPath", request.getContextPath());

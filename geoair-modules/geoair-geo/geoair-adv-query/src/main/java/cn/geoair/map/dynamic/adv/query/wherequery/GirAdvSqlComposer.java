@@ -1,0 +1,596 @@
+package cn.geoair.map.dynamic.adv.query.wherequery;
+
+import cn.geoair.base.util.GutilObject;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
+import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
+import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
+import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.hutool.core.util.StrUtil;
+import java.util.*;
+import lombok.Getter;
+
+/**
+ * SQL生成工具类
+ *
+ * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理
+ *
+ * @author zhangjun
+ */
+public class GirAdvSqlComposer {
+
+    private final DialectTableNameProcessor dialectProcessor;
+    private final IDsDataSourceOpt dataSourceOpt;
+
+    public GirAdvSqlComposer(
+            DialectTableNameProcessor dialectProcessor, IDsDataSourceOpt dataSourceOpt) {
+        this.dialectProcessor = dialectProcessor;
+        this.dataSourceOpt = dataSourceOpt;
+    }
+
+    /** 生成查询SQL */
+    public SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
+        if (param.isCustomSqlMode()) {
+            return buildCustomSql(param);
+        } else {
+            return buildObjectModeSql(param);
+        }
+    }
+
+    /** 生成分页查询SQL */
+    public SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
+        SqlBuildResult result = buildSelectSql(param);
+        if (param.hasPagination()) {
+            String sql = result.getSql();
+            List<Object> params = result.getParams().toList();
+
+            // 使用方言处理器构建分页SQL
+            String pageSql = dialectProcessor.tbBuildPageSql(sql);
+            params.add(param.getPageSize());
+            params.add(param.getOffset());
+
+            return new SqlBuildResult(pageSql, params);
+        }
+
+        return result;
+    }
+
+    /** 生成统计总数SQL */
+    public SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
+        if (param.isCustomSqlMode()) {
+            String customSql = param.getCustomSql();
+            String countSql =
+                    dialectProcessor.tbBuildAsTable(
+                            "SELECT COUNT(*) FROM (" + customSql + ")", "t");
+            return new SqlBuildResult(countSql, new ArrayList<>());
+        } else {
+            // 如果有GROUP BY，需要统计分组后的记录数
+            if (param.hasGroupBy()) {
+                return buildGroupByCountSql(param);
+            }
+
+            StringBuilder sql = new StringBuilder();
+            List<Object> params = new ArrayList<>();
+
+            sql.append("SELECT COUNT(*) FROM ");
+
+            boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+            if (b) {
+                String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+                String aliasTable =
+                        StrUtil.format(
+                                format,
+                                param.getTableOrSqlView(),
+                                dialectProcessor.tbGetTempAliasTableName());
+                sql.append(aliasTable);
+            } else {
+                String tableName =
+                        dialectProcessor.tbGetTableNameWithSchema(
+                                dataSourceOpt, param.getTableOrSqlView());
+                sql.append(tableName);
+            }
+
+            GirAdvWhereFilter where = param.getWhereOption();
+            if (where != null && where.hasExpression()) {
+                String whereClause = buildWhereClause(where.getExpression(), params);
+                if (StrUtil.isNotBlank(whereClause)) {
+                    sql.append(" WHERE ").append(whereClause);
+                }
+            }
+
+            return new SqlBuildResult(sql.toString(), params);
+        }
+    }
+
+    /** 生成带GROUP BY的统计总数SQL 统计分组后的记录数（即分组数量） */
+    private SqlBuildResult buildGroupByCountSql(GirAdvQueryRequest param) {
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+
+        // 构建子查询
+        sql.append("SELECT COUNT(*) FROM (");
+        sql.append("SELECT 1");
+
+        // FROM
+        sql.append(" FROM ");
+        boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+        if (b) {
+            String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+            String aliasTableName =
+                    GutilObject.isEmpty(param.getSqlViewTableNameAlias())
+                            ? dialectProcessor.tbGetTempAliasTableName()
+                            : param.getSqlViewTableNameAlias();
+            String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
+            String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
+            sql.append(aliasTable);
+        } else {
+            String tableName =
+                    dialectProcessor.tbGetTableNameWithSchema(
+                            dataSourceOpt, param.getTableOrSqlView());
+            sql.append(tableName);
+        }
+
+        // WHERE
+        GirAdvWhereFilter where = param.getWhereOption();
+        if (where != null && where.hasExpression()) {
+            String whereClause = buildWhereClause(where.getExpression(), params);
+            if (StrUtil.isNotBlank(whereClause)) {
+                sql.append(" WHERE ").append(whereClause);
+            }
+        }
+
+        // GROUP BY
+        if (param.hasGroupBy()) {
+            List<String> groupByFields = param.getGroupByFields();
+            List<String> escapedGroupFields = new ArrayList<>();
+            for (String field : groupByFields) {
+                escapedGroupFields.add(quoteFieldOrExpression(field));
+            }
+            sql.append(" GROUP BY ").append(String.join(", ", escapedGroupFields));
+        }
+
+        // HAVING - 注意：HAVING 的参数需要单独处理
+        GirAdvWhereFilter having = param.getHavingFilter();
+        if (having != null && having.hasExpression()) {
+            List<Object> havingParams = new ArrayList<>();
+            String havingClause = buildWhereClause(having.getExpression(), havingParams);
+            if (StrUtil.isNotBlank(havingClause)) {
+                sql.append(" HAVING ").append(havingClause);
+                // HAVING 的参数也需要添加到总参数列表中
+                params.addAll(havingParams);
+            }
+        }
+
+        sql.append(") t");
+
+        return new SqlBuildResult(sql.toString(), params);
+    }
+
+    /** 构建对象模式SQL */
+    private SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+
+        // SELECT - 字段名转义
+        sql.append("SELECT ");
+        if (param.hasDistinct()) {
+            sql.append("DISTINCT ");
+        }
+
+        // 构建 SELECT 字段列表
+        List<String> selectFields = buildSelectFields(param);
+        if (GutilObject.isEmpty(selectFields)) {
+            selectFields.add("*");
+        }
+        sql.append(String.join(", ", selectFields));
+
+        // FROM - 使用方言处理器获取带Schema的表名
+        sql.append(" FROM ");
+        boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
+        if (b) {
+            String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
+            String aliasTableName =
+                    GutilObject.isEmpty(param.getSqlViewTableNameAlias())
+                            ? dialectProcessor.tbGetTempAliasTableName()
+                            : param.getSqlViewTableNameAlias();
+            String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
+            String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
+            sql.append(aliasTable);
+        } else {
+            String tableName =
+                    dialectProcessor.tbGetTableNameWithSchema(
+                            dataSourceOpt, param.getTableOrSqlView());
+            sql.append(tableName);
+        }
+
+        // WHERE
+        GirAdvWhereFilter where = param.getWhereOption();
+        if (where != null && where.hasExpression()) {
+            String whereClause = buildWhereClause(where.getExpression(), params);
+            if (StrUtil.isNotBlank(whereClause)) {
+                sql.append(" WHERE ").append(whereClause);
+            }
+        }
+
+        // GROUP BY
+        if (param.hasGroupBy()) {
+            List<String> escapedGroupFields = new ArrayList<>();
+            for (String field : param.getGroupByFields()) {
+                escapedGroupFields.add(quoteFieldOrExpression(field));
+            }
+            sql.append(" GROUP BY ").append(String.join(", ", escapedGroupFields));
+        }
+
+        // HAVING
+        GirAdvWhereFilter having = param.getHavingFilter();
+        if (having != null && having.hasExpression()) {
+            List<Object> havingParams = new ArrayList<>();
+            String havingClause = buildWhereClause(having.getExpression(), havingParams);
+            if (StrUtil.isNotBlank(havingClause)) {
+                sql.append(" HAVING ").append(havingClause);
+                params.addAll(havingParams);
+            }
+        }
+
+        // ORDER BY
+        if (param.hasOrders()) {
+            String orderByClause = buildOrderByClause(param.getOrders());
+            if (StrUtil.isNotBlank(orderByClause)) {
+                sql.append(" ORDER BY ").append(orderByClause);
+            }
+        }
+
+        return new SqlBuildResult(sql.toString(), params);
+    }
+
+    /**
+     * 构建 SELECT 字段列表
+     *
+     * <p>正确处理普通字段、表达式字段、GROUP BY 字段的关系
+     */
+    private List<String> buildSelectFields(GirAdvQueryRequest param) {
+        List<String> selectFields = new ArrayList<>();
+
+        // 1. 添加普通字段（需要转义）
+        for (String field : param.getFieldNames()) {
+            if (isSqlExpression(field)) {
+                // 表达式字段直接添加
+                selectFields.add(field);
+            } else {
+                // 普通字段需要转义
+                selectFields.add(dialectProcessor.tbQuoteFieldName(field));
+            }
+        }
+
+        // 2. 添加表达式字段（如 COUNT(*)、SUM(amount) 等）
+        if (param.getExprColumnNames() != null) {
+            selectFields.addAll(param.getExprColumnNames());
+        }
+
+        // 3. 如果有 GROUP BY 但没有指定任何字段，自动添加 GROUP BY 字段到 SELECT
+        if (param.hasGroupBy() && selectFields.isEmpty()) {
+            for (String groupField : param.getGroupByFields()) {
+                selectFields.add(quoteFieldOrExpression(groupField));
+            }
+        }
+
+        return selectFields;
+    }
+
+    /**
+     * 对字段或表达式进行引用处理
+     *
+     * <p>如果是表达式则原样返回，如果是普通字段则添加引号
+     */
+    private String quoteFieldOrExpression(String field) {
+        if (field == null || field.isEmpty()) {
+            return field;
+        }
+        if (isSqlExpression(field)) {
+            return field;
+        }
+        return dialectProcessor.tbQuoteFieldName(field);
+    }
+
+    /** 判断是否为SQL表达式 */
+    private boolean isSqlExpression(String field) {
+        if (field == null || field.isEmpty()) {
+            return false;
+        }
+
+        String trimmed = field.trim();
+        if (trimmed.equals("*")) {
+            return true;
+        }
+        // 包含空格或运算符
+        if (trimmed.contains(" ")) {
+            return true;
+        }
+
+        // 函数调用模式：字母开头+括号
+        if (trimmed.matches("^[A-Za-z_][A-Za-z0-9_]*\\(.*\\)$")) {
+            String funcName = trimmed.substring(0, trimmed.indexOf('(')).toUpperCase();
+            Set<String> sqlFunctions =
+                    new HashSet<>(
+                            Arrays.asList(
+                                    "COUNT",
+                                    "SUM",
+                                    "AVG",
+                                    "MAX",
+                                    "MIN",
+                                    "CONCAT",
+                                    "SUBSTR",
+                                    "LENGTH",
+                                    "NOW",
+                                    "DATE",
+                                    "YEAR",
+                                    "MONTH",
+                                    "DAY",
+                                    "TRIM",
+                                    "COALESCE",
+                                    "NULLIF",
+                                    "CAST",
+                                    "CONVERT"));
+            return sqlFunctions.contains(funcName);
+        }
+
+        return false;
+    }
+
+    /** 构建自定义SQL模式 */
+    private SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
+        String sql = param.getCustomSql();
+        List<Object> params = new ArrayList<>();
+
+        // 自定义SQL模式下，GROUP BY和HAVING需要用户自己写在SQL中
+        // 这里只处理ORDER BY的追加
+
+        // ORDER BY
+        if (param.hasOrders()) {
+            String orderByClause = buildOrderByClause(param.getOrders());
+            if (StrUtil.isNotBlank(orderByClause)) {
+                if (sql.toUpperCase().contains("ORDER BY")) {
+                    sql = sql + ", " + orderByClause;
+                } else {
+                    sql = sql + " ORDER BY " + orderByClause;
+                }
+            }
+        }
+
+        return new SqlBuildResult(sql, params);
+    }
+
+    public String buildWhereSql(GirAdvWhereFilter where, List<Object> params) {
+        return buildWhereClause(where.getExpression(), params);
+    }
+
+    /** 构建WHERE子句 */
+    public String buildWhereClause(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+        if (expr == null) {
+            return "";
+        }
+
+        if (expr.isLeaf()) {
+            return buildLeafCondition(expr, params);
+        }
+
+        if (expr.getLogicOperator() == AdvLogicOperatorEnums.NOT) {
+            List<GirAdvWhereFilter.ConditionExpression> children = expr.getChildren();
+            if (children != null && children.size() == 1) {
+                String subCondition = buildWhereClause(children.get(0), params);
+                if (StrUtil.isNotBlank(subCondition)) {
+                    return "NOT (" + subCondition + ")";
+                }
+            }
+            return "";
+        }
+
+        List<String> subConditions = new ArrayList<>();
+        for (GirAdvWhereFilter.ConditionExpression child : expr.getChildren()) {
+            String subSql = buildWhereClause(child, params);
+            if (StrUtil.isNotBlank(subSql)) {
+                subConditions.add(subSql);
+            }
+        }
+
+        if (subConditions.isEmpty()) {
+            return "";
+        }
+
+        String connector = expr.getLogicOperator() == AdvLogicOperatorEnums.AND ? " AND " : " OR ";
+
+        if (subConditions.size() > 1) {
+            return "(" + String.join(connector, subConditions) + ")";
+        } else {
+            return subConditions.get(0);
+        }
+    }
+
+    /**
+     * 构建叶子条件
+     *
+     * <p>支持普通字段和SQL表达式两种模式
+     */
+    private String buildLeafCondition(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+        // 获取列名或表达式
+        String column = expr.getColumn();
+        AdvOperatorEnums operator = expr.getOperator();
+        Object value = expr.getValue();
+        boolean isExpression = expr.isExpression();
+
+        // 如果不是表达式，需要进行字段名转义；表达式原样输出
+        String columnPart = isExpression ? column : dialectProcessor.tbQuoteFieldName(column);
+
+        if (operator == AdvOperatorEnums.NOT_OPT) {
+            return columnPart;
+        }
+
+        // IS NULL / IS NOT NULL
+        if (operator == AdvOperatorEnums.IS_NULL) {
+            return columnPart + " IS NULL";
+        }
+        if (operator == AdvOperatorEnums.IS_NOT_NULL) {
+            return columnPart + " IS NOT NULL";
+        }
+
+        // IN / NOT IN
+        if (operator == AdvOperatorEnums.IN || operator == AdvOperatorEnums.NOT_IN) {
+            Collection<?> collection = (Collection<?>) value;
+            if (collection == null || collection.isEmpty()) {
+                return "";
+            }
+            String placeholders = String.join(", ", Collections.nCopies(collection.size(), "?"));
+            params.addAll(collection);
+            return columnPart + " " + operator.getSqlValue() + " (" + placeholders + ")";
+        }
+
+        // BETWEEN / NOT BETWEEN
+        if (operator == AdvOperatorEnums.BETWEEN || operator == AdvOperatorEnums.NOT_BETWEEN) {
+            Object[] between = (Object[]) value;
+            if (between == null || between.length != 2) {
+                return "";
+            }
+            params.add(between[0]);
+            params.add(between[1]);
+            return columnPart + " " + operator.getSqlValue() + " ? AND ?";
+        }
+
+        // EXISTS / NOT EXISTS
+        if (operator == AdvOperatorEnums.EXISTS || operator == AdvOperatorEnums.NOT_EXISTS) {
+            return operator.getSqlValue() + " (" + value + ")";
+        }
+
+        // LIKE / ILIKE
+        if (operator.isLike()) {
+            String formattedValue = formatLikeValue(operator, String.valueOf(value));
+            params.add(formattedValue);
+            return columnPart + " " + operator.getSqlValue() + " ?";
+        }
+
+        // 普通比较操作符
+        params.add(value);
+        return columnPart + " " + operator.getSqlValue() + " ?";
+    }
+
+    /** 格式化LIKE值 */
+    public static String formatLikeValue(AdvOperatorEnums operator, String value) {
+        if (value == null) {
+            return null;
+        }
+
+        // 如果值中已经包含通配符，不再进行额外包装
+        // 但需要根据实际模式进行智能处理
+        switch (operator) {
+            case LIKE_LEFT:
+            case ILIKE_LEFT:
+            case NOT_LIKE_LEFT:
+                // 左模糊：期望 value%
+                if (value.endsWith("%")) {
+                    // 已经以%结尾，直接返回
+                    return value;
+                }
+                return value + "%";
+
+            case LIKE_RIGHT:
+            case ILIKE_RIGHT:
+            case NOT_LIKE_RIGHT:
+                // 右模糊：期望 %value
+                if (value.startsWith("%")) {
+                    // 已经以%开头，直接返回
+                    return value;
+                }
+                return "%" + value;
+
+            case LIKE_ALL:
+            case ILIKE_ALL:
+            case NOT_LIKE_ALL:
+                // 全模糊：期望 %value%
+                boolean hasLeft = value.startsWith("%");
+                boolean hasRight = value.endsWith("%");
+
+                if (hasLeft && hasRight) {
+                    // 已经是全模糊格式，直接返回
+                    return value;
+                }
+                if (hasLeft) {
+                    // 只有左通配符，添加右通配符
+                    return value + "%";
+                }
+                if (hasRight) {
+                    // 只有右通配符，添加左通配符
+                    return "%" + value;
+                }
+                // 没有通配符，添加双通配符
+                return "%" + value + "%";
+
+            default:
+                return value;
+        }
+    }
+
+    /** 构建ORDER BY子句 */
+    private String buildOrderByClause(List<OrderApo> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return "";
+        }
+
+        List<String> orderItems = new ArrayList<>();
+        for (OrderApo order : orders) {
+            String field;
+            if (order.isFunction()) {
+                field = order.getFunction();
+            } else {
+                field = dialectProcessor.tbQuoteFieldName(order.getFieldName());
+            }
+            orderItems.add(field + " " + order.getAdvEnumsOrder().getValue());
+        }
+
+        return String.join(", ", orderItems);
+    }
+
+    /** SQL构建结果 */
+    @Getter
+    public static class SqlBuildResult {
+        private final String sql;
+        private final SqlParamList params;
+
+        public SqlBuildResult(String sql, List<Object> params) {
+            this.sql = sql;
+            this.params = SqlParamList.of(params);
+        }
+
+        public String getPreparedSql() {
+            return sql;
+        }
+
+        public String getExecutableSql() {
+            String executableSql = sql;
+            for (Object param : params) {
+                String valueStr = formatParamValue(param);
+                executableSql = executableSql.replaceFirst("\\?", valueStr);
+            }
+            return executableSql;
+        }
+
+        private String formatParamValue(Object param) {
+            if (param == null) {
+                return "NULL";
+            }
+            if (param instanceof String) {
+                return "'" + param.toString().replace("'", "''") + "'";
+            }
+            if (param instanceof Date) {
+                return "'" + param.toString() + "'";
+            }
+            return param.toString();
+        }
+
+        @Override
+        public String toString() {
+            return "SqlBuildResult{sql='" + sql + "', params=" + params + "}";
+        }
+    }
+}

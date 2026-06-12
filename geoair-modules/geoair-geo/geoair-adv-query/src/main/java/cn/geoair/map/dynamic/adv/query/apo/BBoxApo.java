@@ -181,7 +181,7 @@ public class BBoxApo implements Serializable {
             return "";
         }
         // 使用WKTWriter转换为字符串
-        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(polygon, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(polygon, true);
     }
 
     /**
@@ -195,6 +195,6 @@ public class BBoxApo implements Serializable {
             return "";
         }
         // 使用WKTWriter转换为字符串
-        return GirGeoTools.me().getFormatOpt().jtsGeometryToWktString(polygon, true);
+        return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(polygon, true);
     }
 }

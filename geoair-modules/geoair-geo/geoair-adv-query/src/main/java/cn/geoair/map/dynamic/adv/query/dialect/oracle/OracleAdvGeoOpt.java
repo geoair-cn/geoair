@@ -338,7 +338,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-
+        geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "CREATE INDEX {} ON {} ({}) INDEXTYPE IS MDSYS.SPATIAL_INDEX",

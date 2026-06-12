@@ -10,12 +10,12 @@ import lombok.Data;
 public class PageConfig {
 
     /** 符合条件的总记录数 */
-    private Long totalCount;
+    @Deprecated private Long totalCount;
 
-    /** 最大页码 */
+    /** 允许的最大页码 通过允许的最大页码反着设置每页大小，防止数据量大的时候 ，频繁访问数据库 */
     private Long maxPageNo;
 
-    /** 每页记录数 */
+    /** 每页记录数 通过每页大小 计算 总页数，进行每页遍历。数据量大的时候可能有很多页 */
     private Long pageSize = 0L;
 
     /** 第一页是否从0开始 */

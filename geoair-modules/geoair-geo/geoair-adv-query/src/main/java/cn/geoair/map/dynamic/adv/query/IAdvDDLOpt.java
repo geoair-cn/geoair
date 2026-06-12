@@ -26,25 +26,51 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
     int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation);
 
     /**
-     * 删除表中所有数据（保留表结构）
+     * 删除表中所有数据
      *
-     * @param tableName 表名
+     * @param tableNameWithSchema 表名
      */
-    void dDelTable(String tableName);
+    void dDelTable(String tableNameWithSchema);
+
+    /**
+     * 根据源表名复制表结构（可选是否同步数据）
+     *
+     * @param dstTableName 目标表名（支持schema限定，如：public.target_table）
+     * @param srcTableName 源表名（支持schema限定，如：public.source_table）
+     * @param dataSync 是否同步数据 - true: 复制表结构及所有数据 - false: 仅复制表结构（不含数据）
+     *     <p>注意事项： 1. 如果目标表已存在，操作会失败（除非使用 IF NOT EXISTS） 2. 复制表结构时使用 INCLUDING
+     *     ALL，会包含：索引、约束、默认值、注释等 3. 主键约束不会被复制，需要单独处理 4. 跨schema复制时，需要确保源表可访问、目标schema存在
+     */
+    void dCopyTableByTableName(String dstTableName, String srcTableName, boolean dataSync);
+
+    /**
+     * 根据自定义SQL查询结果复制表结构（可选是否同步数据）
+     *
+     * @param dstTableName 目标表名（支持schema限定，如：public.target_table）
+     * @param sql 源数据查询SQL（用于定义表结构和数据来源） 例如：SELECT id, name, created_time FROM users WHERE status =
+     *     'active'
+     * @param dataSync 是否同步数据 - true: 创建表并插入查询结果数据 - false: 仅根据查询结果创建表结构（不含数据）
+     *     <p>注意事项： 1. 表结构由查询SQL的返回字段决定 2. 目标表会自动创建，但不会包含源表的索引、约束等信息 3. 可以通过SQL的WHERE条件筛选需要同步的数据 4.
+     *     如果dataSync=false，只会创建空表结构 5. 目标表已存在时会失败，建议先检查或先删除
+     *     <p>使用示例： // 复制活跃用户数据 copyTableBySql("public.active_users", "SELECT * FROM users WHERE
+     *     status = 'active'", true);
+     *     <p>// 仅创建表结构 copyTableBySql("public.user_backup", "SELECT * FROM users ", false);
+     */
+    void dCopyTableBySql(String dstTableName, String sql, boolean dataSync);
 
     /**
      * 清空表数据（通常比DELETE效率高）
      *
-     * @param tableName 表名
+     * @param tableNameWithSchema 表名
      */
-    void dTruncateTable(String tableName);
+    void dTruncateTable(String tableNameWithSchema);
 
     /**
      * 删除表（包括表结构）
      *
-     * @param tableName 表名
+     * @param tableNameWithSchema 表名
      */
-    void dDropTable(String tableName);
+    void dDropTable(String tableNameWithSchema);
 
     /**
      * 从数据库获取当前模式名称

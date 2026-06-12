@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
  * GirOpenApiRunnerConfig class.
  *
  * @author ：张俊
- * @date ：Created in 2022/8/29 9:32 @description： TODO
  * @version $Id: $Id
+ * @date ：Created in 2022/8/29 9:32 @description： TODO
  */
 @Component
 public class GirOpenApiRunnerConfig implements ApplicationRunner {
@@ -37,20 +37,40 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
         if (!isLoad) {
             return;
         }
+
         String property = applicationContext.getEnvironment().getProperty("geoair.apidoc.enable");
-        String path = "localhost:{}";
+        String enableAuth =
+                applicationContext.getEnvironment().getProperty("geoair.apidoc.auth.enable-auth");
         String port = applicationContext.getEnvironment().getProperty("server.port");
         if (port == null) {
             port = "8080";
         }
-        String context_path =
+        String contextPath =
                 applicationContext.getEnvironment().getProperty("server.servlet.context-path");
-        boolean notBlank = GutilStr.isNotBlank(context_path);
-        if (notBlank) {
-            path = path + context_path;
+        boolean hasContextPath = GutilStr.isNotBlank(contextPath);
+
+        String baseUrl = "http://localhost:" + port + (hasContextPath ? contextPath : "");
+        boolean isEnabled = "true".equals(property);
+
+        Gir.log.info("");
+        Gir.log.info(
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info("                    📖 API 接口文档服务                            ");
+        Gir.log.info("--------------------------------------------------------------------");
+        Gir.log.info("  状态：{}", isEnabled ? "✅ 已启用" : "❌ 未启用");
+        Gir.log.info("  地址：{}", baseUrl + "/doc.html");
+
+        if ("true".equals(enableAuth)) {
+            String username = Gir.property.getProperty("geoair.apidoc.auth.username", "admin");
+            String password = Gir.property.getProperty("geoair.apidoc.auth.password", "123456");
+            Gir.log.info("--------------------------------------------------------------------");
+            Gir.log.info("  🔐 认证信息（Basic Auth）");
+            Gir.log.info("  用户名：{}", username);
+            Gir.log.info("  密码：  {}", password);
         }
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        Gir.log.info("接口文档地址：" + path + "{} 启用状态：{}", port, "/doc.html", "true".equals(property));
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+        Gir.log.info(
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info("");
     }
 }

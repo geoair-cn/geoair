@@ -1,11 +1,10 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 
@@ -13,13 +12,13 @@ import javax.sql.DataSource;
  * @author ：zhangjun
  * @date ： 模拟的DataSourceGetter,用于调试使用
  */
-public class MockDataSourceGetter implements IDataSourceGetter {
+public class MockDataSourceGetter implements IDsDataSourceOpt {
 
-    public static IDataSourceGetter getInstance() {
+    public static IDsDataSourceOpt getInstance() {
         return new MockDataSourceGetter();
     }
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     @Override
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {}
@@ -55,11 +54,6 @@ public class MockDataSourceGetter implements IDataSourceGetter {
     }
 
     @Override
-    public Connection getConnection() {
-        return null;
-    }
-
-    @Override
     public DataSourceApo getDataSourceApo() {
         return null;
     }
@@ -68,10 +62,4 @@ public class MockDataSourceGetter implements IDataSourceGetter {
     public DataSource getDataSource() {
         return null;
     }
-
-    @Override
-    public void connectionClose(Connection connection) {}
-
-    @Override
-    public void closeResources(ResultSet rs, Statement stmt, Connection conn) {}
 }

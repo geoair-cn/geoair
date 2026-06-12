@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author ：张逢吉
@@ -13,7 +12,6 @@ import tk.mybatis.spring.annotation.MapperScan;
  */
 @Configuration
 @ComponentScan("cn.geoair.comp.db.service")
-@MapperScan("cn.geoair.comp.db.service.starter.mapper")
 public class AutoGirDbServiceConfiguration {
 
     @Bean

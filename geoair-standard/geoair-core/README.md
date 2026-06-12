@@ -83,7 +83,7 @@ goair-core/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-core</artifactId>
-    <version>J8.1.3</version>
+    <version>J8.1.4</version>
 </dependency>
 ```
 该工程作为基础开发库的解耦实现，给 geoair-base库提供了基础能力
@@ -137,7 +137,7 @@ log.error("This is an error message");
 
 ## 版本历史
 
-- J8.1.3：当前开发版本
+- J8.1.4：当前开发版本
 
 ## 贡献指南
 

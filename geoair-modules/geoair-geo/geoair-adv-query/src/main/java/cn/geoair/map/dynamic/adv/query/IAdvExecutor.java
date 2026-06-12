@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.tx.IDsTransactionTemplate;
 
 /**
  * @author ：zhangjun
@@ -8,12 +9,12 @@ import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
  */
 public interface IAdvExecutor
         extends IDataSourceGetter,
+                IDsTransactionTemplate,
                 IAdvBaseOpt,
                 IAdvDDLOpt,
                 IAdvGeoOpt,
                 IAdvGeoPreOpt,
                 IAdvSimplePageOpt,
-                IAdvSimplePagePreOpt,
                 IAdvWhereSelectOpt,
                 DialectTableNameProcessor {
 

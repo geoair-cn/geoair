@@ -1,7 +1,6 @@
 package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import javax.sql.DataSource;
 
 /**
  * @author ：张逢吉
@@ -16,7 +15,4 @@ public interface IAdvDataSourceHelper {
      * @return 数据源描述对象
      */
     DataSourceApo getDataSourceApoById(String dataSourceId);
-
-    /** 根据数据源Apo配置创建并返回Druid连接池实例 不到万不得已，不要去创建一个新的实例 */
-    DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
 }

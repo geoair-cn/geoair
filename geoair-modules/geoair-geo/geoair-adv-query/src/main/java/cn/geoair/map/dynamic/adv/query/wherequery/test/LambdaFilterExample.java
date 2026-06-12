@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilderExample;
+import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposerMockProvider;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ public class LambdaFilterExample {
 
     public static void main(String[] args) {
         //        // 示例1：基础查询
-        //        basicQueryExample();
+        basicQueryExample();
         //
         //        // 示例2：复杂嵌套查询
         //        nestedQueryExample();
@@ -50,7 +50,12 @@ public class LambdaFilterExample {
                         .eq(User::getStatus, 1);
 
         GirAdvWhereFilter whereFilter = wrapper.toWhereFilter();
-        System.out.println("查询条件：" + whereFilter);
+
+        ArrayList<Object> objects = new ArrayList<>();
+        System.out.println(
+                "  - Where条件："
+                        + GirAdvSqlComposerMockProvider.getMockPostgresql()
+                                .buildWhereSql(whereFilter, objects));
         // 预期：name = '张三' AND age >= 18 AND status = 1
     }
 
@@ -131,15 +136,15 @@ public class LambdaFilterExample {
         ArrayList<Object> objects = new ArrayList<>();
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg()
+                        + GirAdvSqlComposerMockProvider.getMockPostgresql()
                                 .buildWhereSql(whereFilter, objects));
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle()
+                        + GirAdvSqlComposerMockProvider.getMockOracle()
                                 .buildWhereSql(whereFilter, objects));
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql()
+                        + GirAdvSqlComposerMockProvider.getMockMysql()
                                 .buildWhereSql(whereFilter, objects));
     }
 
@@ -166,15 +171,15 @@ public class LambdaFilterExample {
         System.out.println("  - 限制：10条");
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg()
+                        + GirAdvSqlComposerMockProvider.getMockPostgresql()
                                 .buildWhereSql(whereFilter, objects));
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderOracle()
+                        + GirAdvSqlComposerMockProvider.getMockOracle()
                                 .buildWhereSql(whereFilter, objects));
         System.out.println(
                 "  - Where条件："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderMysql()
+                        + GirAdvSqlComposerMockProvider.getMockMysql()
                                 .buildWhereSql(whereFilter, objects));
     }
 

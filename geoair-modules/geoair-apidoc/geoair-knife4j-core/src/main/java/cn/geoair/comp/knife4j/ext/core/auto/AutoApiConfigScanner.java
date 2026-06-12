@@ -72,7 +72,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         return rootPackages;
     }
 
-    /** 核心：找到@SpringBootApplication标注的启动类，提取扫描根包 */
+    /** 找到@SpringBootApplication标注的启动类，提取扫描根包 */
     private String getSpringBootRootPackage() {
         Map<String, Object> bootBeans =
                 applicationContext.getBeansWithAnnotation(SpringBootApplication.class);
@@ -264,7 +264,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         String title = environment.getProperty("geoair.apidoc.title", "API 在线文档");
         String description = environment.getProperty("geoair.apidoc.description", "API文档 V1.0");
         String author = environment.getProperty("geoair.apidoc.author", "geoair");
-        String version = environment.getProperty("geoair.apidoc.version", "J8.1.3");
+        String version = environment.getProperty("geoair.apidoc.version", "J8.1.4");
 
         return new ApiModelInfo(title, description, author, version);
     }

@@ -4,12 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * 仅作为配置提示使用，不再通过此类读取配置 所有配置通过 Environment 直接读取
- *
- * @author Administrator
- * @version $Id: $Id
- */
+/** 仅作为配置提示使用， */
 @Data
 @Component
 @ConfigurationProperties(prefix = "geoair.apidoc")
@@ -21,8 +16,11 @@ public class GirSwaggerProperties {
     /** 是否启用swagger注解（全局开关） */
     private boolean enable = false;
 
+    /** 鉴权处理 */
+    ApiDocAuth auth = new ApiDocAuth();
+
     /** API版本号，默认为空 */
-    private String version = "J8.1.3";
+    private String version = "J8.1.4";
 
     /** API标题，默认为空 */
     private String title = "API 在线文档";
@@ -31,7 +29,7 @@ public class GirSwaggerProperties {
     private String author = "geoair";
 
     /** API描述，默认为空 */
-    private String description = "API文档 VJ8.1.3";
+    private String description = "API文档 VJ8.1.4";
 
     /** 手动指定控制器根包（优先级高于从SpringBootApplication自动提取） 示例：com.gtc.gishubteam.editor.wcs.controller */
     private String controllerRootPackage;
@@ -56,4 +54,15 @@ public class GirSwaggerProperties {
 
     /** 是否启用分组序号（true：1-Web；false：Web） */
     private boolean enableGroupIndex = true;
+
+    @Data
+    public static class ApiDocAuth {
+        /** 是否启用swagger的鉴权 */
+        private boolean enableAuth = false;
+
+        /** 接口文档的认证用户名 */
+        private String username = "admin";
+        /** 接口文档的认证密码 */
+        private String password = "123456";
+    }
 }

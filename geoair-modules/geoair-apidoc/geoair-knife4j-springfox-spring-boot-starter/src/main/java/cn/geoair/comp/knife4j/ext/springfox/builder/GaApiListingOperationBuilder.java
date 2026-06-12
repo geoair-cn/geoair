@@ -55,7 +55,7 @@ public class GaApiListingOperationBuilder implements OperationBuilderPlugin {
         return true;
     }
 
-    // ----------------------- 核心：获取默认标签（修复Springfox 3.x API） -----------------------
+    // -----------------------  获取默认标签（修复Springfox 3.x API） -----------------------
     private Set<String> getDefaultTags(OperationContext context) {
         Set<String> objects = new HashSet<>();
         objects.add(context.getGroupName());

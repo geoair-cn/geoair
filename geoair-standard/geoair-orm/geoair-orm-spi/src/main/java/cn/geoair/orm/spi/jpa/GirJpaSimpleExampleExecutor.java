@@ -17,7 +17,7 @@ import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.base.data.tuples.GkPair;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.orm.spi.GirExampleExecutor;
 // import javafx.util.GkPair;
 import cn.geoair.orm.spi.support.GirExample;
@@ -27,7 +27,7 @@ import cn.geoair.orm.spi.support.GirSimpleExampleParser;
 @Component
 public class GirJpaSimpleExampleExecutor implements GirExampleExecutor {
 
-	private final GiLogger log = GirLogger.getLoger(GirJpaSimpleExampleExecutor.class);
+	private final GiLogger log = GirLoggerFactory.getLogger(GirJpaSimpleExampleExecutor.class);
 
 	@Resource
 	EntityManagerProvider entityManagerProvider;

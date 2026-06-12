@@ -96,7 +96,7 @@ public class GirMysqlTran {
             // 3. 提取标准WKB数据（去除前4字节）
             byte[] wkbData = extractWkbData(mysqlBinary);
 
-            jtsGeom = GirGeoTools.me().getFormatOpt().getWKBReader().read(wkbData);
+            jtsGeom = GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(wkbData);
 
             // 5. 设置SRID
             if (jtsGeom != null && srid != 0) {

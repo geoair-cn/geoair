@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
@@ -17,7 +17,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 /** 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制 */
 public class GeoFileTranImpl implements GeoFileTran {
 
-    private static GiLogger log = GirLogger.getLoger(GeoFileTranImpl.class);
+    private static GiLogger log = GirLoggerFactory.getLogger(GeoFileTranImpl.class);
 
     // 上下文
     private TranContext context = new TranContext();

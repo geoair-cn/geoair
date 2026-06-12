@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple.executor;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 /**
  * @author ：张逢吉
@@ -9,7 +9,7 @@ import cn.geoair.base.log.GirLogger;
  */
 public class DefaultTaskInterceptor implements GirTaskInterceptor {
 
-    private static final GiLogger log = GirLogger.getLoger(DefaultTaskInterceptor.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(DefaultTaskInterceptor.class);
 
     @Override
     public String beforeTask(Object task) {

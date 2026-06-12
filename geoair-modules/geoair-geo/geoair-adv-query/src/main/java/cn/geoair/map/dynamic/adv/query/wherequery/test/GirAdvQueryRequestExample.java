@@ -1,61 +1,49 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.test;
 
-import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQuerySqlBuilderExample;
+import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
+import cn.geoair.map.dynamic.adv.query.wherequery.*;
+import cn.hutool.core.date.DateUtil;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import lombok.Data;
 
 /**
  * GirAdvQueryRequest 使用示例
  *
- * <p>展示各种查询场景的使用方法
- *
- * @author 张俊
- * @date Created in 2026/5/18 20:07
+ * @author zhangjun
  */
 public class GirAdvQueryRequestExample {
-
-    public static void main(String[] args) {
-        // 示例1：基础查询 - 传统字符串方式
-        basicStringExample();
-
-        // 示例2：Lambda风格查询
-        lambdaStyleExample();
-
-        // 示例3：复杂条件查询
-        complexConditionExample();
-
-        // 示例4：分页查询
-        paginationExample();
-
-        // 示例5：排序示例
-        orderByExample();
-
-        // 示例6：自定义SQL模式
-        customSqlExample();
-
-        // 示例7：字段别名和映射
-        fieldAliasExample();
-
-        // 示例8：业务场景 - 用户管理
-        userManagementExample();
-
-        // 示例9：业务场景 - 订单查询
-        orderQueryExample();
-
-        // 示例10：动态条件构建
-        dynamicConditionExample();
+    @Data
+    static class User {
+        private Long id;
+        private String name;
+        private Integer age;
+        private String email;
+        private Integer status;
+        private Long deptId;
+        private Date createTime;
     }
 
-    /** 示例1：基础查询 - 传统字符串方式 */
-    public static void basicStringExample() {
-        System.out.println("========== 基础查询（字符串方式） ==========");
+    @Data
+    static class Order {
+        private Long id;
+        private Long userId;
+        private BigDecimal amount;
+        private String status;
+        private Date createTime;
+    }
+
+    private static GirAdvSqlComposer sqlBuilder = GirAdvSqlComposerMockProvider.getMockPostgresql();
+
+    /** 示例1：基础查询 - 简单条件 */
+    public static void example1_BasicQuery() {
+        System.out.println("========== 示例1：基础查询 ==========");
 
         GirAdvQueryRequest query =
                 GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields("id", "name", "age", "email")
+                        .fields("id", "name", "age", "email", "create_time")
                         .where(w -> w.eq("status", 1).ge("age", 18))
                         .orderByAsc("name")
                         .page(1, 10)
@@ -64,363 +52,394 @@ public class GirAdvQueryRequestExample {
         System.out.println("表名: " + query.getTableOrSqlView());
         System.out.println("字段: " + query.getFieldNames());
         System.out.println("是否分页: " + query.hasPagination());
-        System.out.println("偏移量: " + query.getOffset());
-        System.out.println(
-                "  - ALL："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg()
-                                .buildSelectSql(query));
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
     }
 
-    /** 示例2：Lambda风格查询（推荐） */
-    public static void lambdaStyleExample() {
-        System.out.println("\n========== Lambda风格查询 ==========");
+    /** 示例2：复杂条件查询 - AND/OR组合 */
+    public static void example2_ComplexCondition() {
+        System.out.println("========== 示例2：复杂条件查询 ==========");
 
-        // 方式1：使用Lambda表达式指定字段
-        GirAdvQueryRequest query1 =
+        GirAdvQueryRequest query =
                 GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getCreateTime, User::getAge, User::getEmail)
+                        .fields("id", "name", "age", "dept_id")
+                        .where(
+                                w ->
+                                        w.eq("status", 1)
+                                                .and()
+                                                .group(
+                                                        sub ->
+                                                                sub.eq("dept_id", 100)
+                                                                        .or()
+                                                                        .eq("dept_id", 200)
+                                                                        .or()
+                                                                        .eq("dept_id", 300))
+                                                .gt("age", 18)
+                                                .like("name", "张"))
+                        .orderByDesc("create_time")
+                        .orderByAsc("name")
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例3：范围查询 - BETWEEN/IN */
+    public static void example3_RangeQuery() {
+        System.out.println("========== 示例3：范围查询 ==========");
+
+        List<Integer> statusList = Arrays.asList(1, 2, 3);
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields("id", "name", "age", "status")
+                        .where(
+                                w ->
+                                        w.in("status", statusList)
+                                                .between("age", 18, 60)
+                                                .ge(
+                                                        "create_time",
+                                                        DateUtil.beginOfDay(DateUtil.date())))
+                        .orderByDesc("create_time")
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例4：空值判断 - IS NULL/IS NOT NULL */
+    public static void example4_NullCheck() {
+        System.out.println("========== 示例4：空值判断 ==========");
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields("id", "name", "email")
+                        .where(w -> w.isNotNull("email").eq("status", 1).or().isNull("phone"))
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例5：子查询 - EXISTS/NOT EXISTS */
+    public static void example5_SubQuery() {
+        System.out.println("========== 示例5：子查询 ==========");
+
+        // 子查询：查询有订单的用户
+        String subSql = "SELECT 1 FROM orders o WHERE o.user_id = u.id";
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields("id", "name")
+                        .where(w -> w.eq("status", 1).exprExists(subSql))
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例6：分组查询 - GROUP BY + HAVING */
+    public static void example6_GroupByAndHaving() {
+        System.out.println("========== 示例6：分组查询 ==========");
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields("dept_id")
+                        .fieldExpr("COUNT(*) as user_count", "AVG(age) as avg_age")
+                        .where(w -> w.eq("status", 1))
+                        .groupBy("dept_id")
+                        .having(
+                                h ->
+                                        h.expr("COUNT(*)", AdvOperatorEnums.大于, 10)
+                                                .expr("AVG(age)", AdvOperatorEnums.大于等于, 25))
+                        .orderByDesc("user_count")
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+        System.out.println("COUNT SQL: " + sqlBuilder.buildCountSql(query));
+    }
+
+    /** 示例7：去重查询 - DISTINCT */
+    public static void example7_DistinctQuery() {
+        System.out.println("========== 示例7：去重查询 ==========");
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .distinct()
+                        .fields("dept_id", "status")
+                        .where(w -> w.eq("status", 1))
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例8：表达式查询 - SQL函数和计算 */
+    public static void example8_ExpressionQuery() {
+        System.out.println("========== 示例8：表达式查询 ==========");
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields(
+                                "id",
+                                "name",
+                                "DATE_FORMAT(create_time, '%Y-%m-%d') as create_date",
+                                "CASE WHEN age >= 60 THEN '老年' WHEN age >= 18 THEN '成年' ELSE '未成年' END as age_group")
+                        .where(
+                                w ->
+                                        w.expr("YEAR(create_time)", AdvOperatorEnums.等于, 2024)
+                                                .expr(
+                                                        "MONTH(create_time)",
+                                                        AdvOperatorEnums.大于等于,
+                                                        6)
+                                                .expr("age * 2", AdvOperatorEnums.小于, 100))
+                        .orderByDesc("create_time")
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例9：自定义SQL查询 - 复杂业务场景 */
+    public static void example9_CustomSql() {
+        System.out.println("========== 示例9：自定义SQL ==========");
+
+        String customSql =
+                "SELECT u.id, u.name, u.age, "
+                        + "COALESCE(o.order_count, 0) as order_count, "
+                        + "COALESCE(o.total_amount, 0) as total_amount "
+                        + "FROM user u "
+                        + "LEFT JOIN ("
+                        + "  SELECT user_id, COUNT(*) as order_count, SUM(amount) as total_amount "
+                        + "  FROM orders "
+                        + "  WHERE status = 'COMPLETED' "
+                        + "  GROUP BY user_id"
+                        + ") o ON u.id = o.user_id "
+                        + "WHERE u.status = 1";
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder()
+                        .customSql(customSql)
+                        .orderByDesc("total_amount")
+                        .page(1, 20)
+                        .build();
+
+        System.out.println("自定义SQL: " + query.getCustomSql());
+        System.out.println("分页SQL: " + sqlBuilder.buildPageSql(query));
+    }
+
+    /** 示例10：分页查询 - 带总数统计 */
+    public static void example10_PaginationQuery() {
+        System.out.println("========== 示例10：分页查询 ==========");
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .fields("id", "name", "age", "create_time")
+                        .where(
+                                w ->
+                                        w.eq("status", 1)
+                                                .like("name", "测试")
+                                                .between(
+                                                        "create_time",
+                                                        DateUtil.beginOfYear(DateUtil.date()),
+                                                        DateUtil.endOfYear(DateUtil.date())))
+                        .orderByDesc("create_time")
+                        .page(2, 15) // 第2页，每页15条
+                        .pageNumStartZero(false) // 页码从1开始
+                        .build();
+
+        System.out.println("当前页: " + query.getPageNum());
+        System.out.println("每页条数: " + query.getPageSize());
+        System.out.println("偏移量: " + query.getOffset());
+        System.out.println("查询SQL: " + sqlBuilder.buildSelectSql(query));
+        System.out.println("统计SQL: " + sqlBuilder.buildCountSql(query));
+        System.out.println("分页SQL: " + sqlBuilder.buildPageSql(query));
+    }
+
+    /** 示例11：Lambda表达式方式 - 类型安全（如果支持） */
+    public static void example11_LambdaQuery() {
+        System.out.println("========== 示例11：Lambda表达式方式 ==========");
+
+        // 注意：这需要QueryRequestBuilder支持Lambda表达式
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class, true)
+                        .fields(User::getId, User::getName, User::getAge)
                         .whereLambda(
                                 w ->
                                         w.eq(User::getStatus, 1)
                                                 .ge(User::getAge, 18)
                                                 .like(User::getName, "张"))
-                        .orderByDesc(User::getCreateTime)
+                        .orderByAsc(User::getName)
+                        .groupBy(User::getDeptId)
+                        .having(h -> h.expr("COUNT(*)", AdvOperatorEnums.大于, 5))
+                        .page(1, 10)
+                        .build();
+
+        System.out.println("表名: " + query.getTableOrSqlView());
+        System.out.println("字段: " + query.getFieldNames());
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例12：SQL视图查询 - 子查询作为表 */
+    public static void example12_SqlViewQuery() {
+        System.out.println("========== 示例12：SQL视图查询 ==========");
+
+        String sqlView =
+                "SELECT u.id, u.name, u.age, d.dept_name "
+                        + "FROM user u "
+                        + "LEFT JOIN dept d ON u.dept_id = d.id "
+                        + "WHERE u.status = 1";
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder()
+                        .table(sqlView)
+                        .sqlViewTableNameAlias("user_view")
+                        .fields("id", "name", "age", "dept_name")
+                        .where(w -> w.ge("age", 18).like("name", "张"))
+                        .orderByDesc("age")
                         .page(1, 20)
                         .build();
 
-        System.out.println("Lambda查询1构建成功");
-        System.out.println(
-                "  - ALL："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg()
-                                .buildSelectSql(query1));
-        // 方式2：带驼峰转下划线
-        GirAdvQueryRequest query2 =
-                GirAdvQueryRequest.builder(User.class, true)
-                        .table("user")
-                        .fields(User::getId, User::getCreateTime)
-                        .whereLambda(w -> w.between(User::getAge, 18, 30))
-                        .build();
-
-        System.out.println("Lambda查询2构建成功（自动驼峰转下划线）");
+        System.out.println("SQL视图: " + query.getTableOrSqlView());
+        System.out.println("别名: " + query.getSqlViewTableNameAlias());
+        System.out.println("生成SQL: " + sqlBuilder.buildSelectSql(query));
     }
 
-    /** 示例3：复杂条件查询 */
-    public static void complexConditionExample() {
-        System.out.println("\n========== 复杂条件查询 ==========");
+    /** 示例13：多表关联查询 - 使用表达式条件 */
+    public static void example13_JoinQuery() {
+        System.out.println("========== 示例13：多表关联查询 ==========");
 
-        // 查询：年龄>=18 并且 (状态=1 或者 角色='admin')，且未被删除
+        // 注意：这里使用自定义SQL方式处理多表关联
+        String joinSql =
+                "SELECT u.id, u.name, u.age, o.order_id, o.amount "
+                        + "FROM user u "
+                        + "INNER JOIN orders o ON u.id = o.user_id "
+                        + "WHERE u.status = 1";
+
         GirAdvQueryRequest query =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName, User::getAge, User::getRole)
-                        .whereLambda(
+                GirAdvQueryRequest.builder()
+                        .customSql(joinSql)
+                        .where(
                                 w ->
-                                        w.ge(User::getAge, 18)
-                                                .and(
-                                                        sub ->
-                                                                sub.eq(User::getStatus, 1)
-                                                                        .or()
-                                                                        .eq(User::getRole, "admin"))
-                                                .isNull(User::getDeletedAt))
-                        .orderByDesc(User::getCreateTime)
-                        .page(1, 15)
+                                        w // 这个where会追加到自定义SQL后面
+                                                .ge("o.amount", 100)
+                                                .eq("o.status", "COMPLETED"))
+                        .orderByDesc("o.create_time")
                         .build();
 
-        System.out.println("复杂条件查询构建成功");
-        System.out.println("是否有WHERE条件: " + query.getWhereOption().hasExpression());
-        System.out.println(
-                "  - ALL："
-                        + GirAdvQuerySqlBuilderExample.getGirAdvQuerySqlBuilderPg()
-                                .buildSelectSql(query));
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
     }
 
-    /** 示例4：分页查询 */
-    public static void paginationExample() {
-        System.out.println("\n========== 分页查询 ==========");
+    /** 示例14：聚合函数查询 - 统计报表 */
+    public static void example14_AggregateQuery() {
+        System.out.println("========== 示例14：聚合函数查询 ==========");
 
-        // 标准分页（页码从1开始）
-        GirAdvQueryRequest query1 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .whereLambda(w -> w.eq(User::getStatus, 1))
-                        .page(2, 20) // 第2页，每页20条
-                        .build();
-
-        System.out.println("标准分页:");
-        System.out.println("  - 页码: " + query1.getPageNum());
-        System.out.println("  - 每页条数: " + query1.getPageSize());
-        System.out.println("  - 偏移量: " + query1.getOffset());
-        System.out.println("  - 实际页码: " + query1.getActualPageNum());
-
-        // 从0开始的分页
-        GirAdvQueryRequest query2 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .page(0, 20, true) // 页码从0开始
-                        .build();
-
-        System.out.println("\n从0开始的分页:");
-        System.out.println("  - 偏移量: " + query2.getOffset());
-        System.out.println("  - 实际页码: " + query2.getActualPageNum());
-
-        // 不分页查询所有
-        GirAdvQueryRequest query3 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .noPage()
-                        .build();
-
-        System.out.println("\n不分页: " + !query3.hasPagination());
-    }
-
-    /** 示例5：排序示例 */
-    public static void orderByExample() {
-        System.out.println("\n========== 排序示例 ==========");
-
-        // 1. 字段排序
-        GirAdvQueryRequest query1 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .orderByAsc(User::getName) // 名称升序
-                        .orderByDesc(User::getAge) // 年龄降序
-                        .build();
-
-        System.out.println("字段排序 ORDER BY: " + query1.buildOrderByClause());
-
-        // 2. 函数排序
-        GirAdvQueryRequest query2 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .orderByAscFunction("CAST(id AS numeric)")
-                        .orderByDescFunction("LENGTH(name)")
-                        .build();
-
-        System.out.println("函数排序 ORDER BY: " + query2.buildOrderByClause());
-
-        // 3. 混合排序
-        GirAdvQueryRequest query3 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .order(OrderApo.ofASCFieldName("name"))
-                        .order(OrderApo.ofDescFunction("YEAR(create_time)"))
-                        .build();
-
-        System.out.println("混合排序 ORDER BY: " + query3.buildOrderByClause());
-
-        // 4. 批量添加排序
-        List<OrderApo> orders =
-                Arrays.asList(
-                        OrderApo.ofDescFieldName("create_time"), OrderApo.ofASCFieldName("id"));
-        GirAdvQueryRequest query4 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .orders(orders)
-                        .build();
-
-        System.out.println("批量排序 ORDER BY: " + query4.buildOrderByClause());
-    }
-
-    /** 示例6：自定义SQL模式 */
-    public static void customSqlExample() {
-        System.out.println("\n========== 自定义SQL模式 ==========");
-
-        // 完全自定义SQL
         GirAdvQueryRequest query =
-                GirAdvQueryRequest.builder()
-                        .customSql("SELECT id, name, age FROM user WHERE status = 1")
-                        .page(1, 10)
-                        .build();
-
-        System.out.println("是否为自定义SQL模式: " + query.isCustomSqlMode());
-        System.out.println("自定义SQL: " + query.getCustomSql());
-
-        // 带参数的自定义SQL（通过占位符）
-        GirAdvQueryRequest query2 =
-                GirAdvQueryRequest.builder()
-                        .customSql("SELECT * FROM user WHERE age > #{minAge} AND age < #{maxAge}")
-                        .page(1, 10)
-                        .build();
-
-        System.out.println("带参数SQL: " + query2.getCustomSql());
-    }
-
-    /** 示例7：字段别名和映射 */
-    public static void fieldAliasExample() {
-        System.out.println("\n========== 字段别名示例 ==========");
-
-        // 方式1：使用别名
-        GirAdvQueryRequest query1 =
                 GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .field(User::getId, "userId")
-                        .field(User::getName, "userName")
-                        .field(User::getAge, "userAge")
-                        .whereLambda(w -> w.eq(User::getStatus, 1))
-                        .build();
-
-        System.out.println("带别名字段: " + query1.getFieldNames());
-
-        // 方式2：SQL表达式字段
-        GirAdvQueryRequest query2 =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .fieldExpr("COUNT(*)", "total")
-                        .fieldExpr("YEAR(create_time)", "year")
-                        .build();
-
-        System.out.println("表达式字段: " + query2.getFieldNames());
-    }
-
-    /** 示例8：业务场景 - 用户管理 */
-    public static void userManagementExample() {
-        System.out.println("\n========== 用户管理场景 ==========");
-
-        // 查询活跃用户，年龄18-35岁，按注册时间倒序
-        GirAdvQueryRequest activeUsers =
-                GirAdvQueryRequest.builder(User.class, true)
-                        .table("sys_user")
                         .fields(
-                                User::getId,
-                                User::getName,
-                                User::getAge,
-                                User::getEmail,
-                                User::getCreateTime)
-                        .whereLambda(
+                                "dept_id",
+                                "COUNT(*) as total_count",
+                                "SUM(age) as total_age",
+                                "AVG(age) as avg_age",
+                                "MAX(age) as max_age",
+                                "MIN(age) as min_age")
+                        .where(w -> w.eq("status", 1))
+                        .groupBy("dept_id")
+                        .having(h -> h.expr("COUNT(*)", AdvOperatorEnums.大于, 5))
+                        .orderByDesc("total_count")
+                        .build();
+
+        System.out.println("SQL: " + sqlBuilder.buildSelectSql(query));
+    }
+
+    /** 示例15：复杂业务场景 - 组合所有特性 */
+    public static void example15_ComplexBusinessQuery() {
+        System.out.println("========== 示例15：复杂业务场景 ==========");
+
+        // 查询：每个部门中年龄大于18岁的用户，统计各部门人数和平均年龄，
+        // 只显示人数大于5的部门，按人数倒序，分页显示
+
+        GirAdvQueryRequest query =
+                GirAdvQueryRequest.builder(User.class)
+                        .distinct()
+                        .fields("dept_id", "COUNT(*) as user_count", "AVG(age) as avg_age")
+                        .where(
                                 w ->
-                                        w.eq(User::getStatus, 1)
-                                                .between(User::getAge, 18, 35)
-                                                .isNull(User::getDeletedAt))
-                        .orderByDesc(User::getCreateTime)
-                        .page(1, 20)
-                        .build();
-
-        System.out.println("活跃用户查询构建成功");
-
-        // 搜索用户（动态条件）
-        String keyword = "张";
-        Integer minAge = 18;
-        Integer maxAge = 60;
-
-        GirAdvQueryRequest searchUsers =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("sys_user")
-                        .fields(User::getId, User::getName, User::getAge)
-                        .whereLambda(
-                                w -> {
-                                    w.isNull(User::getDeletedAt);
-                                    if (keyword != null && !keyword.isEmpty()) {
-                                        w.like(User::getName, keyword);
-                                    }
-                                    if (minAge != null) {
-                                        w.ge(User::getAge, minAge);
-                                    }
-                                    if (maxAge != null) {
-                                        w.le(User::getAge, maxAge);
-                                    }
-                                })
-                        .orderByAsc(User::getName)
-                        .page(1, 15)
-                        .build();
-
-        System.out.println("用户搜索查询构建成功");
-    }
-
-    /** 示例9：业务场景 - 订单查询 */
-    public static void orderQueryExample() {
-        System.out.println("\n========== 订单查询场景 ==========");
-
-        System.out.println("订单查询构建成功");
-    }
-
-    /** 示例10：动态条件构建 */
-    public static void dynamicConditionExample() {
-        System.out.println("\n========== 动态条件构建 ==========");
-
-        // 模拟前端传入的参数
-        String name = "张三";
-        Integer minAge = null; // 可能为空
-        Integer maxAge = 30;
-        Integer status = 1;
-        List<String> roles = Arrays.asList("admin", "manager");
-
-        GirAdvQueryRequest query =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName, User::getAge, User::getRole)
-                        .whereLambda(
-                                w -> {
-                                    // 基础条件：未删除
-                                    w.isNull(User::getDeletedAt);
-
-                                    // 动态添加条件
-                                    if (name != null && !name.isEmpty()) {
-                                        w.like(User::getName, name);
-                                    }
-                                    if (minAge != null) {
-                                        w.ge(User::getAge, minAge);
-                                    }
-                                    if (maxAge != null) {
-                                        w.le(User::getAge, maxAge);
-                                    }
-                                    if (status != null) {
-                                        w.eq(User::getStatus, status);
-                                    }
-                                    if (roles != null && !roles.isEmpty()) {
-                                        w.in(User::getRole, roles);
-                                    }
-                                })
-                        .orderByDesc(User::getCreateTime)
+                                        w.eq("status", 1)
+                                                .gt("age", 18)
+                                                .in("dept_id", Arrays.asList(1, 2, 3, 4, 5))
+                                                .between(
+                                                        "create_time",
+                                                        DateUtil.parse("2024-01-01"),
+                                                        DateUtil.parse("2024-12-31")))
+                        .groupBy("dept_id")
+                        .having(
+                                h ->
+                                        h.expr("COUNT(*)", AdvOperatorEnums.大于, 5)
+                                                .expr("AVG(age)", AdvOperatorEnums.大于等于, 25))
+                        .orderByDesc("user_count")
+                        .orderByAsc("dept_id")
                         .page(1, 10)
+                        .pageNumStartZero(false)
                         .build();
 
-        System.out.println("动态条件查询构建成功");
-        System.out.println("是否有条件: " + query.getWhereOption().hasExpression());
+        System.out.println("查询参数:");
+        System.out.println("  - 表名: " + query.getTableOrSqlView());
+        System.out.println("  - 是否去重: " + query.hasDistinct());
+        System.out.println("  - 是否分组: " + query.hasGroupBy());
+        System.out.println("  - GROUP BY字段: " + query.getGroupByFields());
+        System.out.println("  - 是否有HAVING: " + query.hasHaving());
+        System.out.println("  - 当前页: " + query.getPageNum());
+        System.out.println("  - 偏移量: " + query.getOffset());
+        System.out.println();
 
-        // 演示NULL处理策略
-        GirAdvQueryRequest queryWithIgnoreNull =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .whereLambda(w -> w.eq(User::getName, null)) // 值为null的条件
-                        .ignoreNull() // 忽略null值条件
-                        .build();
-
-        System.out.println(
-                "\n忽略NULL值后条件数量: " + queryWithIgnoreNull.getWhereOption().hasExpression());
+        System.out.println("查询SQL: " + sqlBuilder.buildSelectSql(query));
+        System.out.println("统计SQL: " + sqlBuilder.buildCountSql(query));
+        System.out.println("分页SQL: " + sqlBuilder.buildPageSql(query));
     }
 
-    /** 示例11：工具方法使用 */
-    public static void utilityMethodsExample() {
-        System.out.println("\n========== 工具方法示例 ==========");
+    public static void main(String[] args) {
+        runAllExamples();
+    }
 
-        GirAdvQueryRequest query =
-                GirAdvQueryRequest.builder(User.class)
-                        .table("user")
-                        .fields(User::getId, User::getName)
-                        .orderByDesc(User::getCreateTime)
-                        .orderByAsc(User::getName)
-                        .page(2, 20)
-                        .build();
+    /** 运行所有示例 */
+    public static void runAllExamples() {
+        example1_BasicQuery();
+        System.out.println();
 
-        // 判断方法
-        System.out.println("是否为自定义SQL模式: " + query.isCustomSqlMode());
-        System.out.println("是否有分页: " + query.hasPagination());
-        System.out.println("是否有排序: " + query.hasOrders());
+        example2_ComplexCondition();
+        System.out.println();
 
-        // 计算分页
-        System.out.println("分页偏移量: " + query.getOffset());
-        System.out.println("实际页码: " + query.getActualPageNum());
+        example3_RangeQuery();
+        System.out.println();
 
-        // 构建ORDER BY
-        System.out.println("ORDER BY子句: " + query.buildOrderByClause());
+        example4_NullCheck();
+        System.out.println();
+
+        example5_SubQuery();
+        System.out.println();
+
+        example6_GroupByAndHaving();
+        System.out.println();
+
+        example7_DistinctQuery();
+        System.out.println();
+
+        example8_ExpressionQuery();
+        System.out.println();
+
+        example9_CustomSql();
+        System.out.println();
+
+        example10_PaginationQuery();
+        System.out.println();
+
+        example12_SqlViewQuery();
+        System.out.println();
+
+        example13_JoinQuery();
+        System.out.println();
+
+        example14_AggregateQuery();
+        System.out.println();
+
+        example15_ComplexBusinessQuery();
+        System.out.println();
+
+        // Lambda示例需要特殊支持
+        example11_LambdaQuery();
     }
 }

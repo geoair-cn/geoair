@@ -38,7 +38,7 @@ public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-        return null;
+        return targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
     @Override
@@ -52,5 +52,20 @@ public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
             return (BoneCPDataSource) targetDataSource;
         }
         throw new IllegalArgumentException("当前数据源不是BoneCP数据源");
+    }
+
+    @Override
+    public Integer getActiveCount() {
+        BoneCPDataSource bcp = getBoneCPDataSource();
+        if (bcp == null) {
+            return 0;
+        }
+        Integer activeCount = null;
+        try {
+            activeCount = bcp.getPool().getTotalLeased();
+        } catch (Exception e) {
+
+        }
+        return activeCount;
     }
 }

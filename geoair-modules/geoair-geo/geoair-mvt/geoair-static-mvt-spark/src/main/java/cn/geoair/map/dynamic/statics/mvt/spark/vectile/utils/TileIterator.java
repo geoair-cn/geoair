@@ -130,7 +130,7 @@ public class TileIterator implements Iterator<Tuple2<String, List<GirAdvOneRow>>
 
         // 生成当前瓦片的 quadKey
         String quadKey =
-                GirGeoTools.me()
+                GirGeoTools.defaultInstance()
                         .getTileGridBingMapOpt()
                         .xyzToQuadKey(currentX, currentY, currentZoom);
 

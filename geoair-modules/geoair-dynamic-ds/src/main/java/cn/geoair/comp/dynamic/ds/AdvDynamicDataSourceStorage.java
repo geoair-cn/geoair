@@ -2,7 +2,7 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
@@ -16,10 +16,11 @@ import lombok.Setter;
 /** 动态数据源的存储器实现类 实现动态数据源的管理功能，包括添加、获取、移除和缓存清空等操作 */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     protected static AdvDynamicDataSourceStorage dataSourceManager;
     @Setter IAdvDataSourceHelper iAdvDataSourceHelper;
+    @Setter IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
 
     /**
      * 全局只有一个存储器实例
@@ -59,6 +60,18 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return iAdvDataSourceHelper;
     }
 
+    public IAdvDataSourceInitHelper getAdvDataSourceInitHelper() {
+        if (iAdvDataSourceInitHelper == null) {
+            try {
+                iAdvDataSourceInitHelper = Gir.beans.getBean(IAdvDataSourceInitHelper.class);
+            } catch (Exception e) {
+                log.error(e, e.getMessage());
+                throw new RuntimeException("无法找到 iAdvDataSourceInitHelper 的实现类!" + e.getMessage());
+            }
+        }
+        return iAdvDataSourceInitHelper;
+    }
+
     private AdvDynamicDataSourceStorage() {}
 
     // 数据源映射
@@ -85,6 +98,19 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     @Override
     public AdvDataSourceWrapper getDataSource(String dataSourceId) {
+        return getOrCreateDataSource(dataSourceId);
+    }
+
+    @Override
+    public AdvDataSourceWrapper getDataSourceById(String dataSourceId) {
+        if (containsDataSource(dataSourceId)) {
+            return dataSourceMap.get(dataSourceId);
+        }
+        return null;
+    }
+
+    @Override
+    public AdvDataSourceWrapper getOrCreateDataSource(String dataSourceId) {
         if (containsDataSource(dataSourceId)) {
             return dataSourceMap.get(dataSourceId);
         } else {
@@ -106,6 +132,11 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     @Override
     public void putDataSource(DataSource dataSource, String dataSourceId) {
+        registerDataSource(dataSourceId, dataSource);
+    }
+
+    @Override
+    public void registerDataSource(String dataSourceId, DataSource dataSource) {
         // 只有当数据源不存在时才添加
         AdvDataSourceWrapper existingDataSource = dataSourceMap.get(dataSourceId);
         if (existingDataSource == null) {
@@ -125,7 +156,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     @Override
     public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo) {
         return AdvDataSourceWrapper.wrap(
-                getAdvDataSourceHelper().getDbDataSourceByApo(dataSourceApo));
+                getAdvDataSourceInitHelper().getDbDataSourceByApo(dataSourceApo));
     }
 
     @Override

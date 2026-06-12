@@ -19,21 +19,49 @@ public interface DynamicDataSourceManager {
     boolean containsDataSource(String dataSourceId);
 
     /**
-     * 获取指定ID的数据源
+     * 获取指定ID的数据源 由于实现上是与getOrCreateDataSource一致，但是命名上感觉像是getDataSourceById，所以这个API废弃
      *
      * @param dataSourceId 数据源ID
      * @return DruidDataSource对象
      * @throws RuntimeException 当数据源不存在时抛出异常
      */
+    @Deprecated
     AdvDataSourceWrapper getDataSource(String dataSourceId);
 
     /**
-     * 添加数据源到管理器
+     * 获取指定ID的数据源，如果数据源不存在，就返回Null
      *
-     * @param druidDataSource Druid数据源对象
+     * @param dataSourceId 数据源ID
+     * @return DruidDataSource对象
+     * @throws RuntimeException 当数据源不存在时抛出异常
+     */
+    AdvDataSourceWrapper getDataSourceById(String dataSourceId);
+
+    /**
+     * 获取指定ID的数据源，如果数据源不存在，就去查询id对应的DataSourceApo进行创建数据源
+     *
+     * @param dataSourceId 数据源ID
+     * @return DruidDataSource对象
+     * @throws RuntimeException 当数据源不存在时抛出异常
+     */
+    AdvDataSourceWrapper getOrCreateDataSource(String dataSourceId);
+
+    /**
+     * 添加数据源到管理器 命名不规范，故废弃，移步registerDataSource
+     *
+     * @param dataSource 数据源对象
      * @param dataSourceId 数据源ID
      */
-    void putDataSource(DataSource druidDataSource, String dataSourceId);
+    @Deprecated
+    void putDataSource(DataSource dataSource, String dataSourceId);
+
+    /**
+     * 注册数据源到管理器
+     *
+     * @param dataSource 数据源对象
+     * @param dataSourceId 数据源ID
+     */
+    void registerDataSource(String dataSourceId, DataSource dataSource);
 
     /**
      * 根据数据源APO对象创建Druid数据源

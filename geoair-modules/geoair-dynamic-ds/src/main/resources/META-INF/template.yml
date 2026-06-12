@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    # 主库配置
+    url: jdbc:postgresql://192.168.0.110:5432/test_dbName
+    username: postgres
+    password: XXXXX
+    driver-class-name: org.postgresql.Driver
+    geoair:
+      group-name: "orderRdGroup"
+      master-data-source-id: "master_db_01"
+      readwrite:
+        enabled: true
+        read-strategy: WEIGHT  # RANDOM, ROUND_ROBIN, WEIGHT
+        read-data-sources:
+          - id: beijing_slave
+            url: jdbc:postgresql://192.168.0.104:5432/test_dbName
+            weight: 50
+            enabled: true
+          - id: shanghai_slave
+            url: jdbc:postgresql://192.168.0.106:5432/test_dbName
+            weight: 30
+            enabled: true
+          - id: guangzhou_slave
+            url: jdbc:postgresql://192.168.0.107:5432/test_dbName
+            weight: 20
+            enabled: true
+          - id: backup_slave
+            url: jdbc:postgresql://192.168.0.108:5432/test_dbName
+            weight: 0
+            enabled: false  # 备用，默认禁用

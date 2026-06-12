@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -22,22 +23,17 @@ import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /** 数据库删除操作抽象父类 封装所有数据库通用的删除逻辑，差异化语法由子类实现 */
 public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt {
 
-    // 注入数据源获取器
     protected IDataSourceGetter dataSourceGetter;
-
-    // 表名处理器（差异化）
     protected DialectTableNameProcessor dialectTableNameProcessor;
-
-    // 日志实例
-    protected static final GiLogger log = GirLogger.getLoger(AbstractExecAdvBaseDeleteOpt.class);
-
-    // 默认分批删除批次大小（通用常量）
+    protected static final GiLogger log =
+            GirLoggerFactory.getLogger(AbstractExecAdvBaseDeleteOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
@@ -56,7 +52,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         this.dataSourceGetter = dataSourceGetter;
     }
 
-    // ========== 通用逻辑：自定义SQL删除 ==========
+    // ========== 1. 自定义SQL删除 ==========
     @Override
     public Integer bDeleteBySql(String sqlStatement) {
         return bDeleteBySql(sqlStatement, SqlParamMap.of());
@@ -65,7 +61,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     @Override
     public Integer bDeleteBySql(String dynamicSql, SqlParamMap sqlParam) {
         if (StrUtil.isEmpty(dynamicSql)) {
-            throw new IllegalArgumentException("更新SQL语句不能为空");
+            throw new IllegalArgumentException("删除SQL语句不能为空");
         }
         SqlMeta sqlMeta =
                 GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
@@ -109,17 +105,16 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (sqlParam == null) {
             return bDeleteBySql(sqlStatement);
         } else if (sqlParam instanceof SqlParamList) {
-            SqlParamList sqlParamList = (SqlParamList) sqlParam;
-            return bDeleteBySql(sqlStatement, sqlParamList);
+            return bDeleteBySql(sqlStatement, (SqlParamList) sqlParam);
         } else if (sqlParam instanceof SqlParamMap) {
-            SqlParamMap sqlParamMap = (SqlParamMap) sqlParam;
-            return bDeleteBySql(sqlStatement, sqlParamMap);
+            return bDeleteBySql(sqlStatement, (SqlParamMap) sqlParam);
         } else {
             throw new RuntimeException("SqlParam参数不合法！");
         }
     }
 
-    // ========== 通用逻辑：主键删除 ==========
+    // ========== 2. 按主键删除 ==========
+
     @Override
     public Integer bDeleteByPK(String tableName, String idKey, Object id) {
         validateTableName(tableName);
@@ -141,7 +136,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter, getConfig())
                     .logExecuteSql(
                             this.getClass(),
-                            "bDeleteByPrimaryKey",
+                            "bDeleteByPK",
                             execSql,
                             SqlParamList.of(id),
                             cost,
@@ -150,15 +145,74 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         } catch (SQLException e) {
             AdvLogSql.of(dataSourceGetter, getConfig())
                     .logExecuteError(
-                            this.getClass(),
-                            "bDeleteByPrimaryKey",
-                            execSql,
-                            SqlParamList.of(id),
-                            e);
+                            this.getClass(), "bDeleteByPK", execSql, SqlParamList.of(id), e);
             throw new RuntimeException("按主键删除失败，表名：" + tableName + "，主键：" + idKey + "=" + id, e);
         } finally {
             closeConnection(connection);
         }
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("删除的实体对象不能为空");
+        }
+        DeleteStrategy strategy = new DeleteStrategy().setToUnderlineCase(true);
+        return bDeleteByPK(entity, strategy);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, DeleteStrategy strategy) {
+        if (entity == null) {
+            throw new IllegalArgumentException("删除的实体对象不能为空");
+        }
+        if (strategy == null) {
+            return bDeleteByPK(entity);
+        }
+
+        String tableName = strategy.getTableName();
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = GirAdvSqlUtils.getTableName(entity.getClass());
+        }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("tableName 不能为空");
+        }
+
+        String idKey = strategy.getIdKey();
+        if (GutilObject.isEmpty(idKey)) {
+            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+            if (CollUtil.isNotEmpty(idKeys)) {
+                idKey = idKeys.get(0);
+            }
+        }
+        if (GutilObject.isEmpty(idKey)) {
+            throw new IllegalArgumentException("主键字段名不能为空");
+        }
+
+        boolean toUnderlineCase = strategy.isToUnderlineCase();
+        List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
+
+        Map<String, Object> rowData =
+                GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+
+        if (toUnderlineCase) {
+            idKey = StrUtil.toUnderlineCase(idKey);
+        }
+        Object id = rowData.get(idKey);
+        if (id == null) {
+            throw new IllegalArgumentException("实体对象中未找到主键字段[" + idKey + "]的值");
+        }
+
+        return bDeleteByPK(tableName, idKey, id);
+    }
+
+    @Override
+    public <T> Integer bDeleteByPK(T entity, Consumer<DeleteStrategy> strategyConsumer) {
+        DeleteStrategy strategy = new DeleteStrategy();
+        if (strategyConsumer != null) {
+            strategyConsumer.accept(strategy);
+        }
+        return bDeleteByPK(entity, strategy);
     }
 
     @Override
@@ -173,6 +227,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+
         List<List<Object>> idBatches = splitCollection(ids, getMaxInParams());
         int totalSuccess = 0;
 
@@ -198,7 +253,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter, getConfig())
                     .logExecuteSql(
                             this.getClass(),
-                            "bDeleteBatchByPrimaryKey",
+                            "bDeleteByPKs",
                             StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess),
                             cost,
                             totalSuccess);
@@ -207,7 +262,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter, getConfig())
                     .logExecuteError(
                             this.getClass(),
-                            "bDeleteBatchByPrimaryKey",
+                            "bDeleteByPKs",
                             StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess),
                             e);
             rollbackConnection(connection);
@@ -225,33 +280,91 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         if (CollUtil.isEmpty(ids)) {
             return 0;
         }
-        if (batchSize <= 0 || batchSize > getMaxInParams()) {
+        if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
         }
 
         List<List<Object>> idBatches = splitCollection(ids, batchSize);
         int totalSuccess = 0;
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         for (List<Object> idBatch : idBatches) {
             totalSuccess += bDeleteByPKs(tableName, idKey, new HashSet<>(idBatch));
         }
-        stopWatch.stop();
-        long cost = stopWatch.getLastTaskTimeMillis();
 
-        AdvLogSql.of(dataSourceGetter, getConfig())
-                .logExecuteSql(
-                        this.getClass(),
-                        "bDeleteBatchWithBatchSize",
-                        StrUtil.format(
-                                "表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
-                        cost,
-                        totalSuccess);
         return totalSuccess;
     }
 
-    // ========== 通用逻辑：条件删除 ==========
+    @Override
+    public <T> void bDeleteBatchByPK(Collection<T> entities) {
+        if (CollUtil.isEmpty(entities)) {
+            return;
+        }
+        DeleteStrategy strategy = new DeleteStrategy().setToUnderlineCase(true);
+        bDeleteBatchByPK(entities, strategy);
+    }
+
+    @Override
+    public <T> void bDeleteBatchByPK(Collection<T> entities, DeleteStrategy strategy) {
+        if (CollUtil.isEmpty(entities)) {
+            return;
+        }
+
+        if (strategy == null) {
+            bDeleteBatchByPK(entities);
+            return;
+        }
+
+        String tableName = strategy.getTableName();
+        if (GutilObject.isEmpty(tableName)) {
+            T first = entities.iterator().next();
+            tableName = GirAdvSqlUtils.getTableName(first.getClass());
+        }
+
+        String idKey = strategy.getIdKey();
+        if (GutilObject.isEmpty(idKey)) {
+            T first = entities.iterator().next();
+            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            if (CollUtil.isNotEmpty(idKeys)) {
+                idKey = idKeys.get(0);
+            }
+        }
+        if (GutilObject.isEmpty(idKey)) {
+            throw new IllegalArgumentException("主键字段名不能为空");
+        }
+
+        boolean toUnderlineCase = strategy.isToUnderlineCase();
+        List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
+
+        Set<Object> ids = new HashSet<>();
+        for (T entity : entities) {
+            Map<String, Object> rowData =
+                    GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+            String finalIdKey = toUnderlineCase ? StrUtil.toUnderlineCase(idKey) : idKey;
+            Object id = rowData.get(finalIdKey);
+            if (id != null) {
+                ids.add(id);
+            }
+        }
+
+        if (CollUtil.isNotEmpty(ids)) {
+            bDeleteByPKs(tableName, idKey, ids);
+        } else {
+            throw new RuntimeException("主键值不能为空！");
+        }
+    }
+
+    @Override
+    public <T> void bDeleteBatchByPK(
+            Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
+        DeleteStrategy strategy = new DeleteStrategy();
+        if (strategyConsumer != null) {
+            strategyConsumer.accept(strategy);
+        }
+        bDeleteBatchByPK(entities, strategy);
+    }
+
+    // ========== 3. 简单条件删除 ==========
+
     @Override
     public Integer bDeleteByMap(String tableName, Map<String, Object> whereMap) {
         validateTableName(tableName);
@@ -263,7 +376,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String whereClause = buildWhereClause(whereMap);
+        String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
         List<Object> params = new ArrayList<>(whereMap.values());
 
@@ -309,7 +422,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         try {
             connection.setAutoCommit(false);
             while (true) {
-                String whereClause = buildWhereClause(whereMap);
+                String whereClause =
+                        GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
                 String execSql =
                         buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
                 List<Object> params = new ArrayList<>(whereMap.values());
@@ -325,7 +439,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter, getConfig())
                     .logExecuteSql(
                             this.getClass(),
-                            "bDeleteBatchByCondition",
+                            "bDeleteByMap",
                             StrUtil.format(
                                     "表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
                             cost,
@@ -340,18 +454,81 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
+    // ========== 4. 条件删除 - Lambda表达式 ==========
+
     @Override
-    public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereLambdaFilter<T> whereFilter) {
-        if (GutilObject.isEmpty(whereFilter)) {
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+        if (whereFilter == null) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
+
+        String tableName = strategy != null ? strategy.getTableName() : null;
+        if (GutilObject.isEmpty(tableName)) {
+            tableName = GirAdvSqlUtils.getTableName(whereFilter.getEntityClass());
+        }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("表名不能为空");
+        }
+
         return bDeleteByWhere(tableName, whereFilter.toWhereFilter());
     }
 
     @Override
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        if (consumer == null) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+
+        Class<T> entityClass = null;
+        if (strategy != null && strategy.getTableName() != null) {
+            // 如果没有实体类，需要一个默认的，这里需要根据实际情况处理
+            throw new IllegalArgumentException("无法确定实体类型，请使用指定表名的方法");
+        }
+
+        // 实际上这里需要知道实体类型，建议使用有表名的方法
+        throw new UnsupportedOperationException("请使用带表名或实体泛型的方法");
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        return bDeleteByWhere(new DeleteStrategy(), consumer);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(
+            Consumer<DeleteStrategy> strategyConsumer,
+            Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        DeleteStrategy strategy = new DeleteStrategy();
+        if (strategyConsumer != null) {
+            strategyConsumer.accept(strategy);
+        }
+        return bDeleteByWhere(strategy, consumer);
+    }
+
+    @Override
+    public <T> Integer bDeleteByWhere(
+            String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+        if (consumer == null) {
+            throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
+        }
+        if (GutilObject.isEmpty(tableName)) {
+            throw new IllegalArgumentException("表名不能为空");
+        }
+
+        // 这里需要一个默认的实体类型，因为没有实体信息
+        // 建议使用者使用其他方法
+        throw new UnsupportedOperationException(
+                "请使用带实体泛型的方法，如 bDeleteByWhere(Consumer<GirAdvWhereLambdaFilter<T>> consumer)");
+    }
+
+    // ========== 5. 条件删除 - 传统Filter ==========
+
+    @Override
     public <T> Integer bDeleteByWhere(String tableName, GirAdvWhereFilter whereFilter) {
         validateTableName(tableName);
-        if (GutilObject.isEmpty(whereFilter)) {
+        if (whereFilter == null) {
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
@@ -367,6 +544,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             throw new IllegalArgumentException("删除条件不能为空（禁止全表删除）");
         }
         String execSql = buildDeleteByConditionSql(quoteTableName, whereClause);
+
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
         try {
@@ -387,7 +565,8 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
-    // ====================== 原有工具方法不动 ======================
+    // ====================== 工具方法 ======================
+
     protected void validateTableName(String tableName) {
         if (StrUtil.isEmpty(tableName)) {
             throw new IllegalArgumentException("表名不能为空");
@@ -423,25 +602,6 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         return batches;
     }
 
-    protected String buildWhereClause(Map<String, Object> whereMap) {
-        return whereMap.keySet()
-                .stream()
-                .map(field -> StrUtil.format("{} = ?", field))
-                .collect(Collectors.joining(" AND "));
-    }
-
-    protected String getSchemaName() {
-        return dataSourceGetter != null ? dataSourceGetter.getSchemaName() : "";
-    }
-
-    protected String getDatabaseName() {
-        return dataSourceGetter != null
-                ? GutilObject.isEmpty(dataSourceGetter.getDatabaseName())
-                        ? ""
-                        : dataSourceGetter.getDatabaseName()
-                : "";
-    }
-
     protected void closeConnection(Connection connection) {
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
@@ -471,11 +631,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
     protected abstract int getMaxInParams();
 
     protected String buildDeleteByPrimaryKeySql(String tableName, String idKey) {
+        idKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         return StrUtil.format("DELETE FROM {} WHERE {} = ?", tableName, idKey);
     }
 
     protected String buildDeleteBatchByPrimaryKeySql(
             String tableName, String idKey, String placeholders) {
+        idKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         return StrUtil.format("DELETE FROM {} WHERE {} IN ({})", tableName, idKey, placeholders);
     }
 

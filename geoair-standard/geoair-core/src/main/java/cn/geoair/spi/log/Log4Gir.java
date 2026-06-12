@@ -3,9 +3,8 @@ package cn.geoair.spi.log;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirConsoleLog;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.*;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.text.GuStrFormatter;
 import cn.geoair.base.util.GutilClass;
 import org.slf4j.Logger;
@@ -18,20 +17,21 @@ public class Log4Gir {
         HUTOOL,
         SLF4J,
         CONSOLE
-    };
+    }
 
     private static LogType logType;
 
     static {
         GkMethodHand.implFromClass(GirLogger.class);
-        if (GutilClass.isPresent("org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
+        GkMethodHand.implFromClass(GirLoggerFactory.class);
+        if (GutilClass.isPresent("cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
+            Log4Gir.setLogType(LogType.HUTOOL);
+        } else if (GutilClass.isPresent(
+                "org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.SLF4J);
         } else if (GutilClass.isPresent(
                 "org.apache.commons.logging.LogFactory", ApacheCommonsLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.APPACHECOMMONS);
-        } else if (GutilClass.isPresent(
-                "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
-            Log4Gir.setLogType(LogType.HUTOOL);
         } else {
             Log4Gir.setLogType(LogType.CONSOLE);
         }
@@ -46,13 +46,21 @@ public class Log4Gir {
             implMethod = "getLoger",
             type = ImplType.expectfirst)
     public static GiLogger getLoger(String name) {
+        return getLogger(name);
+    }
+
+    @GaMethodHandImpl(
+            implClass = GirLoggerFactory.class,
+            implMethod = "getLogger",
+            type = ImplType.expectfirst)
+    public static GiLogger getLogger(String name) {
         switch (logType) {
+            case SLF4J:
+                return Slf4jLog.createLog(name);
             case APPACHECOMMONS:
                 return ApacheCommonsLog.createLog(name);
             case HUTOOL:
                 return HutoolLog.createLog(name);
-            case SLF4J:
-                return Slf4jLog.createLog(name);
             default:
                 return GirConsoleLog.forName(name);
         }

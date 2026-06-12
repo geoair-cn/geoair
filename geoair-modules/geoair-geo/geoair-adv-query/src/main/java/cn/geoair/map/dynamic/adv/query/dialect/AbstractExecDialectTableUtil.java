@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -15,20 +15,20 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     // ========== 通用逻辑：子类无需重写 ==========
     @Override
-    public String tbGetTableNameWithSchema(IDataSourceGetter dataSourceGetter, String tableName) {
+    public String tbGetTableNameWithSchema(IDsDataSourceOpt dsDataSourceOpt, String tableName) {
         return tbGetTableNameWithSchema(
-                dataSourceGetter, tableName, dataSourceGetter.getSchemaName());
+                dsDataSourceOpt, tableName, dsDataSourceOpt.getSchemaName());
     }
 
     @Override
     public String tbGetTableNameWithSchema(
-            IDataSourceGetter dataSourceGetter, String tableName, String schemaName) {
+            IDsDataSourceOpt dsDataSourceOpt, String tableName, String schemaName) {
         // Step1：确定最终Schema/库名（表名提取 > 传入库名 > 默认值）
         String extractedSchema = tbExtractSchemaName(tableName);
         if (StrUtil.isNotEmpty(extractedSchema)) {
             schemaName = extractedSchema;
         } else if (ObjectUtil.isEmpty(schemaName)) {
-            schemaName = tbGetSchemaNameForSql(dataSourceGetter);
+            schemaName = tbGetSchemaNameForSql(dsDataSourceOpt);
         }
 
         // Step2：处理Schema/库名引号
@@ -46,24 +46,23 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     @Override
     public String tbGetTableNameNotSchema(String fullTableName) {
+
         if (StrUtil.isEmpty(fullTableName)) {
             return fullTableName;
         }
 
         // 预处理：去空格
         String processedName = fullTableName.trim();
-        // 通用正则：匹配“Schema.表名”格式（支持带引号/不带引号）
+
         Pattern pattern =
                 Pattern.compile(
-                        "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+)\\."
-                                + // Schema/库名部分（兼容中文、横线）
-                                "([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分（兼容中文）
-                        );
+                        "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\."
+                                + "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$");
+
         Matcher matcher = pattern.matcher(processedName);
 
-        // 匹配成功：提取表名并去引号；失败：直接去引号返回
         if (matcher.matches()) {
-            return tbUnquoteTableName(matcher.group(1));
+            return tbUnquoteTableName(matcher.group(2));
         }
         return tbUnquoteTableName(processedName);
     }
@@ -74,18 +73,15 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
             return null;
         }
 
-        // 预处理：去空格
         String processedName = fullTableName.trim();
-        // 通用正则：提取Schema/库名（兼容中文、特殊字符）
+
         Pattern pattern =
                 Pattern.compile(
-                        "(?:([\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5-]+))\\."
-                                + // Schema/库名部分
-                                "(?:[\"'`][^\"'`]+[\"'`]|[a-zA-Z0-9_\\u4e00-\\u9fa5]+)" // 表名部分
-                        );
+                        "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\."
+                                + "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$");
+
         Matcher matcher = pattern.matcher(processedName);
 
-        // 匹配成功：提取Schema/库名并去引号；失败：返回null
         if (matcher.matches()) {
             return tbUnquoteSchemaName(matcher.group(1));
         }
@@ -170,9 +166,9 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     /** 获取数据源对应的Schema/库名（适配PG/MySQL语义） */
     @Override
-    public String tbGetSchemaNameForSql(IDataSourceGetter dataSourceGetter) {
-        return ObjectUtil.isEmpty(dataSourceGetter.getSchemaName())
+    public String tbGetSchemaNameForSql(IDsDataSourceOpt dataSourceOpt) {
+        return ObjectUtil.isEmpty(dataSourceOpt.getSchemaName())
                 ? getDefaultSchemaName()
-                : dataSourceGetter.getSchemaName();
+                : dataSourceOpt.getSchemaName();
     }
 }

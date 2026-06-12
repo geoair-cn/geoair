@@ -51,7 +51,7 @@ public class AdvQueryGlobalConfig {
      *
      * @return
      */
-    public AdvQueryGlobalConfig turOffLog() {
+    public AdvQueryGlobalConfig turnOffLog() {
         enableQueryLog = false;
         enableDdlLog = false;
         enableUpdateLog = false;

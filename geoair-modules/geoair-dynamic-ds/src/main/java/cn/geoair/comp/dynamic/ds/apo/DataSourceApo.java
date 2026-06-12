@@ -64,9 +64,13 @@ public class DataSourceApo implements Serializable {
 
     private long maxWait = 10000; // 获取连接的超时等待
 
-    private Integer queryTimeout = 5; // 查询的超时时间 单位秒
+    private Integer queryTimeout = 15; // 查询的超时时间 单位秒
 
     private Integer removeAbandonedTimeout = 1800; // 回收连接的超时时间
+
+    private Integer connectionErrorRetryAttempts = 3; // 链接获取失败的时候重试次数
+
+    private String validationQuery; // 验证链接的SQL
 
     public void setJdbcUrl(String jdbcUrl) {
         AdvJdbcUrlUtil splitter = AdvJdbcUrlUtil.splitter(jdbcUrl);

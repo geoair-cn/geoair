@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.hutool.core.util.StrUtil;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -20,8 +19,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
 
-    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.me().getSridOpt();
-    protected GirGeoFormatOpt formatOpt = GirGeoTools.me().getFormatOpt();
+    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.defaultInstance().getSridOpt();
+    protected GirGeoFormatOpt formatOpt = GirGeoTools.defaultInstance().getFormatOpt();
 
     ToolsConfig advToolsConfig;
 
@@ -38,15 +37,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     @Override
     public String xyzToWkt(int z, int x, int y, int targetSrid) {
         validateXyz(z, x, y);
-        ReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
-        Geometry geometry =
-                sridConvertOpt.convertToGeom(
-                        envelope,
-                        envelope.getCoordinateReferenceSystem()
-                                .getCoordinateSystem()
-                                .getDimension(),
-                        targetSrid);
-        return formatOpt.jtsGeometryToWktString(geometry, false);
+        BoxReferencedEnvelope envelope = xyzToTileBox(z, x, y, targetSrid);
+        return envelope.getWktString(targetSrid);
     }
 
     /**

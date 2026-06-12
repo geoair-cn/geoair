@@ -22,10 +22,15 @@ public class GeoMeasureDemo {
         // 3. 两点距离计算（WGS84坐标系，输出单位：米）
         double[] point1 = {116.403874, 39.914885};
         double[] point2 = {116.413874, 39.924885};
-        double pointDistance =
-                measureUtils.calculatePointToPointDistance(
-                        point1, point2, 4326, GirGeoMeasureUtils.UNIT_METER);
-        Gir.log.info("两点距离（米）：" + pointDistance);
+
+        Gir.log.info(
+                "两点距离（米）："
+                        + measureUtils.calculatePointToPointDistance(
+                                point1, point2, 4326, GirGeoMeasureUtils.UNIT_METER));
+        Gir.log.info(
+                "两点距离（米）："
+                        + measureUtils.calculatePointToPointDistance(
+                                point1, point2, 4326, GirGeoMeasureUtils.UNIT_METER));
 
         // 4. 点到线最近距离
         double[] point = {116.405, 39.905};

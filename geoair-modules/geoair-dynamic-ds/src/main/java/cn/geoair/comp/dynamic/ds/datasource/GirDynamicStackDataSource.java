@@ -7,7 +7,8 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 /**
  * @author ：张俊
- * @date ：Created in 2024/12/31 15:43 @description： 用于替换spring托管的数据源，支持嵌套方法调用的数据源切换
+ * @date ：Created in 2024/12/31 15:43
+ * @description： 用于替换spring托管的数据源，支持嵌套方法调用的数据源切换
  */
 @Slf4j
 public class GirDynamicStackDataSource extends AbstractRoutingDataSource {

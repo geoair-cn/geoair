@@ -9,13 +9,23 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 import java.util.Arrays;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /** 读取配置文件 */
 @Component
-public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, EnvironmentAware {
+public class SpringEnvironment4Gir
+        implements GiPropertier,
+                GiEnvironmenter,
+                ApplicationContextAware,
+                InitializingBean,
+                BeanFactoryPostProcessor {
 
     static {
         GkMethodHand.implFromClass(SpringEnvironment4Gir.class);
@@ -39,16 +49,12 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
 
     protected static SpringEnvironment4Gir me;
 
-    protected static Environment environment;
-
-    @Override
-    public void setEnvironment(Environment evn) {
-        me = this;
-        environment = evn;
-    }
+    private static ConfigurableListableBeanFactory beanFactory;
+    /** Spring应用上下文环境 */
+    private static ApplicationContext applicationContext;
 
     public static Environment getEnvironment() {
-        return environment;
+        return applicationContext.getEnvironment();
     }
 
     @Override
@@ -58,22 +64,34 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
 
     @Override
     public String getProperty(String key) {
-        return getEnvironment().getProperty(key);
+        if (null == applicationContext) {
+            return null;
+        }
+        return applicationContext.getEnvironment().getProperty(key);
     }
 
     @Override
     public String getProperty(String key, String defaultValue) {
-        return getEnvironment().getProperty(key, defaultValue);
+        if (null == applicationContext) {
+            return null;
+        }
+        return applicationContext.getEnvironment().getProperty(key, defaultValue);
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> targetType) {
-        return getEnvironment().getProperty(key, targetType);
+        if (null == applicationContext) {
+            return null;
+        }
+        return applicationContext.getEnvironment().getProperty(key, targetType);
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> targetType, T defaultValue) {
-        return getEnvironment().getProperty(key, targetType, defaultValue);
+        if (null == applicationContext) {
+            return null;
+        }
+        return applicationContext.getEnvironment().getProperty(key, targetType, defaultValue);
     }
 
     @Override
@@ -124,5 +142,22 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, Env
     @Override
     public boolean isDebugger() {
         return GirSystemEnvironmentOperater.isDebug();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        me = this;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        me = this;
+        SpringEnvironment4Gir.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+            throws BeansException {
+        me = this;
     }
 }

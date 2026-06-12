@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
-import cn.geoair.comp.dynamic.ds.DataSourceGetter;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.RealDataSourceOpt;
+import cn.geoair.comp.dynamic.ds.tx.GirDsTransactionManager;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
@@ -39,7 +40,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter = new DataSourceGetter();
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceOpt());
                 }
             }
         }
@@ -54,7 +55,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
     private volatile IAdvWhereSelectOpt iAdvWhereSelectOpt;
 
-    private volatile IAdvSimplePagePreOpt simplePageOpt;
+    private volatile IAdvSimplePageOpt simplePageOpt;
 
     private volatile IAdvGeoPreOpt geoOpt;
 
@@ -83,7 +84,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
     }
 
     @Override
-    protected IAdvSimplePagePreOpt getSimplePageOpt() {
+    protected IAdvSimplePageOpt getSimplePageOpt() {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {

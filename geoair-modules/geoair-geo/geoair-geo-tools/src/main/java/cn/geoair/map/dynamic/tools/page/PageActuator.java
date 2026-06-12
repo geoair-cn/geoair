@@ -1,18 +1,21 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/18 13:34 @description： 分页执行器
  */
+@Slf4j
 public class PageActuator<T> {
 
     private final PageConditionDef<T> pageConditionDef;
@@ -20,7 +23,9 @@ public class PageActuator<T> {
     /** 分页配置 */
     PageConfig pageConfig = new PageConfig();
 
-    @Getter private final List<T> finalDataList = new ArrayList<T>();
+    boolean executeIs = false;
+
+    private final List<T> finalDataList = new ArrayList<T>();
 
     // 仅用于标记是否终止
     private final AtomicBoolean isTerminate = new AtomicBoolean(false);
@@ -38,15 +43,25 @@ public class PageActuator<T> {
         return new PageActuator<>(pageConditionDef);
     }
 
-    public void execute() {
+    public List<T> getFinalDataList() {
+        if (!executeIs) {
+            execute();
+        }
+        return finalDataList;
+    }
 
+    public PageActuator<T> execute() {
+        executeIs = true;
         pageConditionDef.setPageConfig(pageConfig);
 
         // 1. 基础参数校验
-        Long totalCount = pageConfig.getTotalCount();
+        Long totalCount =
+                pageConditionDef.getTotalRecordCount() == null
+                        ? pageConfig.getTotalCount()
+                        : pageConditionDef.getTotalRecordCount();
         if (totalCount == null || totalCount <= 0) {
             Gir.log.info("无数据需处理，直接返回");
-            return;
+            return this;
         }
 
         Long pageSize = pageConfig.getPageSize();
@@ -55,29 +70,58 @@ public class PageActuator<T> {
         long actualTotalPages;
 
         // 2. 计算实际页大小和总页数
+        boolean byPageSize = false;
+
         if (pageSize != null && pageSize > 0) {
+            byPageSize = true;
+
+        } else if (maxPageNo != null && maxPageNo > 0) {
+
+        } else {
+            pageSize = 25L;
+            log.info("由于没有设置maxPageNo 与pageSize 这里对 pageSize 进行设置默认值为25");
+            byPageSize = true;
+        }
+        if (byPageSize) { // 通过每页大小计算总页数，进行每页遍历。数据量大的时候可能有很多页
             actualPageSize = pageSize;
             actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
-        } else if (maxPageNo != null && maxPageNo > 0) {
-            actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
-            actualTotalPages = maxPageNo;
-        } else {
-            throw new IllegalArgumentException(
-                    "分页参数异常：pageSize（" + pageSize + "）和maxPageNo（" + maxPageNo + "）不能同时为空/小于等于0");
+        } else { // 通过总页数反着设置每页大小，防止数据量大的时候 ，频繁访问数据库
+            if (totalCount <= maxPageNo) {
+                actualPageSize = totalCount;
+                actualTotalPages = 1;
+            } else {
+                actualPageSize = (totalCount + maxPageNo - 1) / maxPageNo;
+                if (actualPageSize < 25) { // 如果每页条数少于25条，那么就按照25条每页进行分页
+                    actualPageSize = 25;
+                    actualTotalPages = (totalCount + actualPageSize - 1) / actualPageSize;
+                } else {
+                    actualTotalPages = maxPageNo;
+                }
+            }
         }
+        AtomicLong count = new AtomicLong(0);
+        Consumer<T> wapperConsumer =
+                new Consumer<T>() {
+                    @Override
+                    public void accept(T t) {
+                        count.incrementAndGet();
+                        pageConditionDef.getEachRecordConsumer().accept(t);
+                    }
+                };
 
-        Consumer<T> eachRecordConsumer = pageConditionDef.getEachRecordConsumer();
         boolean isParallelConsume = pageConfig.isParallelConsumeRecordIs();
 
         // ========== 核心分支：消费模式 ==========
         if (isParallelConsume) {
             // 模式1：并行消费（ 边查边消费）
-            parallelConsume(actualPageSize, actualTotalPages, eachRecordConsumer);
+            parallelConsume(actualPageSize, actualTotalPages, wapperConsumer);
         } else {
             // 模式2：串行消费（主线程逐页查询+逐页消费，无全量堆积）
-            serialConsumeByPage(actualPageSize, actualTotalPages, eachRecordConsumer);
+            serialConsumeByPage(actualPageSize, actualTotalPages, wapperConsumer);
         }
-        pageConditionDef.onComplete(finalDataList);
+        pageConditionDef.onComplete(
+                finalDataList, actualPageSize, actualTotalPages, count.get(), totalCount);
+        return this;
     }
 
     /** 并行消费（原有逻辑，边查边消费） */
@@ -148,5 +192,31 @@ public class PageActuator<T> {
                                 if (!isSkip) isTerminate.set(true);
                             }
                         });
+    }
+
+    public static void main(String[] args) {
+        GirAdvTools.getPageActuatorOpt(
+                        new PageConditionDef<Object>() {
+                            @Override
+                            public Long getTotalRecordCount() {
+                                return 11L;
+                            }
+
+                            @Override
+                            public void setPageConfig(PageConfig pageConfig) {
+                                pageConfig.setMaxPageNo(20L);
+                            }
+
+                            @Override
+                            public List<Object> getPageRecords(Integer pageNo, Integer pageSize) {
+                                System.out.println(pageNo + "----" + pageSize);
+                                List<Object> pageRecords = new ArrayList<>();
+                                for (Integer i = 0; i < pageSize; i++) {
+                                    pageRecords.add(new Object());
+                                }
+                                return pageRecords;
+                            }
+                        })
+                .execute();
     }
 }

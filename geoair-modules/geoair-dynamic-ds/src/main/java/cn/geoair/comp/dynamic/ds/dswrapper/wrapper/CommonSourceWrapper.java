@@ -59,6 +59,11 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
         return getValueByReflection(targetDataSource, URL_KEYS);
     }
 
+    @Override
+    public Integer getActiveCount() {
+        return null;
+    }
+
     /**
      * 通用反射获取值的方法
      *
@@ -103,8 +108,7 @@ public class CommonSourceWrapper extends GirAbstractDataSourceWrapper {
             }
         }
 
-        // 所有方式都失败，返回null
-        return null;
+        return targetDataSource.getClass().getSimpleName() + "@" + targetDataSource.hashCode();
     }
 
     /** 递归获取声明的字段（包括父类） */

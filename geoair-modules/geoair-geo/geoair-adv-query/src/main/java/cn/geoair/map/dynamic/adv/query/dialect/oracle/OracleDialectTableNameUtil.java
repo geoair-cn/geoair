@@ -85,9 +85,8 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         // 计算 ROWNUM 的上限（起始行 + 每页条数）
         long endRow = offset + pageSize;
         long startRow = offset;
-
         return StrUtil.format(
-                "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= {}) WHERE rn > {}",
+                "SELECT * FROM (SELECT t.*, ROWNUM rn_temp FROM ({}) t WHERE ROWNUM <= {}) WHERE rn_temp > {}",
                 noPageSql,
                 endRow,
                 startRow);
@@ -107,7 +106,7 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         // 三层嵌套：内层排序，中层限制最大行数，外层过滤起始行
         String sql =
                 StrUtil.format(
-                        "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= ?) WHERE rn > ?",
+                        "SELECT * FROM (SELECT t.*, ROWNUM rn_temp FROM ({}) t WHERE ROWNUM <= ?) WHERE rn_temp > ?",
                         noPageSql);
         return sql;
     }

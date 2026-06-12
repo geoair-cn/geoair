@@ -27,7 +27,7 @@ public class GirPostGisJdbcTran {
              */
             PGobject pObject = (PGobject) value;
             jtsGeom =
-                    GirGeoTools.me()
+                    GirGeoTools.defaultInstance()
                             .getFormatOpt()
                             .wkbToJtsGeometry(StrUtil.toString(pObject), true);
         }

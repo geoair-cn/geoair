@@ -1,7 +1,7 @@
 package cn.geoair.base.concurrent;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 /**
  * @author ：张俊
@@ -9,7 +9,7 @@ import cn.geoair.base.log.GirLogger;
  * @description： 默认任务拦截器实现
  */
 public class DefaultLogTaskInterceptor implements GirTaskInterceptor {
-    private static final GiLogger log = GirLogger.getLoger(GirPxyExecutorService.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirPxyExecutorService.class);
 
     @Override
     public String beforeTask(Object task) {

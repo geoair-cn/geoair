@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -22,7 +22,7 @@ import java.util.*;
 /** PostgreSQL（PostGIS）空间操作实现类 复用你原有PgAdvGeoOpt + PgAdvGeoPreOpt的核心逻辑 */
 public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
-    private static final GiLogger log = GirLogger.getLoger();
+    private static final GiLogger log = GirLoggerFactory.getLogger();
 
     private boolean _POSTGIS_IS;
 
@@ -490,6 +490,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "CREATE INDEX {} ON {} USING GIST ({});",

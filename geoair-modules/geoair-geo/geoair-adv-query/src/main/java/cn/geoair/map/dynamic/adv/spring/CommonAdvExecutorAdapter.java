@@ -15,7 +15,7 @@ public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
     @Override
     public IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
         DynamicDataSourceManager instance = AdvDynamicDataSourceStorage.getInstance();
-        AdvDataSourceWrapper dataSource = instance.getDataSource(dataSourceId);
+        AdvDataSourceWrapper dataSource = instance.getOrCreateDataSource(dataSourceId);
         return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceId);
     }
 

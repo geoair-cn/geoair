@@ -2,7 +2,7 @@ package cn.geoair.orm.spi.jpa;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.orm.spi.GirEntityResolve;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
 import cn.geoair.orm.spi.entity.GirEntityField;
@@ -20,7 +20,7 @@ import javax.persistence.*;
  */
 public class GirJpaGirEntityResolve implements GirEntityResolve {
 
-    private final GiLogger log = GirLogger.getLoger(GirJpaGirEntityResolve.class);
+    private final GiLogger log = GirLoggerFactory.getLogger(GirJpaGirEntityResolve.class);
 
     @Override
     public GirEntityTable resolveEntity(Class<?> entityClass) {

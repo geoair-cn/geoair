@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.utils;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -65,6 +67,15 @@ public class LambdaUtils {
             } else {
                 // 如果不是标准的getter/is方法，直接返回方法名
                 fieldName = implMethodName;
+            }
+
+            String implClassPath = serializedLambda.getImplClass();
+            String className = implClassPath.replace('/', '.');
+            Class<?> entityClass = ClassUtil.loadClass(className);
+            String columnNameByAnnotation =
+                    GirAdvSqlUtils.getColumnNameByAnnotation(entityClass, fieldName);
+            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
+                return columnNameByAnnotation;
             }
             if (isToUnderlineCase) {
                 return StrUtil.toUnderlineCase(fieldName);

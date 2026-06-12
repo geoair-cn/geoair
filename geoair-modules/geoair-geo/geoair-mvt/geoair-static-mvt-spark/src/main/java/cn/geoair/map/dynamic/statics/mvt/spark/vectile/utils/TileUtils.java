@@ -25,10 +25,14 @@ public class TileUtils {
         RangeApo rangeApo = null;
         if (outGridSrid == 3857) {
             rangeApo =
-                    GirGeoTools.me().getTileGrid3857Opt().tileRangeByGeom(((int) level), geometry);
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid3857Opt()
+                            .tileRangeByGeom(((int) level), geometry);
         } else {
             rangeApo =
-                    GirGeoTools.me().getTileGrid4326Opt().tileRangeByGeom(((int) level), geometry);
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid4326Opt()
+                            .tileRangeByGeom(((int) level), geometry);
         }
         return new Tuple4<>(
                 rangeApo.getMinX(), rangeApo.getMaxX(), rangeApo.getMinY(), rangeApo.getMaxY());
@@ -38,10 +42,14 @@ public class TileUtils {
         ReferencedEnvelope referencedEnvelope = null;
         if (sourceGrid == 3857) {
             referencedEnvelope =
-                    GirGeoTools.me().getTileGrid3857Opt().xyzToTileBox(level, x, y, 3857);
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid3857Opt()
+                            .xyzToTileBox(level, x, y, 3857);
         } else {
             referencedEnvelope =
-                    GirGeoTools.me().getTileGrid4326Opt().xyzToTileBox(level, x, y, 4326);
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid4326Opt()
+                            .xyzToTileBox(level, x, y, 4326);
         }
         return referencedEnvelope;
     }

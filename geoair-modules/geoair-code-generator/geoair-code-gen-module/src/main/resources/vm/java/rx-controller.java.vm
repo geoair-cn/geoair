@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 /**
  * ${tableComment}Controller
@@ -53,7 +53,7 @@ import cn.geoair.base.log.GirLogger;
 @RequestMapping("/${moduleName}/${businessName}")
 @GaApi(tags = "${tableComment}")
 public class ${ClassName}Controller {
-    private static final GiLogger logger = GirLogger.getLoger(${ClassName}Controller.class);
+    private static final GiLogger logger = GirLoggerFactory.getLogger(${ClassName}Controller.class);
     @Resource
     private ${ClassName}Dao ${className}Dao;
     @Resource

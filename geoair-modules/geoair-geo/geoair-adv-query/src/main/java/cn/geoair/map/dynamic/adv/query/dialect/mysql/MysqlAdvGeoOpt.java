@@ -492,6 +492,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         // MySQL空间索引语法：SPATIAL INDEX
+        geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "CREATE SPATIAL INDEX {} ON {} ({});",
