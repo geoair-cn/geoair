@@ -1,7 +1,9 @@
 package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import cn.geoair.base.Gir;
+
 import com.zaxxer.hikari.HikariDataSource;
+
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -71,7 +73,6 @@ public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
             return null;
         }
     }
-
 
     public HikariDataSource getHikariDataSource() {
         if (isSupport()) {

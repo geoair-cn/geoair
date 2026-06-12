@@ -45,7 +45,9 @@ public class GkSystemClock {
                 () -> now = System.currentTimeMillis(), period, period, TimeUnit.MILLISECONDS);
     }
 
-    /** @return 当前时间毫秒数 */
+    /**
+     * @return 当前时间毫秒数
+     */
     private long currentTimeMillis() {
         return now;
     }
@@ -61,12 +63,16 @@ public class GkSystemClock {
         public static final GkSystemClock INSTANCE = new GkSystemClock(1);
     }
 
-    /** @return 当前时间 */
+    /**
+     * @return 当前时间
+     */
     public static long now() {
         return InstanceHolder.INSTANCE.currentTimeMillis();
     }
 
-    /** @return 当前时间字符串表现形式 */
+    /**
+     * @return 当前时间字符串表现形式
+     */
     public static String nowDate() {
         return new Timestamp(InstanceHolder.INSTANCE.currentTimeMillis()).toString();
     }

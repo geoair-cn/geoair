@@ -1,6 +1,7 @@
 package cn.geoair.base.util;
 
 import cn.geoair.base.text.GuFastDateFormat;
+
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -1600,21 +1601,21 @@ public class GutilDate {
         }
 
         switch (fragment) {
-                // Number of days already calculated for these cases
+            // Number of days already calculated for these cases
             case Calendar.YEAR:
             case Calendar.MONTH:
 
-                // The rest of the valid cases
+            // The rest of the valid cases
             case Calendar.DAY_OF_YEAR:
             case Calendar.DATE:
                 result += (calendar.get(Calendar.HOUR_OF_DAY) * MILLIS_PER_HOUR) / millisPerUnit;
-                // $FALL-THROUGH$
+            // $FALL-THROUGH$
             case Calendar.HOUR_OF_DAY:
                 result += (calendar.get(Calendar.MINUTE) * MILLIS_PER_MINUTE) / millisPerUnit;
-                // $FALL-THROUGH$
+            // $FALL-THROUGH$
             case Calendar.MINUTE:
                 result += (calendar.get(Calendar.SECOND) * MILLIS_PER_SECOND) / millisPerUnit;
-                // $FALL-THROUGH$
+            // $FALL-THROUGH$
             case Calendar.SECOND:
                 result += (calendar.get(Calendar.MILLISECOND) * 1) / millisPerUnit;
                 break;

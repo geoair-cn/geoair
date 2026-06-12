@@ -2,6 +2,7 @@ package cn.geoair.base.tool;
 
 import cn.geoair.base.util.GutilChar;
 import cn.geoair.base.util.GutilStr;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

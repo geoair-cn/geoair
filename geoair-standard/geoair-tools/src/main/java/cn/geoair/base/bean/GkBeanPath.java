@@ -5,6 +5,7 @@ import cn.geoair.base.util.GutilChar;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.base.util.GutilStr;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;

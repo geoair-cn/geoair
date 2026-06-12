@@ -1,14 +1,15 @@
 package cn.geoair.map.dynamic.tools.grid;
 
 import cn.geoair.base.Gir;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+
+import org.locationtech.jts.geom.Geometry;
+
 import java.util.List;
 import java.util.Set;
-import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author ：张逢吉
@@ -37,11 +38,15 @@ public class GirGridTest {
         Set<TileZxyApo> tileZxyApos =
                 tileConverterOpt.zxyListByBox(referencedEnvelope, srid, level);
         Gir.log.info("zxyListByBox:{}", tileZxyApos);
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(referencedEnvelope, srid, srid);
         Gir.log.info("geometry:{}", geometry);
         Set<TileZxyApo> tileZxyApos1 = tileConverterOpt.zxyListByGeom(geometry, srid, level);
         Gir.log.info("zxyListByGeom:{}", tileZxyApos1);
-        GirBingMapQuadKeyOpt tileGridBingMapOpt = GirGeoTools.defaultInstance().getTileGridBingMapOpt();
+        GirBingMapQuadKeyOpt tileGridBingMapOpt =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt();
         List<String> xyzToQuadKeyBatch = tileGridBingMapOpt.xyzToQuadKeyBatch(tileZxyApos1);
         Gir.log.info("xyzToQuadKeyBatch:{}", xyzToQuadKeyBatch);
         String quadKey = tileGridBingMapOpt.xyzToQuadKey(x, y, level);

@@ -3,6 +3,7 @@ package cn.geoair.base.util;
 import cn.geoair.base.bean.GkNullWrapperBean;
 import cn.geoair.base.lang.GkBasicType;
 import cn.geoair.base.tool.GkConcurrentReferenceHashMap;
+
 import java.beans.Introspector;
 import java.io.Closeable;
 import java.io.Externalizable;
@@ -1603,7 +1604,9 @@ public abstract class GutilClass {
     // -----------------------------------------------------------------------------------------
     // Classpath
 
-    /** @return 获得Java ClassPath路径，不包括 jre */
+    /**
+     * @return 获得Java ClassPath路径，不包括 jre
+     */
     public static String[] getJavaClassPaths() {
         return System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     }

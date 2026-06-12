@@ -5,6 +5,7 @@ import cn.geoair.base.data.GiValuable;
 import cn.geoair.base.sp.GirSpHelper;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

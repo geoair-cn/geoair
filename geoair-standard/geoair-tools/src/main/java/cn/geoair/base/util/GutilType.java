@@ -2,6 +2,7 @@ package cn.geoair.base.util;
 
 import cn.geoair.base.lang.GkActualTypeMapperPool;
 import cn.geoair.base.lang.GkParameterizedTypeImpl;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

@@ -1,35 +1,36 @@
-//package cn.geoair.orm.spi.support;
+// package cn.geoair.orm.spi.support;
 //
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.concurrent.ConcurrentHashMap;
+// import java.util.Map;
+// import java.util.Set;
+// import java.util.concurrent.ConcurrentHashMap;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2022/6/30 15:02
 // * @description： TODO
 // */
-//import cn.geoair.base.log.GiLogger;
-//import cn.geoair.base.log.GirLogger;
-//import cn.geoair.orm.spi.GirEntityResolve;
-//import cn.geoair.orm.spi.entity.GirEntityColumn;
-//import cn.geoair.orm.spi.entity.GirEntityTable;
-//import cn.geoair.orm.spi.jpa.GirJpaGirEntityResolve;
+// import cn.geoair.base.log.GiLogger;
+// import cn.geoair.base.log.GirLogger;
+// import cn.geoair.orm.spi.GirEntityResolve;
+// import cn.geoair.orm.spi.entity.GirEntityColumn;
+// import cn.geoair.orm.spi.entity.GirEntityTable;
+// import cn.geoair.orm.spi.jpa.GirJpaGirEntityResolve;
 //
-///**
+/// **
 // * 实体类工具类 - 处理实体和数据库表以及字段关键的一个类
 // * <p/>
 // *
 // * @author zhangjun
 // */
-//public class GirEntityHelper {
+// public class GirEntityHelper {
 //
 //	private static GiLogger logger = GirLogger.getLoger(GirEntityHelper.class);
 //
 //	/**
 //	 * 实体类 => 表对象
 //	 */
-//	private static final Map<Class<?>, GirEntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, GirEntityTable>();
+//	private static final Map<Class<?>, GirEntityTable> entityTableMap = new
+// ConcurrentHashMap<Class<?>, GirEntityTable>();
 //
 //	/**
 //	 * 实体类解析器
@@ -155,9 +156,11 @@
 //		boolean skipAlias = Map.class.isAssignableFrom(entityClass);
 //		for (GirEntityColumn girEntityColumn : columnList) {
 //			selectBuilder.append(girEntityColumn.getSelectColumn());
-//			if (!skipAlias && !girEntityColumn.getSelectColumn().equalsIgnoreCase(girEntityColumn.getProperty())) {
+//			if (!skipAlias &&
+// !girEntityColumn.getSelectColumn().equalsIgnoreCase(girEntityColumn.getProperty())) {
 //				// 不等的时候分几种情况，例如`DESC`
-//				if (girEntityColumn.getSelectColumn().substring(1, girEntityColumn.getSelectColumn().length() - 1)
+//				if (girEntityColumn.getSelectColumn().substring(1, girEntityColumn.getSelectColumn().length()
+// - 1)
 //						.equalsIgnoreCase(girEntityColumn.getProperty())) {
 //					selectBuilder.append(",");
 //				}
@@ -194,4 +197,4 @@
 //		GirEntityHelper.resolve = resolve;
 //	}
 //
-//}
+// }

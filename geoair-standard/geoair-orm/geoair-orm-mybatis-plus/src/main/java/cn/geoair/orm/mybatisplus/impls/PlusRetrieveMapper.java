@@ -2,8 +2,10 @@ package cn.geoair.orm.mybatisplus.impls;
 
 import cn.geoair.base.gpa.dao.GiRetrieveDao;
 import cn.geoair.base.gpa.entity.GiEntityQueryable;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;

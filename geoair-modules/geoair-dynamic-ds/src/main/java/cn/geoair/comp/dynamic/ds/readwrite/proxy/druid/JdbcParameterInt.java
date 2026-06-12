@@ -62,5 +62,4 @@ public final class JdbcParameterInt implements JdbcParameter {
     public int getSqlType() {
         return Types.INTEGER;
     }
-
 }

@@ -1,6 +1,7 @@
 package cn.geoair.base.util;
 
 import cn.geoair.base.text.GuStrFormatter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;

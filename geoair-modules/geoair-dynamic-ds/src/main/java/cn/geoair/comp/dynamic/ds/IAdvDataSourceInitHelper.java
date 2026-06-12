@@ -11,9 +11,6 @@ import javax.sql.DataSource;
  */
 public interface IAdvDataSourceInitHelper {
 
-    /**
-     * 根据数据源Apo配置创建并返回连接池实例
-     * 不到万不得已，不要去创建一个新的实例
-     */
+    /** 根据数据源Apo配置创建并返回连接池实例 不到万不得已，不要去创建一个新的实例 */
     DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo);
 }

@@ -1,6 +1,7 @@
 package cn.geoair.comp.dynamic.ds.datasource;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import java.util.Map;
@@ -14,12 +15,9 @@ import java.util.Stack;
 @Slf4j
 public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
 
-    /**
-     * 线程局部变量 用来保存数据源名称栈
-     */
+    /** 线程局部变量 用来保存数据源名称栈 */
     private static final ThreadLocal<Stack<String>> contextHolder =
             ThreadLocal.withInitial(Stack::new);
-
 
     @Override
     protected Object determineCurrentLookupKey() {
@@ -29,7 +27,7 @@ public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
     /**
      * 将接收到的主库从库数据源和默认数据源（主库）配置写入AbstractRoutingDataSource类的targetDataSources这个Map
      *
-     * @param targetDataSources       目标数据源映射，键为数据源名称，值为数据源实例
+     * @param targetDataSources 目标数据源映射，键为数据源名称，值为数据源实例
      * @param defaultTargetDataSource 默认数据源实例
      */
     public GirDynamicStackDataSource(
@@ -77,7 +75,6 @@ public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
         stack.push(dataSource);
         log.debug("数据源已从 [{}] 切换到 [{}]", previousDataSource, dataSource);
     }
-
 
     /**
      * 从栈顶弹出当前数据源，恢复到之前的数据源上下文
@@ -163,7 +160,7 @@ public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
     /**
      * @return 可能为null或不正确的数据源名称
      * @deprecated 此方法已过时，请使用 {@link #getCurrentDataSource()} 替代。
-     * <p>原因：原方法使用简单的ThreadLocal存储数据源名称，在嵌套方法调用中会导致上下文丢失。 新方法使用栈结构管理数据源，支持多层嵌套调用，并确保正确恢复数据源上下文。
+     *     <p>原因：原方法使用简单的ThreadLocal存储数据源名称，在嵌套方法调用中会导致上下文丢失。 新方法使用栈结构管理数据源，支持多层嵌套调用，并确保正确恢复数据源上下文。
      */
     @Deprecated
     public static String getDataSource() {
@@ -178,8 +175,8 @@ public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
     /**
      * @param dataSource 数据源名称
      * @deprecated 此方法已过时，请使用 {@link #pushDataSource(String)} 和 {@link #popDataSource()} 替代。
-     * <p>原因：原方法使用简单的ThreadLocal.set()，在嵌套方法调用中会覆盖上层方法的数据源设置，
-     * 且无法正确恢复上下文。新方法使用栈结构管理数据源，确保多层嵌套调用的正确性。
+     *     <p>原因：原方法使用简单的ThreadLocal.set()，在嵌套方法调用中会覆盖上层方法的数据源设置，
+     *     且无法正确恢复上下文。新方法使用栈结构管理数据源，确保多层嵌套调用的正确性。
      */
     @Deprecated
     public static void setDataSource(String dataSource) {
@@ -199,8 +196,8 @@ public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
 
     /**
      * @deprecated 此方法已过时，请使用 {@link #popDataSource()} 替代。
-     * <p>原因：原方法使用简单的ThreadLocal.remove()，在嵌套方法调用中会完全清除上下文，
-     * 导致上层方法无法恢复其数据源设置。新方法使用栈结构管理数据源，确保正确恢复上层上下文。
+     *     <p>原因：原方法使用简单的ThreadLocal.remove()，在嵌套方法调用中会完全清除上下文，
+     *     导致上层方法无法恢复其数据源设置。新方法使用栈结构管理数据源，确保正确恢复上层上下文。
      */
     @Deprecated
     public static void clearDataSource() {

@@ -1,6 +1,7 @@
 package cn.geoair.base.gpa.dao;
 
 import cn.geoair.base.gpa.entity.GiCrudEntity;
+
 import java.io.Serializable;
 
 /**

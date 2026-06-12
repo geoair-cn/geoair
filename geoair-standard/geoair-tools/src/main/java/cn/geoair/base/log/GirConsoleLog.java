@@ -3,6 +3,7 @@ package cn.geoair.base.log;
 import cn.geoair.base.tool.GkConsole;
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilStr;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

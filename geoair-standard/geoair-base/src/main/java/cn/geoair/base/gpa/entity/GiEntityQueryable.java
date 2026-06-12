@@ -1,6 +1,7 @@
 package cn.geoair.base.gpa.entity;
 
 import cn.geoair.base.gpa.dao.GiRetrieveDao;
+
 import java.io.Serializable;
 import java.util.List;
 

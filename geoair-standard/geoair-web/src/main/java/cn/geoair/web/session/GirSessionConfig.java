@@ -5,11 +5,13 @@ import cn.geoair.base.cache.GirCacheHelper;
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.geoair.web.util.GutilCookie;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpSession;
 
 public class GirSessionConfig implements Serializable {
 

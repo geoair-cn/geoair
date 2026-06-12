@@ -1,9 +1,10 @@
 package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.base.Gir;
-import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
+import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.spring.GirDsRdAutoConfiguration;
+
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,6 @@ public class DataSourceHelperAutoConfiguration {
         Gir.log.info("自动装配IAdvDataSourceHelper");
         return new DefaultAdvDataSourceHelper();
     }
-
 
     @Bean
     @ConditionalOnMissingBean(IAdvDataSourceInitHelper.class)

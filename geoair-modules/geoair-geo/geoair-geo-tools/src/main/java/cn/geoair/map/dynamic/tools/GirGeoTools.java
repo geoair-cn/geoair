@@ -20,6 +20,7 @@ import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
+
 import lombok.Getter;
 
 /**
@@ -33,7 +34,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     private static volatile GirGeoTools INSTANCE;
 
     protected ToolsConfig advToolsConfig;
-
 
     public GirGeoTools(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
@@ -72,7 +72,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     public static GirGeoTools me() {
         return defaultInstance();
     }
-
 
     @Override
     public GirGeom2ArrayOpt getGeom2ArrayOpt() {

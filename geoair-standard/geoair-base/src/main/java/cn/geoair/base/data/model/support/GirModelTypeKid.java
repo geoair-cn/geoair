@@ -6,6 +6,7 @@ import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.support.GirTypeKid;
 import cn.geoair.base.util.GutilDigest;
 import cn.geoair.base.util.GutilObject;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;

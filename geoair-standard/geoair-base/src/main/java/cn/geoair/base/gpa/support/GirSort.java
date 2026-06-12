@@ -3,6 +3,7 @@ package cn.geoair.base.gpa.support;
 import cn.geoair.base.gpa.support.GirOrder.Direction;
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilStr;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;

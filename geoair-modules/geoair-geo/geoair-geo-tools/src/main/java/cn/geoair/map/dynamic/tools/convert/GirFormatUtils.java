@@ -6,17 +6,17 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
-
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.List;
 
 /**
  * 空间类型转换工具类（单例模式） 实现GeoConvertService接口，提供所有空间类型互转能力
@@ -28,7 +28,6 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirFormatUtils INSTANCE;
-
 
     ToolsConfig advToolsConfig;
 
@@ -52,7 +51,6 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
         return INSTANCE;
     }
-
 
     public static GirFormatUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirFormatUtils(advToolsConfig);
@@ -430,7 +428,6 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         return advToolsConfig.getWkbReaderSupplier().get();
     }
 
-
     @Override
     public GeometryJSON getGeometryJSON() {
         return advToolsConfig.getGeometryJSON();
@@ -438,9 +435,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     // ==============================私有工具方法==============================
 
-    /**
-     * 处理几何对象转字符串
-     */
+    /** 处理几何对象转字符串 */
     private String handleGeometryToString(
             Geometry geometry,
             GeometryToStringFunction function,
@@ -456,9 +451,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 几何对象类型转换
-     */
+    /** 几何对象类型转换 */
     private <T extends Geometry> T castGeometry(
             Geometry geometry, Class<T> targetClass, boolean ifExceptionValueReturnNull) {
         if (ObjectUtil.isNull(geometry)) {
@@ -479,9 +472,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 异常处理通用方法
-     */
+    /** 异常处理通用方法 */
     private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull) {
         if (ifExceptionValueReturnNull) {
             return null;
@@ -490,23 +481,17 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 抛出空参数异常
-     */
+    /** 抛出空参数异常 */
     private <T> T throwEmptyParamException(String paramName) {
         throw new RuntimeException("参数[" + paramName + "]不能为空");
     }
 
-    /**
-     * 抛出通用运行时异常
-     */
+    /** 抛出通用运行时异常 */
     private <T> T throwRuntimeException(String msg) {
         throw new RuntimeException(msg);
     }
 
-    /**
-     * 几何对象转字符串函数式接口
-     */
+    /** 几何对象转字符串函数式接口 */
     @FunctionalInterface
     private interface GeometryToStringFunction {
 

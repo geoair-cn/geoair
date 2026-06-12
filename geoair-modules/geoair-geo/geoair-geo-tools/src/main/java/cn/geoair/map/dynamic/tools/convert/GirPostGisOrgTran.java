@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import org.locationtech.jts.geom.Geometry;
 import org.postgis.PGgeometry;
 
@@ -18,7 +19,10 @@ public class GirPostGisOrgTran {
         Geometry jtsGeom = null;
         if (value instanceof PGgeometry) { // 判断是否为pG的空间对象
             PGgeometry pgGeometry = (PGgeometry) value;
-            jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToJtsGeometry(pgGeometry, true);
+            jtsGeom =
+                    GirGeoTools.defaultInstance()
+                            .getFormatOpt()
+                            .pgGeometryToJtsGeometry(pgGeometry, true);
         }
         return jtsGeom;
     }
@@ -30,7 +34,8 @@ public class GirPostGisOrgTran {
     public static Geometry toJtsGeometry(Object pgGeometry) throws Exception {
         org.postgis.Geometry geometry = cast(pgGeometry).getGeometry();
         Geometry jtsGeom =
-                GirGeoTools.defaultInstance().getFormatOpt()
+                GirGeoTools.defaultInstance()
+                        .getFormatOpt()
                         .getWKTReader()
                         .read(geometry.getTypeString() + geometry.getValue());
         jtsGeom.setSRID(geometry.getSrid());

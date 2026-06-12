@@ -19,10 +19,9 @@ public class GirPropertyHelper {
     }
 
     @GaMethodHandImpl(
-        implClass = GirPropertyHelper.class,
-        implMethod = "getPropertier",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirPropertyHelper.class,
+            implMethod = "getPropertier",
+            type = GaMethodHandImpl.ImplType.comity)
     protected GiPropertier _getPropertier() {
         return new GirSystemPropertierOffice().getOperater();
     }

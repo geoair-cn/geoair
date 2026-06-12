@@ -51,10 +51,9 @@ public class GirCacheHelper {
      * @return GiCache 内存缓存实例
      */
     @GaMethodHandImpl(
-        implClass = GirCacheHelper.class,
-        implMethod = "getCache",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirCacheHelper.class,
+            implMethod = "getCache",
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiCache _getCache(String name) {
         return memoryCacheManager.getCache(name);
     }

@@ -4,6 +4,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
+
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -14,7 +15,6 @@ import javax.sql.DataSource;
  */
 @Slf4j
 public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper {
-
 
     @Override
     public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {
@@ -29,7 +29,6 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
             fastCreate.setUrl(dataSourceApo.getJdbcUrl());
             fastCreate.setUsername(dataSourceApo.getUsername());
             fastCreate.setPassword(dataSourceApo.getPassword());
-
 
             if (GutilObject.isNotEmpty(dataSourceApo.getInitialSize())) {
                 fastCreate.setInitialSize(dataSourceApo.getInitialSize());
@@ -54,9 +53,9 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
             }
 
             if (GutilObject.isNotEmpty(dataSourceApo.getConnectionErrorRetryAttempts())) {
-                fastCreate.setConnectionErrorRetryAttempts(dataSourceApo.getConnectionErrorRetryAttempts());
+                fastCreate.setConnectionErrorRetryAttempts(
+                        dataSourceApo.getConnectionErrorRetryAttempts());
             }
-
 
             return fastCreate.toDataSource();
 
@@ -65,6 +64,4 @@ public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper 
             return null;
         }
     }
-
-
 }
