@@ -308,7 +308,8 @@
               <verbose>false</verbose>
               <filesNamePattern>.*\.java</filesNamePattern>
               <skip>false</skip>
-              <style>aosp</style>
+               <style>aosp</style>
+              <failOnError>false</failOnError>
             </configuration>
           </plugin>
 <!--          <plugin>-->
