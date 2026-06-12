@@ -8,27 +8,24 @@ import cn.geoair.base.env.support.GirSystemEnvironmentOperater;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
-import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.extra.spring.SpringUtil;
+import java.util.Arrays;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-
-/**
- * 读取配置文件
- */
+/** 读取配置文件 */
 @Component
-public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, ApplicationContextAware, InitializingBean,BeanFactoryPostProcessor {
+public class SpringEnvironment4Gir
+        implements GiPropertier,
+                GiEnvironmenter,
+                ApplicationContextAware,
+                InitializingBean,
+                BeanFactoryPostProcessor {
 
     static {
         GkMethodHand.implFromClass(SpringEnvironment4Gir.class);
@@ -37,8 +34,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     @GaMethodHandImpl(
             implClass = GirPropertyHelper.class,
             implMethod = "getPropertier",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     private static GiPropertier getPropertier() {
         return me;
     }
@@ -46,8 +42,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     @GaMethodHandImpl(
             implClass = GirEnvironmentHelper.class,
             implMethod = "getEnvironmenter",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     private static GiEnvironmenter getEnvironmenter() {
         return me;
     }
@@ -55,11 +50,8 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     protected static SpringEnvironment4Gir me;
 
     private static ConfigurableListableBeanFactory beanFactory;
-    /**
-     * Spring应用上下文环境
-     */
+    /** Spring应用上下文环境 */
     private static ApplicationContext applicationContext;
-
 
     public static Environment getEnvironment() {
         return applicationContext.getEnvironment();
@@ -161,11 +153,11 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         me = this;
         SpringEnvironment4Gir.applicationContext = applicationContext;
-
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+            throws BeansException {
         me = this;
     }
 }

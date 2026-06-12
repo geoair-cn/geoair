@@ -12,6 +12,5 @@ import cn.geoair.comp.dynamic.ds.tx.IDsTransactionTemplate;
  * @author zhangjun
  * @date Created in 2025/10/9 10:38
  */
-public interface IDataSourceGetter extends IDsDataSourceOpt, IDsConnectionOpt, IDsTransactionTemplate {
-
-}
+public interface IDataSourceGetter
+        extends IDsDataSourceOpt, IDsConnectionOpt, IDsTransactionTemplate {}

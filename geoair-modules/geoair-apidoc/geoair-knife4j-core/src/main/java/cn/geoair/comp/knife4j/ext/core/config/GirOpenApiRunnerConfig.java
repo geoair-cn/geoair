@@ -2,11 +2,8 @@ package cn.geoair.comp.knife4j.ext.core.config;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilStr;
-
 import java.util.Map;
-import java.util.Objects;
 import javax.annotation.Resource;
-
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
@@ -25,12 +22,9 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
     // @Resource
     // Environment environment;
 
-    @Resource
-    ApplicationContext applicationContext;
+    @Resource ApplicationContext applicationContext;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
@@ -45,19 +39,22 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
         }
 
         String property = applicationContext.getEnvironment().getProperty("geoair.apidoc.enable");
-        String enableAuth = applicationContext.getEnvironment().getProperty("geoair.apidoc.auth.enable-auth");
+        String enableAuth =
+                applicationContext.getEnvironment().getProperty("geoair.apidoc.auth.enable-auth");
         String port = applicationContext.getEnvironment().getProperty("server.port");
         if (port == null) {
             port = "8080";
         }
-        String contextPath = applicationContext.getEnvironment().getProperty("server.servlet.context-path");
+        String contextPath =
+                applicationContext.getEnvironment().getProperty("server.servlet.context-path");
         boolean hasContextPath = GutilStr.isNotBlank(contextPath);
 
         String baseUrl = "http://localhost:" + port + (hasContextPath ? contextPath : "");
         boolean isEnabled = "true".equals(property);
 
         Gir.log.info("");
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info(
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         Gir.log.info("                    📖 API 接口文档服务                            ");
         Gir.log.info("--------------------------------------------------------------------");
         Gir.log.info("  状态：{}", isEnabled ? "✅ 已启用" : "❌ 未启用");
@@ -72,7 +69,8 @@ public class GirOpenApiRunnerConfig implements ApplicationRunner {
             Gir.log.info("  密码：  {}", password);
         }
 
-        Gir.log.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        Gir.log.info(
+                "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         Gir.log.info("");
     }
 }

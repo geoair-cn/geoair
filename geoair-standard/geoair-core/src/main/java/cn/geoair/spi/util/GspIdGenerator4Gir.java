@@ -22,10 +22,9 @@ public class GspIdGenerator4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirIdGenerator.class,
-        implMethod = "timestampId",
-        type = ImplType.comity
-    )
+            implClass = GirIdGenerator.class,
+            implMethod = "timestampId",
+            type = ImplType.comity)
     public static long timestampId() {
         return getGfSnowflake().nextId();
     }

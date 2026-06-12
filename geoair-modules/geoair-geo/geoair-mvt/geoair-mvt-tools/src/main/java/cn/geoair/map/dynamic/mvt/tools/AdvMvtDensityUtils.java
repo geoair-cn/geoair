@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.mvt.tools;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.*;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;

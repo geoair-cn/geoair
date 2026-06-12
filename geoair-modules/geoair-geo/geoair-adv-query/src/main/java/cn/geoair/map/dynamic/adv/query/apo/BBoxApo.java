@@ -1,10 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.base.Gir;
-
-import java.io.Serializable;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.io.Serializable;
 import org.locationtech.jts.geom.*;
 
 /**

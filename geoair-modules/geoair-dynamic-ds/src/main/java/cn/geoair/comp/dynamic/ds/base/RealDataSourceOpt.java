@@ -10,16 +10,13 @@ import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.Connection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 
-/**
- * 真实的数据源管理器实现
- */
+/** 真实的数据源管理器实现 */
 public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
@@ -41,10 +38,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     protected String dataSourceId = null;
 
-
-    public RealDataSourceOpt() {
-
-    }
+    public RealDataSourceOpt() {}
 
     @Override
     public String getSchemaName() {
@@ -112,7 +106,8 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
-            dataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
+            dataSource =
+                    AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
         } else {
             dataSource =
                     AdvDynamicDataSourceStorage.getInstance()
@@ -148,12 +143,10 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         initByDataSource(simpleDataSource);
     }
 
-
     @Override
     public DataSource getDataSource() {
         return dataSource;
     }
-
 
     @Override
     public DataSourceApo getDataSourceApo() {
@@ -164,5 +157,4 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         BeanUtil.copyProperties(dataSourceApo, apo);
         return apo;
     }
-
 }

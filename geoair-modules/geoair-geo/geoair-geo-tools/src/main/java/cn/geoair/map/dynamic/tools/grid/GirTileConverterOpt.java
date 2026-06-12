@@ -5,16 +5,12 @@ import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-
 import java.util.List;
 import java.util.Set;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
-/**
- * 瓦片转换核心接口 定义XYZ瓦片与地理范围的互转规范，支持不同坐标系扩展
- */
+/** 瓦片转换核心接口 定义XYZ瓦片与地理范围的互转规范，支持不同坐标系扩展 */
 public interface GirTileConverterOpt {
 
     /**
@@ -30,9 +26,9 @@ public interface GirTileConverterOpt {
     /**
      * XYZ瓦片转换为瓦片范围DTO
      *
-     * @param z          缩放级别
-     * @param x          瓦片X索引
-     * @param y          瓦片Y索引
+     * @param z 缩放级别
+     * @param x 瓦片X索引
+     * @param y 瓦片Y索引
      * @param targetSrid box网格的坐标系
      * @return 瓦片范围DTO
      */
@@ -41,7 +37,7 @@ public interface GirTileConverterOpt {
     /**
      * 地理范围转换为瓦片索引范围
      *
-     * @param z       缩放级别
+     * @param z 缩放级别
      * @param tileBox 地理范围DTO ，srid 默认为 opt的Srid
      * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
      */
@@ -49,16 +45,16 @@ public interface GirTileConverterOpt {
     /**
      * 地理范围转换为瓦片索引范围
      *
-     * @param z       缩放级别
+     * @param z 缩放级别
      * @param tileBox 地理范围DTO ，srid 默认为 opt的Srid
-     * @param srcSrid 地理范围DTO  的srid
+     * @param srcSrid 地理范围DTO 的srid
      * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
      */
     RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid);
     /**
      * 将几何图形转换为瓦片坐标范围
      *
-     * @param z        缩放级别
+     * @param z 缩放级别
      * @param geometry 几何图形对象 ，srid 默认为 opt的Srid
      * @return 瓦片坐标范围对象
      */
@@ -67,9 +63,9 @@ public interface GirTileConverterOpt {
     /**
      * 将几何图形转换为瓦片坐标范围
      *
-     * @param z        缩放级别
+     * @param z 缩放级别
      * @param geometry 几何图形对象
-     * @param srcSrid  geometry 对象的srid
+     * @param srcSrid geometry 对象的srid
      * @return 瓦片坐标范围对象
      */
     RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid);
@@ -95,8 +91,8 @@ public interface GirTileConverterOpt {
      * <p>注意：转换后的等轴Y索引可能是浮点数，需根据业务需求取整（默认向下取整）
      *
      * @param separateAxisY 非等轴Y索引（XYZ规范，原点左上角）
-     * @param zoom          缩放级别（0-30）
-     * @param roundingType  取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
+     * @param zoom 缩放级别（0-30）
+     * @param roundingType 取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
      * @return 等轴Y索引（XYZ规范，原点左上角）
      * @throws IllegalArgumentException 入参不合法时抛出
      */
@@ -108,8 +104,8 @@ public interface GirTileConverterOpt {
      *
      * <p>与convertSeparateAxisYToEqualAxisY互为逆运算
      *
-     * @param equalAxisY   等轴Y索引（XYZ规范）
-     * @param zoom         缩放级别（0-30）
+     * @param equalAxisY 等轴Y索引（XYZ规范）
+     * @param zoom 缩放级别（0-30）
      * @param roundingType 取整方式
      * @return 非等轴Y索引（XYZ规范）
      */
@@ -120,8 +116,8 @@ public interface GirTileConverterOpt {
      * 根据指定几何图形和缩放级别获取覆盖的瓦片列表
      *
      * @param geometry 几何图形对象
-     * @param srcSrid  源坐标系EPSG代码
-     * @param targetZ  目标缩放级别
+     * @param srcSrid 源坐标系EPSG代码
+     * @param targetZ 目标缩放级别
      * @return 覆盖的瓦片坐标集合
      */
     Set<TileZxyApo> zxyListByGeom(Geometry geometry, int srcSrid, int targetZ);
@@ -130,7 +126,7 @@ public interface GirTileConverterOpt {
      * 根据指定几何图形和多个缩放级别获取覆盖的瓦片列表
      *
      * @param geometry 几何图形对象
-     * @param srcSrid  源坐标系EPSG代码
+     * @param srcSrid 源坐标系EPSG代码
      * @param targetZs 目标缩放级别列表
      * @return 覆盖的瓦片坐标集合
      */
@@ -140,9 +136,9 @@ public interface GirTileConverterOpt {
      * 根据指定几何图形和缩放级别范围获取覆盖的瓦片列表
      *
      * @param geometry 几何图形对象
-     * @param srcSrid  源坐标系EPSG代码
-     * @param minZ     最小缩放级别
-     * @param maxZ     最大缩放级别
+     * @param srcSrid 源坐标系EPSG代码
+     * @param minZ 最小缩放级别
+     * @param maxZ 最大缩放级别
      * @return 覆盖的瓦片坐标集合
      */
     Set<TileZxyApo> zxyListByGeom(Geometry geometry, int srcSrid, int minZ, int maxZ);
@@ -151,8 +147,8 @@ public interface GirTileConverterOpt {
      * 根据指定地理范围和缩放级别获取覆盖的瓦片列表
      *
      * @param envelope 地理范围对象
-     * @param srcSrid  源坐标系EPSG代码
-     * @param targetZ  目标缩放级别
+     * @param srcSrid 源坐标系EPSG代码
+     * @param targetZ 目标缩放级别
      * @return 覆盖的瓦片坐标集合
      */
     Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ);
@@ -161,7 +157,7 @@ public interface GirTileConverterOpt {
      * 根据指定地理范围和多个缩放级别获取覆盖的瓦片列表
      *
      * @param envelope 地理范围对象
-     * @param srcSrid  源坐标系EPSG代码
+     * @param srcSrid 源坐标系EPSG代码
      * @param targetZs 目标缩放级别列表
      * @return 覆盖的瓦片坐标集合
      */
@@ -171,13 +167,12 @@ public interface GirTileConverterOpt {
      * 根据指定地理范围和缩放级别范围获取覆盖的瓦片列表
      *
      * @param envelope 地理范围对象
-     * @param srcSrid  源坐标系EPSG代码
-     * @param minZ     最小缩放级别
-     * @param maxZ     最大缩放级别
+     * @param srcSrid 源坐标系EPSG代码
+     * @param minZ 最小缩放级别
+     * @param maxZ 最大缩放级别
      * @return 覆盖的瓦片坐标集合
      */
     Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int minZ, int maxZ);
-
 
     /**
      * 通过一组zxy获取这个zxy覆盖的大边界框
@@ -198,9 +193,9 @@ public interface GirTileConverterOpt {
     /**
      * 根据比例尺反推合适的瓦片层级
      *
-     * @param targetScale   目标比例尺（例如：10000 表示 1:10000）
+     * @param targetScale 目标比例尺（例如：10000 表示 1:10000）
      * @param tilePixelSize 瓦片像素尺寸
-     * @param dpi           屏幕DPI
+     * @param dpi 屏幕DPI
      * @return 最合适的瓦片层级
      */
     int getZoomByScale(double targetScale, int tilePixelSize, double dpi);
@@ -209,7 +204,7 @@ public interface GirTileConverterOpt {
      * 根据地面分辨率反推合适的瓦片层级
      *
      * @param targetResolution 目标地面分辨率（米/像素）
-     * @param tilePixelSize    瓦片像素尺寸
+     * @param tilePixelSize 瓦片像素尺寸
      * @return 最合适的瓦片层级
      */
     int getZoomByResolution(double targetResolution, int tilePixelSize);
@@ -217,14 +212,14 @@ public interface GirTileConverterOpt {
     /**
      * 批量获取多个层级的瓦片元数据
      *
-     * @param minZoom       最小层级
-     * @param maxZoom       最大层级
+     * @param minZoom 最小层级
+     * @param maxZoom 最大层级
      * @param tilePixelSize 瓦片像素尺寸
-     * @param dpi           屏幕DPI
+     * @param dpi 屏幕DPI
      * @return 层级元数据列表
      */
-    List<TileLevelMetadata> getTileLevelMetadataList(int minZoom, int maxZoom,
-                                                     int tilePixelSize, double dpi);
+    List<TileLevelMetadata> getTileLevelMetadataList(
+            int minZoom, int maxZoom, int tilePixelSize, double dpi);
 
     /**
      * 根据最大分辨率层级获取瓦片元数据（使用默认配置）
@@ -237,9 +232,9 @@ public interface GirTileConverterOpt {
     /**
      * 根据最大分辨率层级获取瓦片元数据（支持自定义瓦片尺寸和DPI）
      *
-     * @param maxZoom       最大分辨率层级（最大缩放级别）
+     * @param maxZoom 最大分辨率层级（最大缩放级别）
      * @param tilePixelSize 瓦片像素尺寸（例如：256、512）
-     * @param dpi           屏幕DPI（例如：72、96、300）
+     * @param dpi 屏幕DPI（例如：72、96、300）
      * @return 瓦片层级元数据对象
      */
     TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi);

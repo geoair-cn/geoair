@@ -1,10 +1,9 @@
 package cn.geoair.comp.dynamic.ds.readwrite.proxy;
 
 import cn.geoair.comp.dynamic.ds.dswrapper.ConnectionWrapper;
-import lombok.Getter;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
+import javax.sql.DataSource;
+import lombok.Getter;
 
 /**
  * @author ：张俊
@@ -14,18 +13,14 @@ import java.sql.Connection;
 @Getter
 public class ReadWritePxyConnection extends ConnectionWrapper {
 
-    /**
-     * 是否是从节点的链接
-     */
+    /** 是否是从节点的链接 */
     boolean slaveIs;
 
-    /**
-     * 来自于那个数据源
-     */
+    /** 来自于那个数据源 */
     DataSource fromDataSource;
 
-
-    public ReadWritePxyConnection(Connection connection, boolean slaveIs, DataSource fromDataSource) {
+    public ReadWritePxyConnection(
+            Connection connection, boolean slaveIs, DataSource fromDataSource) {
         super(connection);
         this.slaveIs = slaveIs;
         this.fromDataSource = fromDataSource;
@@ -33,9 +28,11 @@ public class ReadWritePxyConnection extends ConnectionWrapper {
 
     @Override
     public String toString() {
-        return "ReadWritePxyConnection{" +
-                "slaveIs=" + slaveIs +
-                ", fromDataSource=" + fromDataSource.getClass().getSimpleName() +
-                "} ";
+        return "ReadWritePxyConnection{"
+                + "slaveIs="
+                + slaveIs
+                + ", fromDataSource="
+                + fromDataSource.getClass().getSimpleName()
+                + "} ";
     }
 }

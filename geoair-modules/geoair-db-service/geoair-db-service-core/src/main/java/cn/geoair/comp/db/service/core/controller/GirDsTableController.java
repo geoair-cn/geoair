@@ -42,7 +42,8 @@ public class GirDsTableController {
         DsDataSourceApo dsDataSourceApo = girDsDataSourceDao.getById(sourceId);
         IAdvExecutor iAdvExecutor =
                 GirAdvQuery.getIAdvExecutor(
-                        PoolManager.getJdbcConnectionPool(dsDataSourceApo), dsDataSourceApo.getUrl());
+                        PoolManager.getJdbcConnectionPool(dsDataSourceApo),
+                        dsDataSourceApo.getUrl());
         List<SchemaTableApo> schemaTableApos = iAdvExecutor.dGetTableAndViewBySchema();
         List<String> tablesBySchema =
                 schemaTableApos

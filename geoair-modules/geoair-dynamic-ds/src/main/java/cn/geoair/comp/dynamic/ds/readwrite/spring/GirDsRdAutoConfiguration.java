@@ -7,6 +7,7 @@ import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,8 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import javax.sql.DataSource;
-
 /**
  * 读写分离数据源自动配置
  *
@@ -30,7 +29,11 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(GirRdDataSourceProperties.class)
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @ConditionalOnClass({IAdvDataSourceHelper.class, DataSource.class})
-@ConditionalOnProperty(prefix = "spring.datasource.geoair.readwrite", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(
+        prefix = "spring.datasource.geoair.readwrite",
+        name = "enabled",
+        havingValue = "true",
+        matchIfMissing = false)
 public class GirDsRdAutoConfiguration {
     private static final GiLogger log = GirLoggerFactory.getLogger(GirDsRdAutoConfiguration.class);
 
@@ -52,13 +55,19 @@ public class GirDsRdAutoConfiguration {
         if (GutilObject.isEmpty(properties.getReadwrite().findReadUrlList())) {
             throw new RuntimeException("readwrite readUrlList is empty!");
         }
-        log.info("开始构建读写分离数据源，组名: {}, 从库数量: {}, 策略: {}",
+        log.info(
+                "开始构建读写分离数据源，组名: {}, 从库数量: {}, 策略: {}",
                 properties.getGroupName(),
-                GutilObject.isNotEmpty(properties.getReadwrite().findValidDataSources()) ? properties.getReadwrite().findReadUrlList().size() : 0,
-                properties.getReadwrite().getReadStrategy() != null ? properties.getReadwrite().getReadStrategy().getDescription() : "轮询策略");
+                GutilObject.isNotEmpty(properties.getReadwrite().findValidDataSources())
+                        ? properties.getReadwrite().findReadUrlList().size()
+                        : 0,
+                properties.getReadwrite().getReadStrategy() != null
+                        ? properties.getReadwrite().getReadStrategy().getDescription()
+                        : "轮询策略");
 
-        GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
-                .build();
+        GirReadWriteDataSource dataSource =
+                GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
+                        .build();
 
         RdLog.minLogLevel = properties.minLogLevel;
         RdLog.useIndependentLog = properties.useIndependentLog;
@@ -66,6 +75,4 @@ public class GirDsRdAutoConfiguration {
         log.info("读写分离数据源构建完成");
         return dataSource;
     }
-
-
 }

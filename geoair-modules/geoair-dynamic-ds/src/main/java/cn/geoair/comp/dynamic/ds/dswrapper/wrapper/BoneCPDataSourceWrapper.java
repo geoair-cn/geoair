@@ -1,12 +1,9 @@
 package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import com.jolbox.bonecp.BoneCPDataSource;
-
 import javax.sql.DataSource;
 
-/**
- * BoneCP 数据源包装器（轻量级高性能连接池）
- */
+/** BoneCP 数据源包装器（轻量级高性能连接池） */
 public class BoneCPDataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     private static Boolean canInit = null;

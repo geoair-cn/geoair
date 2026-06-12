@@ -8,17 +8,13 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.*;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-
 import org.opengis.feature.simple.SimpleFeatureType;
 
-/**
- * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制
- */
+/** 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制 */
 public class GeoFileTranImpl implements GeoFileTran {
 
     private static GiLogger log = GirLoggerFactory.getLogger(GeoFileTranImpl.class);
@@ -28,13 +24,9 @@ public class GeoFileTranImpl implements GeoFileTran {
 
     // 全局异常处理器
     private ExceptionConsumer exceptionConsumer;
-    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {
+    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {};
 
-    };
-
-    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {
-
-    };
+    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {};
 
     // 进度监听器
     private TranProgressListener progressListener;
@@ -168,9 +160,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         return result;
     }
 
-    /**
-     * 超时检查
-     */
+    /** 超时检查 */
     private void checkTimeout() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - startTime > context.getTimeout()) {
@@ -179,9 +169,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 更新进度并回调监听器
-     */
+    /** 更新进度并回调监听器 */
     private void updateProgress() {
         if (progressListener == null) {
             return;
@@ -204,9 +192,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 统一异常处理
-     */
+    /** 统一异常处理 */
     private void handleException(Exception e) {
         if (exceptionConsumer != null) {
             exceptionConsumer.accept(e);
@@ -215,9 +201,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 静默关闭资源
-     */
+    /** 静默关闭资源 */
     private void closeQuietly(Closeable closeable) {
         if (closeable == null) {
             return;

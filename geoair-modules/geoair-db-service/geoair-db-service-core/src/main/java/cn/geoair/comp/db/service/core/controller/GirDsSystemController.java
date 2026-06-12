@@ -11,11 +11,9 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson2.JSONObject;
-
 import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @GaApi(tags = "GirDs系统相关")
 public class GirDsSystemController {
 
-    @Resource
-    GirDsServiceProperties girDsServiceProperties;
+    @Resource GirDsServiceProperties girDsServiceProperties;
 
     //
     // @Value("${dbapi.server.port:6106}")
@@ -153,14 +150,13 @@ public class GirDsSystemController {
         }
 
         Map<String, Object> config = MapUtil.newHashMap();
-//        config.put("baseUrl", baseUrl);
+        //        config.put("baseUrl", baseUrl);
         config.put("byGirServlet", GirServletUtil.getClientIP(request));
         config.put("byServerInfoByRequest", GirServletUtil.getServerInfoByRequest());
         config.put(
                 "byCurrentContextPath",
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
-        config.put(
-                "byServerPathByRequest", GirServletUtil.getServerPathByRequest());
+        config.put("byServerPathByRequest", GirServletUtil.getServerPathByRequest());
         config.put("baseUrl", GirServletUtil.getServerPathByRequest());
         config.put("loginPage", "");
         return config;

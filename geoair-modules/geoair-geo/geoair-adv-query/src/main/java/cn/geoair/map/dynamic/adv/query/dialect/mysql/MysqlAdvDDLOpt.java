@@ -13,21 +13,16 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * MySQL DDL操作实现类 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑
- */
+/** MySQL DDL操作实现类 仅实现MySQL专属的差异化逻辑，复用抽象父类的所有通用DDL逻辑 */
 public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
-
 
     public MysqlAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
         super(dataSourceGetter, baseOpt);
-
     }
 
     @Override
@@ -142,12 +137,12 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         // 处理长度/精度
         if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
                 && (newField.getUdtName().contains("char")
-                || newField.getUdtName().contains("varchar"))) {
+                        || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
                 && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
                 && (newField.getUdtName().contains("numeric")
-                || newField.getUdtName().contains("decimal"))) {
+                        || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -234,12 +229,12 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     /**
      * MySQL 版本：给表添加主键（支持字符串/数值自增/数值非自增）
      *
-     * @param tableName      表名（不含库名）
-     * @param pkColumnName   主键列名（如id）
+     * @param tableName 表名（不含库名）
+     * @param pkColumnName 主键列名（如id）
      * @param constraintName 主键约束名（MySQL 中主键约束名可省略，为空自动生成）
-     * @param pkType         主键类型（STRING/INT_AUTO/BIGINT_AUTO/INT_NORMAL/BIGINT_NORMAL）
+     * @param pkType 主键类型（STRING/INT_AUTO/BIGINT_AUTO/INT_NORMAL/BIGINT_NORMAL）
      * @param pkColumnLength 字符串主键列长度（仅STRING类型需要，如50）
-     * @param pkValuePrefix  字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
+     * @param pkValuePrefix 字符串主键值前缀（仅STRING类型需要，如file_，为空则用时间戳）
      */
     @Override
     public void dAddPrimaryKey(
@@ -665,31 +660,29 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
+
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
         // MySQL: CREATE TABLE IF NOT EXISTS target SELECT * FROM source
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} SELECT * FROM {}",
-                dstTableName, srcTableName);
+        return StrUtil.format(
+                "CREATE TABLE IF NOT EXISTS {} SELECT * FROM {}", dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
         // MySQL: CREATE TABLE IF NOT EXISTS target LIKE source
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} LIKE {}",
-                dstTableName, srcTableName);
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} LIKE {}", dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
         // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
-                dstTableName, sql);
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})", dstTableName, sql);
     }
 
     @Override
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
         // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) LIMIT 0
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) LIMIT 0",
-                dstTableName, sql);
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) LIMIT 0", dstTableName, sql);
     }
 }

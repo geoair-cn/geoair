@@ -14,10 +14,9 @@ public class GenericTypeUtil4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GutilGenericType.class,
-        implMethod = "resolveTypeArguments",
-        type = ImplType.expectfirst
-    )
+            implClass = GutilGenericType.class,
+            implMethod = "resolveTypeArguments",
+            type = ImplType.expectfirst)
     private static Type[] resolveTypeArguments(Class<?> clazz, Class<?> genericIfc) {
         return GenericTypeResolver.resolveTypeArguments(clazz, genericIfc);
     }

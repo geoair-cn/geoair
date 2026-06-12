@@ -4,7 +4,6 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -17,33 +16,29 @@ public class MysqlAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
         this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();
     }
 
-
-
-
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         return StrUtil.format(
                 "INSERT IGNORE INTO {} ({}) VALUES ({})", tableName, fields, placeholders);
     }
 
-//    @Override
-//    protected String buildInsertOrUpdateSql(
-//            String tableName, String fields, String placeholders, Set<String> updateFields) {
-//        // MySQL：ON DUPLICATE KEY UPDATE 语法
-//        String updateClause =
-//                updateFields
-//                        .stream()
-//                        .map(field -> StrUtil.format("{} = VALUES({})", field, field))
-//                        .collect(Collectors.joining(","));
-//
-//        return StrUtil.format(
-//                "INSERT INTO {} ({}) VALUES ({}) ON DUPLICATE KEY UPDATE {}",
-//                tableName,
-//                fields,
-//                placeholders,
-//                updateClause);
-//    }
-
-
+    //    @Override
+    //    protected String buildInsertOrUpdateSql(
+    //            String tableName, String fields, String placeholders, Set<String> updateFields) {
+    //        // MySQL：ON DUPLICATE KEY UPDATE 语法
+    //        String updateClause =
+    //                updateFields
+    //                        .stream()
+    //                        .map(field -> StrUtil.format("{} = VALUES({})", field, field))
+    //                        .collect(Collectors.joining(","));
+    //
+    //        return StrUtil.format(
+    //                "INSERT INTO {} ({}) VALUES ({}) ON DUPLICATE KEY UPDATE {}",
+    //                tableName,
+    //                fields,
+    //                placeholders,
+    //                updateClause);
+    //    }
 
 }

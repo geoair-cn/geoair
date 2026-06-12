@@ -12,8 +12,7 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
  */
 public class GirLoggerFactory {
 
-    private GirLoggerFactory() {
-    }
+    private GirLoggerFactory() {}
 
     static {
         GkMethodHand.implFromClass(GirLoggerFactory.class);
@@ -35,10 +34,8 @@ public class GirLoggerFactory {
     @GaMethodHandImpl(
             implClass = GirLoggerFactory.class,
             implMethod = "getLogger",
-            type = GaMethodHandImpl.ImplType.comity
-    )
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiLogger _getLogger(String name) {
         return GirConsoleLog.forName(name);
     }
-
 }

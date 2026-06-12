@@ -5,13 +5,10 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 数据库方言表名处理器抽象父类 封装所有数据库通用的表名/字段名处理逻辑，差异化逻辑由子类实现
- */
+/** 数据库方言表名处理器抽象父类 封装所有数据库通用的表名/字段名处理逻辑，差异化逻辑由子类实现 */
 public abstract class AbstractExecDialectTableUtil implements DialectTableNameProcessor {
 
     protected static final int TEMP_TABLE_ALIAS_LENGTH = 8;
@@ -57,14 +54,12 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         // 预处理：去空格
         String processedName = fullTableName.trim();
 
-
-        Pattern pattern = Pattern.compile(
-                "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
-                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
-        );
+        Pattern pattern =
+                Pattern.compile(
+                        "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\."
+                                + "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$");
 
         Matcher matcher = pattern.matcher(processedName);
-
 
         if (matcher.matches()) {
             return tbUnquoteTableName(matcher.group(2));
@@ -78,14 +73,12 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
             return null;
         }
 
-
         String processedName = fullTableName.trim();
 
-
-        Pattern pattern = Pattern.compile(
-                "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
-                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
-        );
+        Pattern pattern =
+                Pattern.compile(
+                        "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\."
+                                + "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$");
 
         Matcher matcher = pattern.matcher(processedName);
 
@@ -165,19 +158,13 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         return startFragment + " as " + aliasTableName;
     }
 
-    /**
-     * 获取数据库专属的引号字符（PG："，MySQL：`）
-     */
+    /** 获取数据库专属的引号字符（PG："，MySQL：`） */
     protected abstract String getQuoteChar();
 
-    /**
-     * 获取数据库默认的Schema/库名（PG：public，MySQL：空）
-     */
+    /** 获取数据库默认的Schema/库名（PG：public，MySQL：空） */
     protected abstract String getDefaultSchemaName();
 
-    /**
-     * 获取数据源对应的Schema/库名（适配PG/MySQL语义）
-     */
+    /** 获取数据源对应的Schema/库名（适配PG/MySQL语义） */
     @Override
     public String tbGetSchemaNameForSql(IDsDataSourceOpt dataSourceOpt) {
         return ObjectUtil.isEmpty(dataSourceOpt.getSchemaName())

@@ -6,15 +6,12 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.spring.GirSpringAdvExecutor;
-
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends Serializable>
-        extends
-        GiRetrieveDao<T, PK> {
+        extends GiRetrieveDao<T, PK> {
 
     /**
      * 是否能够找到主键的记录
@@ -28,10 +25,12 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
 
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
         String idKey = idByAnnotation.get(0);
-        Number number = GirSpringAdvExecutor.getInstance().wSelectCount(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(w -> w.eq(idKey, pk)).build()
-        );
+        Number number =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectCount(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(w -> w.eq(idKey, pk))
+                                        .build());
         return number.intValue() != 0;
     }
 
@@ -46,11 +45,13 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
         Class<T> modelClass = getModelClass();
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
         String idKey = idByAnnotation.get(0);
-        T t = GirSpringAdvExecutor.getInstance().wSelectObjOne(
-                GirAdvQueryRequest.
-                        builder(getModelClass()).
-                        where(w -> w.eq(idKey, pk)).build(), modelClass
-        );
+        T t =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjOne(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(w -> w.eq(idKey, pk))
+                                        .build(),
+                                modelClass);
         return t;
     }
 
@@ -66,12 +67,14 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
 
         List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
         String idKey = idByAnnotation.get(0);
-        List<T> ts = GirSpringAdvExecutor.getInstance().wSelectObjList(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(w -> w.in(idKey, pks)).build(), modelClass
-        );
+        List<T> ts =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjList(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(w -> w.in(idKey, pks))
+                                        .build(),
+                                modelClass);
         return ts;
-
     }
 
     /**
@@ -83,12 +86,14 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     @Override
     default T gtcSearchOne(T t) {
         Class<T> modelClass = getModelClass();
-        T t1 = GirSpringAdvExecutor.getInstance().wSelectObjOne(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(GirAdvWhereFilter.ofBean(t)).build(), modelClass
-        );
+        T t1 =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjOne(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(GirAdvWhereFilter.ofBean(t))
+                                        .build(),
+                                modelClass);
         return t1;
-
     }
 
     /**
@@ -100,10 +105,13 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     @Override
     default T gtcSearchFirst(T t) {
         Class<T> modelClass = getModelClass();
-        T t1 = GirSpringAdvExecutor.getInstance().wSelectObjOne(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(GirAdvWhereFilter.ofBean(t)).build(), modelClass
-        );
+        T t1 =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjOne(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(GirAdvWhereFilter.ofBean(t))
+                                        .build(),
+                                modelClass);
         return t1;
     }
 
@@ -115,10 +123,10 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     @Override
     default List<T> gtcSearchAll() {
         Class<T> modelClass = getModelClass();
-        List<T> ts = GirSpringAdvExecutor.getInstance().wSelectObjList(GirAdvQueryRequest.
-                builder(getModelClass())
-                .build(), modelClass
-        );
+        List<T> ts =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjList(
+                                GirAdvQueryRequest.builder(getModelClass()).build(), modelClass);
         return ts;
     }
 
@@ -131,10 +139,13 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     @Override
     default List<T> gtcSearch(T t) {
         Class<T> modelClass = getModelClass();
-        List<T> ts = GirSpringAdvExecutor.getInstance().wSelectObjList(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(GirAdvWhereFilter.ofBean(t)).build(), modelClass
-        );
+        List<T> ts =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectObjList(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(GirAdvWhereFilter.ofBean(t))
+                                        .build(),
+                                modelClass);
         return ts;
     }
 
@@ -146,10 +157,12 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
      */
     @Override
     default long gtcSearchCount(T t) {
-        Number number = GirSpringAdvExecutor.getInstance().wSelectCount(GirAdvQueryRequest.
-                builder(getModelClass()).
-                where(GirAdvWhereFilter.ofBean(t)).build()
-        );
+        Number number =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectCount(
+                                GirAdvQueryRequest.builder(getModelClass())
+                                        .where(GirAdvWhereFilter.ofBean(t))
+                                        .build());
         return number.longValue();
     }
 
@@ -161,10 +174,9 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
      */
     @Override
     default long gtcSearchCount() {
-        Number number = GirSpringAdvExecutor.getInstance().wSelectCount(GirAdvQueryRequest.
-                builder(getModelClass())
-                .build()
-        );
+        Number number =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectCount(GirAdvQueryRequest.builder(getModelClass()).build());
         return number.longValue();
     }
 }

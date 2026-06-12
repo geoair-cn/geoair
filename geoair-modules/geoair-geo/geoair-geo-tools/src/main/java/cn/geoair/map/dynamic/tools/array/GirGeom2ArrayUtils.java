@@ -3,9 +3,8 @@ package cn.geoair.map.dynamic.tools.array;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.locationtech.jts.geom.*;
-
 import java.util.List;
+import org.locationtech.jts.geom.*;
 
 /**
  * 几何对象与坐标数组互转接口实现类 基于JTS实现核心转换逻辑，支持指定坐标顺序，保证点顺序不变
@@ -14,7 +13,6 @@ import java.util.List;
  * @date 2024/12/06
  */
 public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
-
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
@@ -46,7 +44,6 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         return INSTANCE;
     }
 
-
     @Override
     public double[] pointToDoubleArray(Point point) {
         return pointToDoubleArray(point, CoordOrder.X_FIRST);
@@ -62,8 +59,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         Coordinate coord = point.getCoordinate();
         return CoordOrder.X_FIRST == actualOrder
-                ? new double[]{coord.x, coord.y} // X在前
-                : new double[]{coord.y, coord.x}; // Y在前
+                ? new double[] {coord.x, coord.y} // X在前
+                : new double[] {coord.y, coord.x}; // Y在前
     }
 
     @Override
@@ -201,33 +198,25 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public Point doubleListToPoint(List<Double> coords) {
-        double[] doubles = coords.stream()
-                .mapToDouble(Double::doubleValue)
-                .toArray();
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
         return doubleArrayToPoint(doubles);
     }
 
     @Override
     public Point doubleListToPoint(List<Double> coords, CoordOrder order) {
-        double[] doubles = coords.stream()
-                .mapToDouble(Double::doubleValue)
-                .toArray();
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
         return doubleArrayToPoint(doubles, order);
     }
 
     @Override
     public Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory) {
-        double[] doubles = coords.stream()
-                .mapToDouble(Double::doubleValue)
-                .toArray();
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
         return doubleArrayToPoint(doubles, order, factory);
     }
 
     @Override
     public Point doubleListToPointFast(List<Double> coords, CoordOrder order) {
-        double[] doubles = coords.stream()
-                .mapToDouble(Double::doubleValue)
-                .toArray();
+        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
         return doubleArrayToPointFast(doubles, order);
     }
 
@@ -334,7 +323,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
-    public LineString doubleListToLineString(List<double[]> coords, CoordOrder order, GeometryFactory factory) {
+    public LineString doubleListToLineString(
+            List<double[]> coords, CoordOrder order, GeometryFactory factory) {
         double[][] coordsArray = coords.toArray(new double[0][]);
         return doubleArrayToLineString(coordsArray, order, factory);
     }

@@ -62,5 +62,4 @@ public final class JdbcParameterLong implements JdbcParameter {
     public int getSqlType() {
         return Types.BIGINT;
     }
-
 }

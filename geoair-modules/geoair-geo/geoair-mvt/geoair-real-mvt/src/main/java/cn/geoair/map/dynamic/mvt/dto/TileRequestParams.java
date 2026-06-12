@@ -8,9 +8,7 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-
 import java.util.List;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,14 +52,13 @@ public class TileRequestParams {
 
     private JSONObject tempVariables = new JSONObject();
 
-
     public static TileRequestParams fromBase32(String baseString) {
         try {
             // 缓存未命中，执行原逻辑
             String encode = URLUtil.decode(baseString);
             String s = Base32.decodeStr(encode);
             TileRequestParams params = JSONUtil.parse(s).toBean(TileRequestParams.class);
-//            TileRequestParams params = JSON.parseObject(s, TileRequestParams.class);
+            //            TileRequestParams params = JSON.parseObject(s, TileRequestParams.class);
             return params;
         } catch (Exception e) {
             // 处理异常（如解码失败）
@@ -96,7 +93,7 @@ public class TileRequestParams {
     /**
      * 向临时变量中设置值
      *
-     * @param key   键
+     * @param key 键
      * @param value 值
      */
     public void putTempVariable(String key, Object value) {
@@ -122,7 +119,7 @@ public class TileRequestParams {
     /**
      * 从临时变量中获取指定类型的值
      *
-     * @param key   键
+     * @param key 键
      * @param clazz 类型
      * @return 指定类型的值
      */
