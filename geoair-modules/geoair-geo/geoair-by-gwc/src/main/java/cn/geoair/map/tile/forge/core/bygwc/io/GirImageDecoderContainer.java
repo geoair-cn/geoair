@@ -14,7 +14,7 @@ import java.util.Map;
  * Class used for containing all the ImageDecoder implementations in a map. The user should only
  * call the decode() method and internally it uses the reader associated to the input mimetype.
  */
-public class GtcImageDecoderContainer {
+public class GirImageDecoderContainer {
     /**
      * Collection of all the ImageDecoder interface implementation
      */
@@ -24,7 +24,7 @@ public class GtcImageDecoderContainer {
      */
     private Map<String, ImageDecoder> mapDecoders;
 
-    public GtcImageDecoderContainer(List<ImageDecoder> decoders) {
+    public GirImageDecoderContainer(List<ImageDecoder> decoders) {
         init(decoders);
     }
 

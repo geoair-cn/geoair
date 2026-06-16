@@ -32,7 +32,7 @@ geoair-web 是一个轻量级的 Web 工具库，为 Java Web 应用提供了一
 - `GirHttpSession`：基于 HttpSession 的会话实现
 - `GirTokenSession`：基于 Token 的会话实现
 - `GirSpringSession`：基于 Spring Session 的会话实现
-- `GtcWebUserSession`：用户会话管理
+- `GirWebUserSession`：用户会话管理
 
 ### 4. 页面参数处理
 
@@ -137,7 +137,7 @@ geoair-web/
 │   │   ├── GirSessionConfig.java
 │   │   ├── GirSpringSession.java
 │   │   ├── GirTokenSession.java
-│   │   ├── GtcWebUserSession.java
+│   │   ├── GirWebUserSession.java
 │   │   └── gtcWebUserSessionProvider.java
 │   └── util/                      # 工具类
 │       ├── GirHttpServletHelper.java

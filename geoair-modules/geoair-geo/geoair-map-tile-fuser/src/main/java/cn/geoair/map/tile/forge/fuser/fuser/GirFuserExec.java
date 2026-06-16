@@ -4,8 +4,8 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.enums.HintsLevel;
-import cn.geoair.map.tile.forge.core.bygwc.io.GtcImageDecoderContainer;
-import cn.geoair.map.tile.forge.core.bygwc.io.GtcImageEncoderContainer;
+import cn.geoair.map.tile.forge.core.bygwc.io.GirImageDecoderContainer;
+import cn.geoair.map.tile.forge.core.bygwc.io.GirImageEncoderContainer;
 import cn.geoair.map.tile.forge.core.bygwc.io.ImageCodecInitializer;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
@@ -203,12 +203,12 @@ public class GirFuserExec implements FuserExec {
     /**
      * 所有可用的解码器映射
      */
-    private GtcImageDecoderContainer decoderMap;
+    private GirImageDecoderContainer decoderMap;
 
     /**
      * 所有可用的编码器映射
      */
-    private GtcImageEncoderContainer encoderMap;
+    private GirImageEncoderContainer encoderMap;
 
     /**
      * 构造函数 - 使用默认输出格式(PNG)
@@ -648,8 +648,8 @@ public class GirFuserExec implements FuserExec {
      */
     public void init() {
         infoLog("初始化解码器和编码器");
-        decoderMap = new GtcImageDecoderContainer(ImageCodecInitializer.getAllDecodersList());
-        encoderMap = new GtcImageEncoderContainer(ImageCodecInitializer.getAllEncodersList());
+        decoderMap = new GirImageDecoderContainer(ImageCodecInitializer.getAllDecodersList());
+        encoderMap = new GirImageEncoderContainer(ImageCodecInitializer.getAllEncodersList());
         infoLog("解码器和编码器初始化完成");
     }
 }

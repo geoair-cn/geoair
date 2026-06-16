@@ -16,7 +16,7 @@ import java.util.Map;
  * Class used for containing all the ImageEncoder implementations in a map. The user should only
  * call the encode() method and internally it uses the writer associated to the input mimetype.
  */
-public class GtcImageEncoderContainer {
+public class GirImageEncoderContainer {
     /**
      * Collection of all the ImageEncoder interface implementation
      */
@@ -26,7 +26,7 @@ public class GtcImageEncoderContainer {
      */
     private Map<String, ImageEncoder> mapEncoders;
 
-    public GtcImageEncoderContainer(List<ImageEncoder> encoders) {
+    public GirImageEncoderContainer(List<ImageEncoder> encoders) {
         init(encoders);
     }
 
