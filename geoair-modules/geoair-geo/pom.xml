@@ -41,6 +41,9 @@
     <module>geoair-jts-all</module>
 <!--    <module>geoair-geoserver</module>-->
 <!--    <module>geoair-geo-demo</module>-->
+    <module>geoair-map-tile-forge</module>
+    <module>geoair-map-tile-fuser</module>
+    <module>geoair-by-gwc</module>
   </modules>
 
   <scm>

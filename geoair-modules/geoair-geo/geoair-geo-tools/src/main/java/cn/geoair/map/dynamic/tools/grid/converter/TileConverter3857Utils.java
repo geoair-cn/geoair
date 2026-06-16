@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
@@ -17,6 +19,7 @@ import org.locationtech.jts.geom.Geometry;
  * Web墨卡托（3857）坐标系瓦片转换实现类
  */
 public class TileConverter3857Utils extends TileConverterCommon {
+    GiLogger log = GirLoggerFactory.getLogger();
 
     // 墨卡托投影常量（地球半径）
     private static final double EARTH_RADIUS = 6378137.0;
@@ -37,6 +40,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
      */
     @Deprecated
     public static TileConverter3857Utils getInstance() {
+
         if (INSTANCE == null) {
             synchronized (TileConverter3857Utils.class) {
                 if (INSTANCE == null) {
@@ -295,20 +299,26 @@ public class TileConverter3857Utils extends TileConverterCommon {
 
     @Override
     public BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
-
+//        log.info("minx:{},maxx:{}", minTileX, maxTileX);
+//        log.info("minTileY:{},maxTileY:{}", minTileY, maxTileY);
 //        TileLevelMetadata tileLevelMetadata = getTileLevelMetadata(zoom);
 //        double width = tileLevelMetadata.getResolution() * 256;
 //        double height = tileLevelMetadata.getResolution() * 256;
 //        double[] tileOrigin = {-20037508.3427892, 20037508.3427892};
 //        double minx = tileOrigin[0] + width * minTileX;
-//        double miny = tileOrigin[1] + height * (minTileY);
-//        double maxx = tileOrigin[0] + width * (maxTileX + 1);
-//        double maxy = tileOrigin[1] + height * (maxTileY + 1);
-//        Envelope envelope3857 = new Envelope(minx, maxx, miny, maxy);
-//        Envelope converted = sridConvertOpt.convert(envelope3857, 3857, targetSrid);
-//        return new BoxReferencedEnvelope(converted, targetSrid);
-
+//        double maxx = tileOrigin[0] + width * (maxTileX);
+//
+//        double miny = height * (tileLevelMetadata.getNumTilesHigh()-minTileY) - tileOrigin[1];
+//        double maxy = height * ( tileLevelMetadata.getNumTilesHigh()-maxTileY) - tileOrigin[1];
+//        BoxReferencedEnvelope boxReferencedEnvelope = new BoxReferencedEnvelope(sridConvertOpt.convert(new Envelope(minx, maxx, miny, maxy), 3857, targetSrid), targetSrid);
+//        System.out.println("===================");
+//        System.out.println(boxReferencedEnvelope.getWktString(4326));
+//        System.out.println("===================");
+//
+//        return boxReferencedEnvelope;
         validateXyz(zoom, (int) minTileX, (int) minTileY);
+
+
         // 计算四个角的瓦片边界
         // 左下角瓦片
         double minX = tileXToCoordinateX((int) minTileX, zoom);
