@@ -11,6 +11,10 @@ import lombok.Getter;
 public enum PxyType {
 
     WEB("web"),
+    MBTILES("mbtiles"), // 没有实现
+    ARCGISV2("arcgisv2"),// 没有实现
+    ARCGISV1("arcgisv1"),// 没有实现
+    DATABASE("database"),// 没有实现
     LOCAL("local");
 
     private final String mode;

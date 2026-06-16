@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.core.bygwc.io.GirImageEncoderContainer;
 import cn.geoair.map.tile.forge.core.bygwc.io.ImageCodecInitializer;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.geotools.image.util.ImageUtilities;
@@ -30,11 +31,11 @@ import java.util.Arrays;
 public class GirFuserExec implements FuserExec {
 
     final GridSubset gridSubset;
-
+    @Getter
     final ImageMime outputFormat;
 
     final LayerTileGetter layerTileGetter;
-
+    @Getter
     ImageMime srcFormat;
 
     int reqHeight;

@@ -53,7 +53,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
         // 先尝试从缓存读取
         if (cacheEnabled) {
             try {
-                byte[] cachedData = tileCache.get(layerCachePreFix, z, x, y);
+                byte[] cachedData = tileCache.get(layerCachePreFix, z, x, y, target.getSrcFormat());
                 if (cachedData != null && cachedData.length > 0) {
                     log.debug("从缓存获取瓦片成功: {} - ({},{},{})", layerCachePreFix, z, x, y);
                     return new ByteArrayResource(cachedData);
@@ -71,7 +71,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
             try {
                 byte[] data = resource.getByteData();
                 if (data != null && data.length > 0) {
-                    tileCache.put(layerCachePreFix, z, x, y, data);
+                    tileCache.put(layerCachePreFix, z, x, y, data, target.getSrcFormat());
                     log.debug("瓦片已保存到缓存: {} - ({},{},{})", layerCachePreFix, z, x, y);
                 }
             } catch (Exception e) {
@@ -107,7 +107,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
      */
     public boolean clearTileCache(int z, int x, int y) {
         if (cacheEnabled) {
-            return tileCache.delete(layerCachePreFix, z, x, y);
+            return tileCache.delete(layerCachePreFix, z, x, y, target.getSrcFormat());
         }
         return false;
     }

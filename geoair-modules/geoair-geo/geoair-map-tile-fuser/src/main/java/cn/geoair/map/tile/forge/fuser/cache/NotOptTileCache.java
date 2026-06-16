@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+
 /**
  * @author ：张俊
  * @date ：Created in 2026/6/16 14:40
@@ -7,12 +9,12 @@ package cn.geoair.map.tile.forge.fuser.cache;
  */
 public class NotOptTileCache implements TileCache {
     @Override
-    public byte[] get(String layerName, int z, int x, int y) {
+    public byte[] get(String layerName, int z, int x, int y, ImageMime format) {
         return new byte[0];
     }
 
     @Override
-    public boolean put(String layerName, int z, int x, int y, byte[] data) {
+    public boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format) {
         return true;
     }
 
@@ -27,7 +29,7 @@ public class NotOptTileCache implements TileCache {
     }
 
     @Override
-    public boolean delete(String layerName, int z, int x, int y) {
+    public boolean delete(String layerName, int z, int x, int y, ImageMime format) {
         return true;
     }
 
@@ -42,7 +44,7 @@ public class NotOptTileCache implements TileCache {
     }
 
     @Override
-    public boolean exists(String layerName, int z, int x, int y) {
+    public boolean exists(String layerName, int z, int x, int y, ImageMime format) {
         return false;
     }
 

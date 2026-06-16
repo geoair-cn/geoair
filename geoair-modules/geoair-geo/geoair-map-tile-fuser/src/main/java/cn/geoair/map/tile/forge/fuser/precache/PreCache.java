@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 
 import lombok.extern.slf4j.Slf4j;
@@ -51,11 +52,18 @@ public class PreCache {
      * @param maxZoom       最大层级
      */
     public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
+        execute(config, wkt4326String, minZoom, maxZoom, null);
+    }
+
+    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
         }
 
+        if (format == null) {
+            format = ImageMime.png;
+        }
         Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
 
 
@@ -70,7 +78,7 @@ public class PreCache {
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
             ZoomPreCacheTask task = new ZoomPreCacheTask(
                     config.getLayerName(), zoom, geometry,
-                    latch, totalCount, successCount, failCount
+                    latch, totalCount, successCount, failCount, format
             );
             executorService.submit(task);
         }

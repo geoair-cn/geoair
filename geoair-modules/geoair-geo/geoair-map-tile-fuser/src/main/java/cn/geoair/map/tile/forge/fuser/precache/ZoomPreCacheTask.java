@@ -33,11 +33,12 @@ public class ZoomPreCacheTask implements Runnable {
     private final AtomicInteger totalCount;
     private final AtomicInteger successCount;
     private final AtomicInteger failCount;
+    private final ImageMime format;
 
     public ZoomPreCacheTask(String layerName,
                             int zoom, Geometry geometry, CountDownLatch latch,
                             AtomicInteger totalCount, AtomicInteger successCount,
-                            AtomicInteger failCount) {
+                            AtomicInteger failCount, ImageMime format) {
         this.layerName = layerName;
 
         this.zoom = zoom;
@@ -46,6 +47,7 @@ public class ZoomPreCacheTask implements Runnable {
         this.totalCount = totalCount;
         this.successCount = successCount;
         this.failCount = failCount;
+        this.format = format;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ZoomPreCacheTask implements Runnable {
                         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
                         CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(layerName, zoom, x, y, bounds, 256, 256, ImageMime.png);
                         // 检查缓存是否已存在
-                        if (cacheTileFuser.getTileCache().exists(layerName, zoom, x, y)) {
+                        if (cacheTileFuser.getTileCache().exists(layerName, zoom, x, y, format)) {
                             zoomSuccess++;
                             successCount.incrementAndGet();
                             continue;

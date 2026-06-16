@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+
 /**
  * @author ：zhangjun
  * @date ：Created in 2026/6/15 12:39
@@ -7,6 +9,9 @@ package cn.geoair.map.tile.forge.fuser.fuser;
  */
 public interface FuserExec {
 
-      byte[] toImageBytes() throws Exception;
+    byte[] toImageBytes() throws Exception;
 
+    ImageMime getOutputFormat();
+
+    ImageMime   getSrcFormat();
 }
