@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 
 import lombok.Getter;
@@ -54,7 +55,8 @@ public class CacheTileFuserExec implements FuserExec {
 
         // 尝试从缓存获取
         try {
-            byte[] cachedResult = tileCache.get(layerName, z, x, y);
+            ImageMime outputFormat = target.getOutputFormat();
+            byte[] cachedResult = tileCache.get(layerName, z, x, y, outputFormat);
             if (cachedResult != null && cachedResult.length > 0) {
                 long cacheHitTime = System.currentTimeMillis() - startTime;
                 log.debug("缓存命中 - layer: {}, z: {}, x: {}, y: {}, 耗时: {} ms, 数据大小: {} bytes",
@@ -75,7 +77,7 @@ public class CacheTileFuserExec implements FuserExec {
         // 将结果存入缓存
         if (result != null && result.length > 0) {
             try {
-                tileCache.put(layerName, z, x, y, result);
+                tileCache.put(layerName, z, x, y, result,target.getOutputFormat() );
                 long totalTime = System.currentTimeMillis() - startTime;
                 log.debug("融合完成并已缓存 - layer: {}, z: {}, x: {}, y: {}, 融合耗时: {} ms, 总耗时: {} ms, 数据大小: {} bytes",
                         layerName, z, x, y, fusionTime, totalTime, result.length);
@@ -88,6 +90,16 @@ public class CacheTileFuserExec implements FuserExec {
         }
 
         return result;
+    }
+
+    @Override
+    public ImageMime getOutputFormat() {
+        return target.getOutputFormat();
+    }
+
+    @Override
+    public ImageMime getSrcFormat() {
+        return target.getSrcFormat();
     }
 
     /**

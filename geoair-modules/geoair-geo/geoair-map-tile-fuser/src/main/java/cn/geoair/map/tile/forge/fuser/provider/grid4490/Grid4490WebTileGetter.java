@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider.grid4490;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.hutool.http.HttpRequest;
@@ -88,7 +89,9 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
                 BufferedImage read = ImageIO.read(response.bodyStream());
                 if (read != null) {
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        ImageIO.write(read, "png", baos);
+                        ImageMime srcFormat = getSrcFormat();
+                        String internalName = srcFormat.getInternalName();
+                        ImageIO.write(read, internalName, baos);
                         log.debug("从网络获取瓦片成功: {} - ({},{},{})", httpUrl, z, x, y);
                         return new ByteArrayResource(baos.toByteArray());
                     }

@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider.google;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.hutool.core.io.FileUtil;
@@ -61,7 +62,9 @@ public class GoogleLocalFileTileGetter extends BaseTileGetter {
 
             if (read != null) {
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    ImageIO.write(read, "png", baos);
+                    ImageMime srcFormat = getSrcFormat();
+                    String internalName = srcFormat.getInternalName();
+                    ImageIO.write(read, internalName, baos);
                     imageBytes = baos.toByteArray();
                 }
                 log.debug("从本地文件读取瓦片成功（转换为PNG）: {}", file.getAbsolutePath());

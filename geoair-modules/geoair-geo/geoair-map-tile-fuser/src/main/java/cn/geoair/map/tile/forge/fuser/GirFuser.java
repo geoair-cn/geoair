@@ -11,11 +11,11 @@ import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 public class GirFuser {
 
     public static LayerTileGetter getLayerTileGetter(String layerName) {
-        return GirFuserLayerTileGetter.getInstance().getLayerTileGetter(layerName);
+        return GirFuserLayerTileHelper.getInstance().getLayerTileGetter(layerName);
     }
 
     public static PxyLayerInfo getPxyLayerInfo(String layerName) {
-        return GirFuserLayerTileGetter.getInstance().getPxyLayerInfo(layerName);
+        return GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
     }
 
 

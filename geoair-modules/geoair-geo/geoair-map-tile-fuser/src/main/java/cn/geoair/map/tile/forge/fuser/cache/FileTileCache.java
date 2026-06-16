@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,20 +54,21 @@ public class FileTileCache implements TileCache {
     }
 
 
-    private Path getCachePath(String layerName, int z, int x, int y) {
+    private Path getCachePath(String layerName, int z, int x, int y, ImageMime format) {
         // 使用layerName/z/x/目录结构，文件名为y.png
         String subDir = layerName + "/" + z + "/" + x;
-        return Paths.get(cacheRoot, subDir, y + ".png");
+        return Paths.get(cacheRoot, subDir, y + "." + format.getFileExtension());
     }
 
+
     @Override
-    public byte[] get(String layerName, int z, int x, int y) {
+    public byte[] get(String layerName, int z, int x, int y, ImageMime format) {
         if (!enabled) {
             return null;
         }
 
         try {
-            Path cachePath = getCachePath(layerName, z, x, y);
+            Path cachePath = getCachePath(layerName, z, x, y, format);
             if (!Files.exists(cachePath)) {
                 log.debug("缓存不存在: {}", cachePath);
                 return null;
@@ -95,13 +97,13 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean put(String layerName, int z, int x, int y, byte[] data) {
+    public boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format) {
         if (!enabled || data == null || data.length == 0) {
             return false;
         }
 
         try {
-            Path cachePath = getCachePath(layerName, z, x, y);
+            Path cachePath = getCachePath(layerName, z, x, y, format);
 
             // 创建父目录
             Path parentDir = cachePath.getParent();
@@ -243,13 +245,13 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean delete(String layerName, int z, int x, int y) {
+    public boolean delete(String layerName, int z, int x, int y, ImageMime format) {
         if (!enabled) {
             return false;
         }
 
         try {
-            Path cachePath = getCachePath(layerName, z, x, y);
+            Path cachePath = getCachePath(layerName, z, x, y, format);
             if (Files.exists(cachePath)) {
                 Files.delete(cachePath);
                 log.debug("删除缓存成功: {} - ({},{},{})", layerName, z, x, y);
@@ -349,12 +351,12 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean exists(String layerName, int z, int x, int y) {
+    public boolean exists(String layerName, int z, int x, int y, ImageMime format) {
         if (!enabled) {
             return false;
         }
 
-        Path cachePath = getCachePath(layerName, z, x, y);
+        Path cachePath = getCachePath(layerName, z, x, y, format);
         if (!Files.exists(cachePath)) {
             return false;
         }

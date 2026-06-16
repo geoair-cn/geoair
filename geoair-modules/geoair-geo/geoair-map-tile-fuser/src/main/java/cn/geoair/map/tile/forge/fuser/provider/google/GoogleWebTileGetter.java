@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.provider.google;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -88,7 +89,9 @@ public class GoogleWebTileGetter extends BaseTileGetter {
                 BufferedImage read = ImageIO.read(response.bodyStream());
                 if (read != null) {
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        ImageIO.write(read, "png", baos);
+                        ImageMime srcFormat = getSrcFormat();
+                        String internalName = srcFormat.getInternalName();
+                        ImageIO.write(read, internalName, baos);
                         log.debug("从网络获取瓦片成功: {} - ({},{},{})", httpUrl, z, x, y);
                         return new ByteArrayResource(baos.toByteArray());
                     }

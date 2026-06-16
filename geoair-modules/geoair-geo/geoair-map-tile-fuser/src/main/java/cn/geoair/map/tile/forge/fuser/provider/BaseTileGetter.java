@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeException;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
@@ -29,11 +30,19 @@ public abstract class BaseTileGetter implements LayerTileGetter {
 
     @Override
     public ImageMime getSrcFormat() {
-        try {
-            return (ImageMime) ImageMime.createFromFormat(layerInfo.getImageType());
-        } catch (MimeException e) {
+        if (GutilObject.isEmpty(layerInfo.getImageType())) {
             return ImageMime.png;
         }
+        try {
+            return (ImageMime) ImageMime.createFromExtension(layerInfo.getImageType());
+        } catch (Exception e) {
+            try {
+                return (ImageMime) ImageMime.createFromFormat(layerInfo.getImageType());
+            } catch (Exception e1) {
+
+            }
+        }
+        return ImageMime.png;
     }
 
     @Override
