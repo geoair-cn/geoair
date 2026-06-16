@@ -40,17 +40,27 @@ import java.util.logging.Logger;
  * object.
  */
 public class ImageDecoderImpl implements ImageDecoder {
-    /** Logger used */
+    /**
+     * Logger used
+     */
     private static final Logger LOGGER = Logging.getLogger(ImageEncoderImpl.class.getName());
 
-    /** Default string used for exceptions */
+    /**
+     * Default string used for exceptions
+     */
     public static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
-    /** Boolean indicating is aggressive inputstream is supported */
+    /**
+     * Boolean indicating is aggressive inputstream is supported
+     */
     private final boolean isAggressiveInputStreamSupported;
-    /** Supported Mimetypes */
+    /**
+     * Supported Mimetypes
+     */
     private final List<String> supportedMimeTypes;
-    /** ImageReaderSpi object used */
+    /**
+     * ImageReaderSpi object used
+     */
     private ImageReaderSpi spi;
 
     /**
@@ -107,7 +117,7 @@ public class ImageDecoderImpl implements ImageDecoder {
      * Decodes the selected image with the defined output object. The user can set the aggressive outputStream if
      * supported.
      *
-     * @param source Source object to read
+     * @param source                            Source object to read
      * @param aggressiveInputStreamOptimization Parameter used if aggressive outputStream optimization must be used.
      */
     @Override
@@ -128,15 +138,17 @@ public class ImageDecoderImpl implements ImageDecoder {
             ImageInputStream stream = null;
             try { // NOPMD (handling of stream is complicated)
                 reader = newSpi.createReaderInstance();
-                if (source instanceof FileResource resource) {
-                    // file
-                    stream = new FileImageInputStreamExtImpl(resource.getFile());
-                    // Image reading
-                    reader.setInput(stream);
-                    return reader.read(0);
-                } else {
-                    // create a stream and move on
-                    source = ((Resource) source).getInputStream();
+                if (source instanceof Resource) {
+                    if (source instanceof FileResource resource) {
+                        // file
+                        stream = new FileImageInputStreamExtImpl(resource.getFile());
+                        // Image reading
+                        reader.setInput(stream);
+                        return reader.read(0);
+                    } else {
+                        // create a stream and move on
+                        source = ((Resource) source).getInputStream();
+                    }
                 }
 
                 // Check if the input object is an InputStream
@@ -177,7 +189,9 @@ public class ImageDecoderImpl implements ImageDecoder {
         return null;
     }
 
-    /** Returns the ImageSpiReader associated to */
+    /**
+     * Returns the ImageSpiReader associated to
+     */
     ImageReaderSpi getReaderSpi() {
         return spi;
     }
@@ -196,7 +210,7 @@ public class ImageDecoderImpl implements ImageDecoder {
      * Indicates if optimization on InputStream can be used
      *
      * @return isAggressiveInputStreamSupported Boolean indicating if the selected decoder supports an aggressive input
-     *     stream optimization
+     * stream optimization
      */
     @Override
     public boolean isAggressiveInputStreamSupported() {
