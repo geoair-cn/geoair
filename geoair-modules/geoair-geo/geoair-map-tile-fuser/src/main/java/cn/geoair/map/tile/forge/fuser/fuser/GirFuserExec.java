@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.core.bygwc.io.GirImageEncoderContainer;
 import cn.geoair.map.tile.forge.core.bygwc.io.ImageCodecInitializer;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
+import cn.hutool.core.date.StopWatch;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -24,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 /**
@@ -464,6 +466,8 @@ public class GirFuserExec implements FuserExec {
         long totalTiles = (srcRectangle[2] - srcRectangle[0] + 1) * (srcRectangle[3] - srcRectangle[1] + 1);
         long processedTiles = 0;
         infoLog("需要处理的瓦片总数: {}", totalTiles);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("获取瓦片");
         Map<String, Resource> resourceMap = new ConcurrentHashMap<>();
         IntStream.rangeClosed((int) starty, (int) srcRectangle[3])
                 .parallel()
@@ -476,6 +480,8 @@ public class GirFuserExec implements FuserExec {
                                 resourceMap.put(key, blob);
                             });
                 });
+        stopWatch.stop();
+        stopWatch.start("渲染瓦片renderCanvas");
         // gridy 是瓦片行索引
         for (long gridy = starty; gridy <= srcRectangle[3]; gridy++) {
             int tiley = 0;
@@ -572,9 +578,10 @@ public class GirFuserExec implements FuserExec {
                 gfx.drawImage(tileImg, canvasx, canvasy, null);
             }
         }
-
+        stopWatch.stop();
         gfx.dispose();
-        infoLog("画布渲染完成 - 共处理瓦片: {}/{}", processedTiles, totalTiles);
+        infoLog("画布渲染完成 - 共处理瓦片: {}/{},总耗时: {}", processedTiles, totalTiles, stopWatch.prettyPrint(TimeUnit.SECONDS));
+        ;
     }
 
     /**
