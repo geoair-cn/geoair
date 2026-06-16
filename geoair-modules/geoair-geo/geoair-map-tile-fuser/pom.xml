@@ -5,7 +5,7 @@
     <parent>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-geo</artifactId>
-        <version>J8-dev-SNAPSHOT</version>
+        <version>J17-dev-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.devkit</groupId>
@@ -42,8 +42,8 @@
     </scm>
 
     <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+        <java.version>17</java.version>
+        <geoair.version>J17-dev-SNAPSHOT</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <guava.version>32.0.0-jre</guava.version>
@@ -89,16 +89,12 @@
 
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta-servlet.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_imageio</artifactId>
-            <version>${jai.imageio.version}</version>
-        </dependency>
+
 
         <dependency>
             <groupId>cn.hutool</groupId>

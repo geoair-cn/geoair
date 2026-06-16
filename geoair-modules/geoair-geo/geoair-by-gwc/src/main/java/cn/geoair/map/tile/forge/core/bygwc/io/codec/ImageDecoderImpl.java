@@ -1,17 +1,27 @@
-
+/**
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * <p>You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * @author Nicola Lagomarsini, GeoSolutions S.A.S., Copyright 2014
+ */
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.tile.forge.core.bygwc.io.FileResource;
-
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
 import it.geosolutions.imageio.stream.input.ImageInputStreamAdapter;
+import org.geotools.util.logging.Logging;
 
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
@@ -19,16 +29,19 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Class implementing the ImageDecoder interface, the user should only create a new bean for
- * instantiating a new decoder object.
+ * Class implementing the ImageDecoder interface, the user should only create a new bean for instantiating a new decoder
+ * object.
  */
 public class ImageDecoderImpl implements ImageDecoder {
     /** Logger used */
-    private static final GiLogger LOGGER = GirLogger.getLoger(ImageEncoderImpl.class);
+    private static final Logger LOGGER = Logging.getLogger(ImageEncoderImpl.class.getName());
 
     /** Default string used for exceptions */
     public static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
@@ -41,45 +54,65 @@ public class ImageDecoderImpl implements ImageDecoder {
     private ImageReaderSpi spi;
 
     /**
-     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the
-     * defined MimeTypes and Spi classes.
+     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the defined MimeTypes.
+     */
+    public ImageDecoderImpl(boolean aggressiveInputStreamOptimization, List<String> supportedMimeTypes) {
+        this(aggressiveInputStreamOptimization, supportedMimeTypes, null);
+    }
+
+    /**
+     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the defined MimeTypes
+     * and Spi classes.
      */
     public ImageDecoderImpl(
-            boolean aggressiveInputStreamOptimization,
-            List<String> supportedMimeTypes,
-            List<String> readerSpi,
-            ImageIOInitializer initializer) {
-
+            boolean aggressiveInputStreamOptimization, List<String> supportedMimeTypes, String preferredSpi) {
         this.isAggressiveInputStreamSupported = aggressiveInputStreamOptimization;
         this.supportedMimeTypes = new ArrayList<>(supportedMimeTypes);
         // Get the IIORegistry if needed
-        IIORegistry theRegistry = initializer.getRegistry();
-        // Checks for each Spi class if it is present and then it is added to the list.
-        for (String spi : readerSpi) {
-            try {
-                Class<?> clazz = Class.forName(spi);
-                ImageReaderSpi reader =
-                        (ImageReaderSpi) theRegistry.getServiceProviderByClass(clazz);
-                if (reader != null) {
-                    this.spi = reader;
-                    break;
+        // Looks up an SPI for each supported MimeType, without breaking the JDK package sealing
+        ImageReaderSpi backupSPI = null;
+        for (String mimeType : supportedMimeTypes) {
+            Iterator<ImageReader> reader = ImageIO.getImageReadersByMIMEType(mimeType);
+            if (reader.hasNext()) {
+                ImageReaderSpi readerSpi = reader.next().getOriginatingProvider();
+                if (readerSpi != null) {
+                    if (preferredSpi == null) {
+                        this.spi = readerSpi;
+                        break;
+                    } else if (readerSpi.getClass().getName().equals(preferredSpi)) {
+                        this.spi = readerSpi;
+                        break;
+                    } else if (backupSPI == null) {
+                        // Keep the first available SPI as a backup
+                        backupSPI = readerSpi;
+                    }
                 }
-            } catch (ClassNotFoundException e) {
-                LOGGER.error(e.getMessage(), e);
+            }
+        }
+        if (this.spi == null) {
+            if (backupSPI == null) {
+                throw new IllegalArgumentException(
+                        "No ImageReaderSpi found for the selected mimetypes: " + supportedMimeTypes);
+            } else {
+                LOGGER.log(
+                        Level.WARNING,
+                        "Preferred SPI not found, using the first available one: "
+                                + backupSPI.getClass().getName());
+                this.spi = backupSPI;
             }
         }
     }
 
     /**
-     * Decodes the selected image with the defined output object. The user can set the aggressive
-     * outputStream if supported.
+     * Decodes the selected image with the defined output object. The user can set the aggressive outputStream if
+     * supported.
      *
      * @param source Source object to read
-     * @param aggressiveInputStreamOptimization Parameter used if aggressive outputStream
-     *     optimization must be used.
+     * @param aggressiveInputStreamOptimization Parameter used if aggressive outputStream optimization must be used.
      */
-    public BufferedImage decode(
-            Object source, boolean aggressiveInputStreamOptimization, Map<String, Object> map)
+    @Override
+    @SuppressWarnings("PMD.CloseResource") // the caller is in charge of source's life cycle if its a stream
+    public BufferedImage decode(Object source, boolean aggressiveInputStreamOptimization, Map<String, Object> map)
             throws Exception {
 
         if (!isAggressiveInputStreamSupported() && aggressiveInputStreamOptimization) {
@@ -95,9 +128,9 @@ public class ImageDecoderImpl implements ImageDecoder {
             ImageInputStream stream = null;
             try { // NOPMD (handling of stream is complicated)
                 reader = newSpi.createReaderInstance();
-                if (source instanceof FileResource) {
+                if (source instanceof FileResource resource) {
                     // file
-                    stream = new FileImageInputStreamExtImpl(((FileResource) source).getFile());
+                    stream = new FileImageInputStreamExtImpl(resource.getFile());
                     // Image reading
                     reader.setInput(stream);
                     return reader.read(0);
@@ -107,12 +140,12 @@ public class ImageDecoderImpl implements ImageDecoder {
                 }
 
                 // Check if the input object is an InputStream
-                if (source instanceof InputStream) {
+                if (source instanceof InputStream inputStream) {
                     // Use of the ImageInputStreamAdapter
                     if (isAggressiveInputStreamSupported()) {
-                        stream = new ImageInputStreamAdapter((InputStream) source);
+                        stream = new ImageInputStreamAdapter(inputStream);
                     } else {
-                        stream = new MemoryCacheImageInputStream((InputStream) source);
+                        stream = new MemoryCacheImageInputStream(inputStream);
                     }
 
                     // Image reading
@@ -122,7 +155,7 @@ public class ImageDecoderImpl implements ImageDecoder {
                     throw new IllegalArgumentException("Wrong input object");
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 throw e;
             } finally {
                 // reader disposal
@@ -134,7 +167,7 @@ public class ImageDecoderImpl implements ImageDecoder {
                     try {
                         stream.close();
                     } catch (IOException e) {
-                        LOGGER.error(e.getMessage(), e);
+                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     }
                     stream = null;
                 }
@@ -154,6 +187,7 @@ public class ImageDecoderImpl implements ImageDecoder {
      *
      * @return supportedMimeTypes List of all the supported Mime Types
      */
+    @Override
     public List<String> getSupportedMimeTypes() {
         return supportedMimeTypes;
     }
@@ -161,9 +195,10 @@ public class ImageDecoderImpl implements ImageDecoder {
     /**
      * Indicates if optimization on InputStream can be used
      *
-     * @return isAggressiveInputStreamSupported Boolean indicating if the selected decoder supports
-     *     an aggressive input stream optimization
+     * @return isAggressiveInputStreamSupported Boolean indicating if the selected decoder supports an aggressive input
+     *     stream optimization
      */
+    @Override
     public boolean isAggressiveInputStreamSupported() {
         return isAggressiveInputStreamSupported;
     }

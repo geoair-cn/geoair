@@ -1,31 +1,6 @@
-/**
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * <p>You should have received a copy of the GNU Lesser General Public License along with this
- * program. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author Arne Kepp, The Open Planning Project, Copyright 2008
- */
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
-import it.geosolutions.jaiext.JAIExt;
-import it.geosolutions.jaiext.colorindexer.ColorIndexer;
-import it.geosolutions.jaiext.colorindexer.Quantizer;
-import javax.imageio.ImageWriter;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.ExtremaDescriptor;
-import java.awt.*;
+import java.awt.RenderingHints;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
@@ -34,119 +9,101 @@ import java.awt.image.renderable.ParameterBlock;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageWriter;
+
+import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.media.colorindexer.ColorIndexer;
+import org.eclipse.imagen.media.colorindexer.Quantizer;
+import org.geotools.image.ImageWorker;
+import org.geotools.util.logging.Logging;
 
 public class ImageMime extends MimeType {
 
     public static final String NATIVE_PNG_WRITER_CLASS_NAME =
             "com.sun.media.imageioimpl.plugins.png.CLibPNGImageWriter";
 
-    private static GiLogger log = GirLoggerFactory.getLogger(ImageMime.class);
+    private static Logger log = Logging.getLogger(ImageMime.class.getName());
 
     boolean supportsAlphaChannel;
 
     boolean supportsAlphaBit;
 
-    static {
-        // register the custom JAIExt operations, without forcing replacement of JAI own
-        JAIExt.initJAIEXT(false, false);
-    }
+    public static final ImageMime png = new ImageMime("image/png", "png", "png", "image/png", true, true, true) {
 
-    public static final ImageMime png =
-            new ImageMime("image/png", "png", "png", "image/png", true, true, true) {
+        /** Any response mime starting with image/png will do */
+        @Override
+        public boolean isCompatible(String otherMimeType) {
+            return super.isCompatible(otherMimeType) || otherMimeType.startsWith("image/png");
+        }
+    };
 
-                /** Any response mime starting with image/png will do */
-                public boolean isCompatible(String otherMimeType) {
-                    return super.isCompatible(otherMimeType)
-                            || otherMimeType.startsWith("image/png");
-                };
-            };
+    public static final ImageMime jpeg = new ImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg", true, false, false) {
 
-    public static final ImageMime jpeg =
-            new ImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg", true, false, false) {
+        /** Shave off the alpha band, JPEG cannot write it out */
+        @Override
+        public RenderedImage preprocess(RenderedImage ri) {
+            if (ri.getColorModel().hasAlpha()) {
+                final int numBands = ri.getSampleModel().getNumBands();
+                // handle both gray-alpha and RGBA (same code as in GeoTools ImageWorker)
+                final int[] bands = new int[numBands - 1];
+                for (int i = 0; i < bands.length; i++) {
+                    bands[i] = i;
+                }
+                // ParameterBlock creation
+                ParameterBlock pb = new ParameterBlock();
+                pb.setSource(ri, 0);
+                pb.set(bands, 0);
+                final RenderingHints hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(ri));
+                ri = ImageN.create("BandSelect", pb, hints);
+            }
+            return ri;
+        }
+    };
 
-                /** Shave off the alpha band, JPEG cannot write it out */
-                @Override
-                public RenderedImage preprocess(RenderedImage ri) {
-                    if (ri.getColorModel().hasAlpha()) {
-                        final int numBands = ri.getSampleModel().getNumBands();
-                        // handle both gray-alpha and RGBA (same code as in GeoTools ImageWorker)
-                        final int[] bands = new int[numBands - 1];
-                        for (int i = 0; i < bands.length; i++) {
-                            bands[i] = i;
-                        }
-                        // ParameterBlock creation
+    public static final ImageMime gif = new ImageMime("image/gif", "gif", "gif", "image/gif", true, false, true);
+
+    public static final ImageMime tiff = new ImageMime("image/tiff", "tiff", "tiff", "image/tiff", true, true, true);
+
+    public static final ImageMime png8 = new ImageMime("image/png", "png8", "png", "image/png8", true, false, true) {
+
+        /** Quantize if the source did not do so already */
+        @Override
+        public RenderedImage preprocess(RenderedImage canvas) {
+            if (!(canvas.getColorModel() instanceof IndexColorModel)) {
+                if (canvas.getColorModel() instanceof ComponentColorModel
+                        && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+                    ColorIndexer indexer = new Quantizer(256).subsample().buildColorIndexer(canvas);
+                    if (indexer != null) {
                         ParameterBlock pb = new ParameterBlock();
-                        pb.setSource(ri, 0);
-                        pb.set(bands, 0);
-                        final RenderingHints hints =
-                                new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout(ri));
-                        ri = JAI.create("BandSelect", pb, hints);
+                        pb.setSource(canvas, 0); // The source image.
+                        pb.set(indexer, 0);
+                        canvas = ImageN.create(
+                                "ColorIndexer", pb, ImageN.getDefaultInstance().getRenderingHints());
                     }
-                    return ri;
                 }
-            };
+            }
+            return canvas;
+        }
+    };
 
-    public static final ImageMime gif =
-            new ImageMime("image/gif", "gif", "gif", "image/gif", true, false, true);
-
-    public static final ImageMime tiff =
-            new ImageMime("image/tiff", "tiff", "tiff", "image/tiff", true, true, true);
-
-    public static final ImageMime png8 =
-            new ImageMime("image/png", "png8", "png", "image/png8", true, false, true) {
-
-                /** Quantize if the source did not do so already */
-                @Override
-                public RenderedImage preprocess(RenderedImage canvas) {
-                    if (!(canvas.getColorModel() instanceof IndexColorModel)) {
-                        if (canvas.getColorModel() instanceof ComponentColorModel
-                                && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
-                            ColorIndexer indexer =
-                                    new Quantizer(256).subsample().buildColorIndexer(canvas);
-                            if (indexer != null) {
-                                ParameterBlock pb = new ParameterBlock();
-                                pb.setSource(canvas, 0); // The source image.
-                                pb.set(indexer, 0);
-                                canvas =
-                                        JAI.create(
-                                                "ColorIndexer",
-                                                pb,
-                                                JAI.getDefaultInstance().getRenderingHints());
-                            }
-                        }
-                    }
-                    return canvas;
-                }
-            };
-
-    public static final ImageMime png24 =
-            new ImageMime("image/png", "png24", "png", "image/png24", true, true, true);
+    public static final ImageMime png24 = new ImageMime("image/png", "png24", "png", "image/png24", true, true, true);
 
     public static final ImageMime png_24 =
-            new ImageMime(
-                    "image/png; mode=24bit",
-                    "png_24",
-                    "png",
-                    "image/png;%20mode=24bit",
-                    true,
-                    true,
-                    true);
+            new ImageMime("image/png; mode=24bit", "png_24", "png", "image/png;%20mode=24bit", true, true, true);
 
-    public static final ImageMime dds =
-            new ImageMime("image/dds", "dds", "dds", "image/dds", false, false, false);
+    public static final ImageMime dds = new ImageMime("image/dds", "dds", "dds", "image/dds", false, false, false) {
+
+    };
 
     public static final ImageMime jpegPng =
-            new JpegPngMime(
-                    "image/vnd.jpeg-png", "jpeg-png", "jpeg-png", "image/vnd.jpeg-png", jpeg, png);
+            new JpegPngMime("image/vnd.jpeg-png", "jpeg-png", "jpeg-png", "image/vnd.jpeg-png", jpeg, png);
 
     public static final ImageMime jpegPng8 =
-            new JpegPngMime(
-                    "image/vnd.jpeg-png8",
-                    "jpeg-png8",
-                    "jpeg-png8",
-                    "image/vnd.jpeg-png8",
-                    jpeg,
-                    png8);
+            new JpegPngMime("image/vnd.jpeg-png8", "jpeg-png8", "jpeg-png8", "image/vnd.jpeg-png8", jpeg, png8);
 
     private ImageMime(
             String mimeType,
@@ -169,8 +126,8 @@ public class ImageMime extends MimeType {
 
         // TODO Making a special exception, generalize later
         if (!formatStr.equals("image/png; mode=24bit") && formatStr.contains(";")) {
-            if (log.isDebugEnabled()) {
-                log.debug("Slicing off " + formatStr.split(";")[1]);
+            if (log.isLoggable(Level.FINE)) {
+                log.fine("Slicing off " + formatStr.split(";")[1]);
             }
             formatStr = formatStr.split(";")[0];
         }
@@ -203,8 +160,7 @@ public class ImageMime extends MimeType {
     protected static ImageMime checkForExtension(String fileExtension) throws MimeException {
         if (fileExtension.equalsIgnoreCase("png")) {
             return png;
-        } else if (fileExtension.equalsIgnoreCase("jpeg")
-                || fileExtension.equalsIgnoreCase("jpg")) {
+        } else if (fileExtension.equalsIgnoreCase("jpeg") || fileExtension.equalsIgnoreCase("jpg")) {
             return jpeg;
         } else if (fileExtension.equalsIgnoreCase("gif")) {
             return gif;
@@ -232,6 +188,7 @@ public class ImageMime extends MimeType {
         return supportsAlphaChannel;
     }
 
+
     public ImageWriter getImageWriter(RenderedImage image) {
         Iterator<ImageWriter> it = javax.imageio.ImageIO.getImageWritersByFormatName(internalName);
         ImageWriter writer = it.next();
@@ -244,9 +201,7 @@ public class ImageMime extends MimeType {
                 || this.internalName.equals(ImageMime.png8.internalName)) {
 
             int bitDepth = image.getSampleModel().getSampleSize(0);
-            if (bitDepth > 1
-                    && bitDepth < 8
-                    && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
+            if (bitDepth > 1 && bitDepth < 8 && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
 
                 writer = it.next();
             }
@@ -278,31 +233,23 @@ public class ImageMime extends MimeType {
         }
 
         /**
-         * Returns true if the best format to encode the image is jpeg (the image is rgb, or rgba
-         * without any actual transparency use). This code is duplicated in GeoServer
-         * JpegPngRenderedImageMapOutputFormat. Unfortunately gwc-core does not depend on GeoTools,
-         * so we don't have an easy place to share it. On the bright side, it's small.
+         * Returns true if the best format to encode the image is jpeg (the image is rgb, or rgba without any actual
+         * transparency use). This code is duplicated in GeoServer JpegPngRenderedImageMapOutputFormat. Unfortunately
+         * gwc-core does not depend on GeoTools, so we don't have an easy place to share it. On the bright side, it's
+         * small.
          */
         boolean isBestFormatJpeg(RenderedImage renderedImage) {
             int numBands = renderedImage.getSampleModel().getNumBands();
             if (numBands == 4 || numBands == 2) {
-                RenderedOp extremaOp =
-                        ExtremaDescriptor.create(
-                                renderedImage,
-                                null,
-                                1,
-                                1,
-                                false,
-                                1,
-                                JAI.getDefaultInstance().getRenderingHints());
-                double[][] extrema = (double[][]) extremaOp.getProperty("Extrema");
-                double[] mins = extrema[0];
+                ImageWorker iw = new ImageWorker(renderedImage);
+                iw.setRenderingHints(ImageN.getDefaultInstance().getRenderingHints());
+                double[] mins = iw.getMinimums();
 
                 return mins[mins.length - 1] == 255; // fully opaque
             } else if (renderedImage.getColorModel() instanceof IndexColorModel) {
                 // JPEG would still compress a bit better, but in order to figure out
                 // if the image has transparency we'd have to expand to RGB or roll
-                // a new JAI image op that looks for the transparent pixels. Out of scope
+                // a new ImageN image op that looks for the transparent pixels. Out of scope
                 // for the moment
                 return false;
             } else {
@@ -311,6 +258,7 @@ public class ImageMime extends MimeType {
             }
         }
 
+        @Override
         public ImageWriter getImageWriter(RenderedImage image) {
             if (isBestFormatJpeg(image)) {
                 return jpegDelegate.getImageWriter(image);
@@ -319,7 +267,8 @@ public class ImageMime extends MimeType {
             }
         }
 
-        public String getMimeType(Resource resource) throws IOException {
+        @Override
+        public String getMimeType( Resource resource) throws IOException {
             try (DataInputStream dis = new DataInputStream(resource.getInputStream())) {
                 final int head = dis.readInt();
                 if ((head & 0xFFFF0000) == JPEG_MAGIC_MASK) {
@@ -328,12 +277,11 @@ public class ImageMime extends MimeType {
                     return pngDelegate.getMimeType();
                 }
             }
-        };
+        }
 
         @Override
         public boolean isCompatible(String otherMimeType) {
-            return jpegDelegate.isCompatible(otherMimeType)
-                    || pngDelegate.isCompatible(otherMimeType);
+            return jpegDelegate.isCompatible(otherMimeType) || pngDelegate.isCompatible(otherMimeType);
         }
 
         @Override

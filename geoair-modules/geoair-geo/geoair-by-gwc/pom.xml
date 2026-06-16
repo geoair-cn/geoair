@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-geo</artifactId>
-        <version>J8-dev-SNAPSHOT</version>
+        <version>J17-dev-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-by-gwc</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
 
     <packaging>jar</packaging>
     <name>geoair-by-gwc</name>
@@ -42,8 +42,8 @@
     </scm>
 
     <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+        <java.version>17</java.version>
+        <geoair.version>J17-dev-SNAPSHOT</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <guava.version>32.0.0-jre</guava.version>
@@ -51,7 +51,7 @@
         <jai.version>1.1.3</jai.version>
         <jai.imageio.version>1.1</jai.imageio.version>
         <jaiext.version>1.1.24</jaiext.version>
-        <imageio.ext.version>1.4.7</imageio.ext.version>
+        <imageio.ext.version>2.1.0</imageio.ext.version>
     </properties>
 
     <dependencies>
@@ -79,47 +79,9 @@
             <version>${xstream.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_core</artifactId>
-            <version>${jai.version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_codec</artifactId>
-            <version>${jai.version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_imageio</artifactId>
-            <version>${jai.imageio.version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>it.geosolutions.jaiext.utilities</groupId>
-            <artifactId>jt-utilities</artifactId>
-            <version>${jaiext.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jts-core</artifactId>
-                    <groupId>org.locationtech.jts</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>it.geosolutions.jaiext.colorindexer</groupId>
-            <artifactId>jt-colorindexer</artifactId>
-            <version>${jaiext.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jts-core</artifactId>
-                    <groupId>org.locationtech.jts</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>it.geosolutions.imageio-ext</groupId>

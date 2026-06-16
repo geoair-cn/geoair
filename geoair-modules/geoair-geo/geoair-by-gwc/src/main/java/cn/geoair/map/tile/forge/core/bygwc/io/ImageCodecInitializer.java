@@ -19,15 +19,14 @@ public class ImageCodecInitializer {
 
     private static Map<String, ImageEncoder> encoders = new HashMap<>();
     private static Map<String, ImageDecoder> decoders = new HashMap<>();
-    private static ImageIOInitializer ioInitializer;
+
 
     static {
         initialize();
     }
 
     public static void initialize() {
-        // 初始化 IO 初始化器
-        ioInitializer = ImageIOInitializer.getInstance(new ArrayList<>());
+
 
         // 初始化编码器
         initEncoders();
@@ -58,11 +57,9 @@ public class ImageCodecInitializer {
 
         PNGImageEncoder pngEncoder = new PNGImageEncoder(
                 false,           // isMultiImage
-                0.25f,            // compressionLevel
-                pngWriterSpis,   // writerSpiClassNames
-                pngParams,       // writerParams
-                false,           // writeAlpha
-                ioInitializer
+                0.25f,
+                pngParams,// pngParams
+                false
         );
         encoders.put("image/png", pngEncoder);
         encoders.put("image/png; mode=24bit", pngEncoder);
@@ -80,9 +77,8 @@ public class ImageCodecInitializer {
         ImageEncoderImpl gifEncoder = new ImageEncoderImpl(
                 true,            // isMultiImage
                 gifMimeTypes,    // mimeTypes
-                gifWriterSpis,   // writerSpiClassNames
-                gifParams,       // writerParams
-                ioInitializer
+
+                gifParams
         );
         encoders.put("image/gif", gifEncoder);
 
@@ -99,9 +95,8 @@ public class ImageCodecInitializer {
         ImageEncoderImpl jpegEncoder = new ImageEncoderImpl(
                 true,            // isMultiImage
                 jpegMimeTypes,   // mimeTypes
-                jpegWriterSpis,  // writerSpiClassNames
-                jpegParams,      // writerParams
-                ioInitializer
+
+                jpegParams
         );
         encoders.put("image/jpeg", jpegEncoder);
 
@@ -118,9 +113,8 @@ public class ImageCodecInitializer {
         ImageEncoderImpl tiffEncoder = new ImageEncoderImpl(
                 false,           // isMultiImage
                 tiffMimeTypes,   // mimeTypes
-                tiffWriterSpis,  // writerSpiClassNames
-                tiffParams,      // writerParams
-                ioInitializer
+
+                tiffParams
         );
         encoders.put("image/tiff", tiffEncoder);
 
@@ -137,9 +131,8 @@ public class ImageCodecInitializer {
         ImageEncoderImpl bmpEncoder = new ImageEncoderImpl(
                 true,            // isMultiImage
                 bmpMimeTypes,    // mimeTypes
-                bmpWriterSpis,   // writerSpiClassNames
-                bmpParams,       // writerParams
-                ioInitializer
+
+                bmpParams
         );
         encoders.put("image/bmp", bmpEncoder);
     }
@@ -147,16 +140,9 @@ public class ImageCodecInitializer {
     private static void initDecoders() {
         // PNG 解码器
         List<String> pngMimeTypes = Arrays.asList("image/png", "image/png; mode=24bit");
-        List<String> pngReaderSpis = Arrays.asList(
-                "com.sun.media.imageioimpl.plugins.png.CLibPNGImageReaderSpi",
-                "com.sun.imageio.plugins.png.PNGImageReaderSpi"
-        );
-
         ImageDecoderImpl pngDecoder = new ImageDecoderImpl(
                 false,           // isMultiImage
-                pngMimeTypes,    // mimeTypes
-                pngReaderSpis,   // readerSpiClassNames
-                ioInitializer
+                pngMimeTypes   // mimeTypes
         );
         decoders.put("image/png", pngDecoder);
         decoders.put("image/png; mode=24bit", pngDecoder);
@@ -169,9 +155,7 @@ public class ImageCodecInitializer {
 
         ImageDecoderImpl gifDecoder = new ImageDecoderImpl(
                 true,            // isMultiImage
-                gifMimeTypes,    // mimeTypes
-                gifReaderSpis,   // readerSpiClassNames
-                ioInitializer
+                gifMimeTypes
         );
         decoders.put("image/gif", gifDecoder);
 
@@ -184,9 +168,7 @@ public class ImageCodecInitializer {
 
         ImageDecoderImpl jpegDecoder = new ImageDecoderImpl(
                 true,            // isMultiImage
-                jpegMimeTypes,   // mimeTypes
-                jpegReaderSpis,  // readerSpiClassNames
-                ioInitializer
+                jpegMimeTypes
         );
         decoders.put("image/jpeg", jpegDecoder);
 
@@ -199,9 +181,7 @@ public class ImageCodecInitializer {
 
         ImageDecoderImpl tiffDecoder = new ImageDecoderImpl(
                 false,           // isMultiImage
-                tiffMimeTypes,   // mimeTypes
-                tiffReaderSpis,  // readerSpiClassNames
-                ioInitializer
+                tiffMimeTypes
         );
         decoders.put("image/tiff", tiffDecoder);
 
@@ -214,9 +194,7 @@ public class ImageCodecInitializer {
 
         ImageDecoderImpl bmpDecoder = new ImageDecoderImpl(
                 true,            // isMultiImage
-                bmpMimeTypes,    // mimeTypes
-                bmpReaderSpis,   // readerSpiClassNames
-                ioInitializer
+                bmpMimeTypes
         );
         decoders.put("image/bmp", bmpDecoder);
     }
