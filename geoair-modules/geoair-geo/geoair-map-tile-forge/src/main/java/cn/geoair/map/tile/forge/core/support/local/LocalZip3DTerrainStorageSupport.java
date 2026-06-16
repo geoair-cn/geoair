@@ -1,0 +1,169 @@
+package cn.geoair.map.tile.forge.core.support.local;
+
+import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.core.cache.TileCache;
+import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
+import cn.geoair.map.tile.forge.core.utils.TilePathParser;
+import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
+
+/**
+ * 本地ZIP瓦片存储支持类
+ * 提供从ZIP压缩包中读取三维地形瓦片数据的功能
+ *
+ * @author 张俊
+ * @since 2025/11/17
+ */
+@Slf4j
+public class LocalZip3DTerrainStorageSupport extends ConfigXmlGetterZip implements ZipDirectoryGetter {
+
+    /**
+     * 压缩处理器实例，用于处理ZIP文件的解压缩操作
+     */
+    protected ICompressionHandler compressionHandler = null;
+
+    /**
+     * 获取压缩处理器实例
+     * 使用懒加载单例模式，确保只有一个压缩处理器实例存在
+     *
+     * @return ICompressionHandler 压缩处理器实例
+     */
+    protected ICompressionHandler getICompressionHandler() {
+        if (compressionHandler == null) {
+            compressionHandler = new LocalCompressionHandler();
+        }
+        return compressionHandler;
+    }
+
+    public BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception {
+        return BoundingBox.WORLD3857;
+    }
+
+
+    @Override
+    public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
+        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
+        StringBuilder inLocalPathBuilder = new StringBuilder();
+        String format = layerConfigContext.getFormat();
+        if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
+            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
+                    .append(z);
+        } else {
+            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
+                    .append(z).append(File.separator)
+                    .append(y).append(File.separator)
+                    .append(x).append(".").append(format);
+        }
+        String inLocalPath = inLocalPathBuilder.toString().trim();
+        File localTileFile = new File(inLocalPath);
+        boolean localStatu = localTileFile.exists();
+        if (!localStatu) {
+            localStatu = byPreCache(layerConfigContext, z, y, x, inLocalPath);
+        }
+        if (localStatu) {
+            tileRequest.setBytes(FileUtil.readBytes(localTileFile));
+            tileRequest.setLastModified(localTileFile.lastModified());
+            tileRequest.setSize(localTileFile.length());
+            tileRequest.setExists(true);
+            Optional<MediaType> mediaType = MediaTypeFactory.getMediaType(localTileFile.getName());
+            MediaType mediaType1 = mediaType.orElse(MediaType.APPLICATION_OCTET_STREAM);
+            tileRequest.mimeTypeByType(mediaType1);
+        }
+        return tileRequest;
+    }
+
+    protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String y, String x, String inLocalPath) {
+        try {
+            TileCentralDirectoryEntry tileCentralDirectoryEntry = null;
+            if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
+                tileCentralDirectoryEntry = getZipDirectoryBFileName(layerConfigContext, z);
+            } else {
+                tileCentralDirectoryEntry = getZipDirectoryByXyz(layerConfigContext, x, y, z);
+            }
+            if (tileCentralDirectoryEntry == null) {
+                return false;
+            }
+            getICompressionHandler().readAndDecompressEntryToLocal(tileCentralDirectoryEntry, layerConfigContext.getObjectKey(), inLocalPath);
+            return true;
+        } catch (Exception e) {
+            log.error("getTileDataByPreZipCache error:", e);
+            return false;
+        }
+
+    }
+
+
+    @Override
+    public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
+        this.initTileCentralDirectoryEntryDao(layerConfigContext, ListUtil.of(progressConsumer));
+    }
+
+
+    @Override
+    public TileCentralDirectoryEntry getTileCentralDirectoryEntry(CentralDirectoryEntry centralDirectoryEntry) {
+        TileCentralDirectoryEntry tileCentralDirectoryEntry = new TileCentralDirectoryEntry();
+        BeanUtil.copyProperties(centralDirectoryEntry, tileCentralDirectoryEntry);
+        tileCentralDirectoryEntry.setId(IdUtil.getSnowflakeNextId());
+        tileCentralDirectoryEntry.setFileName(centralDirectoryEntry.getName());
+
+        TilePathParser.XyzTileInfo xyzTileInfo = TilePathParser.parseXyzPath(centralDirectoryEntry.getName());
+        if (xyzTileInfo == null) {
+            return tileCentralDirectoryEntry;
+        } else {
+            tileCentralDirectoryEntry.setY(xyzTileInfo.getY() + "");
+            tileCentralDirectoryEntry.setX(xyzTileInfo.getX() + "");
+            tileCentralDirectoryEntry.setZ(xyzTileInfo.getZ() + "");
+            tileCentralDirectoryEntry.setFileName(xyzTileInfo.getZ() + "/" + xyzTileInfo.getX() + "/" + xyzTileInfo.getY());
+            return tileCentralDirectoryEntry;
+        }
+    }
+
+
+
+    @Override
+    protected String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+        AtomicReference<String> tileSetPath = new AtomicReference<>("");
+        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
+            boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
+            if (directoryIs) {
+                return true;
+            }
+            String name = centralDirectoryEntry.getName();
+            if (name.toLowerCase().contains("layer.json")) {
+                tileSetPath.set(name);
+                return false;
+            }
+            return true;
+        });
+        String tileSetJsonPath = tileSetPath.get();
+
+        if (StrUtil.isEmpty(tileSetJsonPath)) {
+            throw new RuntimeException("三维地形中缺失layer.json关键元素");
+        }
+        String rootPath = tileSetJsonPath.replace("layer.json", "");
+        return rootPath;
+    }
+}
