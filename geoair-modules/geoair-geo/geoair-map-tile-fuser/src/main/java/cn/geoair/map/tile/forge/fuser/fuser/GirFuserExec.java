@@ -22,6 +22,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 /**
  * 瓦片融合器
@@ -461,7 +464,18 @@ public class GirFuserExec implements FuserExec {
         long totalTiles = (srcRectangle[2] - srcRectangle[0] + 1) * (srcRectangle[3] - srcRectangle[1] + 1);
         long processedTiles = 0;
         infoLog("需要处理的瓦片总数: {}", totalTiles);
-
+        Map<String, Resource> resourceMap = new ConcurrentHashMap<>();
+        IntStream.rangeClosed((int) starty, (int) srcRectangle[3])
+                .parallel()
+                .forEach(gridy -> {
+                    IntStream.rangeClosed((int) srcRectangle[0], (int) srcRectangle[2])
+                            .parallel()
+                            .forEach(gridx -> {
+                                String key = srcIdx + "_" + gridx + "_" + gridy;
+                                Resource blob = layerTileGetter.getTileResource(srcIdx, gridx, gridy);
+                                resourceMap.put(key, blob);
+                            });
+                });
         // gridy 是瓦片行索引
         for (long gridy = starty; gridy <= srcRectangle[3]; gridy++) {
             int tiley = 0;
@@ -497,13 +511,15 @@ public class GirFuserExec implements FuserExec {
                         gridx, gridy, srcIdx, processedTiles, totalTiles);
 
                 // 获取瓦片资源
-                Resource blob = layerTileGetter.getTileResource(srcIdx, (int) gridx, (int) gridy);
+//                Resource blob = layerTileGetter.getTileResource(srcIdx, (int) gridx, (int) gridy);
+                String key = srcIdx + "_" + gridx + "_" + gridy;
+                Resource blob = resourceMap.get(key);
                 if (blob == null) {
                     warnLog("瓦片资源为空 - gridx={}, gridy={}, level={}", gridx, gridy, srcIdx);
                     continue;
                 }
+                resourceMap.remove(key);
                 debugLog("成功获取瓦片资源 - gridx={}, gridy={}", gridx, gridy);
-
                 String formatName = srcFormat.getMimeType();
                 BufferedImage tileImg = decoderMap.decode(
                         formatName, blob,

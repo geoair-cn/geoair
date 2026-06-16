@@ -18,12 +18,12 @@ import java.util.List;
  */
 public class GridTest {
     public static void main(String[] args) {
-        grid3857();
+        grid4326();
     }
 
     private static void grid4326() {
         List<TileLevelMetadata> tileLevelMetadataList = GirAdvTools.getTileGrid4326Opt().getTileLevelMetadataList(0, 20, 256, 96);
-//        tileLevelMetadataList.forEach(System.out::println);
+        tileLevelMetadataList.forEach(System.out::println);
         String s = GirAdvTools.getTileGrid4326Opt().xyzToWkt(4, 12, 2, 4326);
         System.out.println(s);
     }
@@ -34,8 +34,8 @@ public class GridTest {
     }
 
     private static void grid3857() {
-//        List<TileLevelMetadata> tileLevelMetadataList = GirAdvTools.getTileGrid3857Opt().getTileLevelMetadataList(0, 20, 256, 90.7);
-//        tileLevelMetadataList.forEach(System.out::println);
+        List<TileLevelMetadata> tileLevelMetadataList = GirAdvTools.getTileGrid3857Opt().getTileLevelMetadataList(0, 20, 256, 90.7);
+        tileLevelMetadataList.forEach(System.out::println);
 //        String wkt = "POLYGON((104.15712743065644 42.47649994632756,104.15694674023413 44.79331315761985,108.5220365492146 44.79338132926078,108.52231600742141 42.47657770242648,104.15712743065644 42.47649994632756))";
         String wkt = "POLYGON ((104.0625 42.1875, 106.875 42.1875, 106.875 44.99999999999999, 104.0625 44.99999999999999, 104.0625 42.1875))";
 //        String wkt = "POLYGON((104.85190975779834 40.6964286539505,104.85150473702095 45.65467549999515,110.45700838222794 45.65426173885738,110.45768707117826 40.696040777091945,104.85190975779834 40.6964286539505))";
