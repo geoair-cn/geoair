@@ -13,10 +13,10 @@ import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
  * @date ：Created in 2026/6/15 11:55
  * @description：  PxyLayerInfo 的获取实现
  */
-public interface GirFuserLayerTileGetter {
+public interface GirFuserLayerTileHelper {
 
-    static GirFuserLayerTileGetter getInstance() {
-        return Gir.beans.getBean(GirFuserLayerTileGetter.class);
+    static GirFuserLayerTileHelper getInstance() {
+        return Gir.beans.getBean(GirFuserLayerTileHelper.class);
     }
 
     default LayerTileGetter getLayerTileGetter(String layerName) {
