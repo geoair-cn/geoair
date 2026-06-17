@@ -448,9 +448,9 @@ public class GirFuserExec implements FuserExec {
         }
 
         // 渲染提示设置
-        RenderingHints hintsTemp = HintsLevel.DEFAULT.getRenderingHints();
+        RenderingHints hintsTemp = HintsLevel.QUALITY.getRenderingHints();
         gfx.addRenderingHints(hintsTemp);
-        debugLog("渲染提示已应用: {}", HintsLevel.DEFAULT.getModeName());
+        debugLog("渲染提示已应用: {}", HintsLevel.QUALITY.getModeName());
 
         infoLog("画布创建完成");
     }
