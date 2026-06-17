@@ -47,7 +47,7 @@ public class TileUrlBuilder {
      * 构建3Dtile瓦片服务URL
      */
     public static String buildD3TerrainUrl(String dataId, String layerName, String fileName) {
-        return "3dTerrainService/" + StrUtil.format("{}/{}/{}", dataId, fileName, layerName);
+        return "3dTerrainService/" + StrUtil.format("{}/{}/{}/layer.json", dataId, fileName, layerName);
     }
 
 
