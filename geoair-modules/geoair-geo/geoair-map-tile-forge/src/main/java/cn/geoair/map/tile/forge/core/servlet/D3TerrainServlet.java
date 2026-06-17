@@ -21,8 +21,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class D3TerrainServlet extends D3TilesServlet {
-    @Resource
-    GirMapTileService girMapTileService;
+
 
     Pattern pattern = Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
 
@@ -64,7 +63,7 @@ public class D3TerrainServlet extends D3TilesServlet {
 
         layerConfigContext.setFormat(format);
         try {
-            TileRequest layerTile = girMapTileService.getLayerTile(layerConfigContext, z, y, x);
+            TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
             buildTileResponse(layerTile, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

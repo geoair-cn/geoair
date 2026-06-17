@@ -28,8 +28,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class XYZServlet extends D3TilesServlet {
-    @Resource
-    GirMapTileService girMapTileService;
+
 
     Pattern pattern = Pattern.compile("/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 
@@ -99,10 +98,10 @@ public class XYZServlet extends D3TilesServlet {
                     }
                 }
                 TileRequest tileRequest = null;
-                tileRequest = girMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                tileRequest = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
                 buildTileResponse(tileRequest, response);
             } else {
-                TileRequest layerTile = girMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
+                TileRequest layerTile = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
                 buildTileResponse(layerTile, response);
             }
         } catch (Exception e) {

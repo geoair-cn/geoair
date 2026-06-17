@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 @Component
 public class D3TilesServlet extends HttpServlet {
     @Resource
-    GirMapTileService girMapTileService;
+    GirMapTileService gMapTileService;
 
     Pattern pattern = Pattern.compile("/3dTilesService/([^/]+)/([^/]+)/([^/]+)(/.*)?");
 
@@ -59,7 +59,7 @@ public class D3TilesServlet extends HttpServlet {
             return;
         }
         try {
-            TileRequest layerTile = girMapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
+            TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
             buildTileResponse(layerTile, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
