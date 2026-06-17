@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-map-tile-fuser</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
     <name>geoair-map-tile-fuser</name>
 
     <packaging>jar</packaging>

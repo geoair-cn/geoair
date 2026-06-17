@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-map-tile-forge</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
     <name>geoair-map-tile-forge</name>
 
     <description>静态栅格瓦片相关的解决方案</description>
