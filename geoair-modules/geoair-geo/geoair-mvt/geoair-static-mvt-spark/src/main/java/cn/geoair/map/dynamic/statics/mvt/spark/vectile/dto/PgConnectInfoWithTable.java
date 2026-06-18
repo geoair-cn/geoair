@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Data
 @Accessors(chain = true)
-public class PgConnectInfoWithTable extends PgConnectInfo {
+public class PgConnectInfoWithTable extends PgConnectInfoSimple {
 
     private String schemaTableName; // 完整的schema/table（或仅schema）
 

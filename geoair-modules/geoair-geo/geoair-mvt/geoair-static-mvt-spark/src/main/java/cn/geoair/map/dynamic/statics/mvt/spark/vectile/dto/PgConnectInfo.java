@@ -1,12 +1,8 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
-import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.bean.BeanUtil;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import javax.sql.DataSource;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -17,6 +13,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
+@Deprecated
 public class PgConnectInfo implements Serializable {
 
     protected String ip;
@@ -31,36 +28,21 @@ public class PgConnectInfo implements Serializable {
 
     protected String schemaName; // 模式名
 
-    protected transient DataSource dataSource;
+    private String schemaTableName; // 完整的schema/table（或仅schema）
+
+    private String tableName; // 表名（可选，null表示未传）
 
     public PgConnectInfo() {
     }
 
-    public DataSource toDataSource() {
-        Map<String, String> params = toParams();
-        if (dataSource == null) {
-            DataSourceDruidFastCreate druidFastCreate = new DataSourceDruidFastCreate();
-            druidFastCreate.setUrl(params.get("url"));
-            druidFastCreate.setUsername(params.get("user"));
-            druidFastCreate.setPassword(params.get("password"));
-            dataSource = druidFastCreate.toDataSource();
-        }
-        return dataSource;
+
+    PgConnectInfoSimple toPgConnectInfoSimple() {
+        return BeanUtil.copyProperties(this, PgConnectInfoSimple.class);
     }
 
-    public Map<String, String> toParams() {
-        Map<String, String> params = new HashMap<>();
-        String format =
-                String.format(
-                        "jdbc:postgresql://%s:%s/%s",
-                        this.getIp(), this.getPort(), this.getDbName());
-        if (!StrUtil.isEmpty(this.getSchemaName())) {
-            format = format + "?currentSchema=" + this.getSchemaName();
-        }
-        params.put("url", format);
-        params.put("user", this.getUserName());
-        params.put("password", this.getPasswd());
-
-        return params;
+    PgConnectInfoWithTable toPgConnectInfoWithTable() {
+        return BeanUtil.copyProperties(this, PgConnectInfoWithTable.class);
     }
+
+
 }
