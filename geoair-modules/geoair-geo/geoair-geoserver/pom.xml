@@ -383,6 +383,25 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.install.skip>true</maven.install.skip>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>false</extensions>
+            <executions>
+              <execution>
+                <id>injected-central-publishing</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
   </profiles>
