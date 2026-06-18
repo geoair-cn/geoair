@@ -520,8 +520,6 @@ public class SparkVectorTileGenerator implements Serializable {
                 "                          \"insert_time\" int8\n" +
                 "                        )\n" +
                 "                        ;\n" +
-                "                        s\n" +
-                "\n" +
                 "                        CREATE INDEX \"zxy_{UUID}\" ON \"{tableNameWithSchema}\" USING btree (\n" +
                 "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
                 "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
