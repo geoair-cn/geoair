@@ -1,11 +1,13 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
+import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfTileParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
 
+import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.bean.BeanUtil;
@@ -94,9 +96,15 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
-                    // String tileId = zoom + "#" + y + "#" + x;
-                    tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
+                    try {
+                        String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                        // String tileId = zoom + "#" + y + "#" + x;
+                        tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
+                    } catch (Exception e) {
+                        String wktString = GirAdvTools.getFormatOpt().jtsGeometryToWktString(geom, true);
+                        log.error("瓦片边界计算异常 ! wktString:{},xmin:{},xmax:{},ymin:{},ymax:{} ", wktString, xmin, xmax, ymin, ymax);
+                    }
+
                 }
             }
         }
