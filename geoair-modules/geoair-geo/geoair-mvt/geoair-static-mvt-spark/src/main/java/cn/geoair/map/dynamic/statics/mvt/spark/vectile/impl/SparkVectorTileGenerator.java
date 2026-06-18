@@ -203,11 +203,8 @@ public class SparkVectorTileGenerator implements Serializable {
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>)
                         partitionIterator -> {
                             Log log = Log.get();
-                            DataSourceDruidFastCreate druidFastCreate = new DataSourceDruidFastCreate();
-                            druidFastCreate.setUrl(pgParams.get("url"));
-                            druidFastCreate.setUsername(pgParams.get("user"));
-                            druidFastCreate.setPassword(pgParams.get("password"));
-                            DruidDataSource dataSource = (DruidDataSource) druidFastCreate.toDataSource();
+                            PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
+                            DataSource dataSource = outPutConnectWithTable.toDataSource();
                             // 最终日志
                             int outGridSrid = parameter.getOutGridSrid();
                             String edition = parameter.getEdition();
