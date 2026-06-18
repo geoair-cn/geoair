@@ -41,7 +41,8 @@
     <module>geoair-geo</module>
     <module>geoair-dynamic-ds</module>
     <module>geoair-db-service</module>
-    <module>geoair-message-converter</module>
+    <module>geoair-message-jts-jackson</module>
+    <module>geoair-message-jts-mybatis</module>
 
   </modules>
 

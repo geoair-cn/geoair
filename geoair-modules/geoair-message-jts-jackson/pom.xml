@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-message-converter</artifactId>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-modules</artifactId>
     <version>J8-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
