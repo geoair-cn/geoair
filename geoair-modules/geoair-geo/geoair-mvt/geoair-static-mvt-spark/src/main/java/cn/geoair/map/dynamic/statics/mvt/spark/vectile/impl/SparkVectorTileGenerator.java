@@ -28,6 +28,7 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaFutureAction;
@@ -216,7 +217,7 @@ public class SparkVectorTileGenerator implements Serializable {
                             druidFastCreate.setUrl(pgParams.get("url"));
                             druidFastCreate.setUsername(pgParams.get("user"));
                             druidFastCreate.setPassword(pgParams.get("password"));
-                            DataSource dataSource = druidFastCreate.toDataSource();
+                            DruidDataSource dataSource = (DruidDataSource)druidFastCreate.toDataSource();
                             // 最终日志
                             int outGridSrid = parameter.getOutGridSrid();
                             String edition = parameter.getEdition();
@@ -361,9 +362,9 @@ public class SparkVectorTileGenerator implements Serializable {
                                 }
                                 throw new RuntimeException(e);
                             } finally {
+                                IoUtil.close(dataSource);
                                 IoUtil.close(rootPstmt);
                                 IoUtil.close(connRoot);
-
                             }
                         });
 
@@ -406,11 +407,12 @@ public class SparkVectorTileGenerator implements Serializable {
      * 按ID分片读取PostGIS数据（仅此处persist rawFeatures）
      */
     private JavaRDD<GirAdvOneRow> readDataByIdPage(TileSliceParameter parameter) throws Exception {
-        if (parameter == null || parameter.getInputConnectInfo() == null) {
+        if (parameter == null || parameter.getInputConnectSimple() == null) {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
         PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+        DataSource dataSource = pgConnectInfo.toDataSource();
+        IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
         if (totalCount == 0) {
