@@ -34,7 +34,7 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 输入信息配置=====================
     /** 输入连接信息 */
-    public PgConnectInfo inputConnectInfo;
+    public PgConnectInfoSimple inputConnectInfo;
 
     /** 输出连接信息 */
     public PgConnectInfoWithTable outPutConnectInfo;
@@ -209,5 +209,13 @@ public class TileSliceParameter implements Serializable {
         // 对处理后的JSON字符串进行Base32编码
         String encode = Base32.encode(jsonObject.toString());
         return encode;
+    }
+
+    public void setInputConnectInfo(PgConnectInfo pgConnectInfo) {
+        this.inputConnectInfo = pgConnectInfo.toPgConnectInfoSimple();
+    }
+
+    public void setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
+        this.outPutConnectInfo = pgConnectInfo.toPgConnectInfoWithTable();
     }
 }
