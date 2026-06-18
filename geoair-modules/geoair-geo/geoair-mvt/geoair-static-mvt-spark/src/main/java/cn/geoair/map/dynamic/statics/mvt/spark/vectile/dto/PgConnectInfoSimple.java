@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.geoair.base.lang.lambda.GkSerializableFunction;
-import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.DataSourceGetterFunction;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataSourceGetterFunction;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DefaultDataSourceGetterFunction;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -32,7 +32,7 @@ public class PgConnectInfoSimple implements Serializable {
 
     protected String schemaName; // 模式名
 
-    protected GkSerializableFunction<PgConnectInfoSimple, DataSource> dataSourceGetterFunction = new DataSourceGetterFunction();
+    protected DataSourceGetterFunction dataSourceGetterFunction = new DefaultDataSourceGetterFunction();
 
     public PgConnectInfoSimple() {
     }
