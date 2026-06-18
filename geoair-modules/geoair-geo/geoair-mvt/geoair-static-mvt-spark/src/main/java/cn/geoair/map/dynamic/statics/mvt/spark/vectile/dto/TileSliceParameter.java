@@ -199,7 +199,7 @@ public class TileSliceParameter implements Serializable {
      *
      * @return
      */
-    private boolean statisticsIs = Boolean.TRUE;
+    private boolean statisticsIs = Boolean.FALSE;
 
     /**
      * 统计的json存放的根路径
