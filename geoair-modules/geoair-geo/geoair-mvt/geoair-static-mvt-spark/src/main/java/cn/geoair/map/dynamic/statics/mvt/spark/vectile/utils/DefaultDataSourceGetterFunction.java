@@ -1,6 +1,5 @@
-package cn.geoair.map.dynamic.statics.mvt.spark.vectile;
+package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-import cn.geoair.base.lang.lambda.GkSerializableFunction;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
 
@@ -12,8 +11,7 @@ import java.util.Map;
  * @date ：Created in 2026/6/18 17:11
  * @description： 默认的数据源获取器
  */
-public class DataSourceGetterFunction implements GkSerializableFunction<PgConnectInfoSimple, DataSource> {
-
+public class DefaultDataSourceGetterFunction implements DataSourceGetterFunction {
 
     @Override
     public DataSource apply(PgConnectInfoSimple pgConnectInfoSimple) {
