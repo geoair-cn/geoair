@@ -1,7 +1,5 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
 
-import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
@@ -25,7 +23,6 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaFutureAction;
@@ -39,10 +36,6 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
-import scala.collection.JavaConverters;
-import scala.collection.Seq;
-import scala.reflect.ClassTag;
-import scala.reflect.ClassTag$;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -356,6 +349,7 @@ public class SparkVectorTileGenerator implements Serializable {
                                 }
                                 throw new RuntimeException(e);
                             } finally {
+
                                 IoUtil.close(rootPstmt);
                                 IoUtil.close(connRoot);
                             }
