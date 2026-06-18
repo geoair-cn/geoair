@@ -10,11 +10,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -33,40 +35,62 @@ public class TileSliceParameter implements Serializable {
     private ReadStrategy readStrategy = ReadStrategy.ID_PAGE;
 
     // ===================== 输入信息配置=====================
-    /** 输入连接信息 */
+    /**
+     * 输入连接信息
+     */
     public PgConnectInfoSimple inputConnectInfo;
 
-    /** 输出连接信息 */
+    /**
+     * 输出连接信息
+     */
     public PgConnectInfoWithTable outPutConnectInfo;
 
-    /** 几何字段名称 */
+    /**
+     * 几何字段名称
+     */
     private String geomFieldName;
 
-    /** ID字段名称 */
+    /**
+     * ID字段名称
+     */
     private String idFieldName;
 
-    /** 查询语句 */
+    /**
+     * 查询语句
+     */
     private String queryStatement;
 
-    /** 瓦片图层名称 对应命令行：-l/--layer */
+    /**
+     * 瓦片图层名称 对应命令行：-l/--layer
+     */
     private String layerName;
 
-    /** 版本号 */
+    /**
+     * 版本号
+     */
     private String edition;
 
-    /** 数据坐标系（默认EPSG:3857 Web墨卡托） 对应命令行：-s/--srs */
+    /**
+     * 数据坐标系（默认EPSG:3857 Web墨卡托） 对应命令行：-s/--srs
+     */
     private int sourceDataSrid = 3857;
 
     // ===================== 输出信息配置=====================
 
-    /** 输出的网格坐标，可选值 3857/4490 */
+    /**
+     * 输出的网格坐标，可选值 3857/4490
+     */
     private int outGridSrid = 3857;
 
     // ===================== 缩放级别配置 =====================
-    /** 最小缩放级别 对应命令行：-Z/--minimum-zoom */
+    /**
+     * 最小缩放级别 对应命令行：-Z/--minimum-zoom
+     */
     private Integer minZoom = 4;
 
-    /** 最大缩放级别 对应命令行：-z/--maximum-zoom */
+    /**
+     * 最大缩放级别 对应命令行：-z/--maximum-zoom
+     */
     private Integer maxZoom = 15;
 
     // /**
@@ -82,24 +106,36 @@ public class TileSliceParameter implements Serializable {
     // private boolean extendZoomsIfStillDropping = true; // 这个参数需要重启任务，不太好调整，就暂时先不管了
 
     // ===================== 瓦片限制配置 =====================
-    /** 是否开启单瓦片要素数限制 对应命令行：--no-feature-limit */
+    /**
+     * 是否开启单瓦片要素数限制 对应命令行：--no-feature-limit
+     */
     private boolean enableFeatureLimitIs = false;
 
-    /** 是否开启单瓦片大小限制 对应命令行：--no-tile-size-limit */
+    /**
+     * 是否开启单瓦片大小限制 对应命令行：--no-tile-size-limit
+     */
     private boolean enableFeatureSizeLimit = false;
 
     // ===================== 要素过滤/优化配置 =====================
-    /** 保留的属性字段列表（默认空，保留所有字段） 对应命令行：-y/--include */
+    /**
+     * 保留的属性字段列表（默认空，保留所有字段） 对应命令行：-y/--include
+     */
     private List<String> includeFields = new ArrayList<>();
 
-    /** 是否按密度丢弃要素（优先丢弃高密度区域） 对应命令行：--drop-densest-as-needed */
+    /**
+     * 是否按密度丢弃要素（优先丢弃高密度区域） 对应命令行：--drop-densest-as-needed
+     */
     private boolean dropDensestAsNeeded = true;
 
-    /** 是否按密度合并要素（合并高密度区域相邻要素） 对应命令行：--coalesce-densest-as-needed */
+    /**
+     * 是否按密度合并要素（合并高密度区域相邻要素） 对应命令行：--coalesce-densest-as-needed
+     */
     private boolean coalesceDensestAsNeeded = true;
 
     // ===================== 扩展参数 =====================
-    /** 单瓦片最大要素数（默认tippecanoe内置值，仅enableFeatureLimit=false时生效） 对应命令行：-f/--feature-limit */
+    /**
+     * 单瓦片最大要素数（默认tippecanoe内置值，仅enableFeatureLimit=false时生效） 对应命令行：-f/--feature-limit
+     */
     private Integer featureLimit;
 
     /**
@@ -108,15 +144,21 @@ public class TileSliceParameter implements Serializable {
      */
     private String tileSizeLimit = "2MB";
 
-    /** 是否启用要素简化（默认false） 对应命令行：-D/--simplification */
+    /**
+     * 是否启用要素简化（默认false） 对应命令行：-D/--simplification
+     */
     private Integer simplificationLevel;
 
-    /** 要素聚合距离（像素，默认0） 对应命令行：-g/--coalesce */
+    /**
+     * 要素聚合距离（像素，默认0） 对应命令行：-g/--coalesce
+     */
     private Integer coalesceDistance;
 
     // ===================== 系统参数 =====================
 
-    /** 对应分页获取数据的时候，最大的页数 */
+    /**
+     * 对应分页获取数据的时候，最大的页数
+     */
     private Integer maxPartionNum = 20;
 
     // ===================== 其他参数 =====================
@@ -127,19 +169,29 @@ public class TileSliceParameter implements Serializable {
      */
     private boolean createBoundary = Boolean.FALSE;
 
-    /** 边界的表名 */
+    /**
+     * 边界的表名
+     */
     private String tableNameBoundary = null;
 
-    /** 边界的图层名称 */
+    /**
+     * 边界的图层名称
+     */
     private String layerNameBoundary = null;
 
-    /** 是否创建标签 */
+    /**
+     * 是否创建标签
+     */
     private boolean createLabel = Boolean.FALSE;
 
-    /** 标签的表名 */
+    /**
+     * 标签的表名
+     */
     private String tableNameLabel = null;
 
-    /** 标签的图层名称 */
+    /**
+     * 标签的图层名称
+     */
     private String layerNameLabel = null;
 
     /**
@@ -149,7 +201,9 @@ public class TileSliceParameter implements Serializable {
      */
     private boolean statisticsIs = Boolean.TRUE;
 
-    /** 统计的json存放的根路径 */
+    /**
+     * 统计的json存放的根路径
+     */
     private String staticTableName = "static_table_json_def";
 
     /**
@@ -211,11 +265,13 @@ public class TileSliceParameter implements Serializable {
         return encode;
     }
 
-    public void setInputConnectInfo(PgConnectInfo pgConnectInfo) {
+    public TileSliceParameter setInputConnectInfo(PgConnectInfo pgConnectInfo) {
         this.inputConnectInfo = pgConnectInfo.toPgConnectInfoSimple();
+        return this;
     }
 
-    public void setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
+    public TileSliceParameter setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
         this.outPutConnectInfo = pgConnectInfo.toPgConnectInfoWithTable();
+        return this;
     }
 }
