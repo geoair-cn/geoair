@@ -9,10 +9,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
@@ -213,11 +210,8 @@ public class SparkVectorTileGenerator implements Serializable {
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>)
                         partitionIterator -> {
                             Log log = Log.get();
-                            DataSourceDruidFastCreate druidFastCreate = new DataSourceDruidFastCreate();
-                            druidFastCreate.setUrl(pgParams.get("url"));
-                            druidFastCreate.setUsername(pgParams.get("user"));
-                            druidFastCreate.setPassword(pgParams.get("password"));
-                            DruidDataSource dataSource = (DruidDataSource)druidFastCreate.toDataSource();
+                            PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
+                            DataSource dataSource = outPutConnectWithTable.toDataSource();
                             // 最终日志
                             int outGridSrid = parameter.getOutGridSrid();
                             String edition = parameter.getEdition();
@@ -243,7 +237,7 @@ public class SparkVectorTileGenerator implements Serializable {
                             try {
                                 // 建立三个独立连接
                                 if (StringUtils.isNotBlank(rootTableName)) {
-                                    connRoot =dataSource.getConnection();
+                                    connRoot = dataSource.getConnection();
                                     connRoot.setAutoCommit(false);
                                     rootPstmt = connRoot.prepareStatement(String.format(insertSqlTemplate, StrUtil.wrap(rootTableName, "\"")));
                                 }
@@ -510,9 +504,11 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     private void createTableDDL(String tableName, TileSliceParameter parameter) {
-        DataSource dataSource = parameter.getOutPutConnectWithTable().toDataSource();
+        PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
+        DataSource dataSource = outPutConnectWithTable.toDataSource();
+
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
-        String tableNameWithSchema =iAdvExecutor.tbGetTableNameWithSchema(tableName);
+        String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);
         boolean b = iAdvExecutor.dIsTableExists(tableName);
         String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
                 "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
