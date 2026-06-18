@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
-import cn.geoair.base.lang.lambda.GkSerializableFunction;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataSourceGetterFunction;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DefaultDataSourceGetterFunction;
 import cn.hutool.core.util.StrUtil;
