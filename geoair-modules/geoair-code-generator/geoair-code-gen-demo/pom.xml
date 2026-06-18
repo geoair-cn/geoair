@@ -41,7 +41,9 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties></properties>
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
   <dependencies>
 
     <dependency>

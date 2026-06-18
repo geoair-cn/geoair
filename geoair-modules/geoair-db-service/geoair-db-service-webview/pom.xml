@@ -42,6 +42,7 @@
     <java.version>17</java.version>
     <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <maven.install.skip>true</maven.install.skip>
+    <maven.deploy.skip>true</maven.deploy.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!--install的时候跳过-->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
