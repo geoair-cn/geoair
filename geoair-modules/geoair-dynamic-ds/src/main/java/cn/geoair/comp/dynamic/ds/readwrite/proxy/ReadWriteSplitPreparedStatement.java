@@ -249,9 +249,45 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
             case Types.TINYINT:
                 stmt.setByte(index, (Byte) value);
                 break;
+            // =============
             case JdbcParameter.TYPE.BYTES:
                 stmt.setBytes(index, (byte[]) value);
                 break;
+            case JdbcParameter.TYPE.URL:
+                stmt.setURL(index, (URL) value);
+                break;
+            case JdbcParameter.TYPE.NCharacterInputStream:
+                if(length ==-1){
+                    stmt.setNCharacterStream(index, (Reader) value);
+                }else{
+                    stmt.setNCharacterStream(index, (Reader) value,length);
+                }
+                break;
+                case JdbcParameter.TYPE.UnicodeStream:
+                    stmt.setUnicodeStream(index, (InputStream) value,(int)length);
+                break;
+            case JdbcParameter.TYPE.CharacterInputStream:
+                if(length ==-1){
+                    stmt.setCharacterStream(index, (Reader) value);
+                }else{
+                    stmt.setCharacterStream(index, (Reader) value,length);
+                }
+                break;
+            case JdbcParameter.TYPE.AsciiInputStream:
+                if(length ==-1){
+                    stmt.setAsciiStream(index, (InputStream) value);
+                }else{
+                    stmt.setAsciiStream(index, (InputStream) value,length);
+                }
+                break;
+            case JdbcParameter.TYPE.BinaryInputStream:
+                if(length ==-1){
+                    stmt.setBinaryStream(index, (InputStream) value);
+                }else{
+                    stmt.setBinaryStream(index, (InputStream) value,length);
+                }
+                break;
+                // =============
             case Types.SMALLINT:
                 stmt.setShort(index, (Short) value);
                 break;
