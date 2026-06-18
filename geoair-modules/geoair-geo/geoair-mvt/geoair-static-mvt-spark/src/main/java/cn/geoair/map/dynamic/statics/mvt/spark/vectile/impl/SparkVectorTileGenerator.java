@@ -10,7 +10,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoBase;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
@@ -408,7 +408,7 @@ public class SparkVectorTileGenerator implements Serializable {
         if (parameter == null || parameter.getInputConnectInfo() == null) {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
-        PgConnectInfoBase pgConnectInfo = parameter.getInputConnectInfo();
+        PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
@@ -457,7 +457,7 @@ public class SparkVectorTileGenerator implements Serializable {
         if (parameter == null) {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
-        PgConnectInfoBase pgConnectInfo = parameter.getInputConnectInfo();
+        PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
         BBoxApo bBoxApo =

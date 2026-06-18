@@ -239,7 +239,7 @@ public class VectorTileCommonUtils {
      * 通用PG写入参数构建
      */
     public static Map<String, String> buildPgWriteParams(TileSliceParameter parameter) {
-        PgConnectInfo pgInfo = parameter.getOutPutConnectInfo();
+        PgConnectInfoWithTable pgInfo = parameter.getOutPutConnectInfo();
         Map<String, String> params = pgInfo.toParams();
         params.put("batchSize", "50");
         params.put("tableName", pgInfo.getTableName());
