@@ -101,8 +101,9 @@ public class VectorTileCommonUtils {
                         // String tileId = zoom + "#" + y + "#" + x;
                         tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
                     } catch (Exception e) {
-                        String wktString = GirAdvTools.getFormatOpt().jtsGeometryToWktString(geom, true);
-                        log.error("瓦片边界计算异常 ! wktString:{},xmin:{},xmax:{},ymin:{},ymax:{} ", wktString, xmin, xmax, ymin, ymax);
+                        Geometry convert = GirAdvTools.getSridOpt().convert(geom, outGridSrid, 4326);
+                        String wktString= GirAdvTools.getFormatOpt().jtsGeometryToWktString(convert, true);
+                        log.error("瓦片边界计算异常 ! wktString :{},xmin:{},xmax:{},ymin:{},ymax:{},outGrid:{} ", wktString, xmin, xmax, ymin, ymax,outGridSrid);
                     }
 
                 }
