@@ -38,12 +38,12 @@ public class TileSliceParameter implements Serializable {
     /**
      * 输入连接信息
      */
-    public PgConnectInfoSimple inputConnectInfo;
+    public PgConnectInfoSimple inputConnectSimple;
 
     /**
      * 输出连接信息
      */
-    public PgConnectInfoWithTable outPutConnectInfo;
+    public PgConnectInfoWithTable outPutConnectWithTable;
 
     /**
      * 几何字段名称
@@ -265,23 +265,37 @@ public class TileSliceParameter implements Serializable {
         return encode;
     }
 
+    @Deprecated
     public TileSliceParameter setInputConnectInfo(PgConnectInfo pgConnectInfo) {
-        this.inputConnectInfo = pgConnectInfo.toPgConnectInfoSimple();
+        this.inputConnectSimple = pgConnectInfo.toPgConnectInfoSimple();
         return this;
     }
 
+    @Deprecated
     public TileSliceParameter setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
-        this.outPutConnectInfo = pgConnectInfo.toPgConnectInfoWithTable();
+        this.outPutConnectWithTable = pgConnectInfo.toPgConnectInfoWithTable();
         return this;
     }
 
+    @Deprecated
     public TileSliceParameter setInputConnectInfo(PgConnectInfoSimple inputConnectInfo) {
-        this.inputConnectInfo = inputConnectInfo;
+        this.inputConnectSimple = inputConnectInfo;
         return this;
     }
 
+    @Deprecated
     public TileSliceParameter setOutPutConnectInfo(PgConnectInfoWithTable outPutConnectInfo) {
-        this.outPutConnectInfo = outPutConnectInfo;
+        this.outPutConnectWithTable = outPutConnectInfo;
         return this;
+    }
+
+    @Deprecated
+    public PgConnectInfo getInputConnectInfo() {
+        return PgConnectInfo.fromPgConnectInfoSimple(inputConnectSimple);
+    }
+
+    @Deprecated
+    public PgConnectInfo getOutPutConnectInfo() {
+        return PgConnectInfo.fromPgConnectInfoWithTable(outPutConnectWithTable);
     }
 }

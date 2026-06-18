@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/29 09:55
- *  该参数有歧义，所以把参数进行了替换修改
+ * 该参数有歧义，所以把参数进行了替换修改
  */
 @Data
 @Accessors(chain = true)
@@ -38,15 +38,26 @@ public class PgConnectInfo implements Serializable {
     public PgConnectInfo() {
     }
 
-
+    @Deprecated
     PgConnectInfoSimple toPgConnectInfoSimple() {
         return BeanUtil.copyProperties(this, PgConnectInfoSimple.class);
     }
 
+    @Deprecated
     PgConnectInfoWithTable toPgConnectInfoWithTable() {
         return BeanUtil.copyProperties(this, PgConnectInfoWithTable.class);
     }
 
+    public static PgConnectInfo fromPgConnectInfoSimple(PgConnectInfoSimple pgConnectInfoSimple) {
+        return BeanUtil.copyProperties(pgConnectInfoSimple, PgConnectInfo.class);
+    }
+
+    public static PgConnectInfo fromPgConnectInfoWithTable(PgConnectInfoWithTable pgConnectInfoWithTable) {
+        return BeanUtil.copyProperties(pgConnectInfoWithTable, PgConnectInfo.class);
+    }
+
+
+    @Deprecated
     public DataSource toDataSource() {
         return toPgConnectInfoSimple().toDataSource();
     }
