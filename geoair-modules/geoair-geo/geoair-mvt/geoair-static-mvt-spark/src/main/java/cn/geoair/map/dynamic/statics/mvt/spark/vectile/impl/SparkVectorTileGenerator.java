@@ -503,11 +503,9 @@ public class SparkVectorTileGenerator implements Serializable {
     private void createTableDDL(String tableName, TileSliceParameter parameter) {
         DataSource dataSource = parameter.getOutPutConnectWithTable().toDataSource();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
-        String schemaName = iAdvExecutor.tbExtractSchemaName(tableName);
-        String tbGetTableNameNotSchema = iAdvExecutor.tbGetTableNameNotSchema(tableName);
-        String tableNameWithSchema = GutilObject.isEmpty(schemaName) ? tbGetTableNameNotSchema : tableName;
+        String tableNameWithSchema =iAdvExecutor.tbGetTableNameWithSchema(tableName);
         boolean b = iAdvExecutor.dIsTableExists(tableName);
-        String tempLate = "   CREATE TABLE \"{tableNameWithSchema}\" (\n" +
+        String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
                 "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
                 "                          \"z\" int4,\n" +
                 "                          \"x\" int4,\n" +
@@ -520,7 +518,7 @@ public class SparkVectorTileGenerator implements Serializable {
                 "                          \"insert_time\" int8\n" +
                 "                        )\n" +
                 "                        ;\n" +
-                "                        CREATE INDEX \"zxy_{UUID}\" ON \"{tableNameWithSchema}\" USING btree (\n" +
+                "                        CREATE INDEX \"zxy_{UUID}\" ON {tableNameWithSchema} USING btree (\n" +
                 "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
                 "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
                 "                          \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
