@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaFutureAction;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -157,14 +158,20 @@ public class SparkVectorTileGenerator implements Serializable {
                     pbfRDD.takeAsync(500);
             log.info("抽样500条数据完成！");
             List<Tuple2<String, PbfInfo>> tuple2s = listJavaFutureAction.get();
-            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
-                    JavaConverters.asScalaIteratorConverter(tuple2s.iterator()).asScala().toSeq();
-            ClassTag<Tuple2<String, PbfInfo>> classTag = ClassTag$.MODULE$.apply(Tuple2.class);
+
+            //            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
+            // CollectionConverters.asScala(tuple2s);
+            //            ClassTag<Tuple2<String, PbfInfo>> classTag =
+            // ClassTag$.MODULE$.apply(Tuple2.class);
+            JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
             JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
-                    sparkSession
-                            .sparkContext()
-                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION, classTag)
-                            .toJavaRDD();
+                    jsc.parallelize(tuple2s, DEFAULT_REDUCE_PARTITION);
+            //            JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
+            //                    sparkSession
+            //                            .sparkContext()
+            //                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION,
+            // classTag)
+            //                            .toJavaRDD();
             AdvEnumsTypeGeom typeGeom = parameter.getTypeGeom();
             String geomType = typeGeom != null ? typeGeom.name() : "Unknown";
             StatisticUtils.statAndWriteJson(

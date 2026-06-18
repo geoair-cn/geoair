@@ -9,6 +9,7 @@
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
+//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoBase;
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
 //import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
@@ -21,26 +22,28 @@
 //import cn.hutool.json.JSONUtil;
 //import cn.hutool.log.Log;
 //import cn.hutool.log.LogFactory;
+//
+//import lombok.extern.slf4j.Slf4j;
+//
+//import org.apache.commons.lang3.StringUtils;
+//import org.apache.spark.api.java.JavaFutureAction;
+//import org.apache.spark.api.java.JavaPairRDD;
+//import org.apache.spark.api.java.JavaRDD;
+//import org.apache.spark.api.java.JavaSparkContext;
+//import org.apache.spark.api.java.function.VoidFunction;
+//import org.apache.spark.sql.*;
+//import org.apache.spark.storage.StorageLevel;
+//
+//import scala.Tuple2;
+//
 //import java.io.Serializable;
 //import java.sql.Connection;
 //import java.sql.DriverManager;
 //import java.sql.PreparedStatement;
 //import java.util.*;
 //import java.util.concurrent.atomic.AtomicLong;
+//
 //import javax.sql.DataSource;
-//import lombok.extern.slf4j.Slf4j;
-//import org.apache.commons.lang3.StringUtils;
-//import org.apache.spark.api.java.JavaFutureAction;
-//import org.apache.spark.api.java.JavaPairRDD;
-//import org.apache.spark.api.java.JavaRDD;
-//import org.apache.spark.api.java.function.VoidFunction;
-//import org.apache.spark.sql.*;
-//import org.apache.spark.storage.StorageLevel;
-//import scala.Tuple2;
-//import scala.collection.JavaConverters;
-//import scala.collection.Seq;
-//import scala.reflect.ClassTag;
-//import scala.reflect.ClassTag$;
 //
 //@Slf4j
 //public class SparkVectorTileGeneratorAll implements Serializable {
@@ -135,14 +138,20 @@
 //                    pbfRDD.takeAsync(500);
 //            log.info("抽样500条数据完成！");
 //            List<Tuple2<String, PbfInfo>> tuple2s = listJavaFutureAction.get();
-//            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
-//                    JavaConverters.asScalaIteratorConverter(tuple2s.iterator()).asScala().toSeq();
-//            ClassTag<Tuple2<String, PbfInfo>> classTag = ClassTag$.MODULE$.apply(Tuple2.class);
+//
+//            //            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
+//            // CollectionConverters.asScala(tuple2s);
+//            //            ClassTag<Tuple2<String, PbfInfo>> classTag =
+//            // ClassTag$.MODULE$.apply(Tuple2.class);
+//            JavaSparkContext jsc = new JavaSparkContext(sparkSession.sparkContext());
 //            JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
-//                    sparkSession
-//                            .sparkContext()
-//                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION, classTag)
-//                            .toJavaRDD();
+//                    jsc.parallelize(tuple2s, DEFAULT_REDUCE_PARTITION);
+//            //            JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
+//            //                    sparkSession
+//            //                            .sparkContext()
+//            //                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION,
+//            // classTag)
+//            //                            .toJavaRDD();
 //            AdvEnumsTypeGeom typeGeom = parameter.getTypeGeom();
 //            String geomType = typeGeom != null ? typeGeom.name() : "Unknown";
 //            StatisticUtils.statAndWriteJson(
@@ -421,7 +430,7 @@
 //        if (parameter == null || parameter.getInputConnectInfo() == null) {
 //            throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
 //        }
-//        PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
+//        PgConnectInfoBase pgConnectInfo = parameter.getInputConnectInfo();
 //        IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 //
 //        long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
@@ -470,7 +479,7 @@
 //        if (parameter == null) {
 //            throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
 //        }
-//        PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
+//        PgConnectInfoBase pgConnectInfo = parameter.getInputConnectInfo();
 //        IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 //
 //        BBoxApo bBoxApo =
