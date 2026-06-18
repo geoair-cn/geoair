@@ -34,7 +34,7 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 输入信息配置=====================
     /** 输入连接信息 */
-    public PgConnectInfo inputConnectInfo;
+    public PgConnectInfoBase inputConnectInfo;
 
     /** 输出连接信息 */
     public PgConnectInfo outPutConnectInfo;
