@@ -356,7 +356,6 @@ public class SparkVectorTileGenerator implements Serializable {
                                 }
                                 throw new RuntimeException(e);
                             } finally {
-                                IoUtil.close(dataSource);
                                 IoUtil.close(rootPstmt);
                                 IoUtil.close(connRoot);
                             }
