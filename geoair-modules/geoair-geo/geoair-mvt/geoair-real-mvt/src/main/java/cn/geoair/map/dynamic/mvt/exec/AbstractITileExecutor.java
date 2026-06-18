@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.mvt.exec;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-// import geotrellis.vector.Extent;
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
