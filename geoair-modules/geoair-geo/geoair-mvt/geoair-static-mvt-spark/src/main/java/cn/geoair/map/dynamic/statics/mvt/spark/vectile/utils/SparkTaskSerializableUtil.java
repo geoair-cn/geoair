@@ -8,7 +8,6 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 
@@ -62,7 +61,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(Integer pageNum) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectInfo();
+            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
             IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
             long startTime = System.currentTimeMillis();
@@ -118,7 +117,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(String partitionCondition) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectInfo();
+            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
             IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
             // 解析分区范围

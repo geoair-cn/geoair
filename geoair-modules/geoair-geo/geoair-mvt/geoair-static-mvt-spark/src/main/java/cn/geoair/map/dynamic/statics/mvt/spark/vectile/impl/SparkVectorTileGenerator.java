@@ -409,7 +409,7 @@ public class SparkVectorTileGenerator implements Serializable {
         if (parameter == null || parameter.getInputConnectInfo() == null) {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
-        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectInfo();
+        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
@@ -458,7 +458,7 @@ public class SparkVectorTileGenerator implements Serializable {
         if (parameter == null) {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
-        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectInfo();
+        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
         BBoxApo bBoxApo =
