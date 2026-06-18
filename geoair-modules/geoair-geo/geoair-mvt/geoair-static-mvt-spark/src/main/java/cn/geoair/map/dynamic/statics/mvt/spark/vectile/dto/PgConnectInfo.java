@@ -49,10 +49,16 @@ public class PgConnectInfo implements Serializable {
     }
 
     public static PgConnectInfo fromPgConnectInfoSimple(PgConnectInfoSimple pgConnectInfoSimple) {
+        if (pgConnectInfoSimple == null) {
+            return null;
+        }
         return BeanUtil.copyProperties(pgConnectInfoSimple, PgConnectInfo.class);
     }
 
     public static PgConnectInfo fromPgConnectInfoWithTable(PgConnectInfoWithTable pgConnectInfoWithTable) {
+        if (pgConnectInfoWithTable == null) {
+            return null;
+        }
         return BeanUtil.copyProperties(pgConnectInfoWithTable, PgConnectInfo.class);
     }
 

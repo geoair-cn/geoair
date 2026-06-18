@@ -501,7 +501,7 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     private void createTableDDL(String tableName, TileSliceParameter parameter) {
-        DataSource dataSource = parameter.getOutPutConnectInfo().toDataSource();
+        DataSource dataSource = parameter.getOutPutConnectWithTable().toDataSource();
         IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
         String schemaName = iAdvExecutor.tbExtractSchemaName(tableName);
         String tbGetTableNameNotSchema = iAdvExecutor.tbGetTableNameNotSchema(tableName);
