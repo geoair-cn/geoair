@@ -1,39 +1,31 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
+import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.hutool.core.util.StrUtil;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉
- * @date ：Created in 2025/12/29 09:55 @description： TODO
+ * @date ：Created in 2025/12/29 09:55 @description：
  */
 @Data
 @Accessors(chain = true)
-public class PgConnectInfo implements Serializable {
-
-    private String ip;
-
-    private String port;
-
-    private String userName;
-
-    private String passwd;
-
-    private String dbName;
+public class PgConnectInfo extends PgConnectInfoBase {
 
     private String schemaTableName; // 完整的schema/table（或仅schema）
 
-    private String schemaName; // 模式名
-
     private String tableName; // 表名（可选，null表示未传）
 
-    public PgConnectInfo() {}
+    public PgConnectInfo() {
+    }
 
     public PgConnectInfo(String url) {
         // pg路径：pg://user@pa/ip:port/db/a.b
@@ -99,14 +91,6 @@ public class PgConnectInfo implements Serializable {
         } catch (Exception e) {
 
         }
-    }
-
-    public DataSource toDataSource() {
-        Map<String, String> params = toParams();
-        DataSource dataSource =
-                new DriverManagerDataSource(
-                        params.get("url"), params.get("user"), params.get("password"));
-        return dataSource;
     }
 
     public Map<String, String> toParams() {
