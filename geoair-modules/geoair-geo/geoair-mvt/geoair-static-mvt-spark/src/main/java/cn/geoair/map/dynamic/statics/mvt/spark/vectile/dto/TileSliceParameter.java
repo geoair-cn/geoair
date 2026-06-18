@@ -274,4 +274,14 @@ public class TileSliceParameter implements Serializable {
         this.outPutConnectInfo = pgConnectInfo.toPgConnectInfoWithTable();
         return this;
     }
+
+    public TileSliceParameter setInputConnectInfo(PgConnectInfoSimple inputConnectInfo) {
+        this.inputConnectInfo = inputConnectInfo;
+        return this;
+    }
+
+    public TileSliceParameter setOutPutConnectInfo(PgConnectInfoWithTable outPutConnectInfo) {
+        this.outPutConnectInfo = outPutConnectInfo;
+        return this;
+    }
 }
