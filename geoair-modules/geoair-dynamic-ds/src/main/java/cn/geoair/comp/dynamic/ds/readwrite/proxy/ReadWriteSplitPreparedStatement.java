@@ -249,6 +249,9 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
             case Types.TINYINT:
                 stmt.setByte(index, (Byte) value);
                 break;
+            case JdbcParameter.TYPE.BYTES:
+                stmt.setBytes(index, (byte[]) value);
+                break;
             case Types.SMALLINT:
                 stmt.setShort(index, (Short) value);
                 break;
