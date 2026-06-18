@@ -7,9 +7,12 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.sql.DataSource;
+
 /**
  * @author ：张逢吉
- * @date ：Created in 2025/12/29 09:55 @description：
+ * @date ：Created in 2025/12/29 09:55
+ *  该参数有歧义，所以把参数进行了替换修改
  */
 @Data
 @Accessors(chain = true)
@@ -44,5 +47,8 @@ public class PgConnectInfo implements Serializable {
         return BeanUtil.copyProperties(this, PgConnectInfoWithTable.class);
     }
 
+    public DataSource toDataSource() {
+        return toPgConnectInfoSimple().toDataSource();
+    }
 
 }
