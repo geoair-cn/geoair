@@ -96,7 +96,7 @@ public class SparkVectorTileGenerator implements Serializable {
 
         Map<String, String> pgParams = VectorTileCommonUtils.buildPgWriteParams(parameter);
 
-        createTableDDL(pgParams.get("tableName"), parameter);
+        createTableDDL(pgParams.get("table"), parameter);
         // 1. 读取数据（仅此处持久化，避免重复读取PG）
         JavaRDD<GirAdvOneRow> rawFeatures = null;
         ReadStrategy strategy =
