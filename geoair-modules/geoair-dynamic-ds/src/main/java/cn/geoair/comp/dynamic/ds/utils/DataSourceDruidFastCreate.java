@@ -34,6 +34,11 @@ public class DataSourceDruidFastCreate {
     private Integer connectionErrorRetryAttempts = 3;  // 连接错误重试次数
     private String validationQuery;                    // 验证查询SQL
     private Integer numTestsPerEvictionRun = -1;       // 每次检测的连接数
+    private Boolean readOnly;   // 是否只读数据源
+
+    private Consumer<DruidDataSource> configurator= t -> {
+
+    };;
 
     // ==================== 静态工厂方法 ====================
 
@@ -141,13 +146,14 @@ public class DataSourceDruidFastCreate {
         if (url == null || url.trim().isEmpty()) {
             throw new IllegalArgumentException("url must not be null or empty");
         }
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("username must not be null or empty");
+        if(!url.contains("sqlite")){
+            if (username == null || username.trim().isEmpty()) {
+                throw new IllegalArgumentException("username must not be null or empty");
+            }
+            if (password == null) {
+                throw new IllegalArgumentException("password must not be null");
+            }
         }
-        if (password == null) {
-            throw new IllegalArgumentException("password must not be null");
-        }
-
         DruidDataSource dataSource = new DruidDataSource();
         dataSource.setUrl(url);
         dataSource.setUsername(username);
@@ -204,12 +210,16 @@ public class DataSourceDruidFastCreate {
         if (numTestsPerEvictionRun != null) {
             dataSource.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
         }
-
+        if (readOnly != null) {
+            dataSource.setDefaultReadOnly(readOnly);
+        }
         // 强制开启连接泄漏检测
         dataSource.setBreakAfterAcquireFailure(true);
         dataSource.setRemoveAbandoned(true);
         dataSource.setLogAbandoned(true);
-
+        if(configurator != null){
+            configurator.accept(dataSource);
+        }
         return dataSource;
     }
 }
