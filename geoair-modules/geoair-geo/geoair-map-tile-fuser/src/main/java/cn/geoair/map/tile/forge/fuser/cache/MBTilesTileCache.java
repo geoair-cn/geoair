@@ -442,7 +442,7 @@ public class MBTilesTileCache implements TileCache {
 //         */
         private int xyzToTmsY(int z, int y) {
             if (needTranTmsY) {
-                return GirAdvTools.getTileGrid3857Opt().reverseY(z, y);   // 这里使用3857的网格翻转逻辑来进行翻转Y，不进行判断43426的网格原因是因为mbtile规范并不支持4326网格，这里在4326网格的时候就把mbtiles当做一个存储器
+                return GirAdvTools.getTileGrid3857Opt().reverseY(y, z);   // 这里使用3857的网格翻转逻辑来进行翻转Y，不进行判断43426的网格原因是因为mbtile规范并不支持4326网格，这里在4326网格的时候就把mbtiles当做一个存储器
             } else {
                 return y;
             }
