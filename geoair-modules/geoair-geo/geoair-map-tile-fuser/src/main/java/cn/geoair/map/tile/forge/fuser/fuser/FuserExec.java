@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 
 /**
@@ -13,5 +14,8 @@ public interface FuserExec {
 
     ImageMime getOutputFormat();
 
-    ImageMime   getSrcFormat();
+    ImageMime getSrcFormat();
+
+    RangeApo getSrcRange();
+
 }

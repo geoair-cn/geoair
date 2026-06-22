@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.fuser.provider;
 import cn.geoair.map.tile.forge.fuser.CustomTileGetterHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
+import cn.geoair.map.tile.forge.fuser.constant.Constant;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.PxyType;
 import cn.geoair.map.tile.forge.fuser.provider.google.GoogleLocalFileTileGetter;
@@ -49,7 +50,7 @@ public class TileGetterFactory {
         }
         // 生成图层标识
         String layerName = config.getLayerName();
-        String layerCachePreFix = layerName + "_original_grid";
+        String layerCachePreFix = layerName + Constant._original_grid_name_suffix;
         return new CachedTileGetterProxy(realGetter, layerCachePreFix, tileCache);
     }
 
