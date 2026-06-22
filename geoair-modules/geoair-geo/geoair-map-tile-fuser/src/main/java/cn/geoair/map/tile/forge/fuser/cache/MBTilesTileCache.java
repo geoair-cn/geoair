@@ -136,7 +136,7 @@ public class MBTilesTileCache implements TileCache {
         }
 
         try {
-            // 使用 computeIfAbsent 保证原子性
+
             return layerCaches.computeIfAbsent(layerName, key -> {
                 try {
                     String dbPath = getDbPath(key);
