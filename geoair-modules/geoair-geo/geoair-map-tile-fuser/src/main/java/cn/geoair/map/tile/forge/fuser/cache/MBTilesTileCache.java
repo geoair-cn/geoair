@@ -1,11 +1,15 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
+import com.alibaba.druid.pool.DruidDataSource;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * MBTiles 瓦片缓存实现
@@ -19,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author 张逢吉
  * @date Created in 2026/06/22
- * @description 基于 MBTiles 规范的瓦片缓存实现
+ * @description 基于 MBTiles 规范的瓦片缓存实现，使用 Druid 连接池，读写分离
  */
 @Slf4j
 public class MBTilesTileCache implements TileCache {
@@ -27,6 +31,27 @@ public class MBTilesTileCache implements TileCache {
     private final String cacheRoot;
     private final boolean enabled;
     private final ConcurrentHashMap<String, LayerCacheHolder> layerCaches = new ConcurrentHashMap<>();
+
+    private int maxReadPoolSize = 20;
+
+    private int maxWritePoolSize = 5;
+
+    private int minIdle = 2;
+
+    public MBTilesTileCache setMaxReadPoolSize(int maxReadPoolSize) {
+        this.maxReadPoolSize = maxReadPoolSize;
+        return this;
+    }
+
+    public MBTilesTileCache setMaxWritePoolSize(int maxWritePoolSize) {
+        this.maxWritePoolSize = maxWritePoolSize;
+        return this;
+    }
+
+    public MBTilesTileCache setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+        return this;
+    }
 
     // MBTiles 标准表结构
     private static final String CREATE_TILES_TABLE_SQL =
@@ -83,7 +108,7 @@ public class MBTilesTileCache implements TileCache {
                         log.info("创建缓存根目录: {}", this.cacheRoot);
                     }
                 }
-                log.info("MBTiles 缓存初始化完成，根目录: {}", this.cacheRoot);
+                log.info("Druid MBTiles 缓存初始化完成，根目录: {}", this.cacheRoot);
             } catch (Exception e) {
                 log.error("创建缓存根目录失败: {}", this.cacheRoot, e);
             }
@@ -110,15 +135,28 @@ public class MBTilesTileCache implements TileCache {
             return null;
         }
 
-        return layerCaches.computeIfAbsent(layerName, k -> {
-            try {
-                String dbPath = getDbPath(layerName);
-                return new LayerCacheHolder(dbPath, FuserCacheUtils.isNeedReverseY(layerName));
-            } catch (Exception e) {
-                log.error("创建图层缓存失败: {}", layerName, e);
-                return null;
-            }
-        });
+        try {
+
+            return layerCaches.computeIfAbsent(layerName, key -> {
+                try {
+                    String dbPath = getDbPath(key);
+                    log.debug("创建图层缓存: {}", key);
+                    return new LayerCacheHolder(
+                            dbPath,
+                            FuserCacheUtils.isNeedReverseY(key),
+                            maxReadPoolSize,
+                            maxWritePoolSize,
+                            minIdle
+                    );
+                } catch (Exception e) {
+                    log.error("创建图层缓存失败: {}", key, e);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            log.error("获取或创建图层缓存异常: {}", layerName, e);
+            return null;
+        }
     }
 
     @Override
@@ -336,76 +374,113 @@ public class MBTilesTileCache implements TileCache {
     // ==================== 内部类 ====================
 
     /**
-     * 单个图层的缓存持有者
+     * 单个图层的缓存持有者（Druid 连接池 - 读写分离）
      */
     @Slf4j
     private static class LayerCacheHolder {
         private final String dbPath;
-        private Connection connection;
-        private volatile boolean initialized = false;
-        private volatile boolean needReverseY = false;
+        private final boolean needReverseY;
+        private final DruidDataSource readDataSource;
+        private final DruidDataSource writeDataSource;
+        private int maxReadPoolSize = 20;
+        private int maxWritePoolSize = 5;
+        private int minIdle = 2;
+        private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-        public LayerCacheHolder(String dbPath) {
+        public LayerCacheHolder(String dbPath, boolean needReverseY, int maxReadPoolSize, int maxWritePoolSize, int minIdle) {
             this.dbPath = dbPath;
+            this.needReverseY = needReverseY;
+            this.maxReadPoolSize = maxReadPoolSize;
+            this.maxWritePoolSize = maxWritePoolSize;
+            this.minIdle = minIdle;
+            this.readDataSource = createDataSource(true);
+            this.writeDataSource = createDataSource(false);
             init();
         }
 
-        public LayerCacheHolder(String dbPath, boolean needTranTmsY) {
-            this.dbPath = dbPath;
-            this.needReverseY = needTranTmsY;
-            init();
+        /**
+         * 创建 Druid 数据源
+         *
+         * @param readOnly 是否只读
+         * @return DruidDataSource
+         */
+        private DruidDataSource createDataSource(boolean readOnly) {
+            DataSourceDruidFastCreate dataSourceDruidFastCreate = new DataSourceDruidFastCreate();
+            dataSourceDruidFastCreate.setUrl("jdbc:sqlite:" + dbPath);
+            dataSourceDruidFastCreate.setConfigurator(dataSource -> {
+                // 连接池大小配置
+                if (readOnly) {
+                    dataSource.setMaxActive(maxReadPoolSize);
+                    dataSource.setInitialSize(minIdle);
+                } else {
+                    dataSource.setMaxActive(maxWritePoolSize);
+                    dataSource.setInitialSize(1);
+                }
+                dataSource.setMinIdle(minIdle);
+                // 连接有效性检测
+                dataSource.setValidationQuery("SELECT 1");
+
+                // SQLite 特定配置
+                dataSource.setConnectionInitSqls(java.util.Arrays.asList(
+                        "PRAGMA journal_mode=WAL",
+                        "PRAGMA synchronous=" + (readOnly ? "NORMAL" : "FULL"),
+                        "PRAGMA cache_size=10000",
+                        "PRAGMA temp_store=MEMORY",
+                        "PRAGMA mmap_size=268435456"  // 256MB
+                ));
+
+                // 连接属性
+                java.util.Properties properties = new java.util.Properties();
+                properties.setProperty("journal_mode", "WAL");
+                properties.setProperty("synchronous", readOnly ? "NORMAL" : "FULL");
+                properties.setProperty("cache_size", "10000");
+                dataSource.setConnectProperties(properties);
+
+                // 监控配置
+                dataSource.setName("Druid-MBTiles-" + (readOnly ? "Read" : "Write") + "-" +
+                        new java.io.File(dbPath).getName());
+            });
+
+
+            log.debug("创建   数据源: {}, readOnly: {}, maxActive: {}",
+                    dbPath, readOnly, readOnly ? maxReadPoolSize : maxWritePoolSize);
+
+            return (DruidDataSource) dataSourceDruidFastCreate.toDataSource();
         }
 
-        private synchronized void init() {
-            if (initialized) {
+        /**
+         * 初始化数据库
+         */
+        private void init() {
+            if (!initialized.compareAndSet(false, true)) {
                 return;
             }
 
-            try {
+            // 使用写连接初始化表结构
+            try (Connection conn = writeDataSource.getConnection();
+                 Statement stmt = conn.createStatement()) {
 
-                java.io.File dbFile = new java.io.File(dbPath);
-                java.io.File parentDir = dbFile.getParentFile();
-                if (parentDir != null && !parentDir.exists()) {
-                    if (!parentDir.mkdirs()) {
-                        log.warn("创建目录失败: {}", parentDir);
-                    }
-                }
-
-
-                Class.forName("org.sqlite.JDBC");
-
-
-                String url = "jdbc:sqlite:" + dbPath;
-                connection = DriverManager.getConnection(url);
-                connection.setAutoCommit(true);
-
-                try (Statement stmt = connection.createStatement()) {
-                    stmt.execute("PRAGMA journal_mode=WAL");
-                    stmt.execute("PRAGMA synchronous=NORMAL");
-                    stmt.execute("PRAGMA cache_size=10000");
-                    stmt.execute("PRAGMA temp_store=MEMORY");
-                }
-
-
-                try (Statement stmt = connection.createStatement()) {
-                    stmt.execute(CREATE_TILES_TABLE_SQL);
-                    stmt.execute(CREATE_METADATA_TABLE_SQL);
-                    stmt.execute(CREATE_TILES_INDEX_SQL);
-                }
+                // 创建表
+                stmt.execute(CREATE_TILES_TABLE_SQL);
+                stmt.execute(CREATE_METADATA_TABLE_SQL);
+                stmt.execute(CREATE_TILES_INDEX_SQL);
 
                 // 初始化元数据
-                initMetadata();
+                initMetadata(conn);
 
-                initialized = true;
-                log.debug("MBTiles 初始化完成: {}", dbPath);
+                log.info("MBTiles 数据库初始化成功: {}", dbPath);
 
-            } catch (Exception e) {
-                log.error("MBTiles 初始化失败: {}", dbPath, e);
+            } catch (SQLException e) {
+                log.error("MBTiles 数据库初始化失败: {}", dbPath, e);
+                initialized.set(false);
                 throw new RuntimeException("MBTiles 初始化失败: " + dbPath, e);
             }
         }
 
-        private void initMetadata() {
+        /**
+         * 初始化元数据
+         */
+        private void initMetadata(Connection conn) {
             String[] metadata = {
                     "name", new java.io.File(dbPath).getName(),
                     "format", "png",
@@ -413,8 +488,8 @@ public class MBTilesTileCache implements TileCache {
                     "type", "overlay"
             };
 
-            try (PreparedStatement pstmt = connection.prepareStatement(
-                    "INSERT OR IGNORE INTO metadata (name, value) VALUES (?, ?)")) {
+            String sql = "INSERT OR IGNORE INTO metadata (name, value) VALUES (?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 for (int i = 0; i < metadata.length; i += 2) {
                     pstmt.setString(1, metadata[i]);
                     pstmt.setString(2, metadata[i + 1]);
@@ -425,12 +500,25 @@ public class MBTilesTileCache implements TileCache {
             }
         }
 
+        /**
+         * 检查初始化状态
+         */
+        private void checkInitialized() {
+            if (!initialized.get()) {
+                throw new IllegalStateException("MBTiles 未初始化: " + dbPath);
+            }
+        }
 
+        /**
+         * 读取瓦片数据（使用读连接池）
+         */
         public byte[] get(int z, int x, int y) {
-            checkConnection();
+            checkInitialized();
             String sql = "SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = readDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
                 pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
@@ -441,80 +529,114 @@ public class MBTilesTileCache implements TileCache {
                     }
                 }
             } catch (SQLException e) {
-                log.error("读取瓦片失败: z={}, x={}, y={}", z, x, y, e);
+                log.error("读取瓦片失败: z={}, x={}, y={}, db={}", z, x, y, dbPath, e);
             }
             return null;
         }
 
+        /**
+         * 保存瓦片数据（使用写连接池）
+         */
         public boolean put(int z, int x, int y, byte[] data) {
-            checkConnection();
+            checkInitialized();
             String sql = "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = writeDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
                 pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
                 pstmt.setBytes(4, data);
+
                 return pstmt.executeUpdate() > 0;
+
             } catch (SQLException e) {
-                log.error("保存瓦片失败: z={}, x={}, y={}", z, x, y, e);
+                log.error("保存瓦片失败: z={}, x={}, y={}, db={}", z, x, y, dbPath, e);
                 return false;
             }
         }
 
+
+        /**
+         * 删除瓦片（使用写连接池）
+         */
         public boolean delete(int z, int x, int y) {
-            checkConnection();
+            checkInitialized();
             String sql = "DELETE FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = writeDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
                 pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
-                boolean b = pstmt.executeUpdate() > 0;
-                log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
-                return b;
+
+                boolean result = pstmt.executeUpdate() > 0;
+                if (result && log.isDebugEnabled()) {
+                    log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
+                }
+                return result;
+
             } catch (SQLException e) {
-                log.error("删除瓦片失败: z={}, x={}, y={}", z, x, y, e);
+                log.error("删除瓦片失败: z={}, x={}, y={}, db={}", z, x, y, dbPath, e);
                 return false;
             }
         }
 
+        /**
+         * 按层级删除瓦片（使用写连接池）
+         */
         public boolean deleteByZoom(int z) {
-            checkConnection();
+            checkInitialized();
             String sql = "DELETE FROM tiles WHERE zoom_level = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = writeDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 int count = pstmt.executeUpdate();
-                log.debug("删除层级 {} 瓦片: {} 个", z, count);
+                log.debug("删除层级 {} 瓦片: {} 个, db={}", z, count, dbPath);
                 return count > 0;
+
             } catch (SQLException e) {
-                log.error("删除层级失败: z={}", z, e);
+                log.error("删除层级失败: z={}, db={}", z, dbPath, e);
                 return false;
             }
         }
 
+        /**
+         * 按层级和列删除瓦片（使用写连接池）
+         */
         public boolean deleteByZoomAndX(int z, int x) {
-            checkConnection();
+            checkInitialized();
             String sql = "DELETE FROM tiles WHERE zoom_level = ? AND tile_column = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = writeDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
                 int count = pstmt.executeUpdate();
-                log.debug("删除瓦片: z={}, x={}, 数量: {}", z, x, count);
+                log.debug("删除瓦片: z={}, x={}, 数量: {}, db={}", z, x, count, dbPath);
                 return count > 0;
+
             } catch (SQLException e) {
-                log.error("删除瓦片失败: z={}, x={}", z, x, e);
+                log.error("删除瓦片失败: z={}, x={}, db={}", z, x, dbPath, e);
                 return false;
             }
         }
 
+        /**
+         * 检查瓦片是否存在（使用读连接池）
+         */
         public boolean exists(int z, int x, int y) {
-            checkConnection();
+            checkInitialized();
             String sql = "SELECT 1 FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = readDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
                 pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
@@ -522,59 +644,71 @@ public class MBTilesTileCache implements TileCache {
                 try (ResultSet rs = pstmt.executeQuery()) {
                     return rs.next();
                 }
+
             } catch (SQLException e) {
-                log.error("检查瓦片存在失败: z={}, x={}, y={}", z, x, y, e);
+                log.error("检查瓦片存在失败: z={}, x={}, y={}, db={}", z, x, y, dbPath, e);
                 return false;
             }
         }
 
+        /**
+         * 获取瓦片总数（使用读连接池）
+         */
         public long getTileCount() {
-            checkConnection();
+            checkInitialized();
             String sql = "SELECT COUNT(*) FROM tiles";
 
-            try (Statement stmt = connection.createStatement();
+            try (Connection conn = readDataSource.getConnection();
+                 Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
+
                 if (rs.next()) {
                     return rs.getLong(1);
                 }
+
             } catch (SQLException e) {
-                log.error("获取瓦片数量失败", e);
+                log.error("获取瓦片数量失败: db={}", dbPath, e);
             }
             return 0;
         }
 
+        /**
+         * 获取指定层级的瓦片数量（使用读连接池）
+         */
         public long getTileCountByZoom(int zoom) {
-            checkConnection();
+            checkInitialized();
             String sql = "SELECT COUNT(*) FROM tiles WHERE zoom_level = ?";
 
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            try (Connection conn = readDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
                 pstmt.setInt(1, zoom);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
                         return rs.getLong(1);
                     }
                 }
+
             } catch (SQLException e) {
-                log.error("获取层级瓦片数量失败: z={}", zoom, e);
+                log.error("获取层级瓦片数量失败: z={}, db={}", zoom, dbPath, e);
             }
             return 0;
         }
 
-        private void checkConnection() {
-            if (!initialized) {
-                throw new IllegalStateException("MBTiles 未初始化");
+        /**
+         * 关闭连接池
+         */
+        public void close() {
+            if (readDataSource != null && !readDataSource.isClosed()) {
+                readDataSource.close();
+                log.debug("读连接池已关闭: {}", dbPath);
+            }
+            if (writeDataSource != null && !writeDataSource.isClosed()) {
+                writeDataSource.close();
+                log.debug("写连接池已关闭: {}", dbPath);
             }
         }
 
-        public void close() {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    log.debug("MBTiles 连接关闭: {}", dbPath);
-                } catch (SQLException e) {
-                    log.error("关闭 MBTiles 连接失败: {}", dbPath, e);
-                }
-            }
-        }
+
     }
 }
