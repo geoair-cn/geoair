@@ -4,6 +4,7 @@ import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
 import com.alibaba.druid.pool.DruidDataSource;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
@@ -31,11 +32,26 @@ public class MBTilesTileCache implements TileCache {
     private final boolean enabled;
     private final ConcurrentHashMap<String, LayerCacheHolder> layerCaches = new ConcurrentHashMap<>();
 
-    // Druid 连接池配置
-    private static final int MAX_READ_POOL_SIZE = 20;
-    private static final int MAX_WRITE_POOL_SIZE = 5;
-    private static final int MIN_IDLE = 2;
-    private static final int MAX_WAIT = 30000;
+    private int maxReadPoolSize = 20;
+
+    private int maxWritePoolSize = 5;
+
+    private int minIdle = 2;
+
+    public MBTilesTileCache setMaxReadPoolSize(int maxReadPoolSize) {
+        this.maxReadPoolSize = maxReadPoolSize;
+        return this;
+    }
+
+    public MBTilesTileCache setMaxWritePoolSize(int maxWritePoolSize) {
+        this.maxWritePoolSize = maxWritePoolSize;
+        return this;
+    }
+
+    public MBTilesTileCache setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+        return this;
+    }
 
     // MBTiles 标准表结构
     private static final String CREATE_TILES_TABLE_SQL =
@@ -130,7 +146,10 @@ public class MBTilesTileCache implements TileCache {
             String dbPath = getDbPath(layerName);
             LayerCacheHolder newHolder = new LayerCacheHolder(
                     dbPath,
-                    FuserCacheUtils.isNeedReverseY(layerName)
+                    FuserCacheUtils.isNeedReverseY(layerName),
+                    maxReadPoolSize,
+                    maxWritePoolSize,
+                    minIdle
             );
 
             // 使用 putIfAbsent 保证线程安全
@@ -370,11 +389,17 @@ public class MBTilesTileCache implements TileCache {
         private final boolean needReverseY;
         private final DruidDataSource readDataSource;
         private final DruidDataSource writeDataSource;
+        private int maxReadPoolSize = 20;
+        private int maxWritePoolSize = 5;
+        private int minIdle = 2;
         private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-        public LayerCacheHolder(String dbPath, boolean needReverseY) {
+        public LayerCacheHolder(String dbPath, boolean needReverseY, int maxReadPoolSize, int maxWritePoolSize, int minIdle) {
             this.dbPath = dbPath;
             this.needReverseY = needReverseY;
+            this.maxReadPoolSize = maxReadPoolSize;
+            this.maxWritePoolSize = maxWritePoolSize;
+            this.minIdle = minIdle;
             this.readDataSource = createDataSource(true);
             this.writeDataSource = createDataSource(false);
             init();
@@ -392,15 +417,13 @@ public class MBTilesTileCache implements TileCache {
             dataSourceDruidFastCreate.setConfigurator(dataSource -> {
                 // 连接池大小配置
                 if (readOnly) {
-                    dataSource.setMaxActive(MAX_READ_POOL_SIZE);
-                    dataSource.setInitialSize(MIN_IDLE);
+                    dataSource.setMaxActive(maxReadPoolSize);
+                    dataSource.setInitialSize(minIdle);
                 } else {
-                    dataSource.setMaxActive(MAX_WRITE_POOL_SIZE);
+                    dataSource.setMaxActive(maxWritePoolSize);
                     dataSource.setInitialSize(1);
                 }
-                dataSource.setMinIdle(MIN_IDLE);
-                dataSource.setMaxWait(MAX_WAIT);
-
+                dataSource.setMinIdle(minIdle);
                 // 连接有效性检测
                 dataSource.setValidationQuery("SELECT 1");
 
@@ -427,7 +450,7 @@ public class MBTilesTileCache implements TileCache {
 
 
             log.debug("创建   数据源: {}, readOnly: {}, maxActive: {}",
-                    dbPath, readOnly, readOnly ? MAX_READ_POOL_SIZE : MAX_WRITE_POOL_SIZE);
+                    dbPath, readOnly, readOnly ? maxReadPoolSize : maxWritePoolSize);
 
             return (DruidDataSource) dataSourceDruidFastCreate.toDataSource();
         }
