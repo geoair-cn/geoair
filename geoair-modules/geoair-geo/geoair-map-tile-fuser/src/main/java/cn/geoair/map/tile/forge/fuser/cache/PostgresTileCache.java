@@ -183,7 +183,8 @@ public class PostgresTileCache implements TileCache {
 
         if (z == null) {
             // 删除整个图层
-            return deleteLayerCache(layerName);
+            holder.truncateTable();
+            return true;
         } else if (x == null) {
             // 删除指定层级的所有瓦片
             return holder.deleteByZoom(z);
@@ -357,6 +358,11 @@ public class PostgresTileCache implements TileCache {
             GirAdvOneRow dvOneRow = iAdvExecutor.bSelectOne(sql, SqlParamList.of(zoom));
             Long count = dvOneRow.getLong("count");
             return count != null ? count : 0;
+        }
+
+        public void truncateTable() {
+            iAdvExecutor.dTruncateTable(tableName);
+            initialized = false;
         }
 
         public void dropTable() {
