@@ -476,7 +476,9 @@ public class GirFuserExec implements FuserExec {
                             .forEach(gridx -> {
                                 String key = srcIdx + "_" + gridx + "_" + gridy;
                                 Resource blob = layerTileGetter.getTileResource(srcIdx, gridx, gridy);
-                                resourceMap.put(key, blob);
+                                if (blob != null) {
+                                    resourceMap.put(key, blob);
+                                }
                             });
                 });
         stopWatch.stop();

@@ -1,11 +1,13 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
 import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 文件系统缓存实现
@@ -13,6 +15,7 @@ import java.nio.file.*;
  * @author 张俊
  * @date Created in 2023/12/4
  * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
+ * 注意：根据图层的 OriginType 自动处理 Y 轴翻转（Google 坐标系 ↔ TMS 坐标系）
  */
 @Slf4j
 public class FileTileCache implements TileCache {
@@ -23,10 +26,12 @@ public class FileTileCache implements TileCache {
     private final long expireTime;
     // 是否启用缓存
     private final boolean enabled;
+    // 缓存图层 Y 轴翻转配置
+    private final ConcurrentHashMap<String, Boolean> layerReverseCache = new ConcurrentHashMap<>();
 
 
     public FileTileCache() {
-        this(FileUtil.getTmpDirPath() + "/gwc_fuser/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
+        this(FileUtil.getTmpDirPath() + "/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
     }
 
     public FileTileCache(String cacheRoot) {
@@ -53,11 +58,27 @@ public class FileTileCache implements TileCache {
         }
     }
 
+    /**
+     * 判断图层是否需要翻转 Y
+     *
+     * @param layerName 图层名称
+     * @return true: 需要翻转（Google 坐标系 → TMS 坐标系）
+     */
+    private boolean isNeedReverseY(String layerName) {
+        return layerReverseCache.computeIfAbsent(layerName, k -> FuserCacheUtils.isNeedReverseY(layerName));
+    }
 
+
+
+    /**
+     * 获取缓存文件路径（支持 Y 轴翻转）
+     */
     private Path getCachePath(String layerName, int z, int x, int y, ImageMime format) {
-        // 使用layerName/z/x/目录结构，文件名为y.png
+        boolean needReverse = isNeedReverseY(layerName);
+        int storeY = FuserCacheUtils.getStoreY(z, y, needReverse);
+        // 使用layerName/z/x/目录结构，文件名为storeY.format
         String subDir = layerName + "/" + z + "/" + x;
-        return Paths.get(cacheRoot, subDir, y + "." + format.getFileExtension());
+        return Paths.get(cacheRoot, subDir, storeY + "." + format.getFileExtension());
     }
 
 
@@ -146,6 +167,9 @@ public class FileTileCache implements TileCache {
             // 异步删除临时目录
             asyncDeleteDirectory(tempPath);
 
+            // 清除缓存的翻转配置
+            layerReverseCache.remove(layerName);
+
             return true;
 
         } catch (IOException e) {
@@ -155,6 +179,8 @@ public class FileTileCache implements TileCache {
             try {
                 log.warn("尝试直接删除图层缓存: {}", layerName);
                 deleteDirectorySync(layerPath);
+                // 清除缓存的翻转配置
+                layerReverseCache.remove(layerName);
                 return true;
             } catch (IOException ex) {
                 log.error("直接删除图层缓存也失败: {}", layerName, ex);
@@ -291,6 +317,9 @@ public class FileTileCache implements TileCache {
             // 异步删除临时目录
             asyncDeleteDirectory(tempPath);
 
+            // 清除所有翻转配置缓存
+            layerReverseCache.clear();
+
         } catch (IOException e) {
             log.error("重命名缓存根目录失败: {}", cacheRoot, e);
 
@@ -298,6 +327,7 @@ public class FileTileCache implements TileCache {
             try {
                 log.warn("尝试直接清空缓存根目录: {}", cacheRoot);
                 clearAllSync(cacheRootPath);
+                layerReverseCache.clear();
             } catch (IOException ex) {
                 log.error("直接清空缓存根目录也失败: {}", cacheRoot, ex);
             }

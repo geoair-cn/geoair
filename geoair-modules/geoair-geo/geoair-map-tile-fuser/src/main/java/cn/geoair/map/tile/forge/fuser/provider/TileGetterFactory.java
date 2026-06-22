@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
+import cn.geoair.map.tile.forge.fuser.CustomTileGetterHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
@@ -64,7 +65,10 @@ public class TileGetterFactory {
         String type = config.getSrcType();
         PxyType pxyType = PxyType.fromMode(type);
         Integer gridSrid = config.getGridSrid();
-
+        if (pxyType.isCustom()) {
+            CustomTileGetterHelper instance = CustomTileGetterHelper.getInstance();
+            return instance.getTileGetterByPxyLayerInfo(config);
+        }
         if (pxyType.isLocal()) {
             if (gridSrid.equals(3857)) {
                 return new GoogleLocalFileTileGetter(config);

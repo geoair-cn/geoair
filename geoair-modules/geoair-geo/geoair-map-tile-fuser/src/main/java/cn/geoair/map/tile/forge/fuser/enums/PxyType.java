@@ -11,6 +11,7 @@ import lombok.Getter;
 public enum PxyType {
 
     WEB("web"),
+    CUSTOM("custom"), // 自定义实现
     MBTILES("mbtiles"), // 没有实现
     ARCGISV2("arcgisv2"),// 没有实现
     ARCGISV1("arcgisv1"),// 没有实现
@@ -48,7 +49,12 @@ public enum PxyType {
     public boolean isLocal() {
         return this == LOCAL;
     }
-
+    /**
+     * 判断是否为自定义实现
+     */
+    public boolean isCustom() {
+        return this == CUSTOM;
+    }
     @Override
     public String toString() {
         return mode;

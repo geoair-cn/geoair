@@ -28,7 +28,7 @@ public class ZoomPreCacheTask implements Runnable {
 
 
     private final int zoom;
-    private final Geometry geometry;
+    private final Geometry geometry4326;
     private final CountDownLatch latch;
     private final AtomicInteger totalCount;
     private final AtomicInteger successCount;
@@ -36,13 +36,13 @@ public class ZoomPreCacheTask implements Runnable {
     private final ImageMime format;
 
     public ZoomPreCacheTask(String layerName,
-                            int zoom, Geometry geometry, CountDownLatch latch,
+                            int zoom, Geometry geometry4326, CountDownLatch latch,
                             AtomicInteger totalCount, AtomicInteger successCount,
                             AtomicInteger failCount, ImageMime format) {
         this.layerName = layerName;
 
         this.zoom = zoom;
-        this.geometry = geometry;
+        this.geometry4326 = geometry4326;
         this.latch = latch;
         this.totalCount = totalCount;
         this.successCount = successCount;
@@ -54,7 +54,7 @@ public class ZoomPreCacheTask implements Runnable {
     public void run() {
         try {
             // 计算当前层级的瓦片范围
-            RangeApo rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry);
+            RangeApo rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
@@ -74,6 +74,11 @@ public class ZoomPreCacheTask implements Runnable {
                 for (int y = minY; y <= maxY; y++) {
                     try {
                         BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                        String wktString = box.getWktString(4326);
+                        Geometry geometryByBox = GirAdvTools.getFormatOpt().wktToJtsGeometry(wktString);
+                        if (!geometry4326.intersects(geometryByBox)) { // 包含或者相交都算
+                            continue;
+                        }
                         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
                         CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(layerName, zoom, x, y, bounds, 256, 256, ImageMime.png);
                         // 检查缓存是否已存在
