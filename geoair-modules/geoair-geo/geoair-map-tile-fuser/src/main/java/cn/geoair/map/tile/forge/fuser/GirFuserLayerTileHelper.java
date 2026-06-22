@@ -11,7 +11,7 @@ import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
 /**
  * @author ：张俊
  * @date ：Created in 2026/6/15 11:55
- * @description：  PxyLayerInfo 的获取实现
+ * @description： PxyLayerInfo 的获取实现
  */
 public interface GirFuserLayerTileHelper {
 
@@ -24,7 +24,7 @@ public interface GirFuserLayerTileHelper {
         if (GutilObject.isEmpty(pxyLayerInfo)) {
             return null;
         }
-        return TileGetterFactory.create(pxyLayerInfo, TileCacheFactory.getDefaultCache());
+        return TileGetterFactory.create(pxyLayerInfo, CustomTileCacheHelper.getInstance().getTileCache(layerName));
     }
 
     PxyLayerInfo getPxyLayerInfo(String layerName);

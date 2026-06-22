@@ -4,9 +4,9 @@ package cn.geoair.map.tile.forge.fuser.fuser;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
-import cn.geoair.map.tile.forge.fuser.cache.TileCacheFactory;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +72,7 @@ public class GirFuserExecFactory {
         FuserExec tileFuser = new GirFuserExec(layerTileGetter, outputFormat, bounds, width, height);
 
         // 获取缓存实例
-        TileCache tileCache = TileCacheFactory.getDefaultCache();
+        TileCache tileCache = CustomTileCacheHelper.getInstance().getTileCache(layerName);
 
         // 创建带缓存的融合器
         return new CacheTileFuserExec(tileFuser, tileCache, layerName, z, x, y);

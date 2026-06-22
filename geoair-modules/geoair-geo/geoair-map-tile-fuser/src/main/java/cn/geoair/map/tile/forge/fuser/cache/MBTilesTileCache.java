@@ -426,7 +426,6 @@ public class MBTilesTileCache implements TileCache {
         }
 
 
-
         public byte[] get(int z, int x, int y) {
             checkConnection();
             String sql = "SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?";
@@ -434,7 +433,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
+                pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
@@ -454,7 +453,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
+                pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
                 pstmt.setBytes(4, data);
                 return pstmt.executeUpdate() > 0;
             } catch (SQLException e) {
@@ -470,8 +469,10 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
-                return pstmt.executeUpdate() > 0;
+                pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
+                boolean b = pstmt.executeUpdate() > 0;
+                log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
+                return b;
             } catch (SQLException e) {
                 log.error("删除瓦片失败: z={}, x={}, y={}", z, x, y, e);
                 return false;
@@ -516,7 +517,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
+                pstmt.setInt(3, FuserCacheUtils.getStoreY(z, y, needReverseY));
 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     return rs.next();

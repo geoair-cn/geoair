@@ -1,6 +1,9 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
+import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 
 import lombok.Getter;
@@ -102,11 +105,33 @@ public class CacheTileFuserExec implements FuserExec {
         return target.getSrcFormat();
     }
 
+    @Override
+    public RangeApo getSrcRange() {
+        return target.getSrcRange();
+    }
+
     /**
      * 获取底层的GtcTileFuser实例
      */
     public FuserExec getTarget() {
         return target;
+    }
+
+
+    /**
+     * 删除缓存
+     *
+     * @param z
+     * @param x
+     * @param y
+     */
+    public void delCache(Integer z, Integer x, Integer y) {
+        if (y == -1) {
+            tileCache.delete(layerName, z, x);
+        } else {
+            tileCache.delete(layerName, z, x, y, target.getOutputFormat());
+        }
+
     }
 
 

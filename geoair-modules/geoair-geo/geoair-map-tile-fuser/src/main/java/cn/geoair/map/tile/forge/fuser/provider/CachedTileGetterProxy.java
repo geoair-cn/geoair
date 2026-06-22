@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.provider;
 
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
+import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.cache.TileCacheFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
@@ -43,7 +44,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
     public CachedTileGetterProxy(LayerTileGetter target, String layerCachePreFix, TileCache tileCache) {
         this.target = target;
         this.layerCachePreFix = layerCachePreFix;
-        this.tileCache = tileCache != null ? tileCache : TileCacheFactory.getDefaultCache();
+        this.tileCache = tileCache != null ? tileCache : CustomTileCacheHelper.getInstance().getTileCache(layerCachePreFix);
         this.cacheEnabled = this.tileCache.isEnabled();
         log.debug("初始化缓存代理 - layerName: {}, cacheEnabled: {}", layerCachePreFix, cacheEnabled);
     }

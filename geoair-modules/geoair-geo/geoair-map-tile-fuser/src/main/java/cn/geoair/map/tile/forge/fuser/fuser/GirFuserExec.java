@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
@@ -667,6 +668,15 @@ public class GirFuserExec implements FuserExec {
             errorLog("瓦片融合处理失败: {}", e.getMessage(), e);
             throw e;
         }
+    }
+
+    @Override
+    public RangeApo getSrcRange() {
+        if (srcRectangle == null) {
+            determineSourceResolution();
+            determineCanvasLayout();
+        }
+        return new RangeApo(srcRectangle[0], srcRectangle[2], srcRectangle[1], srcRectangle[3], (int) srcRectangle[4]);
     }
 
     /**

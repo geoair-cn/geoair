@@ -3,16 +3,19 @@ package cn.geoair.map.tile.forge.fuser;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.TextMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.fuser.cache.TileCache;
+import cn.geoair.map.tile.forge.fuser.constant.Constant;
+import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -41,6 +44,13 @@ public class TileServiceTran {
         processTileRequest(layerName, z, x, y, bounds, outputFormat);
     }
 
+    public void googleServiceTo4326RequestDelCache(String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857);
+        BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
+        delCache(layerName, z, x, y, bounds, outputFormat);
+    }
+
+
     public void googleServiceTo4326Request(String layerName, Integer z, Integer x, Integer y) {
         googleServiceTo4326Request(layerName, z, x, y, "image/png");
     }
@@ -63,6 +73,12 @@ public class TileServiceTran {
         processTileRequest(layerName, z, x, y, bounds, outputFormat);
     }
 
+    public void grid4490ServiceTo3857RequestDelCache(String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+        BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
+        delCache(layerName, z, x, y, bounds, outputFormat);
+    }
+
     /**
      * 处理瓦片请求的核心方法
      *
@@ -83,13 +99,36 @@ public class TileServiceTran {
             if (imageBytes != null && imageBytes.length > 0) {
                 GirServletUtil.toResponse(GirHttpServletHelper.getResponse(), imageBytes, fromFormat.getMimeType());
             } else {
-                GirServletUtil.toResponse(GirHttpServletHelper.getResponse(), "获取瓦片失败！".getBytes(StandardCharsets.UTF_8), TextMime.txt.getMimeType()+";charset=UTF-8");
+                GirServletUtil.toResponse(GirHttpServletHelper.getResponse(), "获取瓦片失败！".getBytes(StandardCharsets.UTF_8), TextMime.txt.getMimeType() + ";charset=UTF-8");
             }
 
         } catch (Exception e) {
             String message = StrUtil.format("生成瓦片失败: layerName={}, z={}, x={}, y={},异常信息：{}", layerName, z, x, y, e.getMessage());
             log.error(message, e);
-            GirServletUtil.toResponse(GirHttpServletHelper.getResponse(), message.getBytes(StandardCharsets.UTF_8), TextMime.txt.getMimeType()+";charset=UTF-8");
+            GirServletUtil.toResponse(GirHttpServletHelper.getResponse(), message.getBytes(StandardCharsets.UTF_8), TextMime.txt.getMimeType() + ";charset=UTF-8");
         }
     }
+
+
+    public void delCache(String layerName, Integer z, Integer x, Integer y, BoundingBox bounds, String outputFormat) {
+        MimeType fromFormat = ImageMime.createFromFormat(outputFormat);
+        CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
+                layerName, z, x, y, bounds, 256, 256, (ImageMime) fromFormat);
+        cacheTileFuser.delCache(z, x, y);
+        TileCache tileCache = CustomTileCacheHelper.getInstance().getTileCache(layerName + Constant._original_grid_name_suffix);
+        RangeApo srcRange = cacheTileFuser.getSrcRange();
+        int minX = srcRange.getMinX();
+        int maxX = srcRange.getMaxX();
+        int minY = srcRange.getMinY();
+        int maxY = srcRange.getMaxY();
+        int z1 = srcRange.getZ();
+        for (int i = minX; i <= maxX; i++) {
+            for (int j = minY; j <= maxY; j++) {
+                tileCache.delete(layerName + Constant._original_grid_name_suffix, z1, i, j, (ImageMime) fromFormat);
+            }
+        }
+
+
+    }
+
 }

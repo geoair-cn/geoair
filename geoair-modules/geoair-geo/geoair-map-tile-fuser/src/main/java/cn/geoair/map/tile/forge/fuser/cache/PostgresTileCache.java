@@ -319,7 +319,9 @@ public class PostgresTileCache implements TileCache {
         public boolean delete(int z, int x, int y) {
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
             String sql = "DELETE FROM " + tableName + " WHERE z = ? AND x = ? AND y = ?";
-            return iAdvExecutor.bInsertBySql(sql, SqlParamList.of(z, x, storeY)) > 0;
+            boolean b = iAdvExecutor.bInsertBySql(sql, SqlParamList.of(z, x, storeY)) > 0;
+            log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
+            return b;
         }
 
         public boolean deleteByZoom(int z) {
@@ -337,7 +339,7 @@ public class PostgresTileCache implements TileCache {
         }
 
         public boolean exists(int z, int x, int y) {
-            int storeY =FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
             String sql = "SELECT count(1) as count FROM " + tableName + " WHERE z = ? AND x = ? AND y = ?";
             GirAdvOneRow dvOneRow = iAdvExecutor.bSelectOne(sql, SqlParamList.of(z, x, storeY));
             Long count = dvOneRow.getLong("count");
