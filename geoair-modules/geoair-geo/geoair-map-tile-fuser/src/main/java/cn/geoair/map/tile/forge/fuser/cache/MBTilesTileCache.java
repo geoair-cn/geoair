@@ -135,33 +135,26 @@ public class MBTilesTileCache implements TileCache {
             return null;
         }
 
-        // 先尝试获取已存在的
-        LayerCacheHolder holder = layerCaches.get(layerName);
-        if (holder != null) {
-            return holder;
-        }
-
-        // 创建新的 holder
         try {
-            String dbPath = getDbPath(layerName);
-            LayerCacheHolder newHolder = new LayerCacheHolder(
-                    dbPath,
-                    FuserCacheUtils.isNeedReverseY(layerName),
-                    maxReadPoolSize,
-                    maxWritePoolSize,
-                    minIdle
-            );
-
-            // 使用 putIfAbsent 保证线程安全
-            LayerCacheHolder existing = layerCaches.putIfAbsent(layerName, newHolder);
-            if (existing != null) {
-                // 如果有其他线程已经创建了，关闭当前新建的
-                newHolder.close();
-                return existing;
-            }
-            return newHolder;
+            // 使用 computeIfAbsent 保证原子性
+            return layerCaches.computeIfAbsent(layerName, key -> {
+                try {
+                    String dbPath = getDbPath(key);
+                    log.debug("创建图层缓存: {}", key);
+                    return new LayerCacheHolder(
+                            dbPath,
+                            FuserCacheUtils.isNeedReverseY(key),
+                            maxReadPoolSize,
+                            maxWritePoolSize,
+                            minIdle
+                    );
+                } catch (Exception e) {
+                    log.error("创建图层缓存失败: {}", key, e);
+                    return null;
+                }
+            });
         } catch (Exception e) {
-            log.error("创建图层缓存失败: {}", layerName, e);
+            log.error("获取或创建图层缓存异常: {}", layerName, e);
             return null;
         }
     }
