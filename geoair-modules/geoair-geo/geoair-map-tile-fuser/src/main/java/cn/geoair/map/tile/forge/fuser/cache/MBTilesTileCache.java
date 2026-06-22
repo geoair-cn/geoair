@@ -108,7 +108,7 @@ public class MBTilesTileCache implements TileCache {
                         log.info("创建缓存根目录: {}", this.cacheRoot);
                     }
                 }
-                log.info("Druid MBTiles 缓存初始化完成，根目录: {}", this.cacheRoot);
+                log.info("  MBTiles 缓存初始化完成，根目录: {}", this.cacheRoot);
             } catch (Exception e) {
                 log.error("创建缓存根目录失败: {}", this.cacheRoot, e);
             }
@@ -374,7 +374,7 @@ public class MBTilesTileCache implements TileCache {
     // ==================== 内部类 ====================
 
     /**
-     * 单个图层的缓存持有者（Druid 连接池 - 读写分离）
+     * 单个图层的缓存持有者（ 连接池 - 读写分离）
      */
     @Slf4j
     private static class LayerCacheHolder {
