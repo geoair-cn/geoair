@@ -1,9 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
-import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.fuser.GirFuserLayerTileHelper;
-import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
+import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
@@ -115,17 +113,7 @@ public class MBTilesTileCache implements TileCache {
         return layerCaches.computeIfAbsent(layerName, k -> {
             try {
                 String dbPath = getDbPath(layerName);
-                try {
-                    PxyLayerInfo pxyLayerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
-                    if (pxyLayerInfo != null) {
-                        return new LayerCacheHolder(dbPath, true);
-                    } else {
-                        return new LayerCacheHolder(dbPath, false);
-                    }
-                } catch (Exception e) {
-
-                }
-                return new LayerCacheHolder(dbPath, false);
+                return new LayerCacheHolder(dbPath, FuserCacheUtils.isNeedReverseY(layerName));
             } catch (Exception e) {
                 log.error("创建图层缓存失败: {}", layerName, e);
                 return null;
@@ -355,7 +343,7 @@ public class MBTilesTileCache implements TileCache {
         private final String dbPath;
         private Connection connection;
         private volatile boolean initialized = false;
-        private volatile boolean needTranTmsY = false;
+        private volatile boolean needReverseY = false;
 
         public LayerCacheHolder(String dbPath) {
             this.dbPath = dbPath;
@@ -364,7 +352,7 @@ public class MBTilesTileCache implements TileCache {
 
         public LayerCacheHolder(String dbPath, boolean needTranTmsY) {
             this.dbPath = dbPath;
-            this.needTranTmsY = needTranTmsY;
+            this.needReverseY = needTranTmsY;
             init();
         }
 
@@ -437,17 +425,7 @@ public class MBTilesTileCache implements TileCache {
             }
         }
 
-        //        /**
-//         * XYZ → TMS Y 转换
-//         */
-        private int xyzToTmsY(int z, int y) {
-            if (needTranTmsY) {
-                return GirAdvTools.getTileGrid3857Opt().reverseY(y, z);   // 这里使用3857的网格翻转逻辑来进行翻转Y，不进行判断43426的网格原因是因为mbtile规范并不支持4326网格，这里在4326网格的时候就把mbtiles当做一个存储器
-            } else {
-                return y;
-            }
 
-        }
 
         public byte[] get(int z, int x, int y) {
             checkConnection();
@@ -456,7 +434,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3, xyzToTmsY(z, y));
+                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
@@ -476,7 +454,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3, xyzToTmsY(z, y));
+                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
                 pstmt.setBytes(4, data);
                 return pstmt.executeUpdate() > 0;
             } catch (SQLException e) {
@@ -492,7 +470,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3, xyzToTmsY(z, y));
+                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
                 return pstmt.executeUpdate() > 0;
             } catch (SQLException e) {
                 log.error("删除瓦片失败: z={}, x={}, y={}", z, x, y, e);
@@ -538,7 +516,7 @@ public class MBTilesTileCache implements TileCache {
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 pstmt.setInt(1, z);
                 pstmt.setInt(2, x);
-                pstmt.setInt(3, xyzToTmsY(z, y));
+                pstmt.setInt(3,  FuserCacheUtils.getStoreY(z, y,needReverseY));
 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     return rs.next();

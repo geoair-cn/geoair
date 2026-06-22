@@ -77,7 +77,7 @@ public class CacheTileFuserExec implements FuserExec {
         // 将结果存入缓存
         if (result != null && result.length > 0) {
             try {
-                tileCache.put(layerName, z, x, y, result,target.getOutputFormat() );
+                tileCache.put(layerName, z, x, y, result, target.getOutputFormat());
                 long totalTime = System.currentTimeMillis() - startTime;
                 log.debug("融合完成并已缓存 - layer: {}, z: {}, x: {}, y: {}, 融合耗时: {} ms, 总耗时: {} ms, 数据大小: {} bytes",
                         layerName, z, x, y, fusionTime, totalTime, result.length);
