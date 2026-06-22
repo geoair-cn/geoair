@@ -96,6 +96,8 @@ public class GoogleWebTileGetter extends BaseTileGetter {
                         return new ByteArrayResource(baos.toByteArray());
                     }
                 }
+            } else {
+                log.debug("请求远程瓦片失败 z:{}, x:{}, y:{},code:{},message:{}", z, x, y, response.getStatus(), response.body());
             }
         } catch (Exception e) {
             log.error("请求远程瓦片失败 z:{}, x:{}, y:{}", z, x, y, e);

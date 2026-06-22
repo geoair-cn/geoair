@@ -76,7 +76,7 @@ public class ZoomPreCacheTask implements Runnable {
                         BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
                         String wktString = box.getWktString(4326);
                         Geometry geometryByBox = GirAdvTools.getFormatOpt().wktToJtsGeometry(wktString);
-                        if (!geometry4326.contains(geometryByBox)) {
+                        if (!geometry4326.intersects(geometryByBox)) { // 包含或者相交都算
                             continue;
                         }
                         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());

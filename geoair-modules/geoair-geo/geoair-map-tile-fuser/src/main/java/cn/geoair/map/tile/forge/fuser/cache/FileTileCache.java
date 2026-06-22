@@ -26,7 +26,7 @@ public class FileTileCache implements TileCache {
 
 
     public FileTileCache() {
-        this(FileUtil.getTmpDirPath() + "/gwc_fuser/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
+        this(FileUtil.getTmpDirPath() + "/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
     }
 
     public FileTileCache(String cacheRoot) {
