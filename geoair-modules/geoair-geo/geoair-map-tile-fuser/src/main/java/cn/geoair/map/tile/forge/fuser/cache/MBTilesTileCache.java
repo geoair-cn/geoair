@@ -241,7 +241,7 @@ public class MBTilesTileCache implements TileCache {
 
         if (z == null) {
             // 删除整个图层
-            return deleteLayerCache(layerName);
+            return holder.truncateTable();
         } else if (x == null) {
             // 删除指定层级的所有瓦片
             return holder.deleteByZoom(z);
@@ -601,6 +601,18 @@ public class MBTilesTileCache implements TileCache {
 
             } catch (SQLException e) {
                 log.error("删除层级失败: z={}, db={}", z, dbPath, e);
+                return false;
+            }
+        }
+
+        public boolean truncateTable() {
+            checkInitialized();
+            String sql = "DELETE FROM tiles  ";
+            try (Connection conn = writeDataSource.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                int count = pstmt.executeUpdate();
+                return count > 0;
+            } catch (SQLException e) {
                 return false;
             }
         }
