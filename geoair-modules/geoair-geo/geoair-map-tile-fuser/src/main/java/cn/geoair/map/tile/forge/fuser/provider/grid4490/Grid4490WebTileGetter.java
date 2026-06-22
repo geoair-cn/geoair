@@ -92,7 +92,7 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
                         ImageMime srcFormat = getSrcFormat();
                         String internalName = srcFormat.getInternalName();
                         ImageIO.write(read, internalName, baos);
-                        log.debug("从网络获取瓦片成功: {} - ({},{},{})", httpUrl, z, x, y);
+                        log.info("从网络获取瓦片成功: {} - ({},{},{})", httpUrl, z, x, y);
                         return new ByteArrayResource(baos.toByteArray());
                     }
                 }

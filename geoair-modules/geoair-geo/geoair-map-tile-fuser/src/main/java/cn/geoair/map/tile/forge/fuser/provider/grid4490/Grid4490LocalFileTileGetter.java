@@ -64,7 +64,7 @@ public class Grid4490LocalFileTileGetter extends BaseTileGetter {
                     ImageIO.write(read, internalName, baos);
                     imageBytes = baos.toByteArray();
                 }
-                log.debug("从本地文件读取瓦片成功（转换为PNG）: {}", file.getAbsolutePath());
+                log.info("从本地文件读取瓦片成功（转换为PNG）: {}", file.getAbsolutePath());
             } else {
                 imageBytes = FileUtil.readBytes(file);
                 log.debug("从本地文件读取瓦片成功（原始格式）: {}", file.getAbsolutePath());
