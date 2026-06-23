@@ -438,8 +438,33 @@ public class TileBlankDetector {
         return false;
     }
 
+//    /**
+//     * 检测像素是否为空白
+//     */
+//    private static boolean isBlankPixel(int rgb, String format) {
+//        int alpha = (rgb >> 24) & 0xFF;
+//
+//        // 完全透明
+//        if (alpha == 0) {
+//            return true;
+//        }
+//
+//        int red = (rgb >> 16) & 0xFF;
+//        int green = (rgb >> 8) & 0xFF;
+//        int blue = rgb & 0xFF;
+//
+//        // 检测是否为纯白色或接近白色
+//        boolean isWhite = red >= WHITE_THRESHOLD && green >= WHITE_THRESHOLD && blue >= WHITE_THRESHOLD;
+//
+//        // PNG格式：透明或半透明也算空白
+//        if (format != null && format.toLowerCase().contains("png")) {
+//            return isWhite || alpha < 50;
+//        }
+//
+//        return isWhite;
+//    }
     /**
-     * 检测像素是否为空白
+     * 检测像素是否为空白（只检测透明像素）
      */
     private static boolean isBlankPixel(int rgb, String format) {
         int alpha = (rgb >> 24) & 0xFF;
@@ -449,19 +474,13 @@ public class TileBlankDetector {
             return true;
         }
 
-        int red = (rgb >> 16) & 0xFF;
-        int green = (rgb >> 8) & 0xFF;
-        int blue = rgb & 0xFF;
-
-        // 检测是否为纯白色或接近白色
-        boolean isWhite = red >= WHITE_THRESHOLD && green >= WHITE_THRESHOLD && blue >= WHITE_THRESHOLD;
-
-        // PNG格式：透明或半透明也算空白
+        // PNG格式：半透明也算空白（alpha < 50 视为接近透明）
         if (format != null && format.toLowerCase().contains("png")) {
-            return isWhite || alpha < 50;
+            return alpha < 50;
         }
 
-        return isWhite;
+        // 非PNG格式，只有完全透明才算空白
+        return false;
     }
 
 
