@@ -92,8 +92,13 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             Set<Map.Entry<String, AdvDataSourceWrapper>> entries = dataSourceMap.entrySet();
             entries.forEach(
                     entry -> {
-                        // 关闭数据源，释放连接
-                        entry.getValue().close();
+                        try {
+                            // 关闭数据源，释放连接
+                            entry.getValue().close();
+                        } catch (Exception e) {
+                          log.error(e, e.getMessage());
+                        }
+
                     });
             dataSourceMap.clear();
         }
