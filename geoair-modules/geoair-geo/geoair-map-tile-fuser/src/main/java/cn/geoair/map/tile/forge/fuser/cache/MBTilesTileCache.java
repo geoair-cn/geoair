@@ -114,16 +114,25 @@ public class MBTilesTileCache implements TileCache {
      * 获取或创建图层的缓存持有者
      */
     private LayerCacheHolder getOrCreateHolder(String layerName) {
+        return getOrCreateHolder(layerName, false);
+    }
+
+    /**
+     * 获取或创建图层的缓存持有者
+     */
+    private LayerCacheHolder getOrCreateHolder(String layerName, boolean initIs) {
         if (!enabled) {
             return null;
         }
 
         try {
-            LayerCacheHolder layerCacheHolder = layerCaches.computeIfAbsent(layerName, key -> {
-                try {
-                    String dbPath = getDbPath(key);
-                    if (FileUtil.exist(dbPath)) {
-                        log.debug("创建图层缓存: {}", key);
+
+            LayerCacheHolder result = layerCaches.compute(layerName, (key, oldValue) -> {
+                // 情况1: initIs 为 true 且旧值为 NULL_OBJ，需要重建
+                if (initIs && oldValue == NULL_OBJ) {
+                    try {
+                        String dbPath = getDbPath(key);
+                        log.debug("重建图层缓存: {}", key);
                         return new LayerCacheHolder(
                                 dbPath,
                                 FuserCacheUtils.isNeedReverseY(key),
@@ -131,19 +140,45 @@ public class MBTilesTileCache implements TileCache {
                                 maxWritePoolSize,
                                 minIdle
                         );
-                    } else {
-                        return NULL_OBJ;
+                    } catch (Exception e) {
+                        log.error("重建图层缓存失败: {}", key, e);
+                        return null;
                     }
-                } catch (Exception e) {
-                    log.error("创建图层缓存失败: {}", key, e);
-                    return null;
                 }
+
+                // 情况2: 旧值不存在，需要创建
+                if (oldValue == null) {
+                    try {
+                        String dbPath = getDbPath(key);
+                        if (FileUtil.exist(dbPath)) {
+                            log.debug("创建图层缓存: {}", key);
+                            return new LayerCacheHolder(
+                                    dbPath,
+                                    FuserCacheUtils.isNeedReverseY(key),
+                                    maxReadPoolSize,
+                                    maxWritePoolSize,
+                                    minIdle
+                            );
+                        } else {
+                            log.warn("图层缓存文件不存在: {}", dbPath);
+                            return NULL_OBJ;
+                        }
+                    } catch (Exception e) {
+                        log.error("创建图层缓存失败: {}", key, e);
+                        return null;
+                    }
+                }
+
+                // 情况3: 旧值存在，直接返回
+                return oldValue;
             });
-            if (layerCacheHolder == null || layerCacheHolder == NULL_OBJ) {
+
+            // 判断返回结果
+            if (result == null || result == NULL_OBJ) {
                 return null;
-            }else{
-                return layerCacheHolder;
             }
+            return result;
+
         } catch (Exception e) {
             log.error("获取或创建图层缓存异常: {}", layerName, e);
             return null;
@@ -156,7 +191,7 @@ public class MBTilesTileCache implements TileCache {
             return null;
         }
 
-        LayerCacheHolder holder = getOrCreateHolder(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName, false);
         if (holder == null) {
             return null;
         }
@@ -176,7 +211,7 @@ public class MBTilesTileCache implements TileCache {
             return false;
         }
 
-        LayerCacheHolder holder = getOrCreateHolder(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName, true);
         if (holder == null) {
             return false;
         }
@@ -454,7 +489,7 @@ public class MBTilesTileCache implements TileCache {
             checkInitialized();
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
             boolean result = MbtilesUtils.deleteTile(writeDataSource, z, x, storeY);
-            log.info("删除瓦片成功: z={}, x={}, y={}, db={}", z, x, y,dbPath);
+            log.info("删除瓦片成功: z={}, x={}, y={}, db={}", z, x, y, dbPath);
             return result;
         }
 
