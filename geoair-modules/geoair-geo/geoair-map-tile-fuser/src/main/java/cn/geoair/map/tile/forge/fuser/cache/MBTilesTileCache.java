@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
@@ -91,6 +92,7 @@ public class MBTilesTileCache implements TileCache {
                 log.error("创建缓存根目录失败: {}", this.cacheRoot, e);
             }
         }
+        GutilShutdownHook.getInstance().registerTask(this::close);
     }
 
     /**
