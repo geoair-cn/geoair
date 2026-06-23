@@ -4,6 +4,7 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
+import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -168,22 +169,19 @@ public class HttpTileRequestUtils {
     }
 
 
-
-
-
     // ==================== 瓦片请求方法 ====================
 
     /**
      * 请求瓦片数据（带重试）
      *
-     * @param url              请求 URL
-     * @param proxy            代理（可为 null）
-     * @param timeout          超时时间（毫秒）
-     * @param maxRetries       最大重试次数
-     * @param retryDelay       重试延迟（毫秒）
-     * @param maxRetryDelay    最大重试延迟（毫秒）
-     * @param srcFormat        源图片格式
-     * @param logContext       日志上下文（用于记录 z, x, y 等信息）
+     * @param url           请求 URL
+     * @param proxy         代理（可为 null）
+     * @param timeout       超时时间（毫秒）
+     * @param maxRetries    最大重试次数
+     * @param retryDelay    重试延迟（毫秒）
+     * @param maxRetryDelay 最大重试延迟（毫秒）
+     * @param srcFormat     源图片格式
+     * @param logContext    日志上下文（用于记录 z, x, y 等信息）
      * @return 瓦片 Resource，失败返回 null
      */
     public static Resource requestTileWithRetry(String url,
@@ -201,15 +199,15 @@ public class HttpTileRequestUtils {
     /**
      * 请求瓦片数据（带重试和自定义请求头）
      *
-     * @param url              请求 URL
-     * @param proxy            代理（可为 null）
-     * @param timeout          超时时间（毫秒）
-     * @param maxRetries       最大重试次数
-     * @param retryDelay       重试延迟（毫秒）
-     * @param maxRetryDelay    最大重试延迟（毫秒）
-     * @param srcFormat        源图片格式
-     * @param logContext       日志上下文（用于记录 z, x, y 等信息）
-     * @param headers          自定义请求头
+     * @param url           请求 URL
+     * @param proxy         代理（可为 null）
+     * @param timeout       超时时间（毫秒）
+     * @param maxRetries    最大重试次数
+     * @param retryDelay    重试延迟（毫秒）
+     * @param maxRetryDelay 最大重试延迟（毫秒）
+     * @param srcFormat     源图片格式
+     * @param logContext    日志上下文（用于记录 z, x, y 等信息）
+     * @param headers       自定义请求头
      * @return 瓦片 Resource，失败返回 null
      */
     public static Resource requestTileWithRetry(String url,
@@ -245,14 +243,15 @@ public class HttpTileRequestUtils {
                             ImageIO.write(image, internalName, baos);
 
                             long elapsed = System.currentTimeMillis() - startTime;
+                            byte[] byteArray = baos.toByteArray();
                             if (attempt > 1) {
                                 log.info("瓦片请求重试成功: {} - {} 尝试: {} 耗时: {}ms",
                                         url, logContext, attempt, elapsed);
                             } else {
-                                log.info("瓦片请求成功: {} - {} 耗时: {}ms",
-                                        url, logContext, elapsed);
+                                log.info("瓦片请求成功: {} - {} 耗时: {}ms ,bodySize:{}",
+                                        url, logContext, elapsed, DataSizeUtil.format(byteArray.length));
                             }
-                            return new ByteArrayResource(baos.toByteArray());
+                            return new ByteArrayResource(byteArray);
                         }
                     } else {
                         // 响应无法解析为图片
@@ -380,9 +379,9 @@ public class HttpTileRequestUtils {
     /**
      * 计算重试延迟时间（指数退避 + 随机抖动）
      *
-     * @param attempt       当前尝试次数（从1开始）
-     * @param baseDelay     基础延迟（毫秒）
-     * @param maxDelay      最大延迟（毫秒）
+     * @param attempt   当前尝试次数（从1开始）
+     * @param baseDelay 基础延迟（毫秒）
+     * @param maxDelay  最大延迟（毫秒）
      * @return 延迟时间（毫秒）
      */
     private static long calculateRetryDelay(int attempt, long baseDelay, long maxDelay) {
@@ -394,7 +393,6 @@ public class HttpTileRequestUtils {
         double jitter = 0.9 + Math.random() * 0.2;
         return (long) (delay * jitter);
     }
-
 
 
 }

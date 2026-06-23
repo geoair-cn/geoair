@@ -68,7 +68,7 @@ public class GutilShutdownHook {
 
         synchronized (shutdownTasks) {
             shutdownTasks.add(task);
-            log.debug("已注册关闭任务: {}", task.getClass().getSimpleName());
+            log.debug("已注册关闭任务: {}", generateTaskName(task));
         }
 
         // 确保钩子已注册
@@ -194,5 +194,41 @@ public class GutilShutdownHook {
             shutdownTasks.clear();
             log.debug("已清空所有关闭任务");
         }
+    }
+
+    /**
+     * 生成任务名称
+     * <p>
+     * 对于 Lambda 表达式，尝试从堆栈中获取调用者信息
+     * </p>
+     *
+     * @param task 任务
+     * @return 任务名称
+     */
+    private String generateTaskName(Runnable task) {
+        // 获取任务对象的类名
+        String className = task.getClass().getSimpleName();
+
+        // 如果是 Lambda 表达式
+        if (className.contains("$$Lambda")) {
+            // 尝试从堆栈中获取调用者信息
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement element : stackTrace) {
+                String methodName = element.getMethodName();
+                // 跳过当前类的方法
+                if (!element.getClassName().equals(GutilShutdownHook.class.getName())) {
+                    // 提取调用者信息
+                    String simpleClassName = element.getClassName();
+                    if (simpleClassName.contains(".")) {
+                        simpleClassName = simpleClassName.substring(simpleClassName.lastIndexOf('.') + 1);
+                    }
+                    return String.format("Lambda-%s.%s", simpleClassName, methodName);
+                }
+            }
+            return "Lambda-Unknown";
+        }
+
+        // 普通类，返回类名
+        return className;
     }
 }
