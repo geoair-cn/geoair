@@ -2,10 +2,9 @@ package cn.geoair.map.tile.forge.fuser.provider;
 
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeException;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.provider.util.GridInitUtils;
+import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 

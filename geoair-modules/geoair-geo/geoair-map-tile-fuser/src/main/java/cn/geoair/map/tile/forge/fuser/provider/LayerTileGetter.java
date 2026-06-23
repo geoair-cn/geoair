@@ -12,6 +12,14 @@ import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
  */
 public interface LayerTileGetter {
 
+    /**
+     * 获取瓦片资源的请求 ，注意，这里的xyz是tms的网格
+     *
+     * @param z z级别
+     * @param x x轴网格
+     * @param y tms的Y
+     * @return
+     */
     Resource getTileResource(int z, int x, int y);
 
 
