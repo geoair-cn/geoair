@@ -5,6 +5,7 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +32,9 @@ public class MBTilesTileCache implements TileCache {
 
     private final String cacheRoot;
     private final boolean enabled;
+
+    LayerCacheHolder NULL_OBJ = new LayerCacheHolder();
+
     private final ConcurrentHashMap<String, LayerCacheHolder> layerCaches = new ConcurrentHashMap<>();
 
     private int maxReadPoolSize = 20;
@@ -115,22 +119,31 @@ public class MBTilesTileCache implements TileCache {
         }
 
         try {
-            return layerCaches.computeIfAbsent(layerName, key -> {
+            LayerCacheHolder layerCacheHolder = layerCaches.computeIfAbsent(layerName, key -> {
                 try {
                     String dbPath = getDbPath(key);
-                    log.debug("创建图层缓存: {}", key);
-                    return new LayerCacheHolder(
-                            dbPath,
-                            FuserCacheUtils.isNeedReverseY(key),
-                            maxReadPoolSize,
-                            maxWritePoolSize,
-                            minIdle
-                    );
+                    if (FileUtil.exist(dbPath)) {
+                        log.debug("创建图层缓存: {}", key);
+                        return new LayerCacheHolder(
+                                dbPath,
+                                FuserCacheUtils.isNeedReverseY(key),
+                                maxReadPoolSize,
+                                maxWritePoolSize,
+                                minIdle
+                        );
+                    } else {
+                        return NULL_OBJ;
+                    }
                 } catch (Exception e) {
                     log.error("创建图层缓存失败: {}", key, e);
                     return null;
                 }
             });
+            if (layerCacheHolder == null || layerCacheHolder == NULL_OBJ) {
+                return null;
+            }else{
+                return layerCacheHolder;
+            }
         } catch (Exception e) {
             log.error("获取或创建图层缓存异常: {}", layerName, e);
             return null;
@@ -199,7 +212,7 @@ public class MBTilesTileCache implements TileCache {
             return false;
         }
 
-        LayerCacheHolder holder = layerCaches.get(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             log.debug("图层缓存不存在: {}", layerName);
             return false;
@@ -223,7 +236,7 @@ public class MBTilesTileCache implements TileCache {
             return false;
         }
 
-        LayerCacheHolder holder = layerCaches.get(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return false;
         }
@@ -291,7 +304,7 @@ public class MBTilesTileCache implements TileCache {
             return false;
         }
 
-        LayerCacheHolder holder = layerCaches.get(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return false;
         }
@@ -319,7 +332,7 @@ public class MBTilesTileCache implements TileCache {
      * 获取指定图层的瓦片数量
      */
     public long getTileCount(String layerName) {
-        LayerCacheHolder holder = layerCaches.get(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return 0;
         }
@@ -330,7 +343,7 @@ public class MBTilesTileCache implements TileCache {
      * 获取指定图层指定层级的瓦片数量
      */
     public long getTileCountByZoom(String layerName, int zoom) {
-        LayerCacheHolder holder = layerCaches.get(layerName);
+        LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return 0;
         }
@@ -344,11 +357,14 @@ public class MBTilesTileCache implements TileCache {
      */
     @Slf4j
     private static class LayerCacheHolder {
-        private final String dbPath;
-        private final boolean needReverseY;
-        private final DruidDataSource readDataSource;
-        private final DruidDataSource writeDataSource;
-        private final AtomicBoolean initialized = new AtomicBoolean(false);
+        private String dbPath;
+        private boolean needReverseY;
+        private DruidDataSource readDataSource;
+        private DruidDataSource writeDataSource;
+        private AtomicBoolean initialized = new AtomicBoolean(false);
+
+        public LayerCacheHolder() {
+        }
 
         public LayerCacheHolder(String dbPath, boolean needReverseY, int maxReadPoolSize, int maxWritePoolSize, int minIdle) {
             this.dbPath = dbPath;
@@ -438,9 +454,7 @@ public class MBTilesTileCache implements TileCache {
             checkInitialized();
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
             boolean result = MbtilesUtils.deleteTile(writeDataSource, z, x, storeY);
-            if (result && log.isDebugEnabled()) {
-                log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
-            }
+            log.info("删除瓦片成功: z={}, x={}, y={}", z, x, y);
             return result;
         }
 
@@ -450,7 +464,7 @@ public class MBTilesTileCache implements TileCache {
         public int deleteByZoom(int z) {
             checkInitialized();
             int count = MbtilesUtils.deleteTilesByZoom(writeDataSource, z);
-            log.debug("删除层级 {} 瓦片: {} 个, db={}", z, count, dbPath);
+            log.info("删除层级 {} 瓦片: {} 个, db={}", z, count, dbPath);
             return count;
         }
 
@@ -460,7 +474,7 @@ public class MBTilesTileCache implements TileCache {
         public boolean truncateTable() {
             checkInitialized();
             int count = MbtilesUtils.truncateTiles(writeDataSource);
-            log.debug("清空所有瓦片: {} 个, db={}", count, dbPath);
+            log.info("清空所有瓦片: {} 个, db={}", count, dbPath);
             return count > 0;
         }
 
@@ -470,7 +484,7 @@ public class MBTilesTileCache implements TileCache {
         public int deleteByZoomAndX(int z, int x) {
             checkInitialized();
             int count = MbtilesUtils.deleteTilesByZoomAndX(writeDataSource, z, x);
-            log.debug("删除瓦片: z={}, x={}, 数量: {}, db={}", z, x, count, dbPath);
+            log.info("删除瓦片: z={}, x={}, 数量: {}, db={}", z, x, count, dbPath);
             return count;
         }
 

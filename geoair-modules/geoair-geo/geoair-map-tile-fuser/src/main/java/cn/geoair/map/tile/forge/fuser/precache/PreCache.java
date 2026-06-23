@@ -52,10 +52,23 @@ public class PreCache {
      * @param maxZoom       最大层级
      */
     public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
-        execute(config, wkt4326String, minZoom, maxZoom, null);
+        executePreCache(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+        execute(config, wkt4326String, minZoom, maxZoom, format, false);
+    }
+
+    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
+        executePreCheck(config, wkt4326String, minZoom, maxZoom, null);
+    }
+
+    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+        execute(config, wkt4326String, minZoom, maxZoom, format, true);
+    }
+
+
+    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format, boolean isPreCheck) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
@@ -72,21 +85,37 @@ public class PreCache {
         AtomicInteger totalCount = new AtomicInteger(0);
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
+        AtomicInteger checkedCount = new AtomicInteger(0);
 
         log.info("开始预缓存 - 图层: {}, 层级范围: {}-{}", config.getLayerName(), minZoom, maxZoom);
 
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-            ZoomPreCacheTask task = new ZoomPreCacheTask(
-                    config.getLayerName(), zoom, geometry,
-                    latch, totalCount, successCount, failCount, format
-            );
+            Runnable task;
+            if (isPreCheck) {
+                task = new TileCheckAndRepairTask(
+                        config.getLayerName(), zoom, geometry,
+                        latch, totalCount, checkedCount, successCount, failCount, format
+                );
+            } else {
+                task = new ZoomPreCacheTask(
+                        config.getLayerName(), zoom, geometry,
+                        latch, totalCount, successCount, failCount, format
+                );
+            }
+
             executorService.submit(task);
         }
 
         try {
             latch.await();
-            log.info("预缓存完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
-                    config.getLayerName(), totalCount.get(), successCount.get(), failCount.get());
+            if (isPreCheck) {
+                log.info("预检查完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {},检查瓦片：{}",
+                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get(), checkedCount.get());
+            } else {
+                log.info("预缓存完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
+                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get());
+            }
+
         } catch (InterruptedException e) {
             log.error("预缓存被中断 - 图层: {}", config.getLayerName(), e);
             Thread.currentThread().interrupt();

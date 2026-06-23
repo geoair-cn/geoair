@@ -6,12 +6,17 @@ import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
+import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+
+import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import lombok.extern.slf4j.Slf4j;
 
 import org.locationtech.jts.geom.Geometry;
 
+import java.awt.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -82,10 +87,17 @@ public class ZoomPreCacheTask implements Runnable {
                         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
                         CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(layerName, zoom, x, y, bounds, 256, 256, ImageMime.png);
                         // 检查缓存是否已存在
-                        if (cacheTileFuser.getTileCache().exists(layerName, zoom, x, y, format)) {
-                            zoomSuccess++;
-                            successCount.incrementAndGet();
-                            continue;
+                        TileCache tileCache = cacheTileFuser.getTileCache();
+                        if (tileCache.exists(layerName, zoom, x, y, format)) {
+                            byte[] bytes = tileCache.get(layerName, zoom, x, y, format);
+                            if (TileBlankDetector.hasLargeBlankRect(bytes, format.getInternalName())) {
+                                log.info("检查得到存在空白矩形，判定为异常瓦片，重新生成瓦片！z：{}，x：{}，y：{}", zoom, x, y);
+                                FuserCacheUtils.deleteCacheByRequestGrid(layerName, zoom, x, y, cacheTileFuser, format);
+                            } else {
+                                zoomSuccess++;
+                                successCount.incrementAndGet();
+                                continue;
+                            }
                         }
                         byte[] imageBytes = cacheTileFuser.toImageBytes();
                         if (imageBytes != null) {
