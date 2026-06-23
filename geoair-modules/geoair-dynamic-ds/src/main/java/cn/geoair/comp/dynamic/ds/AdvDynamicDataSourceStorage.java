@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds;
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
@@ -78,7 +79,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     private AdvDynamicDataSourceStorage() {
-
+        GutilShutdownHook.getInstance().registerTask(this::cleanCache);
     }
 
     // 数据源映射

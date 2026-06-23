@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.provider.impl;
 
+import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
@@ -50,8 +51,8 @@ public class MBTilesTileGetter extends BaseTileGetter {
 
         // 初始化数据库
         initDatabase();
-
         log.info("MBTiles 瓦片获取器初始化完成: {}", this.mbtilesFilePath);
+        GutilShutdownHook.getInstance().registerTask(this::close);
     }
 
     private void initDatabase() {
