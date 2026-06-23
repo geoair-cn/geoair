@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.provider.google;
+package cn.geoair.map.tile.forge.fuser.provider.impl.google;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;

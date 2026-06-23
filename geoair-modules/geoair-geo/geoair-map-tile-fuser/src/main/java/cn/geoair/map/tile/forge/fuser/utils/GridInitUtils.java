@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.provider.util;
+package cn.geoair.map.tile.forge.fuser.utils;
 
 
 import cn.geoair.map.tile.forge.core.bygwc.core.DefaultGridsets;
@@ -72,7 +72,6 @@ public class GridInitUtils {
             );
 
     public static GridSubset getWorldGrid3857() {
-
         return WORLD_GRID_3857;
     }
 

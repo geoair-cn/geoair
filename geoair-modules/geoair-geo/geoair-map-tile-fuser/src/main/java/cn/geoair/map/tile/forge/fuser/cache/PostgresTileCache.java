@@ -5,7 +5,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.fuser.cache.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;

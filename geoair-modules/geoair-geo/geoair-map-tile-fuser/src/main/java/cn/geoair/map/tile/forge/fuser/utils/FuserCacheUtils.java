@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.cache.utils;
+package cn.geoair.map.tile.forge.fuser.utils;
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.fuser.GirFuserLayerTileHelper;
