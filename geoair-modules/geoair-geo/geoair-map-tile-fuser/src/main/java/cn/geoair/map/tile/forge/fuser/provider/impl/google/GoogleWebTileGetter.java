@@ -28,7 +28,7 @@ public class GoogleWebTileGetter extends BaseTileGetter {
 
 
     public GoogleWebTileGetter(PxyLayerInfo config) {
-        this(config, 13000, 15000, 15000);
+        this(config, 60*1000*1, 60*1000*3, 60*1000*5);
     }
 
     public GoogleWebTileGetter(PxyLayerInfo config, int connectionTimeout, int readTimeout, int totalTimeout) {
