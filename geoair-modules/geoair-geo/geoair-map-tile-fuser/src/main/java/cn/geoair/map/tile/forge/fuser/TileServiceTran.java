@@ -15,9 +15,10 @@ import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.util.StrUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletResponse;
+
 import java.nio.charset.StandardCharsets;
 
 /**
