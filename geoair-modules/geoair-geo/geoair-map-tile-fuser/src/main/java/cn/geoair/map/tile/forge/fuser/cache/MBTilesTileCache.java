@@ -454,7 +454,7 @@ public class MBTilesTileCache implements TileCache {
             checkInitialized();
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
             boolean result = MbtilesUtils.deleteTile(writeDataSource, z, x, storeY);
-            log.info("删除瓦片成功: z={}, x={}, y={}", z, x, y);
+            log.info("删除瓦片成功: z={}, x={}, y={}, db={}", z, x, y,dbPath);
             return result;
         }
 

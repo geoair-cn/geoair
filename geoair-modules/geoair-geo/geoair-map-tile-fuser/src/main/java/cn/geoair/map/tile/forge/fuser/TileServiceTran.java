@@ -196,16 +196,7 @@ public class TileServiceTran {
             byte[] imageBytes = cacheTileFuser.toImageBytes();
 
             // 返回响应
-            if (imageBytes != null && imageBytes.length > 0) {
-                GirServletUtil.toResponse(response, imageBytes, fromFormat.getMimeType());
-                log.debug("瓦片生成成功: layer={}, z={}, x={}, y={}, size={} bytes",
-                        layerName, z, x, y, imageBytes.length);
-            } else {
-                String errorMsg = "获取瓦片失败！";
-                log.warn("瓦片生成失败（返回空数据）: layer={}, z={}, x={}, y={}", layerName, z, x, y);
-                GirServletUtil.toResponse(response, errorMsg.getBytes(StandardCharsets.UTF_8),
-                        TextMime.txt.getMimeType() + ";charset=UTF-8");
-            }
+            byteToResponse(layerName, z, x, y, imageBytes, response, fromFormat);
 
         } catch (Exception e) {
             String errorMsg = StrUtil.format("生成瓦片失败: layerName={}, z={}, x={}, y={}",
@@ -214,6 +205,19 @@ public class TileServiceTran {
 
             String fullErrorMsg = errorMsg + "，异常信息：" + e.getMessage();
             GirServletUtil.toResponse(response, fullErrorMsg.getBytes(StandardCharsets.UTF_8),
+                    TextMime.txt.getMimeType() + ";charset=UTF-8");
+        }
+    }
+
+    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, MimeType fromFormat) {
+        if (imageBytes != null && imageBytes.length > 0) {
+            GirServletUtil.toResponse(response, imageBytes, fromFormat.getMimeType());
+            log.debug("瓦片生成成功: layer={}, z={}, x={}, y={}, size={} bytes",
+                    layerName, z, x, y, imageBytes.length);
+        } else {
+            String errorMsg = "获取瓦片失败！";
+            log.debug("瓦片生成失败（返回空数据）: layer={}, z={}, x={}, y={}", layerName, z, x, y);
+            GirServletUtil.toResponse(response, errorMsg.getBytes(StandardCharsets.UTF_8),
                     TextMime.txt.getMimeType() + ";charset=UTF-8");
         }
     }
@@ -230,7 +234,7 @@ public class TileServiceTran {
      * @param cacheFuser  缓存融合执行器
      * @param imageFormat 图片格式
      */
-    private void deleteCacheForTile(String layerName, Integer z, Integer x, Integer y,
+    public void deleteCacheForTile(String layerName, Integer z, Integer x, Integer y,
                                     FuserExec cacheFuser, ImageMime imageFormat) {
         try {
             // 删除当前瓦片缓存
@@ -290,7 +294,7 @@ public class TileServiceTran {
      * @param box 坐标盒子
      * @return 边界框
      */
-    private BoundingBox buildBoundingBox(BoxReferencedEnvelope box) {
+    public BoundingBox buildBoundingBox(BoxReferencedEnvelope box) {
         return new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
     }
 
