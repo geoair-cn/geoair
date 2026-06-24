@@ -28,7 +28,7 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
 
 
     public Grid4490WebTileGetter(PxyLayerInfo config) {
-        this(config, 13000, 15000, 15000);
+        this(config, 60*1000*1, 60*1000*3, 60*1000*5);
     }
 
     public Grid4490WebTileGetter(PxyLayerInfo config, int connectionTimeout, int readTimeout, int totalTimeout) {

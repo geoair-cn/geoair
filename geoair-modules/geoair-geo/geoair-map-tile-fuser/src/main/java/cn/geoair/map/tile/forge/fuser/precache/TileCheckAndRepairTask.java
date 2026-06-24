@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
@@ -19,13 +20,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 单层级预缓存任务
+ * 瓦片异常检查与修复任务（生产者-消费者模式）
+ * 只检查已存在的瓦片，发现异常（如空白矩形）则重新切片
  *
  * @author 张俊
- * @date Created in 2026/6/15
+ * @date Created in 2026/6/23
  */
 @Slf4j
-public class ZoomPreCacheTask implements Runnable {
+public class TileCheckAndRepairTask implements Runnable {
 
     // 使用唯一的对象作为 Poison Pill（结束信号）
     private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
@@ -35,20 +37,27 @@ public class ZoomPreCacheTask implements Runnable {
     private final Geometry geometry4326;
     private final CountDownLatch latch;
     private final AtomicInteger totalCount;
-    private final AtomicInteger successCount;
+    private final AtomicInteger checkedCount;
+    private final AtomicInteger repairedCount;
     private final AtomicInteger failCount;
     private final ImageMime format;
 
-    public ZoomPreCacheTask(String layerName,
-                            int zoom, Geometry geometry4326, CountDownLatch latch,
-                            AtomicInteger totalCount, AtomicInteger successCount,
-                            AtomicInteger failCount, ImageMime format) {
+    public TileCheckAndRepairTask(String layerName,
+                                  int zoom,
+                                  Geometry geometry4326,
+                                  CountDownLatch latch,
+                                  AtomicInteger totalCount,
+                                  AtomicInteger checkedCount,
+                                  AtomicInteger repairedCount,
+                                  AtomicInteger failCount,
+                                  ImageMime format) {
         this.layerName = layerName;
         this.zoom = zoom;
         this.geometry4326 = geometry4326;
         this.latch = latch;
         this.totalCount = totalCount;
-        this.successCount = successCount;
+        this.checkedCount = checkedCount;
+        this.repairedCount = repairedCount;
         this.failCount = failCount;
         this.format = format;
     }
@@ -66,7 +75,7 @@ public class ZoomPreCacheTask implements Runnable {
             int totalTiles = (maxX - minX + 1) * (maxY - minY + 1);
             totalCount.addAndGet(totalTiles);
 
-            log.info("预缓存层级: {}, X范围: [{}, {}], Y范围: [{}, {}], 瓦片数: {}",
+            log.info("瓦片检查任务开始 - 层级: {}, X范围: [{}, {}], Y范围: [{}, {}], 总瓦片数: {}",
                     zoom, minX, maxX, minY, maxY, totalTiles);
 
             // 如果总瓦片数为0，直接返回
@@ -88,14 +97,16 @@ public class ZoomPreCacheTask implements Runnable {
             // 消费者完成计数器
             CountDownLatch consumerLatch = new CountDownLatch(threadPoolSize);
 
-            AtomicInteger zoomSuccess = new AtomicInteger(0);
+            // 统计计数器
+            AtomicInteger zoomChecked = new AtomicInteger(0);
+            AtomicInteger zoomRepaired = new AtomicInteger(0);
             AtomicInteger zoomFail = new AtomicInteger(0);
+            AtomicInteger zoomSkipped = new AtomicInteger(0);
             AtomicInteger totalValidTiles = new AtomicInteger(0);
 
             // 进度计数器
             AtomicLong processedCount = new AtomicLong(0);
-            // 进度打印间隔（每处理多少个瓦片打印一次进度）
-            int progressInterval = Math.max(100, totalTiles / 100); // 默认每1%打印一次，最少100个
+            int progressInterval = Math.max(100, totalTiles / 100); // 每1%打印一次，最少100个
 
             // 控制结束信号只发送一次
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
@@ -147,16 +158,19 @@ public class ZoomPreCacheTask implements Runnable {
                         }
                     }
                 }
-            }, "Producer-" + zoom);
+            }, "Producer-Check-" + zoom);
 
             // ============ 启动消费者线程 ============
             for (int i = 0; i < threadPoolSize; i++) {
                 final int consumerId = i;
                 executorService.submit(() -> {
-                    String threadName = "Consumer-" + zoom + "-" + consumerId;
+                    String threadName = "Consumer-Check-" + zoom + "-" + consumerId;
                     Thread.currentThread().setName(threadName);
 
-                    int localProcessed = 0;
+                    int localChecked = 0;
+                    int localRepaired = 0;
+                    int localFail = 0;
+                    int localSkipped = 0;
 
                     try {
                         log.debug("消费者线程 {} 启动", threadName);
@@ -166,31 +180,44 @@ public class ZoomPreCacheTask implements Runnable {
 
                             // 检查结束标志 - 使用 == 比较对象引用
                             if (coord == POISON_PILL) {
-                                log.debug("消费者线程 {} 收到结束信号，共处理 {} 个瓦片",
-                                        threadName, localProcessed);
+                                log.debug("消费者线程 {} 收到结束信号，已检查 {} 个瓦片，修复 {} 个，失败 {} 个，跳过 {} 个",
+                                        threadName, localChecked, localRepaired, localFail, localSkipped);
                                 break;
                             }
 
-                            // 直接处理单个瓦片
-                            processSingleTile(coord, zoomSuccess, zoomFail);
-                            localProcessed++;
+                            // 处理单个瓦片
+                            checkAndRepairSingleTile(coord, localChecked, localRepaired, localFail, localSkipped);
+
+                            // 更新全局计数
+                            zoomChecked.addAndGet(localChecked);
+                            zoomRepaired.addAndGet(localRepaired);
+                            zoomFail.addAndGet(localFail);
+                            zoomSkipped.addAndGet(localSkipped);
+
+                            // 重置本地计数器
+                            localChecked = 0;
+                            localRepaired = 0;
+                            localFail = 0;
+                            localSkipped = 0;
 
                             // 更新全局处理计数并打印进度
                             long totalProcessed = processedCount.incrementAndGet();
                             if (totalProcessed % progressInterval == 0 || totalProcessed == totalValidTiles.get()) {
-                                int success = zoomSuccess.get();
+                                int checked = zoomChecked.get();
+                                int repaired = zoomRepaired.get();
                                 int fail = zoomFail.get();
-                                int total = success + fail;
-                                if (total > 0) {
+                                int total = checked + fail;
+                                if (totalValidTiles.get() > 0) {
                                     double percent = (double) total / totalValidTiles.get() * 100;
-                                    log.info("层级 {} 进度: {}/{} ({}%), 成功: {}, 失败: {}",
-                                            zoom, total, totalValidTiles.get(), percent, success, fail);
+                                    log.info("层级 {} 检查进度: {}/{} ({}%), 已检查: {}, 已修复: {}, 失败: {}, 跳过: {}",
+                                            zoom, total, totalValidTiles.get(), percent,
+                                            checked, repaired, fail, zoomSkipped.get());
                                 }
                             }
                         }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
-                        log.error("消费者线程 {} 被中断，已处理 {} 个瓦片", threadName, localProcessed, e);
+                        log.error("消费者线程 {} 被中断", threadName, e);
                     } finally {
                         consumerLatch.countDown();
                         log.debug("消费者线程 {} 结束，剩余消费者: {}", threadName, consumerLatch.getCount());
@@ -208,7 +235,7 @@ public class ZoomPreCacheTask implements Runnable {
                     log.warn("消费者线程未能在30分钟内完成，强制关闭");
                     executorService.shutdownNow();
                 } else {
-                    log.info("所有消费者线程已完成:{}", zoom);
+                    log.info("所有消费者线程已完成: {}", zoom);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -244,16 +271,20 @@ public class ZoomPreCacheTask implements Runnable {
             }
 
             // ============ 更新全局计数器 ============
-            int finalSuccess = zoomSuccess.get();
+            int finalChecked = zoomChecked.get();
+            int finalRepaired = zoomRepaired.get();
             int finalFail = zoomFail.get();
-            successCount.addAndGet(finalSuccess);
+            int finalSkipped = zoomSkipped.get();
+
+            checkedCount.addAndGet(finalChecked);
+            repairedCount.addAndGet(finalRepaired);
             failCount.addAndGet(finalFail);
 
-            log.info("层级预缓存完成: {}, 有效瓦片: {}, 成功: {}, 失败: {}",
-                    zoom, totalValidTiles.get(), finalSuccess, finalFail);
+            log.info("瓦片检查任务完成 - 层级: {}, 有效瓦片: {}, 已检查: {}, 已修复: {}, 失败: {}, 跳过(不存在): {}",
+                    zoom, totalValidTiles.get(), finalChecked, finalRepaired, finalFail, finalSkipped);
 
         } catch (Exception e) {
-            log.error("预缓存层级失败: {}, 错误: {}", zoom, e.getMessage(), e);
+            log.error("瓦片检查任务失败 - 层级: {}, 错误: {}", zoom, e.getMessage(), e);
         } finally {
             if (latch != null) {
                 latch.countDown();
@@ -262,43 +293,68 @@ public class ZoomPreCacheTask implements Runnable {
     }
 
     /**
-     * 处理单个瓦片
+     * 检查并修复单个瓦片
      */
-    private void processSingleTile(TileCoordinate coord,
-                                   AtomicInteger success, AtomicInteger fail) {
+    private void checkAndRepairSingleTile(TileCoordinate coord,
+                                          int localChecked,
+                                          int localRepaired,
+                                          int localFail,
+                                          int localSkipped) {
         int z = coord.getZoom();
         int x = coord.getX();
         int y = coord.getY();
 
         try {
-            // 获取瓦片的边界框
+            // 1. 获取瓦片的边界框
             BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
                     .xyzToTileBox(z, x, y, 3857);
 
-            // 创建缓存融合器
+            // 2. 创建缓存融合器
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
                     box.getMaxX(), box.getMaxY());
             CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
                     layerName, z, x, y, bounds, 256, 256, ImageMime.png);
 
-            // 检查缓存是否存在
+            // 3. 检查瓦片缓存是否存在
             TileCache tileCache = cacheTileFuser.getTileCache();
-            if (tileCache.exists(layerName, z, x, y, format)) {
-                log.debug("缓存存在, layerName:{},z：{}，x：{}，y：{}", layerName, z, x, y);
+
+            // 4. 只检查已存在的瓦片
+            if (!tileCache.exists(layerName, z, x, y, format)) {
+                localSkipped++;
+                return;
             }
 
-            // 生成新的瓦片
-            byte[] imageBytes = cacheTileFuser.toImageBytes();
-            if (imageBytes != null) {
-                success.incrementAndGet();
+            // 5. 获取缓存瓦片并进行检查
+            byte[] bytes = tileCache.get(layerName, z, x, y, format);
+            localChecked++;
+
+            // 6. 检测是否为异常瓦片（空白矩形）
+            LargeBlankCheck largeBlankCheck = TileBlankDetector.hasLargeBlankRect(bytes, format.getInternalName());
+            if (largeBlankCheck.getBlankIs()) {
+                log.info("检测到异常瓦片（空白矩形）: z={}, x={}, y={}, 开始重新切片", z, x, y);
+
+                // 7. 删除异常缓存
+                FuserCacheUtils.deleteCacheByRequestGrid(layerName, z, x, y, cacheTileFuser, format);
+
+                // 8. 重新生成瓦片
+                byte[] newImageBytes = cacheTileFuser.toImageBytes();
+                if (newImageBytes != null && newImageBytes.length > 0) {
+                    localRepaired++;
+                    log.debug("瓦片重新切片成功: z={}, x={}, y={}", z, x, y);
+                } else {
+                    localFail++;
+                    log.warn("瓦片重新切片失败（生成空数据）: z={}, x={}, y={}", z, x, y);
+                }
             } else {
-                fail.incrementAndGet();
-                log.warn("预缓存瓦片失败（资源为空）: {}-({},{},{})", layerName, z, x, y);
+                // 瓦片正常，无需处理
+                if (log.isDebugEnabled()) {
+                    log.debug("瓦片正常: z={}, x={}, y={}", z, x, y);
+                }
             }
 
         } catch (Exception e) {
-            fail.incrementAndGet();
-            log.error("预缓存瓦片异常: {}-({},{},{})", layerName, z, x, y, e);
+            localFail++;
+            log.error("检查瓦片异常: z={}, x={}, y={}, 错误: {}", z, x, y, e.getMessage(), e);
         }
     }
 }
