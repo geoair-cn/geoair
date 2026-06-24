@@ -18,7 +18,7 @@
     <url>https://gitee.com/geoair/map-tile-forge</url>
 
     <properties>
-        <sqlite-jdbc.version>3.36.0.3</sqlite-jdbc.version>
+        <sqlite-jdbc.version>3.49.1.0</sqlite-jdbc.version>
 
         <aws-java-sdk-s3.version>1.12.625</aws-java-sdk-s3.version>
 
