@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.Geometry;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 瓦片异常检查与修复任务（生产者-消费者模式）
@@ -88,7 +87,7 @@ public class TileCheckAndRepairTask implements Runnable {
             int batchSize = 10000;
             int totalBatches = (totalTiles + batchSize - 1) / batchSize;
             int threadPoolSize = Math.min(totalBatches, Runtime.getRuntime().availableProcessors() * 2);
-            threadPoolSize = Math.max(1, threadPoolSize); // 至少启动一个线程
+            threadPoolSize = Math.max(1, threadPoolSize);
 
             log.info("层级 {} 启动消费者线程数量：{}", zoom, threadPoolSize);
 
@@ -147,7 +146,7 @@ public class TileCheckAndRepairTask implements Runnable {
                     // 只发送一次结束信号，每个消费者一个
                     if (shutdownSignalSent.compareAndSet(false, true)) {
                         log.info("生产者发送结束信号，消费者数量: {}", finalThreadPoolSize);
-                        for (int i = 0; i < finalThreadPoolSize * 2; i++) {
+                        for (int i = 0; i < finalThreadPoolSize; i++) {
                             try {
                                 taskQueue.put(POISON_PILL);
                             } catch (InterruptedException e) {
@@ -164,13 +163,8 @@ public class TileCheckAndRepairTask implements Runnable {
             for (int i = 0; i < threadPoolSize; i++) {
                 final int consumerId = i;
                 executorService.submit(() -> {
-                    String threadName = "Consumer-Check-" + zoom + "-" + consumerId;
+                    String threadName = "Consumer-Check-" + zoom + "-" + layerName + "-" + consumerId;
                     Thread.currentThread().setName(threadName);
-
-                    int localChecked = 0;
-                    int localRepaired = 0;
-                    int localFail = 0;
-                    int localSkipped = 0;
 
                     try {
                         log.debug("消费者线程 {} 启动", threadName);
@@ -178,40 +172,47 @@ public class TileCheckAndRepairTask implements Runnable {
                         while (true) {
                             TileCoordinate coord = taskQueue.take();
 
-                            // 检查结束标志 - 使用 == 比较对象引用
+                            // 检查结束标志
                             if (coord == POISON_PILL) {
-                                log.debug("消费者线程 {} 收到结束信号，已检查 {} 个瓦片，修复 {} 个，失败 {} 个，跳过 {} 个",
-                                        threadName, localChecked, localRepaired, localFail, localSkipped);
+                                log.debug("消费者线程 {} 收到结束信号", threadName);
                                 break;
                             }
 
-                            // 处理单个瓦片
-                            checkAndRepairSingleTile(coord, localChecked, localRepaired, localFail, localSkipped);
+                            // 处理单个瓦片并获取结果
+                            RepairResult result = checkAndRepairSingleTile(coord);
 
-                            // 更新全局计数
-                            zoomChecked.addAndGet(localChecked);
-                            zoomRepaired.addAndGet(localRepaired);
-                            zoomFail.addAndGet(localFail);
-                            zoomSkipped.addAndGet(localSkipped);
+                            // 更新统计计数器
+                            if (result.isRepaired()) {
+                                zoomRepaired.incrementAndGet();
+                            } else if (result.isFailed()) {
+                                zoomFail.incrementAndGet();
+                            } else if (result.isSkipped()) {
+                                zoomSkipped.incrementAndGet();
+                            }
+                            // 所有处理过的瓦片都计入已检查
+                            zoomChecked.incrementAndGet();
 
-                            // 重置本地计数器
-                            localChecked = 0;
-                            localRepaired = 0;
-                            localFail = 0;
-                            localSkipped = 0;
-
-                            // 更新全局处理计数并打印进度
+                            // 更新进度
                             long totalProcessed = processedCount.incrementAndGet();
-                            if (totalProcessed % progressInterval == 0 || totalProcessed == totalValidTiles.get()) {
-                                long checked = zoomChecked.get();
-                                long repaired = zoomRepaired.get();
-                                long fail = zoomFail.get();
-                                long total = checked + fail;
-                                if (totalValidTiles.get() > 0) {
-                                    double percent = (double) total / totalValidTiles.get() * 100;
-                                    log.info("层级 {} 检查进度: {}/{} ({}%), 已检查: {}, 已修复: {}, 失败: {}, 跳过: {}",
-                                            zoom, total, totalValidTiles.get(), percent,
-                                            checked, repaired, fail, zoomSkipped.get());
+                            long totalValid = totalValidTiles.get();
+
+                            // 打印进度
+                            if (totalValid > 0) {
+                                if (totalProcessed % progressInterval == 0 || totalProcessed == totalValid) {
+                                    long checked = zoomChecked.get();
+                                    long repaired = zoomRepaired.get();
+                                    long fail = zoomFail.get();
+                                    long skipped = zoomSkipped.get();
+                                    double percent = (double) totalProcessed / totalValid * 100;
+
+                                    log.info("层级 {} 检查进度: {}/{} ({}%), 已修复: {}, 失败: {}, 跳过(不存在): {}",
+                                            zoom, totalProcessed, totalValid, percent,
+                                            repaired, fail, skipped);
+                                }
+                            } else {
+                                // 如果有效瓦片数为0，每1000个打印一次
+                                if (totalProcessed % 1000 == 0) {
+                                    log.info("层级 {} 已处理: {} 个瓦片", zoom, totalProcessed);
                                 }
                             }
                         }
@@ -294,12 +295,11 @@ public class TileCheckAndRepairTask implements Runnable {
 
     /**
      * 检查并修复单个瓦片
+     *
+     * @param coord 瓦片坐标
+     * @return 修复结果
      */
-    private void checkAndRepairSingleTile(TileCoordinate coord,
-                                          int localChecked,
-                                          int localRepaired,
-                                          int localFail,
-                                          int localSkipped) {
+    private RepairResult checkAndRepairSingleTile(TileCoordinate coord) {
         int z = coord.getZoom();
         int x = coord.getX();
         int y = coord.getY();
@@ -320,13 +320,15 @@ public class TileCheckAndRepairTask implements Runnable {
 
             // 4. 只检查已存在的瓦片
             if (!tileCache.exists(layerName, z, x, y, format)) {
-
-                return;
+                return RepairResult.skipped();
             }
 
             // 5. 获取缓存瓦片并进行检查
             byte[] bytes = tileCache.get(layerName, z, x, y, format);
-
+            if (bytes == null || bytes.length == 0) {
+                log.warn("瓦片数据为空: z={}, x={}, y={}", z, x, y);
+                return RepairResult.failed();
+            }
 
             // 6. 检测是否为异常瓦片（空白矩形）
             LargeBlankCheck largeBlankCheck = TileBlankDetector.hasLargeBlankRect(bytes, format.getInternalName());
@@ -339,22 +341,66 @@ public class TileCheckAndRepairTask implements Runnable {
                 // 8. 重新生成瓦片
                 byte[] newImageBytes = cacheTileFuser.toImageBytes();
                 if (newImageBytes != null && newImageBytes.length > 0) {
-                    localRepaired++;
                     log.debug("瓦片重新切片成功: z={}, x={}, y={}", z, x, y);
+                    return RepairResult.repaired();
                 } else {
-                    localFail++;
                     log.warn("瓦片重新切片失败（生成空数据）: z={}, x={}, y={}", z, x, y);
-                }
-            } else {
-                // 瓦片正常，无需处理
-                if (log.isDebugEnabled()) {
-                    log.debug("瓦片正常: z={}, x={}, y={}", z, x, y);
+                    return RepairResult.failed();
                 }
             }
 
+            // 瓦片正常
+            return RepairResult.normal();
+
         } catch (Exception e) {
-            localFail++;
             log.error("检查瓦片异常: z={}, x={}, y={}, 错误: {}", z, x, y, e.getMessage(), e);
+            return RepairResult.failed();
+        }
+    }
+
+    /**
+     * 修复结果枚举
+     */
+    private enum RepairResult {
+        /** 已修复 */
+        REPAIRED,
+        /** 失败 */
+        FAILED,
+        /** 跳过（瓦片不存在） */
+        SKIPPED,
+        /** 正常（瓦片存在且正常） */
+        NORMAL;
+
+        public boolean isRepaired() {
+            return this == REPAIRED;
+        }
+
+        public boolean isFailed() {
+            return this == FAILED;
+        }
+
+        public boolean isSkipped() {
+            return this == SKIPPED;
+        }
+
+        public boolean isNormal() {
+            return this == NORMAL;
+        }
+
+        public static RepairResult repaired() {
+            return REPAIRED;
+        }
+
+        public static RepairResult failed() {
+            return FAILED;
+        }
+
+        public static RepairResult skipped() {
+            return SKIPPED;
+        }
+
+        public static RepairResult normal() {
+            return NORMAL;
         }
     }
 }

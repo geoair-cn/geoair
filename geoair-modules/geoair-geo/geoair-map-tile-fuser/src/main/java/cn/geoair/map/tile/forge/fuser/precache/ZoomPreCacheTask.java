@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class ZoomPreCacheTask implements Runnable {
 
-    // 使用唯一的对象作为 Poison Pill（结束信号）
+
     private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
 
     private final String layerName;
@@ -104,6 +104,7 @@ public class ZoomPreCacheTask implements Runnable {
             int finalThreadPoolSize = threadPoolSize;
             Thread producerThread = new Thread(() -> {
                 try {
+                    int validTileCount = 0;
                     for (int x = minX; x <= maxX; x++) {
                         for (int y = minY; y <= maxY; y++) {
                             try {
@@ -115,7 +116,7 @@ public class ZoomPreCacheTask implements Runnable {
                                         .wktToJtsGeometry(wktString);
                                 if (geometry4326.intersects(geometryByBox)) {
                                     taskQueue.put(new TileCoordinate(zoom, x, y));
-
+                                    validTileCount++;
                                 }
                             } catch (Exception e) {
                                 log.error("准备瓦片任务异常: {}-({},{},{})",
@@ -123,6 +124,8 @@ public class ZoomPreCacheTask implements Runnable {
                             }
                         }
                     }
+                    totalValidTiles.set(validTileCount);
+                    log.info("生产者完成，有效瓦片数: {}", validTileCount);
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                     log.error("生产者线程被中断", e);
@@ -147,7 +150,7 @@ public class ZoomPreCacheTask implements Runnable {
             for (int i = 0; i < threadPoolSize; i++) {
                 final int consumerId = i;
                 executorService.submit(() -> {
-                    String threadName = "Consumer-" + zoom + "-" + consumerId;
+                    String threadName = "Consumer-" + zoom + "-" + layerName + "-" + consumerId;
                     Thread.currentThread().setName(threadName);
 
                     int localProcessed = 0;
@@ -157,7 +160,7 @@ public class ZoomPreCacheTask implements Runnable {
 
                         while (true) {
                             TileCoordinate coord = taskQueue.take();
-                            totalValidTiles.getAndIncrement();
+
                             // 检查结束标志 - 使用 == 比较对象引用
                             if (coord == POISON_PILL) {
                                 log.debug("消费者线程 {} 收到结束信号，共处理 {} 个瓦片",
@@ -169,16 +172,23 @@ public class ZoomPreCacheTask implements Runnable {
                             processSingleTile(coord, zoomSuccess, zoomFail);
                             localProcessed++;
 
-                            // 更新全局处理计数并打印进度
+                            // 更新全局处理计数
                             long totalProcessed = processedCount.incrementAndGet();
-                            if (totalProcessed % progressInterval == 0 || totalProcessed == totalValidTiles.get()) {
-                                long success = zoomSuccess.get();
-                                long fail = zoomFail.get();
-                                long total = success + fail;
-                                if (total > 0) {
-                                    double percent = (double) total / totalValidTiles.get() * 100;
+                            long totalValid = totalValidTiles.get();
+
+                            // 打印进度
+                            if (totalValid > 0) {
+                                if (totalProcessed % progressInterval == 0 || totalProcessed == totalValid) {
+                                    long success = zoomSuccess.get();
+                                    long fail = zoomFail.get();
+                                    double percent = (double) totalProcessed / totalValid * 100;
                                     log.info("层级 {} 进度: {}/{} ({}%), 成功: {}, 失败: {}",
-                                            zoom, total, totalValidTiles.get(), percent, success, fail);
+                                            zoom, totalProcessed, totalValid, percent, success, fail);
+                                }
+                            } else {
+                                // 如果有效瓦片数为0，每1000个打印一次
+                                if (totalProcessed % 1000 == 0) {
+                                    log.info("层级 {} 已处理: {} 个瓦片", zoom, totalProcessed);
                                 }
                             }
                         }
