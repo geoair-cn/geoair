@@ -512,6 +512,7 @@ public class MbtilesLayerImporter {
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
+                            log.info("导入成功{}条，批次：{},总成功数量：{}",batchArgs.size(),pageNo+1,stats.success);
                             batchArgs.clear();
                             return Collections.emptyList();
                         } catch (Exception e) {

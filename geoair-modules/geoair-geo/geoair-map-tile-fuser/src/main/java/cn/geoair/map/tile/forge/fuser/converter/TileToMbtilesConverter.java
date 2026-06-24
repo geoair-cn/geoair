@@ -419,7 +419,7 @@ public class TileToMbtilesConverter {
 
         List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
 
-        try   {
+        try {
 
 
             for (int z : zoomLevels) {
@@ -453,6 +453,7 @@ public class TileToMbtilesConverter {
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
+                            log.info("导入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), z, stats.success);
                             batchArgs.clear();
                         }
 
@@ -470,9 +471,9 @@ public class TileToMbtilesConverter {
                     stats.success += results[0];
                     stats.skipped += results[1];
                     stats.failed += results[2];
+                    log.info("执行剩余的批量插入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), z, stats.success);
                     batchArgs.clear();
                 }
-
 
 
                 log.info("层级 z={} 完成: 总数={}, 耗时={}ms",
@@ -968,7 +969,7 @@ public class TileToMbtilesConverter {
      *
      * @return [success, skipped, failed]
      */
-    private static int[] executeBatch( DruidDataSource dataSource, String sql, List<Object[]> batchArgs) throws SQLException {
+    private static int[] executeBatch(DruidDataSource dataSource, String sql, List<Object[]> batchArgs) throws SQLException {
         if (batchArgs.isEmpty()) {
             return new int[]{0, 0, 0};
         }
@@ -1001,7 +1002,7 @@ public class TileToMbtilesConverter {
         } catch (SQLException e) {
             log.error("批量插入失败", e);
             failed = batchArgs.size();
-        }finally {
+        } finally {
             IoUtil.close(conn);
         }
 
