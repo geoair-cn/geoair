@@ -156,7 +156,7 @@ public class ZoomPreCacheTask implements Runnable {
                     int localProcessed = 0;
 
                     try {
-                        log.debug("消费者线程 {} 启动", threadName);
+                        log.info("消费者线程 {} 启动", threadName);
 
                         while (true) {
                             TileCoordinate coord = taskQueue.take();
@@ -288,7 +288,7 @@ public class ZoomPreCacheTask implements Runnable {
             // 检查缓存是否存在
             TileCache tileCache = cacheTileFuser.getTileCache();
             if (tileCache.exists(layerName, z, x, y, format)) {
-                log.info("缓存存在, layerName:{} ,z：{}，x：{}，y：{}", layerName, z, x, y);
+                log.debug("缓存存在, layerName:{} ,z：{}，x：{}，y：{}", layerName, z, x, y);
             }
 
             // 生成新的瓦片
