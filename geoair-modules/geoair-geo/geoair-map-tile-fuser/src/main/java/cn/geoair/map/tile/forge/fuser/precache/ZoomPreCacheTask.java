@@ -8,14 +8,11 @@ import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
-import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -34,15 +31,15 @@ public class ZoomPreCacheTask implements Runnable {
     private final int zoom;
     private final Geometry geometry4326;
     private final CountDownLatch latch;
-    private final AtomicInteger totalCount;
-    private final AtomicInteger successCount;
-    private final AtomicInteger failCount;
+    private final AtomicLong totalCount;
+    private final AtomicLong successCount;
+    private final AtomicLong failCount;
     private final ImageMime format;
 
     public ZoomPreCacheTask(String layerName,
                             int zoom, Geometry geometry4326, CountDownLatch latch,
-                            AtomicInteger totalCount, AtomicInteger successCount,
-                            AtomicInteger failCount, ImageMime format) {
+                            AtomicLong totalCount, AtomicLong successCount,
+                            AtomicLong failCount, ImageMime format) {
         this.layerName = layerName;
         this.zoom = zoom;
         this.geometry4326 = geometry4326;
@@ -88,9 +85,9 @@ public class ZoomPreCacheTask implements Runnable {
             // 消费者完成计数器
             CountDownLatch consumerLatch = new CountDownLatch(threadPoolSize);
 
-            AtomicInteger zoomSuccess = new AtomicInteger(0);
-            AtomicInteger zoomFail = new AtomicInteger(0);
-            AtomicInteger totalValidTiles = new AtomicInteger(0);
+            AtomicLong zoomSuccess = new AtomicLong(0);
+            AtomicLong zoomFail = new AtomicLong(0);
+            AtomicLong totalValidTiles = new AtomicLong(0);
 
             // 进度计数器
             AtomicLong processedCount = new AtomicLong(0);
@@ -107,7 +104,6 @@ public class ZoomPreCacheTask implements Runnable {
             int finalThreadPoolSize = threadPoolSize;
             Thread producerThread = new Thread(() -> {
                 try {
-                    int validTileCount = 0;
                     for (int x = minX; x <= maxX; x++) {
                         for (int y = minY; y <= maxY; y++) {
                             try {
@@ -119,7 +115,7 @@ public class ZoomPreCacheTask implements Runnable {
                                         .wktToJtsGeometry(wktString);
                                 if (geometry4326.intersects(geometryByBox)) {
                                     taskQueue.put(new TileCoordinate(zoom, x, y));
-                                    validTileCount++;
+
                                 }
                             } catch (Exception e) {
                                 log.error("准备瓦片任务异常: {}-({},{},{})",
@@ -127,8 +123,6 @@ public class ZoomPreCacheTask implements Runnable {
                             }
                         }
                     }
-                    totalValidTiles.set(validTileCount);
-                    log.info("生产者完成，有效瓦片数: {}", validTileCount);
                 } catch (Exception e) {
                     Thread.currentThread().interrupt();
                     log.error("生产者线程被中断", e);
@@ -163,7 +157,7 @@ public class ZoomPreCacheTask implements Runnable {
 
                         while (true) {
                             TileCoordinate coord = taskQueue.take();
-
+                            totalValidTiles.getAndIncrement();
                             // 检查结束标志 - 使用 == 比较对象引用
                             if (coord == POISON_PILL) {
                                 log.debug("消费者线程 {} 收到结束信号，共处理 {} 个瓦片",
@@ -178,9 +172,9 @@ public class ZoomPreCacheTask implements Runnable {
                             // 更新全局处理计数并打印进度
                             long totalProcessed = processedCount.incrementAndGet();
                             if (totalProcessed % progressInterval == 0 || totalProcessed == totalValidTiles.get()) {
-                                int success = zoomSuccess.get();
-                                int fail = zoomFail.get();
-                                int total = success + fail;
+                                long success = zoomSuccess.get();
+                                long fail = zoomFail.get();
+                                long total = success + fail;
                                 if (total > 0) {
                                     double percent = (double) total / totalValidTiles.get() * 100;
                                     log.info("层级 {} 进度: {}/{} ({}%), 成功: {}, 失败: {}",
@@ -244,8 +238,8 @@ public class ZoomPreCacheTask implements Runnable {
             }
 
             // ============ 更新全局计数器 ============
-            int finalSuccess = zoomSuccess.get();
-            int finalFail = zoomFail.get();
+            long finalSuccess = zoomSuccess.get();
+            long finalFail = zoomFail.get();
             successCount.addAndGet(finalSuccess);
             failCount.addAndGet(finalFail);
 
@@ -265,7 +259,7 @@ public class ZoomPreCacheTask implements Runnable {
      * 处理单个瓦片
      */
     private void processSingleTile(TileCoordinate coord,
-                                   AtomicInteger success, AtomicInteger fail) {
+                                   AtomicLong success, AtomicLong fail) {
         int z = coord.getZoom();
         int x = coord.getX();
         int y = coord.getY();
@@ -284,7 +278,7 @@ public class ZoomPreCacheTask implements Runnable {
             // 检查缓存是否存在
             TileCache tileCache = cacheTileFuser.getTileCache();
             if (tileCache.exists(layerName, z, x, y, format)) {
-                log.debug("缓存存在, layerName:{},z：{}，x：{}，y：{}", layerName, z, x, y);
+                log.info("缓存存在, layerName:{} ,z：{}，x：{}，y：{}", layerName, z, x, y);
             }
 
             // 生成新的瓦片

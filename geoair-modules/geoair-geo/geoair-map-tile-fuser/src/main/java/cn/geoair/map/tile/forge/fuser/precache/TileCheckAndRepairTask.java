@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -36,20 +36,20 @@ public class TileCheckAndRepairTask implements Runnable {
     private final int zoom;
     private final Geometry geometry4326;
     private final CountDownLatch latch;
-    private final AtomicInteger totalCount;
-    private final AtomicInteger checkedCount;
-    private final AtomicInteger repairedCount;
-    private final AtomicInteger failCount;
+    private final AtomicLong totalCount;
+    private final AtomicLong checkedCount;
+    private final AtomicLong repairedCount;
+    private final AtomicLong failCount;
     private final ImageMime format;
 
     public TileCheckAndRepairTask(String layerName,
                                   int zoom,
                                   Geometry geometry4326,
                                   CountDownLatch latch,
-                                  AtomicInteger totalCount,
-                                  AtomicInteger checkedCount,
-                                  AtomicInteger repairedCount,
-                                  AtomicInteger failCount,
+                                  AtomicLong totalCount,
+                                  AtomicLong checkedCount,
+                                  AtomicLong repairedCount,
+                                  AtomicLong failCount,
                                   ImageMime format) {
         this.layerName = layerName;
         this.zoom = zoom;
@@ -98,11 +98,11 @@ public class TileCheckAndRepairTask implements Runnable {
             CountDownLatch consumerLatch = new CountDownLatch(threadPoolSize);
 
             // 统计计数器
-            AtomicInteger zoomChecked = new AtomicInteger(0);
-            AtomicInteger zoomRepaired = new AtomicInteger(0);
-            AtomicInteger zoomFail = new AtomicInteger(0);
-            AtomicInteger zoomSkipped = new AtomicInteger(0);
-            AtomicInteger totalValidTiles = new AtomicInteger(0);
+            AtomicLong zoomChecked = new AtomicLong(0);
+            AtomicLong zoomRepaired = new AtomicLong(0);
+            AtomicLong zoomFail = new AtomicLong(0);
+            AtomicLong zoomSkipped = new AtomicLong(0);
+            AtomicLong totalValidTiles = new AtomicLong(0);
 
             // 进度计数器
             AtomicLong processedCount = new AtomicLong(0);
@@ -203,10 +203,10 @@ public class TileCheckAndRepairTask implements Runnable {
                             // 更新全局处理计数并打印进度
                             long totalProcessed = processedCount.incrementAndGet();
                             if (totalProcessed % progressInterval == 0 || totalProcessed == totalValidTiles.get()) {
-                                int checked = zoomChecked.get();
-                                int repaired = zoomRepaired.get();
-                                int fail = zoomFail.get();
-                                int total = checked + fail;
+                                long checked = zoomChecked.get();
+                                long repaired = zoomRepaired.get();
+                                long fail = zoomFail.get();
+                                long total = checked + fail;
                                 if (totalValidTiles.get() > 0) {
                                     double percent = (double) total / totalValidTiles.get() * 100;
                                     log.info("层级 {} 检查进度: {}/{} ({}%), 已检查: {}, 已修复: {}, 失败: {}, 跳过: {}",
@@ -271,10 +271,10 @@ public class TileCheckAndRepairTask implements Runnable {
             }
 
             // ============ 更新全局计数器 ============
-            int finalChecked = zoomChecked.get();
-            int finalRepaired = zoomRepaired.get();
-            int finalFail = zoomFail.get();
-            int finalSkipped = zoomSkipped.get();
+            long finalChecked = zoomChecked.get();
+            long finalRepaired = zoomRepaired.get();
+            long finalFail = zoomFail.get();
+            long finalSkipped = zoomSkipped.get();
 
             checkedCount.addAndGet(finalChecked);
             repairedCount.addAndGet(finalRepaired);
@@ -320,13 +320,13 @@ public class TileCheckAndRepairTask implements Runnable {
 
             // 4. 只检查已存在的瓦片
             if (!tileCache.exists(layerName, z, x, y, format)) {
-                localSkipped++;
+
                 return;
             }
 
             // 5. 获取缓存瓦片并进行检查
             byte[] bytes = tileCache.get(layerName, z, x, y, format);
-            localChecked++;
+
 
             // 6. 检测是否为异常瓦片（空白矩形）
             LargeBlankCheck largeBlankCheck = TileBlankDetector.hasLargeBlankRect(bytes, format.getInternalName());

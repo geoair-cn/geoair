@@ -412,7 +412,8 @@ public class MbtilesUtils {
             return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            log.error("保存瓦片失败: z={}, x={}, y={}", z, x, y, e);
+            String url = dataSource.getUrl();
+            log.error("保存瓦片失败: z={}, x={}, y={},url:{}", z, x, y, url, e);
             return false;
         }
     }
