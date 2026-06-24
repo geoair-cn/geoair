@@ -5,7 +5,9 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.hutool.core.io.IoUtil;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.Data;
 import lombok.Getter;
 
@@ -48,7 +50,7 @@ public class TileToMbtilesConverter {
         private String mbtilesPath;             // MBTiles 文件完整路径
         private String layerName;               // MBTiles 中的图层名称（如果文件已存在且包含该图层则使用已有，否则创建）
         private boolean needReverseY = false;   // 是否需要 Y 轴翻转（Google坐标系 ↔ TMS坐标系）
-        private int batchSize = 1000;           // 批量插入大小
+        private int batchSize = 5000;           // 批量插入大小
         private int maxPoolSize = 20;           // 连接池大小
         private int minIdle = 2;                // 最小空闲连接数
         private boolean overwrite = false;      // 如果瓦片已存在是否覆盖
@@ -417,8 +419,8 @@ public class TileToMbtilesConverter {
 
         List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
 
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false);
+        try   {
+
 
             for (int z : zoomLevels) {
                 log.info("处理层级: z={}", z);
@@ -447,7 +449,7 @@ public class TileToMbtilesConverter {
                         stats.totalSize += data.length;
 
                         if (batchArgs.size() >= config.getBatchSize()) {
-                            int[] results = executeBatch(conn, insertSql, batchArgs);
+                            int[] results = executeBatch(dataSource, insertSql, batchArgs);
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
@@ -464,14 +466,14 @@ public class TileToMbtilesConverter {
 
                 // 执行剩余的批量插入
                 if (!batchArgs.isEmpty()) {
-                    int[] results = executeBatch(conn, insertSql, batchArgs);
+                    int[] results = executeBatch(dataSource, insertSql, batchArgs);
                     stats.success += results[0];
                     stats.skipped += results[1];
                     stats.failed += results[2];
                     batchArgs.clear();
                 }
 
-                conn.commit();
+
 
                 log.info("层级 z={} 完成: 总数={}, 耗时={}ms",
                         z, layerCount, System.currentTimeMillis() - layerStartTime);
@@ -966,7 +968,7 @@ public class TileToMbtilesConverter {
      *
      * @return [success, skipped, failed]
      */
-    private static int[] executeBatch(Connection conn, String sql, List<Object[]> batchArgs) throws SQLException {
+    private static int[] executeBatch( DruidDataSource dataSource, String sql, List<Object[]> batchArgs) throws SQLException {
         if (batchArgs.isEmpty()) {
             return new int[]{0, 0, 0};
         }
@@ -974,7 +976,8 @@ public class TileToMbtilesConverter {
         int success = 0;
         int skipped = 0;
         int failed = 0;
-
+        DruidPooledConnection conn = dataSource.getConnection();
+        conn.setAutoCommit(false);
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (Object[] args : batchArgs) {
                 pstmt.setInt(1, (Integer) args[0]);
@@ -994,9 +997,12 @@ public class TileToMbtilesConverter {
                     skipped++;
                 }
             }
+            conn.commit();
         } catch (SQLException e) {
             log.error("批量插入失败", e);
             failed = batchArgs.size();
+        }finally {
+            IoUtil.close(conn);
         }
 
         return new int[]{success, skipped, failed};
