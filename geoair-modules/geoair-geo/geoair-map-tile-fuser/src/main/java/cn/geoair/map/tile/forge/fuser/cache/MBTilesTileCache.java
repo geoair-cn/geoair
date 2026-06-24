@@ -38,7 +38,7 @@ public class MBTilesTileCache implements TileCache {
     private final ConcurrentHashMap<String, LayerCacheHolder> layerCaches = new ConcurrentHashMap<>();
 
     private int maxReadPoolSize = 20;
-    private int maxWritePoolSize = 5;
+    private int maxWritePoolSize = 20;
     private int minIdle = 2;
 
     public MBTilesTileCache setMaxReadPoolSize(int maxReadPoolSize) {

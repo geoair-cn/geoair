@@ -29,7 +29,7 @@ public class TileBlankDetector {
      * @param format     图片格式
      * @return true表示存在大面积空白矩形区域
      */
-    public static boolean hasLargeBlankRect(byte[] imageBytes, String format) {
+    public static LargeBlankCheck hasLargeBlankRect(byte[] imageBytes, String format) {
         return hasLargeBlankRect(imageBytes, format, null);
     }
 
@@ -41,12 +41,12 @@ public class TileBlankDetector {
      * @param tileInfo   瓦片信息（用于日志记录）
      * @return true表示存在大面积空白矩形区域
      */
-    public static boolean hasLargeBlankRect(byte[] imageBytes, String format, String tileInfo) {
+    public static LargeBlankCheck hasLargeBlankRect(byte[] imageBytes, String format, String tileInfo) {
         if (imageBytes == null || imageBytes.length == 0) {
             if (tileInfo != null) {
                 log.debug("瓦片数据为空: {}", tileInfo);
             }
-            return true;
+            return LargeBlankCheck.of().setBlankIs(true);
         }
 
         try {
@@ -58,7 +58,7 @@ public class TileBlankDetector {
                 if (tileInfo != null) {
                     log.debug("无法解析瓦片图像: {}", tileInfo);
                 }
-                return true;
+                return LargeBlankCheck.of().setBlankIs(true).setImage(image);
             }
 
             int width = image.getWidth();
@@ -70,7 +70,7 @@ public class TileBlankDetector {
                 if (tileInfo != null) {
                     log.debug("瓦片尺寸过小: {}x{}, {}", width, height, tileInfo);
                 }
-                return true;
+                return LargeBlankCheck.of().setBlankIs(true).setImage(image);
             }
 
             // 1. 快速检测：如果瓦片完全空白，直接返回true
@@ -78,7 +78,7 @@ public class TileBlankDetector {
                 if (tileInfo != null) {
                     log.debug("瓦片完全空白: {}", tileInfo);
                 }
-                return true;
+                return LargeBlankCheck.of().setBlankIs(true).setImage(image);
             }
 
             // 2. 采样分析检测空白矩形区域
@@ -87,12 +87,12 @@ public class TileBlankDetector {
             if (result && tileInfo != null) {
                 log.debug("检测到空白矩形瓦片: {}", tileInfo);
             }
+            return LargeBlankCheck.of().setBlankIs(result).setImage(image);
 
-            return result;
 
         } catch (Exception e) {
             log.warn("检测空白矩形失败: {}", e.getMessage());
-            return false;
+            return LargeBlankCheck.of().setBlankIs(false);
         }
     }
 
@@ -463,6 +463,7 @@ public class TileBlankDetector {
 //
 //        return isWhite;
 //    }
+
     /**
      * 检测像素是否为空白（只检测透明像素）
      */
