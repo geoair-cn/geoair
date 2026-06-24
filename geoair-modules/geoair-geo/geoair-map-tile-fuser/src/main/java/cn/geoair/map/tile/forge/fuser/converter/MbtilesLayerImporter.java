@@ -2,14 +2,21 @@ package cn.geoair.map.tile.forge.fuser.converter;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.page.PageActuator;
+import cn.geoair.map.dynamic.tools.page.PageConditionDef;
+import cn.geoair.map.dynamic.tools.page.PageConfig;
 import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.Getter;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -449,80 +456,91 @@ public class MbtilesLayerImporter {
         ImportStats stats = new ImportStats();
 
         // 构建查询和插入 SQL
-        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ?";
+        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ? LIMIT ? OFFSET ?";
 
         String insertSql = config.isOverwrite()
                 ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
                 : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
-
-        try (Connection sourceConn = sourceDataSource.getConnection();
-             Connection targetConn = targetDataSource.getConnection()) {
-
-            targetConn.setAutoCommit(false);
-
+        try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
-                long layerStartTime = System.currentTimeMillis();
-                long layerCount = 0;
 
+                final long[] layerCount = {0};
                 List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
+                long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
+                GirAdvTools.getPageActuatorOpt(new PageConditionDef<Object[]>() {
+                    @Override
+                    public Long getTotalRecordCount() {
+                        return tileCountByZoom;
+                    }
 
-                try (PreparedStatement selectStmt = sourceConn.prepareStatement(selectSql)) {
-                    selectStmt.setInt(1, zoom);
-                    try (ResultSet rs = selectStmt.executeQuery()) {
-                        while (rs.next()) {
-                            int x = rs.getInt(1);
-                            int y = rs.getInt(2);
-                            byte[] data = rs.getBytes(3);
+                    @Override
+                    public void setPageConfig(PageConfig pageConfig) {
+                        pageConfig.setPageSize((long) config.getBatchSize())
+                                .setParallelConsumeRecordIs(true)
+                                .setParallelExecPageIs(true)
+                                .setPageNumStartByZero(true);
+                    }
 
-                            if (data == null || data.length == 0) {
-                                stats.failed++;
-                                continue;
+                    @Override
+                    public List<Object[]> getPageRecords(Integer pageNo, Integer pageSize) {
+                        Connection sourceConn = null;
+                        try {
+                            int offset = pageNo * pageSize;
+                            sourceConn = sourceDataSource.getConnection();
+                            PreparedStatement selectStmt = sourceConn.prepareStatement(selectSql);
+                            selectStmt.setInt(1, zoom);
+                            selectStmt.setInt(2, pageSize);
+                            selectStmt.setInt(3, offset);
+                            try (ResultSet rs = selectStmt.executeQuery()) {
+                                while (rs.next()) {
+                                    int x = rs.getInt(1);
+                                    int y = rs.getInt(2);
+                                    byte[] data = rs.getBytes(3);
+                                    if (data == null || data.length == 0) {
+                                        stats.failed++;
+                                        continue;
+                                    }
+                                    batchArgs.add(new Object[]{zoom, x, y, data});
+                                    stats.total++;
+                                    layerCount[0]++;
+                                }
                             }
-
-                            batchArgs.add(new Object[]{zoom, x, y, data});
-                            stats.total++;
-                            layerCount++;
-
-                            if (batchArgs.size() >= config.getBatchSize()) {
-                                int[] results = executeBatch(targetConn, insertSql, batchArgs);
-                                stats.success += results[0];
-                                stats.skipped += results[1];
-                                stats.failed += results[2];
-                                batchArgs.clear();
+                            IoUtil.close(sourceConn);
+                            int[] results = executeBatch(targetDataSource, insertSql, batchArgs);
+                            stats.success += results[0];
+                            stats.skipped += results[1];
+                            stats.failed += results[2];
+                            batchArgs.clear();
+                            return Collections.emptyList();
+                        } catch (Exception e) {
+                            log.info(e.getMessage());
+                        } finally {
+                            if (sourceConn != null) {
+                                IoUtil.close(sourceConn);
                             }
                         }
+                        return Collections.emptyList();
                     }
-
-                    // 执行剩余的批量插入
-                    if (!batchArgs.isEmpty()) {
-                        int[] results = executeBatch(targetConn, insertSql, batchArgs);
-                        stats.success += results[0];
-                        stats.skipped += results[1];
-                        stats.failed += results[2];
-                        batchArgs.clear();
-                    }
-
-                    targetConn.commit();
-
-                    log.info("层级 z={} 导入完成: 数量={}, 耗时={}ms",
-                            zoom, layerCount, System.currentTimeMillis() - layerStartTime);
+                }).execute();
+                // 执行剩余的批量插入
+                if (!batchArgs.isEmpty()) {
+                    int[] results = executeBatch(targetDataSource, insertSql, batchArgs);
+                    stats.success += results[0];
+                    stats.skipped += results[1];
+                    stats.failed += results[2];
+                    batchArgs.clear();
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             log.error("导入瓦片数据失败", e);
         }
 
         return stats;
     }
 
-    /**
-     * 执行批量插入
-     *
-     * @return [success, skipped, failed]
-     */
-    private static int[] executeBatch(Connection conn, String sql, List<Object[]> batchArgs) throws SQLException {
+    private static int[] executeBatch(DruidDataSource targetDataSource, String sql, List<Object[]> batchArgs) {
         if (batchArgs.isEmpty()) {
             return new int[]{0, 0, 0};
         }
@@ -531,27 +549,35 @@ public class MbtilesLayerImporter {
         int skipped = 0;
         int failed = 0;
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            for (Object[] args : batchArgs) {
-                pstmt.setInt(1, (Integer) args[0]);
-                pstmt.setInt(2, (Integer) args[1]);
-                pstmt.setInt(3, (Integer) args[2]);
-                pstmt.setBytes(4, (byte[]) args[3]);
-                pstmt.addBatch();
-            }
-
-            int[] results = pstmt.executeBatch();
-            for (int result : results) {
-                if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
-                    success++;
-                } else if (result == Statement.EXECUTE_FAILED) {
-                    failed++;
-                } else {
-                    skipped++;
+        try (DruidPooledConnection conn = targetDataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (Object[] args : batchArgs) {
+                    pstmt.setInt(1, (Integer) args[0]);
+                    pstmt.setInt(2, (Integer) args[1]);
+                    pstmt.setInt(3, (Integer) args[2]);
+                    pstmt.setBytes(4, (byte[]) args[3]);
+                    pstmt.addBatch();
                 }
+
+                int[] results = pstmt.executeBatch();
+                for (int result : results) {
+                    if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
+                        success++;
+                    } else if (result == Statement.EXECUTE_FAILED) {
+                        failed++;
+                    } else {
+                        skipped++;
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                log.error("批量插入失败", e);
+                failed = batchArgs.size();
             }
         } catch (SQLException e) {
-            log.error("批量插入失败", e);
+            log.error("获取数据库连接失败", e);
             failed = batchArgs.size();
         }
 

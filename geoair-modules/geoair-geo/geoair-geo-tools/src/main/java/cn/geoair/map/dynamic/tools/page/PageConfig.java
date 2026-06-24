@@ -1,12 +1,14 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/19 13:45 @description： 分页配置
  */
 @Data
+@Accessors(chain = true)
 public class PageConfig {
 
     /**
