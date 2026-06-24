@@ -14,13 +14,13 @@ import java.io.ByteArrayInputStream;
 public class TileBlankDetector {
 
     // 配置参数
-    private static final int MIN_TILE_SIZE = 50;              // 最小瓦片尺寸
-    private static final int SAMPLE_DIVISOR = 20;             // 采样步长除数（调小以提高精度）
-    private static final double MIN_BLANK_RECT_RATIO = 0.15;  // 最小空白矩形占比（15%）
-    private static final double ROW_BLANK_THRESHOLD = 0.7;    // 行空白率阈值（放宽到70%）
-    private static final double COL_BLANK_THRESHOLD = 0.7;    // 列空白率阈值（放宽到70%）
-    private static final double WINDOW_BLANK_THRESHOLD = 0.75; // 窗口空白率阈值
-    private static final int WHITE_THRESHOLD = 240;           // 白色阈值
+    private static int MIN_TILE_SIZE = 50;              // 最小瓦片尺寸
+    private static int SAMPLE_DIVISOR = 10;             // 采样步长除数（调小以提高精度）
+    private static double MIN_BLANK_RECT_RATIO = 0.15;  // 最小空白矩形占比（15%）
+    private static double ROW_BLANK_THRESHOLD = 0.3;    // 行空白率阈值（放宽到70%）
+    private static double COL_BLANK_THRESHOLD = 0.3;    // 列空白率阈值（放宽到70%）
+    private static double WINDOW_BLANK_THRESHOLD = 0.75; // 窗口空白率阈值
+
 
     /**
      * 快速检测瓦片是否存在大面积空白矩形区域（推荐使用）
@@ -157,7 +157,7 @@ public class TileBlankDetector {
         int totalSamples = totalRows * totalCols;
 
         // 如果总空白像素太少（少于10%），直接返回false
-        if (totalSamples == 0 || (double) totalBlank / totalSamples < 0.1) {
+        if (totalSamples == 0 || (double) totalBlank / totalSamples < 0.05) {
             return false;
         }
 
@@ -205,10 +205,10 @@ public class TileBlankDetector {
         }
 
         // 如果行或列其中一个特别大（超过50%），也判定为空白矩形
-        if (maxBlankRows >= totalRows * 0.4 && maxBlankCols >= totalCols * 0.15) {
+        if (maxBlankRows >= totalRows * 0.2 && maxBlankCols >= totalCols * 0.15) {
             return true;
         }
-        if (maxBlankCols >= totalCols * 0.4 && maxBlankRows >= totalRows * 0.15) {
+        if (maxBlankCols >= totalCols * 0.2 && maxBlankRows >= totalRows * 0.15) {
             return true;
         }
 
