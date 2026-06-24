@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 预缓存逻辑
@@ -82,10 +82,10 @@ public class PreCache {
 
         int zoomCount = maxZoom - minZoom + 1;
         CountDownLatch latch = new CountDownLatch(zoomCount);
-        AtomicInteger totalCount = new AtomicInteger(0);
-        AtomicInteger successCount = new AtomicInteger(0);
-        AtomicInteger failCount = new AtomicInteger(0);
-        AtomicInteger checkedCount = new AtomicInteger(0);
+        AtomicLong totalCount = new AtomicLong(0);
+        AtomicLong successCount = new AtomicLong(0);
+        AtomicLong failCount = new AtomicLong(0);
+        AtomicLong checkedCount = new AtomicLong(0);
 
         log.info("开始预缓存 - 图层: {}, 层级范围: {}-{}", config.getLayerName(), minZoom, maxZoom);
 
