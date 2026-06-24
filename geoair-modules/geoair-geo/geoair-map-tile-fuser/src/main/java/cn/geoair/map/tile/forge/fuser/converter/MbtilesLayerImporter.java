@@ -16,6 +16,7 @@ import lombok.Getter;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -584,5 +585,14 @@ public class MbtilesLayerImporter {
         return new int[]{success, skipped, failed};
     }
 
-
+    public static void main(String[] args) {
+        List<Integer> zoomLevels = Arrays.asList(0, 1, 2, 3, 4, 5);
+        MbtilesLayerImporter.ImportResult result2 = MbtilesLayerImporter.importZoomLevels(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "imagery",
+                zoomLevels
+        );
+        System.out.println("导入结果: " + result2);
+    }
 }
