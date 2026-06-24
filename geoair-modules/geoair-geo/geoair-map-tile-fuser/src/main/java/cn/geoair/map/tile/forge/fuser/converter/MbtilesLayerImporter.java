@@ -586,6 +586,17 @@ public class MbtilesLayerImporter {
     }
 
     public static void main(String[] args) {
+        // ==================== 1. 最简单的用法 ====================
+        // 导入单个层级
+        MbtilesLayerImporter.ImportResult result1 = MbtilesLayerImporter.importZoomLevel(
+                "D:/mbtiles/source.mbtiles",      // 源文件
+                "D:/mbtiles/target.mbtiles",      // 目标文件
+                "imagery",                         // 图层名称
+                5                                  // 层级
+        );
+        System.out.println("导入结果: " + result1);
+
+        // ==================== 2. 导入多个层级 ====================
         List<Integer> zoomLevels = Arrays.asList(0, 1, 2, 3, 4, 5);
         MbtilesLayerImporter.ImportResult result2 = MbtilesLayerImporter.importZoomLevels(
                 "D:/mbtiles/source.mbtiles",
@@ -594,5 +605,51 @@ public class MbtilesLayerImporter {
                 zoomLevels
         );
         System.out.println("导入结果: " + result2);
+
+        // ==================== 3. 导入所有层级 ====================
+        MbtilesLayerImporter.ImportResult result3 = MbtilesLayerImporter.importAllZoomLevels(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "imagery"
+        );
+        System.out.println("导入结果: " + result3);
+
+        // ==================== 4. 导入并覆盖已有瓦片 ====================
+        MbtilesLayerImporter.ImportResult result4 = MbtilesLayerImporter.importOverwrite(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "source_layer",      // 源图层名
+                "target_layer"       // 目标图层名（可以不同）
+        );
+        System.out.println("导入结果: " + result4);
+
+        // ==================== 5. 完整配置（推荐） ====================
+        MbtilesLayerImporter.ImportConfig config = new MbtilesLayerImporter.ImportConfig()
+                .setSourceMbtiles("D:/mbtiles/source.mbtiles")
+                .setSourceLayerName("imagery")
+                .setTargetMbtiles("D:/mbtiles/target.mbtiles")
+                .setTargetLayerName("imagery_backup")
+                .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8))
+                .setOverwrite(true)                // 覆盖已存在的瓦片
+                .setBatchSize(2000)                // 批量插入大小
+                .setCopyMetadata(true)             // 复制元数据
+                .setMaxPoolSize(20)                // 连接池大小
+                .setMinIdle(2);                    // 最小空闲连接数
+
+        MbtilesLayerImporter.ImportResult result5 = MbtilesLayerImporter.importLayers(config);
+        System.out.println("导入结果: " + result5);
+
+        // ==================== 6. 同一文件不同图层之间导入 ====================
+        // 从同一个 MBTiles 文件的 layer1 导入到 layer2
+        MbtilesLayerImporter.ImportResult result6 = MbtilesLayerImporter.importLayers(
+                new MbtilesLayerImporter.ImportConfig()
+                        .setSourceMbtiles("D:/mbtiles/merged.mbtiles")
+                        .setSourceLayerName("layer1")
+                        .setTargetMbtiles("D:/mbtiles/merged.mbtiles")
+                        .setTargetLayerName("layer2")
+                        .setZoomLevels(Arrays.asList(0, 1, 2, 3))
+                        .setOverwrite(false)        // 不覆盖，跳过已存在的
+        );
+        System.out.println("导入结果: " + result6);
     }
 }
