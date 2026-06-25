@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.enums;
 
+import cn.geoair.base.data.GiVisualValuable;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  * @description 瓦片获取器类型枚举，用于标识不同的瓦片数据源类型
  */
 @Getter
-public enum PxyType {
+public enum SrcType implements GiVisualValuable<String> {
 
     /**
      * Web 远程方式
@@ -88,12 +89,12 @@ public enum PxyType {
     /**
      * 所有枚举值的映射缓存
      */
-    private static final Map<String, PxyType> CODE_MAP;
+    private static final Map<String, SrcType> CODE_MAP;
 
     static {
         CODE_MAP = Arrays.stream(values())
                 .collect(Collectors.toMap(
-                        PxyType::getCode,
+                        SrcType::getCode,
                         type -> type,
                         (existing, replacement) -> existing
                 ));
@@ -107,7 +108,7 @@ public enum PxyType {
      * @param webType     是否为网络类型
      * @param localType   是否为本地类型
      */
-    PxyType(String code, String description, boolean webType, boolean localType) {
+    SrcType(String code, String description, boolean webType, boolean localType) {
         this.code = code;
         this.description = description;
         this.webType = webType;
@@ -122,7 +123,7 @@ public enum PxyType {
      * @param code 类型标识码
      * @return 对应的枚举，如果未找到返回默认值 WEB
      */
-    public static PxyType fromCode(String code) {
+    public static SrcType fromCode(String code) {
         return fromCode(code, WEB);
     }
 
@@ -133,7 +134,7 @@ public enum PxyType {
      * @param defaultValue 默认值
      * @return 对应的枚举，如果未找到返回默认值
      */
-    public static PxyType fromCode(String code, PxyType defaultValue) {
+    public static SrcType fromCode(String code, SrcType defaultValue) {
         if (code == null || code.trim().isEmpty()) {
             return defaultValue;
         }
@@ -155,10 +156,10 @@ public enum PxyType {
      *
      * @return 网络类型枚举数组
      */
-    public static PxyType[] getWebTypes() {
+    public static SrcType[] getWebTypes() {
         return Arrays.stream(values())
-                .filter(PxyType::isWebType)
-                .toArray(PxyType[]::new);
+                .filter(SrcType::isWebType)
+                .toArray(SrcType[]::new);
     }
 
     /**
@@ -166,10 +167,10 @@ public enum PxyType {
      *
      * @return 本地类型枚举数组
      */
-    public static PxyType[] getLocalTypes() {
+    public static SrcType[] getLocalTypes() {
         return Arrays.stream(values())
-                .filter(PxyType::isLocalType)
-                .toArray(PxyType[]::new);
+                .filter(SrcType::isLocalType)
+                .toArray(SrcType[]::new);
     }
 
     /**
@@ -177,10 +178,10 @@ public enum PxyType {
      *
      * @return 已实现的枚举数组
      */
-    public static PxyType[] getImplementedTypes() {
+    public static SrcType[] getImplementedTypes() {
         return Arrays.stream(values())
                 .filter(type -> !type.isDeprecated())
-                .toArray(PxyType[]::new);
+                .toArray(SrcType[]::new);
     }
 
     // ==================== 判断方法 ====================
