@@ -595,7 +595,7 @@ public class MbtilesUtils {
      * @param y          行号（存储格式）
      * @return 瓦片数据，不存在返回 null
      */
-    public static byte[] getTile(DruidDataSource dataSource, int z, int x, int y) {
+    public static MbtilesInfo getTile(DruidDataSource dataSource, int z, int x, int y) {
         if (dataSource == null || dataSource.isClosed()) {
             return null;
         }
@@ -609,14 +609,14 @@ public class MbtilesUtils {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getBytes("tile_data");
+                    return MbtilesInfo.of().setZoomLevel(z).setX(x).setY(y).setTileData(rs.getBytes("tile_data"));
                 }
             }
 
         } catch (SQLException e) {
             log.error("读取瓦片失败: z={}, x={}, y={}", z, x, y, e);
         }
-        return null;
+        return   MbtilesInfo.of();
     }
 
     /**

@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.page.PageConfig;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -466,7 +467,7 @@ public class MbtilesLayerImporter {
                 log.info("开始导入层级: z={}", zoom);
 
                 final long[] layerCount = {0};
-                List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
+                List<MbtilesInfo> batchArgs = new ArrayList<>(config.getBatchSize());
                 long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
                 GirAdvTools.getPageActuatorOpt(new PageConditionDef<Object[]>() {
                     @Override
@@ -501,7 +502,7 @@ public class MbtilesLayerImporter {
                                         stats.failed++;
                                         continue;
                                     }
-                                    batchArgs.add(new Object[]{zoom, x, y, data});
+                                    batchArgs.add(MbtilesInfo.of().setZoomLevel(zoom).setTileColumn(x).setTileRow(y).setTileData(data));
                                     stats.total++;
                                     layerCount[0]++;
                                 }
@@ -511,7 +512,7 @@ public class MbtilesLayerImporter {
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
-                            log.info("导入成功{}条，批次：{},总成功数量：{}",batchArgs.size(),pageNo+1,stats.success);
+                            log.info("导入成功{}条，批次：{},总成功数量：{}", batchArgs.size(), pageNo + 1, stats.success);
                             batchArgs.clear();
                             return Collections.emptyList();
                         } catch (Exception e) {
@@ -541,7 +542,7 @@ public class MbtilesLayerImporter {
         return stats;
     }
 
-    private static int[] executeBatch(DruidDataSource targetDataSource, String sql, List<Object[]> batchArgs) {
+    private static int[] executeBatch(DruidDataSource targetDataSource, String sql, List<MbtilesInfo> batchArgs) {
         if (batchArgs.isEmpty()) {
             return new int[]{0, 0, 0};
         }
@@ -553,11 +554,11 @@ public class MbtilesLayerImporter {
         try (DruidPooledConnection conn = targetDataSource.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                for (Object[] args : batchArgs) {
-                    pstmt.setInt(1, (Integer) args[0]);
-                    pstmt.setInt(2, (Integer) args[1]);
-                    pstmt.setInt(3, (Integer) args[2]);
-                    pstmt.setBytes(4, (byte[]) args[3]);
+                for (MbtilesInfo args : batchArgs) {
+                    pstmt.setInt(1, args.getZoomLevel());
+                    pstmt.setInt(2, args.getTileColumn());
+                    pstmt.setInt(3, args.getTileRow());
+                    pstmt.setBytes(4, args.getTileData());
                     pstmt.addBatch();
                 }
 

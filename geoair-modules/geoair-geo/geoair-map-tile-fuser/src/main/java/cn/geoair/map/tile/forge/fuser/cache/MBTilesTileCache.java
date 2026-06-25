@@ -473,7 +473,7 @@ public class MBTilesTileCache implements TileCache {
         public byte[] get(int z, int x, int y) {
             checkInitialized();
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
-            return MbtilesUtils.getTile(readDataSource, z, x, storeY);
+            return MbtilesUtils.getTile(readDataSource, z, x, storeY).getTileData();
         }
 
         /**

@@ -24,6 +24,11 @@ import java.io.IOException;
 @Accessors(chain = true)
 public class MbtilesInfo {
     private static GiLogger log = GirLoggerFactory.getLogger();
+
+    public static MbtilesInfo of() {
+        return new MbtilesInfo();
+    }
+
     /**
      * 层级 (Zoom Level)
      */
@@ -45,6 +50,25 @@ public class MbtilesInfo {
      * 格式通常为 PNG、JPG、WebP 或 PBF
      */
     private byte[] tileData;
+
+
+    public MbtilesInfo setX(Integer tileColumn) {
+        this.tileColumn = tileColumn;
+        return this;
+    }
+
+    public MbtilesInfo setY(Integer tileRow) {
+        this.tileRow = tileRow;
+        return this;
+    }
+
+    public Integer getX() {
+        return tileColumn;
+    }
+
+    public Integer getY() {
+        return tileRow;
+    }
 
     /**
      * 构造函数
