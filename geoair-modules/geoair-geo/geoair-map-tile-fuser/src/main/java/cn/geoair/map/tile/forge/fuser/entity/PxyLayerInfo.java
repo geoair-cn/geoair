@@ -3,10 +3,11 @@ package cn.geoair.map.tile.forge.fuser.entity;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.enums.SrcType;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Transient;
+
 
 /**
  * 代理图层信息实体类
