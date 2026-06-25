@@ -1,12 +1,14 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import lombok.extern.slf4j.Slf4j;
+
 
 import javax.sql.DataSource;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,9 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date Created in 2026/06/22
  * @description 基于 PostgreSQL 的瓦片缓存实现
  */
-@Slf4j
-public class PostgresTileCache implements TileCache {
 
+public class PostgresTileCache implements TileCache {
+    private static GiLogger log = GirLoggerFactory.getLogger();
     private final DataSource dataSource;
     private final boolean enabled;
     private final String tablePrefix;
@@ -264,8 +266,9 @@ public class PostgresTileCache implements TileCache {
     /**
      * 单个图层的缓存持有者
      */
-    @Slf4j
+
     private static class TableCacheHolder {
+        private static GiLogger log = GirLoggerFactory.getLogger( );
         private final IAdvExecutor iAdvExecutor;
         private final String tableName;
         private final boolean needReverseY;

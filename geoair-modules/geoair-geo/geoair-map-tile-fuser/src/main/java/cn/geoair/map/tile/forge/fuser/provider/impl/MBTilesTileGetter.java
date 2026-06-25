@@ -7,7 +7,7 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 

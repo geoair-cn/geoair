@@ -1,9 +1,10 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.hutool.core.io.FileUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -17,9 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
  * 注意：根据图层的 OriginType 自动处理 Y 轴翻转（Google 坐标系 ↔ TMS 坐标系）
  */
-@Slf4j
-public class FileTileCache implements TileCache {
 
+public class FileTileCache implements TileCache {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     // 缓存根目录
     private final String cacheRoot;
     // 缓存过期时间（毫秒），0表示不过期

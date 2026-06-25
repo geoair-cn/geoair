@@ -1,13 +1,12 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 带缓存的GtcTileFuser装饰器
@@ -17,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
  * @date ：Created in 2026/6/15 12:37
  * @description：带缓存的GtcTileFuser
  */
-@Slf4j
-public class CacheTileFuserExec implements FuserExec {
 
+public class CacheTileFuserExec implements FuserExec {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     private final FuserExec target;
     @Getter
     private final TileCache tileCache;

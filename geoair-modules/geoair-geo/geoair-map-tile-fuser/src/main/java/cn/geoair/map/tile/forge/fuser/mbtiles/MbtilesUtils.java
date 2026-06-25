@@ -1,5 +1,7 @@
-package cn.geoair.map.tile.forge.fuser.utils;
+package cn.geoair.map.tile.forge.fuser.mbtiles;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,9 @@ import java.util.Properties;
  * @author 张俊
  * @date Created in 2026/6/23 09:09
  */
-@Slf4j
-public class MbtilesUtils {
 
+public class MbtilesUtils {
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // ==================== SQL 语句常量 ====================
 
     /**
@@ -115,6 +117,16 @@ public class MbtilesUtils {
             "SELECT name FROM sqlite_master WHERE type='table' AND name=?";
 
     // ==================== 数据源创建方法 ====================
+
+    /**
+     * 创建 MBTiles 数据源（可读写）
+     *
+     * @param dbPath 数据库文件路径
+     * @return DruidDataSource
+     */
+    public static DruidDataSource createDataSource(String dbPath) {
+        return createDataSource(dbPath, false, 10, 1);
+    }
 
     /**
      * 创建 MBTiles 数据源（可读写）
@@ -344,6 +356,232 @@ public class MbtilesUtils {
             log.error("设置元数据失败: {}={}", name, value, e);
             return false;
         }
+    }
+
+    // ==================== 数据库维护方法 ====================
+
+    /**
+     * 执行 VACUUM 清理空间
+     * <p>
+     * VACUUM 命令会重建数据库文件，回收未使用的空间并整理碎片。
+     * 注意：VACUUM 会锁定数据库，执行期间不能进行写操作，建议在低峰期执行。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean vacuum(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法执行 VACUUM");
+            return false;
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            log.info("开始执行 VACUUM 清理空间...");
+            long startTime = System.currentTimeMillis();
+
+            stmt.execute("VACUUM");
+
+            long elapsed = System.currentTimeMillis() - startTime;
+            log.info("VACUUM 执行完成，耗时: {} ms", elapsed);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("执行 VACUUM 失败", e);
+            return false;
+        }
+    }
+
+    /**
+     * 执行 WAL 日志同步到主文件（Checkpoint）
+     * <p>
+     * 将 WAL 文件中的内容同步到主数据库文件中，释放 WAL 文件占用的空间。
+     * <ul>
+     *   <li>PASSIVE: 默认模式，不阻塞其他读写操作</li>
+     *   <li>FULL: 阻塞写操作，直到所有 WAL 内容同步完成</li>
+     *   <li>RESTART: 与 FULL 类似，但同步后会重置 WAL 文件</li>
+     * </ul>
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @param mode       检查点模式：PASSIVE、FULL、RESTART
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpoint(DruidDataSource dataSource, String mode) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法执行 WAL checkpoint");
+            return false;
+        }
+
+        if (mode == null || mode.trim().isEmpty()) {
+            mode = "PASSIVE";
+        }
+
+        // 确保模式有效
+        String upperMode = mode.toUpperCase();
+        if (!"PASSIVE".equals(upperMode) && !"FULL".equals(upperMode) && !"RESTART".equals(upperMode)) {
+            log.warn("无效的 checkpoint 模式: {}，使用默认 PASSIVE", mode);
+            upperMode = "PASSIVE";
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            log.info("开始执行 WAL checkpoint (模式: {})...", upperMode);
+            long startTime = System.currentTimeMillis();
+
+            stmt.execute("PRAGMA wal_checkpoint(" + upperMode + ")");
+
+            long elapsed = System.currentTimeMillis() - startTime;
+            log.info("WAL checkpoint 执行完成，耗时: {} ms", elapsed);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("执行 WAL checkpoint 失败 (模式: {})", upperMode, e);
+            return false;
+        }
+    }
+
+    /**
+     * 执行 WAL 日志同步到主文件（使用 PASSIVE 模式）
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpoint(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "PASSIVE");
+    }
+
+    /**
+     * 执行完整的 WAL 日志同步（FULL 模式）
+     * <p>
+     * 注意：此方法会阻塞写操作，直到所有 WAL 内容同步到主文件。
+     * 建议在低峰期或关闭数据源前调用。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpointFull(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "FULL");
+    }
+
+    /**
+     * 执行 WAL 日志同步并重置（RESTART 模式）
+     * <p>
+     * 与 FULL 模式类似，但同步后会重置 WAL 文件，常用于维护操作。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpointRestart(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "RESTART");
+    }
+
+    /**
+     * 获取 WAL 文件大小
+     * <p>
+     * 通过查询 PRAGMA wal_checkpoint 获取 WAL 文件大小信息
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return WAL 文件大小（字节），查询失败返回 -1
+     */
+    public static long getWalSize(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            return -1;
+        }
+
+        // 查询 WAL 文件大小（从数据库连接属性获取）
+        String sql = "PRAGMA wal_checkpoint";
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            // PRAGMA wal_checkpoint 返回三列：busy, log, checkpointed
+            // log 列表示 WAL 文件中的页数
+            if (rs.next()) {
+                // 获取页面大小，计算 WAL 文件大小
+                long walPages = rs.getLong(2); // log 列
+                if (walPages > 0) {
+                    try (Statement stmt2 = conn.createStatement();
+                         ResultSet rs2 = stmt2.executeQuery("PRAGMA page_size")) {
+                        if (rs2.next()) {
+                            int pageSize = rs2.getInt(1);
+                            return walPages * pageSize;
+                        }
+                    }
+                }
+                return 0; // WAL 为空
+            }
+
+        } catch (SQLException e) {
+            log.error("获取 WAL 文件大小失败", e);
+        }
+        return -1;
+    }
+
+    /**
+     * 检查当前是否启用 WAL 模式
+     *
+     * @param dataSource 数据源
+     * @return 是否启用 WAL
+     */
+    public static boolean isWalEnabled(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            return false;
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("PRAGMA journal_mode")) {
+
+            if (rs.next()) {
+                String mode = rs.getString(1);
+                return "wal".equalsIgnoreCase(mode);
+            }
+
+        } catch (SQLException e) {
+            log.error("检查 WAL 模式失败", e);
+        }
+        return false;
+    }
+
+    /**
+     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
+     * <p>
+     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
+     * 再执行 VACUUM 回收空间。
+     * 注意：此操作会锁定数据库，建议在低峰期执行。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean compactDatabase(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法压缩数据库");
+            return false;
+        }
+
+        log.info("开始压缩数据库...");
+        long startTime = System.currentTimeMillis();
+
+        // 第一步：执行 WAL checkpoint (FULL 模式)
+        if (!walCheckpointFull(dataSource)) {
+            log.warn("WAL checkpoint 执行失败，继续执行 VACUUM...");
+        }
+
+        // 第二步：执行 VACUUM
+        boolean vacuumResult = vacuum(dataSource);
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        log.info("数据库压缩完成，结果: {}, 耗时: {} ms", vacuumResult, elapsed);
+
+        return vacuumResult;
     }
 
     // ==================== 瓦片操作方法 ====================

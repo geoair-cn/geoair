@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
@@ -11,7 +13,6 @@ import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
-import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
@@ -25,9 +26,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author 张俊
  * @date Created in 2026/6/23
  */
-@Slf4j
-public class TileCheckAndRepairTask implements Runnable {
 
+public class TileCheckAndRepairTask implements Runnable {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     // 使用唯一的对象作为 Poison Pill（结束信号）
     private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
 

@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider.impl.google;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
@@ -10,7 +12,6 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,9 +24,9 @@ import java.io.File;
  * @author 张俊
  * @date Created in 2026/5/9 14:10
  */
-@Slf4j
-public class GoogleLocalFileTileGetter extends BaseTileGetter {
 
+public class GoogleLocalFileTileGetter extends BaseTileGetter {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     private final String filePathTemplate;
 
 

@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
@@ -13,7 +15,6 @@ import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -27,9 +28,9 @@ import java.nio.charset.StandardCharsets;
  * @author 张俊
  * @date Created in 2023/12/4 15:47
  */
-@Slf4j
-public class TileServiceTran {
 
+public class TileServiceTran {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
 
     /**
      * 默认瓦片大小
