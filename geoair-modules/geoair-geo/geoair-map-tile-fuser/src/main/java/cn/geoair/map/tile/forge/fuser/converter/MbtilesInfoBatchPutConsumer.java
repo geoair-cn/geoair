@@ -9,83 +9,168 @@ import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.Getter;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
  * @author ：张俊
  * @date ：Created in 2026/6/25 11:51
- * @description： 批量插入消费模型
+ * @description： 批量插入消费模型（线程安全版）
  */
-public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo> {
+public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Closeable {
 
-    private static GiLogger log = GirLoggerFactory.getLogger(TileToMbtilesConverter.class);
+    private static GiLogger log = GirLoggerFactory.getLogger(MbtilesInfoBatchPutConsumer.class);
+
     @Getter
-    ConvertStats stats = new ConvertStats();
-    boolean needReverseY;
-    boolean overwrite;
-    int batchSize;
-    List<MbtilesInfo> batchArgs;
-    DruidDataSource dataSource;
-    Integer zoom;
-    long layerStartTime;
+    private final ConvertStats stats = new ConvertStats();
 
-    public MbtilesInfoBatchPutConsumer(boolean needReverseY, boolean overwrite, int batchSize, DruidDataSource dataSource, Integer zoom) {
+    private final boolean needReverseY;
+    private final boolean overwrite;
+    private final int batchSize;
+    private final DruidDataSource dataSource;
+    private final Integer zoom;
+    private final List<MbtilesInfo> batchArgs;
+    private final ReentrantLock lock = new ReentrantLock();
+    private long layerStartTime;
+    private volatile boolean closed = false;
+
+    public MbtilesInfoBatchPutConsumer(boolean needReverseY, boolean overwrite,
+                                       int batchSize, DruidDataSource dataSource, Integer zoom) {
         this.needReverseY = needReverseY;
         this.overwrite = overwrite;
         this.batchSize = batchSize;
         this.dataSource = dataSource;
         this.zoom = zoom;
-        batchArgs = new ArrayList<>(batchSize);
-        layerStartTime = System.currentTimeMillis();
+        this.batchArgs = new ArrayList<>(batchSize);
+        this.layerStartTime = System.currentTimeMillis();
     }
-
 
     @Override
     public void accept(MbtilesInfo tile) {
-        stats.total++;
-        try {
-            // 读取瓦片数据
+        if (closed) {
+            log.warn("消费者已关闭，拒绝新任务: z={}, x={}, y={}",
+                    tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow());
+            return;
+        }
 
-            if (tile.getDataSize() == 0) {
-                stats.failed++;
+        // 统计总数（使用 synchronized 保证原子性）
+        synchronized (stats) {
+            stats.total++;
+        }
+
+        try {
+            // 校验数据
+            if (tile.getTileData() == null || tile.getTileData().length == 0) {
+                synchronized (stats) {
+                    stats.failed++;
+                }
+                log.debug("瓦片数据为空，跳过: z={}, x={}, y={}",
+                        tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow());
                 return;
             }
+
             // 计算存储 Y（根据需要翻转）
-            int storeY = FuserCacheUtils.getStoreY(zoom, tile.getY(), needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(zoom, tile.getTileRow(), needReverseY);
+            tile.setTileRow(storeY);
 
-            // 添加到批量
-            batchArgs.add(tile.setY(storeY));
-            stats.totalSize += tile.getDataSize();
+            // 获取锁，保证批量操作的线程安全
+            lock.lock();
+            try {
+                // 添加到批量
+                batchArgs.add(tile);
+                synchronized (stats) {
+                    stats.totalSize += tile.getTileData().length;
+                }
 
-            if (batchArgs.size() >= batchSize) {
-                int[] results = MbtilesUtils.putTileBatch(dataSource, overwrite, batchArgs);
+                // 达到批量大小时提交
+                if (batchArgs.size() >= batchSize) {
+                    doBatchSubmit();
+                }
+            } finally {
+                lock.unlock();
+            }
+
+        } catch (Exception e) {
+            synchronized (stats) {
+                stats.failed++;
+            }
+            log.error("处理瓦片失败: z={}, x={}, y={}",
+                    tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow(), e);
+        }
+    }
+
+    /**
+     * 执行批量提交（必须在锁内调用）
+     */
+    private void doBatchSubmit() {
+        if (batchArgs.isEmpty()) {
+            return;
+        }
+
+        try {
+            // 复制当前批次数据
+            List<MbtilesInfo> batchToSubmit = new ArrayList<>(batchArgs);
+            batchArgs.clear();
+
+            // 执行批量插入
+            int[] results = MbtilesUtils.putTileBatch(dataSource, overwrite, batchToSubmit);
+
+            synchronized (stats) {
                 stats.success += results[0];
                 stats.skipped += results[1];
                 stats.failed += results[2];
-                log.info("导入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
-                batchArgs.clear();
             }
+
+            log.info("批量提交成功: 数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
+                    batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+
         } catch (Exception e) {
-
-            stats.failed++;
-        }
-    }
-
-    public void doImportEnd() {
-        // 执行剩余的批量插入
-        if (!batchArgs.isEmpty()) {
-            int[] results = MbtilesUtils.putTileBatch(dataSource, overwrite, batchArgs);
-            stats.success += results[0];
-            stats.skipped += results[1];
-            stats.failed += results[2];
-            log.info("执行剩余的批量插入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
+            log.error("批量提交失败: zoom={}", zoom, e);
+            synchronized (stats) {
+                stats.failed += batchArgs.size();
+            }
             batchArgs.clear();
         }
-        log.info("层级 z={} 完成: 总数={}, 耗时={}ms,批次总大小={}",
-                zoom, stats.total, System.currentTimeMillis() - layerStartTime, DataSizeUtil.format(stats.totalSize));
     }
 
-}
+    /**
+     * 关闭消费者，提交剩余数据
+     */
+    @Override
+    public void close() {
+        if (closed) {
+            return;
+        }
 
+        lock.lock();
+        try {
+            closed = true;
+            // 提交剩余数据
+            if (!batchArgs.isEmpty()) {
+                doBatchSubmit();
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        long costTime = System.currentTimeMillis() - layerStartTime;
+        log.info("层级 z={} 完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s, 总大小={}",
+                zoom, stats.total, stats.success, stats.skipped, stats.failed,
+                costTime / 1000, DataSizeUtil.format(stats.totalSize));
+    }
+
+    /**
+     * 获取当前批次大小（用于监控）
+     */
+    public int getCurrentBatchSize() {
+        lock.lock();
+        try {
+            return batchArgs.size();
+        } finally {
+            lock.unlock();
+        }
+    }
+}

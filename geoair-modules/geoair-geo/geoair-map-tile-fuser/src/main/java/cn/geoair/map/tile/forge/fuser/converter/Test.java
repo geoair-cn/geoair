@@ -16,7 +16,8 @@ public class Test {
                 .setSourceLayerName("imagery")
                 .setTargetMbtiles("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\copy.mbtiles")
                 .setTargetLayerName("imagery_backup")
-                .setZoomLevels(Arrays.asList(12))
+//                .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6,7,8,9,10,11))
+                .setZoomLevels(Arrays.asList(13))
                 .setOverwrite(true)                // 覆盖已存在的瓦片
                 .setBatchSize(20000)                // 批量插入大小
                 .setCopyMetadata(true)             // 复制元数据

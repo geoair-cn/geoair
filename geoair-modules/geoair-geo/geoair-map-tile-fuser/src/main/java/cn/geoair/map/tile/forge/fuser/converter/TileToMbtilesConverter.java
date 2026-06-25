@@ -383,6 +383,7 @@ public class TileToMbtilesConverter {
         public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize, DruidDataSource dataSource, Integer zoom) {
             mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(needReverseY, overwrite, batchSize, dataSource, zoom);
         }
+
         @Override
         public void accept(TileInfo tile) {
             byte[] data = null;
@@ -394,9 +395,11 @@ public class TileToMbtilesConverter {
             }
             mbtilesInfoBatchPutConsumer.accept(MbtilesInfo.of().setX(tile.x).setY(tile.y).setZoomLevel(tile.z).setTileData(data));
         }
+
         public void doImportEnd() {
-            mbtilesInfoBatchPutConsumer.doImportEnd();
+            mbtilesInfoBatchPutConsumer.close();
         }
+
         public ConvertStats getStats() {
             return mbtilesInfoBatchPutConsumer.getStats();
         }

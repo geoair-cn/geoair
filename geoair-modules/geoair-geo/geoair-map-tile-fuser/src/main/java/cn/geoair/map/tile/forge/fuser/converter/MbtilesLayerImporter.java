@@ -423,8 +423,8 @@ public class MbtilesLayerImporter {
                     @Override
                     public void setPageConfig(PageConfig pageConfig) {
                         pageConfig.setPageSize((long) config.getBatchSize())
-                                .setParallelConsumeRecordIs(false)
-                                .setParallelExecPageIs(false)
+//                                .setParallelConsumeRecordIs(false)
+//                                .setParallelExecPageIs(false)
                                 .setPageNumStartByZero(true);
                     }
 
@@ -435,7 +435,7 @@ public class MbtilesLayerImporter {
                         try {
                             int offset = pageNo * pageSize;
                             sourceConn = sourceDataSource.getConnection();
-                            String sql = StrUtil.format(selectSql, zoom, offset, pageSize);
+                            String sql = StrUtil.format(selectSql, zoom, pageSize, offset);
                             PreparedStatement selectStmt = sourceConn.prepareStatement(sql);
                             log.info("sql:{}", sql);
                             try (ResultSet rs = selectStmt.executeQuery()) {
@@ -460,7 +460,7 @@ public class MbtilesLayerImporter {
                     }
                 }).execute();
                 // 执行剩余的批量插入
-                batchPutConsumer.doImportEnd();
+                batchPutConsumer.close();
                 stats.total += batchPutConsumer.getStats().total;
                 stats.success += batchPutConsumer.getStats().success;
                 stats.failed += batchPutConsumer.getStats().failed;
