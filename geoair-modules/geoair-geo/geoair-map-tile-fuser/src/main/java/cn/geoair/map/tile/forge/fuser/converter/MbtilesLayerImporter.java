@@ -234,7 +234,7 @@ public class MbtilesLayerImporter {
             }
 
             // 获取源图层名称
-            String sourceLayer = getLayerName(sourceDataSource, config.getSourceLayerName());
+            String sourceLayer = MbtilesUtils.getLayerName(sourceDataSource, config.getSourceLayerName());
             if (sourceLayer == null) {
                 log.error("源图层不存在: {}", config.getSourceLayerName());
                 result.failedTiles = -1;
@@ -321,50 +321,8 @@ public class MbtilesLayerImporter {
         return true;
     }
 
-    /**
-     * 获取图层名称
-     */
-    private static String getLayerName(DruidDataSource dataSource, String layerName) {
-        if (layerName != null && !layerName.isEmpty()) {
-            // 检查图层是否存在
-            if (layerExists(dataSource, layerName)) {
-                return layerName;
-            }
-            log.warn("图层不存在: {}, 将使用第一个可用图层", layerName);
-        }
 
-        // 获取第一个图层
-        String sql = "SELECT value FROM metadata WHERE name = 'name' LIMIT 1";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getString(1);
-            }
-        } catch (SQLException e) {
-            log.error("获取图层名称失败", e);
-        }
-        return null;
-    }
 
-    /**
-     * 检查图层是否存在
-     */
-    private static boolean layerExists(DruidDataSource dataSource, String layerName) {
-        String sql = "SELECT COUNT(*) FROM metadata WHERE name = 'name' AND value = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, layerName);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            log.debug("检查图层是否存在失败: {}", e.getMessage());
-        }
-        return false;
-    }
 
     /**
      * 获取所有层级
@@ -391,7 +349,7 @@ public class MbtilesLayerImporter {
                                      DruidDataSource targetDataSource,
                                      String sourceLayer, String targetLayer) {
         // 检查目标图层是否已存在
-        if (layerExists(targetDataSource, targetLayer)) {
+        if (MbtilesUtils.layerExists(targetDataSource, targetLayer)) {
             log.info("目标图层已存在，跳过元数据复制: {}", targetLayer);
             return;
         }
@@ -455,13 +413,8 @@ public class MbtilesLayerImporter {
                                            List<Integer> zoomLevels,
                                            ImportConfig config) {
         ImportStats stats = new ImportStats();
-
         // 构建查询和插入 SQL
         String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ? LIMIT ? OFFSET ?";
-
-        String insertSql = config.isOverwrite()
-                ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
-                : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
         try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
@@ -508,7 +461,7 @@ public class MbtilesLayerImporter {
                                 }
                             }
                             IoUtil.close(sourceConn);
-                            int[] results = executeBatch(targetDataSource, insertSql, batchArgs);
+                            int[] results =    MbtilesUtils.putTileBatch(targetDataSource, config.overwrite, batchArgs);
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
@@ -527,7 +480,7 @@ public class MbtilesLayerImporter {
                 }).execute();
                 // 执行剩余的批量插入
                 if (!batchArgs.isEmpty()) {
-                    int[] results = executeBatch(targetDataSource, insertSql, batchArgs);
+                    int[] results =  MbtilesUtils.putTileBatch(targetDataSource, config.overwrite, batchArgs);
                     stats.success += results[0];
                     stats.skipped += results[1];
                     stats.failed += results[2];
@@ -542,49 +495,7 @@ public class MbtilesLayerImporter {
         return stats;
     }
 
-    private static int[] executeBatch(DruidDataSource targetDataSource, String sql, List<MbtilesInfo> batchArgs) {
-        if (batchArgs.isEmpty()) {
-            return new int[]{0, 0, 0};
-        }
 
-        int success = 0;
-        int skipped = 0;
-        int failed = 0;
-
-        try (DruidPooledConnection conn = targetDataSource.getConnection()) {
-            conn.setAutoCommit(false);
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                for (MbtilesInfo args : batchArgs) {
-                    pstmt.setInt(1, args.getZoomLevel());
-                    pstmt.setInt(2, args.getTileColumn());
-                    pstmt.setInt(3, args.getTileRow());
-                    pstmt.setBytes(4, args.getTileData());
-                    pstmt.addBatch();
-                }
-
-                int[] results = pstmt.executeBatch();
-                for (int result : results) {
-                    if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
-                        success++;
-                    } else if (result == Statement.EXECUTE_FAILED) {
-                        failed++;
-                    } else {
-                        skipped++;
-                    }
-                }
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                log.error("批量插入失败", e);
-                failed = batchArgs.size();
-            }
-        } catch (SQLException e) {
-            log.error("获取数据库连接失败", e);
-            failed = batchArgs.size();
-        }
-
-        return new int[]{success, skipped, failed};
-    }
 
     public static void main(String[] args) {
         // ==================== 1. 最简单的用法 ====================

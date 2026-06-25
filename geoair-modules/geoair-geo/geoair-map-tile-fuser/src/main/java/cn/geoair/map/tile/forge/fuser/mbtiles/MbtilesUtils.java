@@ -4,10 +4,12 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -264,6 +266,52 @@ public class MbtilesUtils {
             log.error("检查 tiles 表是否存在失败", e);
             return false;
         }
+    }
+
+    /**
+     * 检查图层是否已存在
+     */
+    public static boolean layerExists(DruidDataSource dataSource, String layerName) {
+        String sql = "SELECT COUNT(*) FROM metadata WHERE name = ? AND value = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "name");
+            pstmt.setString(2, layerName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            log.debug("检查图层是否存在失败: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * 获取图层名称
+     */
+    public static String getLayerName(DruidDataSource dataSource, String layerName) {
+        if (layerName != null && !layerName.isEmpty()) {
+            // 检查图层是否存在
+            if (MbtilesUtils.layerExists(dataSource, layerName)) {
+                return layerName;
+            }
+            log.warn("图层不存在: {}, 将使用第一个可用图层", layerName);
+        }
+
+        // 获取第一个图层
+        String sql = "SELECT value FROM metadata WHERE name = 'name' LIMIT 1";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } catch (SQLException e) {
+            log.error("获取图层名称失败", e);
+        }
+        return null;
     }
 
     // ==================== 元数据操作方法 ====================
@@ -616,7 +664,7 @@ public class MbtilesUtils {
         } catch (SQLException e) {
             log.error("读取瓦片失败: z={}, x={}, y={}", z, x, y, e);
         }
-        return   MbtilesInfo.of();
+        return MbtilesInfo.of();
     }
 
     /**
@@ -654,6 +702,76 @@ public class MbtilesUtils {
             log.error("保存瓦片失败: z={}, x={}, y={},url:{}", z, x, y, url, e);
             return false;
         }
+    }
+
+    /**
+     * 批量插入瓦片数据
+     *
+     * @param targetDataSource 目标数据源
+     * @param overwrite        是否覆盖已存在的瓦片
+     * @param mbtilesInfos     瓦片信息列表
+     * @return int[]{success, skipped, failed}
+     */
+    public static int[] putTileBatch(DruidDataSource targetDataSource, boolean overwrite, List<MbtilesInfo> mbtilesInfos) {
+        if (mbtilesInfos == null || mbtilesInfos.isEmpty()) {
+            log.warn("瓦片列表为空，跳过批量插入");
+            return new int[]{0, 0, 0};
+        }
+
+        if (targetDataSource == null || targetDataSource.isClosed()) {
+            log.error("数据源无效或已关闭，无法执行批量插入");
+            return new int[]{0, 0, mbtilesInfos.size()};
+        }
+
+        String insertSql = overwrite
+                ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
+                : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
+
+        int success = 0;
+        int skipped = 0;
+        int failed = 0;
+
+        long startTime = System.currentTimeMillis();
+        int totalCount = mbtilesInfos.size();
+        log.info("开始批量插入瓦片，总数: {}, 覆盖模式: {}", totalCount, overwrite);
+
+        try (DruidPooledConnection conn = targetDataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                for (MbtilesInfo args : mbtilesInfos) {
+                    pstmt.setInt(1, args.getZoomLevel());
+                    pstmt.setInt(2, args.getTileColumn());
+                    pstmt.setInt(3, args.getTileRow());
+                    pstmt.setBytes(4, args.getTileData());
+                    pstmt.addBatch();
+                }
+
+                int[] results = pstmt.executeBatch();
+                for (int result : results) {
+                    if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
+                        success++;
+                    } else if (result == Statement.EXECUTE_FAILED) {
+                        failed++;
+                    } else {
+                        skipped++;
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                log.error("批量插入失败", e);
+                failed = mbtilesInfos.size();
+            }
+        } catch (SQLException e) {
+            log.error("获取数据库连接失败", e);
+            failed = mbtilesInfos.size();
+        }
+
+        long costTime = System.currentTimeMillis() - startTime;
+        log.info("批量插入完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}ms",
+                totalCount, success, skipped, failed, costTime);
+
+        return new int[]{success, skipped, failed};
     }
 
     /**

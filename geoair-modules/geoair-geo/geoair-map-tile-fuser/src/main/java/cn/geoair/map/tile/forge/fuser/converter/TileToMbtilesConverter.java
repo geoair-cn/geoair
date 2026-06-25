@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.fuser.converter;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.io.IoUtil;
@@ -311,7 +312,7 @@ public class TileToMbtilesConverter {
         String layerName = config.getLayerName();
 
         // 检查是否已存在该图层
-        if (layerExists(dataSource, layerName)) {
+        if (MbtilesUtils.layerExists(dataSource, layerName)) {
             log.info("图层已存在，将使用已有配置: {}", layerName);
             return true;
         }
@@ -333,25 +334,6 @@ public class TileToMbtilesConverter {
         return metadataInit;
     }
 
-    /**
-     * 检查图层是否已存在
-     */
-    private static boolean layerExists(DruidDataSource dataSource, String layerName) {
-        String sql = "SELECT COUNT(*) FROM metadata WHERE name = ? AND value = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, "name");
-            pstmt.setString(2, layerName);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            log.debug("检查图层是否存在失败: {}", e.getMessage());
-        }
-        return false;
-    }
 
     /**
      * 检测图片格式
@@ -407,21 +389,77 @@ public class TileToMbtilesConverter {
         long totalSize = 0;
     }
 
+    public static class ConsumerTileInfo implements Consumer<TileInfo> {
+
+        ConvertStats stats = new ConvertStats();
+        ConvertConfig config;
+        List<MbtilesInfo> batchArgs;
+        DruidDataSource dataSource;
+        Integer zoom;
+        long layerStartTime;
+
+        public ConsumerTileInfo(ConvertConfig config, DruidDataSource dataSource, Integer zoom) {
+            this.config = config;
+            this.dataSource = dataSource;
+            this.zoom = zoom;
+            batchArgs = new ArrayList<>(config.getBatchSize());
+            layerStartTime = System.currentTimeMillis();
+        }
+
+        @Override
+        public void accept(TileInfo tile) {
+            stats.total++;
+            try {
+                // 读取瓦片数据
+                byte[] data = Files.readAllBytes(tile.path);
+                if (data.length == 0) {
+                    stats.failed++;
+                    return;
+                }
+                // 计算存储 Y（根据需要翻转）
+                int storeY = FuserCacheUtils.getStoreY(zoom, tile.y, config.isNeedReverseY());
+
+                // 添加到批量
+                batchArgs.add(MbtilesInfo.of().setZoomLevel(zoom).setX(tile.x).setY(storeY).setTileData(data));
+                stats.totalSize += data.length;
+
+                if (batchArgs.size() >= config.getBatchSize()) {
+                    int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
+                    stats.success += results[0];
+                    stats.skipped += results[1];
+                    stats.failed += results[2];
+                    log.info("导入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
+                    batchArgs.clear();
+                }
+            } catch (IOException e) {
+                log.debug("读取瓦片文件失败: {}", tile.path, e);
+                stats.failed++;
+            }
+        }
+
+        public void doImportEnd() {
+            // 执行剩余的批量插入
+            if (!batchArgs.isEmpty()) {
+                int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
+                stats.success += results[0];
+                stats.skipped += results[1];
+                stats.failed += results[2];
+                log.info("执行剩余的批量插入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
+                batchArgs.clear();
+            }
+            log.info("层级 z={} 完成: 总数={}, 耗时={}ms",
+                    zoom, stats.total, System.currentTimeMillis() - layerStartTime);
+        }
+
+    }
+
     /**
      * 转换瓦片
      */
     private static ConvertStats convertTiles(ConvertConfig config, DruidDataSource dataSource, List<Integer> zoomLevels) {
         ConvertStats stats = new ConvertStats();
-
-        String insertSql = config.isOverwrite()
-                ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
-                : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
-
-        List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
-
+        List<MbtilesInfo> batchArgs = new ArrayList<>(config.getBatchSize());
         try {
-
-
             for (int z : zoomLevels) {
                 log.info("处理层级: z={}", z);
                 long layerStartTime = System.currentTimeMillis();
@@ -445,11 +483,11 @@ public class TileToMbtilesConverter {
                         int storeY = FuserCacheUtils.getStoreY(z, tile.y, config.isNeedReverseY());
 
                         // 添加到批量
-                        batchArgs.add(new Object[]{z, tile.x, storeY, data});
+                        batchArgs.add(MbtilesInfo.of().setZoomLevel(z).setX(tile.x).setY(storeY).setTileData(data));
                         stats.totalSize += data.length;
 
                         if (batchArgs.size() >= config.getBatchSize()) {
-                            int[] results = executeBatch(dataSource, insertSql, batchArgs);
+                            int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
                             stats.success += results[0];
                             stats.skipped += results[1];
                             stats.failed += results[2];
@@ -467,7 +505,7 @@ public class TileToMbtilesConverter {
 
                 // 执行剩余的批量插入
                 if (!batchArgs.isEmpty()) {
-                    int[] results = executeBatch(dataSource, insertSql, batchArgs);
+                    int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
                     stats.success += results[0];
                     stats.skipped += results[1];
                     stats.failed += results[2];
@@ -483,7 +521,7 @@ public class TileToMbtilesConverter {
             log.info("所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}",
                     stats.total, stats.success, stats.skipped, stats.failed);
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             log.error("数据库操作失败", e);
         }
 
@@ -964,50 +1002,6 @@ public class TileToMbtilesConverter {
 
     // ==================== 数据库操作方法 ====================
 
-    /**
-     * 执行批量插入
-     *
-     * @return [success, skipped, failed]
-     */
-    private static int[] executeBatch(DruidDataSource dataSource, String sql, List<Object[]> batchArgs) throws SQLException {
-        if (batchArgs.isEmpty()) {
-            return new int[]{0, 0, 0};
-        }
-
-        int success = 0;
-        int skipped = 0;
-        int failed = 0;
-        DruidPooledConnection conn = dataSource.getConnection();
-        conn.setAutoCommit(false);
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            for (Object[] args : batchArgs) {
-                pstmt.setInt(1, (Integer) args[0]);
-                pstmt.setInt(2, (Integer) args[1]);
-                pstmt.setInt(3, (Integer) args[2]);
-                pstmt.setBytes(4, (byte[]) args[3]);
-                pstmt.addBatch();
-            }
-
-            int[] results = pstmt.executeBatch();
-            for (int result : results) {
-                if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
-                    success++;
-                } else if (result == Statement.EXECUTE_FAILED) {
-                    failed++;
-                } else {
-                    skipped++;
-                }
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            log.error("批量插入失败", e);
-            failed = batchArgs.size();
-        } finally {
-            IoUtil.close(conn);
-        }
-
-        return new int[]{success, skipped, failed};
-    }
 
     /**
      * 删除源文件
@@ -1110,6 +1104,7 @@ public class TileToMbtilesConverter {
                 .setDeleteSourceAfterConvert(true);
         return convert(config);
     }
+
 
     public static void main(String[] args) {
         // 1. 基本用法 - 转换所有瓦片到 MBTiles
