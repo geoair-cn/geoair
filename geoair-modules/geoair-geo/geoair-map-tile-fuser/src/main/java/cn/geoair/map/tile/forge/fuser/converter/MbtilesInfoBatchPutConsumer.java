@@ -73,7 +73,7 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
             }
 
             // 计算存储 Y（根据需要翻转）
-            int storeY = FuserCacheUtils.getStoreY(zoom, tile.getTileRow(), needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(zoom, tile.getY(), needReverseY);
             tile.setTileRow(storeY);
 
             // 获取锁，保证批量操作的线程安全

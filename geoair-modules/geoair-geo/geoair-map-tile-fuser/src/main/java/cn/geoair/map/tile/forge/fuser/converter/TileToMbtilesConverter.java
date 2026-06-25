@@ -390,6 +390,7 @@ public class TileToMbtilesConverter {
                 // 读取瓦片数据
                 data = Files.readAllBytes(tile.path);
             } catch (Exception e) {
+                log.error(e.getMessage());
 
             }
             mbtilesInfoBatchPutConsumer.accept(MbtilesInfo.of().setX(tile.x).setY(tile.y).setZoomLevel(tile.z).setTileData(data));
