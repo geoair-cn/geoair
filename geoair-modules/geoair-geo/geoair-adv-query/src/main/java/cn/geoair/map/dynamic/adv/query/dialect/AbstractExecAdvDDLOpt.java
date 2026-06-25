@@ -80,8 +80,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
         if (dataSync) {
             // 复制表结构及数据
-            String createSql = buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
-            dExecuteDDL(createSql, dstTableName, "复制表结构及数据");
+            String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
+            dExecuteDDL(createSql, dstTableName, "复制表结构");
+            String copySql = buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
+            dExecuteDDL(copySql, dstTableName, "复制数据");
         } else {
             // 仅复制表结构
             String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
