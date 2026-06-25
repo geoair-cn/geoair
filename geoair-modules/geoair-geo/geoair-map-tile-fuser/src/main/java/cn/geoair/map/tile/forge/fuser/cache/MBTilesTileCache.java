@@ -1,13 +1,15 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.extern.slf4j.Slf4j;
+
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,9 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @date Created in 2026/06/22
  * @description 基于 MBTiles 规范的瓦片缓存实现，使用 Druid 连接池，读写分离
  */
-@Slf4j
-public class MBTilesTileCache implements TileCache {
 
+public class MBTilesTileCache implements TileCache {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     private final String cacheRoot;
     private final boolean enabled;
 
@@ -390,8 +392,9 @@ public class MBTilesTileCache implements TileCache {
     /**
      * 单个图层的缓存持有者（连接池 - 读写分离）
      */
-    @Slf4j
+
     private static class LayerCacheHolder {
+        private static GiLogger log = GirLoggerFactory.getLogger( );
         private String dbPath;
         private boolean needReverseY;
         private DruidDataSource readDataSource;
@@ -470,7 +473,7 @@ public class MBTilesTileCache implements TileCache {
         public byte[] get(int z, int x, int y) {
             checkInitialized();
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
-            return MbtilesUtils.getTile(readDataSource, z, x, storeY);
+            return MbtilesUtils.getTile(readDataSource, z, x, storeY).getTileData();
         }
 
         /**

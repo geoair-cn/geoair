@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
@@ -11,7 +13,6 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -19,8 +20,9 @@ import lombok.extern.slf4j.Slf4j;
  * @date ：Created in 2026/6/22 12:13
  * @description： TODO
  */
-@Slf4j
+
 public class FuserCacheUtils {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     /**
      * 原始网格名称后缀
      */

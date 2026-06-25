@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
@@ -8,7 +10,6 @@ import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -31,9 +32,9 @@ import java.util.Map;
  * @author 张俊
  * @date Created in 2026/6/16 09:20
  */
-@Slf4j
-public class HttpTileRequestUtils {
 
+public class HttpTileRequestUtils {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     // ==================== 默认配置常量 ====================
 
     /**

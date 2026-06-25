@@ -5,9 +5,10 @@ import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
 
@@ -96,8 +97,8 @@ public class MBTilesTileGetter extends BaseTileGetter {
         }
         int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
         long startTime = System.currentTimeMillis();
-        byte[] imageBytes = MbtilesUtils.getTile(dataSource, z, x, storeY);
-
+        MbtilesInfo tile = MbtilesUtils.getTile(dataSource, z, x, storeY);
+        byte[] imageBytes = tile.getTileData();
         if (imageBytes != null && imageBytes.length > 0) {
             long elapsed = System.currentTimeMillis() - startTime;
             log.debug("从 MBTiles 读取瓦片成功: {} ({},{},{}) 大小: {} bytes, 耗时: {}ms",

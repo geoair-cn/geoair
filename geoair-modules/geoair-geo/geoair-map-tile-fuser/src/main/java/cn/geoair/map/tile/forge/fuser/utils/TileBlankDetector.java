@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -10,9 +11,9 @@ import java.io.ByteArrayInputStream;
  * 瓦片空白检测工具类
  * 用于检测瓦片图像中是否存在大面积空白矩形区域
  */
-@Slf4j
-public class TileBlankDetector {
 
+public class TileBlankDetector {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     // 配置参数
     private static int MIN_TILE_SIZE = 50;              // 最小瓦片尺寸
     private static int SAMPLE_DIVISOR = 10;             // 采样步长除数（调小以提高精度）

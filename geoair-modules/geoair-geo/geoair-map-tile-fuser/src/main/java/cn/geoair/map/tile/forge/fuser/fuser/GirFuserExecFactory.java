@@ -2,13 +2,14 @@ package cn.geoair.map.tile.forge.fuser.fuser;
 
 
 import cn.geoair.base.exception.GirException;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -18,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author 张俊
  * @date Created in 2026/6/15
  */
-@Slf4j
-public class GirFuserExecFactory {
 
+public class GirFuserExecFactory {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     /**
      * 默认瓦片尺寸
      */

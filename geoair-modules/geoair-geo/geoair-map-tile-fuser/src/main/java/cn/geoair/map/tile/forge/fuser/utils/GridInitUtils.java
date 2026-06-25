@@ -1,6 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.core.DefaultGridsets;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSetFactory;
@@ -13,7 +15,7 @@ import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubsetFactory;
  * @description： 网格相关的通用
  */
 public class GridInitUtils {
-
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     static DefaultGridsets defaultGridsets = new DefaultGridsets(false, false);
     static GridSubset WORLD_GRID_3857 = GridSubsetFactory.
             createGridSubSet(

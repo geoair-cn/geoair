@@ -1,7 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 
 /**
  * 缓存工厂类
@@ -10,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
  * @date Created in 2023/12/4
  * @description 用于创建和管理缓存实例
  */
-@Slf4j
-public class TileCacheFactory {
 
+public class TileCacheFactory {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     private static volatile TileCache defaultCache;
 
 

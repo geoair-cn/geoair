@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.fuser.CustomTileGetterHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
@@ -19,7 +21,7 @@ import cn.geoair.map.tile.forge.fuser.provider.impl.grid4490.Grid4490WebTileGett
  * @date Created in 2026/6/15
  */
 public class TileGetterFactory {
-
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     /**
      * 根据配置创建瓦片获取器（带缓存）
      */

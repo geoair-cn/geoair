@@ -1,10 +1,11 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 
-import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -19,9 +20,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author 张俊
  * @date Created in 2026/6/15 11:54
  */
-@Slf4j
-public class PreCache {
 
+public class PreCache {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     private final ExecutorService executorService;
 
     public static PreCache getInstance() {

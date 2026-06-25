@@ -1,11 +1,16 @@
-package cn.geoair.map.tile.forge.fuser.utils;
+package cn.geoair.map.tile.forge.fuser.mbtiles;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -21,9 +26,9 @@ import java.util.Properties;
  * @author 张俊
  * @date Created in 2026/6/23 09:09
  */
-@Slf4j
-public class MbtilesUtils {
 
+public class MbtilesUtils {
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // ==================== SQL 语句常量 ====================
 
     /**
@@ -115,6 +120,16 @@ public class MbtilesUtils {
             "SELECT name FROM sqlite_master WHERE type='table' AND name=?";
 
     // ==================== 数据源创建方法 ====================
+
+    /**
+     * 创建 MBTiles 数据源（可读写）
+     *
+     * @param dbPath 数据库文件路径
+     * @return DruidDataSource
+     */
+    public static DruidDataSource createDataSource(String dbPath) {
+        return createDataSource(dbPath, false, 10, 1);
+    }
 
     /**
      * 创建 MBTiles 数据源（可读写）
@@ -254,6 +269,52 @@ public class MbtilesUtils {
         }
     }
 
+    /**
+     * 检查图层是否已存在
+     */
+    public static boolean layerExists(DruidDataSource dataSource, String layerName) {
+        String sql = "SELECT COUNT(*) FROM metadata WHERE name = ? AND value = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "name");
+            pstmt.setString(2, layerName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            log.debug("检查图层是否存在失败: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * 获取图层名称
+     */
+    public static String getLayerName(DruidDataSource dataSource, String layerName) {
+        if (layerName != null && !layerName.isEmpty()) {
+            // 检查图层是否存在
+            if (MbtilesUtils.layerExists(dataSource, layerName)) {
+                return layerName;
+            }
+            log.warn("图层不存在: {}, 将使用第一个可用图层", layerName);
+        }
+
+        // 获取第一个图层
+        String sql = "SELECT value FROM metadata WHERE name = 'name' LIMIT 1";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } catch (SQLException e) {
+            log.error("获取图层名称失败", e);
+        }
+        return null;
+    }
+
     // ==================== 元数据操作方法 ====================
 
     /**
@@ -346,6 +407,250 @@ public class MbtilesUtils {
         }
     }
 
+    // ==================== 数据库维护方法 ====================
+
+    /**
+     * 执行 VACUUM 清理空间
+     * <p>
+     * VACUUM 命令会重建数据库文件，回收未使用的空间并整理碎片。
+     * 注意：VACUUM 会锁定数据库，执行期间不能进行写操作，建议在低峰期执行。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean vacuum(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法执行 VACUUM");
+            return false;
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            log.info("开始执行 VACUUM 清理空间...");
+            long startTime = System.currentTimeMillis();
+
+            stmt.execute("VACUUM");
+
+            long elapsed = System.currentTimeMillis() - startTime;
+            log.info("VACUUM 执行完成，耗时: {} ms", elapsed);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("执行 VACUUM 失败", e);
+            return false;
+        }
+    }
+
+    /**
+     * 执行 WAL 日志同步到主文件（Checkpoint）
+     * <p>
+     * 将 WAL 文件中的内容同步到主数据库文件中，释放 WAL 文件占用的空间。
+     * <ul>
+     *   <li>PASSIVE: 默认模式，不阻塞其他读写操作</li>
+     *   <li>FULL: 阻塞写操作，直到所有 WAL 内容同步完成</li>
+     *   <li>RESTART: 与 FULL 类似，但同步后会重置 WAL 文件</li>
+     * </ul>
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @param mode       检查点模式：PASSIVE、FULL、RESTART
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpoint(DruidDataSource dataSource, String mode) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法执行 WAL checkpoint");
+            return false;
+        }
+
+        if (mode == null || mode.trim().isEmpty()) {
+            mode = "PASSIVE";
+        }
+
+        // 确保模式有效
+        String upperMode = mode.toUpperCase();
+        if (!"PASSIVE".equals(upperMode) && !"FULL".equals(upperMode) && !"RESTART".equals(upperMode)) {
+            log.warn("无效的 checkpoint 模式: {}，使用默认 PASSIVE", mode);
+            upperMode = "PASSIVE";
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            log.info("开始执行 WAL checkpoint (模式: {})...", upperMode);
+            long startTime = System.currentTimeMillis();
+
+            stmt.execute("PRAGMA wal_checkpoint(" + upperMode + ")");
+
+            long elapsed = System.currentTimeMillis() - startTime;
+            log.info("WAL checkpoint 执行完成，耗时: {} ms", elapsed);
+            return true;
+
+        } catch (SQLException e) {
+            log.error("执行 WAL checkpoint 失败 (模式: {})", upperMode, e);
+            return false;
+        }
+    }
+
+    /**
+     * 执行 WAL 日志同步到主文件（使用 PASSIVE 模式）
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpoint(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "PASSIVE");
+    }
+
+    /**
+     * 执行完整的 WAL 日志同步（FULL 模式）
+     * <p>
+     * 注意：此方法会阻塞写操作，直到所有 WAL 内容同步到主文件。
+     * 建议在低峰期或关闭数据源前调用。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpointFull(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "FULL");
+    }
+
+    /**
+     * 执行 WAL 日志同步并重置（RESTART 模式）
+     * <p>
+     * 与 FULL 模式类似，但同步后会重置 WAL 文件，常用于维护操作。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean walCheckpointRestart(DruidDataSource dataSource) {
+        return walCheckpoint(dataSource, "RESTART");
+    }
+
+    /**
+     * 获取 WAL 文件大小
+     * <p>
+     * 通过查询 PRAGMA wal_checkpoint 获取 WAL 文件大小信息
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return WAL 文件大小（字节），查询失败返回 -1
+     */
+    public static long getWalSize(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            return -1;
+        }
+
+        // 查询 WAL 文件大小（从数据库连接属性获取）
+        String sql = "PRAGMA wal_checkpoint";
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            // PRAGMA wal_checkpoint 返回三列：busy, log, checkpointed
+            // log 列表示 WAL 文件中的页数
+            if (rs.next()) {
+                // 获取页面大小，计算 WAL 文件大小
+                long walPages = rs.getLong(2); // log 列
+                if (walPages > 0) {
+                    try (Statement stmt2 = conn.createStatement();
+                         ResultSet rs2 = stmt2.executeQuery("PRAGMA page_size")) {
+                        if (rs2.next()) {
+                            int pageSize = rs2.getInt(1);
+                            return walPages * pageSize;
+                        }
+                    }
+                }
+                return 0; // WAL 为空
+            }
+
+        } catch (SQLException e) {
+            log.error("获取 WAL 文件大小失败", e);
+        }
+        return -1;
+    }
+
+    /**
+     * 检查当前是否启用 WAL 模式
+     *
+     * @param dataSource 数据源
+     * @return 是否启用 WAL
+     */
+    public static boolean isWalEnabled(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            return false;
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("PRAGMA journal_mode")) {
+
+            if (rs.next()) {
+                String mode = rs.getString(1);
+                return "wal".equalsIgnoreCase(mode);
+            }
+
+        } catch (SQLException e) {
+            log.error("检查 WAL 模式失败", e);
+        }
+        return false;
+    }
+
+    /**
+     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
+     * <p>
+     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
+     * 再执行 VACUUM 回收空间。
+     * 注意：此操作会锁定数据库，建议在低峰期执行。
+     * </p>
+     *
+     * @param dbPath 数据库的位置
+     * @return 是否执行成功
+     */
+    public static boolean compactDatabase(String dbPath) {
+        DruidDataSource dataSource = createDataSource(dbPath);
+        boolean b = compactDatabase(dataSource);
+        dataSource.close();
+        return b;
+    }
+
+    /**
+     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
+     * <p>
+     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
+     * 再执行 VACUUM 回收空间。
+     * 注意：此操作会锁定数据库，建议在低峰期执行。
+     * </p>
+     *
+     * @param dataSource 数据源
+     * @return 是否执行成功
+     */
+    public static boolean compactDatabase(DruidDataSource dataSource) {
+        if (dataSource == null || dataSource.isClosed()) {
+            log.error("数据源无效，无法压缩数据库");
+            return false;
+        }
+
+        log.info("开始压缩数据库...");
+        long startTime = System.currentTimeMillis();
+
+        // 第一步：执行 WAL checkpoint (FULL 模式)
+        if (!walCheckpointFull(dataSource)) {
+            log.warn("WAL checkpoint 执行失败，继续执行 VACUUM...");
+        }
+
+        // 第二步：执行 VACUUM
+        boolean vacuumResult = vacuum(dataSource);
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        log.info("数据库压缩完成，结果: {}, 耗时: {} ms", vacuumResult, elapsed);
+
+        return vacuumResult;
+    }
+
     // ==================== 瓦片操作方法 ====================
 
     /**
@@ -357,7 +662,7 @@ public class MbtilesUtils {
      * @param y          行号（存储格式）
      * @return 瓦片数据，不存在返回 null
      */
-    public static byte[] getTile(DruidDataSource dataSource, int z, int x, int y) {
+    public static MbtilesInfo getTile(DruidDataSource dataSource, int z, int x, int y) {
         if (dataSource == null || dataSource.isClosed()) {
             return null;
         }
@@ -371,14 +676,14 @@ public class MbtilesUtils {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getBytes("tile_data");
+                    return MbtilesInfo.of().setZoomLevel(z).setX(x).setY(y).setTileData(rs.getBytes("tile_data"));
                 }
             }
 
         } catch (SQLException e) {
             log.error("读取瓦片失败: z={}, x={}, y={}", z, x, y, e);
         }
-        return null;
+        return MbtilesInfo.of();
     }
 
     /**
@@ -416,6 +721,74 @@ public class MbtilesUtils {
             log.error("保存瓦片失败: z={}, x={}, y={},url:{}", z, x, y, url, e);
             return false;
         }
+    }
+
+    /**
+     * 批量插入瓦片数据
+     *
+     * @param targetDataSource 目标数据源
+     * @param overwrite        是否覆盖已存在的瓦片
+     * @param mbtilesInfos     瓦片信息列表
+     * @return int[]{success, skipped, failed}
+     */
+    public static int[] putTileBatch(DruidDataSource targetDataSource, boolean overwrite, List<MbtilesInfo> mbtilesInfos) {
+        if (mbtilesInfos == null || mbtilesInfos.isEmpty()) {
+            log.warn("瓦片列表为空，跳过批量插入");
+            return new int[]{0, 0, 0};
+        }
+
+        if (targetDataSource == null || targetDataSource.isClosed()) {
+            log.error("数据源无效或已关闭，无法执行批量插入");
+            return new int[]{0, 0, mbtilesInfos.size()};
+        }
+
+        String insertSql = overwrite
+                ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
+                : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
+
+        int success = 0;
+        int skipped = 0;
+        int failed = 0;
+
+        long startTime = System.currentTimeMillis();
+        int totalCount = mbtilesInfos.size();
+        try (DruidPooledConnection conn = targetDataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                for (MbtilesInfo args : mbtilesInfos) {
+                    pstmt.setInt(1, args.getZoomLevel());
+                    pstmt.setInt(2, args.getTileColumn());
+                    pstmt.setInt(3, args.getTileRow());
+                    pstmt.setBytes(4, args.getTileData());
+                    pstmt.addBatch();
+                }
+
+                int[] results = pstmt.executeBatch();
+                for (int result : results) {
+                    if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
+                        success++;
+                    } else if (result == Statement.EXECUTE_FAILED) {
+                        failed++;
+                    } else {
+                        skipped++;
+                    }
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                log.error("批量插入失败", e);
+                failed = mbtilesInfos.size();
+            }
+        } catch (SQLException e) {
+            log.error("获取数据库连接失败", e);
+            failed = mbtilesInfos.size();
+        }
+
+        long costTime = System.currentTimeMillis() - startTime;
+        log.info("批量插入完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s,覆盖模式: {}",
+                totalCount, success, skipped, failed, costTime / 1000, overwrite);
+
+        return new int[]{success, skipped, failed};
     }
 
     /**

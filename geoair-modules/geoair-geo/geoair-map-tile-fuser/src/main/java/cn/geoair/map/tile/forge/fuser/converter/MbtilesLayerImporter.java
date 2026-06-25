@@ -2,15 +2,23 @@ package cn.geoair.map.tile.forge.fuser.converter;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.fuser.utils.MbtilesUtils;
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.page.PageConditionDef;
+import cn.geoair.map.dynamic.tools.page.PageConfig;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.Getter;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author ：张俊
@@ -226,7 +234,7 @@ public class MbtilesLayerImporter {
             }
 
             // 获取源图层名称
-            String sourceLayer = getLayerName(sourceDataSource, config.getSourceLayerName());
+            String sourceLayer = MbtilesUtils.getLayerName(sourceDataSource, config.getSourceLayerName());
             if (sourceLayer == null) {
                 log.error("源图层不存在: {}", config.getSourceLayerName());
                 result.failedTiles = -1;
@@ -262,7 +270,7 @@ public class MbtilesLayerImporter {
                     zoomLevels.size(), zoomLevels, sourceLayer, targetLayer);
 
             // 执行导入
-            ImportStats stats = importTiles(sourceDataSource, targetDataSource,
+            ConvertStats stats = importTiles(sourceDataSource, targetDataSource,
                     sourceLayer, targetLayer, zoomLevels, config);
 
             // 填充结果
@@ -313,50 +321,6 @@ public class MbtilesLayerImporter {
         return true;
     }
 
-    /**
-     * 获取图层名称
-     */
-    private static String getLayerName(DruidDataSource dataSource, String layerName) {
-        if (layerName != null && !layerName.isEmpty()) {
-            // 检查图层是否存在
-            if (layerExists(dataSource, layerName)) {
-                return layerName;
-            }
-            log.warn("图层不存在: {}, 将使用第一个可用图层", layerName);
-        }
-
-        // 获取第一个图层
-        String sql = "SELECT value FROM metadata WHERE name = 'name' LIMIT 1";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getString(1);
-            }
-        } catch (SQLException e) {
-            log.error("获取图层名称失败", e);
-        }
-        return null;
-    }
-
-    /**
-     * 检查图层是否存在
-     */
-    private static boolean layerExists(DruidDataSource dataSource, String layerName) {
-        String sql = "SELECT COUNT(*) FROM metadata WHERE name = 'name' AND value = ?";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, layerName);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (SQLException e) {
-            log.debug("检查图层是否存在失败: {}", e.getMessage());
-        }
-        return false;
-    }
 
     /**
      * 获取所有层级
@@ -383,7 +347,7 @@ public class MbtilesLayerImporter {
                                      DruidDataSource targetDataSource,
                                      String sourceLayer, String targetLayer) {
         // 检查目标图层是否已存在
-        if (layerExists(targetDataSource, targetLayer)) {
+        if (MbtilesUtils.layerExists(targetDataSource, targetLayer)) {
             log.info("目标图层已存在，跳过元数据复制: {}", targetLayer);
             return;
         }
@@ -428,135 +392,156 @@ public class MbtilesLayerImporter {
         }
     }
 
-    /**
-     * 导入统计
-     */
-    private static class ImportStats {
-        long total = 0;
-        long success = 0;
-        long skipped = 0;
-        long failed = 0;
-    }
 
     /**
      * 导入瓦片数据
      */
-    private static ImportStats importTiles(DruidDataSource sourceDataSource,
-                                           DruidDataSource targetDataSource,
-                                           String sourceLayer, String targetLayer,
-                                           List<Integer> zoomLevels,
-                                           ImportConfig config) {
-        ImportStats stats = new ImportStats();
-
+    private static ConvertStats importTiles(DruidDataSource sourceDataSource,
+                                            DruidDataSource targetDataSource,
+                                            String sourceLayer, String targetLayer,
+                                            List<Integer> zoomLevels,
+                                            ImportConfig config) {
+        ConvertStats stats = new ConvertStats();
         // 构建查询和插入 SQL
-        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ?";
-
-        String insertSql = config.isOverwrite()
-                ? "INSERT OR REPLACE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)"
-                : "INSERT OR IGNORE INTO tiles (zoom_level, tile_column, tile_row, tile_data) VALUES (?, ?, ?, ?)";
-
-        try (Connection sourceConn = sourceDataSource.getConnection();
-             Connection targetConn = targetDataSource.getConnection()) {
-
-            targetConn.setAutoCommit(false);
-
+        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = {} order by tile_column, tile_row,zoom_level  LIMIT {} OFFSET {} ";
+        try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
-                long layerStartTime = System.currentTimeMillis();
-                long layerCount = 0;
+                long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
+                MbtilesInfoBatchPutConsumer batchPutConsumer = new MbtilesInfoBatchPutConsumer(false, config.isOverwrite(), config.getBatchSize(), targetDataSource, zoom);
+                GirAdvTools.getPageActuatorOpt(new PageConditionDef<MbtilesInfo>() {
+                    @Override
+                    public Consumer<MbtilesInfo> getEachRecordConsumer() {
+                        return batchPutConsumer;
+                    }
 
-                List<Object[]> batchArgs = new ArrayList<>(config.getBatchSize());
+                    @Override
+                    public Long getTotalRecordCount() {
+                        return tileCountByZoom;
+                    }
 
-                try (PreparedStatement selectStmt = sourceConn.prepareStatement(selectSql)) {
-                    selectStmt.setInt(1, zoom);
-                    try (ResultSet rs = selectStmt.executeQuery()) {
-                        while (rs.next()) {
-                            int x = rs.getInt(1);
-                            int y = rs.getInt(2);
-                            byte[] data = rs.getBytes(3);
+                    @Override
+                    public void setPageConfig(PageConfig pageConfig) {
+                        pageConfig.setPageSize((long) config.getBatchSize())
+//                                .setParallelConsumeRecordIs(false)
+//                                .setParallelExecPageIs(false)
+                                .setPageNumStartByZero(true);
+                    }
 
-                            if (data == null || data.length == 0) {
-                                stats.failed++;
-                                continue;
+                    @Override
+                    public List<MbtilesInfo> getPageRecords(Integer pageNo, Integer pageSize) {
+                        Connection sourceConn = null;
+                        List<MbtilesInfo> mbtilesInfos = new ArrayList<>();
+                        try {
+                            int offset = pageNo * pageSize;
+                            sourceConn = sourceDataSource.getConnection();
+                            String sql = StrUtil.format(selectSql, zoom, pageSize, offset);
+                            PreparedStatement selectStmt = sourceConn.prepareStatement(sql);
+                            log.info("sql:{}", sql);
+                            try (ResultSet rs = selectStmt.executeQuery()) {
+                                while (rs.next()) {
+                                    int x = rs.getInt(1);
+                                    int y = rs.getInt(2);
+                                    byte[] data = rs.getBytes(3);
+                                    MbtilesInfo mbtilesInfo = MbtilesInfo.of().setZoomLevel(zoom).setTileColumn(x).setTileRow(y).setTileData(data);
+                                    mbtilesInfos.add(mbtilesInfo);
+                                }
                             }
-
-                            batchArgs.add(new Object[]{zoom, x, y, data});
-                            stats.total++;
-                            layerCount++;
-
-                            if (batchArgs.size() >= config.getBatchSize()) {
-                                int[] results = executeBatch(targetConn, insertSql, batchArgs);
-                                stats.success += results[0];
-                                stats.skipped += results[1];
-                                stats.failed += results[2];
-                                batchArgs.clear();
+                            IoUtil.close(sourceConn);
+                            return mbtilesInfos;
+                        } catch (Exception e) {
+                            log.info(e.getMessage());
+                        } finally {
+                            if (sourceConn != null) {
+                                IoUtil.close(sourceConn);
                             }
                         }
+                        return mbtilesInfos;
                     }
-
-                    // 执行剩余的批量插入
-                    if (!batchArgs.isEmpty()) {
-                        int[] results = executeBatch(targetConn, insertSql, batchArgs);
-                        stats.success += results[0];
-                        stats.skipped += results[1];
-                        stats.failed += results[2];
-                        batchArgs.clear();
-                    }
-
-                    targetConn.commit();
-
-                    log.info("层级 z={} 导入完成: 数量={}, 耗时={}ms",
-                            zoom, layerCount, System.currentTimeMillis() - layerStartTime);
-                }
+                }).execute();
+                // 执行剩余的批量插入
+                batchPutConsumer.close();
+                stats.total += batchPutConsumer.getStats().total;
+                stats.success += batchPutConsumer.getStats().success;
+                stats.failed += batchPutConsumer.getStats().failed;
+                stats.skipped += batchPutConsumer.getStats().skipped;
+                stats.totalSize += batchPutConsumer.getStats().totalSize;
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             log.error("导入瓦片数据失败", e);
         }
 
         return stats;
     }
 
-    /**
-     * 执行批量插入
-     *
-     * @return [success, skipped, failed]
-     */
-    private static int[] executeBatch(Connection conn, String sql, List<Object[]> batchArgs) throws SQLException {
-        if (batchArgs.isEmpty()) {
-            return new int[]{0, 0, 0};
-        }
 
-        int success = 0;
-        int skipped = 0;
-        int failed = 0;
+    public static void main(String[] args) {
+        // ==================== 1. 最简单的用法 ====================
+        // 导入单个层级
+        MbtilesLayerImporter.ImportResult result1 = MbtilesLayerImporter.importZoomLevel(
+                "D:/mbtiles/source.mbtiles",      // 源文件
+                "D:/mbtiles/target.mbtiles",      // 目标文件
+                "imagery",                         // 图层名称
+                5                                  // 层级
+        );
+        System.out.println("导入结果: " + result1);
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            for (Object[] args : batchArgs) {
-                pstmt.setInt(1, (Integer) args[0]);
-                pstmt.setInt(2, (Integer) args[1]);
-                pstmt.setInt(3, (Integer) args[2]);
-                pstmt.setBytes(4, (byte[]) args[3]);
-                pstmt.addBatch();
-            }
+        // ==================== 2. 导入多个层级 ====================
+        List<Integer> zoomLevels = Arrays.asList(0, 1, 2, 3, 4, 5);
+        MbtilesLayerImporter.ImportResult result2 = MbtilesLayerImporter.importZoomLevels(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "imagery",
+                zoomLevels
+        );
+        System.out.println("导入结果: " + result2);
 
-            int[] results = pstmt.executeBatch();
-            for (int result : results) {
-                if (result >= 0 || result == Statement.SUCCESS_NO_INFO) {
-                    success++;
-                } else if (result == Statement.EXECUTE_FAILED) {
-                    failed++;
-                } else {
-                    skipped++;
-                }
-            }
-        } catch (SQLException e) {
-            log.error("批量插入失败", e);
-            failed = batchArgs.size();
-        }
+        // ==================== 3. 导入所有层级 ====================
+        MbtilesLayerImporter.ImportResult result3 = MbtilesLayerImporter.importAllZoomLevels(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "imagery"
+        );
+        System.out.println("导入结果: " + result3);
 
-        return new int[]{success, skipped, failed};
+        // ==================== 4. 导入并覆盖已有瓦片 ====================
+        MbtilesLayerImporter.ImportResult result4 = MbtilesLayerImporter.importOverwrite(
+                "D:/mbtiles/source.mbtiles",
+                "D:/mbtiles/target.mbtiles",
+                "source_layer",      // 源图层名
+                "target_layer"       // 目标图层名（可以不同）
+        );
+        System.out.println("导入结果: " + result4);
+
+
+        // ==================== 5. 完整配置（推荐） ====================
+        MbtilesLayerImporter.ImportConfig config = new MbtilesLayerImporter.ImportConfig()
+                .setSourceMbtiles("D:/mbtiles/source.mbtiles")
+                .setSourceLayerName("imagery")
+                .setTargetMbtiles("D:/mbtiles/target.mbtiles")
+                .setTargetLayerName("imagery_backup")
+                .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8))
+                .setOverwrite(true)                // 覆盖已存在的瓦片
+                .setBatchSize(2000)                // 批量插入大小
+                .setCopyMetadata(true)             // 复制元数据
+                .setMaxPoolSize(20)                // 连接池大小
+                .setMinIdle(2);                    // 最小空闲连接数
+
+        MbtilesLayerImporter.ImportResult result5 = MbtilesLayerImporter.importLayers(config);
+        System.out.println("导入结果: " + result5);
+
+        // ==================== 6. 同一文件不同图层之间导入 ====================
+        // 从同一个 MBTiles 文件的 layer1 导入到 layer2
+        MbtilesLayerImporter.ImportResult result6 = MbtilesLayerImporter.importLayers(
+                new MbtilesLayerImporter.ImportConfig()
+                        .setSourceMbtiles("D:/mbtiles/merged.mbtiles")
+                        .setSourceLayerName("layer1")
+                        .setTargetMbtiles("D:/mbtiles/merged.mbtiles")
+                        .setTargetLayerName("layer2")
+                        .setZoomLevels(Arrays.asList(0, 1, 2, 3))
+                        .setOverwrite(false)        // 不覆盖，跳过已存在的
+        );
+        System.out.println("导入结果: " + result6);
     }
-
-
 }

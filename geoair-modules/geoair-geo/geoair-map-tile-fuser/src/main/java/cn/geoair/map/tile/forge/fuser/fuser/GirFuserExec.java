@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
@@ -12,7 +14,6 @@ import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 import cn.hutool.core.date.StopWatch;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.imagen.PlanarImage;
 import org.geotools.image.util.ImageUtilities;
@@ -32,9 +33,9 @@ import java.util.stream.IntStream;
  * 瓦片融合器
  * 将多个瓦片拼接成一张完整的大图
  */
-@Slf4j
-public class GirFuserExec implements FuserExec {
 
+public class GirFuserExec implements FuserExec {
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     final GridSubset gridSubset;
     @Getter
     final ImageMime outputFormat;

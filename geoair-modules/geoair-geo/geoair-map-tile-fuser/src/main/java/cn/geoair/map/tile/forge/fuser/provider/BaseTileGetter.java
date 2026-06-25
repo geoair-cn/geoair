@@ -1,12 +1,13 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -16,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
  * @author 张俊
  * @date Created in 2026/5/9 14:10
  */
-@Slf4j
+
 public abstract class BaseTileGetter implements LayerTileGetter {
 
-
+    private static GiLogger log = GirLoggerFactory.getLogger( );
     @Getter
     private final PxyLayerInfo layerInfo;
 
