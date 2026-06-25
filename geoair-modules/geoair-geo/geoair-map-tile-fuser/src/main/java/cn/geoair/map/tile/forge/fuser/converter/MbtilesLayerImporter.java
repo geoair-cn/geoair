@@ -10,6 +10,7 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.Getter;
 
@@ -402,7 +403,7 @@ public class MbtilesLayerImporter {
                                             ImportConfig config) {
         ConvertStats stats = new ConvertStats();
         // 构建查询和插入 SQL
-        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ? LIMIT ? OFFSET ?";
+        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = {} order by tile_column, tile_row,zoom_level  LIMIT {} OFFSET {} ";
         try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
@@ -422,8 +423,8 @@ public class MbtilesLayerImporter {
                     @Override
                     public void setPageConfig(PageConfig pageConfig) {
                         pageConfig.setPageSize((long) config.getBatchSize())
-                                .setParallelConsumeRecordIs(true)
-                                .setParallelExecPageIs(true)
+                                .setParallelConsumeRecordIs(false)
+                                .setParallelExecPageIs(false)
                                 .setPageNumStartByZero(true);
                     }
 
@@ -434,10 +435,9 @@ public class MbtilesLayerImporter {
                         try {
                             int offset = pageNo * pageSize;
                             sourceConn = sourceDataSource.getConnection();
-                            PreparedStatement selectStmt = sourceConn.prepareStatement(selectSql);
-                            selectStmt.setInt(1, zoom);
-                            selectStmt.setInt(2, pageSize);
-                            selectStmt.setInt(3, offset);
+                            String sql = StrUtil.format(selectSql, zoom, offset, pageSize);
+                            PreparedStatement selectStmt = sourceConn.prepareStatement(sql);
+                            log.info("sql:{}", sql);
                             try (ResultSet rs = selectStmt.executeQuery()) {
                                 while (rs.next()) {
                                     int x = rs.getInt(1);
@@ -513,6 +513,7 @@ public class MbtilesLayerImporter {
                 "target_layer"       // 目标图层名（可以不同）
         );
         System.out.println("导入结果: " + result4);
+
 
         // ==================== 5. 完整配置（推荐） ====================
         MbtilesLayerImporter.ImportConfig config = new MbtilesLayerImporter.ImportConfig()
