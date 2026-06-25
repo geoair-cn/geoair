@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -733,8 +734,6 @@ public class MbtilesUtils {
 
         long startTime = System.currentTimeMillis();
         int totalCount = mbtilesInfos.size();
-        log.info("开始批量插入瓦片，总数: {}, 覆盖模式: {}", totalCount, overwrite);
-
         try (DruidPooledConnection conn = targetDataSource.getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
@@ -768,8 +767,8 @@ public class MbtilesUtils {
         }
 
         long costTime = System.currentTimeMillis() - startTime;
-        log.info("批量插入完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}ms",
-                totalCount, success, skipped, failed, costTime);
+        log.info("批量插入完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s,覆盖模式: {}",
+                totalCount, success, skipped, failed, costTime/1000,overwrite);
 
         return new int[]{success, skipped, failed};
     }

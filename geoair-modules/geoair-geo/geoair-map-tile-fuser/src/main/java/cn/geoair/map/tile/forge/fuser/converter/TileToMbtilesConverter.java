@@ -6,16 +6,14 @@ import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
-import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.Data;
 import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -378,154 +376,60 @@ public class TileToMbtilesConverter {
         return zoomLevels;
     }
 
-    /**
-     * 转换统计
-     */
-    private static class ConvertStats {
-        long total = 0;
-        long success = 0;
-        long failed = 0;
-        long skipped = 0;
-        long totalSize = 0;
-    }
 
-    public static class ConsumerTileInfo implements Consumer<TileInfo> {
+    public static class TileInfoConsumer implements Consumer<TileInfo> {
+        MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer;
 
-        ConvertStats stats = new ConvertStats();
-        ConvertConfig config;
-        List<MbtilesInfo> batchArgs;
-        DruidDataSource dataSource;
-        Integer zoom;
-        long layerStartTime;
-
-        public ConsumerTileInfo(ConvertConfig config, DruidDataSource dataSource, Integer zoom) {
-            this.config = config;
-            this.dataSource = dataSource;
-            this.zoom = zoom;
-            batchArgs = new ArrayList<>(config.getBatchSize());
-            layerStartTime = System.currentTimeMillis();
+        public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize, DruidDataSource dataSource, Integer zoom) {
+            mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(needReverseY, overwrite, batchSize, dataSource, zoom);
         }
-
         @Override
         public void accept(TileInfo tile) {
-            stats.total++;
+            byte[] data = null;
             try {
                 // 读取瓦片数据
-                byte[] data = Files.readAllBytes(tile.path);
-                if (data.length == 0) {
-                    stats.failed++;
-                    return;
-                }
-                // 计算存储 Y（根据需要翻转）
-                int storeY = FuserCacheUtils.getStoreY(zoom, tile.y, config.isNeedReverseY());
+                data = Files.readAllBytes(tile.path);
+            } catch (Exception e) {
 
-                // 添加到批量
-                batchArgs.add(MbtilesInfo.of().setZoomLevel(zoom).setX(tile.x).setY(storeY).setTileData(data));
-                stats.totalSize += data.length;
-
-                if (batchArgs.size() >= config.getBatchSize()) {
-                    int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
-                    stats.success += results[0];
-                    stats.skipped += results[1];
-                    stats.failed += results[2];
-                    log.info("导入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
-                    batchArgs.clear();
-                }
-            } catch (IOException e) {
-                log.debug("读取瓦片文件失败: {}", tile.path, e);
-                stats.failed++;
             }
+            mbtilesInfoBatchPutConsumer.accept(MbtilesInfo.of().setX(tile.x).setY(tile.y).setZoomLevel(tile.z).setTileData(data));
         }
-
         public void doImportEnd() {
-            // 执行剩余的批量插入
-            if (!batchArgs.isEmpty()) {
-                int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
-                stats.success += results[0];
-                stats.skipped += results[1];
-                stats.failed += results[2];
-                log.info("执行剩余的批量插入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), zoom, stats.success);
-                batchArgs.clear();
-            }
-            log.info("层级 z={} 完成: 总数={}, 耗时={}ms",
-                    zoom, stats.total, System.currentTimeMillis() - layerStartTime);
+            mbtilesInfoBatchPutConsumer.doImportEnd();
         }
-
+        public ConvertStats getStats() {
+            return mbtilesInfoBatchPutConsumer.getStats();
+        }
     }
 
     /**
      * 转换瓦片
      */
     private static ConvertStats convertTiles(ConvertConfig config, DruidDataSource dataSource, List<Integer> zoomLevels) {
-        ConvertStats stats = new ConvertStats();
-        List<MbtilesInfo> batchArgs = new ArrayList<>(config.getBatchSize());
+
+        ConvertStats convertStats = new ConvertStats();
         try {
             for (int z : zoomLevels) {
                 log.info("处理层级: z={}", z);
-                long layerStartTime = System.currentTimeMillis();
-                long layerCount = 0;
-
                 // 扫描该层级下的所有瓦片
-                List<TileInfo> tiles = scanTiles(config, z);
-                stats.total += tiles.size();
-                log.info("层级 z={} 扫描到 {} 个瓦片", z, tiles.size());
-
-                for (TileInfo tile : tiles) {
-                    try {
-                        // 读取瓦片数据
-                        byte[] data = Files.readAllBytes(tile.path);
-                        if (data.length == 0) {
-                            stats.failed++;
-                            continue;
-                        }
-
-                        // 计算存储 Y（根据需要翻转）
-                        int storeY = FuserCacheUtils.getStoreY(z, tile.y, config.isNeedReverseY());
-
-                        // 添加到批量
-                        batchArgs.add(MbtilesInfo.of().setZoomLevel(z).setX(tile.x).setY(storeY).setTileData(data));
-                        stats.totalSize += data.length;
-
-                        if (batchArgs.size() >= config.getBatchSize()) {
-                            int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
-                            stats.success += results[0];
-                            stats.skipped += results[1];
-                            stats.failed += results[2];
-                            log.info("导入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), z, stats.success);
-                            batchArgs.clear();
-                        }
-
-                        layerCount++;
-
-                    } catch (IOException e) {
-                        log.debug("读取瓦片文件失败: {}", tile.path, e);
-                        stats.failed++;
-                    }
-                }
-
-                // 执行剩余的批量插入
-                if (!batchArgs.isEmpty()) {
-                    int[] results = MbtilesUtils.putTileBatch(dataSource, config.overwrite, batchArgs);
-                    stats.success += results[0];
-                    stats.skipped += results[1];
-                    stats.failed += results[2];
-                    log.info("执行剩余的批量插入成功{}条，zoom：{}，总成功数量：{}", batchArgs.size(), z, stats.success);
-                    batchArgs.clear();
-                }
-
-
-                log.info("层级 z={} 完成: 总数={}, 耗时={}ms",
-                        z, layerCount, System.currentTimeMillis() - layerStartTime);
+                TileInfoConsumer consumerTileInfo = new TileInfoConsumer(config.needReverseY, config.overwrite, config.batchSize, dataSource, z);
+                scanTiles(config, z, consumerTileInfo);
+                consumerTileInfo.doImportEnd();
+                convertStats.total += consumerTileInfo.getStats().total;
+                convertStats.success += consumerTileInfo.getStats().success;
+                convertStats.failed += consumerTileInfo.getStats().failed;
+                convertStats.skipped += consumerTileInfo.getStats().skipped;
+                convertStats.totalSize += consumerTileInfo.getStats().totalSize;
             }
 
-            log.info("所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}",
-                    stats.total, stats.success, stats.skipped, stats.failed);
+            log.info("所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}, 总大小={}",
+                    convertStats.total, convertStats.success, convertStats.skipped, convertStats.failed, DataSizeUtil.format(convertStats.totalSize));
 
         } catch (Exception e) {
             log.error("数据库操作失败", e);
         }
 
-        return stats;
+        return convertStats;
     }
 
     /**
@@ -605,10 +509,10 @@ public class TileToMbtilesConverter {
      * 递归遍历并匹配路径模板
      */
     private static void traverseAndMatch(File dir, String currentPath, String template,
-                                         int z, List<TileInfo> tiles, ConvertConfig config) {
+                                         int z, TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
         if (template == null || template.isEmpty()) {
             // 没有模板了，当前目录下所有文件都是瓦片
-            scanAllFiles(dir, z, currentPath, tiles, config);
+            scanAllFiles(dir, z, currentPath, tileInfoConsumer, config);
             return;
         }
 
@@ -621,7 +525,7 @@ public class TileToMbtilesConverter {
         // 如果第一部分包含 {x} 或 {y}，说明是占位符，需要匹配多个
         if (firstPart.contains(PLACEHOLDER_X) || firstPart.contains(PLACEHOLDER_Y)) {
             // 这是文件名部分，匹配所有文件
-            matchFiles(dir, firstPart, z, currentPath, tiles, config);
+            matchFiles(dir, firstPart, z, currentPath, tileInfoConsumer, config);
         } else if (firstPart.contains(PLACEHOLDER_Z)) {
             // 不应该还有 {z}
             log.warn("模板中仍有 {z} 占位符: {}", firstPart);
@@ -630,10 +534,10 @@ public class TileToMbtilesConverter {
             File subDir = new File(dir, firstPart);
             if (subDir.exists() && subDir.isDirectory()) {
                 String newPath = currentPath + firstPart + File.separator;
-                traverseAndMatch(subDir, newPath, restPart, z, tiles, config);
+                traverseAndMatch(subDir, newPath, restPart, z, tileInfoConsumer, config);
             } else {
                 // 尝试作为占位符处理（可能是数字目录）
-                matchDirectories(dir, firstPart, restPart, z, currentPath, tiles, config);
+                matchDirectories(dir, firstPart, restPart, z, currentPath, tileInfoConsumer, config);
             }
         }
     }
@@ -643,7 +547,7 @@ public class TileToMbtilesConverter {
      */
     private static void matchDirectories(File dir, String dirPattern, String restTemplate,
                                          int z, String currentPath,
-                                         List<TileInfo> tiles, ConvertConfig config) {
+                                         TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
         File[] subDirs = dir.listFiles(File::isDirectory);
         if (subDirs == null) {
             return;
@@ -655,7 +559,7 @@ public class TileToMbtilesConverter {
                 Integer.parseInt(subDir.getName());
                 String newPath = currentPath + subDir.getName() + File.separator;
                 // 递归处理剩余模板
-                traverseAndMatch(subDir, newPath, restTemplate, z, tiles, config);
+                traverseAndMatch(subDir, newPath, restTemplate, z, tileInfoConsumer, config);
             } catch (NumberFormatException e) {
                 // 跳过非数字目录
             }
@@ -666,7 +570,7 @@ public class TileToMbtilesConverter {
      * 匹配文件
      */
     private static void matchFiles(File dir, String filePattern, int z, String currentPath,
-                                   List<TileInfo> tiles, ConvertConfig config) {
+                                   TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
         File[] files = dir.listFiles(File::isFile);
         if (files == null) {
             return;
@@ -674,7 +578,7 @@ public class TileToMbtilesConverter {
 
         for (File file : files) {
             if (matchesFileNamePattern(file.getName(), filePattern)) {
-                parseAndAddTile(file, z, currentPath, tiles, config);
+                parseAndAddTile(file, z, currentPath, tileInfoConsumer, config);
             }
         }
     }
@@ -683,14 +587,14 @@ public class TileToMbtilesConverter {
      * 扫描所有文件
      */
     private static void scanAllFiles(File dir, int z, String currentPath,
-                                     List<TileInfo> tiles, ConvertConfig config) {
+                                     TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
         File[] files = dir.listFiles(File::isFile);
         if (files == null) {
             return;
         }
 
         for (File file : files) {
-            parseAndAddTile(file, z, currentPath, tiles, config);
+            parseAndAddTile(file, z, currentPath, tileInfoConsumer, config);
         }
     }
 
@@ -698,8 +602,8 @@ public class TileToMbtilesConverter {
      * 扫描瓦片文件 - 递归遍历目录
      * 根据路径模板递归查找所有瓦片文件
      */
-    private static List<TileInfo> scanTiles(ConvertConfig config, int z) {
-        List<TileInfo> tiles = new ArrayList<>();
+    private static void scanTiles(ConvertConfig config, int z, TileInfoConsumer tileInfoConsumer) {
+
 
         // 1. 构建 z 层级的路径（只替换 {z}）
         String template = config.getPathTemplate();
@@ -712,7 +616,7 @@ public class TileToMbtilesConverter {
         File zRootDir = new File(fullDirPath);
         if (!zRootDir.exists() || !zRootDir.isDirectory()) {
             log.warn("层级根目录不存在: {}", fullDirPath);
-            return tiles;
+            return;
         }
 
         // 3. 获取剩余路径模板（用于匹配子目录和文件）
@@ -720,9 +624,9 @@ public class TileToMbtilesConverter {
         String remainingTemplate = getRemainingPath(zPath, zRootPath);
 
         // 4. 递归扫描目录，匹配路径模板
-        scanDirectoryWithTemplate(zRootDir, "", remainingTemplate, z, tiles, config);
+        scanDirectoryWithTemplate(zRootDir, "", remainingTemplate, z, tileInfoConsumer, config);
 
-        return tiles;
+
     }
 
     /**
@@ -765,11 +669,11 @@ public class TileToMbtilesConverter {
      */
     private static void scanDirectoryWithTemplate(File dir, String currentPath,
                                                   String template, int z,
-                                                  List<TileInfo> tiles,
+                                                  TileInfoConsumer tileInfoConsumer,
                                                   ConvertConfig config) {
         if (template == null || template.isEmpty()) {
             // 如果模板为空，说明当前目录下应该直接是瓦片文件
-            scanTileFiles(dir, z, tiles);
+            scanTileFiles(dir, z, tileInfoConsumer);
             return;
         }
 
@@ -808,10 +712,10 @@ public class TileToMbtilesConverter {
                             // 根据模板中的位置来判断
                             if (firstPart.equals(PLACEHOLDER_Y)) {
                                 // 这个目录是 y
-                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tiles, config);
+                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
                             } else {
                                 // 这个目录是 x
-                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tiles, config);
+                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
                             }
                         } catch (NumberFormatException e) {
                             // 跳过非数字目录
@@ -824,7 +728,7 @@ public class TileToMbtilesConverter {
                 File targetDir = new File(dir, firstPart);
                 if (targetDir.exists() && targetDir.isDirectory()) {
                     String newPath = currentPath + firstPart + File.separator;
-                    scanDirectoryWithTemplate(targetDir, newPath, remainingTemplate, z, tiles, config);
+                    scanDirectoryWithTemplate(targetDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
                 }
             }
         } else {
@@ -832,12 +736,12 @@ public class TileToMbtilesConverter {
             // firstPart 应该是 {x}.png 或 {y}.png 或具体文件名
             if (firstPart.contains(PLACEHOLDER_X) || firstPart.contains(PLACEHOLDER_Y)) {
                 // 匹配文件
-                scanTileFilesWithPattern(dir, firstPart, z, currentPath, tiles, config);
+                scanTileFilesWithPattern(dir, firstPart, z, currentPath, tileInfoConsumer, config);
             } else {
                 // 具体文件名，直接匹配
                 File targetFile = new File(dir, firstPart);
                 if (targetFile.exists() && targetFile.isFile()) {
-                    parseAndAddTile(targetFile, z, currentPath, tiles, config);
+                    parseAndAddTile(targetFile, z, currentPath, tileInfoConsumer, config);
                 }
             }
         }
@@ -848,7 +752,7 @@ public class TileToMbtilesConverter {
      */
     private static void scanTileFilesWithPattern(File dir, String fileNamePattern,
                                                  int z, String currentPath,
-                                                 List<TileInfo> tiles,
+                                                 TileInfoConsumer tileInfoConsumer,
                                                  ConvertConfig config) {
         File[] files = dir.listFiles(File::isFile);
         if (files == null) {
@@ -857,7 +761,7 @@ public class TileToMbtilesConverter {
 
         for (File file : files) {
             if (matchesFileNamePattern(file.getName(), fileNamePattern)) {
-                parseAndAddTile(file, z, currentPath, tiles, config);
+                parseAndAddTile(file, z, currentPath, tileInfoConsumer, config);
             }
         }
     }
@@ -865,7 +769,7 @@ public class TileToMbtilesConverter {
     /**
      * 扫描目录下的所有瓦片文件（没有模板限制）
      */
-    private static void scanTileFiles(File dir, int z, List<TileInfo> tiles) {
+    private static void scanTileFiles(File dir, int z, TileInfoConsumer tileInfoConsumer) {
         File[] files = dir.listFiles(File::isFile);
         if (files == null) {
             return;
@@ -878,7 +782,7 @@ public class TileToMbtilesConverter {
             // 从文件名和路径中解析 x 和 y
             parseXYFromPath(file, tile);
             if (tile.x >= 0 && tile.y >= 0) {
-                tiles.add(tile);
+                tileInfoConsumer.accept(tile);
             }
         }
     }
@@ -913,7 +817,7 @@ public class TileToMbtilesConverter {
      * 解析并添加瓦片
      */
     private static void parseAndAddTile(File file, int z, String currentPath,
-                                        List<TileInfo> tiles, ConvertConfig config) {
+                                        TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
         try {
             TileInfo tile = new TileInfo();
             tile.z = z;
@@ -935,7 +839,7 @@ public class TileToMbtilesConverter {
 
                 tile.x = Integer.parseInt(matcher.group(xGroup - 1));
                 tile.y = Integer.parseInt(matcher.group(yGroup - 1));
-                tiles.add(tile);
+                tileInfoConsumer.accept(tile);
             }
         } catch (Exception e) {
             log.debug("解析瓦片失败: {}", file.getPath(), e);

@@ -11,14 +11,13 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.Getter;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author ：张俊
@@ -270,7 +269,7 @@ public class MbtilesLayerImporter {
                     zoomLevels.size(), zoomLevels, sourceLayer, targetLayer);
 
             // 执行导入
-            ImportStats stats = importTiles(sourceDataSource, targetDataSource,
+            ConvertStats stats = importTiles(sourceDataSource, targetDataSource,
                     sourceLayer, targetLayer, zoomLevels, config);
 
             // 填充结果
@@ -320,8 +319,6 @@ public class MbtilesLayerImporter {
 
         return true;
     }
-
-
 
 
     /**
@@ -394,35 +391,29 @@ public class MbtilesLayerImporter {
         }
     }
 
-    /**
-     * 导入统计
-     */
-    private static class ImportStats {
-        long total = 0;
-        long success = 0;
-        long skipped = 0;
-        long failed = 0;
-    }
 
     /**
      * 导入瓦片数据
      */
-    private static ImportStats importTiles(DruidDataSource sourceDataSource,
-                                           DruidDataSource targetDataSource,
-                                           String sourceLayer, String targetLayer,
-                                           List<Integer> zoomLevels,
-                                           ImportConfig config) {
-        ImportStats stats = new ImportStats();
+    private static ConvertStats importTiles(DruidDataSource sourceDataSource,
+                                            DruidDataSource targetDataSource,
+                                            String sourceLayer, String targetLayer,
+                                            List<Integer> zoomLevels,
+                                            ImportConfig config) {
+        ConvertStats stats = new ConvertStats();
         // 构建查询和插入 SQL
         String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = ? LIMIT ? OFFSET ?";
         try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
-
-                final long[] layerCount = {0};
-                List<MbtilesInfo> batchArgs = new ArrayList<>(config.getBatchSize());
                 long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
-                GirAdvTools.getPageActuatorOpt(new PageConditionDef<Object[]>() {
+                MbtilesInfoBatchPutConsumer batchPutConsumer = new MbtilesInfoBatchPutConsumer(false, config.isOverwrite(), config.getBatchSize(), targetDataSource, zoom);
+                GirAdvTools.getPageActuatorOpt(new PageConditionDef<MbtilesInfo>() {
+                    @Override
+                    public Consumer<MbtilesInfo> getEachRecordConsumer() {
+                        return batchPutConsumer;
+                    }
+
                     @Override
                     public Long getTotalRecordCount() {
                         return tileCountByZoom;
@@ -437,8 +428,9 @@ public class MbtilesLayerImporter {
                     }
 
                     @Override
-                    public List<Object[]> getPageRecords(Integer pageNo, Integer pageSize) {
+                    public List<MbtilesInfo> getPageRecords(Integer pageNo, Integer pageSize) {
                         Connection sourceConn = null;
+                        List<MbtilesInfo> mbtilesInfos = new ArrayList<>();
                         try {
                             int offset = pageNo * pageSize;
                             sourceConn = sourceDataSource.getConnection();
@@ -451,23 +443,12 @@ public class MbtilesLayerImporter {
                                     int x = rs.getInt(1);
                                     int y = rs.getInt(2);
                                     byte[] data = rs.getBytes(3);
-                                    if (data == null || data.length == 0) {
-                                        stats.failed++;
-                                        continue;
-                                    }
-                                    batchArgs.add(MbtilesInfo.of().setZoomLevel(zoom).setTileColumn(x).setTileRow(y).setTileData(data));
-                                    stats.total++;
-                                    layerCount[0]++;
+                                    MbtilesInfo mbtilesInfo = MbtilesInfo.of().setZoomLevel(zoom).setTileColumn(x).setTileRow(y).setTileData(data);
+                                    mbtilesInfos.add(mbtilesInfo);
                                 }
                             }
                             IoUtil.close(sourceConn);
-                            int[] results =    MbtilesUtils.putTileBatch(targetDataSource, config.overwrite, batchArgs);
-                            stats.success += results[0];
-                            stats.skipped += results[1];
-                            stats.failed += results[2];
-                            log.info("导入成功{}条，批次：{},总成功数量：{}", batchArgs.size(), pageNo + 1, stats.success);
-                            batchArgs.clear();
-                            return Collections.emptyList();
+                            return mbtilesInfos;
                         } catch (Exception e) {
                             log.info(e.getMessage());
                         } finally {
@@ -475,17 +456,16 @@ public class MbtilesLayerImporter {
                                 IoUtil.close(sourceConn);
                             }
                         }
-                        return Collections.emptyList();
+                        return mbtilesInfos;
                     }
                 }).execute();
                 // 执行剩余的批量插入
-                if (!batchArgs.isEmpty()) {
-                    int[] results =  MbtilesUtils.putTileBatch(targetDataSource, config.overwrite, batchArgs);
-                    stats.success += results[0];
-                    stats.skipped += results[1];
-                    stats.failed += results[2];
-                    batchArgs.clear();
-                }
+                batchPutConsumer.doImportEnd();
+                stats.total += batchPutConsumer.getStats().total;
+                stats.success += batchPutConsumer.getStats().success;
+                stats.failed += batchPutConsumer.getStats().failed;
+                stats.skipped += batchPutConsumer.getStats().skipped;
+                stats.totalSize += batchPutConsumer.getStats().totalSize;
             }
 
         } catch (Exception e) {
@@ -494,7 +474,6 @@ public class MbtilesLayerImporter {
 
         return stats;
     }
-
 
 
     public static void main(String[] args) {
