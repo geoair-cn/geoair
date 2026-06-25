@@ -4,7 +4,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
-import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;

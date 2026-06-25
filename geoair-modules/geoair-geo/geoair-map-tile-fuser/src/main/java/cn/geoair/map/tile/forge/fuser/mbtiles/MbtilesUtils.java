@@ -607,6 +607,24 @@ public class MbtilesUtils {
      * 注意：此操作会锁定数据库，建议在低峰期执行。
      * </p>
      *
+     * @param dbPath 数据库的位置
+     * @return 是否执行成功
+     */
+    public static boolean compactDatabase(String dbPath) {
+        DruidDataSource dataSource = createDataSource(dbPath);
+        boolean b = compactDatabase(dataSource);
+        dataSource.close();
+        return b;
+    }
+
+    /**
+     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
+     * <p>
+     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
+     * 再执行 VACUUM 回收空间。
+     * 注意：此操作会锁定数据库，建议在低峰期执行。
+     * </p>
+     *
      * @param dataSource 数据源
      * @return 是否执行成功
      */
@@ -768,7 +786,7 @@ public class MbtilesUtils {
 
         long costTime = System.currentTimeMillis() - startTime;
         log.info("批量插入完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s,覆盖模式: {}",
-                totalCount, success, skipped, failed, costTime/1000,overwrite);
+                totalCount, success, skipped, failed, costTime / 1000, overwrite);
 
         return new int[]{success, skipped, failed};
     }
