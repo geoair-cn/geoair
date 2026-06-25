@@ -7,7 +7,7 @@ import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.constant.Constant;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.enums.PxyType;
+import cn.geoair.map.tile.forge.fuser.enums.SrcType;
 import cn.geoair.map.tile.forge.fuser.provider.impl.MBTilesTileGetter;
 import cn.geoair.map.tile.forge.fuser.provider.impl.google.GoogleLocalFileTileGetter;
 import cn.geoair.map.tile.forge.fuser.provider.impl.google.GoogleWebTileGetter;
@@ -67,16 +67,16 @@ public class TileGetterFactory {
      */
     private static LayerTileGetter createRealGetter(PxyLayerInfo pxyLayerInfo) {
         String type = pxyLayerInfo.getSrcType();
-        PxyType pxyType = PxyType.fromCode(type);
+        SrcType srcType = SrcType.fromCode(type);
         Integer gridSrid = pxyLayerInfo.getGridSrid();
-        if (pxyType.isCustom()) {
+        if (srcType.isCustom()) {
             CustomTileGetterHelper instance = CustomTileGetterHelper.getInstance();
             return instance.getTileGetterByPxyLayerInfo(pxyLayerInfo);
         }
-        if (pxyType.isMbtiles()) {
+        if (srcType.isMbtiles()) {
             return new MBTilesTileGetter(pxyLayerInfo);
         }
-        if (pxyType.isLocal()) {
+        if (srcType.isLocal()) {
             if (gridSrid.equals(3857)) {
                 return new GoogleLocalFileTileGetter(pxyLayerInfo);
             }

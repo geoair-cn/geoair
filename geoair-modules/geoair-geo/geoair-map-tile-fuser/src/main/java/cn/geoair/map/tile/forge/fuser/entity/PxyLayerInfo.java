@@ -1,7 +1,12 @@
 package cn.geoair.map.tile.forge.fuser.entity;
 
+import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.map.tile.forge.fuser.enums.OriginType;
+import cn.geoair.map.tile.forge.fuser.enums.SrcType;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import javax.persistence.Transient;
 
 /**
  * 代理图层信息实体类
@@ -22,6 +27,7 @@ public class PxyLayerInfo {
      * <p>用于标识和区分不同的瓦片图层，在缓存中作为目录名使用</p>
      * <p>示例：img_w、vec_w、terrain等</p>
      */
+    @GaModelField(text = "图层名称")
     private String layerName;
 
     /**
@@ -31,11 +37,13 @@ public class PxyLayerInfo {
      * <p>示例：本地模板 - D:/tiles/{z}/{x}/{y}.png</p>
      * <p>示例：网络模板 - http://tile.example.com/{z}/{x}/{y}.png</p>
      */
+    @GaModelField(text = "资源路径模板")
     private String path;
 
     /**
      * 坐标原点类型，默认谷歌原点
      */
+    @GaModelField(text = "坐标原点类型，默认谷歌原点", em = OriginType.class)
     private String originType;
 
     /**
@@ -47,8 +55,9 @@ public class PxyLayerInfo {
      *   <li>database - 从数据库获取（预留）</li>
      * </ul>
      *
-     * @see cn.geoair.map.tile.forge.fuser.enums.PxyType
+     * @see SrcType
      */
+    @GaModelField(text = "获取器类型", em = SrcType.class)
     private String srcType;
 
 
@@ -96,4 +105,20 @@ public class PxyLayerInfo {
      * <p>示例：8080、3128、1080</p>
      */
     private Integer webPxyPort;
+
+    @Transient
+    public OriginType getOriginTypeEnums() {
+        return OriginType.fromMode(originType);
+    }
+
+    /**
+     *  是否为3857网格
+     * @return
+     */
+    @Transient
+    public boolean isGoogleGrid() {
+        return gridSrid==3857;
+    }
+
+
 }

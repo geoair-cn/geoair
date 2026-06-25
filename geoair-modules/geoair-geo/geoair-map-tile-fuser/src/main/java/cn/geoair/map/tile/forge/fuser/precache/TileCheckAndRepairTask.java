@@ -7,7 +7,9 @@ import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
+import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
@@ -28,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 
 public class TileCheckAndRepairTask implements Runnable {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // 使用唯一的对象作为 Poison Pill（结束信号）
     private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
 
@@ -41,6 +43,7 @@ public class TileCheckAndRepairTask implements Runnable {
     private final AtomicLong repairedCount;
     private final AtomicLong failCount;
     private final ImageMime format;
+    boolean googleGridIs;
 
     public TileCheckAndRepairTask(String layerName,
                                   int zoom,
@@ -60,13 +63,29 @@ public class TileCheckAndRepairTask implements Runnable {
         this.repairedCount = repairedCount;
         this.failCount = failCount;
         this.format = format;
+        PxyLayerInfo pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
+
+
+        if (pxyLayerInfo == null) {
+            log.error("图层不存在  {}", layerName);
+            throw new RuntimeException("图层不存在");
+        }
+
+        googleGridIs = pxyLayerInfo.isGoogleGrid();
     }
 
     @Override
     public void run() {
         try {
             // 计算当前层级的瓦片范围
-            RangeApo rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
+            RangeApo rangeApo = null;
+            if (googleGridIs) {
+                // 计算当前层级的瓦片范围
+                rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
+            } else {
+                Geometry convert = GirAdvTools.getSridOpt().convert(geometry4326, 4326, 3857);
+                rangeApo = GirAdvTools.getTileGrid3857Opt().tileRangeByGeom(zoom, convert);
+            }
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
@@ -122,16 +141,30 @@ public class TileCheckAndRepairTask implements Runnable {
                     for (int x = minX; x <= maxX; x++) {
                         for (int y = minY; y <= maxY; y++) {
                             try {
-                                // 先过滤不相交的瓦片
-                                BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
-                                        .xyzToTileBox(zoom, x, y, 3857);
-                                String wktString = box.getWktString(4326);
-                                Geometry geometryByBox = GirAdvTools.getFormatOpt()
-                                        .wktToJtsGeometry(wktString);
-                                if (geometry4326.intersects(geometryByBox)) {
-                                    taskQueue.put(new TileCoordinate(zoom, x, y));
-                                    validTileCount++;
+                                if (googleGridIs) {
+                                    // 先过滤不相交的瓦片
+                                    BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
+                                            .xyzToTileBox(zoom, x, y, 3857);
+                                    String wktString = box.getWktString(4326);
+                                    Geometry geometryByBox = GirAdvTools.getFormatOpt()
+                                            .wktToJtsGeometry(wktString);
+                                    if (geometry4326.intersects(geometryByBox)) {
+                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        validTileCount++;
+                                    }
+                                } else {
+                                    // 先过滤不相交的瓦片
+                                    BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt()
+                                            .xyzToTileBox(zoom, x, y, 4326);
+                                    String wktString = box.getWktString(4326);
+                                    Geometry geometryByBox = GirAdvTools.getFormatOpt()
+                                            .wktToJtsGeometry(wktString);
+                                    if (geometry4326.intersects(geometryByBox)) {
+                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        validTileCount++;
+                                    }
                                 }
+
                             } catch (Exception e) {
                                 log.error("准备瓦片任务异常: {}-({},{},{})",
                                         layerName, zoom, x, y, e);
@@ -307,8 +340,14 @@ public class TileCheckAndRepairTask implements Runnable {
 
         try {
             // 1. 获取瓦片的边界框
-            BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
-                    .xyzToTileBox(z, x, y, 3857);
+            BoxReferencedEnvelope box = null;
+            if (googleGridIs) {
+                box = GirAdvTools.getTileGrid4326Opt()
+                        .xyzToTileBox(z, x, y, 3857);
+            } else {
+                box = GirAdvTools.getTileGrid3857Opt()
+                        .xyzToTileBox(z, x, y, 4326);
+            }
 
             // 2. 创建缓存融合器
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
@@ -363,13 +402,21 @@ public class TileCheckAndRepairTask implements Runnable {
      * 修复结果枚举
      */
     private enum RepairResult {
-        /** 已修复 */
+        /**
+         * 已修复
+         */
         REPAIRED,
-        /** 失败 */
+        /**
+         * 失败
+         */
         FAILED,
-        /** 跳过（瓦片不存在） */
+        /**
+         * 跳过（瓦片不存在）
+         */
         SKIPPED,
-        /** 正常（瓦片存在且正常） */
+        /**
+         * 正常（瓦片存在且正常）
+         */
         NORMAL;
 
         public boolean isRepaired() {

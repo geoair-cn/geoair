@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.enums;
 
+import cn.geoair.base.data.GiVisualValuable;
 import lombok.Getter;
 
 /**
@@ -8,7 +9,7 @@ import lombok.Getter;
  * @description：
  */
 @Getter
-public enum OriginType {
+public enum OriginType  implements GiVisualValuable<String> {
 
     TMS("tms"),
     Google("wmts");

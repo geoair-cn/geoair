@@ -1,6 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.enums;
 
 
+import cn.geoair.base.data.GiVisualValuable;
+
 import java.awt.*;
 
 /**
@@ -8,7 +10,7 @@ import java.awt.*;
  * @date ：Created in 2026/6/12 17:15
  * @description： 枚举存储与三种配置（速度、质量、默认）之一相关的提示
  */
-public enum HintsLevel {
+public enum HintsLevel  implements GiVisualValuable<String> {
     QUALITY(0, "quality"),
     DEFAULT(1, "default"),
     SPEED(2, "speed");
