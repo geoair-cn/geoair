@@ -73,7 +73,7 @@ public class XYZServlet extends D3TilesServlet {
             if (mapTileType == GirMapTileType.XYZ) {
                 String zxyType = request.getParameter("zxyType");
                 String gridSet = request.getParameter("gridSet");
-                String orginType = request.getParameter("orginType");
+                String originType = request.getParameter("originType");
                 int wmtsY = Integer.parseInt(y);
 
                 if (gridSet == null) {
@@ -89,7 +89,7 @@ public class XYZServlet extends D3TilesServlet {
                     wmtsY = temp;
                 }
 
-                if (StringUtils.equals(orginType, "tms")) {
+                if (StringUtils.equals(originType, "tms")) {
                     if (Objects.equals(gridSet, "EPSG:4326") || Objects.equals(gridSet, "EPSG:4490")) {
                         zInt = zInt - 1;
                         wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);

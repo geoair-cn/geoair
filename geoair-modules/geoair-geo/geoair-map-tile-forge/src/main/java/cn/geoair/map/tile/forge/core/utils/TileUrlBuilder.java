@@ -14,15 +14,15 @@ public class TileUrlBuilder {
     /**
      * 构建XYZ瓦片服务URL
      */
-    public static String buildXyzUrl(GirMapTileType mapTileType, String layerName, String dataId, String fileName, String format, String orginType, String zxyType,String gridSet) {
+    public static String buildXyzUrl(GirMapTileType mapTileType, String layerName, String dataId, String fileName, String format, String originType, String zxyType,String gridSet) {
         String baseUrl = null;
         if (StrUtil.isEmpty(format)) {
             baseUrl = "xyzTileService/rest/" + StrUtil.format("{}/{}/{}/{}/", mapTileType.getValue(), dataId, fileName, layerName) + "{z}/{x}/{y}";
         } else {
             baseUrl = "xyzTileService/rest/" + StrUtil.format("{}/{}/{}/{}/", mapTileType.getValue(), dataId, fileName, layerName) + "{z}/{x}/{y}." + format;
         }
-        if (StrUtil.isEmpty(orginType)) {
-            orginType = "wmts";
+        if (StrUtil.isEmpty(originType)) {
+            originType = "wmts";
         }
         if (StrUtil.isEmpty(zxyType)) {
             zxyType = "zxy";
@@ -33,7 +33,7 @@ public class TileUrlBuilder {
         if (!StrUtil.startWith(gridSet,"EPSG")) {
             gridSet = "EPSG:" + gridSet;
         }
-        return baseUrl + "?" + "orginType=" + orginType + "&zxyType=" + zxyType+ "&gridSet=" + gridSet;
+        return baseUrl + "?" + "originType=" + originType + "&zxyType=" + zxyType+ "&gridSet=" + gridSet;
     }
 
     /**
