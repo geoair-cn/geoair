@@ -1,6 +1,5 @@
 package cn.geoair.map.tile.forge.fuser.converter;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
