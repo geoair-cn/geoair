@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -35,7 +36,7 @@ public class TileStorageSupportAdapter {
     /**
      * 缓存StorageType+TileFormat与TileStorageSupport实例的映射关系
      */
-    private final Map<String, ITileStorageSupport> supportCache = new HashMap<>();
+    private final Map<String, ITileStorageSupport> supportCache = new ConcurrentHashMap<>();
 
     /**
      * 根据图层名称获取对应的TileStorageSupport实例
