@@ -1,11 +1,13 @@
 package cn.geoair.map.tile.forge.core.zip;
 
 
+import ch.qos.logback.core.util.FileSize;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
+import cn.hutool.core.io.unit.DataSizeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -1366,7 +1368,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         Files.createDirectories(Paths.get(localOutputPath).getParent());
         try (OutputStream out = new FileOutputStream(localOutputPath)) {
             out.write(fileData);
-            log.debug("文件已写入本地：{}，大小：{}字节", localOutputPath, fileData.length);
+            log.debug("文件已写入本地：{}，大小：{}", localOutputPath, DataSizeUtil.format(fileData.length));
         } catch (IOException e) {
             log.error("写入本地文件失败：{}", localOutputPath, e);
             throw new IOException("写入本地文件失败：" + localOutputPath, e);
