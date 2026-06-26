@@ -5,6 +5,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.base.util.GutilStr;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -267,6 +268,7 @@ public class GirRdDataSourceProperties {
         }
 
         return copyWithCustomization(source, readWriteConfig -> {
+            source.setGroupName(source.getGroupName() + "_" + IdUtil.fastSimpleUUID());
             // 修改所有从库的 schema
             List<ReadDataSourceConfig> slaves = readWriteConfig.getReadDataSourceConfigs();
             if (slaves != null && !slaves.isEmpty()) {
