@@ -15,6 +15,7 @@ import java.sql.*;
 import java.util.*;
 
 /**
+ * 读写分离 PreparedStatement 代理（完整修复版本）
  *
  * @author 张俊
  * @date Created in 2026/5/28
@@ -46,12 +47,11 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
     private boolean routed = false;
 
     // 标记是否已关闭
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
     public ReadWriteSplitPreparedStatement(ReadWriteSplitConnection connection, String sql) {
         super(connection);
         this.sql = sql;
-        // 初始容量为4，避免频繁扩容
         this.parameters = new JdbcParameter[Math.max(4, getParamCount(sql))];
     }
 
@@ -136,8 +136,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         parameters[index] = parameter;
 
         // 更新实际参数数量（最大有效索引+1）
-        // 注意：如果有空洞（如设置了索引5，但索引2为null），parametersSize仍为6
-        // 这样可以保证后续遍历时能覆盖所有已设置的非空参数
         if (index + 1 > parametersSize) {
             parametersSize = index + 1;
         }
@@ -164,14 +162,27 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
     }
 
     /**
+     * 检查是否已关闭
+     */
+    private void checkClosed() throws SQLException {
+        if (closed) {
+            throw new SQLException("PreparedStatement has been closed");
+        }
+    }
+
+    /**
      * 获取真实的 PreparedStatement
-     * 修复：缓存路由结果
      */
     private PreparedStatement getRealPreparedStatement() throws SQLException {
         checkClosed();
 
-        if (realStatement != null) {
+        if (realStatement != null && !realStatement.isClosed()) {
             return realStatement;
+        }
+
+        // 如果 realStatement 已关闭但未置空，重新创建
+        if (realStatement != null && realStatement.isClosed()) {
+            realStatement = null;
         }
 
         // 根据 SQL 路由获取连接
@@ -199,15 +210,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
                 sql, getTargetDataSourceType());
 
         return realStatement;
-    }
-
-    /**
-     * 检查是否已关闭
-     */
-    private void checkClosed() throws SQLException {
-        if (closed) {
-            throw new SQLException("PreparedStatement has been closed");
-        }
     }
 
     /**
@@ -239,7 +241,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     /**
      * 应用缓存的所有参数到真实 Statement
-     * 修复：添加清除参数选项
      */
     private void applyCachedParameters() throws SQLException {
         applyCachedParameters(false);
@@ -390,7 +391,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
                 }
                 break;
             default:
-                // 处理 scaleOrLength
                 if (param instanceof JdbcParameterImpl) {
                     JdbcParameterImpl impl = (JdbcParameterImpl) param;
                     if (impl.getScaleOrLength() != -1) {
@@ -401,6 +401,8 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
                 stmt.setObject(index, value, sqlType);
         }
     }
+
+    // ==================== 参数设置方法 ====================
 
     @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
@@ -508,12 +510,19 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
     @Override
     public void clearParameters() throws SQLException {
         checkClosed();
-        if (parametersSize > 0) {
-            Arrays.fill(parameters, 0, parametersSize, null);
-            parametersSize = 0;
-            if (paramMap != null) {
-                paramMap = null;
-            }
+        clearParametersInternal();
+    }
+
+    /**
+     * 内部清理参数方法 - 不检查closed状态
+     */
+    private void clearParametersInternal() {
+        if (parameters != null) {
+            Arrays.fill(parameters, 0, Math.min(parametersSize, parameters.length), null);
+        }
+        parametersSize = 0;
+        if (paramMap != null) {
+            paramMap = null;
         }
     }
 
@@ -738,20 +747,15 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         return stmt.execute();
     }
 
-    /**
-     * 修复：addBatch 时重新应用当前参数
-     */
     @Override
     public void addBatch() throws SQLException {
         checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
+        // 重新应用所有参数，确保当前参数被正确设置
         applyCachedParameters(true);
         stmt.addBatch();
     }
 
-    /**
-     * 修复：执行批处理后自动清除参数
-     */
     @Override
     public int[] executeBatch() throws SQLException {
         checkClosed();
@@ -759,11 +763,14 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         try {
             return stmt.executeBatch();
         } finally {
-            // 执行完成后清除参数，准备下一批
-            clearParameters();
-            // 同时清除真实Statement的参数
+            // 执行完成后清除参数
+            clearParametersInternal();
             if (realStatement != null) {
-                realStatement.clearParameters();
+                try {
+                    realStatement.clearParameters();
+                } catch (SQLException e) {
+                    // 忽略清理异常
+                }
             }
         }
     }
@@ -786,7 +793,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
     // ==================== 关闭和资源释放 ====================
 
     /**
-     * 修复：改进资源释放，防止异常时状态不一致
+     * 修复：先清理参数，再标记关闭，避免 checkClosed 异常
      */
     @Override
     public void close() throws SQLException {
@@ -802,9 +809,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
         } catch (SQLException e) {
             savedException = e;
         } finally {
-            realStatement = null;
+            // 先清理参数（不检查closed状态）
+            clearParametersInternal();
+
+            // 然后标记为已关闭
             closed = true;
-            clearParameters();
+            realStatement = null;
+
             if (savedException != null) {
                 throw savedException;
             }
@@ -968,9 +979,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement imp
 
     // ==================== 私有辅助方法 ====================
 
-    /**
-     * 修复：完善 setObject 的类型映射
-     */
     private void setObjectParameter(int parameterIndex, Object x) {
         if (x == null) {
             setParameter(parameterIndex, createParameterNull(Types.OTHER));
