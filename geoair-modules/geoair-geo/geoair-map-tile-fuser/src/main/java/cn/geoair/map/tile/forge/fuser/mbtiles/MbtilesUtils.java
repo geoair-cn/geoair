@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.hutool.core.date.DateUtil;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * MBTiles 工具类
@@ -427,36 +429,77 @@ public class MbtilesUtils {
 
     // ==================== 数据库维护方法 ====================
 
+
     /**
-     * 执行 VACUUM 清理空间
-     * <p>
-     * VACUUM 命令会重建数据库文件，回收未使用的空间并整理碎片。
-     * 注意：VACUUM 会锁定数据库，执行期间不能进行写操作，建议在低峰期执行。
-     * </p>
+     * 执行 VACUUM 全库重建清理（仅停机/低峰离线使用）
+     * 100G+超大库会占用双倍磁盘空间，执行期间独占写锁
      *
-     * @param dbPath 数据库文件位置
-     * @return 是否执行成功
+     * @param dbPath 数据库文件路径
+     * @return true成功 false失败
      */
     public static boolean vacuum(String dbPath) {
-        if (dbPath == null) {
-            log.error("数据源无效，无法执行 VACUUM");
+        if (dbPath == null || GutilObject.isEmpty(dbPath)) {
+            log.error("数据源路径为空，无法执行 VACUUM");
             return false;
         }
-        DriverManagerDataSource dataSource = new DriverManagerDataSource("jdbc:sqlite:" + dbPath, null, null);
+        File dbFile = new File(dbPath);
+        if (!dbFile.exists() || !dbFile.isFile()) {
+            log.error("数据库文件不存在: {}", dbPath);
+            return false;
+        }
+        long dbSize = dbFile.length();
+        long freeSpace = dbFile.getParentFile().getUsableSpace();
+        long needMinFree = dbSize + 10L * 1024 * 1024 * 1024;
+        if (freeSpace < needMinFree) {
+            log.error("磁盘空间不足，当前库大小:{}G，最少需要空闲:{}G，实际空闲:{}G",
+                    dbSize / 1024 / 1024 / 1024,
+                    needMinFree / 1024 / 1024 / 1024,
+                    freeSpace / 1024 / 1024 / 1024);
+            return false;
+        }
+        // JDBC URL追加参数，配合PRAGMA双重提速
+        String url = String.format("jdbc:sqlite:%s?busy_timeout=30000", dbPath);
+        DriverManagerDataSource dataSource = new DriverManagerDataSource(url, null, null);
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
+            // ========== 核心提速PRAGMA 批量执行 ==========
+            // 1. 关闭外键校验，减少重建索引开销
+            stmt.execute("PRAGMA foreign_keys = OFF;");
+            // 2. WAL模式减少日志刷盘阻塞
+            stmt.execute("PRAGMA journal_mode = WAL;");
+            // 3. 临时文件全部放内存
+            stmt.execute("PRAGMA temp_store = MEMORY;");
+            // 4. 缓存大小：-N 代表N KB，这里512MB缓存
+            stmt.execute("PRAGMA cache_size = -524288;");
+            // 5. mmap内存映射120G，减少磁盘随机读
+            stmt.execute("PRAGMA mmap_size = 268435456;");
+            // 6. 维护阶段临时关闭同步，大幅提速（停机执行无断电风险可用）
+            stmt.execute("PRAGMA synchronous = OFF;");
 
-            log.info("开始执行 VACUUM 清理空间...");
+            log.info("开始执行VACUUM，数据库大小:{}GB，磁盘空闲:{}GB",
+                    dbSize / 1024 / 1024 / 1024,
+                    freeSpace / 1024 / 1024 / 1024);
             long startTime = System.currentTimeMillis();
 
-            stmt.execute("VACUUM");
+            // 执行全量真空
+            stmt.execute("VACUUM;");
+            // 顺带更新统计信息，优化后续查询性能
+            stmt.execute("ANALYZE;");
 
-            long elapsed = System.currentTimeMillis() - startTime;
-            log.info("VACUUM 执行完成，耗时: {} s", elapsed/1000);
+            long costMs = System.currentTimeMillis() - startTime;
+            long costSec = TimeUnit.MILLISECONDS.toSeconds(costMs);
+            long newDbSize = dbFile.length();
+            long shrinkGb = (dbSize - newDbSize) / 1024 / 1024 / 1024;
+
+            log.info("VACUUM执行完成，耗时:{}s，原大小:{}GB，清理后:{}GB，释放空间:{}GB",
+                    costSec,
+                    dbSize / 1024 / 1024 / 1024,
+                    newDbSize / 1024 / 1024 / 1024,
+                    shrinkGb);
             return true;
 
         } catch (SQLException e) {
-            log.error("执行 VACUUM 失败", e);
+            log.error("执行VACUUM异常", e);
             return false;
         }
     }
@@ -502,7 +545,7 @@ public class MbtilesUtils {
             stmt.execute("PRAGMA wal_checkpoint(" + upperMode + ")");
 
             long elapsed = System.currentTimeMillis() - startTime;
-            log.info("WAL checkpoint 执行完成，耗时: {} s", elapsed/1000);
+            log.info("WAL checkpoint 执行完成，耗时: {} s", elapsed / 1000);
             return true;
 
         } catch (SQLException e) {
@@ -662,7 +705,7 @@ public class MbtilesUtils {
         boolean vacuumResult = vacuum(dbPath);
 
         long elapsed = System.currentTimeMillis() - startTime;
-        log.info("数据库压缩完成，结果: {}, 耗时: {} s", vacuumResult, elapsed/1000);
+        log.info("数据库压缩完成，结果: {}, 耗时: {} s", vacuumResult, elapsed / 1000);
 
         return vacuumResult;
     }
