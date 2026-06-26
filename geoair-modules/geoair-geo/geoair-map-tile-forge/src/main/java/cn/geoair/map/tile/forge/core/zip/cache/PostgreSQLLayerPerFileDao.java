@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -226,7 +227,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
 
         String sql = String.format("SELECT * FROM %s WHERE xyz_path = #{xyzPath}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql, SqlParamMap.of().addOne("xyzPath", xyzPath));
-        return girAdvOneRow == null ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
     }
 
     public TileCentralDirectoryEntry findByXyz(String x, String y, String z) throws SQLException {
@@ -237,7 +238,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
                         .addOne("x", x)
                         .addOne("y", y)
                         .addOne("z", z));
-        return girAdvOneRow == null ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return  GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
     }
 
     // 3. 根据 fileName 查询
@@ -246,7 +247,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
         String sql = String.format("SELECT * FROM %s WHERE file_name = #{fileName}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql,
                 SqlParamMap.of().addOne("fileName", fileName));
-        return girAdvOneRow == null ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
     }
 
     public TileCentralDirectoryEntry findById(Long id) throws SQLException {
@@ -254,7 +255,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
         String sql = String.format("SELECT * FROM %s WHERE id = #{id}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql,
                 SqlParamMap.of().addOne("id", id));
-        return girAdvOneRow == null ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
     }
 
     @Override
@@ -355,7 +356,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
 
     @Override
     public void close() {
-        log.info("PostgreSQLLayerPerFileDao 已关闭");
+
     }
 
 }
