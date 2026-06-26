@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.converter;
 
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
+
 import java.util.List;
 
 /**
@@ -10,6 +12,11 @@ import java.util.List;
 public class Test {
 
     public static void main(String[] args) {
+        MbtilesUtils.compactDatabase("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles");
+
+    }
+
+    private static void localFileConverter() {
         // 1. 基本用法 - 转换所有瓦片到 MBTiles
         // ==================== 6. 指定层级 + 覆盖 ====================
         List<Integer> zoomLevels = java.util.Arrays.asList(0, 1, 2, 3, 4, 5);

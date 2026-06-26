@@ -2,12 +2,14 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.sql.*;
 import java.util.List;
@@ -432,15 +434,15 @@ public class MbtilesUtils {
      * 注意：VACUUM 会锁定数据库，执行期间不能进行写操作，建议在低峰期执行。
      * </p>
      *
-     * @param dataSource 数据源
+     * @param dbPath 数据库文件位置
      * @return 是否执行成功
      */
-    public static boolean vacuum(DruidDataSource dataSource) {
-        if (dataSource == null || dataSource.isClosed()) {
+    public static boolean vacuum(String dbPath) {
+        if (dbPath == null) {
             log.error("数据源无效，无法执行 VACUUM");
             return false;
         }
-
+        DriverManagerDataSource dataSource = new DriverManagerDataSource("jdbc:sqlite:" + dbPath, null, null);
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
 
@@ -450,7 +452,7 @@ public class MbtilesUtils {
             stmt.execute("VACUUM");
 
             long elapsed = System.currentTimeMillis() - startTime;
-            log.info("VACUUM 执行完成，耗时: {} ms", elapsed);
+            log.info("VACUUM 执行完成，耗时: {} s", elapsed/1000);
             return true;
 
         } catch (SQLException e) {
@@ -474,8 +476,8 @@ public class MbtilesUtils {
      * @param mode       检查点模式：PASSIVE、FULL、RESTART
      * @return 是否执行成功
      */
-    public static boolean walCheckpoint(DruidDataSource dataSource, String mode) {
-        if (dataSource == null || dataSource.isClosed()) {
+    public static boolean walCheckpoint(DataSource dataSource, String mode) {
+        if (dataSource == null) {
             log.error("数据源无效，无法执行 WAL checkpoint");
             return false;
         }
@@ -500,7 +502,7 @@ public class MbtilesUtils {
             stmt.execute("PRAGMA wal_checkpoint(" + upperMode + ")");
 
             long elapsed = System.currentTimeMillis() - startTime;
-            log.info("WAL checkpoint 执行完成，耗时: {} ms", elapsed);
+            log.info("WAL checkpoint 执行完成，耗时: {} s", elapsed/1000);
             return true;
 
         } catch (SQLException e) {
@@ -515,7 +517,7 @@ public class MbtilesUtils {
      * @param dataSource 数据源
      * @return 是否执行成功
      */
-    public static boolean walCheckpoint(DruidDataSource dataSource) {
+    public static boolean walCheckpoint(DataSource dataSource) {
         return walCheckpoint(dataSource, "PASSIVE");
     }
 
@@ -529,7 +531,7 @@ public class MbtilesUtils {
      * @param dataSource 数据源
      * @return 是否执行成功
      */
-    public static boolean walCheckpointFull(DruidDataSource dataSource) {
+    public static boolean walCheckpointFull(DataSource dataSource) {
         return walCheckpoint(dataSource, "FULL");
     }
 
@@ -615,23 +617,23 @@ public class MbtilesUtils {
         return false;
     }
 
-    /**
-     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
-     * <p>
-     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
-     * 再执行 VACUUM 回收空间。
-     * 注意：此操作会锁定数据库，建议在低峰期执行。
-     * </p>
-     *
-     * @param dbPath 数据库的位置
-     * @return 是否执行成功
-     */
-    public static boolean compactDatabase(String dbPath) {
-        DruidDataSource dataSource = createDataSource(dbPath);
-        boolean b = compactDatabase(dataSource);
-        dataSource.close();
-        return b;
-    }
+//    /**
+//     * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
+//     * <p>
+//     * 先执行 FULL 模式的 checkpoint 将 WAL 同步到主文件，
+//     * 再执行 VACUUM 回收空间。
+//     * 注意：此操作会锁定数据库，建议在低峰期执行。
+//     * </p>
+//     *
+//     * @param dbPath 数据库的位置
+//     * @return 是否执行成功
+//     */
+//    public static boolean compactDatabase(String dbPath) {
+//        DruidDataSource dataSource = createDataSource(dbPath);
+//        boolean b = compactDatabase(dataSource);
+//        dataSource.close();
+//        return b;
+//    }
 
     /**
      * 压缩数据库（执行 VACUUM 和 WAL checkpoint 的组合）
@@ -641,31 +643,30 @@ public class MbtilesUtils {
      * 注意：此操作会锁定数据库，建议在低峰期执行。
      * </p>
      *
-     * @param dataSource 数据源
+     * @param dbPath 数据源
      * @return 是否执行成功
      */
-    public static boolean compactDatabase(DruidDataSource dataSource) {
-        if (dataSource == null || dataSource.isClosed()) {
+    public static boolean compactDatabase(String dbPath) {
+        if (dbPath == null) {
             log.error("数据源无效，无法压缩数据库");
             return false;
         }
 
         log.info("开始压缩数据库...");
         long startTime = System.currentTimeMillis();
-
-        // 第一步：执行 WAL checkpoint (FULL 模式)
+        DriverManagerDataSource dataSource = new DriverManagerDataSource("jdbc:sqlite:" + dbPath, null, null);
         if (!walCheckpointFull(dataSource)) {
             log.warn("WAL checkpoint 执行失败，继续执行 VACUUM...");
         }
-
         // 第二步：执行 VACUUM
-        boolean vacuumResult = vacuum(dataSource);
+        boolean vacuumResult = vacuum(dbPath);
 
         long elapsed = System.currentTimeMillis() - startTime;
         log.info("数据库压缩完成，结果: {}, 耗时: {} ms", vacuumResult, elapsed);
 
         return vacuumResult;
     }
+
 
     // ==================== 瓦片操作方法 ====================
 
