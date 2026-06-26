@@ -277,6 +277,8 @@ public class GirRdDataSourceProperties {
             if (slaves != null && !slaves.isEmpty()) {
                 slaves.forEach(slave -> {
                     String url = slave.getUrl();
+                    String id = slave.getId();
+                    slave.setId(id + "by_copy_" + IdUtil.fastSimpleUUID());
                     slave.setUrl(appendSchemaToUrl(url, schema));
                 });
             }
