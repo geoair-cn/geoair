@@ -182,7 +182,7 @@ public class GirRdDataSourceProperties {
         // 1. 复制主对象
         GirRdDataSourceProperties target = new GirRdDataSourceProperties();
         BeanUtil.copyProperties(source, target);
-
+        target.setGroupName(source.getGroupName() + "_by_copy_" + IdUtil.fastSimpleUUID());
         // 2. 处理 ReadWriteConfig
         GirRdDataSourceProperties.ReadWriteConfig sourceReadwrite = source.getReadwrite();
         if (sourceReadwrite != null) {
@@ -268,7 +268,6 @@ public class GirRdDataSourceProperties {
         }
 
         return copyWithCustomization(source, readWriteConfig -> {
-            source.setGroupName(source.getGroupName() + "_" + IdUtil.fastSimpleUUID());
             // 修改所有从库的 schema
             List<ReadDataSourceConfig> slaves = readWriteConfig.getReadDataSourceConfigs();
             if (slaves != null && !slaves.isEmpty()) {
