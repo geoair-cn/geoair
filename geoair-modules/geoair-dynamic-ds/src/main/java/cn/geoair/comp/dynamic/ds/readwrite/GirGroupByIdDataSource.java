@@ -1,7 +1,5 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
@@ -12,7 +10,6 @@ import javax.sql.DataSource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * 数据源组代理（基于数据源ID）
