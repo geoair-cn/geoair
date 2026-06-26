@@ -662,7 +662,7 @@ public class MbtilesUtils {
         boolean vacuumResult = vacuum(dbPath);
 
         long elapsed = System.currentTimeMillis() - startTime;
-        log.info("数据库压缩完成，结果: {}, 耗时: {} ms", vacuumResult, elapsed);
+        log.info("数据库压缩完成，结果: {}, 耗时: {} s", vacuumResult, elapsed/1000);
 
         return vacuumResult;
     }

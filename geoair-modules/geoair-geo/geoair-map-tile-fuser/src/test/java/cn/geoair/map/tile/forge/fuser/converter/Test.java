@@ -12,8 +12,8 @@ import java.util.List;
 public class Test {
 
     public static void main(String[] args) {
-        MbtilesUtils.compactDatabase("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles");
-
+//        MbtilesUtils.compactDatabase("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles");
+        localFileConverter();
     }
 
     private static void localFileConverter() {
