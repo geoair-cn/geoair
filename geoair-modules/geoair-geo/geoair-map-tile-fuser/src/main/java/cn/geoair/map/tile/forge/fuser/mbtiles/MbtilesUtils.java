@@ -321,6 +321,22 @@ public class MbtilesUtils {
      * 初始化元数据
      *
      * @param dataSource 数据源
+     * @return 是否成功
+     */
+    public static boolean initMetadata(String layerName, String format, DruidDataSource dataSource) {
+        return MbtilesUtils.initMetadata(dataSource,
+                "name", layerName,
+                "format", format,
+                "version", "1.0",
+                "type", "overlay"
+        );
+    }
+
+
+    /**
+     * 初始化元数据
+     *
+     * @param dataSource 数据源
      * @param metadata   元数据键值对（key1, value1, key2, value2, ...）
      * @return 是否成功
      */

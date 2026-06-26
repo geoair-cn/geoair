@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * @author ：张俊
  * @date ：Created in 2026/6/25 11:51
- * @description： 批量插入消费模型（线程安全版）
+ * @description： 批量插入消费模型
  */
 public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Closeable {
 
@@ -50,6 +50,12 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
 
     @Override
     public void accept(MbtilesInfo tile) {
+        if (tile == null) {
+            synchronized (stats) {
+                stats.failed++;
+            }
+            return;
+        }
         if (closed) {
             log.warn("消费者已关闭，拒绝新任务: z={}, x={}, y={}",
                     tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow());
@@ -73,7 +79,7 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
             }
 
             // 计算存储 Y（根据需要翻转）
-            int storeY = FuserCacheUtils.getStoreY(zoom, tile.getY(), needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(tile.getZoomLevel(), tile.getY(), needReverseY);
             tile.setTileRow(storeY);
 
             // 获取锁，保证批量操作的线程安全
