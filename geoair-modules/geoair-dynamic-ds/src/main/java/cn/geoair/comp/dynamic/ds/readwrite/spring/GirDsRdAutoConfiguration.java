@@ -57,7 +57,7 @@ public class GirDsRdAutoConfiguration {
                 GutilObject.isNotEmpty(properties.getReadwrite().findValidDataSources()) ? properties.getReadwrite().findReadUrlList().size() : 0,
                 properties.getReadwrite().getReadStrategy() != null ? properties.getReadwrite().getReadStrategy().getDescription() : "轮询策略");
 
-        GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
+        GirReadWriteDataSource dataSource = GirSpringReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
                 .build();
 
         RdLog.minLogLevel = properties.minLogLevel;
