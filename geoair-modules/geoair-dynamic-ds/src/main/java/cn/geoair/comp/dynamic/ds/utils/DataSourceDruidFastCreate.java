@@ -30,7 +30,7 @@ public class DataSourceDruidFastCreate {
     private Boolean poolPreparedStatements = true;
     private Integer maxPoolPreparedStatementPerConnectionSize = 20;
 
-    private Integer removeAbandonedTimeout = 300;      // 连接泄漏回收超时（秒）
+    private Integer removeAbandonedTimeout = 60*10;      // 连接泄漏回收超时（秒）
     private Integer connectionErrorRetryAttempts = 3;  // 连接错误重试次数
     private String validationQuery;                    // 验证查询SQL
     private Integer numTestsPerEvictionRun = -1;       // 每次检测的连接数
