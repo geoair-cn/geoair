@@ -40,22 +40,22 @@ public class MbtilesUtils {
      */
     public static final String CREATE_TILES_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS tiles (" +
-                    "  zoom_level INTEGER NOT NULL," +
-                    "  tile_column INTEGER NOT NULL," +
-                    "  tile_row INTEGER NOT NULL," +
-                    "  tile_data BLOB NOT NULL," +
-                    "  PRIMARY KEY (zoom_level, tile_column, tile_row)" +
-                    ")";
+            "  zoom_level INTEGER NOT NULL," +
+            "  tile_column INTEGER NOT NULL," +
+            "  tile_row INTEGER NOT NULL," +
+            "  tile_data BLOB NOT NULL," +
+            "  PRIMARY KEY (zoom_level, tile_column, tile_row)" +
+            ")";
 
     /**
      * 创建 metadata 表的 SQL
      */
     public static final String CREATE_METADATA_TABLE_SQL =
             "CREATE TABLE IF NOT EXISTS metadata (" +
-                    "  name TEXT NOT NULL," +
-                    "  value TEXT," +
-                    "  PRIMARY KEY (name)" +
-                    ")";
+            "  name TEXT NOT NULL," +
+            "  value TEXT," +
+            "  PRIMARY KEY (name)" +
+            ")";
 
     /**
      * 创建 tiles 索引的 SQL
@@ -189,10 +189,10 @@ public class MbtilesUtils {
                 properties.setProperty("read_uncommitted", "true");
             }
             dataSource.setConnectProperties(properties);
-
+            dataSource.setRemoveAbandoned(false);
             // 监控配置
             dataSource.setName("Druid-MBTiles-" + (readOnly ? "Read" : "Write") + "-" +
-                    new File(dbPath).getName());
+                               new File(dbPath).getName());
         });
 
         log.debug("创建 MBTiles 数据源: {}, readOnly: {}, maxActive: {}", dbPath, readOnly, maxActive);
