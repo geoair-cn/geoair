@@ -123,7 +123,7 @@ public class GeoFileTranImpl implements GeoFileTran {
                 // 批量日志
                 if (totalCount.get() % context.getBatchLogThreshold() == 0) {
                     log.info(
-                            "转换进度：已处理 {} 条，成功 {} 条，失败 {} 条，成功率 {:.2f}%",
+                            "转换进度：已处理 {} 条，成功 {} 条，失败 {} 条，成功率 {}%",
                             totalCount.get(),
                             successCount.get(),
                             failCount.get(),
