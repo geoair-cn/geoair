@@ -184,7 +184,7 @@ public class GirRdDataSourceProperties {
         BeanUtil.copyProperties(source, target);
         target.setGroupName(source.getGroupName() + "_by_copy_" + IdUtil.fastSimpleUUID());
         String masterDataSourceIdBySource = source.masterDataSourceId;
-        if (GutilObject.isEmpty(masterDataSourceIdBySource)) {
+        if (GutilObject.isNotEmpty(masterDataSourceIdBySource)) {
             target.setMasterDataSourceId(source.masterDataSourceId + "_by_copy_" + IdUtil.fastSimpleUUID());
         }
         // 2. 处理 ReadWriteConfig
