@@ -2,11 +2,14 @@ package cn.geoair.comp.dynamic.ds.readwrite.spring;
 
 import cn.geoair.base.log.GemLogLevel;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.base.util.GutilStr;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
+import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -158,4 +161,198 @@ public class GirRdDataSourceProperties {
             return !findValidDataSources().isEmpty();
         }
     }
+
+
+    /**
+     * 复制 GirRdDataSourceProperties，完全由外部自定义
+     *
+     * @param source                  源配置
+     * @param readWriteConfigConsumer 对 ReadWriteConfig 的自定义操作
+     * @return 复制后的配置
+     */
+    public static GirRdDataSourceProperties copyWithCustomization(
+            GirRdDataSourceProperties source,
+            Consumer<GirRdDataSourceProperties.ReadWriteConfig> readWriteConfigConsumer) {
+
+        if (source == null) {
+            return null;
+        }
+
+        // 1. 复制主对象
+        GirRdDataSourceProperties target = new GirRdDataSourceProperties();
+        BeanUtil.copyProperties(source, target);
+
+        // 2. 处理 ReadWriteConfig
+        GirRdDataSourceProperties.ReadWriteConfig sourceReadwrite = source.getReadwrite();
+        if (sourceReadwrite != null) {
+            GirRdDataSourceProperties.ReadWriteConfig targetReadwrite =
+                    copyReadWriteConfig(sourceReadwrite);
+
+            // 3. 执行外部自定义操作
+            if (readWriteConfigConsumer != null) {
+                readWriteConfigConsumer.accept(targetReadwrite);
+            }
+
+            target.setReadwrite(targetReadwrite);
+        }
+
+        return target;
+    }
+
+    /**
+     * 复制 ReadWriteConfig，支持分别自定义主库和从库
+     */
+    public static GirRdDataSourceProperties.ReadWriteConfig copyReadWriteConfigWithCustom(
+            GirRdDataSourceProperties.ReadWriteConfig source,
+            Consumer<List<ReadDataSourceConfig>> slavesConsumer) {
+
+        if (source == null) {
+            return null;
+        }
+
+        GirRdDataSourceProperties.ReadWriteConfig target = new GirRdDataSourceProperties.ReadWriteConfig();
+        BeanUtil.copyProperties(source, target);
+
+        // 复制并修改从库列表
+        List<ReadDataSourceConfig> sourceSlaves = source.getReadDataSourceConfigs();
+        if (sourceSlaves != null && !sourceSlaves.isEmpty()) {
+            List<ReadDataSourceConfig> targetSlaves = sourceSlaves.stream()
+                    .map(slave -> copyReadDataSourceConfig(slave, null))
+                    .collect(Collectors.toList());
+
+            // 执行外部自定义从库列表
+            if (slavesConsumer != null) {
+                slavesConsumer.accept(targetSlaves);
+            }
+
+            target.setReadDataSources(targetSlaves);
+        }
+
+        return target;
+    }
+
+    /**
+     * 复制单个 ReadDataSourceConfig，支持自定义操作
+     */
+    public static ReadDataSourceConfig copyReadDataSourceConfig(
+            ReadDataSourceConfig source,
+            Consumer<ReadDataSourceConfig> consumer) {
+
+        if (source == null) {
+            return null;
+        }
+
+        ReadDataSourceConfig target = new ReadDataSourceConfig();
+        BeanUtil.copyProperties(source, target);
+
+        // 执行外部自定义操作
+        if (consumer != null) {
+            consumer.accept(target);
+        }
+
+        return target;
+    }
+
+    // ==================== 便捷方法（快速修改 schema） ====================
+
+    /**
+     * 简单复制并添加 schema
+     */
+    public static GirRdDataSourceProperties copyWithSchema(
+            GirRdDataSourceProperties source,
+            String schema) {
+
+        if (source == null) {
+            return null;
+        }
+
+        return copyWithCustomization(source, readWriteConfig -> {
+            // 修改所有从库的 schema
+            List<ReadDataSourceConfig> slaves = readWriteConfig.getReadDataSourceConfigs();
+            if (slaves != null && !slaves.isEmpty()) {
+                slaves.forEach(slave -> {
+                    String url = slave.getUrl();
+                    slave.setUrl(appendSchemaToUrl(url, schema));
+                });
+            }
+        });
+    }
+
+    /**
+     * 复制并自定义 ReadWriteConfig
+     */
+    public static GirRdDataSourceProperties copy(
+            GirRdDataSourceProperties source,
+            Consumer<GirRdDataSourceProperties.ReadWriteConfig> readWriteConfigConsumer) {
+        return copyWithCustomization(source, readWriteConfigConsumer);
+    }
+
+
+    /**
+     * 复制 ReadWriteConfig（内部使用，不对外暴露）
+     */
+    private static GirRdDataSourceProperties.ReadWriteConfig copyReadWriteConfig(
+            GirRdDataSourceProperties.ReadWriteConfig source) {
+
+        if (source == null) {
+            return null;
+        }
+
+        GirRdDataSourceProperties.ReadWriteConfig target = new GirRdDataSourceProperties.ReadWriteConfig();
+        BeanUtil.copyProperties(source, target);
+
+
+        // 复制从库列表
+        List<ReadDataSourceConfig> sourceSlaves = source.getReadDataSourceConfigs();
+        if (sourceSlaves != null && !sourceSlaves.isEmpty()) {
+            List<ReadDataSourceConfig> targetSlaves = sourceSlaves.stream()
+                    .map(slave -> copyReadDataSourceConfig(slave, null))
+                    .collect(Collectors.toList());
+            target.setReadDataSources(targetSlaves);
+        }
+
+        return target;
+    }
+
+    // ==================== URL 工具方法 ====================
+
+    /**
+     * 为 URL 添加 schema 参数
+     */
+    public static String appendSchemaToUrl(String url, String schema) {
+        if (url == null || url.trim().isEmpty() || schema == null || schema.trim().isEmpty()) {
+            return url;
+        }
+
+        // 如果 URL 已经包含 currentSchema，先移除旧的
+        if (url.contains("currentSchema=")) {
+            url = removeParameterFromUrl(url, "currentSchema");
+        }
+
+        // 添加新的 schema 参数
+        if (url.contains("?")) {
+            return url + "&currentSchema=" + schema;
+        } else {
+            return url + "?currentSchema=" + schema;
+        }
+    }
+
+    /**
+     * 从 URL 中移除指定参数
+     */
+    public static String removeParameterFromUrl(String url, String paramName) {
+        if (url == null || !url.contains(paramName + "=")) {
+            return url;
+        }
+        String pattern = "[&?]" + paramName + "=[^&]*";
+        String result = url.replaceAll(pattern, "");
+        if (result.endsWith("?")) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+
 }
+
+

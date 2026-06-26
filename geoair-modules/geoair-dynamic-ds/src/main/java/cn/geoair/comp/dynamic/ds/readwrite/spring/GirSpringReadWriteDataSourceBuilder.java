@@ -26,9 +26,9 @@ import java.util.List;
  * @author 张俊
  * @date Created in 2026/5/29
  */
-public class GirReadWriteDataSourceBuilder {
+public class GirSpringReadWriteDataSourceBuilder {
 
-    private static final GiLogger log = GirLoggerFactory.getLogger(GirReadWriteDataSourceBuilder.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(GirSpringReadWriteDataSourceBuilder.class);
 
     private final GirRdDataSourceProperties properties;
 
@@ -37,19 +37,19 @@ public class GirReadWriteDataSourceBuilder {
     private final IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
 
 
-    public GirReadWriteDataSourceBuilder(GirRdDataSourceProperties properties,
-                                         DataSourceProperties springDataSourceProperties,
-                                         IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
+    public GirSpringReadWriteDataSourceBuilder(GirRdDataSourceProperties properties,
+                                               DataSourceProperties springDataSourceProperties,
+                                               IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
         this.properties = properties;
         this.springDataSourceProperties = springDataSourceProperties;
         this.iAdvDataSourceInitHelper = iAdvDataSourceInitHelper;
     }
 
 
-    public static GirReadWriteDataSourceBuilder builder(GirRdDataSourceProperties properties,
-                                                        DataSourceProperties springDataSourceProperties,
-                                                        IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
-        return new GirReadWriteDataSourceBuilder(properties, springDataSourceProperties, iAdvDataSourceInitHelper);
+    public static GirSpringReadWriteDataSourceBuilder builder(GirRdDataSourceProperties properties,
+                                                              DataSourceProperties springDataSourceProperties,
+                                                              IAdvDataSourceInitHelper iAdvDataSourceInitHelper) {
+        return new GirSpringReadWriteDataSourceBuilder(properties, springDataSourceProperties, iAdvDataSourceInitHelper);
     }
 
     /**
