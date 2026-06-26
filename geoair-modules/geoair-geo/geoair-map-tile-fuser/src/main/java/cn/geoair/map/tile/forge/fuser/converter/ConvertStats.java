@@ -11,4 +11,11 @@ public class ConvertStats {
     public long failed = 0;
     public long skipped = 0;
     public long totalSize = 0;
+    public void add(ConvertStats other) {
+        this.total += other.total;
+        this.success += other.success;
+        this.failed += other.failed;
+        this.skipped += other.skipped;
+        this.totalSize += other.totalSize;
+    }
 }

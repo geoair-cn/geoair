@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.converter;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author ：张俊
@@ -11,20 +12,19 @@ public class Test {
 
     public static void main(String[] args) {
         // 1. 基本用法 - 转换所有瓦片到 MBTiles
-        MbtilesLayerImporter.ImportConfig config = new MbtilesLayerImporter.ImportConfig()
-                .setSourceMbtiles("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles")
-                .setSourceLayerName("imagery")
-                .setTargetMbtiles("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\copy.mbtiles")
-                .setTargetLayerName("imagery_backup")
-                .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6,7,8,9,10,11,12))
-//                .setZoomLevels(Arrays.asList(13))
-                .setOverwrite(true)                // 覆盖已存在的瓦片
-                .setBatchSize(20000)                // 批量插入大小
-                .setCopyMetadata(true)             // 复制元数据
-                .setMaxPoolSize(20)                // 连接池大小
-                .setMinIdle(2);                    // 最小空闲连接数
-
-        MbtilesLayerImporter.ImportResult result5 = MbtilesLayerImporter.importLayers(config);
+        // ==================== 6. 指定层级 + 覆盖 ====================
+        List<Integer> zoomLevels = java.util.Arrays.asList(0, 1, 2, 3, 4, 5);
+        MbtilesFromLocalFileConverter.ConvertResult result6 = MbtilesFromLocalFileConverter.convert(
+                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles",
+                "1_13_partial",
+                config -> {
+                    config.setNeedReverseY(true);
+                    config.setOverwrite(true);
+                    config.setBatchSize(3000);
+                }
+        );
+        System.out.println("结果6: " + result6);
     }
 
 }
