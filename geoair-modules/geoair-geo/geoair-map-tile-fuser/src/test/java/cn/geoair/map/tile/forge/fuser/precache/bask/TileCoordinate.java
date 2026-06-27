@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.precache;
+package cn.geoair.map.tile.forge.fuser.precache.bask;
 
 /**
  * 瓦片坐标实体类

@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.precache;
+package cn.geoair.map.tile.forge.fuser.precache.bask;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -12,6 +12,7 @@ import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
+import cn.geoair.map.tile.forge.fuser.precache.TileCoordinate;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
@@ -28,7 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TileFuserPreCacheTask implements Runnable {
 
     private static GiLogger log = GirLoggerFactory.getLogger();
-    private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
+    private static final cn.geoair.map.tile.forge.fuser.precache.TileCoordinate POISON_PILL = new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(-1, -1, -1);
 
     private final String layerName;
     private final int zoom;
@@ -120,7 +121,7 @@ public class TileFuserPreCacheTask implements Runnable {
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
 
             // 使用阻塞队列作为任务队列
-            BlockingQueue<TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
+            BlockingQueue<cn.geoair.map.tile.forge.fuser.precache.TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
 
             // ============ 启动生产者线程 ============
             int finalThreadPoolSize = threadPoolSize;
@@ -138,7 +139,7 @@ public class TileFuserPreCacheTask implements Runnable {
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 } else {
@@ -148,7 +149,7 @@ public class TileFuserPreCacheTask implements Runnable {
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 }
@@ -195,7 +196,7 @@ public class TileFuserPreCacheTask implements Runnable {
                         log.info("消费者线程 {} 启动", threadName);
 
                         while (true) {
-                            TileCoordinate coord = taskQueue.take();
+                            cn.geoair.map.tile.forge.fuser.precache.TileCoordinate coord = taskQueue.take();
 
                             // 检查结束标志 - 使用 == 比较对象引用
                             if (coord == POISON_PILL) {

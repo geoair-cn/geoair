@@ -1,18 +1,21 @@
-package cn.geoair.map.tile.forge.fuser.precache;
+package cn.geoair.map.tile.forge.fuser.precache.bask;
+
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
-import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
-import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.precache.TileCoordinate;
+import cn.geoair.map.tile.forge.fuser.provider.CachedTileGetter;
+import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
 import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import org.locationtech.jts.geom.Geometry;
@@ -21,20 +24,20 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * 瓦片异常检查与修复任务
- * 只检查已存在的瓦片，发现异常（如空白矩形）则重新切片
- *
- * @author 张俊
- * @date Created in 2026/6/23
- */
+import static cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils.ORIGINAL_GRID_SUFFIX;
 
-public class TileFuserCheckAndRepairTask implements Runnable {
+/**
+ * @author ：张俊
+ * @date ：Created in 2026/6/27 13:09
+ * @description： 原始网格的预缓存任务
+ */
+public class TileOriginalCheckAndRepairTask implements Runnable {
     private static GiLogger log = GirLoggerFactory.getLogger();
     // 使用唯一的对象作为 Poison Pill（结束信号）
-    private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
+    private static final cn.geoair.map.tile.forge.fuser.precache.TileCoordinate POISON_PILL = new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(-1, -1, -1);
 
-    private final String layerName;
+
+    private final String originalCacheName;
     private final int zoom;
     private final Geometry geometry4326;
     private final CountDownLatch latch;
@@ -44,17 +47,21 @@ public class TileFuserCheckAndRepairTask implements Runnable {
     private final AtomicLong failCount;
     private final ImageMime format;
     boolean googleGridIs;
+    TileCache tileCache;
 
-    public TileFuserCheckAndRepairTask(String layerName,
-                                       int zoom,
-                                       Geometry geometry4326,
-                                       CountDownLatch latch,
-                                       AtomicLong totalCount,
-                                       AtomicLong checkedCount,
-                                       AtomicLong repairedCount,
-                                       AtomicLong failCount,
-                                       ImageMime format) {
-        this.layerName = layerName;
+    CachedTileGetter layerTileGetter;
+    PxyLayerInfo pxyLayerInfo;
+
+    public TileOriginalCheckAndRepairTask(String layerName, String originalCacheName,
+                                          int zoom,
+                                          Geometry geometry4326,
+                                          CountDownLatch latch,
+                                          AtomicLong totalCount,
+                                          AtomicLong checkedCount,
+                                          AtomicLong repairedCount,
+                                          AtomicLong failCount,
+                                          ImageMime format) {
+        this.originalCacheName = GutilObject.isEmpty(originalCacheName) ? layerName + ORIGINAL_GRID_SUFFIX : originalCacheName;
         this.zoom = zoom;
         this.geometry4326 = geometry4326;
         this.latch = latch;
@@ -63,15 +70,18 @@ public class TileFuserCheckAndRepairTask implements Runnable {
         this.repairedCount = repairedCount;
         this.failCount = failCount;
         this.format = format;
-        PxyLayerInfo pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
-
-
+        pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
         if (pxyLayerInfo == null) {
             log.error("图层不存在  {}", layerName);
             throw new RuntimeException("图层不存在");
         }
-
         googleGridIs = pxyLayerInfo.isGoogleGrid();
+        layerTileGetter = (CachedTileGetter) TileGetterFactory.
+                create(pxyLayerInfo,
+                        CustomTileCacheHelper.getInstance().getTileCache(layerName),
+                        originalCacheName
+                );
+        tileCache = layerTileGetter.getTileCache();
     }
 
     @Override
@@ -80,11 +90,11 @@ public class TileFuserCheckAndRepairTask implements Runnable {
             // 计算当前层级的瓦片范围
             RangeApo rangeApo = null;
             if (googleGridIs) {
-                // 计算当前层级的瓦片范围
-                rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
-            } else {
                 Geometry convert = GirAdvTools.getSridOpt().convert(geometry4326, 4326, 3857);
                 rangeApo = GirAdvTools.getTileGrid3857Opt().tileRangeByGeom(zoom, convert);
+            } else {
+                // 计算当前层级的瓦片范围
+                rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
             }
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
@@ -131,7 +141,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
 
             // 使用阻塞队列作为任务队列
-            BlockingQueue<TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
+            BlockingQueue<cn.geoair.map.tile.forge.fuser.precache.TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
 
             // ============ 启动生产者线程 ============
             int finalThreadPoolSize = threadPoolSize;
@@ -141,7 +151,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                     for (int x = minX; x <= maxX; x++) {
                         for (int y = minY; y <= maxY; y++) {
                             try {
-                                if (googleGridIs) {
+                                if (!googleGridIs) {
                                     // 先过滤不相交的瓦片
                                     BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
                                             .xyzToTileBox(zoom, x, y, 3857);
@@ -149,7 +159,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 } else {
@@ -160,14 +170,14 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 }
 
                             } catch (Exception e) {
                                 log.error("准备瓦片任务异常: {}-({},{},{})",
-                                        layerName, zoom, x, y, e);
+                                        originalCacheName, zoom, x, y, e);
                             }
                         }
                     }
@@ -197,14 +207,14 @@ public class TileFuserCheckAndRepairTask implements Runnable {
             for (int i = 0; i < threadPoolSize; i++) {
                 final int consumerId = i;
                 executorService.submit(() -> {
-                    String threadName = "Consumer-Check-" + zoom + "-" + layerName + "-" + consumerId;
+                    String threadName = "Consumer-Check-" + zoom + "-" + originalCacheName + "-" + consumerId;
                     Thread.currentThread().setName(threadName);
 
                     try {
                         log.debug("消费者线程 {} 启动", threadName);
 
                         while (true) {
-                            TileCoordinate coord = taskQueue.take();
+                            cn.geoair.map.tile.forge.fuser.precache.TileCoordinate coord = taskQueue.take();
 
                             // 检查结束标志
                             if (coord == POISON_PILL) {
@@ -337,34 +347,19 @@ public class TileFuserCheckAndRepairTask implements Runnable {
         int z = coord.getZoom();
         int x = coord.getX();
         int y = coord.getY();
-
+        // 这里的坐标是谷歌原点
         try {
             // 1. 获取瓦片的边界框
-            BoxReferencedEnvelope box = null;
-            if (googleGridIs) {
-                box = GirAdvTools.getTileGrid4326Opt()
-                        .xyzToTileBox(z, x, y, 3857);
-            } else {
-                box = GirAdvTools.getTileGrid3857Opt()
-                        .xyzToTileBox(z, x, y, 4326);
-            }
+            y = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
 
-            // 2. 创建缓存融合器
-            BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
-                    box.getMaxX(), box.getMaxY());
-            CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
-                    layerName, z, x, y, bounds, 256, 256, ImageMime.png);
-
-            // 3. 检查瓦片缓存是否存在
-            TileCache tileCache = cacheTileFuser.getTileCache();
 
             // 4. 只检查已存在的瓦片
-            if (!tileCache.exists(layerName, z, x, y, format)) {
+            if (!tileCache.exists(originalCacheName, z, x, y, format)) {
                 return RepairResult.skipped();
             }
 
             // 5. 获取缓存瓦片并进行检查
-            byte[] bytes = tileCache.get(layerName, z, x, y, format);
+            byte[] bytes = tileCache.get(originalCacheName, z, x, y, format);
             if (bytes == null || bytes.length == 0) {
                 log.warn("瓦片数据为空: z={}, x={}, y={}", z, x, y);
                 return RepairResult.failed();
@@ -376,10 +371,10 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                 log.info("检测到异常瓦片（空白矩形）: z={}, x={}, y={}, 开始重新切片", z, x, y);
 
                 // 7. 删除异常缓存
-                FuserCacheUtils.deleteCacheByRequestGrid(layerName, z, x, y, cacheTileFuser, format);
-
+                tileCache.delete(originalCacheName, z, x, y, format);
+                Resource tileResource = layerTileGetter.getTileResource(z, x, y);
                 // 8. 重新生成瓦片
-                byte[] newImageBytes = cacheTileFuser.toImageBytes();
+                byte[] newImageBytes = tileResource.getByteData();
                 if (newImageBytes != null && newImageBytes.length > 0) {
                     log.debug("瓦片重新切片成功: z={}, x={}, y={}", z, x, y);
                     return RepairResult.repaired();

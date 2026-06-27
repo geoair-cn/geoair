@@ -1,4 +1,4 @@
-package cn.geoair.map.tile.forge.fuser.precache;
+package cn.geoair.map.tile.forge.fuser.precache.bask;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -6,6 +6,8 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 
+import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
+import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
