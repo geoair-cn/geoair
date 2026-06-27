@@ -7,31 +7,42 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 单层级融合预缓存任务（简化版）
+ * 原始网格预缓存任务
  *
  * @author 张俊
  */
-public class TileFuserPreCacheTask implements Runnable {
+public class TileOriginalPreCacheTask implements Runnable {
 
     private final TileTaskExecutor executor;
 
-    public TileFuserPreCacheTask(String layerName, int zoom, Geometry geometry4326,
-                                  CountDownLatch latch, AtomicLong totalCount,
-                                  AtomicLong successCount, AtomicLong failCount,
-                                  ImageMime format) {
-        TileTaskConfig config = TileTaskConfig.forPreCache(layerName, zoom, geometry4326, format)
+    public TileOriginalPreCacheTask(String layerName, String originalCacheName,
+                                    int zoom, Geometry geometry4326,
+                                    CountDownLatch latch, AtomicLong totalCount,
+                                    AtomicLong successCount, AtomicLong failCount,
+                                    ImageMime format) {
+        TileTaskConfig config = TileTaskConfig.forOriginalPreCache(layerName, originalCacheName, zoom, geometry4326, format)
                 .setLatch(latch)
                 .setTotalCount(totalCount)
                 .setSuccessCount(successCount)
                 .setFailCount(failCount);
-        this.executor = TileTaskExecutor.forPreCache(config);
+        this.executor = TileTaskExecutor.forOriginalPreCache(config);
     }
 
     /**
      * 便捷创建方法
      */
-    public static TileFuserPreCacheTask of(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
-        return new TileFuserPreCacheTask(layerName, zoom, geometry4326, null, null, null, null, format);
+    public static TileOriginalPreCacheTask of(String layerName, String originalCacheName,
+                                               int zoom, Geometry geometry4326, ImageMime format) {
+        return new TileOriginalPreCacheTask(layerName, originalCacheName, zoom, geometry4326,
+                null, null, null, null, format);
+    }
+
+    /**
+     * 便捷创建方法（使用默认缓存名）
+     */
+    public static TileOriginalPreCacheTask of(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
+        return new TileOriginalPreCacheTask(layerName, null, zoom, geometry4326,
+                null, null, null, null, format);
     }
 
     /**
@@ -48,6 +59,7 @@ public class TileFuserPreCacheTask implements Runnable {
 
     public static class Builder {
         private String layerName;
+        private String originalCacheName;
         private int zoom;
         private Geometry geometry4326;
         private ImageMime format;
@@ -58,6 +70,11 @@ public class TileFuserPreCacheTask implements Runnable {
 
         public Builder layerName(String layerName) {
             this.layerName = layerName;
+            return this;
+        }
+
+        public Builder originalCacheName(String originalCacheName) {
+            this.originalCacheName = originalCacheName;
             return this;
         }
 
@@ -96,8 +113,9 @@ public class TileFuserPreCacheTask implements Runnable {
             return this;
         }
 
-        public TileFuserPreCacheTask build() {
-            return new TileFuserPreCacheTask(layerName, zoom, geometry4326, latch, totalCount, successCount, failCount, format);
+        public TileOriginalPreCacheTask build() {
+            return new TileOriginalPreCacheTask(layerName, originalCacheName, zoom, geometry4326,
+                    latch, totalCount, successCount, failCount, format);
         }
     }
 }
