@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 
 public class MbtilesFromOtherMbtilesConverter {
-    private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
 
     /**
      * 导入配置

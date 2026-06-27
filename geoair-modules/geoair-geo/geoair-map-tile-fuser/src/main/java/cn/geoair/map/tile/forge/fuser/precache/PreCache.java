@@ -93,12 +93,12 @@ public class PreCache {
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
             Runnable task;
             if (isPreCheck) {
-                task = new TileCheckAndRepairTask(
+                task = new TileFuserCheckAndRepairTask(
                         config.getLayerName(), zoom, geometry,
                         latch, totalCount, checkedCount, successCount, failCount, format
                 );
             } else {
-                task = new ZoomPreCacheTask(
+                task = new TileFuserPreCacheTask(
                         config.getLayerName(), zoom, geometry,
                         latch, totalCount, successCount, failCount, format
                 );
