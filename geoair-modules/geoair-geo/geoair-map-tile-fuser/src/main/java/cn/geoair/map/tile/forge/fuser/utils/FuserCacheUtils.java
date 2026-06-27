@@ -26,7 +26,7 @@ public class FuserCacheUtils {
     /**
      * 原始网格名称后缀
      */
-    private static final String ORIGINAL_GRID_SUFFIX = Constant._original_grid_name_suffix;
+    public static final String ORIGINAL_GRID_SUFFIX = Constant._original_grid_name_suffix;
 
     /**
      * 判断是否需要翻转 Y

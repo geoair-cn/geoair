@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.converter;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
@@ -35,10 +36,11 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
     private final List<MbtilesInfo> batchArgs;
     private final ReentrantLock lock = new ReentrantLock();
     private long layerStartTime;
+    private String tileCountToLog;
     private volatile boolean closed = false;
 
     public MbtilesInfoBatchPutConsumer(boolean needReverseY, boolean overwrite,
-                                       int batchSize, DruidDataSource dataSource, Integer zoom) {
+                                       int batchSize, DruidDataSource dataSource, Integer zoom, long tileCount) {
         this.needReverseY = needReverseY;
         this.overwrite = overwrite;
         this.batchSize = batchSize;
@@ -46,6 +48,7 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
         this.zoom = zoom;
         this.batchArgs = new ArrayList<>(batchSize);
         this.layerStartTime = System.currentTimeMillis();
+        this.tileCountToLog = tileCount == 0 ? "" : tileCount + "";
     }
 
     @Override
@@ -129,9 +132,13 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
                 stats.skipped += results[1];
                 stats.failed += results[2];
             }
-
-            log.info("批量提交成功: 数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
-                    batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+            if (GutilObject.isEmpty(tileCountToLog)) {
+                log.info("批量提交成功:当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
+                        batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+            } else {
+                log.info("批量提交成功:总数量={}, 当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
+                        tileCountToLog, batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+            }
 
         } catch (Exception e) {
             log.error("批量提交失败: zoom={}", zoom, e);

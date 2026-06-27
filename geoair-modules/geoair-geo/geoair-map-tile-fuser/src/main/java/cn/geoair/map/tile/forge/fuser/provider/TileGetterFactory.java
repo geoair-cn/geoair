@@ -44,17 +44,19 @@ public class TileGetterFactory {
      * @param tileCache 自定义缓存（可选）
      */
     public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache) {
+        String layerName = pxyLayerInfo.getLayerName();
+        String layerCachePreFix = layerName + Constant._original_grid_name_suffix;
+        return create(pxyLayerInfo, tileCache, layerCachePreFix);
+    }
 
+    public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache, String layerCachePreFix) {
         LayerTileGetter realGetter = createRealGetter(pxyLayerInfo);
         boolean enableCache = "true".equalsIgnoreCase(pxyLayerInfo.getEnableCache())
                 || "1".equals(pxyLayerInfo.getEnableCache());
         if (!enableCache) {
             return realGetter;
         }
-        // 生成图层标识
-        String layerName = pxyLayerInfo.getLayerName();
-        String layerCachePreFix = layerName + Constant._original_grid_name_suffix;
-        return new CachedTileGetterProxy(realGetter, layerCachePreFix, tileCache);
+        return new CachedTileGetter(realGetter, layerCachePreFix, tileCache);
     }
 
     public static LayerTileGetter create(String layerName, TileCache tileCache) {

@@ -1,8 +1,15 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 /**
- * 瓦片坐标实体类
+ * @author ：张俊
+ * @date ：Created in 2026/6/27 13:37
+ * @description： TODO
  */
+@Data
+@Accessors(chain = true)
 public class TileCoordinate {
     private final int x;
     private final int y;
@@ -18,32 +25,5 @@ public class TileCoordinate {
         this.zoom = zoom;
         this.x = x;
         this.y = y;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZoom() {
-        return zoom;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TileCoordinate that = (TileCoordinate) o;
-        return x == that.x && y == that.y && zoom == that.zoom;
-    }
-
-
-
-    @Override
-    public String toString() {
-        return String.format("TileCoordinate{zoom=%d, x=%d, y=%d}", zoom, x, y);
     }
 }

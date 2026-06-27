@@ -8,21 +8,18 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -158,11 +155,26 @@ public class MbtilesFromLocalZipConverter {
                     "version", "1.0",
                     "type", "overlay"
             );
-            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false, config.getOverwrite(), config.batchSize, dataSource, 0);
             // 处理 ZIP 文件
-            try (ZipFile zipFile = new ZipFile(config.getZipPath())) {
+            ZipFile zipFile = null;
+            try {
+                zipFile = new ZipFile(config.getZipPath());
+            } catch (IOException e) {
+                log.error("ZIP 文件读取失败: " + config.getZipPath(), e);
+                result.failedTiles = -1;
+                result.costTime = System.currentTimeMillis() - startTime;
+                return result;
+            }
+            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
+                    config.getOverwrite(),
+                    config.batchSize,
+                    dataSource,
+                    0,
+                    zipFile.size()
+            );
+            // 处理 ZIP 文件
+            try {
                 Enumeration<? extends ZipEntry> entryEnum = zipFile.entries();
-
                 while (entryEnum.hasMoreElements()) {
                     ZipEntry entry = entryEnum.nextElement();
                     String entryName = entry.getName();
@@ -214,11 +226,13 @@ public class MbtilesFromLocalZipConverter {
 
                 return result;
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("ZIP 文件读取失败: " + config.getZipPath(), e);
                 result.failedTiles = -1;
                 result.costTime = System.currentTimeMillis() - startTime;
                 return result;
+            }finally {
+                IoUtil.close(zipFile);
             }
 
         } catch (Exception e) {

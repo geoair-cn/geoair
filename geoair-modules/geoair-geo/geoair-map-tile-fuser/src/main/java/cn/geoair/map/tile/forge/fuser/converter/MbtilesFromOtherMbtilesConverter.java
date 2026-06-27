@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 
 public class MbtilesFromOtherMbtilesConverter {
-    private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
+    private static final GiLogger log = GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
 
     /**
      * 导入配置
@@ -404,7 +404,12 @@ public class MbtilesFromOtherMbtilesConverter {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
                 long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
-                MbtilesInfoBatchPutConsumer batchPutConsumer = new MbtilesInfoBatchPutConsumer(false, config.isOverwrite(), config.getBatchSize(), targetDataSource, zoom);
+                MbtilesInfoBatchPutConsumer batchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
+                        config.isOverwrite(),
+                        config.getBatchSize(),
+                        targetDataSource,
+                        zoom,
+                        tileCountByZoom);
                 GirAdvTools.getPageActuatorOpt(new PageConditionDef<MbtilesInfo>() {
                     @Override
                     public Consumer<MbtilesInfo> getEachRecordConsumer() {

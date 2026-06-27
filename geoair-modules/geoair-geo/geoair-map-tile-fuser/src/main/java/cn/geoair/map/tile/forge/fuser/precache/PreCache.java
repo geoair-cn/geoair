@@ -5,7 +5,10 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-
+import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
+import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
+import cn.geoair.map.tile.forge.fuser.precache.TileOriginalCheckAndRepairTask;
+import cn.geoair.map.tile.forge.fuser.precache.TileOriginalPreCacheTask;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -14,15 +17,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils.ORIGINAL_GRID_SUFFIX;
+
 /**
  * 预缓存逻辑
  *
  * @author 张俊
  * @date Created in 2026/6/15 11:54
  */
-
 public class PreCache {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     private final ExecutorService executorService;
 
     public static PreCache getInstance() {
@@ -44,6 +48,8 @@ public class PreCache {
         this.executorService = Executors.newFixedThreadPool(threadCount);
     }
 
+    // ==================== 普通预缓存 ====================
+
     /**
      * 执行预缓存
      *
@@ -57,7 +63,7 @@ public class PreCache {
     }
 
     public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
-        execute(config, wkt4326String, minZoom, maxZoom, format, false);
+        execute(config, wkt4326String, minZoom, maxZoom, format, false, false, null);
     }
 
     public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
@@ -65,11 +71,69 @@ public class PreCache {
     }
 
     public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
-        execute(config, wkt4326String, minZoom, maxZoom, format, true);
+        execute(config, wkt4326String, minZoom, maxZoom, format, true, false, null);
     }
 
+    // ==================== 原始网格预缓存 ====================
 
-    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format, boolean isPreCheck) {
+    /**
+     * 执行原始网格预缓存
+     *
+     * @param config        图层配置
+     * @param wkt4326String WKT几何范围
+     * @param minZoom       最小层级
+     * @param maxZoom       最大层级
+     */
+    public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
+        executeOriginalPreCache(config, wkt4326String, minZoom, maxZoom, null);
+    }
+
+    public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+        executeOriginalPreCache(config, wkt4326String, minZoom, maxZoom, format, null);
+    }
+
+    public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
+                                         ImageMime format, String originalCacheName) {
+        execute(config, wkt4326String, minZoom, maxZoom, format, false, true, originalCacheName);
+    }
+
+    /**
+     * 执行原始网格预检查
+     *
+     * @param config        图层配置
+     * @param wkt4326String WKT几何范围
+     * @param minZoom       最小层级
+     * @param maxZoom       最大层级
+     */
+    public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
+        executeOriginalPreCheck(config, wkt4326String, minZoom, maxZoom, null);
+    }
+
+    public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+        executeOriginalPreCheck(config, wkt4326String, minZoom, maxZoom, format, null);
+    }
+
+    public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
+                                         ImageMime format, String originalCacheName) {
+        execute(config, wkt4326String, minZoom, maxZoom, format, true, true, originalCacheName);
+    }
+
+    // ==================== 统一执行方法 ====================
+
+    /**
+     * 统一执行方法
+     *
+     * @param config            图层配置
+     * @param wkt4326String     WKT几何范围
+     * @param minZoom           最小层级
+     * @param maxZoom           最大层级
+     * @param format            图片格式
+     * @param isPreCheck        是否为检查修复模式
+     * @param isOriginalGrid    是否为原始网格
+     * @param originalCacheName 原始网格缓存名（可为null，使用默认）
+     */
+    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
+                         ImageMime format, boolean isPreCheck, boolean isOriginalGrid, String originalCacheName) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
@@ -78,8 +142,13 @@ public class PreCache {
         if (format == null) {
             format = ImageMime.png;
         }
-        Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
 
+        // 处理原始网格缓存名
+        if (isOriginalGrid && (originalCacheName == null || originalCacheName.isEmpty())) {
+            originalCacheName = config.getLayerName() + ORIGINAL_GRID_SUFFIX;
+        }
+
+        Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
 
         int zoomCount = maxZoom - minZoom + 1;
         CountDownLatch latch = new CountDownLatch(zoomCount);
@@ -87,39 +156,97 @@ public class PreCache {
         AtomicLong successCount = new AtomicLong(0);
         AtomicLong failCount = new AtomicLong(0);
         AtomicLong checkedCount = new AtomicLong(0);
+        AtomicLong repairedCount = new AtomicLong(0);
 
-        log.info("开始预缓存 - 图层: {}, 层级范围: {}-{}", config.getLayerName(), minZoom, maxZoom);
+        String taskTypeDesc = buildTaskTypeDesc(isPreCheck, isOriginalGrid);
+        log.info("开始{} - 图层: {}, 层级范围: {}-{}", taskTypeDesc, config.getLayerName(), minZoom, maxZoom);
 
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-            Runnable task;
-            if (isPreCheck) {
-                task = new TileCheckAndRepairTask(
-                        config.getLayerName(), zoom, geometry,
-                        latch, totalCount, checkedCount, successCount, failCount, format
-                );
-            } else {
-                task = new ZoomPreCacheTask(
-                        config.getLayerName(), zoom, geometry,
-                        latch, totalCount, successCount, failCount, format
-                );
-            }
-
+            Runnable task = buildTask(config, zoom, geometry, format,
+                    isPreCheck, isOriginalGrid, originalCacheName,
+                    latch, totalCount, successCount, failCount, checkedCount, repairedCount);
             executorService.submit(task);
         }
 
         try {
             latch.await();
-            if (isPreCheck) {
-                log.info("预检查完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {},检查瓦片：{}",
-                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get(), checkedCount.get());
-            } else {
-                log.info("预缓存完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
-                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get());
-            }
-
+            logResult(config.getLayerName(), isPreCheck, isOriginalGrid,
+                    totalCount, successCount, failCount, checkedCount, repairedCount);
         } catch (InterruptedException e) {
-            log.error("预缓存被中断 - 图层: {}", config.getLayerName(), e);
+            log.error("{}被中断 - 图层: {}", taskTypeDesc, config.getLayerName(), e);
             Thread.currentThread().interrupt();
+        }
+    }
+
+    // ==================== 构建任务 ====================
+
+    /**
+     * 构建任务
+     */
+    private Runnable buildTask(PxyLayerInfo config, int zoom, Geometry geometry, ImageMime format,
+                                boolean isPreCheck, boolean isOriginalGrid, String originalCacheName,
+                                CountDownLatch latch, AtomicLong totalCount, AtomicLong successCount,
+                                AtomicLong failCount, AtomicLong checkedCount, AtomicLong repairedCount) {
+        String layerName = config.getLayerName();
+
+        if (isOriginalGrid) {
+            // 原始网格任务
+            if (isPreCheck) {
+                return new TileOriginalCheckAndRepairTask(
+                        layerName, originalCacheName, zoom, geometry,
+                        latch, totalCount, checkedCount, repairedCount, failCount, format
+                );
+            } else {
+                return new TileOriginalPreCacheTask(
+                        layerName, originalCacheName, zoom, geometry,
+                        latch, totalCount, successCount, failCount, format
+                );
+            }
+        } else {
+            // 普通任务
+            if (isPreCheck) {
+                return new TileFuserCheckAndRepairTask(
+                        layerName, zoom, geometry,
+                        latch, totalCount, checkedCount, repairedCount, failCount, format
+                );
+            } else {
+                return new TileFuserPreCacheTask(
+                        layerName, zoom, geometry,
+                        latch, totalCount, successCount, failCount, format
+                );
+            }
+        }
+    }
+
+    // ==================== 辅助方法 ====================
+
+    /**
+     * 构建任务类型描述
+     */
+    private String buildTaskTypeDesc(boolean isPreCheck, boolean isOriginalGrid) {
+        if (isOriginalGrid) {
+            return isPreCheck ? "原始网格检查修复" : "原始网格预缓存";
+        } else {
+            return isPreCheck ? "检查修复" : "预缓存";
+        }
+    }
+
+    /**
+     * 记录结果日志
+     */
+    private void logResult(String layerName, boolean isPreCheck, boolean isOriginalGrid,
+                           AtomicLong totalCount, AtomicLong successCount, AtomicLong failCount,
+                           AtomicLong checkedCount, AtomicLong repairedCount) {
+        String taskType = buildTaskTypeDesc(isPreCheck, isOriginalGrid);
+
+        if (isPreCheck) {
+            log.info("{}完成 - 图层: {}, 总瓦片: {}, 已检查: {}, 已修复: {}, 失败: {}",
+                    taskType, layerName, totalCount.get(),
+                    checkedCount.get(), repairedCount.get(), failCount.get());
+        } else {
+            log.info("{}完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
+                    taskType, layerName, totalCount.get(),
+                    successCount.get(), failCount.get());
         }
     }
 

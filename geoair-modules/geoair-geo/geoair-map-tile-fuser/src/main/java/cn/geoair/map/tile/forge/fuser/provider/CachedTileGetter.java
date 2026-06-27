@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.*;
+import lombok.Getter;
 
 /**
  * 带缓存功能的瓦片获取器代理类
@@ -17,9 +18,10 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.*;
  * @date Created in 2026/6/15
  */
 
-public class CachedTileGetterProxy implements LayerTileGetter {
+public class CachedTileGetter implements LayerTileGetter {
     private static GiLogger log = GirLoggerFactory.getLogger( );
     private final LayerTileGetter target;
+    @Getter
     private final TileCache tileCache;
     private final String layerCachePreFix;
     private final boolean cacheEnabled;
@@ -30,7 +32,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
      * @param target           真实的瓦片获取器
      * @param layerCachePreFix 图层名称（用于缓存key）
      */
-    public CachedTileGetterProxy(LayerTileGetter target, String layerCachePreFix) {
+    public CachedTileGetter(LayerTileGetter target, String layerCachePreFix) {
         this(target, layerCachePreFix, null);
     }
 
@@ -41,7 +43,7 @@ public class CachedTileGetterProxy implements LayerTileGetter {
      * @param layerCachePreFix 图层名称（用于缓存key）
      * @param tileCache        缓存实现，如果为null则使用默认缓存
      */
-    public CachedTileGetterProxy(LayerTileGetter target, String layerCachePreFix, TileCache tileCache) {
+    public CachedTileGetter(LayerTileGetter target, String layerCachePreFix, TileCache tileCache) {
         this.target = target;
         this.layerCachePreFix = layerCachePreFix;
         this.tileCache = tileCache != null ? tileCache : CustomTileCacheHelper.getInstance().getTileCache(layerCachePreFix);

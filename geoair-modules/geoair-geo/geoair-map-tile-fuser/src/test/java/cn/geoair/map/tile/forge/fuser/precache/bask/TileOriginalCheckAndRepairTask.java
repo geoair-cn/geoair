@@ -1,82 +1,101 @@
-package cn.geoair.map.tile.forge.fuser.precache;
+package cn.geoair.map.tile.forge.fuser.precache.bask;
+
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
-import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
+import cn.geoair.map.tile.forge.fuser.precache.TileCoordinate;
+import cn.geoair.map.tile.forge.fuser.provider.CachedTileGetter;
+import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
+import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
+import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils.ORIGINAL_GRID_SUFFIX;
+
 /**
- * 单层级预缓存任务
- *
- * @author 张俊
- * @date Created in 2026/6/15
+ * @author ：张俊
+ * @date ：Created in 2026/6/27 13:09
+ * @description： 原始网格的预缓存任务
  */
-
-public class ZoomPreCacheTask implements Runnable {
-
+public class TileOriginalCheckAndRepairTask implements Runnable {
     private static GiLogger log = GirLoggerFactory.getLogger();
-    private static final TileCoordinate POISON_PILL = new TileCoordinate(-1, -1, -1);
+    // 使用唯一的对象作为 Poison Pill（结束信号）
+    private static final cn.geoair.map.tile.forge.fuser.precache.TileCoordinate POISON_PILL = new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(-1, -1, -1);
 
-    private final String layerName;
+
+    private final String originalCacheName;
     private final int zoom;
     private final Geometry geometry4326;
     private final CountDownLatch latch;
     private final AtomicLong totalCount;
-    private final AtomicLong successCount;
+    private final AtomicLong checkedCount;
+    private final AtomicLong repairedCount;
     private final AtomicLong failCount;
     private final ImageMime format;
     boolean googleGridIs;
+    TileCache tileCache;
 
-    public ZoomPreCacheTask(String layerName,
-                            int zoom, Geometry geometry4326, CountDownLatch latch,
-                            AtomicLong totalCount, AtomicLong successCount,
-                            AtomicLong failCount, ImageMime format) {
-        this.layerName = layerName;
+    CachedTileGetter layerTileGetter;
+    PxyLayerInfo pxyLayerInfo;
+
+    public TileOriginalCheckAndRepairTask(String layerName, String originalCacheName,
+                                          int zoom,
+                                          Geometry geometry4326,
+                                          CountDownLatch latch,
+                                          AtomicLong totalCount,
+                                          AtomicLong checkedCount,
+                                          AtomicLong repairedCount,
+                                          AtomicLong failCount,
+                                          ImageMime format) {
+        this.originalCacheName = GutilObject.isEmpty(originalCacheName) ? layerName + ORIGINAL_GRID_SUFFIX : originalCacheName;
         this.zoom = zoom;
         this.geometry4326 = geometry4326;
         this.latch = latch;
         this.totalCount = totalCount;
-        this.successCount = successCount;
+        this.checkedCount = checkedCount;
+        this.repairedCount = repairedCount;
         this.failCount = failCount;
         this.format = format;
-        PxyLayerInfo pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
-
-
+        pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
         if (pxyLayerInfo == null) {
             log.error("图层不存在  {}", layerName);
             throw new RuntimeException("图层不存在");
         }
-
         googleGridIs = pxyLayerInfo.isGoogleGrid();
+        layerTileGetter = (CachedTileGetter) TileGetterFactory.
+                create(pxyLayerInfo,
+                        CustomTileCacheHelper.getInstance().getTileCache(layerName),
+                        originalCacheName
+                );
+        tileCache = layerTileGetter.getTileCache();
     }
 
     @Override
     public void run() {
         try {
-
+            // 计算当前层级的瓦片范围
             RangeApo rangeApo = null;
             if (googleGridIs) {
-                // 计算当前层级的瓦片范围
-                rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
-            } else {
                 Geometry convert = GirAdvTools.getSridOpt().convert(geometry4326, 4326, 3857);
                 rangeApo = GirAdvTools.getTileGrid3857Opt().tileRangeByGeom(zoom, convert);
+            } else {
+                // 计算当前层级的瓦片范围
+                rangeApo = GirAdvTools.getTileGrid4326Opt().tileRangeByGeom(zoom, geometry4326);
             }
-
-
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
@@ -85,7 +104,7 @@ public class ZoomPreCacheTask implements Runnable {
             int totalTiles = (maxX - minX + 1) * (maxY - minY + 1);
             totalCount.addAndGet(totalTiles);
 
-            log.info("预缓存层级: {}, X范围: [{}, {}], Y范围: [{}, {}], 瓦片数: {}",
+            log.info("瓦片检查任务开始 - 层级: {}, X范围: [{}, {}], Y范围: [{}, {}], 总瓦片数: {}",
                     zoom, minX, maxX, minY, maxY, totalTiles);
 
             // 如果总瓦片数为0，直接返回
@@ -98,7 +117,7 @@ public class ZoomPreCacheTask implements Runnable {
             int batchSize = 10000;
             int totalBatches = (totalTiles + batchSize - 1) / batchSize;
             int threadPoolSize = Math.min(totalBatches, Runtime.getRuntime().availableProcessors() * 2);
-            threadPoolSize = Math.max(1, threadPoolSize); // 至少启动一个线程
+            threadPoolSize = Math.max(1, threadPoolSize);
 
             log.info("层级 {} 启动消费者线程数量：{}", zoom, threadPoolSize);
 
@@ -107,20 +126,22 @@ public class ZoomPreCacheTask implements Runnable {
             // 消费者完成计数器
             CountDownLatch consumerLatch = new CountDownLatch(threadPoolSize);
 
-            AtomicLong zoomSuccess = new AtomicLong(0);
+            // 统计计数器
+            AtomicLong zoomChecked = new AtomicLong(0);
+            AtomicLong zoomRepaired = new AtomicLong(0);
             AtomicLong zoomFail = new AtomicLong(0);
+            AtomicLong zoomSkipped = new AtomicLong(0);
             AtomicLong totalValidTiles = new AtomicLong(0);
 
             // 进度计数器
             AtomicLong processedCount = new AtomicLong(0);
-            // 进度打印间隔（每处理多少个瓦片打印一次进度）
-            int progressInterval = Math.max(100, totalTiles / 100); // 默认每1%打印一次，最少100个
+            int progressInterval = Math.max(100, totalTiles / 100); // 每1%打印一次，最少100个
 
             // 控制结束信号只发送一次
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
 
             // 使用阻塞队列作为任务队列
-            BlockingQueue<TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
+            BlockingQueue<cn.geoair.map.tile.forge.fuser.precache.TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
 
             // ============ 启动生产者线程 ============
             int finalThreadPoolSize = threadPoolSize;
@@ -130,33 +151,33 @@ public class ZoomPreCacheTask implements Runnable {
                     for (int x = minX; x <= maxX; x++) {
                         for (int y = minY; y <= maxY; y++) {
                             try {
-                                // 先过滤不相交的瓦片
-                                if (googleGridIs) {
+                                if (!googleGridIs) {
+                                    // 先过滤不相交的瓦片
                                     BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
                                             .xyzToTileBox(zoom, x, y, 3857);
                                     String wktString = box.getWktString(4326);
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 } else {
+                                    // 先过滤不相交的瓦片
                                     BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt()
                                             .xyzToTileBox(zoom, x, y, 4326);
                                     String wktString = box.getWktString(4326);
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
                                     if (geometry4326.intersects(geometryByBox)) {
-                                        taskQueue.put(new TileCoordinate(zoom, x, y));
+                                        taskQueue.put(new cn.geoair.map.tile.forge.fuser.precache.TileCoordinate(zoom, x, y));
                                         validTileCount++;
                                     }
                                 }
 
-
                             } catch (Exception e) {
                                 log.error("准备瓦片任务异常: {}-({},{},{})",
-                                        layerName, zoom, x, y, e);
+                                        originalCacheName, zoom, x, y, e);
                             }
                         }
                     }
@@ -169,7 +190,7 @@ public class ZoomPreCacheTask implements Runnable {
                     // 只发送一次结束信号，每个消费者一个
                     if (shutdownSignalSent.compareAndSet(false, true)) {
                         log.info("生产者发送结束信号，消费者数量: {}", finalThreadPoolSize);
-                        for (int i = 0; i < finalThreadPoolSize * 2; i++) {
+                        for (int i = 0; i < finalThreadPoolSize; i++) {
                             try {
                                 taskQueue.put(POISON_PILL);
                             } catch (InterruptedException e) {
@@ -180,46 +201,57 @@ public class ZoomPreCacheTask implements Runnable {
                         }
                     }
                 }
-            }, "Producer-" + zoom);
+            }, "Producer-Check-" + zoom);
 
             // ============ 启动消费者线程 ============
             for (int i = 0; i < threadPoolSize; i++) {
                 final int consumerId = i;
                 executorService.submit(() -> {
-                    String threadName = "Consumer-" + zoom + "-" + layerName + "-" + consumerId;
+                    String threadName = "Consumer-Check-" + zoom + "-" + originalCacheName + "-" + consumerId;
                     Thread.currentThread().setName(threadName);
 
-                    int localProcessed = 0;
-
                     try {
-                        log.info("消费者线程 {} 启动", threadName);
+                        log.debug("消费者线程 {} 启动", threadName);
 
                         while (true) {
-                            TileCoordinate coord = taskQueue.take();
+                            cn.geoair.map.tile.forge.fuser.precache.TileCoordinate coord = taskQueue.take();
 
-                            // 检查结束标志 - 使用 == 比较对象引用
+                            // 检查结束标志
                             if (coord == POISON_PILL) {
-                                log.debug("消费者线程 {} 收到结束信号，共处理 {} 个瓦片",
-                                        threadName, localProcessed);
+                                log.debug("消费者线程 {} 收到结束信号", threadName);
                                 break;
                             }
 
-                            // 直接处理单个瓦片
-                            processSingleTile(coord, zoomSuccess, zoomFail);
-                            localProcessed++;
+                            // 处理单个瓦片并获取结果
+                            RepairResult result = checkAndRepairSingleTile(coord);
 
-                            // 更新全局处理计数
+                            // 更新统计计数器
+                            if (result.isRepaired()) {
+                                zoomRepaired.incrementAndGet();
+                            } else if (result.isFailed()) {
+                                zoomFail.incrementAndGet();
+                            } else if (result.isSkipped()) {
+                                zoomSkipped.incrementAndGet();
+                            }
+                            // 所有处理过的瓦片都计入已检查
+                            zoomChecked.incrementAndGet();
+
+                            // 更新进度
                             long totalProcessed = processedCount.incrementAndGet();
                             long totalValid = totalValidTiles.get();
 
                             // 打印进度
                             if (totalValid > 0) {
                                 if (totalProcessed % progressInterval == 0 || totalProcessed == totalValid) {
-                                    long success = zoomSuccess.get();
+                                    long checked = zoomChecked.get();
+                                    long repaired = zoomRepaired.get();
                                     long fail = zoomFail.get();
+                                    long skipped = zoomSkipped.get();
                                     double percent = (double) totalProcessed / totalValid * 100;
-                                    log.info("层级 {} 进度: {}/{} ({}%), 成功: {}, 失败: {}",
-                                            zoom, totalProcessed, totalValid, percent, success, fail);
+
+                                    log.info("层级 {} 检查进度: {}/{} ({}%), 已修复: {}, 失败: {}, 跳过(不存在): {}",
+                                            zoom, totalProcessed, totalValid, percent,
+                                            repaired, fail, skipped);
                                 }
                             } else {
                                 // 如果有效瓦片数为0，每1000个打印一次
@@ -230,7 +262,7 @@ public class ZoomPreCacheTask implements Runnable {
                         }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
-                        log.error("消费者线程 {} 被中断，已处理 {} 个瓦片", threadName, localProcessed, e);
+                        log.error("消费者线程 {} 被中断", threadName, e);
                     } finally {
                         consumerLatch.countDown();
                         log.debug("消费者线程 {} 结束，剩余消费者: {}", threadName, consumerLatch.getCount());
@@ -248,7 +280,7 @@ public class ZoomPreCacheTask implements Runnable {
                     log.warn("消费者线程未能在30分钟内完成，强制关闭");
                     executorService.shutdownNow();
                 } else {
-                    log.info("所有消费者线程已完成:{}", zoom);
+                    log.info("所有消费者线程已完成: {}", zoom);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -284,16 +316,20 @@ public class ZoomPreCacheTask implements Runnable {
             }
 
             // ============ 更新全局计数器 ============
-            long finalSuccess = zoomSuccess.get();
+            long finalChecked = zoomChecked.get();
+            long finalRepaired = zoomRepaired.get();
             long finalFail = zoomFail.get();
-            successCount.addAndGet(finalSuccess);
+            long finalSkipped = zoomSkipped.get();
+
+            checkedCount.addAndGet(finalChecked);
+            repairedCount.addAndGet(finalRepaired);
             failCount.addAndGet(finalFail);
 
-            log.info("层级预缓存完成: {}, 有效瓦片: {}, 成功: {}, 失败: {}",
-                    zoom, totalValidTiles.get(), finalSuccess, finalFail);
+            log.info("瓦片检查任务完成 - 层级: {}, 有效瓦片: {}, 已检查: {}, 已修复: {}, 失败: {}, 跳过(不存在): {}",
+                    zoom, totalValidTiles.get(), finalChecked, finalRepaired, finalFail, finalSkipped);
 
         } catch (Exception e) {
-            log.error("预缓存层级失败: {}, 错误: {}", zoom, e.getMessage(), e);
+            log.error("瓦片检查任务失败 - 层级: {}, 错误: {}", zoom, e.getMessage(), e);
         } finally {
             if (latch != null) {
                 latch.countDown();
@@ -302,48 +338,112 @@ public class ZoomPreCacheTask implements Runnable {
     }
 
     /**
-     * 处理单个瓦片
+     * 检查并修复单个瓦片
+     *
+     * @param coord 瓦片坐标
+     * @return 修复结果
      */
-    private void processSingleTile(TileCoordinate coord,
-                                   AtomicLong success, AtomicLong fail) {
+    private RepairResult checkAndRepairSingleTile(TileCoordinate coord) {
         int z = coord.getZoom();
         int x = coord.getX();
         int y = coord.getY();
-
+        // 这里的坐标是谷歌原点
         try {
-            // 获取瓦片的边界框
-            BoxReferencedEnvelope box = null;
-            if (googleGridIs) {
-                box = GirAdvTools.getTileGrid4326Opt()
-                        .xyzToTileBox(z, x, y, 3857);
-            } else {
-                box = GirAdvTools.getTileGrid3857Opt()
-                        .xyzToTileBox(z, x, y, 4326);
-            }
-            // 创建缓存融合器
-            BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
-                    box.getMaxX(), box.getMaxY());
-            CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
-                    layerName, z, x, y, bounds, 256, 256, ImageMime.png);
+            // 1. 获取瓦片的边界框
+            y = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
 
-            // 检查缓存是否存在
-            TileCache tileCache = cacheTileFuser.getTileCache();
-            if (tileCache.exists(layerName, z, x, y, format)) {
-                log.debug("缓存存在, layerName:{} ,z：{}，x：{}，y：{}", layerName, z, x, y);
+
+            // 4. 只检查已存在的瓦片
+            if (!tileCache.exists(originalCacheName, z, x, y, format)) {
+                return RepairResult.skipped();
             }
 
-            // 生成新的瓦片
-            byte[] imageBytes = cacheTileFuser.toImageBytes();
-            if (imageBytes != null) {
-                success.incrementAndGet();
-            } else {
-                fail.incrementAndGet();
-                log.warn("预缓存瓦片失败（资源为空）: {}-({},{},{})", layerName, z, x, y);
+            // 5. 获取缓存瓦片并进行检查
+            byte[] bytes = tileCache.get(originalCacheName, z, x, y, format);
+            if (bytes == null || bytes.length == 0) {
+                log.warn("瓦片数据为空: z={}, x={}, y={}", z, x, y);
+                return RepairResult.failed();
             }
+
+            // 6. 检测是否为异常瓦片（空白矩形）
+            LargeBlankCheck largeBlankCheck = TileBlankDetector.hasLargeBlankRect(bytes, format.getInternalName());
+            if (largeBlankCheck.getBlankIs()) {
+                log.info("检测到异常瓦片（空白矩形）: z={}, x={}, y={}, 开始重新切片", z, x, y);
+
+                // 7. 删除异常缓存
+                tileCache.delete(originalCacheName, z, x, y, format);
+                Resource tileResource = layerTileGetter.getTileResource(z, x, y);
+                // 8. 重新生成瓦片
+                byte[] newImageBytes = tileResource.getByteData();
+                if (newImageBytes != null && newImageBytes.length > 0) {
+                    log.debug("瓦片重新切片成功: z={}, x={}, y={}", z, x, y);
+                    return RepairResult.repaired();
+                } else {
+                    log.warn("瓦片重新切片失败（生成空数据）: z={}, x={}, y={}", z, x, y);
+                    return RepairResult.failed();
+                }
+            }
+
+            // 瓦片正常
+            return RepairResult.normal();
 
         } catch (Exception e) {
-            fail.incrementAndGet();
-            log.error("预缓存瓦片异常: {}-({},{},{})", layerName, z, x, y, e);
+            log.error("检查瓦片异常: z={}, x={}, y={}, 错误: {}", z, x, y, e.getMessage(), e);
+            return RepairResult.failed();
+        }
+    }
+
+    /**
+     * 修复结果枚举
+     */
+    private enum RepairResult {
+        /**
+         * 已修复
+         */
+        REPAIRED,
+        /**
+         * 失败
+         */
+        FAILED,
+        /**
+         * 跳过（瓦片不存在）
+         */
+        SKIPPED,
+        /**
+         * 正常（瓦片存在且正常）
+         */
+        NORMAL;
+
+        public boolean isRepaired() {
+            return this == REPAIRED;
+        }
+
+        public boolean isFailed() {
+            return this == FAILED;
+        }
+
+        public boolean isSkipped() {
+            return this == SKIPPED;
+        }
+
+        public boolean isNormal() {
+            return this == NORMAL;
+        }
+
+        public static RepairResult repaired() {
+            return REPAIRED;
+        }
+
+        public static RepairResult failed() {
+            return FAILED;
+        }
+
+        public static RepairResult skipped() {
+            return SKIPPED;
+        }
+
+        public static RepairResult normal() {
+            return NORMAL;
         }
     }
 }
