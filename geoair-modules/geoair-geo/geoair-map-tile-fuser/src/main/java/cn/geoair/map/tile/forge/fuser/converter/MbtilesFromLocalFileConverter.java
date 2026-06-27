@@ -35,7 +35,6 @@ public class MbtilesFromLocalFileConverter {
     private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromLocalFileConverter.class);
 
 
-
     /**
      * 自定义正则表达式解析器构建器
      */
@@ -77,7 +76,7 @@ public class MbtilesFromLocalFileConverter {
         private boolean overwrite = false;      // 如果瓦片已存在是否覆盖
         private List<Integer> zoomLevels;       // 指定要转换的层级，为空则自动扫描
         private boolean deleteSourceAfterConvert = false; // 转换后是否删除源文件
-        private TilePathParser pathParser = TilePathParser.DEFAULT_ZYX_PARSER ; // 路径解析器
+        private TilePathParser pathParser = TilePathParser.DEFAULT_ZYX_PARSER; // 路径解析器
 
 
     }
@@ -102,8 +101,8 @@ public class MbtilesFromLocalFileConverter {
         @Override
         public String toString() {
             return String.format("ConvertResult{source='%s', target='%s', layer='%s', " +
-                            "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, " +
-                            "totalSize=%s, costTime=%dms, deletedSource=%s}",
+                                 "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, " +
+                                 "totalSize=%s, costTime=%dms, deletedSource=%s}",
                     sourceRoot, mbtilesPath, layerName,
                     totalTiles, successTiles, skippedTiles, failedTiles,
                     DataSizeUtil.format(totalSize), costTime, deletedSource);
@@ -148,7 +147,7 @@ public class MbtilesFromLocalFileConverter {
         public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize,
                                 DruidDataSource dataSource, Integer zoom) {
             this.mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(
-                    needReverseY, overwrite, batchSize, dataSource, zoom
+                    needReverseY, overwrite, batchSize, dataSource, zoom, 0
             );
         }
 
@@ -336,6 +335,7 @@ public class MbtilesFromLocalFileConverter {
                         config.getBatchSize(),
                         dataSource,
                         z
+
                 );
 
                 // 递归遍历层级目录下的所有文件
@@ -685,8 +685,6 @@ public class MbtilesFromLocalFileConverter {
                 true  // needReverseY
         );
         System.out.println("结果1: " + result1);
-
-
 
 
         // ==================== 4. 使用正则表达式解析器 ====================

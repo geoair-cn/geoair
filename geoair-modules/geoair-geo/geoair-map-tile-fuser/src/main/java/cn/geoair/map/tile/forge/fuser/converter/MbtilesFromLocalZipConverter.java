@@ -158,11 +158,26 @@ public class MbtilesFromLocalZipConverter {
                     "version", "1.0",
                     "type", "overlay"
             );
-            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false, config.getOverwrite(), config.batchSize, dataSource, 0);
             // 处理 ZIP 文件
-            try (ZipFile zipFile = new ZipFile(config.getZipPath())) {
+            ZipFile zipFile = null;
+            try {
+                zipFile = new ZipFile(config.getZipPath());
+            } catch (IOException e) {
+                log.error("ZIP 文件读取失败: " + config.getZipPath(), e);
+                result.failedTiles = -1;
+                result.costTime = System.currentTimeMillis() - startTime;
+                return result;
+            }
+            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
+                    config.getOverwrite(),
+                    config.batchSize,
+                    dataSource,
+                    0,
+                    zipFile.size()
+            );
+            // 处理 ZIP 文件
+            try {
                 Enumeration<? extends ZipEntry> entryEnum = zipFile.entries();
-
                 while (entryEnum.hasMoreElements()) {
                     ZipEntry entry = entryEnum.nextElement();
                     String entryName = entry.getName();
@@ -214,7 +229,7 @@ public class MbtilesFromLocalZipConverter {
 
                 return result;
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("ZIP 文件读取失败: " + config.getZipPath(), e);
                 result.failedTiles = -1;
                 result.costTime = System.currentTimeMillis() - startTime;
