@@ -12,8 +12,8 @@ import java.util.List;
 public class Test {
 
     public static void main(String[] args) {
-        MbtilesUtils.compactDatabase("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles");
-//        localFileConverter();
+//        MbtilesUtils.compactDatabase("G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles");
+        localZipConverter();
     }
 
     private static void localFileConverter() {
@@ -22,7 +22,7 @@ public class Test {
         List<Integer> zoomLevels = java.util.Arrays.asList(0, 1, 2, 3, 4, 5);
         MbtilesFromLocalFileConverter.ConvertResult result6 = MbtilesFromLocalFileConverter.convert(
                 "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles",
+                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partialaaa.mbtiles",
                 "1_13_partial",
                 config -> {
                     config.setNeedReverseY(true);
@@ -31,6 +31,16 @@ public class Test {
                 }
         );
         System.out.println("结果6: " + result6);
+    }
+    private static void localZipConverter() {
+        // 1. 基本用法 - 转换所有瓦片到 MBTiles
+        // ==================== 6. 指定层级 + 覆盖 ====================
+         MbtilesFromLocalZipConverter.importZip(
+                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13\\13.zip",
+                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\localZipConverter13.mbtiles",
+                "1_13_partial"
+        );
+
     }
 
 }

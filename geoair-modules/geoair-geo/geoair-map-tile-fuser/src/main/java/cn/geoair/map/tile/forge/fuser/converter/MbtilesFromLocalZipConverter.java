@@ -8,21 +8,18 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -234,6 +231,8 @@ public class MbtilesFromLocalZipConverter {
                 result.failedTiles = -1;
                 result.costTime = System.currentTimeMillis() - startTime;
                 return result;
+            }finally {
+                IoUtil.close(zipFile);
             }
 
         } catch (Exception e) {
