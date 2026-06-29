@@ -30,11 +30,13 @@ public class GirJtsJacksonUtils {
     public static void registerModule(ObjectMapper objectMapper) {
         if (jtsToWkt) {
             objectMapper.registerModule(new ShapesAsWKTModule());
+            log.debug("ShapesAsWKTModule注册");
         }else{
             objectMapper.registerModule(new ShapesAsGeoJSONModule());
+            log.debug("ShapesAsGeoJSONModule注册");
         }
 //        objectMapper.registerModule(new JtsModule());
-        log.debug("JtsModule注册");
+
         objectMapper.registerModule(new JtsExtModule());
         log.debug("JtsExtModule注册");
         if (GirPostGisTran.isPostGisAvailable() && GirPostGisTran.isNetConvert()) {
