@@ -60,7 +60,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
         Pattern pattern = Pattern.compile(
                 "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
-                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
+                "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
         );
 
         Matcher matcher = pattern.matcher(processedName);
@@ -84,7 +84,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
         Pattern pattern = Pattern.compile(
                 "^([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)\\." +
-                        "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
+                "([\"'`]?[a-zA-Z0-9_\\u4e00-\\u9fa5.-]+[\"'`]?)$"
         );
 
         Matcher matcher = pattern.matcher(processedName);
@@ -99,7 +99,7 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
     public String tbQuoteTableName(String tableName) {
         // 通用加引号逻辑：避免重复加引号
         if (StrUtil.isEmpty(tableName)
-                || (tableName.startsWith(getQuoteChar()) && tableName.endsWith(getQuoteChar()))) {
+            || (tableName.startsWith(getQuoteChar()) && tableName.endsWith(getQuoteChar()))) {
             return tableName;
         }
         return StrUtil.wrap(tableName, getQuoteChar());
@@ -163,6 +163,16 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
     @Override
     public String tbBuildAsTable(String startFragment, String aliasTableName) {
         return startFragment + " as " + aliasTableName;
+    }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
+        long offset = getPageOffset(pageNum, pageSize, pageNumStartZero);
+        return tbBuildPageSql(noPageSql, pageSize, offset);
+    }
+
+    public long getPageOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
+        return pageNumStartZero ? (long) pageNum * pageSize : (long) (pageNum - 1) * pageSize;
     }
 
     /**

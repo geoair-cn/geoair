@@ -32,7 +32,7 @@ public class PageConfig {
     /**
      * 第一页是否从0开始
      */
-    private boolean pageNumStartByZero;
+    private boolean pageNumStartByZero = false;
 
     /**
      * 是否保存最终的结果 默认不保存，因为在流里面进行消费了。
