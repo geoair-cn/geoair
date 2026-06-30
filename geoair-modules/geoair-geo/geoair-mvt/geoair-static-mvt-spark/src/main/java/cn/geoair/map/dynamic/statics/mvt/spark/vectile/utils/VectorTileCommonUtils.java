@@ -101,9 +101,10 @@ public class VectorTileCommonUtils {
                         // String tileId = zoom + "#" + y + "#" + x;
                         tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
                     } catch (Exception e) {
-                        Geometry convert = GirAdvTools.getSridOpt().convert(geom, outGridSrid, 4326);
-                        String wktString= GirAdvTools.getFormatOpt().jtsGeometryToWktString(convert, true);
-                        log.error("瓦片边界计算异常 ! wktString :{},xmin:{},xmax:{},ymin:{},ymax:{},outGrid:{} ", wktString, xmin, xmax, ymin, ymax,outGridSrid);
+                        // 这个日志不打印，因为会抢占IO
+//                        Geometry convert = GirAdvTools.getSridOpt().convert(geom, outGridSrid, 4326);
+//                        String wktString= GirAdvTools.getFormatOpt().jtsGeometryToWktString(convert, true);
+//                        log.error("瓦片边界计算异常 ! wktString :{},xmin:{},xmax:{},ymin:{},ymax:{},outGrid:{} ", wktString, xmin, xmax, ymin, ymax,outGridSrid);
                     }
 
                 }
