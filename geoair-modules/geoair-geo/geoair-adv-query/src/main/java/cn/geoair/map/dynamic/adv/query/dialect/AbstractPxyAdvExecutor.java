@@ -1691,6 +1691,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public long getPageOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
+        return getDialectTableNameProcessor().getPageOffset(pageNum, pageSize, pageNumStartZero);
+    }
+
+    @Override
+    public String tbBuildPageSql(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
+        return getDialectTableNameProcessor().tbBuildPageSql(noPageSql, pageNum, pageSize, pageNumStartZero);
+    }
+
+    @Override
     public String tbBuildPageSql(String noPageSql) {
         return getDialectTableNameProcessor().tbBuildPageSql(noPageSql);
     }

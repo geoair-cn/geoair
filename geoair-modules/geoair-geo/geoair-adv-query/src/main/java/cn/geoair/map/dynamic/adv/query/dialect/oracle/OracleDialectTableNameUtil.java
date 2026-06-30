@@ -81,7 +81,7 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         long endRow = offset + pageSize;
         long startRow = offset;
         return StrUtil.format(
-                "SELECT * FROM (SELECT t.*, ROWNUM rn_temp FROM ({}) t WHERE ROWNUM <= {}) WHERE rn_temp > {}",
+                "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= {}) WHERE rn > {}",
                 noPageSql, endRow, startRow
         );
     }
@@ -98,7 +98,7 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         // 使用 ROWNUM 实现分页（兼容 Oracle 9i+）
         // 三层嵌套：内层排序，中层限制最大行数，外层过滤起始行
         String sql = StrUtil.format(
-                "SELECT * FROM (SELECT t.*, ROWNUM rn_temp FROM ({}) t WHERE ROWNUM <= ?) WHERE rn_temp > ?",
+                "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= ?) WHERE rn > ?",
                 noPageSql
         );
         return sql;

@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
 import cn.hutool.core.collection.ListUtil;
 import lombok.Getter;
 
@@ -11,21 +13,31 @@ import java.util.List;
  * @date ：Created in 2025/10/10 10:52 @description： 分页对象的返回结果
  */
 @Getter
-public class PageApo<T> implements Serializable {
+public class PageApo<T> implements Serializable, GiPager<T> {
 
-    /** 每页条数 */
+    /**
+     * 每页条数
+     */
     private int pageSize = 0; // 状态码
 
-    /** 最后一页的页号（总页数） */
+    /**
+     * 最后一页的页号（总页数）
+     */
     private int lastPageNum = 0;
 
-    /** 游标开始行 */
+    /**
+     * 游标开始行
+     */
     private long startRow = 0;
 
-    /** 当前页码 */
+    /**
+     * 当前页码
+     */
     private int pageNum = 0;
 
-    /** 总条数 */
+    /**
+     * 总条数
+     */
     private long total = 0;
 
     /**
@@ -34,10 +46,14 @@ public class PageApo<T> implements Serializable {
      */
     private boolean pageNumStartZero;
 
-    /** 数据 */
+    /**
+     * 数据
+     */
     private Iterable<T> records;
 
-    /** 字段列表 */
+    /**
+     * 字段列表
+     */
     private DataFieldsApo dataFieldsApo;
 
     public PageApo<T> setDataFieldsApo(DataFieldsApo dataFieldsApo) {
@@ -87,5 +103,29 @@ public class PageApo<T> implements Serializable {
      */
     public List<T> geRecordsList() {
         return ListUtil.toList(records);
+    }
+
+    @Override
+    public long total() {
+        return total;
+    }
+
+    @Override
+    public GiPageParam pageParam() {
+        return GiPageParam.of().putParam(pageNum, pageSize, startRow, pageNumStartZero);
+    }
+
+    @Override
+    public GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam) {
+        this.total = total;
+        this.records = list;
+        int pagedNum = pageParam.pageNum();
+        int pagedSize = pageParam.pageSize();
+        long startedRow = pageParam.startRow();
+        this.pageNumStartZero = pageParam.isPageNumStartZero();
+        this.pageNum = pagedNum;
+        this.pageSize = pagedSize;
+        this.startRow = startedRow;
+        return this;
     }
 }
