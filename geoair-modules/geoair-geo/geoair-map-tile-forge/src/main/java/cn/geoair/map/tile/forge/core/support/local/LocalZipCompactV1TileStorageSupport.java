@@ -110,7 +110,7 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
         if (!b) {
             return;
         }
-        preCacheBundleFileToLocal(layerConfigContext, filePath, tempDirAbsolutePath, BUNDLE_EXT);
+//        preCacheBundleFileToLocal(layerConfigContext, filePath, tempDirAbsolutePath, BUNDLE_EXT);
     }
 
     protected boolean zipBundleFileToLocal(GirLayerConfigContext layerConfigContext, String filePath, String tempDirAbsolutePath, String fileExt) throws IOException {
