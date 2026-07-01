@@ -30,15 +30,17 @@ public class DataSourceDruidFastCreate {
     private Boolean poolPreparedStatements = true;
     private Integer maxPoolPreparedStatementPerConnectionSize = 20;
 
-    private Integer removeAbandonedTimeout = 60*10;      // 连接泄漏回收超时（秒）
+    private Integer removeAbandonedTimeout = 60 * 10;      // 连接泄漏回收超时（秒）
+    private Boolean removeAbandoned = true;      // 连接泄漏回收超时（秒）
     private Integer connectionErrorRetryAttempts = 3;  // 连接错误重试次数
     private String validationQuery;                    // 验证查询SQL
     private Integer numTestsPerEvictionRun = -1;       // 每次检测的连接数
     private Boolean readOnly;   // 是否只读数据源
 
-    private Consumer<DruidDataSource> configurator= t -> {
+    private Consumer<DruidDataSource> configurator = t -> {
 
-    };;
+    };
+    ;
 
     // ==================== 静态工厂方法 ====================
 
@@ -146,7 +148,7 @@ public class DataSourceDruidFastCreate {
         if (url == null || url.trim().isEmpty()) {
             throw new IllegalArgumentException("url must not be null or empty");
         }
-        if(!url.contains("sqlite")){
+        if (!url.contains("sqlite")) {
             if (username == null || username.trim().isEmpty()) {
                 throw new IllegalArgumentException("username must not be null or empty");
             }
@@ -215,9 +217,9 @@ public class DataSourceDruidFastCreate {
         }
         // 强制开启连接泄漏检测
         dataSource.setBreakAfterAcquireFailure(true);
-        dataSource.setRemoveAbandoned(true);
-        dataSource.setLogAbandoned(true);
-        if(configurator != null){
+        dataSource.setRemoveAbandoned(removeAbandoned);
+        dataSource.setLogAbandoned(removeAbandoned);
+        if (configurator != null) {
             configurator.accept(dataSource);
         }
         return dataSource;
