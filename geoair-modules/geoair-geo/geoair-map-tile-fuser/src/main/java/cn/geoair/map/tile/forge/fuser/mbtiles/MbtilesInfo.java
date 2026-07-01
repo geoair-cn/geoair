@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.fuser.utils.GirImageUtils;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -137,14 +138,13 @@ public class MbtilesInfo {
             log.warn("瓦片数据为空，无法转换为图片: z={}, x={}, y={}", zoomLevel, tileColumn, tileRow);
             return null;
         }
-
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(tileData)) {
-            BufferedImage image = ImageIO.read(bais);
-            if (image == null) {
+        try  {
+            BufferedImage bufferedImage = GirImageUtils.bytesToImage(tileData);
+            if (bufferedImage == null) {
                 log.warn("无法解析瓦片数据为图片: z={}, x={}, y={}, 数据大小={}",
                         zoomLevel, tileColumn, tileRow, tileData.length);
             }
-            return image;
+            return bufferedImage;
         } catch (IOException e) {
             log.error("转换瓦片数据为图片失败: z={}, x={}, y={}", zoomLevel, tileColumn, tileRow, e);
             return null;
