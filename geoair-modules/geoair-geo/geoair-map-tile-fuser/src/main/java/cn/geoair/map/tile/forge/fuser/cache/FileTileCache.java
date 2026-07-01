@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 张俊
  * @date Created in 2023/12/4
  * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
- * 注意：根据图层的 OriginType 自动处理 Y 轴翻转（Google 坐标系 ↔ TMS 坐标系）
+ * 注意：根据图层的 OriginType 自动处理 Y 轴翻转（TMS  源点 ↔ WMTS  源点）
  */
 
 public class FileTileCache implements TileCache {
