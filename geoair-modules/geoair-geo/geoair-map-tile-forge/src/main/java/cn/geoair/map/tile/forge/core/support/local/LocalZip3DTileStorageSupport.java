@@ -126,7 +126,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         String rootFileName = "tileset.json";
         if (mapTileType == GirMapTileType.S3M) {
-            rootFileName = "tilesets3mb.scp";
+            rootFileName = "tilesetS3MB.scp";
         } else {
             rootFileName = "tileset.json";
         }
