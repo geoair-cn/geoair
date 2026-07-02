@@ -14,7 +14,7 @@ import cn.geoair.map.tile.forge.core.bygwc.layer.GridSetBuilder;
 import cn.geoair.map.tile.forge.core.bygwc.wmts.GetCapabilitiesGenerator;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.AbstractTileStorageSupport;
+import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date ：Created in 2026/7/2 10:59
  * @description：
  */
-public abstract class AbstractArcgisSupport extends AbstractTileStorageSupport implements ArcgisConfigXmlGetter {
+public abstract class AbstractArcgisSupport implements ArcgisConfigXmlGetter, ITileStorageSupport {
 
     GiLogger log = GirLoggerFactory.getLogger();
 

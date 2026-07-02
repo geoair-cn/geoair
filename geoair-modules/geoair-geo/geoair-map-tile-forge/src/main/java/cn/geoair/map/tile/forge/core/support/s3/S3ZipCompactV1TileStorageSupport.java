@@ -16,7 +16,7 @@ public class  S3ZipCompactV1TileStorageSupport extends LocalZipCompactV1TileStor
      * 如果压缩处理器未初始化，则创建一个新的S3压缩处理器实例
      * @return ICompressionHandler 压缩处理器实例
      */
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new S3CompressionHandler();
         }

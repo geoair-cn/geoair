@@ -11,10 +11,7 @@ public interface ITileStorageSupport {
      */
     TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception;
 
-    /**
-     * 获取瓦片的 capabilities 文件
-     */
-    String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception;
+
 
     /**
      * 预缓存指定层级范围的瓦片

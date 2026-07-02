@@ -19,21 +19,21 @@ public interface LayerPerFileDao extends Closeable {
 
     String getTableName();
 
-    void insert(TileCentralDirectoryEntry entry) throws SQLException;
+    void insert(TileCentralDirectoryModel entry) throws SQLException;
 
-    void batchInsert(List<TileCentralDirectoryEntry> entries) throws SQLException;
+    void batchInsert(List<TileCentralDirectoryModel> entries) throws SQLException;
 
-    TileCentralDirectoryEntry findByXyzPath(String xyzPath) throws SQLException;
+    TileCentralDirectoryModel findByXyzPath(String xyzPath) throws SQLException;
 
-    TileCentralDirectoryEntry findByFileName(String fileName) throws SQLException;
+    TileCentralDirectoryModel findByFileName(String fileName) throws SQLException;
 
-    TileCentralDirectoryEntry findByXyz(String x, String y, String z) throws SQLException;
+    TileCentralDirectoryModel findByXyz(String x, String y, String z) throws SQLException;
 
-    TileCentralDirectoryEntry findById(Long id) throws SQLException;
+    TileCentralDirectoryModel findById(Long id) throws SQLException;
 
-    void findBySql(String sql, Consumer<TileCentralDirectoryEntry> consumer) throws SQLException;
+    void findBySql(String sql, Consumer<TileCentralDirectoryModel> consumer) throws SQLException;
 
-    void findAll(Consumer<TileCentralDirectoryEntry> consumer) throws SQLException;
+    void findAll(Consumer<TileCentralDirectoryModel> consumer) throws SQLException;
 
     boolean cacheEnableIs(GirLayerConfigContext layerConfigContext) throws SQLException;
 

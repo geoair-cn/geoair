@@ -6,8 +6,8 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.hutool.core.io.FileUtil;
 
 import java.io.File;
@@ -137,7 +137,7 @@ public class ArcgisTileUtils {
                                             String tempDirAbsolutePath,
                                             String confFileName,
                                             ICompressionHandler iCompressionHandler) throws IOException, SQLException {
-        TileCentralDirectoryEntry entry = layerPerFileDao.findByFileName(confFileName);
+        TileCentralDirectoryModel entry = layerPerFileDao.findByFileName(confFileName);
         if (entry != null) {
             String targetPath = tempDirAbsolutePath + File.separator + confFileName;
             iCompressionHandler.readAndDecompressEntryToLocal(entry, layerConfigContext.getObjectKey(), targetPath);
@@ -154,7 +154,7 @@ public class ArcgisTileUtils {
                                                String confFileName,
                                                ICompressionHandler iCompressionHandler) throws IOException {
         String objectKey = layerConfigContext.getObjectKey();
-        CentralDirectoryEntry entry = findEntryInZip(iCompressionHandler, objectKey, confFileName);
+        CentralDirectoryModel entry = findEntryInZip(iCompressionHandler, objectKey, confFileName);
 
         if (entry == null) {
             throw new RuntimeException("无法找到配置文件: " + confFileName);
@@ -167,10 +167,10 @@ public class ArcgisTileUtils {
     /**
      * 在ZIP中查找指定的配置文件条目
      */
-    private static CentralDirectoryEntry findEntryInZip(ICompressionHandler iCompressionHandler,
+    private static CentralDirectoryModel findEntryInZip(ICompressionHandler iCompressionHandler,
                                                         String objectKey,
                                                         String confFileName) throws IOException {
-        final CentralDirectoryEntry[] foundEntry = {null};
+        final CentralDirectoryModel[] foundEntry = {null};
         final String lowerCaseFileName = confFileName.toLowerCase();
 
         iCompressionHandler.scanAllEntries(objectKey, (centralDirectoryEntry, allCount, currentCount) -> {

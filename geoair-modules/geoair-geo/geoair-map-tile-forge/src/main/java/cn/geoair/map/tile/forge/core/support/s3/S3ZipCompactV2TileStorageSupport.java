@@ -11,7 +11,7 @@ import cn.geoair.map.tile.forge.core.zip.S3CompressionHandler;
  */
 public class S3ZipCompactV2TileStorageSupport extends LocalZipCompactV2TileStorageSupport {
 
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new S3CompressionHandler();
         }

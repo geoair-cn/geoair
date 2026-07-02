@@ -4,8 +4,9 @@ import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 
-import cn.geoair.map.tile.forge.core.support.arcgis.ConfigXmlGetterLocal;
+import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisSupport;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.hutool.core.io.IoUtil;
 import org.springframework.http.MediaType;
@@ -17,7 +18,7 @@ import org.springframework.http.MediaType;
  * &#064;date Created in 2025/11/13 17:55
  * &#064;description 提供对本地解压后的Compact V1格式瓦片数据的访问支持
  */
-public class LocalUnzippedCompactV1TileStorageSupport extends ConfigXmlGetterLocal {
+public class LocalUnzippedCompactV1TileStorageSupport extends AbstractArcgisSupport {
 
     /**
      * 根据图层名称和瓦片坐标获取瓦片数据
@@ -61,4 +62,20 @@ public class LocalUnzippedCompactV1TileStorageSupport extends ConfigXmlGetterLoc
     }
 
 
+    /**
+     * 根据图层配置信息获取配置XML内容
+     *
+     * @param layerConfigContext 图层配置信息对象
+     * @return 配置文件的XML字符串内容
+     * @throws Exception 读取文件异常
+     */
+    @Override
+    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigXmlByLocal(layerConfigContext);
+    }
+
+    @Override
+    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigCdiByLocal(layerConfigContext);
+    }
 }

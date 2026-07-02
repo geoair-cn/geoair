@@ -1,9 +1,8 @@
 package cn.geoair.map.tile.forge.core.zip;
 
 
-import ch.qos.logback.core.util.FileSize;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
@@ -56,7 +55,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     public byte[] readFileFromZip(String zipSource, String targetFilePathInZip) throws IOException {
         long zipFileSize = getFileSize(zipSource);
         EocdInfo eocd = parseEocd(zipFileSize, zipSource);
-        CentralDirectoryEntry targetEntry = findEntryInCentralDir(eocd, targetFilePathInZip, zipSource);
+        CentralDirectoryModel targetEntry = findEntryInCentralDir(eocd, targetFilePathInZip, zipSource);
         if (targetEntry == null) {
             throw new IOException("ZIP文件[" + zipSource + "]中未找到目标路径：" + targetFilePathInZip);
         }
@@ -85,7 +84,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
      * 根据中央目录条目中的compressionMethod自动适配解压逻辑
      */
     @Override
-    public byte[] decompressChunk(byte[] compressedData, CentralDirectoryEntry entry) throws IOException {
+    public byte[] decompressChunk(byte[] compressedData, CentralDirectoryModel entry) throws IOException {
         if (compressedData == null || compressedData.length == 0) {
             return new byte[0];
         }
@@ -131,7 +130,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public CentralDirectoryEntry findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException {
+    public CentralDirectoryModel findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException {
         String normalizedTarget = normalizePath(targetPath);
         boolean isFolderCheck = isFolderPath(targetPath);
 
@@ -149,7 +148,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             log.trace("读取中央目录块 {}：偏移={}, 大小={}", chunkCount, currentOffset, chunkSize);
 
             byte[] dirChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
-            CentralDirectoryEntry entry = findEntryInDirChunk(dirChunk, normalizedTarget, isFolderCheck, currentOffset, source);
+            CentralDirectoryModel entry = findEntryInDirChunk(dirChunk, normalizedTarget, isFolderCheck, currentOffset, source);
 
             if (entry != null) {
                 log.debug("找到目标路径：{}", targetPath);
@@ -165,7 +164,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public byte[] readAndDecompressEntry(CentralDirectoryEntry entry, String source) throws IOException {
+    public byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source) throws IOException {
         if (Objects.isNull(entry.getDataOffset())) {
             try {
                 LocalFileHeader header = readLocalFileHeader(entry.getLocalHeaderOffset(), source, getFileSize(source));
@@ -187,7 +186,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public void readAndDecompressEntryToLocal(CentralDirectoryEntry entry, String source, String localOutputPath) throws IOException {
+    public void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String localOutputPath) throws IOException {
         byte[] bytes = readAndDecompressEntry(entry, source);
         byteToLocal(localOutputPath, bytes);
     }
@@ -313,7 +312,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         );
     }
 
-    public void scanAllEntries1(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryEntry> entryConsumer) throws IOException {
+    public void scanAllEntries1(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
         // 优先使用ZIP64 EOCD（若存在）
         EocdInfo finalEocd = eocd;
         long fileSize = eocd.getFileSize();
@@ -499,7 +498,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             }
 
             // 创建条目并消费
-            CentralDirectoryEntry entry = new CentralDirectoryEntry(
+            CentralDirectoryModel entry = new CentralDirectoryModel(
                     headerOffset,
                     dataOffset,
                     compressionMethod,
@@ -530,7 +529,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
 
 
-    public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryEntry> entryConsumer) throws IOException {
+    public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
         // ===================== 固定配置 =====================
         final int BATCH_SIZE = 500;                    // 每批解析多少条
         final int QUEUE_CAPACITY = 2000;               // 队列大小（防内存爆）
@@ -551,7 +550,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         long fileLength = fileSize;
         long remaining = totalDirSize;
 
-        BlockingQueue<CentralDirectoryEntry> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
+        BlockingQueue<CentralDirectoryModel> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
         ExecutorService producerExecutor = Executors.newWorkStealingPool(threads);
         AtomicBoolean producerFinish = new AtomicBoolean(false);
         AtomicLong entryCount = new AtomicLong(0);
@@ -561,7 +560,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             try {
                 while (true) {
                     // 队列获取，超时判断是否结束
-                    CentralDirectoryEntry entry = queue.poll(100, TimeUnit.MILLISECONDS);
+                    CentralDirectoryModel entry = queue.poll(100, TimeUnit.MILLISECONDS);
                     if (entry == null && producerFinish.get()) {
                         break; // 生产完毕 + 队列空 → 结束
                     }
@@ -687,7 +686,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                                 }
                             }
 
-                            CentralDirectoryEntry entry = new CentralDirectoryEntry(
+                            CentralDirectoryModel entry = new CentralDirectoryModel(
                                     headerOffset, dataOffset, compressionMethod,
                                     compressedSize, uncompressedSize, fileName, entryLen
                             );
@@ -778,7 +777,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return isDirectory;
     }
 
-    public void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryEntry> entryConsumer) throws IOException {
+    public void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
         long fileSize = getFileSize(source);
         EocdInfo eocdInfo = parseEocd(fileSize, source);
         eocdInfo.setFileSize(fileSize);
@@ -902,7 +901,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     /**
      * 在中央目录分块中查找目标路径（支持文件和文件夹）
      */
-    private CentralDirectoryEntry findEntryInDirChunk(byte[] dirChunk, String normalizedTarget, boolean isFolderCheck, long chunkOffset, String source) throws IOException {
+    private CentralDirectoryModel findEntryInDirChunk(byte[] dirChunk, String normalizedTarget, boolean isFolderCheck, long chunkOffset, String source) throws IOException {
         int pos = 0;
 
         // 处理跨分块的情况：回退查找可能的签名
@@ -1072,7 +1071,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
                 boolean isDirectory = false;
                 isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-                CentralDirectoryEntry centralDirectoryEntry = new CentralDirectoryEntry(
+                CentralDirectoryModel centralDirectoryModel = new CentralDirectoryModel(
                         headerOffset,
                         null,
                         compressionMethod,
@@ -1081,8 +1080,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                         unicodeFileName != null ? unicodeFileName : fileName,
                         (int) (chunkOffset + pos)
                 );
-                centralDirectoryEntry.setDirectoryIs(isDirectory);
-                return centralDirectoryEntry;
+                centralDirectoryModel.setDirectoryIs(isDirectory);
+                return centralDirectoryModel;
             }
 
             // 9. 移动到下一个条目
@@ -1321,7 +1320,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     /**
      * 读取大文件的压缩数据（分块解压）
      */
-    private byte[] readLargeEntryData(CentralDirectoryEntry entry, String source) throws IOException {
+    private byte[] readLargeEntryData(CentralDirectoryModel entry, String source) throws IOException {
         long totalCompressed = entry.getCompressedSize();
         long totalUncompressed = entry.getUncompressedSize();
         long currentOffset = entry.getDataOffset();

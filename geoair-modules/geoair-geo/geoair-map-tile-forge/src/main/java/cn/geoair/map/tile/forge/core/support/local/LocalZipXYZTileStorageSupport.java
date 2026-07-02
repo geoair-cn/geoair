@@ -5,7 +5,8 @@ import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterXYZ;
+import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
@@ -13,8 +14,8 @@ import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 2025/11/17
  */
 @Slf4j
-public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements ZipDirectoryGetter {
+public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter implements ITileStorageSupport {
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -49,11 +51,16 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
      *
      * @return ICompressionHandler 压缩处理器实例
      */
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new LocalCompressionHandler();
         }
         return compressionHandler;
+    }
+
+    @Override
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
+        return null;
     }
 
 
@@ -70,7 +77,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
      */
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String format = layerConfigContext.getFormat();
         if (format == null) {
             format = "png";
@@ -104,7 +111,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
 
     private boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String y, String x, String inLocalPath) {
         try {
-            TileCentralDirectoryEntry zipDirectoryByFileName = getZipDirectoryByXyz(layerConfigContext, x + "", y + "", z + ""); //空指针
+            TileCentralDirectoryModel zipDirectoryByFileName = getZipDirectoryByXyz(layerConfigContext, x + "", y + "", z + ""); //空指针
             if (zipDirectoryByFileName == null) {
                 return false;
             }
@@ -137,7 +144,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
         try {
             layerPerFileDao.findAll(tileCentralDirectoryEntry -> {
                 Integer z = tileCentralDirectoryEntry.getZAsInt(), x = tileCentralDirectoryEntry.getXAsInt(), y = tileCentralDirectoryEntry.getYAsInt();
-                TileRequest tileRequest = getTileRequest(layerConfigContext);
+                TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
                 String cacheKey = tileCache.buildTileCacheKey(layerConfigContext.getDataId(), z + "", y + "", x + "");
                 ForgeExecutorUtils.getExecutor().submit(() -> {
                     try {
@@ -166,7 +173,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
     public void initTileCentralDirectoryEntryDao(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         log.info("initTileCentralDirectoryEntryDao start...{}", getClass().getName());
         ICompressionHandler iCompressionHandler = getICompressionHandler();
-        List<TileCentralDirectoryEntry> batchList = new ArrayList<>();
+        List<TileCentralDirectoryModel> batchList = new ArrayList<>();
         AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> saveCount = new AtomicReference<>(0);
         GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
@@ -190,7 +197,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
                     if (centralDirectoryEntry.isDirectoryIs()) {
                         return true;
                     }
-                    TileCentralDirectoryEntry tileCentralDirectoryEntry = new TileCentralDirectoryEntry();
+                    TileCentralDirectoryModel tileCentralDirectoryEntry = new TileCentralDirectoryModel();
                     BeanUtil.copyProperties(centralDirectoryEntry, tileCentralDirectoryEntry);
                     tileCentralDirectoryEntry.setId(IdUtil.getSnowflakeNextId());
                     TilePathParser.XyzTileInfo xyzTileInfo = TilePathParser.parseXyzPath(centralDirectoryEntry.getName());
@@ -207,7 +214,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
                     batchList.add(tileCentralDirectoryEntry);
                     if (batchList.size() >= layerPerCacheBatchSize) {
                         try {
-                            List<TileCentralDirectoryEntry> insertList = new ArrayList<>(batchList);
+                            List<TileCentralDirectoryModel> insertList = new ArrayList<>(batchList);
                             layerPerFileDao.batchInsert(insertList);
                             log.info("insert 图层{} 缓存条数  {} ,遍历总数{} ，已经插入的数量 {} ", layerConfigContext.getLayerName(), batchList.size(), count.get(), saveCount.get());
                             batchList.clear();
@@ -229,5 +236,10 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+        return "";
     }
 }

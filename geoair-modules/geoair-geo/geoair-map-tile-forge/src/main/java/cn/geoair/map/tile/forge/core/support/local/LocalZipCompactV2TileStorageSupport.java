@@ -3,8 +3,8 @@ package cn.geoair.map.tile.forge.core.support.local;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class LocalZipCompactV2TileStorageSupport extends LocalZipCompactV1TileSt
     }
 
     @Override
-    public TileCentralDirectoryEntry getTileCentralDirectoryEntry(CentralDirectoryEntry centralDirectoryEntry) {
-        return super.getTileCentralDirectoryEntry(centralDirectoryEntry);
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
+        return super.tranToTileModel(centralDirectoryModel);
     }
 }

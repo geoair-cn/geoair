@@ -24,7 +24,7 @@ public class S3UnzippedCompactV2TileStorageSupport extends S3UnzippedCompactV1Ti
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
 
         // 构建远程文件路径
         ArcGISCompactCacheV2 remoteCache = new ArcGISCompactCacheV2(layerConfigContext.getTilePathPrefix());

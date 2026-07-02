@@ -1,7 +1,5 @@
 package cn.geoair.map.tile.forge.core.cache.delegate;
 
-import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -99,7 +97,7 @@ public class CachedTileStorage implements ITileStorageSupport {
         }
 
         // 3. 查本地缓存：缓存命中则直接返回
-        TileRequest cachedTile = tileCache.getTile(tileKey,fileFormat);
+        TileRequest cachedTile = tileCache.getTile(tileKey, fileFormat);
         if (cachedTile != null) {
             // 补全必要字段（避免字段缺失导致业务异常）
             fillTileRequestFields(cachedTile, layerConfigContext);
@@ -114,7 +112,7 @@ public class CachedTileStorage implements ITileStorageSupport {
         // 5. 处理瓦片数据：分「存在」和「不存在」两种情况
         if (tileData != null && tileData.isExists() && tileData.getBytes() != null) {
             // 5.1 瓦片存在：异步写入缓存（避免阻塞主线程）
-            asyncPutTileToCache(layerName, tileKey, tileData,fileFormat);
+            asyncPutTileToCache(layerName, tileKey, tileData, fileFormat);
         } else {
             // 5.2 瓦片不存在：写入布隆过滤器（下次直接过滤）
             if (bloomFilter != null) {
@@ -147,7 +145,7 @@ public class CachedTileStorage implements ITileStorageSupport {
     /**
      * 异步将瓦片写入缓存（避免阻塞查询主线程）
      */
-    private void asyncPutTileToCache(String layerName, String tileKey, TileRequest originalTile,String fileFormat) {
+    private void asyncPutTileToCache(String layerName, String tileKey, TileRequest originalTile, String fileFormat) {
         try {
             // 拷贝字节数组（避免原始流被关闭导致数据丢失）
             byte[] tileBytes = originalTile.getBytes().clone();
@@ -166,7 +164,7 @@ public class CachedTileStorage implements ITileStorageSupport {
             // 提交异步任务
             executorService.submit(() -> {
                 try {
-                    tileCache.putTile(tileKey, cacheTile,fileFormat);
+                    tileCache.putTile(tileKey, cacheTile, fileFormat);
                     log.trace("异步缓存瓦片成功：{}", tileKey);
                 } catch (Exception e) {
                     log.error("异步缓存瓦片失败：{}", tileKey, e);
@@ -199,20 +197,6 @@ public class CachedTileStorage implements ITileStorageSupport {
         log.info("CachedTileStorage资源关闭完成");
     }
 
-    @Override
-    public String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception {
-        return delegate.getCapabilities(layerConfigContext);
-    }
-
-    @Override
-    public BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception {
-        return delegate.getBoundingBox(layerConfigContext);
-    }
-
-    @Override
-    public CacheInfo getCacheInfo(GirLayerConfigContext layerConfigContext) throws Exception {
-        return delegate.getCacheInfo(layerConfigContext);
-    }
 
     @Override
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {

@@ -6,16 +6,17 @@ import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
-import cn.geoair.map.tile.forge.core.support.arcgis.ConfigXmlGetterZip;
+import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -36,12 +37,12 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
  * &#064;description：本地ZIP压缩V1版本瓦片存储支持类，用于处理ArcGIS紧凑型缓存V1格式的瓦片数据读取
  */
 @Slf4j
-public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
+public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirectoryGetter {
 
     protected ICompressionHandler compressionHandler = null;
 
 
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new LocalCompressionHandler();
         }
@@ -142,8 +143,8 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
         if (filePath.startsWith(File.separator)) {
             String replaceFirst = StrUtil.replaceFirst(filePath, File.separator, "");
             pathToBundleFile = replaceFirst + fileExt;
-        }else{
-            pathToBundleFile = filePath+ fileExt;
+        } else {
+            pathToBundleFile = filePath + fileExt;
         }
         // 检查并解压 .bundle 文件到临时目录
 
@@ -156,7 +157,7 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
             boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
             if (b) {
                 String replace = pathToBundleFile.replace("\\", "/");
-                TileCentralDirectoryEntry zipDirectoryByFileName = layerPerFileDao.findByFileName(replace);
+                TileCentralDirectoryModel zipDirectoryByFileName = layerPerFileDao.findByFileName(replace);
                 if (zipDirectoryByFileName == null) {
                     return false;
                 }
@@ -173,13 +174,13 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
     }
 
     @Override
-    public TileCentralDirectoryEntry getTileCentralDirectoryEntry(CentralDirectoryEntry centralDirectoryEntry) {
-        if (centralDirectoryEntry.isDirectoryIs()) {
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
+        if (centralDirectoryModel.isDirectoryIs()) {
             return null;
         }
-        TileCentralDirectoryEntry tileCentralDirectoryEntry = new TileCentralDirectoryEntry();
-        BeanUtil.copyProperties(centralDirectoryEntry, tileCentralDirectoryEntry);
-        String name = centralDirectoryEntry.getName();
+        TileCentralDirectoryModel tileCentralDirectoryEntry = new TileCentralDirectoryModel();
+        BeanUtil.copyProperties(centralDirectoryModel, tileCentralDirectoryEntry);
+        String name = centralDirectoryModel.getName();
         String subBundlePath = TilePathParser.getSubBundlePath(name);
         if (subBundlePath == null) {
             return null;
@@ -195,7 +196,7 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
         GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         // 参数校验
-        if (layerConfigContext == null ) {
+        if (layerConfigContext == null) {
             throw new IllegalArgumentException("layerConfigDto 不能为空");
         }
 
@@ -229,7 +230,7 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
     }
 
     @Override
-    protected   String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> tileSetPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
@@ -246,12 +247,28 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
         });
         String tileSetJsonPath = tileSetPath.get();
 
-        if(StrUtil.isEmpty(tileSetJsonPath)){
-            throw  new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
+        if (StrUtil.isEmpty(tileSetJsonPath)) {
+            throw new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
         }
         String rootPath = tileSetJsonPath.replace("conf.xml", "")
                 .replace("Conf.xml", "");
         return rootPath;
     }
 
+    /**
+     * 根据图层配置信息获取配置XML内容
+     *
+     * @param layerConfigContext 图层配置信息对象
+     * @return 配置文件的XML字符串内容
+     * @throws Exception 读取文件异常
+     */
+    @Override
+    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigXmlByLocal(layerConfigContext);
+    }
+
+    @Override
+    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigCdiByLocal(layerConfigContext);
+    }
 }

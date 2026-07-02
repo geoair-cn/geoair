@@ -6,7 +6,7 @@ import lombok.Data;
  * ZIP 中央目录中的单个文件条目
  */
 @Data
-public class CentralDirectoryEntry {
+public class CentralDirectoryModel {
     // 本地文件头的起始偏移量
     private long localHeaderOffset;
     // 压缩数据的起始偏移量（可通过本地文件头计算）
@@ -27,11 +27,11 @@ public class CentralDirectoryEntry {
     // 是否文件夹
     private boolean directoryIs;
 
-    public CentralDirectoryEntry() {
+    public CentralDirectoryModel() {
 
     }
 
-    public CentralDirectoryEntry(long localHeaderOffset, Long dataOffset, long compressionMethod,
+    public CentralDirectoryModel(long localHeaderOffset, Long dataOffset, long compressionMethod,
                                  long compressedSize, long uncompressedSize, String name, int entrySize) {
         this.localHeaderOffset = localHeaderOffset;
         this.dataOffset = dataOffset;

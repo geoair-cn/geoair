@@ -6,7 +6,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.tile.forge.core.caches.CacheProvider;
 import cn.geoair.map.tile.forge.core.caches.NoOpCacheProvider;
-import cn.geoair.map.tile.forge.core.caches.S3CacheProvider;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.collection.ListUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -147,7 +146,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
         return layerCacheTableName;
     }
 
-    public void insert(TileCentralDirectoryEntry entry) throws SQLException {
+    public void insert(TileCentralDirectoryModel entry) throws SQLException {
 
         String sql = String.format("INSERT INTO %s (" +
                 "local_header_offset, data_offset, compression_method, compressed_size, " +
@@ -175,7 +174,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
     }
 
     @Override
-    public void batchInsert(List<TileCentralDirectoryEntry> entries) throws SQLException {
+    public void batchInsert(List<TileCentralDirectoryModel> entries) throws SQLException {
         if (entries == null || entries.isEmpty()) {
             return;
         }
@@ -200,7 +199,7 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
 
         // 组装批量数据
         List<Map<String, Object>> rowsData = new ArrayList<>();
-        for (TileCentralDirectoryEntry entry : entries) {
+        for (TileCentralDirectoryModel entry : entries) {
             Map<String, Object> row = new HashMap<>();
             row.put("local_header_offset", entry.getLocalHeaderOffset());
             row.put("data_offset", entry.getDataOffset());
@@ -223,14 +222,14 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
         log.info("图层{}批量插入{}条缓存数据成功", dataId, entries.size());
     }
 
-    public TileCentralDirectoryEntry findByXyzPath(String xyzPath) throws SQLException {
+    public TileCentralDirectoryModel findByXyzPath(String xyzPath) throws SQLException {
 
         String sql = String.format("SELECT * FROM %s WHERE xyz_path = #{xyzPath}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql, SqlParamMap.of().addOne("xyzPath", xyzPath));
-        return GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryModel.class);
     }
 
-    public TileCentralDirectoryEntry findByXyz(String x, String y, String z) throws SQLException {
+    public TileCentralDirectoryModel findByXyz(String x, String y, String z) throws SQLException {
 
         String sql = String.format("SELECT * FROM %s WHERE x = #{x} AND y = #{y} AND z = #{z}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql,
@@ -238,34 +237,34 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
                         .addOne("x", x)
                         .addOne("y", y)
                         .addOne("z", z));
-        return  GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return  GutilObject.isEmpty(girAdvOneRow) ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryModel.class);
     }
 
     // 3. 根据 fileName 查询
-    public TileCentralDirectoryEntry findByFileName(String fileName) throws SQLException {
+    public TileCentralDirectoryModel findByFileName(String fileName) throws SQLException {
 
         String sql = String.format("SELECT * FROM %s WHERE file_name = #{fileName}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql,
                 SqlParamMap.of().addOne("fileName", fileName));
-        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryModel.class);
     }
 
-    public TileCentralDirectoryEntry findById(Long id) throws SQLException {
+    public TileCentralDirectoryModel findById(Long id) throws SQLException {
 
         String sql = String.format("SELECT * FROM %s WHERE id = #{id}", layerCacheTableName);
         GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(sql,
                 SqlParamMap.of().addOne("id", id));
-        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryEntry.class);
+        return GutilObject.isEmpty(girAdvOneRow)  ? null : girAdvOneRow.toBeanObj(TileCentralDirectoryModel.class);
     }
 
     @Override
-    public void findBySql(String sql, Consumer<TileCentralDirectoryEntry> consumer) throws SQLException {
+    public void findBySql(String sql, Consumer<TileCentralDirectoryModel> consumer) throws SQLException {
 
-        iAdvExecutor.bSelectObjListStream(sql, TileCentralDirectoryEntry.class, consumer);
+        iAdvExecutor.bSelectObjListStream(sql, TileCentralDirectoryModel.class, consumer);
     }
 
     @Override
-    public void findAll(Consumer<TileCentralDirectoryEntry> consumer) throws SQLException {
+    public void findAll(Consumer<TileCentralDirectoryModel> consumer) throws SQLException {
 
         String sql = String.format("SELECT * FROM %s", layerCacheTableName);
         findBySql(sql, consumer);
@@ -334,8 +333,8 @@ public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable
         return new NoOpCacheProvider();
     }
 
-    private TileCentralDirectoryEntry mapResultSetToEntry(ResultSet rs) throws SQLException {
-        TileCentralDirectoryEntry entry = new TileCentralDirectoryEntry(
+    private TileCentralDirectoryModel mapResultSetToEntry(ResultSet rs) throws SQLException {
+        TileCentralDirectoryModel entry = new TileCentralDirectoryModel(
                 rs.getLong("local_header_offset"),
                 rs.getObject("data_offset") != null ? rs.getLong("data_offset") : null,
                 rs.getLong("compression_method"),

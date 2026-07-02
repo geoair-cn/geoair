@@ -1,18 +1,18 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 2025/11/17
  */
 @Slf4j
-public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter {
+public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -50,21 +50,17 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
      *
      * @return ICompressionHandler 压缩处理器实例
      */
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new LocalCompressionHandler();
         }
         return compressionHandler;
     }
 
-    public BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception {
-        return BoundingBox.WORLD3857;
-    }
-
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
         StringBuilder inLocalPathBuilder = new StringBuilder();
         String format = layerConfigContext.getFormat();
@@ -97,7 +93,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
     protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String y, String x, String inLocalPath) {
         try {
-            TileCentralDirectoryEntry tileCentralDirectoryEntry = null;
+            TileCentralDirectoryModel tileCentralDirectoryEntry = null;
             if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
                 tileCentralDirectoryEntry = getZipDirectoryBFileName(layerConfigContext, z);
             } else {
@@ -123,13 +119,13 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
 
     @Override
-    public TileCentralDirectoryEntry getTileCentralDirectoryEntry(CentralDirectoryEntry centralDirectoryEntry) {
-        TileCentralDirectoryEntry tileCentralDirectoryEntry = new TileCentralDirectoryEntry();
-        BeanUtil.copyProperties(centralDirectoryEntry, tileCentralDirectoryEntry);
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
+        TileCentralDirectoryModel tileCentralDirectoryEntry = new TileCentralDirectoryModel();
+        BeanUtil.copyProperties(centralDirectoryModel, tileCentralDirectoryEntry);
         tileCentralDirectoryEntry.setId(IdUtil.getSnowflakeNextId());
-        tileCentralDirectoryEntry.setFileName(centralDirectoryEntry.getName());
+        tileCentralDirectoryEntry.setFileName(centralDirectoryModel.getName());
 
-        TilePathParser.XyzTileInfo xyzTileInfo = TilePathParser.parseXyzPath(centralDirectoryEntry.getName());
+        TilePathParser.XyzTileInfo xyzTileInfo = TilePathParser.parseXyzPath(centralDirectoryModel.getName());
         if (xyzTileInfo == null) {
             return tileCentralDirectoryEntry;
         } else {
@@ -142,9 +138,8 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
     }
 
 
-
     @Override
-    protected String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> tileSetPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
