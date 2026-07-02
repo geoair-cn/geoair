@@ -14,7 +14,7 @@ public class TileUrlBuilder {
     /**
      * 构建XYZ瓦片服务URL
      */
-    public static String buildXyzUrl(GirMapTileType mapTileType, String layerName, String dataId, String fileName, String format, String originType, String zxyType,String gridSet) {
+    public static String buildXyzUrl(GirMapTileType mapTileType, String layerName, String dataId, String fileName, String format, String originType, String zxyType, String gridSet) {
         String baseUrl = null;
         if (StrUtil.isEmpty(format)) {
             baseUrl = "xyzTileService/rest/" + StrUtil.format("{}/{}/{}/{}/", mapTileType.getValue(), dataId, fileName, layerName) + "{z}/{x}/{y}";
@@ -30,10 +30,10 @@ public class TileUrlBuilder {
         if (StrUtil.isEmpty(gridSet)) {
             gridSet = "EPSG:3857";
         }
-        if (!StrUtil.startWith(gridSet,"EPSG")) {
+        if (!StrUtil.startWith(gridSet, "EPSG")) {
             gridSet = "EPSG:" + gridSet;
         }
-        return baseUrl + "?" + "originType=" + originType + "&zxyType=" + zxyType+ "&gridSet=" + gridSet;
+        return baseUrl + "?" + "originType=" + originType + "&zxyType=" + zxyType + "&gridSet=" + gridSet;
     }
 
     /**
@@ -41,6 +41,13 @@ public class TileUrlBuilder {
      */
     public static String buildD3TilesUrl(String dataId, String layerName, String fileName) {
         return "3dTilesService/" + StrUtil.format("{}/{}/{}/tileset.json", dataId, fileName, layerName);
+    }
+
+    /**
+     * 构建S3m瓦片服务URL
+     */
+    public static String buildS3mUrl(String dataId, String layerName, String fileName) {
+        return "3dTilesService/" + StrUtil.format("{}/{}/{}/tilesetS3MB.scp", dataId, fileName, layerName);
     }
 
     /**
