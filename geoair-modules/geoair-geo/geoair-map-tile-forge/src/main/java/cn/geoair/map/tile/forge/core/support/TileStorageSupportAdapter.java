@@ -11,9 +11,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +54,7 @@ public class TileStorageSupportAdapter {
         String cacheKey = generateCacheKey(girStorageType, mapTileType);
 
         // 3. 从缓存获取实例，不存在则创建并缓存
-        return supportCache.computeIfAbsent(cacheKey, k ->createSupportInstance(girStorageType, mapTileType));
+        return supportCache.computeIfAbsent(cacheKey, k -> createSupportInstance(girStorageType, mapTileType));
     }
 
     /**
@@ -97,6 +95,7 @@ public class TileStorageSupportAdapter {
             case LOOSE:
                 return new LocalZipLooseTileStorageSupport();
             case TILE_3D:
+            case S3M:
                 return new LocalZip3DTileStorageSupport();
             case TERRAIN_3D:
                 return new LocalZip3DTerrainStorageSupport();
@@ -119,6 +118,7 @@ public class TileStorageSupportAdapter {
             case XYZ:
                 return new S3ZipXYZTileStorageSupport();
             case TILE_3D:
+            case S3M:
                 return new S3Zip3DTileStorageSupport();
             case TERRAIN_3D:
                 return new S3Zip3DTerrainStorageSupport();
@@ -150,7 +150,7 @@ public class TileStorageSupportAdapter {
     /**
      * 创建S3_UNZIPPED类型对应的实例
      */
-    private AbstractTileStorageSupport createS3UnzippedSupport(GirMapTileType mapTileType) {
+    private ITileStorageSupport createS3UnzippedSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
                 return new S3UnzippedCompactV1TileStorageSupport();

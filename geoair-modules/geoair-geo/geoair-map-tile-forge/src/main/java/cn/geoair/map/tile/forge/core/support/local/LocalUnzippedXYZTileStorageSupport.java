@@ -1,8 +1,10 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterXYZ;
+import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.hutool.core.io.FileUtil;
 import org.springframework.http.MediaType;
 
@@ -15,7 +17,7 @@ import java.io.File;
  * @author 张俊
  * @since 2025/11/17
  */
-public class LocalUnzippedXYZTileStorageSupport extends ConfigXmlGetterXYZ {
+public class LocalUnzippedXYZTileStorageSupport implements ITileStorageSupport {
 
     /**
      * 根据图层配置和瓦片坐标获取瓦片数据
@@ -30,7 +32,7 @@ public class LocalUnzippedXYZTileStorageSupport extends ConfigXmlGetterXYZ {
      */
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String format = layerConfigContext.getFormat();
         if (format == null) {
             format = "png";
@@ -48,6 +50,11 @@ public class LocalUnzippedXYZTileStorageSupport extends ConfigXmlGetterXYZ {
         tileRequest.setExists(true);
         tileRequest.mimeTypeByType(MediaType.parseMediaType("image/" + format));
         return tileRequest;
+    }
+
+    @Override
+    public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
+
     }
 
     /**

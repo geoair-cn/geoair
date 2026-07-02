@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import lombok.Data;
 
 /**
@@ -9,13 +9,13 @@ import lombok.Data;
  * @description： TODO
  */
 @Data
-public class TileCentralDirectoryEntry extends CentralDirectoryEntry {
-    public TileCentralDirectoryEntry(long localHeaderOffset, Long dataOffset, long compressionMethod,
+public class TileCentralDirectoryModel extends CentralDirectoryModel {
+    public TileCentralDirectoryModel(long localHeaderOffset, Long dataOffset, long compressionMethod,
                                      long compressedSize, long uncompressedSize, String name, int entrySize) {
         super(localHeaderOffset, dataOffset, compressionMethod, compressedSize, uncompressedSize, name, entrySize);
     }
 
-    public TileCentralDirectoryEntry() {
+    public TileCentralDirectoryModel() {
     }
 
     private Long id;

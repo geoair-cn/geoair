@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.core.zip;
 
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 
 import java.io.IOException;
@@ -63,7 +63,7 @@ public interface ICompressionHandler {
      * @param entry          中央目录条目
      * @return 解压后的字节数组
      */
-    byte[] decompressChunk(byte[] compressedData, CentralDirectoryEntry entry) throws IOException;
+    byte[] decompressChunk(byte[] compressedData, CentralDirectoryModel entry) throws IOException;
 
     /**
      * 获取文件大小（字节）
@@ -92,7 +92,7 @@ public interface ICompressionHandler {
      * @return 中央目录条目
      * @throws IOException 查找失败时抛出
      */
-    CentralDirectoryEntry findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException;
+    CentralDirectoryModel findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException;
 
     /**
      * 读取并解压ZIP中的指定条目
@@ -102,7 +102,7 @@ public interface ICompressionHandler {
      * @return 解压后的字节数据
      * @throws IOException 处理失败时抛出
      */
-    byte[] readAndDecompressEntry(CentralDirectoryEntry entry, String source) throws IOException;
+    byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source) throws IOException;
 
     /**
      * 读取并解压ZIP中的指定条目到本地目录
@@ -113,7 +113,7 @@ public interface ICompressionHandler {
      * @return 解压后的字节数据
      * @throws IOException 处理失败时抛出
      */
-    void readAndDecompressEntryToLocal(CentralDirectoryEntry entry, String source, String localOutputPath) throws IOException;
+    void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String localOutputPath) throws IOException;
 
     /**
      * 检查下面的路径是否存在于ZIP中
@@ -134,7 +134,7 @@ public interface ICompressionHandler {
      * @param entryConsumer 条目消费者，用于处理每个扫描到的中央目录条目
      * @throws IOException 扫描过程中发生IO异常时抛出
      */
-    void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryEntry> entryConsumer) throws IOException;
+    void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException;
 
-    void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryEntry> entryConsumer) throws IOException;
+    void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException;
 }

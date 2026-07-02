@@ -202,7 +202,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     // 插入/批量插入/查询方法保持不变...
-    public void insert(TileCentralDirectoryEntry entry) throws SQLException {
+    public void insert(TileCentralDirectoryModel entry) throws SQLException {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
@@ -221,7 +221,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     @Override
-    public void batchInsert(List<TileCentralDirectoryEntry> entries) throws SQLException {
+    public void batchInsert(List<TileCentralDirectoryModel> entries) throws SQLException {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
@@ -229,7 +229,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
         );
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            for (TileCentralDirectoryEntry entry : entries) {
+            for (TileCentralDirectoryModel entry : entries) {
                 setParameters(stmt, entry);
                 stmt.addBatch();
             }
@@ -242,7 +242,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
 
-    public TileCentralDirectoryEntry findByXyzPath(String xyzPath) throws SQLException {
+    public TileCentralDirectoryModel findByXyzPath(String xyzPath) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE xyz_path = ?", TABLE_NAME);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -256,7 +256,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         }
     }
 
-    public TileCentralDirectoryEntry findByXyz(String x, String y, String z) throws SQLException {
+    public TileCentralDirectoryModel findByXyz(String x, String y, String z) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE x = ? and y = ? and z = ?", TABLE_NAME);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -272,7 +272,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         }
     }
 
-    public TileCentralDirectoryEntry findByFileName(String fileName) throws SQLException {
+    public TileCentralDirectoryModel findByFileName(String fileName) throws SQLException {
         init();
 
         String sql = String.format("SELECT * FROM %s WHERE file_name  = ?  ", TABLE_NAME);
@@ -287,7 +287,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         }
     }
 
-    public TileCentralDirectoryEntry findById(Long id) throws SQLException {
+    public TileCentralDirectoryModel findById(Long id) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE id = ?", TABLE_NAME);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -303,13 +303,13 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     @Override
-    public void findBySql(String sql, Consumer<TileCentralDirectoryEntry> consumer) throws SQLException {
+    public void findBySql(String sql, Consumer<TileCentralDirectoryModel> consumer) throws SQLException {
         init();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             log.info("findBySql sql:{}", sql);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    TileCentralDirectoryEntry tileCentralDirectoryEntry = mapResultSetToEntry(rs);
+                    TileCentralDirectoryModel tileCentralDirectoryEntry = mapResultSetToEntry(rs);
                     consumer.accept(tileCentralDirectoryEntry);
                 }
 
@@ -318,7 +318,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     @Override
-    public void findAll(Consumer<TileCentralDirectoryEntry> consumer) throws SQLException {
+    public void findAll(Consumer<TileCentralDirectoryModel> consumer) throws SQLException {
         init();
         findBySql(String.format("SELECT * FROM %s  ", TABLE_NAME), consumer);
     }
@@ -408,7 +408,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     // 私有辅助方法
-    private void setParameters(PreparedStatement stmt, TileCentralDirectoryEntry entry) throws SQLException {
+    private void setParameters(PreparedStatement stmt, TileCentralDirectoryModel entry) throws SQLException {
         stmt.setLong(1, entry.getLocalHeaderOffset());
         stmt.setObject(2, entry.getDataOffset());
         stmt.setLong(3, entry.getCompressionMethod());
@@ -424,8 +424,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         stmt.setString(13, entry.getFileName());
     }
 
-    private TileCentralDirectoryEntry mapResultSetToEntry(ResultSet rs) throws SQLException {
-        TileCentralDirectoryEntry entry = new TileCentralDirectoryEntry(
+    private TileCentralDirectoryModel mapResultSetToEntry(ResultSet rs) throws SQLException {
+        TileCentralDirectoryModel entry = new TileCentralDirectoryModel(
                 rs.getLong("local_header_offset"),
                 rs.getObject("data_offset") != null ? rs.getLong("data_offset") : null,
                 rs.getLong("compression_method"),

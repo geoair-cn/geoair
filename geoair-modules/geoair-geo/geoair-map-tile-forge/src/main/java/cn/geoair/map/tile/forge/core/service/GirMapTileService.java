@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -63,29 +64,30 @@ public class GirMapTileService extends TileStorageSupportAdapter {
 
         // 2. 通过适配器获取对应的TileStorageSupport实例
         ITileStorageSupport storageSupport = super.getSupport(config);
-
-        // 3. 调用实例方法获取瓦片数据
-        String configXml = storageSupport.getCapabilities(config);
         TileRequest tileRequest = new TileRequest();
-        if (configXml != null) {
-            tileRequest.setBytes(configXml.getBytes());
-            tileRequest.mimeTypeByType(MediaType.APPLICATION_XML);
-            tileRequest.setExists(true);
-            tileRequest.setSize(configXml.getBytes().length);
-            tileRequest.setLastModified(System.currentTimeMillis());
-            tileRequest.setLayerName(layerName);
-            tileRequest.setMapTileType(config.getMapTileType());
-            tileRequest.setStorageType(config.getStorageType());
-        } else {
-            tileRequest.setBytes(new String("无法找到配置文件").getBytes("UTF-8"));
-            tileRequest.mimeTypeByType(MediaType.TEXT_XML);
-            tileRequest.setExists(true);
-            tileRequest.setSize(configXml.getBytes().length);
-            tileRequest.setLastModified(System.currentTimeMillis());
-            tileRequest.setLayerName(layerName);
-            tileRequest.setMapTileType(config.getMapTileType());
-            tileRequest.setStorageType(config.getStorageType());
+        if (storageSupport instanceof ArcgisConfigXmlGetter) {
+            ArcgisConfigXmlGetter arcgisConfigXmlGetter = (ArcgisConfigXmlGetter) storageSupport;
+            // 3. 调用实例方法获取瓦片数据
+            String configXml = arcgisConfigXmlGetter.getCapabilities(config);
+            if (configXml != null) {
+                tileRequest.setBytes(configXml.getBytes());
+                tileRequest.mimeTypeByType(MediaType.APPLICATION_XML);
+                tileRequest.setExists(true);
+                tileRequest.setSize(configXml.getBytes().length);
+                tileRequest.setLastModified(System.currentTimeMillis());
+                tileRequest.setLayerName(layerName);
+                tileRequest.setMapTileType(config.getMapTileType());
+                tileRequest.setStorageType(config.getStorageType());
+            }
         }
+        tileRequest.setBytes(new String("无法找到配置文件").getBytes("UTF-8"));
+        tileRequest.mimeTypeByType(MediaType.TEXT_XML);
+        tileRequest.setExists(false);
+        tileRequest.setSize(0);
+        tileRequest.setLastModified(System.currentTimeMillis());
+        tileRequest.setLayerName(layerName);
+        tileRequest.setMapTileType(config.getMapTileType());
+        tileRequest.setStorageType(config.getStorageType());
         return tileRequest;
     }
 

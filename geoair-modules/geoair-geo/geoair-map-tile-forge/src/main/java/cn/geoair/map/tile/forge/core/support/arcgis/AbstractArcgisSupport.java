@@ -1,5 +1,7 @@
-package cn.geoair.map.tile.forge.core.support;
+package cn.geoair.map.tile.forge.core.support.arcgis;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfoPersister;
 import cn.geoair.map.tile.forge.core.bygwc.config.LODInfo;
@@ -12,87 +14,23 @@ import cn.geoair.map.tile.forge.core.bygwc.layer.GridSetBuilder;
 import cn.geoair.map.tile.forge.core.bygwc.wmts.GetCapabilitiesGenerator;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
+import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.hutool.core.lang.Pair;
-import cn.hutool.extra.spring.SpringUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * @author ：张俊
+ * @date ：Created in 2026/7/2 10:59
+ * @description：
+ */
+public abstract class AbstractArcgisSupport implements ArcgisConfigXmlGetter, ITileStorageSupport {
 
-@Slf4j
-public abstract class AbstractTileStorageSupport implements ITileStorageSupport {
-    /**
-     * 获取瓦片数据
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @param z              瓦片的级别
-     * @param x              瓦片的列号
-     * @param y              瓦片的行号
-     * @return 瓦片的数据
-     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
-     */
-    public abstract TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception;
-
-
-    public ArcGISCacheLayer getGwcArcGISCacheLayer(GirLayerConfigContext layerConfigContext) throws Exception {
-        CacheInfo cacheInfo = getCacheInfo(layerConfigContext);
-        BoundingBox boundingBox = getBoundingBox(layerConfigContext);
-        String layerName = layerConfigContext.getLayerName();
-        return new ArcGISCacheLayer(layerName, cacheInfo, boundingBox);
-    }
-
-    /**
-     * 获取瓦片的 capabilities 文件
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @return capabilities 文件
-     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
-     */
-    public String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception {
-        try {
-            ArcGISCacheLayer gwcArcGISCacheLayer = getGwcArcGISCacheLayer(layerConfigContext);
-            String generate = GetCapabilitiesGenerator.getInstance().generate(gwcArcGISCacheLayer);
-            return generate;
-        } catch (Exception e) {
-            log.error("生成文档异常", e);
-            throw e;
-        }
-    }
-
-    /**
-     * 获取描述瓦片的格式的xml
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @return 描述瓦片的格式的xml
-     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
-     */
-    protected abstract String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception;
-
-    /**
-     * 获取描述边界的文件描述
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @return 描述边界的文件描述
-     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
-     */
-    protected abstract String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception;
-
-    /**
-     * 获取瓦片的边界信息
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @return 瓦片的边界信息
-     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
-     */
-    public BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception {
-        String configCdi = getConfigCdi(layerConfigContext);
-        CacheInfoPersister instance = CacheInfoPersister.getInstance();
-        return instance.parseLayerBounds(configCdi);
-    }
+    GiLogger log = GirLoggerFactory.getLogger();
 
     /**
      * 获取瓦片的缓存信息
@@ -107,80 +45,50 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
         return instance.load(configXml);
     }
 
-    /**
-     * 创建TileRequest对象
-     *
-     * @param layerConfigContext 瓦片的配置信息
-     * @return 瓦片的请求对象
-     */
-    protected TileRequest getTileRequest(GirLayerConfigContext layerConfigContext, String z, String y, String x) {
-        TileRequest tileRequest = new TileRequest();
-        tileRequest.setStorageType(layerConfigContext.getStorageType());
-        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
-        tileRequest.setLayerName(layerConfigContext.getLayerName());
-
-        tileRequest.setExists(false);
-        tileRequest.setLastModified(0);
-        tileRequest.setSize(0);
-        tileRequest.setBytes(new byte[0]);
-        return tileRequest;
-    }
 
     /**
-     * 创建TileRequest对象
+     * 获取瓦片的 capabilities 文件
      *
      * @param layerConfigContext 瓦片的配置信息
-     * @return 瓦片的请求对象
+     * @return capabilities 文件
+     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
      */
-    protected TileRequest getTileRequest(GirLayerConfigContext layerConfigContext) {
-        TileRequest tileRequest = new TileRequest();
+    public String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception {
+        try {
 
-        tileRequest.setStorageType(layerConfigContext.getStorageType());
-        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
-        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
-        tileRequest.setLayerName(layerConfigContext.getLayerName());
-
-        tileRequest.setExists(false);
-        tileRequest.setLastModified(0);
-        tileRequest.setSize(0);
-        tileRequest.setBytes(new byte[0]);
-        return tileRequest;
+            ArcGISCacheLayer gwcArcGISCacheLayer = getGwcArcGISCacheLayer(layerConfigContext);
+            String generate = GetCapabilitiesGenerator.getInstance().generate(gwcArcGISCacheLayer);
+            return generate;
+        } catch (Exception e) {
+            log.error("生成文档异常", e);
+            throw e;
+        }
     }
 
-    private static ExecutorService executor = null;
-
-    public static ExecutorService getExecutor() {
-        if (executor == null) {
-            try {
-                executor = SpringUtil.getBean(ExecutorService.class);
-            } catch (Exception e) {
-            }
-        }
-        if (executor == null) {
-            int CORE_POOL_SIZE = 20;
-            int MAX_POOL_SIZE = 200;
-            long KEEP_ALIVE_TIME = 60L;
-            BlockingQueue<Runnable> WORK_QUEUE = new LinkedBlockingQueue<>(10000);
-            executor = new ThreadPoolExecutor(
-                    CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                    WORK_QUEUE, new ThreadFactory() {
-                private final AtomicLong count = new AtomicLong(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "tile-precache-" + count.incrementAndGet());
-                }
-            }, new ThreadPoolExecutor.CallerRunsPolicy() // 拒绝策略：由调用线程执行
-            );
-        }
-
-        return executor;
+    public ArcGISCacheLayer getGwcArcGISCacheLayer(GirLayerConfigContext layerConfigContext) throws Exception {
+        CacheInfo cacheInfo = getCacheInfo(layerConfigContext);
+        BoundingBox boundingBox = getBoundingBox(layerConfigContext);
+        String layerName = layerConfigContext.getLayerName();
+        return new ArcGISCacheLayer(layerName, cacheInfo, boundingBox);
     }
 
-    @Override
+    /**
+     * 获取瓦片的边界信息
+     *
+     * @param layerConfigContext 瓦片的配置信息
+     * @return 瓦片的边界信息
+     * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
+     */
+    public BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception {
+        String configCdi = getConfigCdi(layerConfigContext);
+        CacheInfoPersister instance = CacheInfoPersister.getInstance();
+        return instance.parseLayerBounds(configCdi);
+    }
+
+
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
         // 参数校验
-        if (layerConfigContext == null ) {
+        if (layerConfigContext == null) {
             throw new IllegalArgumentException("layerConfigDto 不能为空");
         }
 
@@ -192,10 +100,7 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
             gwcArcGISCacheLayer = getGwcArcGISCacheLayer(layerConfigContext);
             cacheInfo = gwcArcGISCacheLayer.getCacheInfo();
             gridSubset = gwcArcGISCacheLayer.getGridSubset();
-//            SpatialReference spatialReference = cacheInfo.getTileCacheInfo().getSpatialReference();
-//            int latestWKID = spatialReference.getLatestWKID();
             GridSetBuilder gridSetBuilder = new GridSetBuilder();
-
             preCacheGridSet = gridSetBuilder.buildGridset(layerConfigContext.getLayerName(), cacheInfo, gwcArcGISCacheLayer.getLayerBounds());
             log.info("GridSet构建完成  ");
         } catch (Exception e) {
@@ -230,12 +135,12 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
                     final int zoom = i;
                     final long tileX = x;
                     final long tileY = y;
-                    getExecutor().submit(() -> {
+                    ForgeExecutorUtils.getExecutor().submit(() -> {
                         try {
                             String key = tileCache.buildTileCacheKey(
                                     layerConfigContext.getLayerName(), zoom + "", tileY + "", tileX + "");
                             TileRequest tileRequest = getTileData(layerConfigContext, zoom + "", tileX + "", tileY + "");
-                            tileCache.putTile(key, tileRequest,"png");
+                            tileCache.putTile(key, tileRequest, "png");
                             completedTiles.incrementAndGet();
 
                             // 进度日志（每1000个瓦片打印一次）
@@ -252,14 +157,10 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
                 }
             }
         }
-
-
     }
-
 
     public Pair<Integer, Integer> getXExtremes(GridSubset gridSubset, int z) {
         try {
-
             //[minx,miny,maxx,maxy]
             long[] gridCov = gridSubset.getCoverage((int) z);
             return Pair.of((int) gridCov[0], (int) (gridCov[2]));
@@ -267,7 +168,6 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
         }
         return null;
     }
-
 
     public Pair<Integer, Integer> getYExtremes(GridSubset gridSubset, int z) {
         try {
@@ -284,5 +184,3 @@ public abstract class AbstractTileStorageSupport implements ITileStorageSupport 
 
 
 }
-
-

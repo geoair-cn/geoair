@@ -1,9 +1,7 @@
 package cn.geoair.map.tile.forge.core.support;
 
-import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 
@@ -13,20 +11,6 @@ public interface ITileStorageSupport {
      */
     TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception;
 
-    /**
-     * 获取瓦片的 capabilities 文件
-     */
-    String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception;
-
-    /**
-     * 获取瓦片的边界信息
-     */
-    BoundingBox getBoundingBox(GirLayerConfigContext layerConfigContext) throws Exception;
-
-    /**
-     * 获取瓦片的缓存信息
-     */
-    CacheInfo getCacheInfo(GirLayerConfigContext layerConfigContext) throws Exception;
 
 
     /**

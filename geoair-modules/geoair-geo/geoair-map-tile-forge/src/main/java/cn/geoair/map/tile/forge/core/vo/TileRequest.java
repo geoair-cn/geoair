@@ -3,7 +3,9 @@ package cn.geoair.map.tile.forge.core.vo;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.springframework.http.MediaType;
 
 import java.io.Serializable;
@@ -14,13 +16,13 @@ import java.io.Serializable;
  * &#064;description：瓦片请求数据传输对象
  */
 @Data
+@Accessors(chain = true)
 public class TileRequest implements Serializable {
 
     /**
      * 图层名称
      */
     private String layerName;
-
 
 
     /**
@@ -36,7 +38,7 @@ public class TileRequest implements Serializable {
     /**
      * 瓦片输入流
      */
-    private byte [] bytes;
+    private byte[] bytes;
 
     /**
      * 最后修改时间戳
@@ -52,7 +54,7 @@ public class TileRequest implements Serializable {
      * 媒体类型，默认为PNG格式
      */
 //    protected  MediaType mimeType = MediaType.IMAGE_PNG;
-    protected  String  mimeType = MediaType.IMAGE_PNG_VALUE;
+    protected String mimeType = MediaType.IMAGE_PNG_VALUE;
 
     /**
      * 瓦片是否存在标识
@@ -68,4 +70,19 @@ public class TileRequest implements Serializable {
     public void mimeTypeByType(MediaType mimeType) {
         this.mimeType = mimeType.toString();
     }
+
+
+    public static TileRequest emptyByContext(GirLayerConfigContext layerConfigContext) {
+        TileRequest tileRequest = new TileRequest();
+        tileRequest.setStorageType(layerConfigContext.getStorageType());
+        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
+        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
+        tileRequest.setLayerName(layerConfigContext.getLayerName());
+        tileRequest.setExists(false);
+        tileRequest.setLastModified(0);
+        tileRequest.setSize(0);
+        tileRequest.setBytes(new byte[0]);
+        return tileRequest;
+    }
+
 }

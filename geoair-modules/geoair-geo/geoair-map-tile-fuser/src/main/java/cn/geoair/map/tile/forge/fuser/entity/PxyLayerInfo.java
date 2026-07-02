@@ -112,13 +112,28 @@ public class PxyLayerInfo {
         return OriginType.fromMode(originType);
     }
 
+    @Transient
+    public SrcType getSrcTypeEnums() {
+        return SrcType.fromCode(srcType);
+    }
+
     /**
-     *  是否为3857网格
+     * 是否为3857网格
+     *
      * @return
      */
     @Transient
     public boolean isGoogleGrid() {
-        return gridSrid==3857;
+        return gridSrid == 3857;
+    }
+
+    /**
+     * 检查缓存是否启用
+     */
+    @Transient
+    public boolean isCacheEnabled(PxyLayerInfo config) {
+        return "true".equalsIgnoreCase(config.getEnableCache())
+               || "1".equals(config.getEnableCache());
     }
 
 

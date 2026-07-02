@@ -3,9 +3,10 @@ package cn.geoair.map.tile.forge.core.support.s3;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterS3;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
+import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisSupport;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,12 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
  * &#064;description：S3存储支持类，用于处理未压缩的紧凑型V1瓦片数据
  */
 @Slf4j
-public class S3UnzippedCompactV1TileStorageSupport extends ConfigXmlGetterS3 {
+public class S3UnzippedCompactV1TileStorageSupport extends AbstractArcgisSupport {
 
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
 
         // 构建远程文件路径
         ArcGISCompactCacheV1 remoteCache = new ArcGISCompactCacheV1(layerConfigContext.getTilePathPrefix());
@@ -65,4 +66,21 @@ public class S3UnzippedCompactV1TileStorageSupport extends ConfigXmlGetterS3 {
     }
 
 
+    /**
+     * 从压缩包中获取配置XML文件内容
+     *
+     * @param layerConfigContext 图层配置信息对象
+     * @return String 配置XML文件内容
+     * @throws Exception 文件读取异常
+     */
+    @Override
+    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigXmlByS3(layerConfigContext);
+    }
+
+
+    @Override
+    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigCdiByS3(layerConfigContext);
+    }
 }

@@ -31,7 +31,7 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
      */
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
 
         String format = layerConfigContext.getFormat();
         if (format == null) {

@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 public class S3ZipXYZTileStorageSupport extends LocalZipXYZTileStorageSupport {
 
 
-
     /**
      * 获取压缩处理器实例
      * 使用单例模式，确保只有一个压缩处理器实例存在
@@ -22,7 +21,7 @@ public class S3ZipXYZTileStorageSupport extends LocalZipXYZTileStorageSupport {
      * @return ICompressionHandler 压缩处理器实例
      */
     @Override
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new S3CompressionHandler();
         }

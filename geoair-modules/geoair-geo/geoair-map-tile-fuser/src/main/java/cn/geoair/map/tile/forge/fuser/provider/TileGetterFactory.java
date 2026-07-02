@@ -21,7 +21,8 @@ import cn.geoair.map.tile.forge.fuser.provider.impl.grid4490.Grid4490WebTileGett
  * @date Created in 2026/6/15
  */
 public class TileGetterFactory {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
+
     /**
      * 根据配置创建瓦片获取器（带缓存）
      */
@@ -40,8 +41,8 @@ public class TileGetterFactory {
     /**
      * 根据配置创建瓦片获取器（带缓存）
      *
-     * @param pxyLayerInfo    配置信息
-     * @param tileCache 自定义缓存（可选）
+     * @param pxyLayerInfo 配置信息
+     * @param tileCache    自定义缓存（可选）
      */
     public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache) {
         String layerName = pxyLayerInfo.getLayerName();
@@ -52,7 +53,7 @@ public class TileGetterFactory {
     public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache, String layerCachePreFix) {
         LayerTileGetter realGetter = createRealGetter(pxyLayerInfo);
         boolean enableCache = "true".equalsIgnoreCase(pxyLayerInfo.getEnableCache())
-                || "1".equals(pxyLayerInfo.getEnableCache());
+                              || "1".equals(pxyLayerInfo.getEnableCache());
         if (!enableCache) {
             return realGetter;
         }
@@ -68,8 +69,7 @@ public class TileGetterFactory {
      * 创建真实的获取器（不带缓存）
      */
     private static LayerTileGetter createRealGetter(PxyLayerInfo pxyLayerInfo) {
-        String type = pxyLayerInfo.getSrcType();
-        SrcType srcType = SrcType.fromCode(type);
+        SrcType srcType = pxyLayerInfo.getSrcTypeEnums();
         Integer gridSrid = pxyLayerInfo.getGridSrid();
         if (srcType.isCustom()) {
             CustomTileGetterHelper instance = CustomTileGetterHelper.getInstance();

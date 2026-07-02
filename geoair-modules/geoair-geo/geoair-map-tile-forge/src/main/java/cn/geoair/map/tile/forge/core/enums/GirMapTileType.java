@@ -13,6 +13,7 @@ public enum GirMapTileType implements GiVisualValuable<String> {
     XYZ("xyz"), // XYZ格式
     LOOSE("loose"),// 松散型瓦片格式
     TILE_3D("3d_tiles"),
+    S3M("s3m"),
     TERRAIN_3D("3d_terrain"),
     ;
     private final String value;

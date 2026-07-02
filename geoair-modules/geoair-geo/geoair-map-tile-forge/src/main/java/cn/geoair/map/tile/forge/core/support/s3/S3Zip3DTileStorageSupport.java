@@ -25,7 +25,7 @@ public class S3Zip3DTileStorageSupport extends LocalZip3DTileStorageSupport {
      *
      * @return ICompressionHandler 压缩处理器实例
      */
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new S3CompressionHandler();
         }

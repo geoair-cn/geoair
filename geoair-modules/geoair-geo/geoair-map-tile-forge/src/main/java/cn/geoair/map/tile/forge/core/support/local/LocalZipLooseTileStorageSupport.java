@@ -1,12 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
  * &#064;date ：Created in 2025/11/17 15:20
  * &#064;description：本地松散ZIP瓦片存储支持类，用于处理ArcGIS瓦片数据的读取和解压缩
  */
-public class LocalZipLooseTileStorageSupport extends ConfigXmlGetterZip {
+public class LocalZipLooseTileStorageSupport extends AbstractArcgisZipDirectoryGetter {
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -29,7 +30,7 @@ public class LocalZipLooseTileStorageSupport extends ConfigXmlGetterZip {
      * @return ICompressionHandler 压缩处理器实例
      */
     @Override
-    protected ICompressionHandler getICompressionHandler() {
+    public ICompressionHandler getICompressionHandler() {
         if (compressionHandler == null) {
             compressionHandler = new LocalCompressionHandler();
         }
@@ -56,12 +57,31 @@ public class LocalZipLooseTileStorageSupport extends ConfigXmlGetterZip {
 
 
     @Override
-    public TileCentralDirectoryEntry getTileCentralDirectoryEntry(CentralDirectoryEntry centralDirectoryEntry) {
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
         return null;
     }
 
     @Override
-    protected String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         return "";
     }
+
+    /**
+     * 从压缩包中获取配置XML文件内容
+     *
+     * @param layerConfigContext 图层配置信息对象
+     * @return String 配置XML文件内容
+     * @throws Exception 文件读取异常
+     */
+    @Override
+    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigXmlByZip(layerConfigContext, getICompressionHandler());
+    }
+
+
+    @Override
+    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigCdiByZip(layerConfigContext, getICompressionHandler());
+    }
+
 }
