@@ -75,9 +75,15 @@ public class ${ClassName}SearchVo {
         #end
 
         #if($column.javaType == 'Date')
+            @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             @GaModelField(text = "${column.columnComment}始")
             private Date ${column.javaField}Start;
 
+            @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
             @GaModelField(text = "${column.columnComment}止")
             private Date ${column.javaField}End;
         #end
