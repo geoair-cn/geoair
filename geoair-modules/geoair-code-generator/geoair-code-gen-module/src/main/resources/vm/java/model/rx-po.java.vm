@@ -127,6 +127,7 @@ import $importone;
     public void initCreateMeta() {
         setNotDel();
         // setTimeCreate(new Date());
+        // setTimeUpdate(new Date());
     }
 
     public void initUpdateMeta() {
