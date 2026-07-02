@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterXYZ;
+import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -138,7 +139,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
                 Integer z = tileCentralDirectoryEntry.getZAsInt(), x = tileCentralDirectoryEntry.getXAsInt(), y = tileCentralDirectoryEntry.getYAsInt();
                 TileRequest tileRequest = getTileRequest(layerConfigContext);
                 String cacheKey = tileCache.buildTileCacheKey(layerConfigContext.getDataId(), z + "", y + "", x + "");
-                getExecutor().submit(() -> {
+                ForgeExecutorUtils.getExecutor().submit(() -> {
                     try {
                         byte[] bytes = iCompressionHandler.readAndDecompressEntry(tileCentralDirectoryEntry, objectKey);
                         tileRequest.setBytes(bytes);

@@ -4,6 +4,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
+import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
@@ -117,7 +118,7 @@ public abstract class ConfigXmlGetterZip extends AbstractTileStorageSupport impl
     protected void doInsert(List<TileCentralDirectoryEntry> batchList, LayerPerFileDao layerPerFileDao) {
 
         List<TileCentralDirectoryEntry> insertList = new ArrayList<>(batchList);
-        getExecutor().submit(() -> {
+        ForgeExecutorUtils.getExecutor().submit(() -> {
             try {
                 layerPerFileDao.batchInsert(insertList);
                 insertList.clear();
