@@ -16,7 +16,6 @@ public class CentralDirectoryUtils {
 
 
     public static void doInsert(List<TileCentralDirectoryModel> batchList, LayerPerFileDao layerPerFileDao) {
-
         List<TileCentralDirectoryModel> insertList = new ArrayList<>(batchList);
         ForgeExecutorUtils.getExecutor().submit(() -> {
             try {

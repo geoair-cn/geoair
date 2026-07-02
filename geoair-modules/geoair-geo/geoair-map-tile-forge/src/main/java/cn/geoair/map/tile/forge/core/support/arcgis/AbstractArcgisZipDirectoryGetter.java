@@ -4,7 +4,6 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
-import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
@@ -12,7 +11,6 @@ import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSupport implements ZipDirectoryGetter {
 
 
-    public void initTileCentralDirectoryEntryDao(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
+    public void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         ICompressionHandler iCompressionHandler = getICompressionHandler();
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();
         GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();

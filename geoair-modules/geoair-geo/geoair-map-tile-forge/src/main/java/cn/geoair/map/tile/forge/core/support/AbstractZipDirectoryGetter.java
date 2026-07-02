@@ -3,7 +3,7 @@ package cn.geoair.map.tile.forge.core.support;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
+import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
@@ -11,7 +11,6 @@ import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,10 +23,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
 
-    public void initTileCentralDirectoryEntryDao(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
+    public void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         ICompressionHandler iCompressionHandler = getICompressionHandler();
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();
         GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+        Long layerPerCacheBatchSize = instance.getLayerPerCacheBatchSize(layerConfigContext);
         AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> saveCount = new AtomicReference<>(0);
         try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
@@ -65,8 +65,8 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
                     }
                     saveCount.updateAndGet(v -> v + 1);
                     batchList.add(tileCentralDirectoryEntry);
-                    if (batchList.size() >= 300) {
-                        doInsert(batchList, layerPerFileDao);
+                    if (batchList.size() >= layerPerCacheBatchSize) {
+                        CentralDirectoryUtils.doInsert(batchList, layerPerFileDao);
                         log.info("insert 图层{} 缓存条数  {} ,遍历总数{} ，已经插入的数量 {} ", layerConfigContext.getLayerName(), batchList.size(), count.get(), saveCount.get());
                         log.info("insert {}", batchList.size());
                         batchList.clear();
@@ -74,7 +74,7 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
                     return true;
                 });
                 if (!batchList.isEmpty()) {
-                    doInsert(batchList, layerPerFileDao);
+                    CentralDirectoryUtils.doInsert(batchList, layerPerFileDao);
                 }
                 log.info("该压缩包的缓存构建完成{}，{}", layerConfigContext.getStorageType().getValue(), layerConfigContext.getObjectKey());
             }
@@ -82,21 +82,6 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    protected void doInsert(List<TileCentralDirectoryModel> batchList, LayerPerFileDao layerPerFileDao) {
-
-        List<TileCentralDirectoryModel> insertList = new ArrayList<>(batchList);
-        ForgeExecutorUtils.getExecutor().submit(() -> {
-            try {
-                layerPerFileDao.batchInsert(insertList);
-                insertList.clear();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
     }
 
 

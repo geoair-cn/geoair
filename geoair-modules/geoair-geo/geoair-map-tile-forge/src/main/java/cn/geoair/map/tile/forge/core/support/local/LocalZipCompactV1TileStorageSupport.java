@@ -192,7 +192,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
 
     @Override
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
-        this.initTileCentralDirectoryEntryDao(layerConfigContext, ListUtil.of(progressConsumer));
+        this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
         GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         // 参数校验

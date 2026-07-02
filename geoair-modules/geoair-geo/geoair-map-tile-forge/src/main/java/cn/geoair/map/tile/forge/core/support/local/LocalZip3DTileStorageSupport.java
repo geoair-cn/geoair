@@ -105,7 +105,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
     @Override
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
-        this.initTileCentralDirectoryEntryDao(layerConfigContext, ListUtil.of(progressConsumer));
+        this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
     }
 
 

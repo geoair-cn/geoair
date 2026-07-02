@@ -68,11 +68,11 @@ public interface ZipDirectoryGetter {
      *
      * @param layerConfigContext 图层配置信息
      */
-    default void initTileCentralDirectoryEntryDao(GirLayerConfigContext layerConfigContext) {
-        initTileCentralDirectoryEntryDao(layerConfigContext, ListUtil.of(new LogProgressConsumer()));
+    default void preCacheCentralDir(GirLayerConfigContext layerConfigContext) {
+        preCacheCentralDir(layerConfigContext, ListUtil.of(new LogProgressConsumer()));
     }
 
-    void initTileCentralDirectoryEntryDao(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers);
+    void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers);
 
     /**
      * 前置检查ZIP文件，并获取到当前的zip的根
