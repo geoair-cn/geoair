@@ -65,5 +65,21 @@ public class ${ClassName}SearchVo {
     private ${column.javaType} ${column.javaField};
 
     #end
+    #foreach ($column in $columns)
+        #if($column.isPk == 1)
+            @GaModelField(text = "查询多个主键数据")
+            private $column.javaType [] andIdsIn;
 
+            @GaModelField(text = "查询排除多个主键数据")
+            private $column.javaType [] andIdsNotIn;
+        #end
+
+        #if($column.javaType == 'Date')
+            @GaModelField(text = "${column.columnComment}始")
+            private Date ${column.javaField}Start;
+
+            @GaModelField(text = "${column.columnComment}止")
+            private Date ${column.javaField}End;
+        #end
+    #end
 }
