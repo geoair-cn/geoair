@@ -25,17 +25,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </if>
 #end
 #if($column.javaType=='Date')
-                <if test="param.$column.javaField != null">
-                    AND ${tableName}.$column.columnName <![CDATA[>=]]>  #{param.$column.javaField,jdbcType=TIMESTAMP}
-                    AND ${tableName}.$column.columnName <![CDATA[<=]]> date_add(#{param.$column.javaField,jdbcType=TIMESTAMP}, date_trunc('day', current_date + interval '1 day'))
+                <if test="param.${column.javaField}Start != null">
+                    AND ${tableName}.$column.columnName <![CDATA[>=]]>  #{param.${column.javaField}Start,jdbcType=TIMESTAMP}
                 </if>
+               <if test="param.${column.javaField}End != null">
+                    AND ${tableName}.$column.columnName <![CDATA[<=]]> #{param.${column.javaField}End,jdbcType=TIMESTAMP}
+               </if>
 #end
 #end
 
         <if test="param.andQueryContentIn != null and param.andQueryContentIn.length > 0">
             AND (
             <foreach collection="param.andQueryContentIn" item="str" index="index"   >
-                row_to_json(${tableName})||'' LIKE '%'|| #{str}||'%'    or
+                ${tableName}::text ||'' LIKE '%'|| #{str}||'%'    or
             </foreach>
             1!=1 )
         </if>
