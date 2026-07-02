@@ -4,7 +4,7 @@ import cn.geoair.base.exception.GirException;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
+import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -39,7 +39,7 @@ import java.util.Optional;
  * @since 2025/11/17
  */
 @Slf4j
-public class LocalZip3DTileStorageSupport extends ConfigXmlGetterZip implements ZipDirectoryGetter {
+public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter {
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作

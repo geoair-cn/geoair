@@ -6,7 +6,7 @@ import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
+import cn.geoair.map.tile.forge.core.support.arcgis.ConfigXmlGetterZip;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
@@ -52,7 +52,7 @@ public class LocalZipCompactV1TileStorageSupport extends ConfigXmlGetterZip {
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
         // 初始化瓦片请求对象
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         try {
             // 创建缓存访问器，用于构建文件路径
             String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);

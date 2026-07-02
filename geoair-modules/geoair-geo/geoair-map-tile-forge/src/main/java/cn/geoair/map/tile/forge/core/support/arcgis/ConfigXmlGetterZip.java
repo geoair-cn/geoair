@@ -1,23 +1,9 @@
 package cn.geoair.map.tile.forge.core.support.arcgis;
 
-import cn.geoair.base.util.GutilObject;
-import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.AbstractTileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
-import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
-import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
-import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
-import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
-import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author ：张俊
@@ -25,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * &#064;description：本地配置XML获取器抽象类，用于从本地文件系统读取ArcGIS图层配置文件
  */
 @Slf4j
-public abstract class ConfigXmlGetterZip implements ArcgisConfigXmlGetter {
+public abstract class ConfigXmlGetterZip extends AbstractArcgisSupport {
 
     /**
      * 获取压缩文件处理器实例

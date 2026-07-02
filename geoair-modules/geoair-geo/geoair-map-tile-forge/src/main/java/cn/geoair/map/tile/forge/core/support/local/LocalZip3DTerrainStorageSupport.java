@@ -4,7 +4,7 @@ import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
+import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 2025/11/17
  */
 @Slf4j
-public class LocalZip3DTerrainStorageSupport extends ConfigXmlGetterZip implements ZipDirectoryGetter {
+public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter {
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作

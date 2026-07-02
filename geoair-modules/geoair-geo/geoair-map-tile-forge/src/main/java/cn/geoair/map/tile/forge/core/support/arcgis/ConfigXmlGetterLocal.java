@@ -1,8 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.arcgis;
 
-import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.support.AbstractTileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 
 /**
@@ -10,7 +8,7 @@ import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
  * &#064;date ：Created in 2025/11/17 10:16
  * &#064;description：本地配置XML获取器抽象类，用于从本地文件系统读取ArcGIS图层配置文件
  */
-public abstract class ConfigXmlGetterLocal implements ArcgisConfigXmlGetter {
+public abstract class ConfigXmlGetterLocal extends AbstractArcgisSupport {
 
 
     /**

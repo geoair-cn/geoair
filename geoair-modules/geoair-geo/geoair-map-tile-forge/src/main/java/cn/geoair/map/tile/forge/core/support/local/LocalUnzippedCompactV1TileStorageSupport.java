@@ -4,7 +4,7 @@ import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 
-import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterLocal;
+import cn.geoair.map.tile.forge.core.support.arcgis.ConfigXmlGetterLocal;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.vo.TileRequest;
 import cn.hutool.core.io.IoUtil;
@@ -23,17 +23,17 @@ public class LocalUnzippedCompactV1TileStorageSupport extends ConfigXmlGetterLoc
      * 根据图层名称和瓦片坐标获取瓦片数据
      *
      * @param layerConfigContext 图层名称
-     * @param z              瓦片级别
-     * @param x              瓦片列号
-     * @param y              瓦片行号
+     * @param z                  瓦片级别
+     * @param x                  瓦片列号
+     * @param y                  瓦片行号
      * @return TileRequest 瓦片请求对象
      * @throws Exception 获取瓦片数据时可能抛出的异常
      */
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = getTileRequest(layerConfigContext);
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String rootPath = getRootPath(layerConfigContext);
-        ArcGISCompactCache gisCompactCache =   getArcGISCompactCache(rootPath);
+        ArcGISCompactCache gisCompactCache = getArcGISCompactCache(rootPath);
         BundleFileResource bundleFileResource = gisCompactCache.getBundleFileResource(Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
         String format = layerConfigContext.getFormat();
         if (format == null) {

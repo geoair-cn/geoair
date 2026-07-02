@@ -20,6 +20,10 @@ public interface ArcgisConfigXmlGetter {
     String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception;
 
     /**
+     * 获取瓦片的 capabilities 文件
+     */
+    String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception;
+    /**
      * 获取描述边界的文件描述
      *
      * @param layerConfigContext 瓦片的配置信息

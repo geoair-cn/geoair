@@ -11,14 +11,5 @@ import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 public abstract class ConfigXmlGetterS3 extends AbstractTileStorageSupport {
 
 
-    @Override
-    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigXmlByS3(layerConfigContext);
-    }
-
-    @Override
-    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigCdiByS3(layerConfigContext);
-    }
 
 }
