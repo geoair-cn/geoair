@@ -1,9 +1,7 @@
 package cn.geoair.map.tile.forge.core.support;
 
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.hutool.core.io.FileUtil;
-
-import java.io.File;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 
 /**
  * @author ：张俊
@@ -23,28 +21,13 @@ public abstract class ConfigXmlGetterLocal extends AbstractTileStorageSupport {
     @Override
     public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
 
-        String confFileName = "Conf.xml";
-        // 获取配置文件根路径
-        return getString(layerConfigContext, confFileName);
+        return ArcgisTileUtils.getConfigXmlByLocal(layerConfigContext);
     }
 
     @Override
     public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
-        String confFileName = "conf.cdi";
-        return getString(layerConfigContext, confFileName);
+        return ArcgisTileUtils.getConfigCdiByLocal(layerConfigContext);
     }
 
-    private static String getString(GirLayerConfigContext layerConfigContext, String confFileName) {
-        // 获取配置文件根路径
-        String rootPath = layerConfigContext.getObjectKey();
-        // 创建文件对象
-        File file = FileUtil.file(rootPath);
-        // 获取文件所在目录的绝对路径
-        String absolutePath = file.getParentFile().getAbsolutePath();
-        // 构建配置文件完整路径（目录路径 + Conf.xml）
-        String configXmlPath = absolutePath + File.separator + confFileName;
-        // 读取配置文件内容为UTF-8编码的字符串
-        String xmlString = FileUtil.readString(configXmlPath, "utf-8");
-        return xmlString;
-    }
+
 }

@@ -97,6 +97,7 @@ public class TileStorageSupportAdapter {
             case LOOSE:
                 return new LocalZipLooseTileStorageSupport();
             case TILE_3D:
+            case S3M:
                 return new LocalZip3DTileStorageSupport();
             case TERRAIN_3D:
                 return new LocalZip3DTerrainStorageSupport();
@@ -119,6 +120,7 @@ public class TileStorageSupportAdapter {
             case XYZ:
                 return new S3ZipXYZTileStorageSupport();
             case TILE_3D:
+            case S3M:
                 return new S3Zip3DTileStorageSupport();
             case TERRAIN_3D:
                 return new S3Zip3DTerrainStorageSupport();

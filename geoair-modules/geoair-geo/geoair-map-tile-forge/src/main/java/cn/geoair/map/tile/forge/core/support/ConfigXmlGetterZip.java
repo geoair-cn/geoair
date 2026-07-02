@@ -2,18 +2,16 @@ package cn.geoair.map.tile.forge.core.support;
 
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
-import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryEntry;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryEntry;
-import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,98 +42,13 @@ public abstract class ConfigXmlGetterZip extends AbstractTileStorageSupport impl
      */
     @Override
     public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
-
-        // 构建临时目录绝对路径
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-
-        // 配置文件在zip中的路径
-        String confFileName = "Conf.xml";
-
-
-        return getString(layerConfigContext, tempDirAbsolutePath, confFileName);
-    }
-
-    String getString(GirLayerConfigContext layerConfigContext, String tempDirAbsolutePath, String confFileName) {
-        File tempConfFile = FileUtil.file(tempDirAbsolutePath + File.separator + confFileName);
-        // 如果临时目录中不存在conf.xml，则从zip中解压出来
-        if (!FileUtil.exist(tempConfFile)) {
-            GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-            try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
-                boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
-                if (b) {
-                    boolean stringByPreCache = getStringByPreCache(layerConfigContext, tempDirAbsolutePath, confFileName);
-                    if (!stringByPreCache) {
-                        getStringByZip(layerConfigContext, tempDirAbsolutePath, confFileName);
-                    }
-                } else {
-                    getStringByZip(layerConfigContext, tempDirAbsolutePath, confFileName);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        //        // 读取配置文件内容并返回
-        if (FileUtil.exist(tempConfFile)) {
-            return FileUtil.readUtf8String(tempConfFile);
-        }
-        return null;
-    }
-
-    private boolean getStringByZip(GirLayerConfigContext layerConfigContext, String tempDirAbsolutePath, String confFileName) throws IOException {
-        File tempConfFile = FileUtil.file(tempDirAbsolutePath + File.separator + confFileName);
-        ICompressionHandler iCompressionHandler = getICompressionHandler();
-        final CentralDirectoryEntry[] confFileCentralDirectoryEntry = {null};
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
-            if (!directoryIs) {
-                String name = centralDirectoryEntry.getName();
-                if (name.toLowerCase().contains(confFileName.toLowerCase())) {
-                    confFileCentralDirectoryEntry[0] = centralDirectoryEntry;
-                    return false;
-                }
-            }
-            return true;
-        });
-        CentralDirectoryEntry centralDirectoryEntry = confFileCentralDirectoryEntry[0];
-        if (centralDirectoryEntry == null) {
-            throw new RuntimeException("无法找到配置文件" + confFileName);
-        }
-        iCompressionHandler.readAndDecompressEntryToLocal(centralDirectoryEntry, layerConfigContext.getObjectKey(), tempConfFile.getAbsolutePath());
-        return true;
-    }
-
-
-    private boolean getStringByPreCache(GirLayerConfigContext layerConfigContext, String tempDirAbsolutePath, String confFileName) throws IOException {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-        ICompressionHandler iCompressionHandler = getICompressionHandler();
-        try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
-            boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
-            if (b) {
-                TileCentralDirectoryEntry byFileName = layerPerFileDao.findByFileName(confFileName);
-                if (byFileName != null) {
-                    iCompressionHandler.readAndDecompressEntryToLocal(byFileName, layerConfigContext.getObjectKey(), tempDirAbsolutePath + File.separator + confFileName);
-                    return true;
-                } else {
-                    return false;
-                }
-
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return false;
+        return ArcgisTileUtils.getConfigXmlByZip(layerConfigContext, getICompressionHandler());
     }
 
 
     @Override
     public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
-
-        // 构建临时目录绝对路径
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-
-        // 配置文件在zip中的路径
-        String confFileName = "conf.cdi";
-        return getString(layerConfigContext, tempDirAbsolutePath, confFileName);
+        return ArcgisTileUtils.getConfigCdiByZip(layerConfigContext, getICompressionHandler());
     }
 
 

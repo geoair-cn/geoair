@@ -1,7 +1,9 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.base.exception.GirException;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.support.ConfigXmlGetterZip;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
@@ -121,11 +123,18 @@ public class LocalZip3DTileStorageSupport extends ConfigXmlGetterZip implements 
 
 
     @Override
-    protected   String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    protected String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         // 存储所有找到的tileset.json路径
         List<String> allTileSetPaths = new ArrayList<>();
-
+        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
+        String rootFileName = "tileset.json";
+        if (mapTileType == GirMapTileType.S3M) {
+            rootFileName = "tilesets3bm.scp";
+        } else {
+            rootFileName = "tileset.json";
+        }
         // 扫描ZIP中所有条目，收集所有tileset.json路径
+        String finalRootFileName = rootFileName;
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             // 跳过目录
             if (centralDirectoryEntry.isDirectoryIs()) {
@@ -133,9 +142,11 @@ public class LocalZip3DTileStorageSupport extends ConfigXmlGetterZip implements 
             }
             String entryName = centralDirectoryEntry.getName();
             // 匹配tileset.json（不区分大小写）
-            if (entryName.toLowerCase().contains("tileset.json")) {
+            String lowerCase = entryName.toLowerCase();
+            if (lowerCase.contains(finalRootFileName)) {
                 allTileSetPaths.add(entryName);
-                log.info("发现tileset.json路径: {}", entryName);
+                log.info("发现{}路径: {}", finalRootFileName, entryName);
+//                return false;  这里不停止的原因是 每个层级都有tileset.json，所以要拿到所有的tileset.json，在判断最外面的根
             }
             // 继续扫描所有条目（不提前终止）
             return true;
@@ -143,7 +154,7 @@ public class LocalZip3DTileStorageSupport extends ConfigXmlGetterZip implements 
 
         // 校验是否找到tileset.json
         if (allTileSetPaths.isEmpty()) {
-            throw new RuntimeException("三维地形中缺失tileset.json关键元素");
+            throw new GirException("三维数据中缺失{}关键元素", rootFileName);
         }
 
         // 筛选最外层的tileset.json（路径层级最少）
@@ -151,11 +162,12 @@ public class LocalZip3DTileStorageSupport extends ConfigXmlGetterZip implements 
         log.info("选中最外层的tileset.json路径: {}", outerMostTileSetPath);
 
         // 提取根路径（移除tileset.json文件名）
-        return outerMostTileSetPath.replace("tileset.json", "");
+        return outerMostTileSetPath.replace(rootFileName, "");
     }
 
     /**
      * 从多个路径中找到层级最少（最外层）的路径
+     *
      * @param paths 所有tileset.json的路径列表
      * @return 最外层路径
      */

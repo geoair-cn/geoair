@@ -127,7 +127,7 @@ public class LocalZipXYZTileStorageSupport extends ConfigXmlGetterXYZ implements
 //            throw new IllegalArgumentException("layerConfigDto和cacheProvider不能为空");
 //        }
         if (tileCache == null) {
-            log.error("tileCache is null， 跳过缓存执行操作");
+            log.info("tileCache is null， 跳过缓存执行操作");
             return;
         }
 
