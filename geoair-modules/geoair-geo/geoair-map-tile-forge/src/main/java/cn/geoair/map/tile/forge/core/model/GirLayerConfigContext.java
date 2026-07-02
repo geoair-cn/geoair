@@ -2,9 +2,12 @@ package cn.geoair.map.tile.forge.core.model;
 
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
+import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 
-@Getter
+@Data
+@Accessors(chain = true)
 public class GirLayerConfigContext {
 
     /**
@@ -67,111 +70,9 @@ public class GirLayerConfigContext {
     private Integer minZ; // 默认最小缩放级别0
 
 
-    /**
-     * 设置X方向上的最大瓦片编号
-     *
-     * @param maxX X方向上的最大瓦片编号
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setMaxX(Integer maxX) {
-        this.maxX = maxX;
-        return this;
-    }
-
-    /**
-     * 设置Y方向上的最大瓦片编号
-     *
-     * @param maxY Y方向上的最大瓦片编号
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setMaxY(Integer maxY) {
-        this.maxY = maxY;
-        return this;
-    }
-
-    /**
-     * 设置Z方向（缩放级别）上的最大值
-     *
-     * @param maxZ Z方向上的最大缩放级别
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setMaxZ(Integer maxZ) {
-        this.maxZ = maxZ;
-        return this;
-    }
-
-    /**
-     * 设置Z方向（缩放级别）上的最小值
-     *
-     * @param minZ Z方向上的最小缩放级别
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setMinZ(Integer minZ) {
-        this.minZ = minZ;
-        return this;
-    }
-
-
-    /**
-     * 设置ZIP文件对象键
-     *
-     * @param objectKey 存储系统中的唯一标识符/路径
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setObjectKey(String objectKey) {
-        this.objectKey = objectKey;
-        return this;
-    }
-
-
-    /**
-     * 设置存储类型
-     *
-     * @param storageType 存储类型枚举
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setStorageType(GirStorageType storageType) {
-        this.storageType = storageType;
-        return this;
-    }
-
-    /**
-     * 设置瓦片ArcGIS类型
-     *
-     * @param mapTileType 瓦片格式类型枚举
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setMapTileType(GirMapTileType mapTileType) {
-        this.mapTileType = mapTileType;
-        return this;
-    }
-
-    /**
-     * 设置瓦片路径前缀
-     *
-     * @param tilePathPrefix 瓦片路径前缀
-     * @return 当前对象实例，支持链式调用
-     */
-    public GirLayerConfigContext setTilePathPrefix(String tilePathPrefix) {
-        this.tilePathPrefix = tilePathPrefix;
-        return this;
-    }
-
-    public GirLayerConfigContext setDataId(String dataId) {
-        this.dataId = dataId;
-        return this;
-    }
-
     public String getLayerName() {
         return dataId;
     }
 
-    /**
-     * 设置瓦片格式
-     *
-     * @param format png/jpg
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
+
 }
