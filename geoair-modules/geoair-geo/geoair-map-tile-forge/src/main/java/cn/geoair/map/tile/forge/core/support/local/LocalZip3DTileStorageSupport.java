@@ -139,8 +139,8 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
             }
             String entryName = centralDirectoryEntry.getName();
             // 匹配tileset.json（不区分大小写）
-            String lowerCase = entryName.toLowerCase();
-            if (lowerCase.contains(finalRootFileName)) {
+
+            if (entryName.contains(finalRootFileName)) {
                 allTileSetPaths.add(entryName);
                 log.info("发现{}路径: {}", finalRootFileName, entryName);
 //                return false;  这里不停止的原因是 每个层级都有tileset.json，所以要拿到所有的tileset.json，在判断最外面的根
