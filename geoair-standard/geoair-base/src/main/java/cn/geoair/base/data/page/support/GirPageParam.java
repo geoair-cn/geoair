@@ -62,6 +62,12 @@ public class GirPageParam implements GiPageParam {
     }
 
     @Override
+    public GiPageParam setPageNumStartZero(boolean pageNumStartZero) {
+        this.pageNumStartZero = pageNumStartZero;
+        return this;
+    }
+
+    @Override
     public GirPageParam putParam(Integer pageSize, Integer pageNum, Long startRow) {
         return putParam(pageSize, pageNum, startRow, pageNumStartZero);
     }
