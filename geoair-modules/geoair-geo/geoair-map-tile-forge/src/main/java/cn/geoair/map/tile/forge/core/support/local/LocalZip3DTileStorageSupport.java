@@ -153,7 +153,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         String name = FileUtil.getName(outerMostTileSetPath);
         String rootPath = outerMostTileSetPath.replace(name, "");
         return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath)
-                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "root.scp" : "tileset.json");
+                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "tilesetS3MB.scp" : "tileset.json");
     }
 
     /**
