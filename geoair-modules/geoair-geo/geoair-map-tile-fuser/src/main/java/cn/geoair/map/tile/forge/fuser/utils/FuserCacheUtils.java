@@ -54,6 +54,19 @@ public class FuserCacheUtils {
     public static boolean fileCheckIsNeedReverseY(String layerName) {
         //layerName请求找缓存的时候，用的是 google原点
         // layerName_orgin_grid_请求找缓存的时候，用的是tms原点
+//        try {
+//            PxyLayerInfo pxyLayerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
+//            if (pxyLayerInfo != null) {
+//                String originTypeStr = pxyLayerInfo.getOriginType();
+//                OriginType originType = OriginType.fromMode(originTypeStr);
+//                // Google 坐标系需要翻转 Y（TMS 风格）
+//                return !originType.isGoogle();
+//            }
+//        } catch (Exception e) {
+//            log.debug("获取图层 {} 的 OriginType 失败，默认不翻转", layerName);
+//        }
+//        // 默认翻转
+//        return true;
         return !mbtilesCheckIsNeedReverseY(layerName);
     }
 
