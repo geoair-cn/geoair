@@ -16,11 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author 张俊
  * @date Created in 2023/12/4
  * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
- * 注意：根据图层的 OriginType 自动处理 Y 轴翻转（TMS  源点 ↔ WMTS  源点）
+ * 注意：
+ * 缓存的结果，全部转换成wmts原点
  */
 
 public class FileTileCache implements TileCache {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // 缓存根目录
     private final String cacheRoot;
     // 缓存过期时间（毫秒），0表示不过期
@@ -66,9 +67,8 @@ public class FileTileCache implements TileCache {
      * @return true: 需要翻转（Google 坐标系 → TMS 坐标系）
      */
     private boolean isNeedReverseY(String layerName) {
-        return layerReverseCache.computeIfAbsent(layerName, k -> FuserCacheUtils.isNeedReverseY(layerName));
+        return layerReverseCache.computeIfAbsent(layerName, k ->  FuserCacheUtils.fileCheckIsNeedReverseY(layerName));
     }
-
 
 
     /**
@@ -248,8 +248,8 @@ public class FileTileCache implements TileCache {
 
         try {
             String tempDirName = targetPath.getFileName().toString() +
-                    "_deleting_" + System.currentTimeMillis() +
-                    "_" + Thread.currentThread().getId();
+                                 "_deleting_" + System.currentTimeMillis() +
+                                 "_" + Thread.currentThread().getId();
             Path tempPath = targetPath.resolveSibling(tempDirName);
 
             Files.move(targetPath, tempPath, StandardCopyOption.ATOMIC_MOVE);

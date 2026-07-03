@@ -22,16 +22,17 @@ import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
  */
 
 public class FuserCacheUtils {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * 原始网格名称后缀
      */
     public static final String ORIGINAL_GRID_SUFFIX = Constant._original_grid_name_suffix;
 
+
     /**
-     * 判断是否需要翻转 Y
+     * 保存到mbtiles的时候，判断是否需要翻转 Y
      */
-    public static boolean isNeedReverseY(String layerName) {
+    public static boolean mbtilesCheckIsNeedReverseY(String layerName) {
         try {
             PxyLayerInfo pxyLayerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
             if (pxyLayerInfo != null) {
@@ -45,6 +46,15 @@ public class FuserCacheUtils {
         }
         // 默认不翻转
         return false;
+    }
+
+    /**
+     * 保存到文件的时候，判断是否需要翻转 Y
+     */
+    public static boolean fileCheckIsNeedReverseY(String layerName) {
+        //layerName请求找缓存的时候，用的是 google原点
+        // layerName_orgin_grid_请求找缓存的时候，用的是tms原点
+        return !mbtilesCheckIsNeedReverseY(layerName);
     }
 
     /**

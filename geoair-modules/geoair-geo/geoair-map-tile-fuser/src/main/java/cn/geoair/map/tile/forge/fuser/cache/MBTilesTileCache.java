@@ -137,7 +137,7 @@ public class MBTilesTileCache implements TileCache {
                         log.debug("重建图层缓存: {}", key);
                         return new LayerCacheHolder(
                                 dbPath,
-                                FuserCacheUtils.isNeedReverseY(key),
+                                FuserCacheUtils.mbtilesCheckIsNeedReverseY(key),
                                 maxReadPoolSize,
                                 maxWritePoolSize,
                                 minIdle
@@ -156,7 +156,7 @@ public class MBTilesTileCache implements TileCache {
                             log.debug("创建图层缓存: {}", key);
                             return new LayerCacheHolder(
                                     dbPath,
-                                    FuserCacheUtils.isNeedReverseY(key),
+                                    FuserCacheUtils.mbtilesCheckIsNeedReverseY(key),
                                     maxReadPoolSize,
                                     maxWritePoolSize,
                                     minIdle

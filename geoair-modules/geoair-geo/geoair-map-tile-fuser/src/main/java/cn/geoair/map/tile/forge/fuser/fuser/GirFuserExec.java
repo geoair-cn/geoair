@@ -478,7 +478,7 @@ public class GirFuserExec implements FuserExec {
                             .parallel()
                             .forEach(gridx -> {
                                 String key = srcIdx + "_" + gridx + "_" + gridy;
-                                Resource blob = layerTileGetter.getTileResource(srcIdx, gridx, gridy);
+                                Resource blob = layerTileGetter.getTileResource(srcIdx, gridx, gridy);    // tms 原点，找原始
                                 if (blob != null) {
                                     resourceMap.put(key, blob);
                                 }

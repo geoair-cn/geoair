@@ -58,7 +58,7 @@ public class CacheTileFuserExec implements FuserExec {
         // 尝试从缓存获取
         try {
             ImageMime outputFormat = target.getOutputFormat();
-            byte[] cachedResult = tileCache.get(layerName, z, x, y, outputFormat);
+            byte[] cachedResult = tileCache.get(layerName, z, x, y, outputFormat);   //谷歌原点xyz
             if (cachedResult != null && cachedResult.length > 0) {
                 long cacheHitTime = System.currentTimeMillis() - startTime;
                 log.debug("缓存命中 - layer: {}, z: {}, x: {}, y: {}, 耗时: {} ms, 数据大小: {} bytes",
