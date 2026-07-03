@@ -56,7 +56,7 @@ public class CachedTileGetter implements LayerTileGetter {
         // 先尝试从缓存读取
         if (cacheEnabled) {
             try {
-                byte[] cachedData = tileCache.get(layerCachePreFix, z, x, y, target.getSrcFormat());
+                byte[] cachedData = tileCache.get(layerCachePreFix, z, x, y, target.getSrcFormat()); // tms 原点
                 if (cachedData != null && cachedData.length > 0) {
                     log.debug("从缓存获取瓦片成功: {} - ({},{},{})", layerCachePreFix, z, x, y);
                     return new ByteArrayResource(cachedData);

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * PostgreSQL 瓦片缓存实现
  * <p>
  * 每个图层独立一张表，表名格式: tile_cache_fuser_{layerName}
+ * 缓存的结果，全部转换成wmts原点
  * </p>
  *
  * @author 张逢吉
@@ -109,7 +110,7 @@ public class PostgresTileCache implements TileCache {
         return layerCaches.computeIfAbsent(layerName, k -> {
             try {
                 String tableName = getTableName(k);
-                boolean needReverse = FuserCacheUtils.isNeedReverseY(k);
+                boolean needReverse = FuserCacheUtils.fileCheckIsNeedReverseY(k);
                 return new TableCacheHolder(dataSource, tableName, needReverse);
             } catch (Exception e) {
                 log.error("创建图层缓存失败: {}", layerName, e);
