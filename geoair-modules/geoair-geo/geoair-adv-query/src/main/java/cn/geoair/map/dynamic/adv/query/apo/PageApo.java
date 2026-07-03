@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
+import cn.geoair.base.data.page.support.GirPager;
 import cn.hutool.core.collection.ListUtil;
 import lombok.Getter;
 
@@ -126,6 +127,13 @@ public class PageApo<T> implements Serializable, GiPager<T> {
         this.pageNum = pagedNum;
         this.pageSize = pagedSize;
         this.startRow = startedRow;
+        return this;
+    }
+
+    @Override
+    public GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero) {
+        put(list, total, pageParam);
+        this.pageNumStartZero = pageNumStartZero;
         return this;
     }
 }
