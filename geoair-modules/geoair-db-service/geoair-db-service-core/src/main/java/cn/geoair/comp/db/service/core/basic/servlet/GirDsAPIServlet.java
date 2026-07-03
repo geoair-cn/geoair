@@ -1,5 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
+import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.basic.executor.Executor;
@@ -10,16 +11,19 @@ import cn.geoair.comp.db.service.core.basic.util.Constants;
 import cn.geoair.comp.db.service.core.basic.util.JacksonUtils;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
+import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,24 +64,22 @@ public class GirDsAPIServlet extends HttpServlet {
         String realApiContext = property + "/" + realApiContext2;
         String servletPath = request.getRequestURI();
         servletPath = servletPath.substring(realApiContext.length() + 1);
-        PrintWriter out = null;
+
         try {
-            out = response.getWriter();
+
             ResponseDto responseDto = process(servletPath, request, response);
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            out.append(json);
+            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             ResponseDto responseDto = ResponseDto.fail(e.toString());
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            out.append(json);
+            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
             log.error(e.toString(), e);
-        } finally {
-            if (out != null) out.close();
         }
     }
 
