@@ -9,24 +9,21 @@ import java.awt.image.renderable.ParameterBlock;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageWriter;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.media.colorindexer.ColorIndexer;
 import org.eclipse.imagen.media.colorindexer.Quantizer;
-import org.geotools.image.ImageWorker;
-import org.geotools.util.logging.Logging;
 
 public class ImageMime extends MimeType {
 
     public static final String NATIVE_PNG_WRITER_CLASS_NAME =
             "com.sun.media.imageioimpl.plugins.png.CLibPNGImageWriter";
 
-    private static Logger log = Logging.getLogger(ImageMime.class.getName());
+    private static GiLogger log = GirLoggerFactory.getLogger(ImageMime.class);
 
     boolean supportsAlphaChannel;
 
@@ -41,7 +38,8 @@ public class ImageMime extends MimeType {
         }
     };
 
-    public static final ImageMime jpeg = new ImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg", true, false, false) {
+    public static final ImageMime jpeg =
+            new ImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg", true, false, false) {
 
         /** Shave off the alpha band, JPEG cannot write it out */
         @Override
@@ -233,10 +231,10 @@ public class ImageMime extends MimeType {
         }
 
         /**
-         * Returns true if the best format to encode the image is jpeg (the image is rgb, or rgba without any actual
-         * transparency use). This code is duplicated in GeoServer JpegPngRenderedImageMapOutputFormat. Unfortunately
-         * gwc-core does not depend on GeoTools, so we don't have an easy place to share it. On the bright side, it's
-         * small.
+         * Returns true if the best format to encode the image is jpeg (the image is rgb, or rgba
+         * without any actual transparency use). This code is duplicated in GeoServer
+         * JpegPngRenderedImageMapOutputFormat. Unfortunately gwc-core does not depend on GeoTools,
+         * so we don't have an easy place to share it. On the bright side, it's small.
          */
         boolean isBestFormatJpeg(RenderedImage renderedImage) {
             int numBands = renderedImage.getSampleModel().getNumBands();

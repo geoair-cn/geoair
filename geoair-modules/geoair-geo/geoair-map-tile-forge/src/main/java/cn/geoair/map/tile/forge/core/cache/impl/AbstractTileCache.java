@@ -4,7 +4,7 @@ import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.caches.CacheProvider;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;

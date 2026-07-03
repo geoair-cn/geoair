@@ -64,7 +64,7 @@ public class D3TerrainServlet extends D3TilesServlet {
         layerConfigContext.setFormat(format);
         try {
             TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
-            buildTileResponse(layerTile, response);
+            TileResponseUtils.buildTileResponse(layerTile, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

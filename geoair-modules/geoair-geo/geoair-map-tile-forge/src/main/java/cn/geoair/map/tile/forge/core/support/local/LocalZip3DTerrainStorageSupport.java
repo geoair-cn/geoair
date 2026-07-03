@@ -1,12 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
@@ -86,7 +87,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
             tileRequest.setExists(true);
             Optional<MediaType> mediaType = MediaTypeFactory.getMediaType(localTileFile.getName());
             MediaType mediaType1 = mediaType.orElse(MediaType.APPLICATION_OCTET_STREAM);
-            tileRequest.mimeTypeByType(mediaType1);
+            tileRequest.setMimeType(MimeType.createFromExtension(localTileFile.getName()));
         }
         return tileRequest;
     }

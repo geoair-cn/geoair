@@ -3,8 +3,9 @@ package cn.geoair.map.tile.forge.core.support.local;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
 import org.springframework.http.MediaType;
 
@@ -43,7 +44,8 @@ public class LocalUnzippedCompactV2TileStorageSupport extends LocalUnzippedCompa
             tileRequest.setBytes(IoUtil.readBytes(bundleFileResource.getInputStream()));
             tileRequest.setSize(size);
             tileRequest.setLastModified(bundleFileResource.getLastModified());
-            tileRequest.mimeTypeByType(MediaType.parseMediaType("image/" + format));
+
+            tileRequest.setMimeType(MimeType.createFromExtension(format));
         }
         return tileRequest;
     }

@@ -2,7 +2,7 @@ package cn.geoair.map.tile.forge.core.cache;
 
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 
 /**
  * 瓦片缓存提供者接口

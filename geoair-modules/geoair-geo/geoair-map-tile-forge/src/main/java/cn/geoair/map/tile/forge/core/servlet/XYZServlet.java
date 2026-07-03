@@ -99,10 +99,10 @@ public class XYZServlet extends D3TilesServlet {
                 }
                 TileRequest tileRequest = null;
                 tileRequest = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
-                buildTileResponse(tileRequest, response);
+                TileResponseUtils.buildTileResponse(tileRequest, response);
             } else {
                 TileRequest layerTile = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
-                buildTileResponse(layerTile, response);
+                TileResponseUtils.buildTileResponse(layerTile, response);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

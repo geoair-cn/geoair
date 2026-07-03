@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 
+
 @Slf4j
 @Service
 public class GirMapTileService extends TileStorageSupportAdapter {
@@ -71,7 +72,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
             String configXml = arcgisConfigXmlGetter.getCapabilities(config);
             if (configXml != null) {
                 tileRequest.setBytes(configXml.getBytes());
-                tileRequest.mimeTypeByType(MediaType.APPLICATION_XML);
+                tileRequest.mimeTypeBySpring(MediaType.APPLICATION_XML);
                 tileRequest.setExists(true);
                 tileRequest.setSize(configXml.getBytes().length);
                 tileRequest.setLastModified(System.currentTimeMillis());
@@ -81,7 +82,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
             }
         }
         tileRequest.setBytes(new String("无法找到配置文件").getBytes("UTF-8"));
-        tileRequest.mimeTypeByType(MediaType.TEXT_XML);
+        tileRequest.mimeTypeBySpring(MediaType.TEXT_XML);
         tileRequest.setExists(false);
         tileRequest.setSize(0);
         tileRequest.setLastModified(System.currentTimeMillis());

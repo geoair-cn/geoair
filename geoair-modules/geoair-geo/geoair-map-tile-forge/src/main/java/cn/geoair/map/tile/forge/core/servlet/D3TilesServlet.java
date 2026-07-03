@@ -5,7 +5,7 @@ import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
 
 import jakarta.annotation.Resource;
@@ -60,36 +60,12 @@ public class D3TilesServlet extends HttpServlet {
         }
         try {
             TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
-            buildTileResponse(layerTile, response);
+            TileResponseUtils.buildTileResponse(layerTile, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
 
-    /**
-     * 构建瓦片响应
-     */
-    protected void buildTileResponse(TileRequest tileRequest, HttpServletResponse response) throws Exception {
-        // 1. 校验瓦片是否存在
-        if (!tileRequest.isExists()) {
-            response.setStatus(HttpStatus.NO_CONTENT.value());
-            return;
-        }
-        response.setHeader("Cache-Control", "public, max-age=86400");
-        response.setHeader("Last-Modified", tileRequest.getLastModified() + "");
-        if (tileRequest.getSize() > 0) {
-            response.setHeader("Content-Length", tileRequest.getSize() + "");
-        }
-        response.setContentType(tileRequest.getMimeType());
-        response.setStatus(HttpStatus.OK.value());
-
-        // 3. 转换输入流为字节数组并返回
-        byte[] tileData = tileRequest.getBytes();
-        ServletOutputStream outputStream = response.getOutputStream();
-        IoUtil.copy(new ByteArrayInputStream(tileData), outputStream);
-        IoUtil.close(outputStream);
-
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
