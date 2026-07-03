@@ -25,7 +25,7 @@ public class ApplicationMime extends MimeType {
      * 超图软件的自定义格式
      */
     public static final ApplicationMime scp =
-            new ApplicationMime("application/json", "scp", "json", "application/json;from=supermap", false);
+            new ApplicationMime("application/json", "scp", "json", "application/json;from=supermap;type=scp", false);
 
 
     public static final ApplicationMime stream =
