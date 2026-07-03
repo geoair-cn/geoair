@@ -27,6 +27,10 @@ public class ApplicationMime extends MimeType {
     public static final ApplicationMime scp =
             new ApplicationMime("application/json", "scp", "json", "application/json", false);
 
+
+    public static final ApplicationMime stream =
+            new ApplicationMime("application/octet-stream", "*", "*", "application/octet-stream", false);
+
     public static final ApplicationMime topojson =
             new ApplicationMime(
                     "application/json",

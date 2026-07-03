@@ -2,6 +2,8 @@ package cn.geoair.map.tile.forge.core.support.local;
 
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -10,7 +12,7 @@ import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
 import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
@@ -116,7 +118,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            tileRequest.mimeTypeByType(MediaType.parseMediaType("image/" + format));
+            tileRequest.setMimeType(MimeType.createFromExtension(format));
         }
         return tileRequest;
     }
@@ -166,7 +168,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
                         tileRequest.setLastModified(System.currentTimeMillis());
                         tileRequest.setSize(bytes.length);
                         tileRequest.setExists(true);
-                        tileRequest.mimeTypeByType(MediaType.IMAGE_PNG);
+                        tileRequest.setMimeType(ImageMime.png);
                         tileCache.putTile(cacheKey, tileRequest, "png");
                     } catch (Exception e) {
                         log.error("preCacheTiles error:{}", e.getMessage());

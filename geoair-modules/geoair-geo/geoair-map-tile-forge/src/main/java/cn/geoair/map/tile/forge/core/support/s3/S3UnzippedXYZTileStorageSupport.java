@@ -1,10 +1,11 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.geoair.map.tile.forge.core.support.local.LocalUnzippedXYZTileStorageSupport;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.FileUtil;
 import org.springframework.http.MediaType;
 
@@ -23,9 +24,9 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
      * 首先检查本地临时目录是否存在对应瓦片文件，如果不存在则从S3下载
      *
      * @param layerConfigContext 图层配置信息对象，包含瓦片存储路径等配置信息
-     * @param z              瓦片级别(Zoom Level)
-     * @param x              瓦片列号(X Coordinate)
-     * @param y              瓦片行号(Y Coordinate)
+     * @param z                  瓦片级别(Zoom Level)
+     * @param x                  瓦片列号(X Coordinate)
+     * @param y                  瓦片行号(Y Coordinate)
      * @return TileRequest 瓦片请求对象，包含瓦片数据流及相关元信息
      * @throws Exception 获取瓦片数据过程中可能出现的IO异常
      */
@@ -53,10 +54,9 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
         tileRequest.setLastModified(localTileFile.lastModified());
         tileRequest.setSize(localTileFile.length());
         tileRequest.setExists(true);
-        tileRequest.mimeTypeByType(MediaType.parseMediaType("image/" + format));
+        tileRequest.setMimeType(MimeType.createFromExtension(format));
         return tileRequest;
     }
-
 
 
 }

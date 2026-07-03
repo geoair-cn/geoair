@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.hutool.core.io.FileUtil;
 
 import java.io.IOException;
 
@@ -12,22 +13,34 @@ import java.io.IOException;
  */
 public class MimeType {
 
-    /** MIME类型字符串，如 "image/png" */
+    /**
+     * MIME类型字符串，如 "image/png"
+     */
     protected String mimeType;
 
-    /** 格式名称，可能与mimeType不同 */
+    /**
+     * 格式名称，可能与mimeType不同
+     */
     protected String format;
 
-    /** 文件扩展名，如 ".png" */
+    /**
+     * 文件扩展名，如 ".png"
+     */
     protected String fileExtension;
 
-    /** 内部名称，用于内部识别，如图像渲染器选择 */
+    /**
+     * 内部名称，用于内部识别，如图像渲染器选择
+     */
     protected String internalName;
 
-    /** 是否支持切片（瓦片化），无损栅格图像通常支持 */
+    /**
+     * 是否支持切片（瓦片化），无损栅格图像通常支持
+     */
     protected boolean supportsTiling;
 
-    /** 日志记录器 */
+    /**
+     * 日志记录器
+     */
     private static GiLogger log = GirLoggerFactory.getLogger(MimeType.class);
 
     /**
@@ -119,7 +132,7 @@ public class MimeType {
      * 矢量格式的输出不应有边距（guttering）
      *
      * @return {@code true} 表示矢量或其他非栅格格式，
-     *         这类格式应用边距会导致结果不正确
+     * 这类格式应用边距会导致结果不正确
      */
     public boolean isVector() {
         return false;
@@ -191,7 +204,13 @@ public class MimeType {
         }
         // 所有检查都未匹配，记录调试日志并返回null
         log.debug("Unsupported MIME type: " + fileExtension + ", returning null");
-        return null;
+        return ApplicationMime.stream;
+    }
+
+
+    public static MimeType createFromFileName(String fileName) throws MimeException {
+        String suffix = FileUtil.getSuffix(fileName);
+        return createFromExtension(suffix);
     }
 
     /**

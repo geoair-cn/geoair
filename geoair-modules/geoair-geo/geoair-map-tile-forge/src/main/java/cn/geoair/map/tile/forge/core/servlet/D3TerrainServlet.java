@@ -3,12 +3,10 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.service.GirMapTileService;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,7 +61,7 @@ public class D3TerrainServlet extends D3TilesServlet {
         layerConfigContext.setFormat(format);
         try {
             TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
-            buildTileResponse(layerTile, response);
+            TileResponseUtils.buildTileResponse(layerTile, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

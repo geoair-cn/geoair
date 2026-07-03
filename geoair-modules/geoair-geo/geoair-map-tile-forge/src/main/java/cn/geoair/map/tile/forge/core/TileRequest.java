@@ -1,5 +1,7 @@
-package cn.geoair.map.tile.forge.core.vo;
+package cn.geoair.map.tile.forge.core;
 
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
@@ -7,6 +9,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.http.MediaType;
+
 
 import java.io.Serializable;
 
@@ -53,8 +56,7 @@ public class TileRequest implements Serializable {
     /**
      * 媒体类型，默认为PNG格式
      */
-//    protected  MediaType mimeType = MediaType.IMAGE_PNG;
-    protected String mimeType = MediaType.IMAGE_PNG_VALUE;
+    protected MimeType mimeType = ImageMime.png;
 
     /**
      * 瓦片是否存在标识
@@ -63,12 +65,10 @@ public class TileRequest implements Serializable {
 
     private String httpUrl;
 
-    public MediaType mimeTypeToType() {
-        return MediaType.parseMediaType(mimeType);
-    }
 
-    public void mimeTypeByType(MediaType mimeType) {
-        this.mimeType = mimeType.toString();
+    public void mimeTypeBySpring(MediaType mimeType) {
+        String type = mimeType.getSubtype();
+        this.mimeType = MimeType.createFromExtension(type);
     }
 
 

@@ -7,7 +7,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisSupport;
 import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
 import lombok.extern.slf4j.Slf4j;
 
