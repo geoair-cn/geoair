@@ -14,11 +14,13 @@ import cn.geoair.comp.db.service.core.dialect.BaseDialect;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSONObject;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class GirDsSQLExecutor implements Executor {
 
-    @Autowired DsDataSourceService dsDataSourceService;
+    @Autowired
+    DsDataSourceService dsDataSourceService;
 
     @Override
     public Object execute(JSONObject taskJson, Map<String, Object> sqlParam) throws Exception {
@@ -145,8 +148,9 @@ public class GirDsSQLExecutor implements Executor {
                                             sql,
                                             sqlMeta.getJdbcParamValues(),
                                             task.humpIs());
-                    GiPager<List> pager = new GirPager<>( );
-                    pager.put(data, count, giPageParam,true);
+                    GiPager<List> pager = new GirPager<>();
+                    giPageParam.setPageNumStartZero(true);
+                    pager.put(data, count, giPageParam, true);
                     dataList.add(pager);
                 } else {
                     Object data =

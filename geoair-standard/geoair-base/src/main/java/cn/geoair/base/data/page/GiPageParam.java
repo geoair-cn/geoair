@@ -42,6 +42,11 @@ public interface GiPageParam extends Serializable {
     boolean isPageNumStartZero();
 
     /**
+     * 设置分页是否从0开始
+     */
+    GiPageParam setPageNumStartZero(boolean pageNumStartZero);
+
+    /**
      * 是否包含count查询
      *
      * @return true:包含count查询,false:不包含count查询
