@@ -145,8 +145,8 @@ public class GirDsSQLExecutor implements Executor {
                                             sql,
                                             sqlMeta.getJdbcParamValues(),
                                             task.humpIs());
-                    GiPager<List> pager = new GirPager<>();
-                    pager.put(data, count, giPageParam);
+                    GiPager<List> pager = new GirPager<>( );
+                    pager.put(data, count, giPageParam,true);
                     dataList.add(pager);
                 } else {
                     Object data =

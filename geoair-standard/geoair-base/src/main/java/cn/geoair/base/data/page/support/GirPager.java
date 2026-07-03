@@ -82,9 +82,11 @@ public class GirPager<T> implements GiPager<T> {
     /**
      * 重载方法：支持直接传入分页参数和页码起始方式
      */
+    @Override
     public GirPager<T> put(Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero) {
+        put(list, total, pageParam);
         this.pageNumStartZero = pageNumStartZero;
-        return put(list, total, pageParam);
+        return this;
     }
 
     /**
@@ -165,6 +167,7 @@ public class GirPager<T> implements GiPager<T> {
     public GiPageParam pageParam() {
         return pageParam;
     }
+
     @Override
     public boolean isPageNumStartZero() {
         return pageNumStartZero;

@@ -53,6 +53,8 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
      */
     GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam);
 
+    GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero);
+
     /**
      * 获取泛型类型的实际类
      *
