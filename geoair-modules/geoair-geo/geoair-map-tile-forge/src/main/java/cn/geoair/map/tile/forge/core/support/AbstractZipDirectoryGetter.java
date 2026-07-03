@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -73,9 +74,9 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
                         return true;
                     }
                     String replace = name.replace(rootPath, "");
-                    if (name.equals(rootPathInfo.getRootFilePath())) {
+                    if (GutilObject.isNotEmpty(rootPathInfo.getRootFilePath())&&name.equals(rootPathInfo.getRootFilePath())) {
                         log.info("根文件的位置为===={}", name);
-                        centralDirectoryEntry.setName("root." + rootPathInfo.getRootFileExtension());
+                        centralDirectoryEntry.setName(rootPathInfo.getRootFileStandardName());
                     } else {
                         centralDirectoryEntry.setName(replace);
                     }

@@ -121,40 +121,39 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        // 存储所有找到的tileset.json路径
+        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         List<String> allTileSetPaths = new ArrayList<>();
-        String rootFileName = "tileset.json";
-        // 扫描ZIP中所有条目，收集所有tileset.json路径
-        String finalRootFileName = rootFileName;
+        String finalRootFileNameSuffix = "json";
+        if (mapTileType.equals(GirMapTileType.S3M)) {
+            finalRootFileNameSuffix = "scp";
+        } else {
+            finalRootFileNameSuffix = "json";
+        }
+
+        String finalRootFileNameSuffix1 = finalRootFileNameSuffix;
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             // 跳过目录
             if (centralDirectoryEntry.isDirectoryIs()) {
                 return true;
             }
             String entryName = centralDirectoryEntry.getName();
-            // 匹配tileset.json（不区分大小写）
-
-            if (entryName.contains(finalRootFileName)) {
+            String suffix = FileUtil.getSuffix(entryName);
+            if (suffix.equals(finalRootFileNameSuffix1)) {
                 allTileSetPaths.add(entryName);
-                log.info("发现{}路径: {}", finalRootFileName, entryName);
-//                return false;  这里不停止的原因是 每个层级都有tileset.json，所以要拿到所有的tileset.json，在判断最外面的根
             }
-            // 继续扫描所有条目（不提前终止）
             return true;
         });
 
         // 校验是否找到tileset.json
         if (allTileSetPaths.isEmpty()) {
-            throw new GirException("三维数据中缺失{}关键元素", rootFileName);
+            throw new GirException("三维数据中缺失{}关键元素", finalRootFileNameSuffix);
         }
-
-        // 筛选最外层的tileset.json（路径层级最少）
         String outerMostTileSetPath = findOuterMostPath(allTileSetPaths);
-        log.info("选中最外层的tileset.json路径: {}", outerMostTileSetPath);
-
-        // 提取根路径（移除tileset.json文件名）
-        String rootPath = outerMostTileSetPath.replace(rootFileName, "");
-        return RootPathInfo.of().setRootFileName("tileset.json").setRootPath(rootPath);
+        log.info("选中最外层的路径: {}", outerMostTileSetPath);
+        String name = FileUtil.getName(outerMostTileSetPath);
+        String rootPath = outerMostTileSetPath.replace(name, "");
+        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath)
+                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "root.scp" : "tileset.json");
     }
 
     /**
