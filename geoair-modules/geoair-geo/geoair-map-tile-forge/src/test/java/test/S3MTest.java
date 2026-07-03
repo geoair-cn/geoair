@@ -17,7 +17,7 @@ public class S3MTest {
         GirLayerConfigContext
                 context = new GirLayerConfigContext();
         context.setDataId("111").setMapTileType(GirMapTileType.S3M).setStorageType(GirStorageType.LOCAL_ZIP).setObjectKey("E:\\gis测试数据\\测试数据\\s3m.zip");
-        TileStorageSupportAdapter adapter = new TileStorageSupportAdapter();
+        TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
         ITileStorageSupport support = adapter.getSupport(context);
         support.preCacheTiles(context, new LogProgressConsumer());
 

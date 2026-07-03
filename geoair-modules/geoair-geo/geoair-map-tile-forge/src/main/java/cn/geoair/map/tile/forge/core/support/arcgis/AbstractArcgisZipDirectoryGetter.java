@@ -28,6 +28,11 @@ public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSup
         super(contextHelper);
     }
 
+    @Override
+    public GirLayerConfigContextHelper getContextHelper() {
+        return contextHelper;
+    }
+
     public void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         ICompressionHandler iCompressionHandler = getICompressionHandler();
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();

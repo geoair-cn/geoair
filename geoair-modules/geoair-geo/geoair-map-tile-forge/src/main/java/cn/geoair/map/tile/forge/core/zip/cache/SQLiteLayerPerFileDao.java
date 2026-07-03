@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
 import cn.geoair.map.tile.forge.core.caches.CacheProvider;
+import cn.geoair.map.tile.forge.core.caches.NoOpCacheProvider;
 import cn.geoair.map.tile.forge.core.caches.S3CacheProvider;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -59,33 +60,33 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         // 创建瓦片数据表
         String createTableSql = String.format(
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "local_header_offset BIGINT NOT NULL, " +
-                        "data_offset BIGINT, " +
-                        "compression_method BIGINT NOT NULL, " +
-                        "compressed_size BIGINT NOT NULL, " +
-                        "uncompressed_size BIGINT NOT NULL, " +
-                        "name TEXT, " +
-                        "entry_size INTEGER NOT NULL, " +
-                        "directory_is BOOLEAN NOT NULL, " +
-                        "xyz_path TEXT, " +
-                        "x TEXT, " +
-                        "y TEXT, " +
-                        "z TEXT, " +
-                        "file_name TEXT" +
-                        ")", TABLE_NAME
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "local_header_offset BIGINT NOT NULL, " +
+                "data_offset BIGINT, " +
+                "compression_method BIGINT NOT NULL, " +
+                "compressed_size BIGINT NOT NULL, " +
+                "uncompressed_size BIGINT NOT NULL, " +
+                "name TEXT, " +
+                "entry_size INTEGER NOT NULL, " +
+                "directory_is BOOLEAN NOT NULL, " +
+                "xyz_path TEXT, " +
+                "x TEXT, " +
+                "y TEXT, " +
+                "z TEXT, " +
+                "file_name TEXT" +
+                ")", TABLE_NAME
         );
 
         // 创建缓存状态表
         String createStatusTableSql = String.format(
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "layer_name TEXT UNIQUE NOT NULL, " +
-                        "cache_status TEXT NOT NULL, " +
-                        "cache_time TIMESTAMP, " +
-                        "cache_size BIGINT, " +
-                        "last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                        ")", CACHE_STATUS_TABLE
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "layer_name TEXT UNIQUE NOT NULL, " +
+                "cache_status TEXT NOT NULL, " +
+                "cache_time TIMESTAMP, " +
+                "cache_size BIGINT, " +
+                "last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                ")", CACHE_STATUS_TABLE
         );
 
         try (Statement stmt = connection.createStatement()) {
@@ -134,9 +135,9 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "UPDATE %s SET cache_status = ?, last_update = CURRENT_TIMESTAMP, " +
-                        "cache_time = CASE WHEN ? = 'CACHED' THEN CURRENT_TIMESTAMP ELSE cache_time END, " +
-                        "cache_size = CASE WHEN ? = 'CACHED' THEN ? ELSE cache_size END " +
-                        "WHERE layer_name = ?", CACHE_STATUS_TABLE);
+                "cache_time = CASE WHEN ? = 'CACHED' THEN CURRENT_TIMESTAMP ELSE cache_time END, " +
+                "cache_size = CASE WHEN ? = 'CACHED' THEN ? ELSE cache_size END " +
+                "WHERE layer_name = ?", CACHE_STATUS_TABLE);
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, status.name());
@@ -206,8 +207,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
-                        "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
+                "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
         );
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -225,8 +226,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
-                        "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
+                "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
         );
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (TileCentralDirectoryModel entry : entries) {
@@ -404,7 +405,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
 
     @Override
     public CacheProvider getCacheProvider() {
-        return new S3CacheProvider("tilePreCache");
+        return new NoOpCacheProvider();
     }
 
     // 私有辅助方法

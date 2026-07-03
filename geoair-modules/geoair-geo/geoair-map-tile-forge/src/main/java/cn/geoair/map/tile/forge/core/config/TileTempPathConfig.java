@@ -2,6 +2,7 @@
 
 package cn.geoair.map.tile.forge.core.config;
 
+import cn.geoair.base.Gir;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.io.FileUtil;
@@ -25,7 +26,12 @@ public class TileTempPathConfig {
 
     public static TileTempPathConfig getInstance() {
         if (tileTempPathConfig == null) {
-            tileTempPathConfig = SpringUtil.getBean(TileTempPathConfig.class);
+            try {
+                tileTempPathConfig = Gir.beans.getBean(TileTempPathConfig.class);
+            } catch (Exception e) {
+                Gir.log.error("无法在beans中获取到TileTempPathConfig对象，使用默认对象");
+                return new TileTempPathConfig();
+            }
         }
         return tileTempPathConfig;
     }

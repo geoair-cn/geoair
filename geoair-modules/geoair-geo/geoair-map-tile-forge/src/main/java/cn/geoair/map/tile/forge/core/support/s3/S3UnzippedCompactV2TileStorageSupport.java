@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
@@ -21,6 +22,9 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
 @Slf4j
 public class S3UnzippedCompactV2TileStorageSupport extends S3UnzippedCompactV1TileStorageSupport {
 
+    public S3UnzippedCompactV2TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {

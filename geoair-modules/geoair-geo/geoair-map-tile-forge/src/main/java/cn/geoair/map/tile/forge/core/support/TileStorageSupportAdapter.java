@@ -22,11 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * TileStorageSupport适配器
  * 根据图层配置（LayerZipConfigPo）动态获取对应的TileStorageSupport实例
  */
-//@Component
-@RequiredArgsConstructor
+
 public class TileStorageSupportAdapter {
 
-    GirLayerConfigContextHelper contextHelper;
+    protected GirLayerConfigContextHelper contextHelper;
 
     static TileStorageSupportAdapter instance;
 
@@ -143,9 +142,9 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createLocalUnzippedSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new LocalUnzippedCompactV1TileStorageSupport();
+                return new LocalUnzippedCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new LocalUnzippedCompactV2TileStorageSupport();
+                return new LocalUnzippedCompactV2TileStorageSupport(contextHelper);
             case XYZ:
                 return new LocalUnzippedXYZTileStorageSupport();
 //            case LOOSE:
@@ -161,9 +160,9 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createS3UnzippedSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new S3UnzippedCompactV1TileStorageSupport();
+                return new S3UnzippedCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new S3UnzippedCompactV2TileStorageSupport();
+                return new S3UnzippedCompactV2TileStorageSupport(contextHelper);
             case XYZ:
                 return new S3UnzippedXYZTileStorageSupport();
 //            case LOOSE:

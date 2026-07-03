@@ -20,6 +20,10 @@ public class GirMapTileService extends TileStorageSupportAdapter {
 
     static GirMapTileService self = null;
 
+    public GirMapTileService(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
+
     public static GirMapTileService getInstance() {
         if (self == null) {
             self = GirBeanHelper.getProvider().getBean(GirMapTileService.class);
@@ -27,10 +31,6 @@ public class GirMapTileService extends TileStorageSupportAdapter {
         return self;
     }
 
-    //    @Resource
-//    private TileStorageSupportAdapter supportAdapter;
-    @Resource
-    GirLayerConfigContextHelper layerConfigHelper;
 
     /**
      * 获取图层的瓦片数据
@@ -41,7 +41,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
      */
     public TileRequest getLayerTile(String layerName, String z, String y, String x) throws Exception {
         // 1. 查询图层配置
-        GirLayerConfigContext config = layerConfigHelper.getByLayerName(layerName)
+        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
         return getLayerTile(config, z, y, x);
     }
@@ -59,7 +59,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
      */
     public TileRequest getCapabilities(String layerName) throws Exception {
         // 1. 查询图层配置
-        GirLayerConfigContext config = layerConfigHelper.getByLayerName(layerName)
+        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         // 2. 通过适配器获取对应的TileStorageSupport实例
@@ -94,7 +94,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
 
     public void preCacheTiles(String layerName) {
 
-        GirLayerConfigContext config = layerConfigHelper.getByLayerName(layerName)
+        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         ITileStorageSupport storageSupport = super.getSupport(config);
