@@ -21,6 +21,8 @@ import java.util.List;
  */
 public interface ZipDirectoryGetter {
 
+    GirLayerConfigContextHelper getContextHelper();
+
     /**
      * 获取压缩文件处理器实例
      *
@@ -41,7 +43,7 @@ public interface ZipDirectoryGetter {
      * @return 中央目录条目
      */
     default TileCentralDirectoryModel getZipDirectoryByXyz(GirLayerConfigContext layerConfigContext, String x, String y, String z) {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+        GirLayerConfigContextHelper instance = getContextHelper();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         try {
             return layerPerFileDao.findByXyz(x, y, z);
@@ -53,7 +55,7 @@ public interface ZipDirectoryGetter {
     }
 
     default TileCentralDirectoryModel getZipDirectoryBFileName(GirLayerConfigContext layerConfigContext, String fileName) {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+        GirLayerConfigContextHelper instance = getContextHelper();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         try {
             return layerPerFileDao.findByFileName(fileName);

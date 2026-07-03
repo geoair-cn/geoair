@@ -40,6 +40,10 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
 @Slf4j
 public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirectoryGetter {
 
+    public LocalZipCompactV1TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
+
     protected ICompressionHandler compressionHandler = null;
 
 
@@ -58,8 +62,8 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         try {
             // 创建缓存访问器，用于构建文件路径
             String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-            GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-            LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
+
+            LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
             if (!layerPerFileDao.cacheEnableIs(layerConfigContext)) {
                 byZip(layerConfigContext, z, y, x, tempDirAbsolutePath);
             } else {
@@ -139,7 +143,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
     }
 
     protected boolean preCacheBundleFileToLocal(GirLayerConfigContext layerConfigContext, String filePath, String tempDirAbsolutePath, String fileExt) {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+
         String pathToBundleFile = null;
         if (filePath.startsWith(File.separator)) {
             String replaceFirst = StrUtil.replaceFirst(filePath, File.separator, "");
@@ -154,7 +158,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         if (FileUtil.exist(tempBundleFile)) {
             return true;
         }
-        try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
+        try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
             boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
             if (b) {
                 String replace = pathToBundleFile.replace("\\", "/");
@@ -194,8 +198,8 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
     @Override
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
         this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-        LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
+
+        LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
         // 参数校验
         if (layerConfigContext == null) {
             throw new IllegalArgumentException("layerConfigDto 不能为空");

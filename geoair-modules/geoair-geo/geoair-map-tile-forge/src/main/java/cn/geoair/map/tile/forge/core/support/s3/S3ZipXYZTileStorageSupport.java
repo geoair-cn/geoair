@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.local.LocalZipXYZTileStorageSupport;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.S3CompressionHandler;
@@ -12,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class S3ZipXYZTileStorageSupport extends LocalZipXYZTileStorageSupport {
-
+    public S3ZipXYZTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 获取压缩处理器实例

@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.local.LocalZipCompactV1TileStorageSupport;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.S3CompressionHandler;
@@ -10,6 +11,9 @@ import cn.geoair.map.tile.forge.core.zip.S3CompressionHandler;
  * &#064;description：S3存储的紧凑型V1瓦片支持类，用于处理基于S3的压缩瓦片存储和读取
  */
 public class  S3ZipCompactV1TileStorageSupport extends LocalZipCompactV1TileStorageSupport {
+    public S3ZipCompactV1TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 获取压缩处理器实例

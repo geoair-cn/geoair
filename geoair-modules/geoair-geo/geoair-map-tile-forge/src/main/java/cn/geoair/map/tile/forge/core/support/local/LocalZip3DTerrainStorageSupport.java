@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
@@ -40,6 +41,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+
+    public LocalZip3DTerrainStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作

@@ -43,6 +43,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter implements ITileStorageSupport {
 
+
+    public LocalZipXYZTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
+
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
      */
@@ -143,8 +148,8 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
     public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
         log.info("preCacheTiles start...{}", getClass().getName());
         this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-        LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
+
+        LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
         // 参数校验
 //        if (layerConfigContext == null || tileCache == null) {
 //            throw new IllegalArgumentException("layerConfigDto和cacheProvider不能为空");
@@ -191,9 +196,9 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();
         AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> saveCount = new AtomicReference<>(0);
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-        Long layerPerCacheBatchSize = instance.getLayerPerCacheBatchSize(layerConfigContext);
-        try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
+
+        Long layerPerCacheBatchSize = contextHelper.getLayerPerCacheBatchSize(layerConfigContext);
+        try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
             boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
             if (b) {
                 log.info("  start...{},enable..{}", layerPerFileDao.getClass().getName(), b);

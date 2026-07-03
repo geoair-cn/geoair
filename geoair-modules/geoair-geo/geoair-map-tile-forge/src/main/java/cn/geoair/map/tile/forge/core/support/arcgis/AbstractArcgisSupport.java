@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.core.support.arcgis;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfoPersister;
 import cn.geoair.map.tile.forge.core.bygwc.config.LODInfo;
@@ -29,6 +30,12 @@ import java.util.concurrent.atomic.AtomicLong;
  * @description：
  */
 public abstract class AbstractArcgisSupport implements ArcgisConfigXmlGetter, ITileStorageSupport {
+
+    protected GirLayerConfigContextHelper contextHelper;
+
+    public AbstractArcgisSupport(GirLayerConfigContextHelper contextHelper) {
+        this.contextHelper = contextHelper;
+    }
 
     GiLogger log = GirLoggerFactory.getLogger();
 

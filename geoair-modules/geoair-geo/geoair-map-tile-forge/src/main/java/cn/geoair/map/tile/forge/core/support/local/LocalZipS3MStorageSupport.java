@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
 import cn.geoair.base.exception.GirException;
-import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
@@ -22,29 +22,25 @@ import java.util.List;
  */
 @Slf4j
 public class LocalZipS3MStorageSupport extends LocalZip3DTileStorageSupport {
+    public LocalZipS3MStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        // 存储所有找到的tileset.json路径
         List<String> allTileSetPaths = new ArrayList<>();
-        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
-        String rootFileNameSuffix = "scp";
-        // 扫描ZIP中所有条目，收集所有tileset.json路径
-        String finalRootFileNameSuffix = rootFileNameSuffix;
+        String finalRootFileNameSuffix = "scp";
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             // 跳过目录
             if (centralDirectoryEntry.isDirectoryIs()) {
                 return true;
             }
             String entryName = centralDirectoryEntry.getName();
-            // 匹配tileset.json（不区分大小写）
             String suffix = FileUtil.getSuffix(entryName);
             if (suffix.equals(finalRootFileNameSuffix)) {
                 allTileSetPaths.add(entryName);
                 log.info("发现{}路径: {}", finalRootFileNameSuffix, entryName);
-//                return false;  这里不停止的原因是 每个层级都有tileset.json，所以要拿到所有的tileset.json，在判断最外面的根
             }
-            // 继续扫描所有条目（不提前终止）
             return true;
         });
 

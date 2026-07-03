@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
 import cn.geoair.base.exception.GirException;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
@@ -39,6 +40,9 @@ import java.util.List;
  */
 @Slf4j
 public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+    public LocalZip3DTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -57,7 +61,6 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         }
         return compressionHandler;
     }
-
 
 
     @Override
@@ -120,13 +123,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         // 存储所有找到的tileset.json路径
         List<String> allTileSetPaths = new ArrayList<>();
-        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         String rootFileName = "tileset.json";
-        if (mapTileType == GirMapTileType.S3M) {
-            rootFileName = "tilesetS3MB.scp";
-        } else {
-            rootFileName = "tileset.json";
-        }
         // 扫描ZIP中所有条目，收集所有tileset.json路径
         String finalRootFileName = rootFileName;
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {

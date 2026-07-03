@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core.support;
 
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
@@ -25,10 +26,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class TileStorageSupportAdapter {
 
+    GirLayerConfigContextHelper contextHelper;
+
     static TileStorageSupportAdapter instance;
 
     public static TileStorageSupportAdapter getInstance() {
         return instance == null ? instance = SpringUtil.getBean(TileStorageSupportAdapter.class) : instance;
+    }
+
+    public TileStorageSupportAdapter(GirLayerConfigContextHelper contextHelper) {
+        this.contextHelper = contextHelper;
     }
 
     /**
@@ -89,18 +96,19 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createLocalZipSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new LocalZipCompactV1TileStorageSupport();
+                return new LocalZipCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new LocalZipCompactV2TileStorageSupport();
+                return new LocalZipCompactV2TileStorageSupport(contextHelper);
             case LOOSE:
-                return new LocalZipLooseTileStorageSupport();
+                return new LocalZipLooseTileStorageSupport(contextHelper);
             case TILE_3D:
+                return new LocalZip3DTileStorageSupport(contextHelper);
             case S3M:
-                return new LocalZip3DTileStorageSupport();
+                return new LocalZipS3MStorageSupport(contextHelper);
             case TERRAIN_3D:
-                return new LocalZip3DTerrainStorageSupport();
+                return new LocalZip3DTerrainStorageSupport(contextHelper);
             case XYZ:
-                return new LocalZipXYZTileStorageSupport();
+                return new LocalZipXYZTileStorageSupport(contextHelper);
             default:
                 throw new RuntimeException("LOCAL_ZIP不支持的瓦片格式：" + mapTileType.getValue());
         }
@@ -112,16 +120,16 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createS3ZipSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new S3ZipCompactV1TileStorageSupport();
+                return new S3ZipCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new S3ZipCompactV2TileStorageSupport();
+                return new S3ZipCompactV2TileStorageSupport(contextHelper);
             case XYZ:
-                return new S3ZipXYZTileStorageSupport();
+                return new S3ZipXYZTileStorageSupport(contextHelper);
             case TILE_3D:
             case S3M:
-                return new S3Zip3DTileStorageSupport();
+                return new S3Zip3DTileStorageSupport(contextHelper);
             case TERRAIN_3D:
-                return new S3Zip3DTerrainStorageSupport();
+                return new S3Zip3DTerrainStorageSupport(contextHelper);
 
 
             default:
