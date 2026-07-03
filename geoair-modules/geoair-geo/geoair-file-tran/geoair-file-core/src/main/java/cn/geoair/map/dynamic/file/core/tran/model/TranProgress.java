@@ -11,13 +11,14 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TranProgress {
 
-    private long featureCount = 0; // 所有的总数
-    // 核心统计
-    private long totalCount = 0; // 当前批次处理条数
+    private long totalFeatureCount = 0; // 数据源总要素数（所有数据总量）
 
-    private long successCount = 0; // 当前批次成功条数
+    // 当前批次统计
+    private long batchTotalCount = 0; // 当前批次处理总条数
 
-    private long failCount = 0; // 当前批次失败条数
+    private long batchSuccessCount = 0; // 当前批次成功条数
+
+    private long batchFailCount = 0; // 当前批次失败条数
 
     // 计算字段
     private double successRate = 0.0; // 当前批次成功率（%）
@@ -31,10 +32,10 @@ public class TranProgress {
 
     // 计算成功率
     public TranProgress calculateSuccessRate() {
-        if (totalCount == 0) {
+        if (batchTotalCount == 0) {
             this.successRate = 0.0;
         } else {
-            this.successRate = (double) successCount / totalCount * 100;
+            this.successRate = (double) batchSuccessCount / batchTotalCount * 100;
         }
         return this;
     }
