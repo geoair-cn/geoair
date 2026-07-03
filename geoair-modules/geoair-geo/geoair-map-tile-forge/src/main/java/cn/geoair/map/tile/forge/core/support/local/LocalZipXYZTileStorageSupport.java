@@ -19,13 +19,13 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 
 import java.io.File;
 import java.io.IOException;
@@ -200,7 +200,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
                 return;
             } else {
                 log.info("开始扫描压缩包{}", layerConfigContext.getObjectKey());
-                preCheckZip(layerConfigContext, iCompressionHandler);
+                preCheckZipAndGetRoot(layerConfigContext, iCompressionHandler);
                 iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
                     try {
                         if (GutilObject.isNotEmpty(progressConsumers)) {
@@ -242,7 +242,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
     }
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> checkPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
@@ -270,7 +270,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
             throw new RuntimeException("xyz瓦片总缺失XYZ组合");
         }
 
-        return "";
+        return RootPathInfo.of();
     }
 
 }

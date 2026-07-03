@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -38,8 +39,9 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
             } else {
                 log.info("开始扫描压缩包{}，{}", layerConfigContext.getStorageType().getValue(), layerConfigContext.getObjectKey());
 
-                String rootPath = preCheckZip(layerConfigContext, iCompressionHandler);
+                RootPathInfo rootPathInfo = preCheckZipAndGetRoot(layerConfigContext, iCompressionHandler);
 
+                String rootPath = rootPathInfo.getRootPath();
                 layerPerFileDao.doPreCacheStart();
                 iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
                     try {

@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LogProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.IoUtil;
 
@@ -82,5 +83,5 @@ public interface ZipDirectoryGetter {
      * @return
      * @throws IOException
      */
-    String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException;
+    RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException;
 }

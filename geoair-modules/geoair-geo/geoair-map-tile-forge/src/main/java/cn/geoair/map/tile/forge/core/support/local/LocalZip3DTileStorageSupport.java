@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -116,7 +117,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         // 存储所有找到的tileset.json路径
         List<String> allTileSetPaths = new ArrayList<>();
         GirMapTileType mapTileType = layerConfigContext.getMapTileType();
@@ -155,7 +156,8 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         log.info("选中最外层的tileset.json路径: {}", outerMostTileSetPath);
 
         // 提取根路径（移除tileset.json文件名）
-        return outerMostTileSetPath.replace(rootFileName, "");
+        String rootPath = outerMostTileSetPath.replace(rootFileName, "");
+        return RootPathInfo.of().setRootFileName("tileset.json").setRootPath(rootPath);
     }
 
     /**
@@ -164,7 +166,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
      * @param paths 所有tileset.json的路径列表
      * @return 最外层路径
      */
-    private String findOuterMostPath(List<String> paths) {
+    protected String findOuterMostPath(List<String> paths) {
         // 初始化最外层路径为第一个元素
         String outerMost = paths.get(0);
         int minLevel = getPathLevel(outerMost);

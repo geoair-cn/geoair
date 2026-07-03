@@ -14,6 +14,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -140,7 +141,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> tileSetPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
@@ -160,6 +161,6 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
             throw new RuntimeException("三维地形中缺失layer.json关键元素");
         }
         String rootPath = tileSetJsonPath.replace("layer.json", "");
-        return rootPath;
+        return RootPathInfo.of().setRootFileName("layer.json").setRootPath(rootPath);
     }
 }

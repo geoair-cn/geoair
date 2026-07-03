@@ -17,6 +17,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -230,7 +231,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
     }
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> tileSetPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
@@ -250,9 +251,10 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         if (StrUtil.isEmpty(tileSetJsonPath)) {
             throw new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
         }
+        String name = FileUtil.getName(tileSetJsonPath);
         String rootPath = tileSetJsonPath.replace("conf.xml", "")
                 .replace("Conf.xml", "");
-        return rootPath;
+        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath);
     }
 
     /**
