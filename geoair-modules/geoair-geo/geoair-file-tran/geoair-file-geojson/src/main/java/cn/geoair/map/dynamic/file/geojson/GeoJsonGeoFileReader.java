@@ -40,6 +40,14 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         initGeoJsonReader();
     }
 
+    @Override
+    public long getFeatureCount() {
+        if (this.featureCollection == null) {
+            return 0;
+        }
+        return this.featureCollection.size();
+    }
+
     /** 初始化 GeoJSON 读取器 */
     private void initGeoJsonReader() {
         try (FileInputStream fis = new FileInputStream(linkInfo.getGeoJsonFilePath())) {

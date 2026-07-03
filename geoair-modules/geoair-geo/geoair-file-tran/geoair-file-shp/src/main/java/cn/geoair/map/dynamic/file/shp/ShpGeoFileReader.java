@@ -47,6 +47,14 @@ public class ShpGeoFileReader implements GeoFileReader {
         initShpReader();
     }
 
+    @Override
+    public long getFeatureCount() {
+        if (this.featureCollection == null) {
+            return 0;
+        }
+        return this.featureCollection.size();
+    }
+
     /**
      * 初始化 Shapefile 读取器
      */

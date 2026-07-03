@@ -59,6 +59,11 @@ public class PostgisGeoFileReader implements GeoFileReader {
         calculateTotalCount();
     }
 
+    @Override
+    public long getFeatureCount() {
+        return this.totalCount;
+    }
+
     /** 初始化 GeoTools PostGIS DataStore（替代原生 JDBC 连接） */
     private void initPostgisDataStore() {
         try {

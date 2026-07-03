@@ -45,6 +45,8 @@ public class GeoFileTranImpl implements GeoFileTran {
     private AtomicLong successCount = new AtomicLong(0);
 
     private AtomicLong failCount = new AtomicLong(0);
+    // 要素总数
+    long featureCount = 0L;
 
     // 状态控制
     private volatile TranStatus status = TranStatus.INIT;
@@ -93,6 +95,7 @@ public class GeoFileTranImpl implements GeoFileTran {
 
             // 4. 逐行转换（带超时控制）
             GirAdvOneRow oneRow;
+              featureCount = reader.getFeatureCount();
             while ((oneRow = reader.readOneRow(this::handleException)) != null) {
                 // 超时检查
                 checkTimeout();
@@ -189,6 +192,7 @@ public class GeoFileTranImpl implements GeoFileTran {
 
         TranProgress progress =
                 new TranProgress()
+                        .setFeatureCount(featureCount)
                         .setTotalCount(totalCount.get())
                         .setSuccessCount(successCount.get())
                         .setFailCount(failCount.get())
