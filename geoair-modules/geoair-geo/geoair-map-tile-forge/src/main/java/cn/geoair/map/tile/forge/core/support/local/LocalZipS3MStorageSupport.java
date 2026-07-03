@@ -52,7 +52,7 @@ public class LocalZipS3MStorageSupport extends LocalZip3DTileStorageSupport {
         log.info("选中最外层的tileset.json路径: {}", outerMostTileSetPath);
         String name = FileUtil.getName(outerMostTileSetPath);
         String rootPath = outerMostTileSetPath.replace(name, "");
-        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath);
+        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath).setRootFileExtension("scp");
     }
 
 

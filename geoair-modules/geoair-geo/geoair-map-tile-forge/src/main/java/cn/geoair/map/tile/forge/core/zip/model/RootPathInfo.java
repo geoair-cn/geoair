@@ -20,5 +20,9 @@ public class RootPathInfo {
 
     String rootFileName;
 
+    String rootFilePath;
+
+    String rootFileExtension;
+
 
 }

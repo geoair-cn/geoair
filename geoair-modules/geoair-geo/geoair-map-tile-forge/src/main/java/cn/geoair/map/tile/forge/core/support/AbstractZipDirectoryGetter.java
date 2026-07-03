@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -10,7 +12,7 @@ import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
-import lombok.extern.slf4j.Slf4j;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +23,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * &#064;date ：Created in 2025/11/17 10:16
  * &#064;description：本地配置XML获取器抽象类，用于从本地文件系统读取ArcGIS图层配置文件
  */
-@Slf4j
-public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
 
+public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
+    GiLogger log = GirLoggerFactory.getLogger();
     protected GirLayerConfigContextHelper contextHelper;
 
     public AbstractZipDirectoryGetter(GirLayerConfigContextHelper contextHelper) {
         this.contextHelper = contextHelper;
+
     }
 
     @Override
@@ -70,7 +73,13 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
                         return true;
                     }
                     String replace = name.replace(rootPath, "");
-                    centralDirectoryEntry.setName(replace);
+                    if (name.equals(rootPathInfo.getRootFilePath())) {
+                        log.info("根文件的位置为===={}", name);
+                        centralDirectoryEntry.setName("root." + rootPathInfo.getRootFileExtension());
+                    } else {
+                        centralDirectoryEntry.setName(replace);
+                    }
+
                     TileCentralDirectoryModel tileCentralDirectoryEntry = tranToTileModel(centralDirectoryEntry);
                     if (tileCentralDirectoryEntry == null) {
                         return true;
