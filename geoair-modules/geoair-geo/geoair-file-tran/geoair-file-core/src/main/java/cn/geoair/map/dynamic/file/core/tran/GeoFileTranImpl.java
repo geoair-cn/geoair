@@ -192,10 +192,10 @@ public class GeoFileTranImpl implements GeoFileTran {
 
         TranProgress progress =
                 new TranProgress()
-                        .setFeatureCount(featureCount)
-                        .setTotalCount(totalCount.get())
-                        .setSuccessCount(successCount.get())
-                        .setFailCount(failCount.get())
+                        .setTotalFeatureCount(featureCount)
+                        .setBatchTotalCount(totalCount.get())
+                        .setBatchSuccessCount(successCount.get())
+                        .setBatchFailCount(failCount.get())
                         .calculateSuccessRate()
                         .setElapsedTime(System.currentTimeMillis() - startTime)
                         .setStatus(status)
