@@ -1,11 +1,9 @@
 
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ApplicationMime extends MimeType {
 
@@ -22,6 +20,12 @@ public class ApplicationMime extends MimeType {
 
     public static final ApplicationMime json =
             new ApplicationMime("application/json", "json", "json", "application/json", false);
+
+    /**
+     * 超图软件的自定义格式
+     */
+    public static final ApplicationMime scp =
+            new ApplicationMime("application/json", "scp", "json", "application/json", false);
 
     public static final ApplicationMime topojson =
             new ApplicationMime(
@@ -56,13 +60,22 @@ public class ApplicationMime extends MimeType {
                     true);
 
     static Set<ApplicationMime> ALL =
-            ImmutableSet.of(bil16, bil32, json, topojson, geojson, utfgrid, mapboxVector);
+            Collections.unmodifiableSet(
+                    new HashSet<>(Arrays.asList(bil16, bil32, json, topojson, geojson, utfgrid, mapboxVector,scp))
+            );
+
 
     private static Map<String, ApplicationMime> BY_FORMAT =
-            Maps.uniqueIndex(ALL, mimeType -> mimeType.getFormat());
+            ALL.stream().collect(Collectors.toMap(
+                    ApplicationMime::getFormat,  // key 映射
+                    Function.identity()          // value 就是元素本身
+            ));
 
     private static Map<String, ApplicationMime> BY_EXTENSION =
-            Maps.uniqueIndex(ALL, mimeType -> mimeType.getFileExtension());
+            ALL.stream().collect(Collectors.toMap(
+                    ApplicationMime::getFileExtension,  // key 映射
+                    Function.identity()          // value 就是元素本身
+            ));
 
     private ApplicationMime(
             String mimeType,
@@ -71,6 +84,7 @@ public class ApplicationMime extends MimeType {
             String format,
             boolean vector) {
         super(mimeType, fileExtension, internalName, format, false);
+
         this.vector = vector;
     }
 

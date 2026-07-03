@@ -1,17 +1,3 @@
-/**
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * <p>You should have received a copy of the GNU Lesser General Public License along with this
- * program. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author Arne Kepp, The Open Planning Project, Copyright 2008
- */
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
 import cn.geoair.base.log.GiLogger;
@@ -20,6 +6,7 @@ import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import it.geosolutions.jaiext.JAIExt;
 import it.geosolutions.jaiext.colorindexer.ColorIndexer;
 import it.geosolutions.jaiext.colorindexer.Quantizer;
+
 import javax.imageio.ImageWriter;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
@@ -57,8 +44,10 @@ public class ImageMime extends MimeType {
                 /** Any response mime starting with image/png will do */
                 public boolean isCompatible(String otherMimeType) {
                     return super.isCompatible(otherMimeType)
-                            || otherMimeType.startsWith("image/png");
-                };
+                           || otherMimeType.startsWith("image/png");
+                }
+
+                ;
             };
 
     public static final ImageMime jpeg =
@@ -100,7 +89,7 @@ public class ImageMime extends MimeType {
                 public RenderedImage preprocess(RenderedImage canvas) {
                     if (!(canvas.getColorModel() instanceof IndexColorModel)) {
                         if (canvas.getColorModel() instanceof ComponentColorModel
-                                && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+                            && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
                             ColorIndexer indexer =
                                     new Quantizer(256).subsample().buildColorIndexer(canvas);
                             if (indexer != null) {
@@ -204,7 +193,7 @@ public class ImageMime extends MimeType {
         if (fileExtension.equalsIgnoreCase("png")) {
             return png;
         } else if (fileExtension.equalsIgnoreCase("jpeg")
-                || fileExtension.equalsIgnoreCase("jpg")) {
+                   || fileExtension.equalsIgnoreCase("jpg")) {
             return jpeg;
         } else if (fileExtension.equalsIgnoreCase("gif")) {
             return gif;
@@ -241,12 +230,12 @@ public class ImageMime extends MimeType {
         // which will presumably be the pure Java version. A bit hacky, but it's roughly what
         // GeoServer does to make sure it doesn't encode incompatible PNGs with the native writer
         if (this.internalName.equals(ImageMime.png.internalName)
-                || this.internalName.equals(ImageMime.png8.internalName)) {
+            || this.internalName.equals(ImageMime.png8.internalName)) {
 
             int bitDepth = image.getSampleModel().getSampleSize(0);
             if (bitDepth > 1
-                    && bitDepth < 8
-                    && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
+                && bitDepth < 8
+                && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
 
                 writer = it.next();
             }
@@ -254,7 +243,9 @@ public class ImageMime extends MimeType {
         return writer;
     }
 
-    /** Preprocesses the image to optimize it for the write about to happen */
+    /**
+     * Preprocesses the image to optimize it for the write about to happen
+     */
     public RenderedImage preprocess(RenderedImage tile) {
         return tile;
     }
@@ -328,12 +319,14 @@ public class ImageMime extends MimeType {
                     return pngDelegate.getMimeType();
                 }
             }
-        };
+        }
+
+        ;
 
         @Override
         public boolean isCompatible(String otherMimeType) {
             return jpegDelegate.isCompatible(otherMimeType)
-                    || pngDelegate.isCompatible(otherMimeType);
+                   || pngDelegate.isCompatible(otherMimeType);
         }
 
         @Override
