@@ -25,7 +25,7 @@ public class ApplicationMime extends MimeType {
      * 超图软件的自定义格式
      */
     public static final ApplicationMime scp =
-            new ApplicationMime("application/json", "scp", "json", "application/json", false);
+            new ApplicationMime("application/json", "scp", "json", "application/json;from=supermap", false);
 
 
     public static final ApplicationMime stream =
@@ -65,7 +65,7 @@ public class ApplicationMime extends MimeType {
 
     static Set<ApplicationMime> ALL =
             Collections.unmodifiableSet(
-                    new HashSet<>(Arrays.asList(bil16, bil32, json, topojson, geojson, utfgrid, mapboxVector,scp))
+                    new HashSet<>(Arrays.asList(bil16, bil32, json, topojson, geojson, utfgrid, mapboxVector, scp))
             );
 
 
@@ -114,5 +114,11 @@ public class ApplicationMime extends MimeType {
     @Override
     public boolean isVector() {
         return vector;
+    }
+
+
+    public static void main(String[] args) {
+        ApplicationMime scp1 = checkForExtension("scp");
+        System.out.println(scp1);
     }
 }

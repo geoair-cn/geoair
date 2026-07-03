@@ -76,7 +76,6 @@ public class TileRequest implements Serializable {
         TileRequest tileRequest = new TileRequest();
         tileRequest.setStorageType(layerConfigContext.getStorageType());
         tileRequest.setMapTileType(layerConfigContext.getMapTileType());
-        tileRequest.setMapTileType(layerConfigContext.getMapTileType());
         tileRequest.setLayerName(layerConfigContext.getLayerName());
         tileRequest.setExists(false);
         tileRequest.setLastModified(0);
