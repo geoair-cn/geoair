@@ -93,6 +93,7 @@ public class GeoFileTranImpl implements GeoFileTran {
 
             // 4. 逐行转换（带超时控制）
             GirAdvOneRow oneRow;
+            reader.get()
             while ((oneRow = reader.readOneRow(this::handleException)) != null) {
                 // 超时检查
                 checkTimeout();
