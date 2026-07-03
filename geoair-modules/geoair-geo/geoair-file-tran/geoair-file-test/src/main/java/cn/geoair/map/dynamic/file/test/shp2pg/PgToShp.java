@@ -14,6 +14,7 @@ import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisReadLinkInfo;
 import cn.geoair.map.dynamic.file.shp.ShpGeoFileWriter;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
+import cn.hutool.core.util.StrUtil;
 
 import java.io.IOException;
 
@@ -79,9 +80,9 @@ public class PgToShp {
                         .setProgressListener(
                                 progress -> {
                                     log.info(
-                                            String.format(
-                                                    "进度更新：已处理 %d 条，成功率 %.2f%%，状态 %s",
-                                                    progress.getTotalCount(),
+                                            StrUtil.format(
+                                                    "进度更新：已处理 {} 条，成功率 {}%，状态{}s",
+                                                    progress.getBatchTotalCount(),
                                                     progress.getSuccessRate(),
                                                     progress.getStatus()));
                                 });
