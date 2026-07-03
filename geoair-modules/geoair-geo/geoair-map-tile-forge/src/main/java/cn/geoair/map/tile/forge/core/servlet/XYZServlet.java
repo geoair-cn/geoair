@@ -3,11 +3,10 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.service.GirMapTileService;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
-import jakarta.annotation.Resource;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -15,8 +15,10 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.media.colorindexer.ColorIndexer;
 import org.eclipse.imagen.media.colorindexer.Quantizer;
+import org.geotools.image.ImageWorker;
 
 public class ImageMime extends MimeType {
 
@@ -124,8 +126,8 @@ public class ImageMime extends MimeType {
 
         // TODO Making a special exception, generalize later
         if (!formatStr.equals("image/png; mode=24bit") && formatStr.contains(";")) {
-            if (log.isLoggable(Level.FINE)) {
-                log.fine("Slicing off " + formatStr.split(";")[1]);
+            if (log.isFatalEnabled( )) {
+                log.fatal("Slicing off " + formatStr.split(";")[1]);
             }
             formatStr = formatStr.split(";")[0];
         }

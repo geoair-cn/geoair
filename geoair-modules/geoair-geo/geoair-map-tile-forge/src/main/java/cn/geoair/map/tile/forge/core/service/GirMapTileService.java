@@ -1,13 +1,14 @@
 package cn.geoair.map.tile.forge.core.service;
 
 import cn.geoair.base.bean.GirBeanHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
-import cn.geoair.map.tile.forge.core.vo.TileRequest;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
