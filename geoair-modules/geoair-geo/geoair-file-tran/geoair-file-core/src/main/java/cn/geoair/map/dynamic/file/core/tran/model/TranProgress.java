@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TranProgress {
 
-    private long allCount = 0; // 所有的总数
+    private long featureCount = 0; // 所有的总数
     // 核心统计
     private long totalCount = 0; // 当前批次处理条数
 
