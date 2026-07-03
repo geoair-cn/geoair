@@ -65,6 +65,7 @@ public class SparkVectorTileGenerator implements Serializable {
     private static final int TILE_BATCH_SIZE = 300; //最大300条一次提交
 
     final long BATCH_SIZE_THRESHOLD = 900 * 1024; // 数据量限制900KB一次提交
+    String insertSqlTemplate = "INSERT INTO tile_cache.%s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public SparkVectorTileGenerator(SparkSession sparkSession) {
         this.sparkSession = sparkSession;
@@ -209,33 +210,14 @@ public class SparkVectorTileGenerator implements Serializable {
                             int outGridSrid = parameter.getOutGridSrid();
                             String edition = parameter.getEdition();
                             // ================= 每个表独立连接 =================
-                            Connection connRoot = null;
-
-                            PreparedStatement rootPstmt = null;
-
                             List<Row> rootBatchRows = new ArrayList<>(TILE_BATCH_SIZE);
-
                             // ================= 日志统计变量 =================
                             AtomicLong rootTotalCount = new AtomicLong(0);
-
                             long rootBatchNum = 0;
-
                             // 每个批次总字节数
                             long currentBatchSize = 0;
-
                             String rootTableName = pgParams.get("tableName");
-
-                            String insertSqlTemplate = "INSERT INTO tile_cache.%s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
                             try {
-                                // 建立三个独立连接
-                                if (StringUtils.isNotBlank(rootTableName)) {
-                                    connRoot = dataSource.getConnection();
-                                    connRoot.setAutoCommit(false);
-                                    rootPstmt = connRoot.prepareStatement(String.format(insertSqlTemplate, StrUtil.wrap(rootTableName, "\"")));
-                                }
-
-
                                 SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
                                         new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, PbfTargetInfo.getInstance());
 
@@ -259,7 +241,7 @@ public class SparkVectorTileGenerator implements Serializable {
                                     }
 
                                     // ================= Root 表 =================
-                                    if (rootPstmt != null) {
+                                    if (StringUtils.isNotBlank(rootTableName)) {
                                         Row row = buildRow(pbfTuple, false, false, parameter);
                                         if (row != null) {
                                             // 规则：单条 >= 300KB，直接单独提交
@@ -267,8 +249,7 @@ public class SparkVectorTileGenerator implements Serializable {
                                                 // 先把之前批次提交掉
                                                 if (!rootBatchRows.isEmpty()) {
                                                     rootBatchNum++;
-                                                    executeBatchInsert(rootPstmt, rootBatchRows);
-                                                    connRoot.commit();
+                                                    executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                                     rootTotalCount.addAndGet(rootBatchRows.size());
                                                     log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{},edition:{}",
                                                             rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
@@ -279,8 +260,7 @@ public class SparkVectorTileGenerator implements Serializable {
                                                 // 单独提交这条超大数据
                                                 rootBatchRows.add(row);
                                                 rootBatchNum++;
-                                                executeBatchInsert(rootPstmt, rootBatchRows);
-                                                connRoot.commit();
+                                                executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                                 rootTotalCount.addAndGet(1);
                                                 log.info("{}:分区内Root表单条超大数据提交完成，大小：{}，累计瓦片数：{} ,outGridSrid:{}",
                                                         rootTableName, DataSizeUtil.format(singleSize), rootTotalCount.get(), outGridSrid);
@@ -295,8 +275,7 @@ public class SparkVectorTileGenerator implements Serializable {
                                                 boolean needFlush = rootBatchRows.size() >= TILE_BATCH_SIZE || currentBatchSize >= BATCH_SIZE_THRESHOLD;
                                                 if (needFlush) {
                                                     rootBatchNum++;
-                                                    executeBatchInsert(rootPstmt, rootBatchRows);
-                                                    connRoot.commit();
+                                                    executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                                     rootTotalCount.addAndGet(rootBatchRows.size());
                                                     log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{}",
                                                             rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
@@ -327,9 +306,8 @@ public class SparkVectorTileGenerator implements Serializable {
                                 }
 
                                 // 处理剩余数据
-                                if (rootPstmt != null && !rootBatchRows.isEmpty()) {
-                                    executeBatchInsert(rootPstmt, rootBatchRows);
-                                    connRoot.commit();
+                                if (!rootBatchRows.isEmpty()) {
+                                    executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                     rootTotalCount.addAndGet(rootBatchRows.size());
                                     log.info("{}:分区内Root表最后批次写入完成，剩余条数：{}，累计总数：{}，提交大小：{} outGridSrid:{}",
                                             rootTableName, rootBatchRows.size(), rootTotalCount.get(),
@@ -343,15 +321,10 @@ public class SparkVectorTileGenerator implements Serializable {
 
                             } catch (Exception e) {
                                 log.error("写入PG失败", e);
-                                try {
-                                    if (connRoot != null) connRoot.rollback();
-                                } catch (Exception ignored) {
-                                }
+
                                 throw new RuntimeException(e);
                             } finally {
 
-                                IoUtil.close(rootPstmt);
-                                IoUtil.close(connRoot);
                             }
                         });
 
@@ -386,6 +359,36 @@ public class SparkVectorTileGenerator implements Serializable {
             pstmt.addBatch();
         }
         pstmt.executeBatch();
+        stopWatch.stop();
+        log.info("====================批量提交结束：耗时：{}，条数：{}=====", stopWatch.getLastTaskTimeMillis(), batchRows.size());
+    }
+
+    private void executeBatchInsert(List<Row> batchRows, String tableName, DataSource dataSource) throws Exception {
+        log.info("====================批量提交开始===================");
+        Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
+        PreparedStatement preparedStatement = connection.prepareStatement(String.format(insertSqlTemplate, StrUtil.wrap(tableName, "\"")));
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (Row row : batchRows) {
+            // 按schema顺序设置参数
+            preparedStatement.setString(1, IdUtil.getSnowflakeNextIdStr()); // z
+            preparedStatement.setInt(2, row.getInt(0)); // z
+            preparedStatement.setInt(3, row.getInt(1)); // x
+            preparedStatement.setInt(4, row.getInt(2)); // tms_ y
+            preparedStatement.setInt(5, row.getInt(3)); // y
+            preparedStatement.setInt(6, row.getInt(4)); // grid_srid
+            preparedStatement.setBytes(7, row.getAs(5)); // tile_data
+            preparedStatement.setString(8, row.getString(6)); // layer_name
+            preparedStatement.setString(9, row.getString(7)); // edition
+            preparedStatement.setLong(10, System.currentTimeMillis()); // 时间戳
+            preparedStatement.addBatch();
+        }
+        preparedStatement.executeBatch();
+        connection.commit();
+        connection.setAutoCommit(true);
+        IoUtil.close(preparedStatement);
+        IoUtil.close(connection);
         stopWatch.stop();
         log.info("====================批量提交结束：耗时：{}，条数：{}=====", stopWatch.getLastTaskTimeMillis(), batchRows.size());
     }
@@ -504,25 +507,25 @@ public class SparkVectorTileGenerator implements Serializable {
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);
         boolean b = iAdvExecutor.dIsTableExists(tableName);
         String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
-                "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                "                          \"z\" int4,\n" +
-                "                          \"x\" int4,\n" +
-                "                          \"tms_y\" int4,\n" +
-                "                          \"y\" int4,\n" +
-                "                          \"grid_srid\" int4,\n" +
-                "                          \"tile_data\" bytea,\n" +
-                "                          \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                "                          \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                "                          \"insert_time\" int8\n" +
-                "                        )\n" +
-                "                        ;\n" +
-                "                        CREATE INDEX \"zxy_{UUID}\" ON {tableNameWithSchema} USING btree (\n" +
-                "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                "                          \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                "                          \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                "                          \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
-                "                        );";
+                          "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                          "                          \"z\" int4,\n" +
+                          "                          \"x\" int4,\n" +
+                          "                          \"tms_y\" int4,\n" +
+                          "                          \"y\" int4,\n" +
+                          "                          \"grid_srid\" int4,\n" +
+                          "                          \"tile_data\" bytea,\n" +
+                          "                          \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                          "                          \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                          "                          \"insert_time\" int8\n" +
+                          "                        )\n" +
+                          "                        ;\n" +
+                          "                        CREATE INDEX \"zxy_{UUID}\" ON {tableNameWithSchema} USING btree (\n" +
+                          "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                          "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                          "                          \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                          "                          \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                          "                          \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
+                          "                        );";
         if (!b) {
             log.info("检测到表不存在，执行创建表动作！");
             String sqlDDL = tempLate.replace("{tableNameWithSchema}", tableNameWithSchema).replace("{UUID}", IdUtil.getSnowflakeNextIdStr());
