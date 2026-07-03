@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LogProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.IoUtil;
 
@@ -19,6 +20,8 @@ import java.util.List;
  * @description： zip的中央目录的获取器
  */
 public interface ZipDirectoryGetter {
+
+    GirLayerConfigContextHelper getContextHelper();
 
     /**
      * 获取压缩文件处理器实例
@@ -40,7 +43,7 @@ public interface ZipDirectoryGetter {
      * @return 中央目录条目
      */
     default TileCentralDirectoryModel getZipDirectoryByXyz(GirLayerConfigContext layerConfigContext, String x, String y, String z) {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+        GirLayerConfigContextHelper instance = getContextHelper();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         try {
             return layerPerFileDao.findByXyz(x, y, z);
@@ -52,7 +55,7 @@ public interface ZipDirectoryGetter {
     }
 
     default TileCentralDirectoryModel getZipDirectoryBFileName(GirLayerConfigContext layerConfigContext, String fileName) {
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+        GirLayerConfigContextHelper instance = getContextHelper();
         LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext);
         try {
             return layerPerFileDao.findByFileName(fileName);
@@ -82,5 +85,5 @@ public interface ZipDirectoryGetter {
      * @return
      * @throws IOException
      */
-    String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException;
+    RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException;
 }

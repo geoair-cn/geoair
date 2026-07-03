@@ -171,7 +171,7 @@ public class MimeType {
             return mimeType;
         }
         // 所有检查都未匹配，抛出异常
-        throw new MimeException("Unsupported format request: " + formatStr);
+        return ApplicationMime.stream;
     }
 
     /**
@@ -203,7 +203,7 @@ public class MimeType {
             return mimeType;
         }
         // 所有检查都未匹配，记录调试日志并返回null
-        log.debug("Unsupported MIME type: " + fileExtension + ", returning null");
+//        log.debug("Unsupported MIME type: " + fileExtension + ", returning null");
         return ApplicationMime.stream;
     }
 

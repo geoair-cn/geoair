@@ -1,11 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
 import cn.geoair.base.exception.GirException;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -38,6 +40,9 @@ import java.util.List;
  */
 @Slf4j
 public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+    public LocalZip3DTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -56,7 +61,6 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         }
         return compressionHandler;
     }
-
 
 
     @Override
@@ -116,46 +120,40 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        // 存储所有找到的tileset.json路径
-        List<String> allTileSetPaths = new ArrayList<>();
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         GirMapTileType mapTileType = layerConfigContext.getMapTileType();
-        String rootFileName = "tileset.json";
-        if (mapTileType == GirMapTileType.S3M) {
-            rootFileName = "tilesetS3MB.scp";
+        List<String> allTileSetPaths = new ArrayList<>();
+        String finalRootFileNameSuffix = "json";
+        if (mapTileType.equals(GirMapTileType.S3M)) {
+            finalRootFileNameSuffix = "scp";
         } else {
-            rootFileName = "tileset.json";
+            finalRootFileNameSuffix = "json";
         }
-        // 扫描ZIP中所有条目，收集所有tileset.json路径
-        String finalRootFileName = rootFileName;
+
+        String finalRootFileNameSuffix1 = finalRootFileNameSuffix;
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             // 跳过目录
             if (centralDirectoryEntry.isDirectoryIs()) {
                 return true;
             }
             String entryName = centralDirectoryEntry.getName();
-            // 匹配tileset.json（不区分大小写）
-
-            if (entryName.contains(finalRootFileName)) {
+            String suffix = FileUtil.getSuffix(entryName);
+            if (suffix.equals(finalRootFileNameSuffix1)) {
                 allTileSetPaths.add(entryName);
-                log.info("发现{}路径: {}", finalRootFileName, entryName);
-//                return false;  这里不停止的原因是 每个层级都有tileset.json，所以要拿到所有的tileset.json，在判断最外面的根
             }
-            // 继续扫描所有条目（不提前终止）
             return true;
         });
 
         // 校验是否找到tileset.json
         if (allTileSetPaths.isEmpty()) {
-            throw new GirException("三维数据中缺失{}关键元素", rootFileName);
+            throw new GirException("三维数据中缺失{}关键元素", finalRootFileNameSuffix);
         }
-
-        // 筛选最外层的tileset.json（路径层级最少）
         String outerMostTileSetPath = findOuterMostPath(allTileSetPaths);
-        log.info("选中最外层的tileset.json路径: {}", outerMostTileSetPath);
-
-        // 提取根路径（移除tileset.json文件名）
-        return outerMostTileSetPath.replace(rootFileName, "");
+        log.info("选中最外层的路径: {}", outerMostTileSetPath);
+        String name = FileUtil.getName(outerMostTileSetPath);
+        String rootPath = outerMostTileSetPath.replace(name, "");
+        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath)
+                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "tilesetS3MB.scp" : "tileset.json");
     }
 
     /**
@@ -164,7 +162,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
      * @param paths 所有tileset.json的路径列表
      * @return 最外层路径
      */
-    private String findOuterMostPath(List<String> paths) {
+    protected String findOuterMostPath(List<String> paths) {
         // 初始化最外层路径为第一个元素
         String outerMost = paths.get(0);
         int minLevel = getPathLevel(outerMost);

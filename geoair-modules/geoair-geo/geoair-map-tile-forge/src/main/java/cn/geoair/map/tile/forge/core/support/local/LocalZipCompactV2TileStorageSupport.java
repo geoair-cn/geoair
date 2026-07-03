@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -18,7 +19,9 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
  * 支持从ZIP压缩包中解压.bundle文件并读取特定行列层级的瓦片数据
  */
 public class LocalZipCompactV2TileStorageSupport extends LocalZipCompactV1TileStorageSupport {
-
+    public LocalZipCompactV2TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     ArcGISCompactCache getArcGISCompactCache(String pathToCacheRoot) {
         return new ArcGISCompactCacheV2(pathToCacheRoot);

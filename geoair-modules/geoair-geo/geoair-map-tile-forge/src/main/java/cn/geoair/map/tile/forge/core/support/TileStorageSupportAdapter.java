@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core.support;
 
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
@@ -21,14 +22,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * TileStorageSupport适配器
  * 根据图层配置（LayerZipConfigPo）动态获取对应的TileStorageSupport实例
  */
-//@Component
-@RequiredArgsConstructor
+
 public class TileStorageSupportAdapter {
+
+    protected GirLayerConfigContextHelper contextHelper;
 
     static TileStorageSupportAdapter instance;
 
     public static TileStorageSupportAdapter getInstance() {
         return instance == null ? instance = SpringUtil.getBean(TileStorageSupportAdapter.class) : instance;
+    }
+
+    public TileStorageSupportAdapter(GirLayerConfigContextHelper contextHelper) {
+        this.contextHelper = contextHelper;
     }
 
     /**
@@ -89,18 +95,18 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createLocalZipSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new LocalZipCompactV1TileStorageSupport();
+                return new LocalZipCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new LocalZipCompactV2TileStorageSupport();
+                return new LocalZipCompactV2TileStorageSupport(contextHelper);
             case LOOSE:
-                return new LocalZipLooseTileStorageSupport();
+                return new LocalZipLooseTileStorageSupport(contextHelper);
             case TILE_3D:
             case S3M:
-                return new LocalZip3DTileStorageSupport();
+                return new LocalZip3DTileStorageSupport(contextHelper);
             case TERRAIN_3D:
-                return new LocalZip3DTerrainStorageSupport();
+                return new LocalZip3DTerrainStorageSupport(contextHelper);
             case XYZ:
-                return new LocalZipXYZTileStorageSupport();
+                return new LocalZipXYZTileStorageSupport(contextHelper);
             default:
                 throw new RuntimeException("LOCAL_ZIP不支持的瓦片格式：" + mapTileType.getValue());
         }
@@ -112,16 +118,16 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createS3ZipSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new S3ZipCompactV1TileStorageSupport();
+                return new S3ZipCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new S3ZipCompactV2TileStorageSupport();
+                return new S3ZipCompactV2TileStorageSupport(contextHelper);
             case XYZ:
-                return new S3ZipXYZTileStorageSupport();
+                return new S3ZipXYZTileStorageSupport(contextHelper);
             case TILE_3D:
             case S3M:
-                return new S3Zip3DTileStorageSupport();
+                return new S3Zip3DTileStorageSupport(contextHelper);
             case TERRAIN_3D:
-                return new S3Zip3DTerrainStorageSupport();
+                return new S3Zip3DTerrainStorageSupport(contextHelper);
 
 
             default:
@@ -135,9 +141,9 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createLocalUnzippedSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new LocalUnzippedCompactV1TileStorageSupport();
+                return new LocalUnzippedCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new LocalUnzippedCompactV2TileStorageSupport();
+                return new LocalUnzippedCompactV2TileStorageSupport(contextHelper);
             case XYZ:
                 return new LocalUnzippedXYZTileStorageSupport();
 //            case LOOSE:
@@ -153,9 +159,9 @@ public class TileStorageSupportAdapter {
     private ITileStorageSupport createS3UnzippedSupport(GirMapTileType mapTileType) {
         switch (mapTileType) {
             case COMPACT_V1:
-                return new S3UnzippedCompactV1TileStorageSupport();
+                return new S3UnzippedCompactV1TileStorageSupport(contextHelper);
             case COMPACT_V2:
-                return new S3UnzippedCompactV2TileStorageSupport();
+                return new S3UnzippedCompactV2TileStorageSupport(contextHelper);
             case XYZ:
                 return new S3UnzippedXYZTileStorageSupport();
 //            case LOOSE:

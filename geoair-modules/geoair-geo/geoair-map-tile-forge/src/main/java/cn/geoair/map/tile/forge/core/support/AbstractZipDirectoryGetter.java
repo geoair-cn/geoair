@@ -1,7 +1,10 @@
 package cn.geoair.map.tile.forge.core.support;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -9,7 +12,8 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,17 +24,28 @@ import java.util.concurrent.atomic.AtomicReference;
  * &#064;date ：Created in 2025/11/17 10:16
  * &#064;description：本地配置XML获取器抽象类，用于从本地文件系统读取ArcGIS图层配置文件
  */
-@Slf4j
+
 public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
+    GiLogger log = GirLoggerFactory.getLogger();
+    protected GirLayerConfigContextHelper contextHelper;
+
+    public AbstractZipDirectoryGetter(GirLayerConfigContextHelper contextHelper) {
+        this.contextHelper = contextHelper;
+
+    }
+
+    @Override
+    public GirLayerConfigContextHelper getContextHelper() {
+        return contextHelper;
+    }
 
     public void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         ICompressionHandler iCompressionHandler = getICompressionHandler();
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
-        Long layerPerCacheBatchSize = instance.getLayerPerCacheBatchSize(layerConfigContext);
+        Long layerPerCacheBatchSize = contextHelper.getLayerPerCacheBatchSize(layerConfigContext);
         AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> saveCount = new AtomicReference<>(0);
-        try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
+        try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
             boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
             if (b) {
                 log.info("该数据的缓存已经构建过，此次无需构建！");
@@ -38,8 +53,9 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
             } else {
                 log.info("开始扫描压缩包{}，{}", layerConfigContext.getStorageType().getValue(), layerConfigContext.getObjectKey());
 
-                String rootPath = preCheckZip(layerConfigContext, iCompressionHandler);
+                RootPathInfo rootPathInfo = preCheckZipAndGetRoot(layerConfigContext, iCompressionHandler);
 
+                String rootPath = rootPathInfo.getRootPath();
                 layerPerFileDao.doPreCacheStart();
                 iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
                     try {
@@ -58,7 +74,13 @@ public abstract class AbstractZipDirectoryGetter implements ZipDirectoryGetter {
                         return true;
                     }
                     String replace = name.replace(rootPath, "");
-                    centralDirectoryEntry.setName(replace);
+                    if (GutilObject.isNotEmpty(rootPathInfo.getRootFilePath())&&name.equals(rootPathInfo.getRootFilePath())) {
+                        log.info("根文件的位置为===={}", name);
+                        centralDirectoryEntry.setName(rootPathInfo.getRootFileStandardName());
+                    } else {
+                        centralDirectoryEntry.setName(replace);
+                    }
+
                     TileCentralDirectoryModel tileCentralDirectoryEntry = tranToTileModel(centralDirectoryEntry);
                     if (tileCentralDirectoryEntry == null) {
                         return true;

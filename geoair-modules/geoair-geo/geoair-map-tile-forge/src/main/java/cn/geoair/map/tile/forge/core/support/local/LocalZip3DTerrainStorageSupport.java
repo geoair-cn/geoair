@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
@@ -14,6 +15,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -39,6 +41,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+
+    public LocalZip3DTerrainStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 压缩处理器实例，用于处理ZIP文件的解压缩操作
@@ -140,7 +146,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
 
     @Override
-    public String preCheckZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
         AtomicReference<String> tileSetPath = new AtomicReference<>("");
         iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
             boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
@@ -160,6 +166,6 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
             throw new RuntimeException("三维地形中缺失layer.json关键元素");
         }
         String rootPath = tileSetJsonPath.replace("layer.json", "");
-        return rootPath;
+        return RootPathInfo.of().setRootFileName("layer.json").setRootPath(rootPath);
     }
 }

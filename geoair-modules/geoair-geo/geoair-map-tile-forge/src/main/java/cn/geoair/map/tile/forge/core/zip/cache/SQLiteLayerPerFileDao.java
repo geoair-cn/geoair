@@ -1,11 +1,13 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
 import cn.geoair.map.tile.forge.core.caches.CacheProvider;
+import cn.geoair.map.tile.forge.core.caches.NoOpCacheProvider;
 import cn.geoair.map.tile.forge.core.caches.S3CacheProvider;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.unit.DataSizeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.sqlite.JDBC;
 
@@ -19,7 +21,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
 
     private final String baseDir;          // 数据库文件根目录
     private final String layerName;        // 图层名称
-    private Connection connection;
+
     private static final String TABLE_NAME = "tile_central_directory"; // 固定表名
     private static final String CACHE_STATUS_TABLE = "cache_status";    // 缓存状态表名
 
@@ -44,48 +46,45 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
 
     // 获取图层专属SQLite文件路径
     private String getDbFilePath() {
-        String format = String.format("%s%s%s_tiles.db", baseDir, File.separator, layerName.replaceAll("[^a-zA-Z0-9_]", "_"));
-//        log.info("getDbFilePath: {}", format);
+        String format = String.format("%s%s%s_tiles.sqlite", baseDir, File.separator, layerName.replaceAll("[^a-zA-Z0-9_]", "_"));
+        log.info("sqlite路径: {}", format);
         return format;
     }
 
     // 初始化：创建图层专属数据库文件 + 表 + 缓存状态表
     public void init() throws SQLException {
         // 连接图层专属SQLite文件（不存在自动创建）
-        DriverManager.registerDriver(new JDBC());
-        if (connection == null) {
-            connection = DriverManager.getConnection("jdbc:sqlite:" + getDbFilePath());
-        }
+        Connection connection = getConnection();
         // 创建瓦片数据表
         String createTableSql = String.format(
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "local_header_offset BIGINT NOT NULL, " +
-                        "data_offset BIGINT, " +
-                        "compression_method BIGINT NOT NULL, " +
-                        "compressed_size BIGINT NOT NULL, " +
-                        "uncompressed_size BIGINT NOT NULL, " +
-                        "name TEXT, " +
-                        "entry_size INTEGER NOT NULL, " +
-                        "directory_is BOOLEAN NOT NULL, " +
-                        "xyz_path TEXT, " +
-                        "x TEXT, " +
-                        "y TEXT, " +
-                        "z TEXT, " +
-                        "file_name TEXT" +
-                        ")", TABLE_NAME
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "local_header_offset BIGINT NOT NULL, " +
+                "data_offset BIGINT, " +
+                "compression_method BIGINT NOT NULL, " +
+                "compressed_size BIGINT NOT NULL, " +
+                "uncompressed_size BIGINT NOT NULL, " +
+                "name TEXT, " +
+                "entry_size INTEGER NOT NULL, " +
+                "directory_is BOOLEAN NOT NULL, " +
+                "xyz_path TEXT, " +
+                "x TEXT, " +
+                "y TEXT, " +
+                "z TEXT, " +
+                "file_name TEXT" +
+                ")", TABLE_NAME
         );
 
         // 创建缓存状态表
         String createStatusTableSql = String.format(
                 "CREATE TABLE IF NOT EXISTS %s (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "layer_name TEXT UNIQUE NOT NULL, " +
-                        "cache_status TEXT NOT NULL, " +
-                        "cache_time TIMESTAMP, " +
-                        "cache_size BIGINT, " +
-                        "last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                        ")", CACHE_STATUS_TABLE
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "layer_name TEXT UNIQUE NOT NULL, " +
+                "cache_status TEXT NOT NULL, " +
+                "cache_time TIMESTAMP, " +
+                "cache_size BIGINT, " +
+                "last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                ")", CACHE_STATUS_TABLE
         );
 
         try (Statement stmt = connection.createStatement()) {
@@ -95,6 +94,21 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
             initCacheStatus();
         }
         connection.setAutoCommit(false);
+        IoUtil.close(connection);
+    }
+
+    private Connection getConnection() throws SQLException {
+        DriverManager.registerDriver(new JDBC());
+
+        // 启用 WAL 模式 + 设置超时
+        String url = "jdbc:sqlite:" + getDbFilePath() +
+                     "?journal_mode=WAL" +
+                     "&busy_timeout=30000" +
+                     "&synchronous=NORMAL" +
+                     "&cache_size=10000" +
+                     "&foreign_keys=ON";
+
+        return DriverManager.getConnection(url);
     }
 
     /**
@@ -102,6 +116,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
      */
     private void initCacheStatus() throws SQLException {
         String checkSql = String.format("SELECT 1 FROM %s WHERE layer_name = ?", CACHE_STATUS_TABLE);
+        Connection connection = getConnection();
         try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
             checkStmt.setString(1, layerName);
             try (ResultSet rs = checkStmt.executeQuery()) {
@@ -118,6 +133,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
             }
         }
+        IoUtil.close(connection);
     }
 
     /**
@@ -134,10 +150,11 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "UPDATE %s SET cache_status = ?, last_update = CURRENT_TIMESTAMP, " +
-                        "cache_time = CASE WHEN ? = 'CACHED' THEN CURRENT_TIMESTAMP ELSE cache_time END, " +
-                        "cache_size = CASE WHEN ? = 'CACHED' THEN ? ELSE cache_size END " +
-                        "WHERE layer_name = ?", CACHE_STATUS_TABLE);
-
+                "cache_time = CASE WHEN ? = 'CACHED' THEN CURRENT_TIMESTAMP ELSE cache_time END, " +
+                "cache_size = CASE WHEN ? = 'CACHED' THEN ? ELSE cache_size END " +
+                "WHERE layer_name = ?", CACHE_STATUS_TABLE);
+        Connection connection = getConnection();
+        connection.setAutoCommit(false);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, status.name());
             stmt.setString(2, CacheStatus.CACHED.name());
@@ -151,6 +168,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         } catch (SQLException e) {
             connection.rollback();
             throw e;
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -160,6 +179,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     public CacheStatus getCacheStatus() throws SQLException {
         init();
         String sql = String.format("SELECT cache_status FROM %s WHERE layer_name = ?", CACHE_STATUS_TABLE);
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, layerName);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -168,6 +188,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
                 return CacheStatus.NOT_CACHED;
             }
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -178,7 +200,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "SELECT * FROM %s WHERE layer_name = ?", CACHE_STATUS_TABLE);
-
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, layerName);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -193,6 +215,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
                 return null;
             }
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -206,10 +230,10 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
-                        "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
+                "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
         );
-
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             setParameters(stmt, entry);
             stmt.executeUpdate();
@@ -217,6 +241,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         } catch (SQLException e) {
             connection.rollback();
             throw e;
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -225,9 +251,10 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
         String sql = String.format(
                 "INSERT INTO %s (local_header_offset, data_offset, compression_method, compressed_size, " +
-                        "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
+                "uncompressed_size, name, entry_size, directory_is, xyz_path, x, y, z, file_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE_NAME
         );
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             for (TileCentralDirectoryModel entry : entries) {
                 setParameters(stmt, entry);
@@ -238,6 +265,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         } catch (SQLException e) {
             connection.rollback();
             throw e;
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -245,6 +274,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     public TileCentralDirectoryModel findByXyzPath(String xyzPath) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE xyz_path = ?", TABLE_NAME);
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, xyzPath);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -253,12 +283,15 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
                 return null;
             }
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
     public TileCentralDirectoryModel findByXyz(String x, String y, String z) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE x = ? and y = ? and z = ?", TABLE_NAME);
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, x);
             stmt.setString(2, y);
@@ -269,6 +302,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
                 return null;
             }
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -276,6 +311,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
         init();
 
         String sql = String.format("SELECT * FROM %s WHERE file_name  = ?  ", TABLE_NAME);
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, fileName);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -285,11 +321,15 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 return null;
             }
         }
+        finally {
+            IoUtil.close(connection);
+        }
     }
 
     public TileCentralDirectoryModel findById(Long id) throws SQLException {
         init();
         String sql = String.format("SELECT * FROM %s WHERE id = ?", TABLE_NAME);
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -298,6 +338,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
                 return null;
             }
+        }finally {
+            IoUtil.close(connection);
         }
 
     }
@@ -305,6 +347,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     @Override
     public void findBySql(String sql, Consumer<TileCentralDirectoryModel> consumer) throws SQLException {
         init();
+        Connection connection = getConnection();
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             log.info("findBySql sql:{}", sql);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -314,6 +357,8 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
                 }
 
             }
+        }finally {
+            IoUtil.close(connection);
         }
     }
 
@@ -362,10 +407,9 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
             CacheProvider cacheProvider = getCacheProvider();
             File dbFile = new File(getDbFilePath());
             byte[] dbBytes = FileUtil.readBytes(dbFile);
-            log.info("图层{}缓存开始，文件大小:{}字节", layerName, dbFile.length());
+            log.info("图层{}缓存开始，文件大小:{}", layerName, DataSizeUtil.format(dbFile.length()));
             cacheProvider.put("sqlLiteCache_" + layerName, dbBytes, -1);
-
-            log.info("图层{}缓存成功，文件大小:{}字节", layerName, dbFile.length());
+            log.info("图层{}缓存成功，文件大小:{}", layerName, DataSizeUtil.format(dbFile.length()));
         } catch (Exception e) {
             log.error("图层{}缓存失败", layerName, e);
             try {
@@ -404,7 +448,7 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
 
     @Override
     public CacheProvider getCacheProvider() {
-        return new S3CacheProvider("tilePreCache");
+        return new NoOpCacheProvider();
     }
 
     // 私有辅助方法
@@ -497,6 +541,6 @@ public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
     }
 
     public void close() {
-        IoUtil.close(connection);
+
     }
 }

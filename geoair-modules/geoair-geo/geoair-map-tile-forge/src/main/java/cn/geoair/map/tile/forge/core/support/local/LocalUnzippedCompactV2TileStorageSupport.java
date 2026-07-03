@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
@@ -17,6 +18,9 @@ import org.springframework.http.MediaType;
  * &#064;description 提供对本地解压后的Compact V1格式瓦片数据的访问支持
  */
 public class LocalUnzippedCompactV2TileStorageSupport extends LocalUnzippedCompactV1TileStorageSupport {
+    public LocalUnzippedCompactV2TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
 
     /**
      * 根据图层名称和瓦片坐标获取瓦片数据

@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -23,14 +24,22 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSupport implements ZipDirectoryGetter {
 
+    public AbstractArcgisZipDirectoryGetter(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
+
+    @Override
+    public GirLayerConfigContextHelper getContextHelper() {
+        return contextHelper;
+    }
 
     public void preCacheCentralDir(GirLayerConfigContext layerConfigContext, List<ProgressConsumer> progressConsumers) {
         ICompressionHandler iCompressionHandler = getICompressionHandler();
         List<TileCentralDirectoryModel> batchList = new ArrayList<>();
-        GirLayerConfigContextHelper instance = GirLayerConfigContextHelper.getInstance();
+
         AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> saveCount = new AtomicReference<>(0);
-        try (LayerPerFileDao layerPerFileDao = instance.getLayerPerFileDao(layerConfigContext)) {
+        try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
             boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
             if (b) {
                 log.info("该数据的缓存已经构建过，此次无需构建！");
@@ -38,8 +47,8 @@ public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSup
             } else {
                 log.info("开始扫描压缩包{}，{}", layerConfigContext.getStorageType().getValue(), layerConfigContext.getObjectKey());
 
-                String rootPath = preCheckZip(layerConfigContext, iCompressionHandler);
-
+                RootPathInfo rootPathInfo = preCheckZipAndGetRoot(layerConfigContext, iCompressionHandler);
+                String rootPath = rootPathInfo.getRootPath();
                 layerPerFileDao.doPreCacheStart();
                 iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
                     try {
