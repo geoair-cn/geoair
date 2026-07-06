@@ -118,7 +118,7 @@ public class DsDataSourceService {
         DsDataSourceEvent.triggerUpdateBeforeEvent(byId, dsDataSourceApo);
         girDsDataSourceDao.updateSelectiveById(dsDataSourceApo);
         DsDataSourceEvent.triggerUpdateAfterEvent(byId, dsDataSourceApo, true);
-        PoolManager.removeJdbcConnectionPool(dsDataSourceApo.getId());
+        PoolManager.removeExecutor(dsDataSourceApo.getId());
     }
 
     /**
@@ -150,7 +150,7 @@ public class DsDataSourceService {
             DsDataSourceApo byId = girDsDataSourceDao.getById(id);
             DsDataSourceEvent.triggerDeleteBeforeEvent(byId);
             girDsDataSourceDao.deleteByPK(id);
-            PoolManager.removeJdbcConnectionPool(id);
+            PoolManager.removeExecutor(id);
             DsDataSourceEvent.triggerDeleteAfterEvent(byId, true);
             // cacheManager.getCache("datasource").evictIfPresent(id);
 
