@@ -32,9 +32,9 @@ public class GoogleLocalFileTileGetter extends BaseTileGetter {
 
 
 
-    public GoogleLocalFileTileGetter(PxyLayerInfo config) {
-        super(config);
-        this.filePathTemplate = config.getPath();
+    public GoogleLocalFileTileGetter(PxyLayerInfo layerInfo) {
+        super(layerInfo);
+        this.filePathTemplate = layerInfo.getPath();
 
     }
 

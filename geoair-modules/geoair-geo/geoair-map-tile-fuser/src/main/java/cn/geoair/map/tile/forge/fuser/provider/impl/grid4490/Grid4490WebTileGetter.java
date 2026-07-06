@@ -32,10 +32,10 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
         this(config, 60*1000*1, 60*1000*3, 60*1000*5);
     }
 
-    public Grid4490WebTileGetter(PxyLayerInfo config, int connectionTimeout, int readTimeout, int totalTimeout) {
-        super(config);
-        this.urlTemplate = config.getPath();
-        this.proxy = HttpTileRequestUtils.getHttpProxy(config);
+    public Grid4490WebTileGetter(PxyLayerInfo layerInfo, int connectionTimeout, int readTimeout, int totalTimeout) {
+        super(layerInfo);
+        this.urlTemplate = layerInfo.getPath();
+        this.proxy = HttpTileRequestUtils.getHttpProxy(layerInfo);
         this.connectionTimeout = connectionTimeout;
         this.readTimeout = readTimeout;
         this.totalTimeout = totalTimeout;

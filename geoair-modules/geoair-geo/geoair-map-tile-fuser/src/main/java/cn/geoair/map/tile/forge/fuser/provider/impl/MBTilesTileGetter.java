@@ -26,16 +26,16 @@ public class MBTilesTileGetter extends BaseTileGetter {
     private final boolean needReverseY;
     private volatile boolean initialized = false;
 
-    public MBTilesTileGetter(PxyLayerInfo config) {
-        super(config);
+    public MBTilesTileGetter(PxyLayerInfo layerInfo) {
+        super(layerInfo);
 
-        String path = config.getPath();
+        String path = layerInfo.getPath();
         if (path == null || path.trim().isEmpty()) {
             throw new IllegalArgumentException("MBTiles 文件路径不能为空");
         }
 
         this.mbtilesFilePath = path.trim();
-        this.needReverseY = OriginType.fromMode(config.getOriginType()).isGoogle();
+        this.needReverseY = OriginType.fromMode(layerInfo.getOriginType()).isGoogle();
 
         // 检查文件是否存在
         if (!MbtilesUtils.existsFile(this.mbtilesFilePath)) {

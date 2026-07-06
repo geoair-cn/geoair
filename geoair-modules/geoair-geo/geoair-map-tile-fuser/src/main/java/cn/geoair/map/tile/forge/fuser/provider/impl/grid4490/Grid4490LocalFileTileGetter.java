@@ -29,9 +29,9 @@ public class Grid4490LocalFileTileGetter extends BaseTileGetter {
     private final String filePathTemplate;
 
 
-    public Grid4490LocalFileTileGetter(PxyLayerInfo config) {
-        super(config);
-        this.filePathTemplate = config.getPath();
+    public Grid4490LocalFileTileGetter(PxyLayerInfo layerInfo) {
+        super(layerInfo);
+        this.filePathTemplate = layerInfo.getPath();
 
     }
 
