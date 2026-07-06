@@ -9,6 +9,7 @@ import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
 import cn.geoair.comp.db.service.core.basic.service.DsDataSourceService;
 import cn.geoair.comp.db.service.core.basic.util.JdbcUtil;
 import cn.geoair.comp.db.service.core.basic.util.PoolManager;
+import cn.geoair.comp.db.service.core.basic.util.SafeSqlExecutor;
 import cn.geoair.comp.db.service.core.basic.util.SqlEngineUtil;
 import cn.geoair.comp.db.service.core.dialect.BaseDialect;
 import cn.geoair.comp.dynamic.ds.tx.TxAction;
@@ -75,12 +76,12 @@ public class GirDsSQLExecutor implements Executor {
                 iAdvExecutor.tx(new TxActionNp() {
                     @Override
                     public void run() {
-                        dataList[0] = getObjects(task, sqlParam, iAdvExecutor);
+                        dataList[0] = SafeSqlExecutor.getObjects(task, sqlParam, iAdvExecutor, task.humpIs());
                     }
                 });
                 return dataList[0];
             } else {
-                return getObjects(task, sqlParam, iAdvExecutor);
+                return SafeSqlExecutor.getObjects(task, sqlParam, iAdvExecutor, task.humpIs());
             }
         } catch (Exception e) {
 
@@ -88,53 +89,5 @@ public class GirDsSQLExecutor implements Executor {
         }
     }
 
-    private static List<Object> getObjects(SQLTaskDto task, Map<String, Object> sqlParam, IAdvExecutor iAdvExecutor) {
-        List<Object> dataList = new ArrayList<>();
-        List<ApiSqlDto> sqlList = task.getSqlList();
-        GiPageParam giPageParam = null;
-        if (task.pageIs()) {
-            giPageParam = GiPageParam.of();
-        }
-        for (ApiSqlDto apiSql : sqlList) {
-            SqlMeta sqlMeta = null;
-            try {
-                sqlMeta = SqlEngineUtil.getEngine().parse(apiSql.getSqlText(), sqlParam);
-            } catch (RuntimeException runtimeException) {
-                String message = runtimeException.getMessage();
-                if (message.contains("could not found value")) {
-                    String prefix = "could not found value : "; // 固定前缀
-                    // 计算前缀长度，从前缀结束的位置开始截取
-                    int prefixLength = prefix.length();
-                    // 确保原字符串包含前缀，避免索引越界
-                    String result = message.substring(prefixLength);
-                    throw new RuntimeException("无法找到必填参数！" + result);
-                } else {
-                    throw runtimeException;
-                }
-            }
 
-            if (task.pageIs()) {
-                int pageSize = giPageParam.pageSize();
-                Number number = iAdvExecutor.bSelectRecordRowCount(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
-                Long count = number.longValue();
-                String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
-                List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(pageSql);
-                if (task.humpIs()) {
-                    girAdvOneRows = GirAdvOneRow.toCamelCaseList(girAdvOneRows);
-                }
-                GiPager<GirAdvOneRow> pager = new GirPager<>();
-                giPageParam.setPageNumStartZero(true);
-                pager.put(girAdvOneRows, count, giPageParam, true);
-                dataList.add(pager);
-            } else {
-                List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
-                if (task.humpIs()) {
-                    girAdvOneRows = GirAdvOneRow.toCamelCaseList(girAdvOneRows);
-                }
-                dataList.add(girAdvOneRows);
-            }
-        }
-
-        return dataList;
-    }
 }

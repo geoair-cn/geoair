@@ -20,8 +20,7 @@ import javax.sql.DataSource;
 @Slf4j
 public class PoolManager {
 
-    // 所有数据源的连接池存在map里
-    static ConcurrentHashMap<String, DruidDataSource> map = new ConcurrentHashMap<>();
+
     static ConcurrentHashMap<String, IAdvExecutor> advExecutorConcurrentHashMap = new ConcurrentHashMap<>();
 
 
