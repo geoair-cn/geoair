@@ -1,20 +1,20 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
+import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
+import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import com.alibaba.fastjson2.JSONObject;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JdbcUtil {
 
-    public static ResultSet query(String sql, Connection connection) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        return resultSet;
-    }
 
     public static Connection getConnection(DsDataSourceApo ds) throws Exception {
         try {
@@ -28,173 +28,36 @@ public class JdbcUtil {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(
                     "Please check whether the jdbc driver jar is missing, if missed copy the jdbc jar file to lib dir. "
-                            + e.getMessage());
+                    + e.getMessage());
         }
     }
 
-    /**
-     * 查询库中所有表
-     *
-     * @param conn
-     * @param sql
-     * @return
-     */
-    public static List<String> getAllTables(Connection conn, String sql) {
-        List<String> list = new ArrayList<>();
-        PreparedStatement pst = null;
-        try {
-            pst = conn.prepareStatement(sql);
-            ResultSet resultSet = pst.executeQuery();
 
-            while (resultSet.next()) {
-                String s = resultSet.getString(1);
-                list.add(s);
-            }
-            return list;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        } finally {
-            try {
-                if (pst != null) pst.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 查询表所有字段
-     *
-     * @param conn
-     * @param type
-     * @param table
-     * @return
-     */
     public static List<JSONObject> getRDBMSColumnProperties(
-            Connection conn, String type, String table) {
+            DataFieldsApo dataFieldsApo) {
         List<JSONObject> list = new ArrayList<>();
         PreparedStatement pst = null;
         try {
-            String sql;
-            switch (type) {
-                case "POSTGRESQL":
-                    sql = "select * from \"" + table + "\" where 1=2";
-                    break;
-                default:
-                    sql = "select * from " + table + " where 1=2";
-            }
-            pst = conn.prepareStatement(sql);
-            ResultSetMetaData rsd = pst.executeQuery().getMetaData();
-
-            for (int i = 0; i < rsd.getColumnCount(); i++) {
-                JSONObject jsonObject = new JSONObject();
-
-                String columnTypeName = rsd.getColumnTypeName(i + 1);
-                jsonObject.put("fieldTypeName", columnTypeName); // 数据库字段类型名
-                jsonObject.put("TypeName", columnTypeName);
-                jsonObject.put("fieldJavaTypeName", rsd.getColumnClassName(i + 1)); // 映射到java的类型名
-                String columnName = rsd.getColumnName(i + 1);
-                if (columnName.contains(".")) columnName = columnName.split("\\.")[1];
-                jsonObject.put("label", columnName); // 表字段
-                list.add(jsonObject);
-            }
+            dataFieldsApo.getFieldList(new Function<FieldBySchemaApo, JSONObject>() {
+                @Override
+                public JSONObject apply(FieldBySchemaApo fieldBySchemaApo) {
+                    String javaClassName = fieldBySchemaApo.getJavaClassName();
+                    JSONObject jsonObject = new JSONObject();
+                    String udtName = fieldBySchemaApo.getUdtName();
+                    String columnName1 = fieldBySchemaApo.getColumnName();
+                    jsonObject.put("fieldTypeName", udtName);
+                    jsonObject.put("TypeName", udtName);
+                    jsonObject.put("fieldJavaTypeName", javaClassName);
+                    jsonObject.put("label", columnName1);
+                    return jsonObject;
+                }
+            }, true);
             return list;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return null;
-        } finally {
-            try {
-                if (pst != null) pst.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
-    public static Object executeSql(
-            Connection connection, String sql, List<Object> jdbcParamValues, boolean humpIs)
-            throws SQLException {
-        return SafeSqlExecutor.executeSafeSql(connection, sql, jdbcParamValues, humpIs);
-    }
 
-    // /**
-    // * 没有关闭连接，需要在调用方关闭
-    // *
-    // * @param connection
-    // * @param sql
-    // * @param jdbcParamValues
-    // * @return
-    // */
-    // public static Object executeSql(Connection connection, String sql, List<Object>
-    // jdbcParamValues, boolean humpIs) throws SQLException {
-    // log.debug(sql);
-    // log.debug(JSON.toJSONString(jdbcParamValues));
-    // PreparedStatement statement = connection.prepareStatement(sql);
-    // //参数注入
-    // for (int i = 1; i <= jdbcParamValues.size(); i++) {
-    // statement.setObject(i, jdbcParamValues.get(i - 1));
-    // }
-    // boolean hasResultSet = statement.execute();
-    //
-    // if (hasResultSet) {
-    // ResultSet rs = statement.getResultSet();
-    // int columnCount = rs.getMetaData().getColumnCount();
-    //
-    // List<String> columns = new ArrayList<>();
-    // for (int i = 1; i <= columnCount; i++) {
-    // String columnName = rs.getMetaData().getColumnLabel(i);
-    // columns.add(columnName);
-    // }
-    // List<JSONObject> list = new ArrayList<>();
-    //
-    // while (rs.next()) {
-    // JSONObject jo = new JSONObject();
-    // columns.stream().forEach(t -> {
-    // try {
-    // TypeHandler typeHandlerByJavaType =
-    // TypeHandlerRegistry.getTypeHandlerByJavaType(rs.getObject(t));
-    // Object result = typeHandlerByJavaType.getResult(rs, t);
-    // if (result instanceof java.util.Date) {
-    // result = DateUtil.format((java.util.Date) result, "yyyy-MM-dd
-    // HH:mm:ss");
-    // }
-    // if (humpIs) {
-    // String camelCase = StrUtil.toCamelCase(t);
-    // jo.put(camelCase, result);
-    // } else {
-    // jo.put(t, result);
-    // }
-    //
-    // } catch (SQLException throwables) {
-    // throwables.printStackTrace();
-    // }
-    // });
-    // list.add(jo);
-    // }
-    // return list;
-    // } else {
-    // int updateCount = statement.getUpdateCount();
-    // return updateCount + " rows affected";
-    // }
-    //
-    // }
-
-    /**
-     * 没有关闭连接，需要在调用方关闭
-     *
-     * @param connection
-     * @param sql
-     * @param jdbcParamValues
-     * @return
-     */
-    public static Long executeSqlCount(
-            Connection connection, String countSql, List<Object> jdbcParamValues)
-            throws SQLException {
-        List list = (List) executeSql(connection, countSql, jdbcParamValues, false);
-        JSONObject o = (JSONObject) list.get(0);
-        return o.getLong("count");
-    }
 }

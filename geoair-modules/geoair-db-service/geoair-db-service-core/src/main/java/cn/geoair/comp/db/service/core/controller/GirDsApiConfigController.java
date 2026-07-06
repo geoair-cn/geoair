@@ -14,12 +14,16 @@ import cn.geoair.comp.db.service.core.basic.util.*;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -305,13 +309,10 @@ public class GirDsApiConfigController {
         DruidPooledConnection connection = null;
         try {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dsDataSourceApo);
+            IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
+            List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
         } finally {
@@ -331,13 +332,10 @@ public class GirDsApiConfigController {
         DruidPooledConnection connection = null;
         try {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dsDataSourceApo);
+            IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
+            List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
         } finally {
