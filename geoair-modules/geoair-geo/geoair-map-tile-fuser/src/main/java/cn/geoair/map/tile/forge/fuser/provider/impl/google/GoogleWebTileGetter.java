@@ -28,14 +28,14 @@ public class GoogleWebTileGetter extends BaseTileGetter {
     protected final int totalTimeout;
 
 
-    public GoogleWebTileGetter(PxyLayerInfo config) {
-        this(config, 60*1000*1, 60*1000*3, 60*1000*5);
+    public GoogleWebTileGetter(PxyLayerInfo layerInfo) {
+        this(layerInfo, 60*1000*1, 60*1000*3, 60*1000*5);
     }
 
-    public GoogleWebTileGetter(PxyLayerInfo config, int connectionTimeout, int readTimeout, int totalTimeout) {
-        super(config);
-        this.urlTemplate = config.getPath();
-        this.proxy = HttpTileRequestUtils.getHttpProxy(config);
+    public GoogleWebTileGetter(PxyLayerInfo layerInfo, int connectionTimeout, int readTimeout, int totalTimeout) {
+        super(layerInfo);
+        this.urlTemplate = layerInfo.getPath();
+        this.proxy = HttpTileRequestUtils.getHttpProxy(layerInfo);
         this.connectionTimeout = connectionTimeout;
         this.readTimeout = readTimeout;
         this.totalTimeout = totalTimeout;
