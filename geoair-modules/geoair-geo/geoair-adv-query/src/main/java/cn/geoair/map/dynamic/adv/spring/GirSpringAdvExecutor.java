@@ -15,8 +15,13 @@ public class GirSpringAdvExecutor extends AbstractPxyAdvExecutor implements IAdv
 
     IAdvExecutor iAdvExecutorPxy;
 
+
     public static GirSpringAdvExecutor getInstance() {
         return SpringUtil.getBean(GirSpringAdvExecutor.class);
+    }
+
+    public static IAdvExecutor getExecutorInstance() {
+        return SpringUtil.getBean(IAdvExecutor.class);
     }
 
     @Override

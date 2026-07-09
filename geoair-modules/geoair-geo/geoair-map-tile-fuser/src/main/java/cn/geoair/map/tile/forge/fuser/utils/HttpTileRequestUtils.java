@@ -7,6 +7,7 @@ import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.hutool.core.io.unit.DataSizeUtil;
+import cn.hutool.extra.spring.EnableSpringUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
