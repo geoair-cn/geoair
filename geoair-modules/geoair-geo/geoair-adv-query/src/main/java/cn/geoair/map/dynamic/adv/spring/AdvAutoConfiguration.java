@@ -32,7 +32,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 @EnableConfigurationProperties({DataSourceProperties.class})
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 @Order(100)
-//@Configuration
+@Configuration
 public class AdvAutoConfiguration {
     public AdvAutoConfiguration() {
         Gir.log.info("springAdvExecutor 自动装配逻辑初始化  ");

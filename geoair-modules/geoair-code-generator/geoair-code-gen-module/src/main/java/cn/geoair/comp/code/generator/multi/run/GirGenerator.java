@@ -3,18 +3,21 @@ package cn.geoair.comp.code.generator.multi.run;
 import cn.geoair.base.Gir;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
-import cn.geoair.comp.code.generator.multi.db.CommonRuner;
+import cn.geoair.comp.code.generator.multi.db.CommonRunner;
+import cn.geoair.comp.code.generator.multi.db.ICommonRunner;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
 import cn.hutool.core.map.MapUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import javax.sql.DataSource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -24,12 +27,17 @@ public class GirGenerator {
 
     private GirGeneratorConfig globalConfig;
 
-    private CommonRuner commonRuner;
+    private ICommonRunner iCommonRunner;
 
     public GirGenerator(DataSource dataSource, GirGeneratorConfig globalConfig) {
-        this.commonRuner = new CommonRuner(dataSource);
+        this.iCommonRunner = new CommonRunner(dataSource);
         this.globalConfig = globalConfig;
+        VelocityUtils.initVelocity();
+    }
 
+    public GirGenerator(ICommonRunner iCommonRunner, GirGeneratorConfig globalConfig) {
+        this.iCommonRunner = iCommonRunner;
+        this.globalConfig = globalConfig;
         VelocityUtils.initVelocity();
     }
 
@@ -38,14 +46,14 @@ public class GirGenerator {
             throw new GirException("生成表名列表不能为空");
         }
         // 查询表信息
-        List<GenTable> tableList = commonRuner.selectDbTableListByNames(tables);
+        List<GenTable> tableList = iCommonRunner.selectDbTableListByNames(tables);
         for (GenTable table : tableList) {
             GenUtils.initTable(table, this.globalConfig);
             table.setPackageName(globalConfig.getSourceRootPackage());
             table.setGenPath(globalConfig.getSourceRootPath());
             // 查询列信息
             List<GenTableColumn> genTableColumns =
-                    commonRuner.getTableColumnsByTableName(table.getTableName());
+                    iCommonRunner.getTableColumnsByTableName(table.getTableName());
             if (genTableColumns.isEmpty()) {
                 throw new GirException("表[" + table.getTableName() + "]无列信息，无法生成代码");
             }
@@ -60,7 +68,7 @@ public class GirGenerator {
     }
 
     public void genCode(String table) {
-        genCode(new String[] {table});
+        genCode(new String[]{table});
     }
 
     private void generatorCode(GenTable table, GirGeneratorConfig globalConfig) {
@@ -76,7 +84,7 @@ public class GirGenerator {
             try {
                 // 只处理枚举模板
                 if (template.contains("rx-enum.java.vm")
-                        || template.contains("rx-apienum.java.vm")) {
+                    || template.contains("rx-apienum.java.vm")) {
                     generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
@@ -94,7 +102,9 @@ public class GirGenerator {
         }
     }
 
-    /** 生成枚举代码 */
+    /**
+     * 生成枚举代码
+     */
     private void generateEnumCode(GenTable table, String template, Boolean mutiIs) {
         Template tpl = null;
         try {
@@ -130,7 +140,9 @@ public class GirGenerator {
         }
     }
 
-    /** 设置主键列信息（修复空指针） */
+    /**
+     * 设置主键列信息（修复空指针）
+     */
     private void setPkColumn(GenTable table) {
         List<GenTableColumn> columns = table.getColumns();
         if (columns.isEmpty()) {
