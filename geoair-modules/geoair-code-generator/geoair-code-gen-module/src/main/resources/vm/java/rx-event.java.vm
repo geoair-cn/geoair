@@ -15,20 +15,20 @@ import java.util.Map;
  */
 public interface ${ClassName}Event {
 
+    ConcurrentHashMap<String, List<${ClassName}Event>> CACHE = new ConcurrentHashMap<>();
+
     static List<${ClassName}Event> getInstances() {
-        List<${ClassName}Event> events = new ArrayList<>();
-        Map<String, ${ClassName}Event> beans = Gir.beans.getBeans(${ClassName}Event.class);
-        for (Map.Entry<String, ${ClassName}Event> event : beans.entrySet()) {
-            events.add(event.getValue());
-        }
-        return ListUtil.sort(events, new Comparator<${ClassName}Event>() {
-            @Override
-            public int compare(${ClassName}Event o1, ${ClassName}Event o2) {
-                return o1.getOrder() - o2.getOrder();
+        return CACHE.computeIfAbsent("instances", key -> {
+            List<${ClassName}Event> events = new ArrayList<>();
+            Map<String, ${ClassName}Event> beans = Gtc.beans.getBeans(${ClassName}Event.class);
+            for (Map.Entry<String, ${ClassName}Event> entry : beans.entrySet()) {
+                events.add(entry.getValue());
             }
+            return Collections.unmodifiableList(ListUtil.sort(
+                    events,
+                    Comparator.comparingInt(${ClassName}Event::getOrder)));
         });
     }
-
     /**
  * 获取排序,bean的顺序根据 1->无穷大排列
  *
