@@ -4,7 +4,7 @@ import ${packageName}.model.${moduleName}.entity.${ClassName}Po;
 import java.util.*;
 
 import cn.hutool.core.collection.ListUtil;
-
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 /**
