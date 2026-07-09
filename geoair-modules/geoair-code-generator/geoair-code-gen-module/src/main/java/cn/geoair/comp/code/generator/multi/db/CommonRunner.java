@@ -19,22 +19,17 @@ import javax.sql.DataSource;
  * @author ：张逢吉
  * @date ：Created in 13:24 @description： 数据库配置获取器
  */
-public class CommonRuner {
+public class CommonRunner implements ICommonRunner {
 
     DataSource dataSource;
 
     IAdvExecutor executor;
 
-    public CommonRuner(DataSource dataSource) {
+    public CommonRunner(DataSource dataSource) {
         this.dataSource = dataSource;
         executor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
     }
 
-    public String getTableCommentByTableName(String tableName) {
-        String tableComment;
-        tableComment = executor.dGetTableComment(tableName);
-        return tableComment;
-    }
 
     public List<GenTableColumn> getTableColumnsByTableName(String tableName) {
         // 初始化返回列表
@@ -88,19 +83,19 @@ public class CommonRuner {
     public List<GenTable> selectDbTableListByNames(String[] tableNames) {
         String sql =
                 "\t\tSELECT\n"
-                        + "\t\trelname AS table_name,\n"
-                        + "\t\tobj_description ( C.oid ) AS table_comment\n"
-                        + "\t\tFROM\n"
-                        + "\t\tpg_class C\n"
-                        + "\t\tWHERE\n"
-                        + "\t\tc.relkind IN ('r', 'v')\n"
-                        + "\t\tAND C.relnamespace = ( SELECT oid FROM pg_namespace WHERE nspname = ( SELECT CURRENT_SCHEMA ( ) ) )\n"
-                        + "\t\tAND C.relname NOT LIKE'qrtz_%'\n"
-                        + "\t\tAND C.relname NOT LIKE'gen_%'\n"
-                        + "\t\tand C.relname in\n"
-                        + "\t\t<foreach collection=\"array\" item=\"name\" open=\"(\" separator=\",\" close=\")\">\n"
-                        + "\t\t\t#{name}\n"
-                        + "\t\t</foreach>";
+                + "\t\trelname AS table_name,\n"
+                + "\t\tobj_description ( C.oid ) AS table_comment\n"
+                + "\t\tFROM\n"
+                + "\t\tpg_class C\n"
+                + "\t\tWHERE\n"
+                + "\t\tc.relkind IN ('r', 'v')\n"
+                + "\t\tAND C.relnamespace = ( SELECT oid FROM pg_namespace WHERE nspname = ( SELECT CURRENT_SCHEMA ( ) ) )\n"
+                + "\t\tAND C.relname NOT LIKE'qrtz_%'\n"
+                + "\t\tAND C.relname NOT LIKE'gen_%'\n"
+                + "\t\tand C.relname in\n"
+                + "\t\t<foreach collection=\"array\" item=\"name\" open=\"(\" separator=\",\" close=\")\">\n"
+                + "\t\t\t#{name}\n"
+                + "\t\t</foreach>";
         List<GenTable> tableList = executor.bSelectObjList(
                 sql, SqlParamMap.of().addOne("array", tableNames), GenTable.class);
         if (GutilObject.isNotEmpty(tableList)) {
