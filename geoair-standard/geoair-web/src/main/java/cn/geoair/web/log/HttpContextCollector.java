@@ -17,6 +17,18 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 public interface HttpContextCollector {
+    /**
+     * 前置校验器。
+     * <p>
+     * 在请求处理之前执行，用于校验请求的合法性。
+     * 如果校验失败，可以设置错误响应并返回 false。
+     *
+     * @param request HTTP 请求对象
+     * @param response HTTP 响应对象
+     * @return true 表示校验通过，继续执行；false 表示校验失败，终止执行
+     */
+    boolean preValidate(HttpServletRequest request, HttpServletResponse response);
+
 
     // ==================== 请求信息采集 ====================
 
@@ -65,27 +77,6 @@ public interface HttpContextCollector {
      */
     Map<String, String> collectResponseHeaders(HttpServletResponse response);
 
-    /**
-     * 采集响应体大小。
-     * <p>
-     * 优先从 Content-Length 头获取，如果无法获取则返回 null。
-     *
-     * @param response HTTP 响应对象
-     * @return 响应体大小（字节），如果无法获取则返回 null
-     */
-    Long collectResponseBodySize(HttpServletResponse response);
 
-    // ==================== 前置校验 ====================
 
-    /**
-     * 前置校验器。
-     * <p>
-     * 在请求处理之前执行，用于校验请求的合法性。
-     * 如果校验失败，可以设置错误响应并返回 false。
-     *
-     * @param request HTTP 请求对象
-     * @param response HTTP 响应对象
-     * @return true 表示校验通过，继续执行；false 表示校验失败，终止执行
-     */
-    boolean preValidate(HttpServletRequest request, HttpServletResponse response);
 }
