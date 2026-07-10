@@ -3,6 +3,8 @@ package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GirImageMime;
+import cn.geoair.web.mime.MimeException;
 import it.geosolutions.jaiext.JAIExt;
 import it.geosolutions.jaiext.colorindexer.ColorIndexer;
 import it.geosolutions.jaiext.colorindexer.Quantizer;
@@ -39,7 +41,7 @@ public class ImageMime extends MimeType {
     }
 
     public static final ImageMime png =
-            new ImageMime("image/png", "png", "png", "image/png", true, true, true) {
+            new ImageMime(GirImageMime.png, true, true, true) {
 
                 /** Any response mime starting with image/png will do */
                 public boolean isCompatible(String otherMimeType) {
@@ -51,7 +53,7 @@ public class ImageMime extends MimeType {
             };
 
     public static final ImageMime jpeg =
-            new ImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg", true, false, false) {
+            new ImageMime(GirImageMime.jpeg, true, false, false) {
 
                 /** Shave off the alpha band, JPEG cannot write it out */
                 @Override
@@ -76,13 +78,13 @@ public class ImageMime extends MimeType {
             };
 
     public static final ImageMime gif =
-            new ImageMime("image/gif", "gif", "gif", "image/gif", true, false, true);
+            new ImageMime(GirImageMime.gif, true, false, true);
 
     public static final ImageMime tiff =
-            new ImageMime("image/tiff", "tiff", "tiff", "image/tiff", true, true, true);
+            new ImageMime(GirImageMime.tiff, true, true, true);
 
     public static final ImageMime png8 =
-            new ImageMime("image/png", "png8", "png", "image/png8", true, false, true) {
+            new ImageMime(GirImageMime.png8, true, false, true) {
 
                 /** Quantize if the source did not do so already */
                 @Override
@@ -109,44 +111,31 @@ public class ImageMime extends MimeType {
             };
 
     public static final ImageMime png24 =
-            new ImageMime("image/png", "png24", "png", "image/png24", true, true, true);
-
+            new ImageMime(GirImageMime.png24, true, true, true);
     public static final ImageMime png_24 =
-            new ImageMime(
-                    "image/png; mode=24bit",
-                    "png_24",
-                    "png",
-                    "image/png;%20mode=24bit",
-                    true,
-                    true,
-                    true);
+            new ImageMime(GirImageMime.png_24, true, true, true);
+
 
     public static final ImageMime dds =
-            new ImageMime("image/dds", "dds", "dds", "image/dds", false, false, false);
+            new ImageMime(GirImageMime.dds, false, false, false);
 
     public static final ImageMime jpegPng =
             new JpegPngMime(
-                    "image/vnd.jpeg-png", "jpeg-png", "jpeg-png", "image/vnd.jpeg-png", jpeg, png);
+                    GirImageMime.jpegPng, jpeg, png);
 
     public static final ImageMime jpegPng8 =
             new JpegPngMime(
-                    "image/vnd.jpeg-png8",
-                    "jpeg-png8",
-                    "jpeg-png8",
-                    "image/vnd.jpeg-png8",
+                    GirImageMime.jpegPng8,
                     jpeg,
                     png8);
 
+
     private ImageMime(
-            String mimeType,
-            String fileExtension,
-            String internalName,
-            String format,
+            GirImageMime girImageMime,
             boolean tiled,
             boolean alphaChannel,
             boolean alphaBit) {
-        super(mimeType, fileExtension, internalName, format, tiled);
-
+        super(girImageMime.getMimeType(), girImageMime.getFileExtension(), girImageMime.getInternalName(), girImageMime.getFormat(), tiled);
         this.supportsAlphaChannel = alphaChannel;
         this.supportsAlphaBit = alphaBit;
     }
@@ -257,13 +246,10 @@ public class ImageMime extends MimeType {
         private final ImageMime pngDelegate;
 
         public JpegPngMime(
-                String mimeType,
-                String fileExtension,
-                String internalName,
-                String format,
+                GirImageMime girImageMime,
                 ImageMime jpegDelegate,
                 ImageMime pngDelegate) {
-            super(mimeType, fileExtension, internalName, format, true, true, true);
+            super(girImageMime, true, true, true);
             this.jpegDelegate = jpegDelegate;
             this.pngDelegate = pngDelegate;
         }

@@ -1,50 +1,21 @@
 
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
+import cn.geoair.web.mime.GirXMLMime;
+import cn.geoair.web.mime.MimeException;
+
 public class XMLMime extends MimeType {
 
-    public static final XMLMime ogcxml =
-            new XMLMime(
-                    "application/vnd.ogc.se_xml",
-                    "ogc-xml",
-                    "ogc-xml",
-                    "application/vnd.ogc.se_xml",
-                    false);
-
-    public static final XMLMime kml =
-            new XMLMime(
-                    "application/vnd.google-earth.kml+xml",
-                    "kml",
-                    "kml",
-                    "application/vnd.google-earth.kml+xml",
-                    false);
-
-    public static final XMLMime kmz =
-            new XMLMime(
-                    "application/vnd.google-earth.kmz",
-                    "kmz",
-                    "kmz",
-                    "application/vnd.google-earth.kmz",
-                    false);
-
-    public static final XMLMime gml =
-            new XMLMime("application/vnd.ogc.gml", "gml", "gml", "application/vnd.ogc.gml", false);
-
-    public static final XMLMime gml3 =
-            new XMLMime(
-                    "application/vnd.ogc.gml/3.1.1",
-                    "gml3",
-                    "gml3",
-                    "application/vnd.ogc.gml/3.1.1",
-                    false);
+    public static final XMLMime ogcxml = new XMLMime(GirXMLMime.ogcxml, false);
+    public static final XMLMime kml = new XMLMime(GirXMLMime.kml, false);
+    public static final XMLMime kmz = new XMLMime(GirXMLMime.kmz, false);
+    public static final XMLMime gml = new XMLMime(GirXMLMime.gml, false);
+    public static final XMLMime gml3 = new XMLMime(GirXMLMime.gml3, false);
 
     private XMLMime(
-            String mimeType,
-            String fileExtension,
-            String internalName,
-            String format,
+            GirXMLMime xmlMime,
             boolean noop) {
-        super(mimeType, fileExtension, internalName, format, false);
+        super(xmlMime.getMimeType(), xmlMime.getFileExtension(), xmlMime.getInternalName(), xmlMime.getFormat(), false);
     }
 
     protected static XMLMime checkForFormat(String formatStr) throws MimeException {

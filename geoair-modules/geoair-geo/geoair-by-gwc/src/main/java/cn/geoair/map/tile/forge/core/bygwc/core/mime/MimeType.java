@@ -3,6 +3,8 @@ package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GirMimeType;
+import cn.geoair.web.mime.MimeException;
 import cn.hutool.core.io.FileUtil;
 
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.io.IOException;
  * MIME类型类，用于表示和处理各种媒体类型的格式信息。
  * 包括MIME类型字符串、文件扩展名、格式名称等元数据。
  */
-public class MimeType {
+public class MimeType extends GirMimeType {
     /**
      * 日志记录器
      */
@@ -42,7 +44,6 @@ public class MimeType {
     protected boolean supportsTiling;
 
 
-
     /**
      * 构造方法，创建MIME类型实例
      *
@@ -58,6 +59,7 @@ public class MimeType {
             String internalName,
             String format,
             boolean supportsTiling) {
+        super(mimeType, fileExtension, internalName, format);
         this.mimeType = mimeType;
         this.fileExtension = fileExtension;
         this.internalName = internalName;
@@ -65,14 +67,6 @@ public class MimeType {
         this.supportsTiling = supportsTiling;
     }
 
-    /**
-     * 获取该格式的MIME标识符字符串
-     *
-     * @return MIME类型字符串
-     */
-    public String getMimeType() {
-        return mimeType;
-    }
 
     /**
      * 根据资源获取MIME类型字符串
@@ -86,36 +80,6 @@ public class MimeType {
         return mimeType;
     }
 
-    /**
-     * 返回格式字符串，可能与MIME类型不同
-     * 如果格式名称为空，则返回MIME类型作为备选
-     *
-     * @return 格式名称或MIME类型
-     */
-    public String getFormat() {
-        if (format != null) {
-            return format;
-        }
-        return mimeType;
-    }
-
-    /**
-     * 获取该格式最常用的文件扩展名
-     *
-     * @return 文件扩展名
-     */
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    /**
-     * 获取内部名称，用于内部目的，如选择图像渲染器
-     *
-     * @return 内部名称
-     */
-    public String getInternalName() {
-        return internalName;
-    }
 
     /**
      * 判断该格式是否支持切片（可分割为小块或组合为大块）

@@ -1,30 +1,23 @@
 
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
+import cn.geoair.web.mime.GirTextMime;
+import cn.geoair.web.mime.MimeException;
+
 public class TextMime extends MimeType {
 
-    public static final TextMime txt = new TextMime("text/plain", "txt", "txt", "text/plain", true);
+    public static final TextMime txt = new TextMime(GirTextMime.txt, true);
+    public static final TextMime txtHtml = new TextMime(GirTextMime.txtHtml, true);
+    public static final TextMime txtMapml = new TextMime(GirTextMime.txtMapml, true);
+    public static final TextMime txtXml = new TextMime(GirTextMime.txtXml, true);
+    public static final TextMime txtCss = new TextMime(GirTextMime.txtCss, true);
+    public static final TextMime txtJs = new TextMime(GirTextMime.txtJs, true);
 
-    public static final TextMime txtHtml =
-            new TextMime("text/html", "txt.html", "html", "text/html", true);
-
-    public static final TextMime txtMapml =
-            new TextMime("text/mapml", "mapml", "mapml", "text/mapml", true);
-
-    public static final TextMime txtXml = new TextMime("text/xml", "xml", "xml", "text/xml", true);
-
-    public static final TextMime txtCss = new TextMime("text/css", "css", "css", "text/css", true);
-
-    public static final TextMime txtJs =
-            new TextMime("text/javascript", "js", "javascript", "text/javascript", true);
 
     private TextMime(
-            String mimeType,
-            String fileExtension,
-            String internalName,
-            String format,
+            GirTextMime girTextMime,
             boolean noop) {
-        super(mimeType, fileExtension, internalName, format, false);
+        super(girTextMime.getMimeType(), girTextMime.getFileExtension(), girTextMime.getInternalName(), girTextMime.getFormat(), false);
     }
 
     protected static TextMime checkForFormat(String formatStr) throws MimeException {
