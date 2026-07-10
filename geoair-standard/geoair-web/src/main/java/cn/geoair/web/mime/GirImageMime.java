@@ -3,7 +3,7 @@ package cn.geoair.web.mime;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 
-public class GirImageMime extends GirMimeType implements IMimeTypeGetter {
+public class GirImageMime extends BaseMimeType implements IMimeTypeGetter {
 
 
     private static GiLogger log = GirLoggerFactory.getLogger(GirImageMime.class);

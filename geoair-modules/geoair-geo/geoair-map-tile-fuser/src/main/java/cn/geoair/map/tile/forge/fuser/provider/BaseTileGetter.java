@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
@@ -32,15 +33,15 @@ public abstract class BaseTileGetter implements LayerTileGetter {
     }
 
     @Override
-    public GiMimeType getSrcFormat() {
+    public ImageMime getSrcFormat() {
         if (GutilObject.isEmpty(layerInfo.getImageType())) {
-            return GirImageMime.png;
+            return ImageMime.png;
         }
         try {
-            return GutilMimeType.createFromExtension(layerInfo.getImageType());
+            return (ImageMime) MimeType.createFromExtension(layerInfo.getImageType());
         } catch (Exception e) {
             try {
-                return GutilMimeType.createFromFormat(layerInfo.getImageType());
+                return (ImageMime) MimeType.createFromFormat(layerInfo.getImageType());
             } catch (Exception e1) {
 
             }

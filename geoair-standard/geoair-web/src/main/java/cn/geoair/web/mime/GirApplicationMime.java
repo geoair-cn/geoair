@@ -1,7 +1,7 @@
 
 package cn.geoair.web.mime;
 
-public class GirApplicationMime extends GirMimeType {
+public class GirApplicationMime extends BaseMimeType {
 
 
 

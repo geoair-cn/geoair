@@ -1,7 +1,7 @@
 
 package cn.geoair.web.mime;
 
-public class GirXMLMime extends GirMimeType {
+public class GirXMLMime extends BaseMimeType {
 
     public static final GirXMLMime ogcxml =
             new GirXMLMime(

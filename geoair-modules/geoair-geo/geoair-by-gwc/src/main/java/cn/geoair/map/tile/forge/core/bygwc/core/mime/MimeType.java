@@ -3,7 +3,7 @@ package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
-import cn.geoair.web.mime.GirMimeType;
+import cn.geoair.web.mime.BaseMimeType;
 import cn.geoair.web.mime.MimeException;
 import cn.hutool.core.io.FileUtil;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
  * MIME类型类，用于表示和处理各种媒体类型的格式信息。
  * 包括MIME类型字符串、文件扩展名、格式名称等元数据。
  */
-public class MimeType extends GirMimeType {
+public class MimeType extends BaseMimeType {
     /**
      * 日志记录器
      */

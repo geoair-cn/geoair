@@ -1,7 +1,7 @@
 
 package cn.geoair.web.mime;
 
-public class GirTextMime extends GirMimeType implements IMimeTypeGetter{
+public class GirTextMime extends BaseMimeType implements IMimeTypeGetter{
 
     public static final GirTextMime txt = new GirTextMime("text/plain", "txt", "txt", "text/plain");
 

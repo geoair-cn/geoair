@@ -7,11 +7,11 @@ import cn.geoair.base.log.GirLoggerFactory;
  * MIME类型类，用于表示和处理各种媒体类型的格式信息。
  * 包括MIME类型字符串、文件扩展名、格式名称等元数据。
  */
-public abstract class GirMimeType implements GiMimeType {
+public abstract class BaseMimeType implements GiMimeType {
     /**
      * 日志记录器
      */
-    private static GiLogger log = GirLoggerFactory.getLogger(GirMimeType.class);
+    private static GiLogger log = GirLoggerFactory.getLogger(BaseMimeType.class);
     /**
      * MIME类型字符串，如 "image/png"
      */
@@ -41,7 +41,7 @@ public abstract class GirMimeType implements GiMimeType {
      * @param internalName  内部名称
      * @param format        格式名称
      */
-    protected GirMimeType(
+    protected BaseMimeType(
             String mimeType,
             String fileExtension,
             String internalName,
@@ -109,7 +109,7 @@ public abstract class GirMimeType implements GiMimeType {
     @Override
     public boolean equals(Object obj) {
         if (obj != null && obj.getClass() == this.getClass()) {
-            GirMimeType mimeObj = (GirMimeType) obj;
+            BaseMimeType mimeObj = (BaseMimeType) obj;
             if (this.format.equalsIgnoreCase(mimeObj.format)) {
                 return true;
             }

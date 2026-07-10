@@ -87,7 +87,7 @@ public class CachedTileGetter implements LayerTileGetter {
     }
 
     @Override
-    public GiMimeType getSrcFormat() {
+    public ImageMime getSrcFormat() {
         return target.getSrcFormat();
     }
 
