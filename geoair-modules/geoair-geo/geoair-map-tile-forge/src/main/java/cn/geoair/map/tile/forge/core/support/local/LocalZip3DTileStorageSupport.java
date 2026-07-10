@@ -4,19 +4,19 @@ import cn.geoair.base.exception.GirException;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 
 import cn.hutool.core.util.StrUtil;
- 
+
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
@@ -40,7 +40,7 @@ import java.util.List;
  * @author 张俊
  * @since 2025/11/17
  */
- 
+
 public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
     public static GiLogger log = GirLoggerFactory.getLogger();
     public LocalZip3DTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
@@ -85,7 +85,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            tileRequest.setMimeType(MimeType.createFromFileName(localTileFile.getName()));
+            tileRequest.setMimeType(GutilMimeType.createFromExtension(FileUtil.getSuffix(localTileFile.getName())));
         }
         return tileRequest;
     }

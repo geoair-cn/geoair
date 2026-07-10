@@ -18,6 +18,7 @@ import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
@@ -43,7 +44,7 @@ public class TileTaskExecutor {
     private final String layerName;
     private final int zoom;
     private final Geometry geometry4326;
-    private final ImageMime format;
+    private final GirImageMime format;
 
     // 任务类型
     private final TaskType taskType;

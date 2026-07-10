@@ -4,9 +4,13 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
+import cn.geoair.web.mime.GiMimeType;
+import cn.geoair.web.mime.GirImageMime;
+import cn.geoair.web.util.GutilMimeType;
 import lombok.Getter;
 
 
@@ -20,7 +24,7 @@ import lombok.Getter;
 
 public abstract class BaseTileGetter implements LayerTileGetter {
 
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     @Getter
     private final PxyLayerInfo layerInfo;
 
@@ -34,10 +38,10 @@ public abstract class BaseTileGetter implements LayerTileGetter {
             return ImageMime.png;
         }
         try {
-            return (ImageMime) ImageMime.createFromExtension(layerInfo.getImageType());
+            return (ImageMime) MimeType.createFromExtension(layerInfo.getImageType());
         } catch (Exception e) {
             try {
-                return (ImageMime) ImageMime.createFromFormat(layerInfo.getImageType());
+                return (ImageMime) MimeType.createFromFormat(layerInfo.getImageType());
             } catch (Exception e1) {
 
             }
@@ -48,7 +52,7 @@ public abstract class BaseTileGetter implements LayerTileGetter {
     @Override
     public GridSubset getSrcGridSubset() {
         Integer gridSrid = layerInfo.getGridSrid();
-        if (gridSrid.equals(3857)||gridSrid.equals(900913)) {
+        if (gridSrid.equals(3857) || gridSrid.equals(900913)) {
             return GridInitUtils.getWorldGrid3857();
         } else {
             return GridInitUtils.getTdtGrid4490();

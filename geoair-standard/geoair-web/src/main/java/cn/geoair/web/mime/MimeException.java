@@ -12,7 +12,7 @@
  *
  * @author Arne Kepp, The Open Planning Project, Copyright 2008
  */
-package cn.geoair.map.tile.forge.core.bygwc.core.mime;
+package cn.geoair.web.mime;
 
 
 

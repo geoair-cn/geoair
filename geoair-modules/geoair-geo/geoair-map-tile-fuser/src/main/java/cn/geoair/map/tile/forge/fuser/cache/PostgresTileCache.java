@@ -6,8 +6,8 @@ import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.web.mime.GiMimeType;
 
 
 import javax.sql.DataSource;
@@ -120,7 +120,7 @@ public class PostgresTileCache implements TileCache {
     }
 
     @Override
-    public byte[] get(String layerName, int z, int x, int y, ImageMime format) {
+    public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return null;
         }
@@ -140,7 +140,7 @@ public class PostgresTileCache implements TileCache {
     }
 
     @Override
-    public boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format) {
+    public boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
         if (!enabled || data == null || data.length == 0) {
             return false;
         }
@@ -198,7 +198,7 @@ public class PostgresTileCache implements TileCache {
     }
 
     @Override
-    public boolean delete(String layerName, int z, int x, int y, ImageMime format) {
+    public boolean delete(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
@@ -222,7 +222,7 @@ public class PostgresTileCache implements TileCache {
     }
 
     @Override
-    public boolean exists(String layerName, int z, int x, int y, ImageMime format) {
+    public boolean exists(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }

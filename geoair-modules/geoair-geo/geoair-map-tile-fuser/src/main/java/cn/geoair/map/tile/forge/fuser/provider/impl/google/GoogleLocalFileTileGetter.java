@@ -3,9 +3,9 @@ package cn.geoair.map.tile.forge.fuser.provider.impl.google;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.FileUtil;
 
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
@@ -63,7 +63,7 @@ public class GoogleLocalFileTileGetter extends BaseTileGetter {
 
             if (read != null) {
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    ImageMime srcFormat = getSrcFormat();
+                    GiMimeType srcFormat = getSrcFormat();
                     String internalName = srcFormat.getInternalName();
                     ImageIO.write(read, internalName, baos);
                     imageBytes = baos.toByteArray();

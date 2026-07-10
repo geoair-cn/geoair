@@ -1,24 +1,15 @@
 
-package cn.geoair.map.tile.forge.core.bygwc.core.mime;
+package cn.geoair.web.mime.getter;
 
-import cn.geoair.web.mime.GirXMLMime;
-import cn.geoair.web.mime.MimeException;
+import cn.geoair.web.mime.GiMimeType;
+import cn.geoair.web.mime.IMimeTypeGetter;
 
-public class XMLMime extends MimeType {
+import static cn.geoair.web.mime.GirXMLMime.*;
 
-    public static final XMLMime ogcxml = new XMLMime(GirXMLMime.ogcxml, false);
-    public static final XMLMime kml = new XMLMime(GirXMLMime.kml, false);
-    public static final XMLMime kmz = new XMLMime(GirXMLMime.kmz, false);
-    public static final XMLMime gml = new XMLMime(GirXMLMime.gml, false);
-    public static final XMLMime gml3 = new XMLMime(GirXMLMime.gml3, false);
+public class XMLMimeGetter implements IMimeTypeGetter {
 
-    private XMLMime(
-            GirXMLMime xmlMime,
-            boolean noop) {
-        super(xmlMime.getMimeType(), xmlMime.getFileExtension(), xmlMime.getInternalName(), xmlMime.getFormat(), false);
-    }
-
-    protected static XMLMime checkForFormat(String formatStr) throws MimeException {
+    @Override
+    public GiMimeType checkForFormat(String formatStr) {
         if (formatStr.equalsIgnoreCase("application/vnd.google-earth.kml+xml")) {
             return kml;
         } else if (formatStr.equalsIgnoreCase("application/vnd.google-earth.kmz")) {
@@ -34,7 +25,8 @@ public class XMLMime extends MimeType {
         return null;
     }
 
-    protected static XMLMime checkForExtension(String fileExtension) throws MimeException {
+    @Override
+    public GiMimeType checkForExtension(String fileExtension) {
         if (fileExtension.equalsIgnoreCase("kml")) {
             return kml;
         } else if (fileExtension.equalsIgnoreCase("kmz")) {

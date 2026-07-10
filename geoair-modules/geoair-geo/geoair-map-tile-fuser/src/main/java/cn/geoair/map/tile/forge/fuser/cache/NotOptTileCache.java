@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.web.mime.GiMimeType;
 
 /**
  * @author ：张俊
@@ -8,29 +8,30 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
  * @description： 什么都不干的缓存实现
  */
 public class NotOptTileCache implements TileCache {
+
     @Override
-    public byte[] get(String layerName, int z, int x, int y, ImageMime format) {
+    public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
         return new byte[0];
     }
 
     @Override
-    public boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format) {
-        return true;
+    public boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
+        return false;
     }
 
     @Override
     public boolean deleteLayerCache(String layerName) {
-        return true;
+        return false;
     }
 
     @Override
     public boolean delete(String layerName, Integer z, Integer x) {
-        return true;
+        return false;
     }
 
     @Override
-    public boolean delete(String layerName, int z, int x, int y, ImageMime format) {
-        return true;
+    public boolean delete(String layerName, int z, int x, int y, GiMimeType format) {
+        return false;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class NotOptTileCache implements TileCache {
     }
 
     @Override
-    public boolean exists(String layerName, int z, int x, int y, ImageMime format) {
+    public boolean exists(String layerName, int z, int x, int y, GiMimeType format) {
         return false;
     }
 

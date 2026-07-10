@@ -1,13 +1,12 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.geoair.map.tile.forge.core.support.local.LocalUnzippedXYZTileStorageSupport;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.FileUtil;
-import org.springframework.http.MediaType;
 
 import java.io.File;
 
@@ -54,7 +53,7 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
         tileRequest.setLastModified(localTileFile.lastModified());
         tileRequest.setSize(localTileFile.length());
         tileRequest.setExists(true);
-        tileRequest.setMimeType(MimeType.createFromExtension(format));
+        tileRequest.setMimeType(GutilMimeType.createFromExtension(format));
         return tileRequest;
     }
 

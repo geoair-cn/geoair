@@ -3,12 +3,8 @@ package cn.geoair.map.tile.forge.fuser.precache;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
-import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
-import cn.geoair.map.tile.forge.fuser.precache.TileOriginalCheckAndRepairTask;
-import cn.geoair.map.tile.forge.fuser.precache.TileOriginalPreCacheTask;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -62,7 +58,7 @@ public class PreCache {
         executePreCache(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, false, false, null);
     }
 
@@ -70,7 +66,7 @@ public class PreCache {
         executePreCheck(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, true, false, null);
     }
 
@@ -88,12 +84,12 @@ public class PreCache {
         executeOriginalPreCache(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         executeOriginalPreCache(config, wkt4326String, minZoom, maxZoom, format, null);
     }
 
     public void executeOriginalPreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
-                                         ImageMime format, String originalCacheName) {
+                                        GirImageMime format, String originalCacheName) {
         execute(config, wkt4326String, minZoom, maxZoom, format, false, true, originalCacheName);
     }
 
@@ -109,12 +105,12 @@ public class PreCache {
         executeOriginalPreCheck(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         executeOriginalPreCheck(config, wkt4326String, minZoom, maxZoom, format, null);
     }
 
     public void executeOriginalPreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
-                                         ImageMime format, String originalCacheName) {
+                                        GirImageMime format, String originalCacheName) {
         execute(config, wkt4326String, minZoom, maxZoom, format, true, true, originalCacheName);
     }
 
@@ -133,14 +129,14 @@ public class PreCache {
      * @param originalCacheName 原始网格缓存名（可为null，使用默认）
      */
     public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
-                         ImageMime format, boolean isPreCheck, boolean isOriginalGrid, String originalCacheName) {
+                        GirImageMime format, boolean isPreCheck, boolean isOriginalGrid, String originalCacheName) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
         }
 
         if (format == null) {
-            format = ImageMime.png;
+            format = GirImageMime.png;
         }
 
         // 处理原始网格缓存名
@@ -183,7 +179,7 @@ public class PreCache {
     /**
      * 构建任务
      */
-    private Runnable buildTask(PxyLayerInfo config, int zoom, Geometry geometry, ImageMime format,
+    private Runnable buildTask(PxyLayerInfo config, int zoom, Geometry geometry, GirImageMime format,
                                 boolean isPreCheck, boolean isOriginalGrid, String originalCacheName,
                                 CountDownLatch latch, AtomicLong totalCount, AtomicLong successCount,
                                 AtomicLong failCount, AtomicLong checkedCount, AtomicLong repairedCount) {

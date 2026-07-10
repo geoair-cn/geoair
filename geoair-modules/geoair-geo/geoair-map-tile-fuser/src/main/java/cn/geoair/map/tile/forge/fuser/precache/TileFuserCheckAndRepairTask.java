@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -18,7 +19,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
     public TileFuserCheckAndRepairTask(String layerName, int zoom, Geometry geometry4326,
                                         CountDownLatch latch, AtomicLong totalCount,
                                         AtomicLong checkedCount, AtomicLong repairedCount,
-                                        AtomicLong failCount, ImageMime format) {
+                                        AtomicLong failCount, GirImageMime format) {
         TileTaskConfig config = TileTaskConfig.forCheckAndRepair(layerName, zoom, geometry4326, format)
                 .setLatch(latch)
                 .setTotalCount(totalCount)
@@ -31,7 +32,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
     /**
      * 便捷创建方法
      */
-    public static TileFuserCheckAndRepairTask of(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
+    public static TileFuserCheckAndRepairTask of(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
         return new TileFuserCheckAndRepairTask(layerName, zoom, geometry4326, null, null, null, null, null, format);
     }
 
@@ -51,7 +52,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
         private String layerName;
         private int zoom;
         private Geometry geometry4326;
-        private ImageMime format;
+        private GirImageMime format;
         private CountDownLatch latch;
         private AtomicLong totalCount;
         private AtomicLong checkedCount;
@@ -73,7 +74,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
             return this;
         }
 
-        public Builder format(ImageMime format) {
+        public Builder format(GirImageMime format) {
             this.format = format;
             return this;
         }

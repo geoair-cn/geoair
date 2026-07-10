@@ -1,26 +1,33 @@
 
-package cn.geoair.map.tile.forge.core.bygwc.core.mime;
+package cn.geoair.web.mime;
 
-import cn.geoair.web.mime.GirTextMime;
-import cn.geoair.web.mime.MimeException;
+public class GirTextMime extends BaseMimeType implements IMimeTypeGetter{
 
-public class TextMime extends MimeType {
+    public static final GirTextMime txt = new GirTextMime("text/plain", "txt", "txt", "text/plain");
 
-    public static final TextMime txt = new TextMime(GirTextMime.txt, true);
-    public static final TextMime txtHtml = new TextMime(GirTextMime.txtHtml, true);
-    public static final TextMime txtMapml = new TextMime(GirTextMime.txtMapml, true);
-    public static final TextMime txtXml = new TextMime(GirTextMime.txtXml, true);
-    public static final TextMime txtCss = new TextMime(GirTextMime.txtCss, true);
-    public static final TextMime txtJs = new TextMime(GirTextMime.txtJs, true);
+    public static final GirTextMime txtHtml =
+            new GirTextMime("text/html", "txt.html", "html", "text/html");
 
+    public static final GirTextMime txtMapml =
+            new GirTextMime("text/mapml", "mapml", "mapml", "text/mapml");
 
-    private TextMime(
-            GirTextMime girTextMime,
-            boolean noop) {
-        super(girTextMime.getMimeType(), girTextMime.getFileExtension(), girTextMime.getInternalName(), girTextMime.getFormat(), false);
+    public static final GirTextMime txtXml = new GirTextMime("text/xml", "xml", "xml", "text/xml");
+
+    public static final GirTextMime txtCss = new GirTextMime("text/css", "css", "css", "text/css");
+
+    public static final GirTextMime txtJs =
+            new GirTextMime("text/javascript", "js", "javascript", "text/javascript");
+
+    private GirTextMime(
+            String mimeType,
+            String fileExtension,
+            String internalName,
+            String format) {
+        super(mimeType, fileExtension, internalName, format);
     }
 
-    protected static TextMime checkForFormat(String formatStr) throws MimeException {
+    @Override
+    public GirTextMime checkForFormat(String formatStr) {
         if (formatStr.toLowerCase().startsWith("text")) {
             if (formatStr.equalsIgnoreCase("text/plain")) {
                 return txt;
@@ -40,7 +47,8 @@ public class TextMime extends MimeType {
         return null;
     }
 
-    protected static TextMime checkForExtension(String fileExtension) throws MimeException {
+    @Override
+    public GirTextMime checkForExtension(String fileExtension) {
         if (fileExtension.equalsIgnoreCase("txt")) {
             return txt;
         } else if (fileExtension.equalsIgnoreCase("txt.html")) {

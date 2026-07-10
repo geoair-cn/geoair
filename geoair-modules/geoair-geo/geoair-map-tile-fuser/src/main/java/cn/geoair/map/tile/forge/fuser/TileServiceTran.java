@@ -6,14 +6,16 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.TextMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.web.mime.GiMimeType;
+import cn.geoair.web.mime.GirImageMime;
 import cn.geoair.web.util.GirHttpServletHelper;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 
 public class TileServiceTran {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
 
     /**
      * 默认瓦片大小
@@ -165,7 +167,7 @@ public class TileServiceTran {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
 
         try {
-            MimeType fromFormat = ImageMime.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
 
             // 创建融合执行器
             FuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
@@ -176,12 +178,12 @@ public class TileServiceTran {
                     bounds,
                     DEFAULT_TILE_SIZE,
                     DEFAULT_TILE_SIZE,
-                    (ImageMime) fromFormat
+                    (ImageMime) ImageMime.createFromFormat(fromFormat.getFormat())
             );
 
             // 如果需要删除缓存
             if (deleteCache) {
-                deleteCacheForTile(layerName, z, x, y, cacheTileFuser, (ImageMime) fromFormat);
+                deleteCacheForTile(layerName, z, x, y, cacheTileFuser, (GirImageMime) fromFormat);
                 // 删除缓存后，重新生成瓦片
                 cacheTileFuser = GirFuserExecFactory.createCachedFuser(
                         layerName,
@@ -191,7 +193,7 @@ public class TileServiceTran {
                         bounds,
                         DEFAULT_TILE_SIZE,
                         DEFAULT_TILE_SIZE,
-                        (ImageMime) fromFormat
+                        (ImageMime) ImageMime.createFromFormat(fromFormat.getFormat())
                 );
             }
 
@@ -212,7 +214,7 @@ public class TileServiceTran {
         }
     }
 
-    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, MimeType fromFormat) {
+    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, GiMimeType fromFormat) {
         if (imageBytes != null && imageBytes.length > 0) {
             GirServletUtil.toResponse(response, imageBytes, fromFormat.getMimeType());
             log.debug("瓦片生成成功: layer={}, z={}, x={}, y={}, size={} bytes",
@@ -238,7 +240,7 @@ public class TileServiceTran {
      * @param imageFormat 图片格式
      */
     public void deleteCacheForTile(String layerName, Integer z, Integer x, Integer y,
-                                    FuserExec cacheFuser, ImageMime imageFormat) {
+                                   FuserExec cacheFuser, GirImageMime imageFormat) {
         try {
             // 删除当前瓦片缓存
             if (cacheFuser instanceof CacheTileFuserExec) {
@@ -267,7 +269,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
 
         try {
-            MimeType fromFormat = ImageMime.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
             CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
                     layerName,
                     z,
@@ -280,7 +282,7 @@ public class TileServiceTran {
             );
 
             // 删除周边瓦片缓存
-            FuserCacheUtils.deleteCacheByRequestGrid(layerName, z, x, y, cacheTileFuser, (ImageMime) fromFormat);
+            FuserCacheUtils.deleteCacheByRequestGrid(layerName, z, x, y, cacheTileFuser, (GirImageMime) fromFormat);
 
             log.info("删除瓦片缓存完成: layer={}, z={}, x={}, y={}", layerName, z, x, y);
 

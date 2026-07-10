@@ -4,11 +4,10 @@ import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.IoUtil;
-import org.springframework.http.MediaType;
 
 /**
  * 本地解压版Compact V1瓦片存储支持类
@@ -49,7 +48,7 @@ public class LocalUnzippedCompactV2TileStorageSupport extends LocalUnzippedCompa
             tileRequest.setSize(size);
             tileRequest.setLastModified(bundleFileResource.getLastModified());
 
-            tileRequest.setMimeType(MimeType.createFromExtension(format));
+            tileRequest.setMimeType(GutilMimeType.createFromExtension(format));
         }
         return tileRequest;
     }
