@@ -28,7 +28,7 @@ public class TileResponseUtils {
         response.setHeader("Cache-Control", "public, max-age=86400");
         response.setHeader("Last-Modified", tileRequest.getLastModified() + "");
         if (tileRequest.getSize() > 0) {
-            response.setHeader("Content-Length", tileRequest.getSize() + "");
+            response.setContentLengthLong(tileRequest.getSize());
         }
         response.setContentType(tileRequest.getMimeType().getFormat());
         response.setStatus(HttpStatus.OK.value());

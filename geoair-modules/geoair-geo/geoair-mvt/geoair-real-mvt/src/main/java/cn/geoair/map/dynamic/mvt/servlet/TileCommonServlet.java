@@ -23,6 +23,7 @@ import java.util.Objects;
 
 public class TileCommonServlet extends HttpServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     /**
      * 输出响应内容
      */
@@ -86,6 +87,7 @@ public class TileCommonServlet extends HttpServlet {
             }
 
             response.setContentType("application/octet-stream");
+            response.setContentLengthLong(data.length);
         } else {
             response.setContentType("text/plain; charset=utf-8");
             response.setStatus(500);
