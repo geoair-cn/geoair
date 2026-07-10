@@ -93,6 +93,9 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void fatal(String format, Object... arguments) {
+        if (!isFatalEnabled()) {
+            return;
+        }
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
         log(GemLogLevel.FATAL, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
 

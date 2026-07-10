@@ -251,6 +251,9 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
+            if (!isFatalEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.fatal(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
@@ -267,6 +270,9 @@ public class Log4Gir {
 
         @Override
         public void error(String format, Object... arguments) {
+            if (!isErrorEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.error(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
@@ -283,6 +289,9 @@ public class Log4Gir {
 
         @Override
         public void warn(String format, Object... arguments) {
+            if (!isWarnEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.warn(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
 
@@ -300,6 +309,9 @@ public class Log4Gir {
 
         @Override
         public void info(String format, Object... arguments) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.info(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
 
@@ -317,6 +329,9 @@ public class Log4Gir {
 
         @Override
         public void debug(String format, Object... arguments) {
+            if (!isDebugEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.debug(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
@@ -333,6 +348,9 @@ public class Log4Gir {
 
         @Override
         public void trace(String format, Object... arguments) {
+            if (!isTraceEnabled()) {
+                return;
+            }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
             logger.trace(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
@@ -395,7 +413,10 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
-            logger.error(format, arguments);
+            if (isFatalEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
         }
 
         @Override
@@ -410,8 +431,10 @@ public class Log4Gir {
 
         @Override
         public void error(String format, Object... arguments) {
-            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (isErrorEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
         }
 
         @Override
@@ -426,7 +449,11 @@ public class Log4Gir {
 
         @Override
         public void warn(String format, Object... arguments) {
-            logger.warn(format, arguments);
+            if (isWarnEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.warn(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
+
         }
 
         @Override
@@ -441,7 +468,10 @@ public class Log4Gir {
 
         @Override
         public void info(String format, Object... arguments) {
-            logger.info(format, arguments);
+            if (isInfoEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.info(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
         }
 
         @Override
@@ -456,7 +486,10 @@ public class Log4Gir {
 
         @Override
         public void debug(String format, Object... arguments) {
-            logger.debug(format, arguments);
+            if (isDebugEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.debug(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
         }
 
         @Override
@@ -471,7 +504,11 @@ public class Log4Gir {
 
         @Override
         public void trace(String format, Object... arguments) {
-            logger.trace(format, arguments);
+            if (isTraceEnabled()) {
+                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+                logger.trace(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            }
+
         }
 
         @Override
