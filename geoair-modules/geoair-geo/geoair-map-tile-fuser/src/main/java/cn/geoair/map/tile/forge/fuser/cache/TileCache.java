@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.web.mime.GiMimeType;
 
 /**
  * 瓦片缓存接口
@@ -21,7 +21,7 @@ public interface TileCache {
      * @param format
      * @return 瓦片字节数组，不存在则返回null
      */
-    byte[] get(String layerName, int z, int x, int y, ImageMime format);
+    byte[] get(String layerName, int z, int x, int y, GiMimeType format);
 
     /**
      * 保存瓦片到缓存
@@ -34,7 +34,7 @@ public interface TileCache {
      * @param format
      * @return 是否保存成功
      */
-    boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format);
+    boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format);
 
     /**
      * 删除指定图层的所有缓存
@@ -64,7 +64,7 @@ public interface TileCache {
      * @param format
      * @return 是否删除成功
      */
-    boolean delete(String layerName, int z, int x, int y, ImageMime format);
+    boolean delete(String layerName, int z, int x, int y, GiMimeType format);
 
     /**
      * 清空所有缓存
@@ -88,7 +88,7 @@ public interface TileCache {
      * @param format
      * @return 是否存在
      */
-    boolean exists(String layerName, int z, int x, int y, ImageMime format);
+    boolean exists(String layerName, int z, int x, int y, GiMimeType format);
 
     /**
      * 缓存是否启用

@@ -3,7 +3,6 @@ package cn.geoair.map.tile.forge.core.support.local;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -18,19 +17,16 @@ import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 
- 
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -41,9 +37,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author 张俊
  * @since 2025/11/17
  */
- 
+
 public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public LocalZip3DTerrainStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }
@@ -93,9 +90,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            Optional<MediaType> mediaType = MediaTypeFactory.getMediaType(localTileFile.getName());
-            MediaType mediaType1 = mediaType.orElse(MediaType.APPLICATION_OCTET_STREAM);
-            tileRequest.setMimeType(MimeType.createFromExtension(localTileFile.getName()));
+            tileRequest.setMimeType(GutilMimeType.createFromExtension(localTileFile.getName()));
         }
         return tileRequest;
     }

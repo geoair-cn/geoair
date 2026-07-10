@@ -1,13 +1,12 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.FileUtil;
-import org.springframework.http.MediaType;
 
 import java.io.File;
 
@@ -49,7 +48,7 @@ public class LocalUnzippedXYZTileStorageSupport implements ITileStorageSupport {
         tileRequest.setLastModified(localTileFile.lastModified());
         tileRequest.setSize(localTileFile.length());
         tileRequest.setExists(true);
-        tileRequest.setMimeType(MimeType.createFromExtension(format));
+        tileRequest.setMimeType(GutilMimeType.createFromExtension(format));
         return tileRequest;
     }
 

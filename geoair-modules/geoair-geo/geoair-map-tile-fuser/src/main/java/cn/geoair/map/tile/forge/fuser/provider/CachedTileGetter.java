@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.*;
+import cn.geoair.web.mime.GiMimeType;
 import lombok.Getter;
 
 /**
@@ -86,7 +87,7 @@ public class CachedTileGetter implements LayerTileGetter {
     }
 
     @Override
-    public ImageMime getSrcFormat() {
+    public GiMimeType getSrcFormat() {
         return target.getSrcFormat();
     }
 

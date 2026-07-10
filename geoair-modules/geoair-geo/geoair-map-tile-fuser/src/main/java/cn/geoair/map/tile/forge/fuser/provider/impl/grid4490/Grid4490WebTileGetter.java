@@ -19,7 +19,7 @@ import java.net.Proxy;
  */
 
 public class Grid4490WebTileGetter extends BaseTileGetter {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     protected final String urlTemplate;
 
     protected final Proxy proxy;
@@ -29,7 +29,7 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
 
 
     public Grid4490WebTileGetter(PxyLayerInfo config) {
-        this(config, 60*1000*1, 60*1000*3, 60*1000*5);
+        this(config, 60 * 1000 * 1, 60 * 1000 * 3, 60 * 1000 * 5);
     }
 
     public Grid4490WebTileGetter(PxyLayerInfo layerInfo, int connectionTimeout, int readTimeout, int totalTimeout) {

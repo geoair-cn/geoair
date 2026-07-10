@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
+import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.extra.spring.EnableSpringUtil;
 import cn.hutool.http.HttpRequest;
@@ -192,7 +193,7 @@ public class HttpTileRequestUtils {
                                                 int maxRetries,
                                                 long retryDelay,
                                                 long maxRetryDelay,
-                                                ImageMime srcFormat,
+                                                GiMimeType srcFormat,
                                                 String logContext) {
         return requestTileWithRetry(url, proxy, timeout, maxRetries, retryDelay, maxRetryDelay,
                 srcFormat, logContext, null);
@@ -218,7 +219,7 @@ public class HttpTileRequestUtils {
                                                 int maxRetries,
                                                 long retryDelay,
                                                 long maxRetryDelay,
-                                                ImageMime srcFormat,
+                                                GiMimeType srcFormat,
                                                 String logContext,
                                                 Map<String, String> headers) {
 

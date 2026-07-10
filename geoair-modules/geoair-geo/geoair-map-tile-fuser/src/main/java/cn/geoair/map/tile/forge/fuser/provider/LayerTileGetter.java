@@ -4,6 +4,7 @@ package cn.geoair.map.tile.forge.fuser.provider;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GiMimeType;
 
 /**
  * @author ：zhangjun
@@ -23,7 +24,7 @@ public interface LayerTileGetter {
     Resource getTileResource(int z, int x, int y);
 
 
-    ImageMime getSrcFormat();
+    GiMimeType getSrcFormat();
 
 
     GridSubset getSrcGridSubset();

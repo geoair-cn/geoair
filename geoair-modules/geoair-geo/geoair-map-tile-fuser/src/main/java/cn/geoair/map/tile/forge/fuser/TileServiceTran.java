@@ -6,14 +6,15 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.TextMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.util.GirHttpServletHelper;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.util.StrUtil;
 
 import javax.servlet.http.HttpServletResponse;
@@ -163,7 +164,7 @@ public class TileServiceTran {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
 
         try {
-            MimeType fromFormat = ImageMime.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
 
             // 创建融合执行器
             FuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
@@ -210,7 +211,7 @@ public class TileServiceTran {
         }
     }
 
-    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, MimeType fromFormat) {
+    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, GiMimeType fromFormat) {
         if (imageBytes != null && imageBytes.length > 0) {
             GirServletUtil.toResponse(response, imageBytes, fromFormat.getMimeType());
             log.debug("瓦片生成成功: layer={}, z={}, x={}, y={}, size={} bytes",
@@ -265,7 +266,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
 
         try {
-            MimeType fromFormat = ImageMime.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
             CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
                     layerName,
                     z,

@@ -2,8 +2,8 @@ package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.FileUtil;
 
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class FileTileCache implements TileCache {
     /**
      * 获取缓存文件路径（支持 Y 轴翻转）
      */
-    private Path getCachePath(String layerName, int z, int x, int y, ImageMime format) {
+    private Path getCachePath(String layerName, int z, int x, int y, GiMimeType format) {
         boolean needReverse = isNeedReverseY(layerName);
         int storeY = FuserCacheUtils.getStoreY(z, y, needReverse);
         // 使用layerName/z/x/目录结构，文件名为storeY.format
@@ -84,7 +84,7 @@ public class FileTileCache implements TileCache {
 
 
     @Override
-    public byte[] get(String layerName, int z, int x, int y, ImageMime format) {
+    public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return null;
         }
@@ -119,7 +119,7 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean put(String layerName, int z, int x, int y, byte[] data, ImageMime format) {
+    public boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
         if (!enabled || data == null || data.length == 0) {
             return false;
         }
@@ -272,7 +272,7 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean delete(String layerName, int z, int x, int y, ImageMime format) {
+    public boolean delete(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
@@ -382,7 +382,7 @@ public class FileTileCache implements TileCache {
     }
 
     @Override
-    public boolean exists(String layerName, int z, int x, int y, ImageMime format) {
+    public boolean exists(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
