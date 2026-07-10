@@ -6,6 +6,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
 
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
