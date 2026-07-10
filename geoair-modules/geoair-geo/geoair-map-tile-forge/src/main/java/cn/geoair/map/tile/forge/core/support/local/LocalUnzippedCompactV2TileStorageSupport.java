@@ -48,7 +48,7 @@ public class LocalUnzippedCompactV2TileStorageSupport extends LocalUnzippedCompa
             tileRequest.setSize(size);
             tileRequest.setLastModified(bundleFileResource.getLastModified());
 
-            tileRequest.setMimeType(GutilMimeType.createFromExtension(format));
+            tileRequest.setMimeType(GutilMimeType.fromExtension(format));
         }
         return tileRequest;
     }

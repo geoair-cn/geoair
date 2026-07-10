@@ -85,7 +85,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.createFromExtension(FileUtil.getSuffix(localTileFile.getName())));
+            tileRequest.setMimeType(GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
         }
         return tileRequest;
     }
