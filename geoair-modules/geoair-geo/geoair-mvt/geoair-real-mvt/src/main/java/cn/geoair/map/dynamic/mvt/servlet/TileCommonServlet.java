@@ -31,7 +31,7 @@ public class TileCommonServlet extends HttpServlet {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream in = null;
         response.setContentType(contentType);
-
+        response.setContentLength(re.length);
         try {
             in = new ByteArrayInputStream(re);
             outputStream = response.getOutputStream();

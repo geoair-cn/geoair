@@ -73,20 +73,6 @@ public class HttpContextLoggingFilter implements Filter {
             return;
         }
 
-        try {
-            boolean b = httpContextCollector.preValidate(httpRequest, httpResponse);
-            if (!b) {
-                return;
-            }
-        } catch (Exception e) {
-            // 这是兜底的，如果在里面抛异常了，这里就兜底，如果你在里面写了流，并且返回了false，这里就不会执行
-            response.setContentType("application/json;charset=UTF-8");
-            String message = e.getMessage();
-            GiResult<Object> objectGiResult = GiResult.failureMsg(message).andCode(403);
-            response.getWriter().write(Gir.toJson(objectGiResult).toString());
-            return;
-        }
-
 
         HttpContext context = HttpContext.of();
         context.setRequestStartTime(System.currentTimeMillis());
@@ -97,8 +83,6 @@ public class HttpContextLoggingFilter implements Filter {
         context.setQueryString(httpRequest.getQueryString());
         context.setUserAgent(httpRequest.getHeader("User-Agent"));
         context.setRequestBodySize((long) request.getContentLength());
-
-
         context.setClientIp(httpContextCollector.collectClientIp(httpRequest));
         context.setRequestHeaders(httpContextCollector.collectRequestHeaders(httpRequest));
         context.setRequestParams(httpContextCollector.collectRequestParameters(httpRequest));
@@ -108,10 +92,14 @@ public class HttpContextLoggingFilter implements Filter {
         }
 
         try {
-
+            try {
+                httpContextCollector.preValidate(httpRequest, httpResponse);
+            } catch (Exception e) {
+                collectExceptionInfo(context, e);
+                httpContextCollector.exceptionToResponse(e, httpResponse);
+                return;
+            }
             chain.doFilter(httpRequest, httpResponse);
-
-
             context.setStatusCode(httpResponse.getStatus());
             context.setResponseStartTime(System.currentTimeMillis());
             String contentType = response.getContentType();
@@ -138,7 +126,7 @@ public class HttpContextLoggingFilter implements Filter {
 
         } catch (Exception e) {
             collectExceptionInfo(context, e);
-            context.setStatusCode(500);
+            context.setStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             throw e;
         } finally {
             context.setResponseEndTime(System.currentTimeMillis());
