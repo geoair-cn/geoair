@@ -1,5 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
@@ -7,7 +9,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import javax.sql.DataSource;
 
@@ -17,9 +19,9 @@ import javax.sql.DataSource;
  * @author: 武汉刘德华
  * @create: 2020-12-11 10:51
  */
-@Slf4j
+ 
 public class PoolManager {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     static ConcurrentHashMap<String, IAdvExecutor> advExecutorConcurrentHashMap = new ConcurrentHashMap<>();
 

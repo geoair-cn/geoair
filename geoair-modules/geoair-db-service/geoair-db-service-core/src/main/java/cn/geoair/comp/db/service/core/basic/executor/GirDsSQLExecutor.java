@@ -3,6 +3,8 @@ package cn.geoair.comp.db.service.core.basic.executor;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.support.GirPager;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.dto.ApiSqlDto;
 import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
@@ -27,15 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Slf4j
+ 
 @Component
 public class GirDsSQLExecutor implements Executor {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Autowired
     DsDataSourceService dsDataSourceService;
 

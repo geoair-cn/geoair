@@ -2,6 +2,8 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.service.DsDataSourceService;
@@ -20,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +33,12 @@ import org.springframework.web.multipart.MultipartFile;
  * @author: 武汉刘德华
  * @create: 2021-01-20 10:43
  */
-@Slf4j
+
 @RestController
 @RequestMapping("/ds_api/datasource")
 @GaApi(tags = "GirDs 数据源相关")
 public class GirDsDataSourceController {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Autowired DsDataSourceService dsDataSourceService;
 
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;

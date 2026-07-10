@@ -1,6 +1,8 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.TileRequest;
@@ -10,7 +12,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +26,10 @@ import java.util.regex.Pattern;
 /**
  * url构建逻辑参考 TileUrlBuilder
  */
-@Slf4j
+
 @Component
 public class XYZServlet extends D3TilesServlet {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     Pattern pattern = Pattern.compile("/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 

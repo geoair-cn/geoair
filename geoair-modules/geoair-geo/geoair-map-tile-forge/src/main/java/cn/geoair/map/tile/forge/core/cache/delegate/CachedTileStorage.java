@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.cache.delegate;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -9,7 +11,7 @@ import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.hutool.bloomfilter.BloomFilter;
 import cn.hutool.bloomfilter.BloomFilterUtil;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 
 
 import java.util.Map;
@@ -22,9 +24,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * 带缓存的瓦片存储委派包装类
  */
-@Slf4j
+ 
 public class CachedTileStorage implements ITileStorageSupport {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     private final ITileStorageSupport delegate;
     private final TileCache tileCache;

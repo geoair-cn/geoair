@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -8,7 +10,7 @@ import cn.geoair.map.tile.forge.core.caches.CacheProvider;
 import cn.geoair.map.tile.forge.core.caches.NoOpCacheProvider;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.collection.ListUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@Slf4j
+ 
 public class PostgreSQLLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     protected final String dataId;
     protected static final String CACHE_STATUS_TABLE = "cache_status";
     private final String layerCacheTableName;

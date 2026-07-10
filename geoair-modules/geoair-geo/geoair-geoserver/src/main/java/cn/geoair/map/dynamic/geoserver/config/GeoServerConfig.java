@@ -1,10 +1,12 @@
 package cn.geoair.map.dynamic.geoserver.config;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.hutool.core.io.FileUtil;
 import java.io.File;
 import jakarta.servlet.ServletContext;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -19,7 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
-@Slf4j
+
 @ImportResource(
     locations = {"classpath*:/applicationContext.xml"
         // , "classpath*:/applicationContext.xml"
@@ -29,7 +31,7 @@ import org.springframework.context.annotation.ImportResource;
 @EnableConfigurationProperties(GirGeoServerProperties.class)
 public class GeoServerConfig
         implements BeanPostProcessor, ApplicationContextAware, BeanDefinitionRegistryPostProcessor {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     ApplicationContext applicationContext;
 
     @Autowired GirGeoServerProperties girGeoServerProperties;

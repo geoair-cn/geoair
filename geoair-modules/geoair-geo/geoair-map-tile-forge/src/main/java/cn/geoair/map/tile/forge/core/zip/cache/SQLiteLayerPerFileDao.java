@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.zip.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.caches.CacheProvider;
 import cn.geoair.map.tile.forge.core.caches.NoOpCacheProvider;
 import cn.geoair.map.tile.forge.core.caches.S3CacheProvider;
@@ -8,7 +10,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.unit.DataSizeUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.sqlite.JDBC;
 
 import java.io.File;
@@ -16,9 +18,9 @@ import java.sql.*;
 import java.util.List;
 import java.util.function.Consumer;
 
-@Slf4j
+ 
 public class SQLiteLayerPerFileDao implements LayerPerFileDao, AutoCloseable {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final String baseDir;          // 数据库文件根目录
     private final String layerName;        // 图层名称
 

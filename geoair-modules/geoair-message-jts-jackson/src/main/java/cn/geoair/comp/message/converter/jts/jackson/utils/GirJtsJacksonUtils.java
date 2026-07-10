@@ -1,5 +1,7 @@
 package cn.geoair.comp.message.converter.jts.jackson.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.jts.JtsExtModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module.OracleJsonObjectModule;
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module.OracleStdTypesFullModule;
@@ -10,7 +12,7 @@ import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org.OrgPGG
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.locationtech.spatial4j.io.jackson.ShapesAsGeoJSONModule;
 import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
 
@@ -18,9 +20,9 @@ import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
  * @author ：张俊
  * @date ：Created in 2026/3/19 18:47 @description： TODO
  */
-@Slf4j
+ 
 public class GirJtsJacksonUtils {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * jts对象转换为wkt，如果为false，就转换为geojson
      */

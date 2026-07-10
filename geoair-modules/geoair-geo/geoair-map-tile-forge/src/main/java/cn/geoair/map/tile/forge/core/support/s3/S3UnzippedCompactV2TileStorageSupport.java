@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV2;
 import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
@@ -8,7 +10,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.File;
 
@@ -19,9 +21,9 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
  * &#064;date  ：Created in 2025/11/13 17:58
  * &#064;description：S3存储支持类，用于处理未压缩的紧凑型V2瓦片数据
  */
-@Slf4j
+ 
 public class S3UnzippedCompactV2TileStorageSupport extends S3UnzippedCompactV1TileStorageSupport {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     public S3UnzippedCompactV2TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }

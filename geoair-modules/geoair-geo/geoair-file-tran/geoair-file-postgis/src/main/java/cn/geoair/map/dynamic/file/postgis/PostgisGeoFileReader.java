@@ -2,6 +2,8 @@ package cn.geoair.map.dynamic.file.postgis;
 
 import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.data.page.support.GirPager;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
@@ -12,12 +14,11 @@ import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
 import java.io.IOException;
 import java.util.*;
-import lombok.extern.slf4j.Slf4j;
+
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureSource;
 import org.geotools.api.data.Query;
-import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -31,9 +32,9 @@ import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 
 /** 改造后的 PostGIS 读取器 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑 基于 GeoTools 实现，统一要素类型标准 */
-@Slf4j
-public class PostgisGeoFileReader implements GeoFileReader {
 
+public class PostgisGeoFileReader implements GeoFileReader {
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private PostgisReadLinkInfo linkInfo;
 
     private DataStore postgisDataStore;

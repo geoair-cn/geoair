@@ -1,5 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
@@ -10,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 
-@Slf4j
+ 
 public class JdbcUtil {
 
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     public static Connection getConnection(DsDataSourceApo ds) throws Exception {
         try {
             Class.forName(ds.getDriver());

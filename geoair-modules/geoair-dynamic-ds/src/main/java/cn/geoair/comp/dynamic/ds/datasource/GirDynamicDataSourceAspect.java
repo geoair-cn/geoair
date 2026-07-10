@@ -2,9 +2,11 @@ package cn.geoair.comp.dynamic.ds.datasource;
 
 import cn.geoair.base.bean.GirBeanHelper;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.GirDsAspectDoAroundApiHelper;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,11 +20,11 @@ import java.lang.reflect.Method;
  * @author ：张俊
  * @date ：Created in 2024/12/31 15:45 @description：
  */
-@Slf4j
+ 
 @Aspect
 @Order(-1)
 public class GirDynamicDataSourceAspect {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     static GirDsAspectDoAroundApiHelper gtcDsAspectDoAroundApi;
 
     /**

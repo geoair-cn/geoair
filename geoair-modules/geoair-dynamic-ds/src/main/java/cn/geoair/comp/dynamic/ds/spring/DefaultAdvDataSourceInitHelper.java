@@ -1,10 +1,12 @@
 package cn.geoair.comp.dynamic.ds.spring;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceInitHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import javax.sql.DataSource;
 
@@ -12,9 +14,9 @@ import javax.sql.DataSource;
  * @author ：张逢吉
  * @date ：Created in 15:34 @description： spring默认的数据源获取器
  */
-@Slf4j
+ 
 public class DefaultAdvDataSourceInitHelper implements IAdvDataSourceInitHelper {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     @Override
     public DataSource getDbDataSourceByApo(DataSourceApo dataSourceApo) {

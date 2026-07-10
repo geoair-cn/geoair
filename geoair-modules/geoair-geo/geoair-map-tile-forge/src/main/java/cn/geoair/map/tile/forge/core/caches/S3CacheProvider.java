@@ -1,6 +1,8 @@
 package cn.geoair.map.tile.forge.core.caches;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.hutool.core.util.StrUtil;
@@ -8,7 +10,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,8 +24,9 @@ import java.util.concurrent.Callable;
 /**
  * 基于S3对象存储的缓存实现
  */
-@Slf4j
+ 
 public class S3CacheProvider implements CacheProvider {
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final String domain;

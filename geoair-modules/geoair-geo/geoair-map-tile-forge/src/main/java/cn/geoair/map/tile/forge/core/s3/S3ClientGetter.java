@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.s3;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -11,7 +13,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 import com.amazonaws.services.s3.model.S3Object;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +24,10 @@ import java.nio.file.Paths;
  * S3客户端抽象基类
  * 封装S3配置参数和客户端初始化逻辑，
  */
-@Slf4j
+
 @Component
 public class S3ClientGetter {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     static S3ClientGetter instance;
 
     public static S3ClientGetter getInstance() {

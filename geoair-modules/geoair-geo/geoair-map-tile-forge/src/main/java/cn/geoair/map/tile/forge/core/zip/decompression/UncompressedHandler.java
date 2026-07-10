@@ -1,17 +1,19 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+ 
 
 import java.io.IOException;
 
 /**
  * 未压缩数据解压适配器
  */
-@Slf4j
+ 
 public class UncompressedHandler implements DecompressionHandler {
 
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {

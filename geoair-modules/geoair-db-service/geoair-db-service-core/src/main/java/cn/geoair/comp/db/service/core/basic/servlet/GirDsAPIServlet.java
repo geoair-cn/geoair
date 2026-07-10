@@ -1,6 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
-import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.basic.executor.Executor;
@@ -22,7 +23,6 @@ import com.alibaba.fastjson2.TypeReference;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,22 +32,25 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-@Slf4j
+
 @Component
 public class GirDsAPIServlet extends HttpServlet {
+    public static GiLogger log = GirLoggerFactory.getLogger();
+    @Autowired
+    DsApiConfigService dsApiConfigService;
 
-    @Autowired DsApiConfigService dsApiConfigService;
+    @Autowired
+    GirDsServiceProperties girDsServiceProperties;
 
-    @Autowired GirDsServiceProperties girDsServiceProperties;
+    @Autowired
+    DsApiService dsApiService;
 
-    @Autowired DsApiService dsApiService;
-
-    @Autowired GirDsSQLExecutor girDsSqlExecutor;
+    @Autowired
+    GirDsSQLExecutor girDsSqlExecutor;
 
     ApiConfigApo config;
 

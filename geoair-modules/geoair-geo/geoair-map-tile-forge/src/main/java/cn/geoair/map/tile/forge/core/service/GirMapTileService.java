@@ -2,6 +2,8 @@ package cn.geoair.map.tile.forge.core.service;
 
 import cn.geoair.base.bean.GirBeanHelper;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
@@ -9,17 +11,13 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
 
-import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 
-
-@Slf4j
 @Service
 public class GirMapTileService extends TileStorageSupportAdapter {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     static GirMapTileService self = null;
 
     public GirMapTileService(GirLayerConfigContextHelper contextHelper) {

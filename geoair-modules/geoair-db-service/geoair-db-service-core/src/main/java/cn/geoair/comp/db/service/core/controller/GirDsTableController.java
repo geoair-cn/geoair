@@ -2,24 +2,23 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.util.JdbcUtil;
 import cn.geoair.comp.db.service.core.basic.util.PoolManager;
 import cn.geoair.comp.db.service.core.dao.GirDsDataSourceDao;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
-import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
 import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
-import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSONObject;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,13 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author: 武汉刘德华
  * @create: 2021-04-01 15:11
  */
-@Slf4j
+
 @RestController
 @RequestMapping("/ds_api/table")
 @GaApi(tags = "GirDs表相关的接口")
 public class GirDsTableController {
-
-    @Resource GirDsDataSourceDao girDsDataSourceDao;
+    public static GiLogger log = GirLoggerFactory.getLogger();
+    @Resource
+    GirDsDataSourceDao girDsDataSourceDao;
 
     @RequestMapping("/getAllTables")
     @GaApiAction(text = "获取所有的表")

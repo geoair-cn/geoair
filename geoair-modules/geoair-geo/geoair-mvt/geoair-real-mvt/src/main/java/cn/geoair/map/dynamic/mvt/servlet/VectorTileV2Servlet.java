@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.mvt.servlet;
 
 import cn.geoair.base.api.annotation.GaApi;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
@@ -12,17 +14,17 @@ import com.alibaba.fastjson2.JSONWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
-@Slf4j
+
 @GaApi(text = "矢量瓦片服务", tags = {"矢量瓦片服务"})
 public class VectorTileV2Servlet extends TileCommonServlet {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     public VectorTileV2Servlet() {
         log.info("初始化矢量瓦片 Servlet 完成");
     }

@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider.impl;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
@@ -10,7 +12,7 @@ import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 /**
  * MBTiles 瓦片获取器（从 MBTiles 数据库读取瓦片）
@@ -18,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author 张俊
  * @date Created in 2026/06/23
  */
-@Slf4j
+ 
 public class MBTilesTileGetter extends BaseTileGetter {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final String mbtilesFilePath;
     private final DruidDataSource dataSource;
     private final boolean needReverseY;

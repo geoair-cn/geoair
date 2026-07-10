@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -25,14 +27,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 
 /**
  * 空间操作抽象基类 封装通用参数校验、结果处理等逻辑，子类只需实现数据库方言相关逻辑
  */
-@Slf4j
+ 
 public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     protected final IDataSourceGetter dataSourceGetter;
 
     protected final DialectTableNameProcessor dialectTableNameProcessor;

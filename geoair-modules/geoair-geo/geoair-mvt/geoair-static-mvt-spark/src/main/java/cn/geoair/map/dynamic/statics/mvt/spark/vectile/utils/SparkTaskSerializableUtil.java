@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
@@ -18,7 +20,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
 import java.util.*;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -27,9 +29,9 @@ import org.apache.spark.sql.RowFactory;
 import scala.Tuple2;
 
 /** 生成可序列化的spark的任务 */
-@Slf4j
+ 
 public class SparkTaskSerializableUtil implements Serializable {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // 序列化ID（必须）
     private static final long serialVersionUID = 1L;
 
