@@ -14,10 +14,13 @@ import javax.imageio.ImageWriter;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.web.mime.GirImageMime;
+import cn.geoair.web.mime.MimeException;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.media.colorindexer.ColorIndexer;
 import org.eclipse.imagen.media.colorindexer.Quantizer;
+import org.geotools.image.ImageWorker;
 
 public class ImageMime extends MimeType {
 
@@ -30,7 +33,7 @@ public class ImageMime extends MimeType {
 
     boolean supportsAlphaBit;
 
-    public static final ImageMime png = new ImageMime(GirImageMime.png , true, true, true) {
+    public static final ImageMime png = new ImageMime(GirImageMime.png, true, true, true) {
 
         /** Any response mime starting with image/png will do */
         @Override
@@ -42,28 +45,28 @@ public class ImageMime extends MimeType {
     public static final ImageMime jpeg =
             new ImageMime(GirImageMime.jpeg, true, false, false) {
 
-        /** Shave off the alpha band, JPEG cannot write it out */
-        @Override
-        public RenderedImage preprocess(RenderedImage ri) {
-            if (ri.getColorModel().hasAlpha()) {
-                final int numBands = ri.getSampleModel().getNumBands();
-                // handle both gray-alpha and RGBA (same code as in GeoTools ImageWorker)
-                final int[] bands = new int[numBands - 1];
-                for (int i = 0; i < bands.length; i++) {
-                    bands[i] = i;
+                /** Shave off the alpha band, JPEG cannot write it out */
+                @Override
+                public RenderedImage preprocess(RenderedImage ri) {
+                    if (ri.getColorModel().hasAlpha()) {
+                        final int numBands = ri.getSampleModel().getNumBands();
+                        // handle both gray-alpha and RGBA (same code as in GeoTools ImageWorker)
+                        final int[] bands = new int[numBands - 1];
+                        for (int i = 0; i < bands.length; i++) {
+                            bands[i] = i;
+                        }
+                        // ParameterBlock creation
+                        ParameterBlock pb = new ParameterBlock();
+                        pb.setSource(ri, 0);
+                        pb.set(bands, 0);
+                        final RenderingHints hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(ri));
+                        ri = ImageN.create("BandSelect", pb, hints);
+                    }
+                    return ri;
                 }
-                // ParameterBlock creation
-                ParameterBlock pb = new ParameterBlock();
-                pb.setSource(ri, 0);
-                pb.set(bands, 0);
-                final RenderingHints hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(ri));
-                ri = ImageN.create("BandSelect", pb, hints);
-            }
-            return ri;
-        }
-    };
+            };
 
-     public static final ImageMime gif =
+    public static final ImageMime gif =
             new ImageMime(GirImageMime.gif, true, false, true);
 
     public static final ImageMime tiff =
@@ -72,25 +75,25 @@ public class ImageMime extends MimeType {
     public static final ImageMime png8 =
             new ImageMime(GirImageMime.png8, true, false, true) {
 
-        /** Quantize if the source did not do so already */
-        @Override
-        public RenderedImage preprocess(RenderedImage canvas) {
-            if (!(canvas.getColorModel() instanceof IndexColorModel)) {
-                if (canvas.getColorModel() instanceof ComponentColorModel
-                        && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
-                    ColorIndexer indexer = new Quantizer(256).subsample().buildColorIndexer(canvas);
-                    if (indexer != null) {
-                        ParameterBlock pb = new ParameterBlock();
-                        pb.setSource(canvas, 0); // The source image.
-                        pb.set(indexer, 0);
-                        canvas = ImageN.create(
-                                "ColorIndexer", pb, ImageN.getDefaultInstance().getRenderingHints());
+                /** Quantize if the source did not do so already */
+                @Override
+                public RenderedImage preprocess(RenderedImage canvas) {
+                    if (!(canvas.getColorModel() instanceof IndexColorModel)) {
+                        if (canvas.getColorModel() instanceof ComponentColorModel
+                            && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+                            ColorIndexer indexer = new Quantizer(256).subsample().buildColorIndexer(canvas);
+                            if (indexer != null) {
+                                ParameterBlock pb = new ParameterBlock();
+                                pb.setSource(canvas, 0); // The source image.
+                                pb.set(indexer, 0);
+                                canvas = ImageN.create(
+                                        "ColorIndexer", pb, ImageN.getDefaultInstance().getRenderingHints());
+                            }
+                        }
                     }
+                    return canvas;
                 }
-            }
-            return canvas;
-        }
-    };
+            };
 
     public static final ImageMime png24 =
             new ImageMime(GirImageMime.png24, true, true, true);
@@ -129,7 +132,7 @@ public class ImageMime extends MimeType {
 
         // TODO Making a special exception, generalize later
         if (!formatStr.equals("image/png; mode=24bit") && formatStr.contains(";")) {
-            if (log.isFatalEnabled( )) {
+            if (log.isFatalEnabled()) {
                 log.fatal("Slicing off " + formatStr.split(";")[1]);
             }
             formatStr = formatStr.split(";")[0];
@@ -201,7 +204,7 @@ public class ImageMime extends MimeType {
         // which will presumably be the pure Java version. A bit hacky, but it's roughly what
         // GeoServer does to make sure it doesn't encode incompatible PNGs with the native writer
         if (this.internalName.equals(ImageMime.png.internalName)
-                || this.internalName.equals(ImageMime.png8.internalName)) {
+            || this.internalName.equals(ImageMime.png8.internalName)) {
 
             int bitDepth = image.getSampleModel().getSampleSize(0);
             if (bitDepth > 1 && bitDepth < 8 && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
@@ -212,7 +215,9 @@ public class ImageMime extends MimeType {
         return writer;
     }
 
-    /** Preprocesses the image to optimize it for the write about to happen */
+    /**
+     * Preprocesses the image to optimize it for the write about to happen
+     */
     public RenderedImage preprocess(RenderedImage tile) {
         return tile;
     }
@@ -268,7 +273,7 @@ public class ImageMime extends MimeType {
         }
 
         @Override
-        public String getMimeType( Resource resource) throws IOException {
+        public String getMimeType(Resource resource) throws IOException {
             try (DataInputStream dis = new DataInputStream(resource.getInputStream())) {
                 final int head = dis.readInt();
                 if ((head & 0xFFFF0000) == JPEG_MAGIC_MASK) {
