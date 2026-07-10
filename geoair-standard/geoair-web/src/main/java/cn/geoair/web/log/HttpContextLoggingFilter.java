@@ -61,7 +61,10 @@ public class HttpContextLoggingFilter implements Filter {
         collectRequestInfo(httpRequest, context);
         RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
         if (requestBodyCollector != null) {
-            httpRequest = requestBodyCollector.collectRequestBody(httpRequest, context::setRequestBody);
+            HttpServletRequest httpServletRequest = requestBodyCollector.collectRequestBody(httpRequest, context::setRequestBody);
+            if (httpServletRequest != null) {
+                httpRequest = httpServletRequest;
+            }
         }
 
 
