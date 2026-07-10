@@ -90,7 +90,7 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.createFromExtension(localTileFile.getName()));
+            tileRequest.setMimeType(GutilMimeType.fromExtension(localTileFile.getName()));
         }
         return tileRequest;
     }

@@ -50,7 +50,7 @@ public class LocalUnzippedCompactV1TileStorageSupport extends AbstractArcgisSupp
             tileRequest.setBytes(IoUtil.readBytes(bundleFileResource.getInputStream()));
             tileRequest.setSize(size);
             tileRequest.setLastModified(bundleFileResource.getLastModified());
-            tileRequest.setMimeType(GutilMimeType.createFromExtension(format));
+            tileRequest.setMimeType(GutilMimeType.fromExtension(format));
         }
         return tileRequest;
     }

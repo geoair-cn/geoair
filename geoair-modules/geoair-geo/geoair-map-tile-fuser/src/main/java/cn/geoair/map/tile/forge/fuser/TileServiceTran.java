@@ -166,7 +166,7 @@ public class TileServiceTran {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
 
         try {
-            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
 
             // 创建融合执行器
             FuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
@@ -268,7 +268,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
 
         try {
-            GiMimeType fromFormat = GutilMimeType.createFromFormat(outputFormat);
+            GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
             CacheTileFuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
                     layerName,
                     z,

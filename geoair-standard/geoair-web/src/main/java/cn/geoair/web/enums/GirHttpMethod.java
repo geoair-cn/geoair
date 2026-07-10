@@ -115,7 +115,6 @@ public enum GirHttpMethod implements GiVisualValuable<String> {
         return hasRequestBody;
     }
 
-    // ====== 工具方法 ======
 
     /**
      * 安全地将字符串解析为 HttpMethod 枚举。

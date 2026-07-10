@@ -69,7 +69,7 @@ public class TileRequest implements Serializable {
 
     public void mimeTypeBySpring(MediaType mimeType) {
         String type = mimeType.getSubtype();
-        this.mimeType = GutilMimeType.createFromExtension(type);
+        this.mimeType = GutilMimeType.fromExtension(type);
     }
 
 
