@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * HTTP 上下文日志采集过滤器。
@@ -23,6 +24,12 @@ public class HttpContextLoggingFilter implements Filter {
     private static final GiLogger log = GirLoggerFactory.getLogger(HttpContextLoggingFilter.class);
 
     public static HttpContextLoggingFilter of(LoggingFilterConfig loggingFilterConfig) {
+        return new HttpContextLoggingFilter(loggingFilterConfig);
+    }
+
+    public static HttpContextLoggingFilter of(Consumer<LoggingFilterConfig> loggingFilterConfigConsumer) {
+        LoggingFilterConfig loggingFilterConfig = new LoggingFilterConfig();
+        loggingFilterConfigConsumer.accept(loggingFilterConfig);
         return new HttpContextLoggingFilter(loggingFilterConfig);
     }
 
@@ -72,6 +79,12 @@ public class HttpContextLoggingFilter implements Filter {
         context.setThreadName(Thread.currentThread().getName());
 
         try {
+            if (requestBodyCollector != null) {
+                HttpServletResponse httpServletResponse = requestBodyCollector.collectResponseBody(httpResponse, context::setResponseBody);
+                if (httpServletResponse != null) {
+                    httpResponse = httpServletResponse;
+                }
+            }
             chain.doFilter(httpRequest, httpResponse);
             collectResponseInfo(httpResponse, context);
         } catch (Exception e) {
@@ -106,8 +119,10 @@ public class HttpContextLoggingFilter implements Filter {
         context.setStatusCode(response.getStatus());
         context.setResponseStartTime(System.currentTimeMillis());
         RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
-        Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
-        context.setResponseHeaders(responseHeaders);
+        if (requestBodyCollector != null) {
+            Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
+            context.setResponseHeaders(responseHeaders);
+        }
         String contentType = response.getContentType();
         context.setContentType(contentType);
         if (contentType != null) {

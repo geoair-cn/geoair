@@ -268,18 +268,6 @@ public class HttpContext {
      */
     private String contentEncoding;
 
-    /**
-     * 响应头中的日期或 Age 值
-     * <p>
-     * 从响应头中获取：
-     * <ul>
-     *   <li>{@code Date}：响应生成时间</li>
-     *   <li>{@code Age}：响应在缓存中停留的时间（秒）</li>
-     * </ul>
-     * <p>
-     * 主要用于缓存分析、CDN 效果评估和时钟同步检查。
-     */
-    private Long responseTime;
 
     public HttpContext setMethod(GirHttpMethod method) {
         this.method = method;
@@ -401,10 +389,7 @@ public class HttpContext {
         return this;
     }
 
-    public HttpContext setResponseTime(Long responseTime) {
-        this.responseTime = responseTime;
-        return this;
-    }
+
 
     public GirHttpMethod getMethod() {
         return method;
@@ -502,7 +487,5 @@ public class HttpContext {
         return contentEncoding;
     }
 
-    public Long getResponseTime() {
-        return responseTime;
-    }
+
 }
