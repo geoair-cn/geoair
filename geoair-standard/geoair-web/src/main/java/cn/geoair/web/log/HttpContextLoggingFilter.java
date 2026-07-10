@@ -2,7 +2,6 @@ package cn.geoair.web.log;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.data.result.GiResult;
-import cn.geoair.base.data.result.support.GirResult;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.web.enums.GirHttpMethod;
@@ -76,7 +75,7 @@ public class HttpContextLoggingFilter implements Filter {
 
         try {
             boolean b = httpContextCollector.preValidate(httpRequest, httpResponse);
-            if (b) {
+            if (!b) {
                 return;
             }
         } catch (Exception e) {
