@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * HTTP 上下文日志采集过滤器。
@@ -23,6 +24,12 @@ public class HttpContextLoggingFilter implements Filter {
     private static final GiLogger log = GirLoggerFactory.getLogger(HttpContextLoggingFilter.class);
 
     public static HttpContextLoggingFilter of(LoggingFilterConfig loggingFilterConfig) {
+        return new HttpContextLoggingFilter(loggingFilterConfig);
+    }
+
+    public static HttpContextLoggingFilter of(Consumer<LoggingFilterConfig> loggingFilterConfigConsumer) {
+        LoggingFilterConfig loggingFilterConfig = new LoggingFilterConfig();
+        loggingFilterConfigConsumer.accept(loggingFilterConfig);
         return new HttpContextLoggingFilter(loggingFilterConfig);
     }
 
