@@ -1,5 +1,8 @@
 package cn.geoair.web.log;
 
+import cn.geoair.base.Gir;
+import cn.geoair.base.data.result.GiResult;
+import cn.geoair.base.data.result.support.GirResult;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.web.enums.GirHttpMethod;
@@ -47,9 +50,17 @@ public class HttpContextLoggingFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        HttpContextCollector httpContextCollector = loggingFilterConfig.getHttpContextCollector();
+
+        if (httpContextCollector == null) {
+            chain.doFilter(request, response);
+            return;
+        }
+
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+
 
         String path = httpRequest.getRequestURI();
         if (!shouldLog(path)) {
@@ -63,6 +74,21 @@ public class HttpContextLoggingFilter implements Filter {
             return;
         }
 
+        try {
+            boolean b = httpContextCollector.preValidate(httpRequest, httpResponse);
+            if (b) {
+                return;
+            }
+        } catch (Exception e) {
+            // 这是兜底的，如果在里面抛异常了，这里就兜底，如果你在里面写了流，并且返回了false，这里就不会执行
+            response.setContentType("application/json;charset=UTF-8");
+            String message = e.getMessage();
+            GiResult<Object> objectGiResult = GiResult.failureMsg(message).andCode(403);
+            response.getWriter().write(Gir.toJson(objectGiResult).toString());
+            return;
+        }
+
+
         HttpContext context = HttpContext.of();
         context.setRequestStartTime(System.currentTimeMillis());
         context.setThreadName(Thread.currentThread().getName());
@@ -73,15 +99,13 @@ public class HttpContextLoggingFilter implements Filter {
         context.setUserAgent(httpRequest.getHeader("User-Agent"));
         context.setRequestBodySize((long) request.getContentLength());
 
-        RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
-        if (requestBodyCollector != null) {
-            context.setClientIp(requestBodyCollector.collectClientIp(httpRequest));
-            context.setRequestHeaders(requestBodyCollector.collectRequestHeaders(httpRequest));
-            context.setRequestParams(requestBodyCollector.collectRequestParameters(httpRequest));
-            HttpServletRequest httpServletRequest = requestBodyCollector.collectRequestBody(httpRequest, context::setRequestBody);
-            if (httpServletRequest != null) {
-                httpRequest = httpServletRequest;
-            }
+
+        context.setClientIp(httpContextCollector.collectClientIp(httpRequest));
+        context.setRequestHeaders(httpContextCollector.collectRequestHeaders(httpRequest));
+        context.setRequestParams(httpContextCollector.collectRequestParameters(httpRequest));
+        HttpServletRequest httpServletRequest = httpContextCollector.collectRequestBody(httpRequest, context::setRequestBody);
+        if (httpServletRequest != null) {
+            httpRequest = httpServletRequest;
         }
 
         try {
@@ -106,12 +130,10 @@ public class HttpContextLoggingFilter implements Filter {
                 }
             }
 
-            if (requestBodyCollector != null) {
-                Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(httpResponse);
-                context.setResponseHeaders(responseHeaders);
-                if (ResponseBodyContext.hasBody()) {
-                    context.setResponseBody(ResponseBodyContext.getBytes());
-                }
+            Map<String, String> responseHeaders = httpContextCollector.collectResponseHeaders(httpResponse);
+            context.setResponseHeaders(responseHeaders);
+            if (ResponseBodyContext.hasBody()) {
+                context.setResponseBody(ResponseBodyContext.getBytes());
             }
 
 
