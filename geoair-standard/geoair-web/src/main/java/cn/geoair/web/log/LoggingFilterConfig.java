@@ -33,7 +33,9 @@ public class LoggingFilterConfig {
     /**
      * HttpContext 消费者
      */
-    private Consumer<HttpContext> contextConsumer;
+    private Consumer<HttpContext> contextConsumer = httpContext -> {
+
+    };
 
     public List<String> getIncludeUrlPatterns() {
         return includeUrlPatterns;

@@ -140,18 +140,8 @@ public class HttpContextLoggingFilter implements Filter {
     private void collectExceptionInfo(HttpContext context, Exception e) {
         context.setErrorMessage(e.getMessage());
         context.setErrorType(e.getClass().getName());
-        StackTraceElement[] elements = e.getStackTrace();
-        if (elements != null && elements.length > 0) {
-            StringBuilder sb = new StringBuilder();
-            int maxLines = Math.min(10, elements.length);
-            for (int i = 0; i < maxLines; i++) {
-                sb.append(elements[i].toString()).append("\n");
-            }
-            if (elements.length > 10) {
-                sb.append("... [truncated]");
-            }
-            context.setStackTrace(sb.toString());
-        }
+        String stackTrace = loggingFilterConfig.getHttpContextCollector().collectExceptionStackTrace(e);
+        context.setStackTrace(stackTrace);
     }
 
 

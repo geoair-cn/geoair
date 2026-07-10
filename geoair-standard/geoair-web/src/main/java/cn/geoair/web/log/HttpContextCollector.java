@@ -26,7 +26,7 @@ public interface HttpContextCollector {
      * 前置校验器。
      * <p>
      * 在请求处理之前执行，用于校验请求的合法性。
-     * 如果校验失败，可以设置错误响应并返回 false。
+     * 如果校验失败，请抛出异常
      *
      * @param request  HTTP 请求对象
      * @param response HTTP 响应对象
@@ -98,6 +98,28 @@ public interface HttpContextCollector {
      * @return 响应头键值对，如果无需采集则返回空 Map
      */
     Map<String, String> collectResponseHeaders(HttpServletResponse response);
+
+    /**
+     * 如果有异常，这里采集异常的堆栈
+     *
+     * @param exception
+     * @return
+     */
+    default String collectExceptionStackTrace(Exception exception) {
+        StackTraceElement[] elements = exception.getStackTrace();
+        if (elements != null && elements.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            int maxLines = Math.min(10, elements.length);
+            for (int i = 0; i < maxLines; i++) {
+                sb.append(elements[i].toString()).append("\n");
+            }
+            if (elements.length > 10) {
+                sb.append("... [truncated]");
+            }
+            return sb.toString();
+        }
+        return exception.getMessage();
+    }
 
 
 }
