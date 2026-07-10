@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
@@ -12,12 +14,12 @@ import com.alibaba.fastjson2.JSONObject;
 import java.util.List;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+ 
 
-@Slf4j
+ 
 @Data
 public class TileRequestParams {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @GaModelField(text = "数据库资源ID")
     private String dsId;
 

@@ -2,6 +2,8 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.basic.util.IPUtil;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
@@ -16,17 +18,17 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@Slf4j
+ 
 @RequestMapping("/ds_api/system")
 @GaApi(tags = "GirDs系统相关")
 public class GirDsSystemController {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Resource
     GirDsServiceProperties girDsServiceProperties;
 

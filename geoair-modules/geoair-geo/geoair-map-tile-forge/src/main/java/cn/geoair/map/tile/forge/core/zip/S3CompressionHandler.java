@@ -1,20 +1,22 @@
 package cn.geoair.map.tile.forge.core.zip;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.hutool.extra.spring.SpringUtil;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+ 
 public class S3CompressionHandler extends AbstractZipCompressionHandler {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     static S3ClientGetter s3ClientGetter;
 

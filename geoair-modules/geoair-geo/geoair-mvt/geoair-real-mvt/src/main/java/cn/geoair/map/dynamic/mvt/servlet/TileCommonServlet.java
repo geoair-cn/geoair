@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.mvt.servlet;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
@@ -9,7 +11,7 @@ import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -19,9 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-@Slf4j
+ 
 public class TileCommonServlet extends HttpServlet {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * 输出响应内容
      */

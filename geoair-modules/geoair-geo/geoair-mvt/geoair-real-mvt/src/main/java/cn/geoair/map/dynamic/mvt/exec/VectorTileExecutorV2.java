@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.mvt.exec;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -23,16 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.apache.commons.lang3.ObjectUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
 
 /** 矢量瓦片查询工具 V2版本，该版本把客户端传入的sql全部当做一个临时表进行处理 */
-@Slf4j
+ 
 public class VectorTileExecutorV2 extends AbstractITileExecutor {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Override
     public TileGlobalConfig getTileGlobalConfig() {
         TileGlobalConfig tileGlobalConfig = new TileGlobalConfig();

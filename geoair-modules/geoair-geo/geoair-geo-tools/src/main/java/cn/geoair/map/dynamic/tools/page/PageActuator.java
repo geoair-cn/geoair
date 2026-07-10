@@ -1,9 +1,11 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,9 +20,9 @@ import java.util.stream.LongStream;
  * @author ：张逢吉
  * @date ：Created in 2025/12/18 13:34 @description： 分页执行器
  */
-@Slf4j
+ 
 public class PageActuator<T> {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final PageConditionDef<T> pageConditionDef;
 
     /**

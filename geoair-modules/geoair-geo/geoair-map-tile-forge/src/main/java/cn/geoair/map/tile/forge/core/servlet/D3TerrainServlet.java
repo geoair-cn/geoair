@@ -1,10 +1,12 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -15,10 +17,10 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Slf4j
+ 
 @Component
 public class D3TerrainServlet extends D3TilesServlet {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     Pattern pattern = Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
 

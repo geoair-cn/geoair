@@ -1,5 +1,7 @@
 package cn.geoair.comp.knife4j.ext.springdoc.auto;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
 import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
@@ -12,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.springdoc.core.GroupedOpenApi;
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.SwaggerUiConfigProperties;
@@ -34,10 +36,10 @@ import org.springframework.context.annotation.Primary;
  * @author Administrator
  * @version $Id: $Id
  */
-@Slf4j
+ 
 public class GirSpringDocApiRunner
         implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // 1. 保存Spring应用上下文（通过ApplicationContextAware接口）
     private ApplicationContext applicationContext;
 

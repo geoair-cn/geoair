@@ -2,6 +2,8 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,11 +48,11 @@ import org.springframework.web.multipart.MultipartFile;
  * @create: 2021-01-19 17:27
  */
 @RestController
-@Slf4j
+ 
 @RequestMapping("/ds_api/apiConfig")
 @GaApi(tags = "GirDs api配置")
 public class GirDsApiConfigController {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Resource
     DsApiUserInfoHelper dsApiUserInfoHelper;
 

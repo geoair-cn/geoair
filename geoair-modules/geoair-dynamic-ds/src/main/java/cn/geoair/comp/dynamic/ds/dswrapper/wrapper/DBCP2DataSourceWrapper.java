@@ -3,15 +3,17 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+ 
 import org.apache.commons.dbcp.BasicDataSource;
 
 /**
  * Apache DBCP2 数据源包装器
  */
-@Slf4j
+ 
 public class DBCP2DataSourceWrapper extends GirAbstractDataSourceWrapper {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private static Boolean canInit = null;
 
     public DBCP2DataSourceWrapper(DataSource targetDataSource) {

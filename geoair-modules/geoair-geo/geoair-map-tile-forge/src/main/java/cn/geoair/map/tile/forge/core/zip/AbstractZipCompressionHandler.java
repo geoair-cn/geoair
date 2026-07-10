@@ -1,13 +1,15 @@
 package cn.geoair.map.tile.forge.core.zip;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
 import cn.hutool.core.io.unit.DataSizeUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -27,9 +29,9 @@ import java.util.zip.Inflater;
  * ZIP压缩文件处理抽象基类
  * 封装通用的ZIP解析、解压逻辑，子类只需实现文件读取的具体细节
  */
-@Slf4j
-public abstract class AbstractZipCompressionHandler implements ICompressionHandler {
 
+public abstract class AbstractZipCompressionHandler implements ICompressionHandler {
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // ------------------------------ 通用常量（子类共享） ------------------------------
     protected static final int BUFFER_SIZE = 8192;
     protected static final int EOCD_SIGNATURE = 0x06054b50;
@@ -420,8 +422,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             // 如果任何字段是ZIP64占位符，强制扫描整个扩展字段
             boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                    uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                    headerOffset32 == ZIP64_MAGIC_NUMBER);
+                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
+                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
 
             if (needZip64Parsing && extraLen > 0) {
                 // 直接扫描整个扩展字段数据，不依赖结构解析
@@ -525,8 +527,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
         log.info("中央目录扫描完成：共解析{}个条目", entryCount);
     }
-
-
 
 
     public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
@@ -636,8 +636,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                             int extraLen = readShort(entryData, 30) & 0xFFFF;
 
                             boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                    uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                    headerOffset32 == ZIP64_MAGIC_NUMBER);
+                                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
+                                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
 
                             if (needZip64Parsing && extraLen > 0) {
                                 int extraPos = 46 + nameLen;
@@ -724,7 +724,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
 
-
     /**
      * 估算本地文件头偏移量（备选方案）
      */
@@ -741,9 +740,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             // 查找本地文件头签名
             for (int i = 0; i < searchData.length - 3; i++) {
                 int sig = (searchData[i] & 0xFF) |
-                        ((searchData[i + 1] & 0xFF) << 8) |
-                        ((searchData[i + 2] & 0xFF) << 16) |
-                        ((searchData[i + 3] & 0xFF) << 24);
+                          ((searchData[i + 1] & 0xFF) << 8) |
+                          ((searchData[i + 2] & 0xFF) << 16) |
+                          ((searchData[i + 3] & 0xFF) << 24);
 
                 if (sig == LOCAL_FILE_HEADER_SIGNATURE) {
                     long foundOffset = searchStart + i;
@@ -767,7 +766,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         }
         // 规则2：压缩大小和未压缩大小均为0且包含路径分隔符（兼容部分工具创建的目录条目）
         else if (compressedSize32 == 0 && uncompressedSize32 == 0
-                && (fileName.contains("/") || fileName.contains("\\"))) {
+                 && (fileName.contains("/") || fileName.contains("\\"))) {
             isDirectory = true;
         }
         // 规则3：文件名本身是盘符或根目录（特殊情况处理）
@@ -878,7 +877,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             if (!found) {
                 throw new IOException("无效的本地文件头签名：0x" + Integer.toHexString(signature) +
-                        "，偏移量：" + offset);
+                                      "，偏移量：" + offset);
             }
         }
 
@@ -955,8 +954,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
                 // 精确匹配文件夹
                 if (normalizedFile.equals(normalizedTarget) ||
-                        normalizedFile.equals(folderTargetWithSlash) ||
-                        folderFileWithSlash.equals(normalizedTarget)) {
+                    normalizedFile.equals(folderTargetWithSlash) ||
+                    folderFileWithSlash.equals(normalizedTarget)) {
                     isMatch = true;
                 }
                 // 子文件/子文件夹匹配
@@ -994,13 +993,13 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                             if (isFolderCheck) {
                                 String folderTargetWithSlash = normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
                                 if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                        normalizedUnicodeFile.startsWith(folderTargetWithSlash)) {
+                                    normalizedUnicodeFile.startsWith(folderTargetWithSlash)) {
                                     isMatch = true;
                                     normalizedFile = normalizedUnicodeFile;
                                 }
                             } else {
                                 if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                        normalizedUnicodeFile.equalsIgnoreCase(normalizedTarget)) {
+                                    normalizedUnicodeFile.equalsIgnoreCase(normalizedTarget)) {
                                     isMatch = true;
                                     normalizedFile = normalizedUnicodeFile;
                                 }
@@ -1036,9 +1035,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
                     while (extraPosInChunk + 4 <= extraData.length) {
                         int headerId = (extraData[extraPosInChunk] & 0xFF) |
-                                ((extraData[extraPosInChunk + 1] & 0xFF) << 8);
+                                       ((extraData[extraPosInChunk + 1] & 0xFF) << 8);
                         int dataSize = (extraData[extraPosInChunk + 2] & 0xFF) |
-                                ((extraData[extraPosInChunk + 3] & 0xFF) << 8);
+                                       ((extraData[extraPosInChunk + 3] & 0xFF) << 8);
 
                         if (headerId == ZIP64_EXTRA_FIELD_ID) {
                             ByteBuffer buffer = ByteBuffer.wrap(extraData, extraPosInChunk + 4,
@@ -1146,14 +1145,14 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     // 文件夹匹配
                     String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
                     if (normalizedFile.equals(checkPath) ||
-                            normalizedFile.equals(folderCheckWithSlash) ||
-                            normalizedFile.startsWith(folderCheckWithSlash)) {
+                        normalizedFile.equals(folderCheckWithSlash) ||
+                        normalizedFile.startsWith(folderCheckWithSlash)) {
                         matchFound = true;
                     }
                 } else {
                     // 文件匹配
                     if (normalizedFile.equals(checkPath) ||
-                            normalizedFile.equalsIgnoreCase(checkPath)) {
+                        normalizedFile.equalsIgnoreCase(checkPath)) {
                         matchFound = true;
                     }
                 }
@@ -1189,12 +1188,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                                 if (isFolderCheck) {
                                     String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
                                     if (normalizedUnicodeFile.equals(checkPath) ||
-                                            normalizedUnicodeFile.startsWith(folderCheckWithSlash)) {
+                                        normalizedUnicodeFile.startsWith(folderCheckWithSlash)) {
                                         matchFound = true;
                                     }
                                 } else {
                                     if (normalizedUnicodeFile.equals(checkPath) ||
-                                            normalizedUnicodeFile.equalsIgnoreCase(checkPath)) {
+                                        normalizedUnicodeFile.equalsIgnoreCase(checkPath)) {
                                         matchFound = true;
                                     }
                                 }
@@ -1416,8 +1415,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             return false;
         }
         return path.endsWith("/") || path.endsWith("\\") ||
-                path.endsWith(File.separator) ||
-                !path.contains(".") && !path.matches(".+\\.[a-zA-Z0-9]+$");
+               path.endsWith(File.separator) ||
+               !path.contains(".") && !path.matches(".+\\.[a-zA-Z0-9]+$");
     }
 
     /**

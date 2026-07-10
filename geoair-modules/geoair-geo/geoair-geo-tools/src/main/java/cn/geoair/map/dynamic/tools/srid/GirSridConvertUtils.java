@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.tools.srid;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.log.StaticLog;
@@ -8,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -26,8 +28,9 @@ import org.opengis.referencing.operation.TransformException;
  * @author 张逢吉
  * @date 2024/12/05
  */
-@Slf4j
+ 
 public class GirSridConvertUtils implements GirSridConvertOpt {
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private static volatile GirSridConvertUtils INSTANCE;
     ToolsConfig advToolsConfig;
 

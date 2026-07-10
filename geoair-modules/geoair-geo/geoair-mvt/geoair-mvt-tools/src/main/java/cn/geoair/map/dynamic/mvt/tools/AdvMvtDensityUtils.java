@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.mvt.tools;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.*;
 
@@ -9,7 +11,7 @@ import cn.hutool.core.util.StrUtil;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
-import lombok.extern.slf4j.Slf4j;
+ 
 import no.ecc.vectortile.VectorTileEncoder;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
@@ -19,9 +21,9 @@ import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
  * @author ：张逢吉
  * @date ：Created in 2025/12/29 13:56 @description： 处理瓦片丢弃的相关处理策略，与spark无关
  */
-@Slf4j
+ 
 public class AdvMvtDensityUtils {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // MVT默认扩展尺寸（像素）
     private static final int MVT_EXTENT_SIZE = 4096;
 

@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import com.alibaba.fastjson2.JSONObject;
 
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
@@ -20,15 +22,15 @@ import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/19 11:29 @description： TODO
  */
-@Slf4j
+ 
 public abstract class AbstractITileExecutor implements ITileExecutor {
-
+	public static GiLogger log = GirLoggerFactory.getLogger();
 	abstract void getRecordByStream(VectorTileBuilderConsumer vectorTileBuilder);
 
 	abstract void featuresTransform(GirAdvOneRow oneRow);

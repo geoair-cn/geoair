@@ -1,6 +1,8 @@
 package cn.geoair.comp.dynamic.ds.datasource;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+ 
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 import java.util.Map;
@@ -11,9 +13,9 @@ import java.util.Stack;
  * @date ：Created in 2024/12/31 15:43
  * @description： 用于替换spring托管的数据源，支持嵌套方法调用的数据源切换
  */
-@Slf4j
+ 
 public class GirDynamicStackDataSource extends AbstractRoutingDataSource {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * 线程局部变量 用来保存数据源名称栈
      */

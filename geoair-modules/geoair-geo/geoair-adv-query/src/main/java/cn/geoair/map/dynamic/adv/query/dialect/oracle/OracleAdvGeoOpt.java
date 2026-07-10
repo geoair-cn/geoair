@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
@@ -11,7 +13,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.sql.*;
 import java.util.*;
@@ -22,9 +24,9 @@ import java.util.*;
  *
  * @author zhangjun
  */
-@Slf4j
+ 
 public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final IAdvBaseOpt baseOpt;
     private final IAdvDDLOpt ddlOpt;
 

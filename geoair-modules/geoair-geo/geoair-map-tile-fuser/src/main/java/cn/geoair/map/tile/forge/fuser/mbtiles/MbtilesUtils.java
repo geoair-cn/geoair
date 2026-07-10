@@ -8,7 +8,7 @@ import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidPooledConnection;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import javax.sql.DataSource;
 import java.io.File;

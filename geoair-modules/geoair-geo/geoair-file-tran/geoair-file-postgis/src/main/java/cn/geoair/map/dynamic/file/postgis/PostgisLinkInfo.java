@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.postgis;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,15 +10,15 @@ import java.util.Properties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 /** PostGIS 链接信息类 包含数据库连接、排序字段、几何字段等核心配置 */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@Slf4j
+ 
 public abstract class PostgisLinkInfo extends LinkInfo {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // 数据库基础配置
     protected String jdbcUrl; // PostGIS JDBC地址，如 jdbc:postgresql://localhost:5432/geo_db
 

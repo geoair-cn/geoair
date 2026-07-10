@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
@@ -8,7 +10,7 @@ import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +26,10 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Slf4j
+ 
 @Component
 public class D3TilesServlet extends HttpServlet {
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Resource
     GirMapTileService gMapTileService;
 

@@ -1,8 +1,10 @@
 package cn.geoair.map.tile.forge.core.cache;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.cache.impl.TileNoOpCache;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 缓存提供者注册器
  */
-@Slf4j
+ 
 public class TileCacheRegistry {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * 存储类型与缓存提供者的映射（key：ITileStorageSupport实现类的Class.getName()）
      */

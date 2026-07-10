@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
@@ -16,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.util.GeometryFixer;
@@ -26,9 +28,9 @@ import scala.Tuple4;
 /**
  * 矢量瓦片生成通用工具类 抽离与运行环境无关的核心算法
  */
-@Slf4j
+ 
 public class VectorTileCommonUtils {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     /**
      * 通用空间要素转换（单条要素）
      */

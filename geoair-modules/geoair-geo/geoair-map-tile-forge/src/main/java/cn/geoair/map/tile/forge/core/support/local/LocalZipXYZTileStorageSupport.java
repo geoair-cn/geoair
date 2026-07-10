@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
@@ -25,7 +27,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +42,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author 张俊
  * @since 2025/11/17
  */
-@Slf4j
+ 
 public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter implements ITileStorageSupport {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     public LocalZipXYZTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);

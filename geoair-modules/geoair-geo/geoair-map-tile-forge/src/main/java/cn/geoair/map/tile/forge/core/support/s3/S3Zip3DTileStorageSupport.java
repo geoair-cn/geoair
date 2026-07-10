@@ -1,11 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.s3;
 
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.local.LocalZip3DTileStorageSupport;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.S3CompressionHandler;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 
 /**
@@ -15,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author 张俊
  * @since 2025/11/17
  */
-@Slf4j
+ 
 public class S3Zip3DTileStorageSupport extends LocalZip3DTileStorageSupport {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     public S3Zip3DTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }

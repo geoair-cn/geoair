@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.arcgis;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -10,7 +12,7 @@ import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +23,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * &#064;date ：Created in 2025/11/17 10:16
  * &#064;description：本地配置XML获取器抽象类，用于从本地文件系统读取ArcGIS图层配置文件
  */
-@Slf4j
+ 
 public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSupport implements ZipDirectoryGetter {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     public AbstractArcgisZipDirectoryGetter(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }

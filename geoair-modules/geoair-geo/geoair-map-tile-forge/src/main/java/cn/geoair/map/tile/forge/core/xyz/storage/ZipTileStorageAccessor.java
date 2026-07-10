@@ -1,7 +1,9 @@
 package cn.geoair.map.tile.forge.core.xyz.storage;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
-import lombok.extern.slf4j.Slf4j;
+ 
 
 import java.io.IOException;
 import java.util.*;
@@ -10,9 +12,9 @@ import java.util.stream.Collectors;
 /**
  * ZIP瓦片存储访问器
  */
-@Slf4j
+ 
 public class ZipTileStorageAccessor extends AbstractTileStorageAccessor {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private final String zipSource;
     private final String rootPrefix;
     private final ICompressionHandler compressionHandler;

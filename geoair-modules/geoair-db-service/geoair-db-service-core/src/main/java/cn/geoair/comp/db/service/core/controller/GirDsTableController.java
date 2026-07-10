@@ -2,6 +2,8 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.util.JdbcUtil;
 import cn.geoair.comp.db.service.core.basic.util.PoolManager;
@@ -20,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,12 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author: 武汉刘德华
  * @create: 2021-04-01 15:11
  */
-@Slf4j
+ 
 @RestController
 @RequestMapping("/ds_api/table")
 @GaApi(tags = "GirDs表相关的接口")
 public class GirDsTableController {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Resource
     GirDsDataSourceDao girDsDataSourceDao;
 
