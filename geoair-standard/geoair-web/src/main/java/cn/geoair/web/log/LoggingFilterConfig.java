@@ -28,7 +28,7 @@ public class LoggingFilterConfig {
     /**
      * 请求体采集器
      */
-    private RequestInfoCollector requestBodyCollector;
+    private HttpContextCollector httpContextCollector;
 
     /**
      * HttpContext 消费者
@@ -62,12 +62,12 @@ public class LoggingFilterConfig {
         return this;
     }
 
-    public RequestInfoCollector getRequestBodyCollector() {
-        return requestBodyCollector;
+    public HttpContextCollector getHttpContextCollector() {
+        return httpContextCollector;
     }
 
-    public LoggingFilterConfig setRequestBodyCollector(RequestInfoCollector requestBodyCollector) {
-        this.requestBodyCollector = requestBodyCollector;
+    public LoggingFilterConfig setHttpContextCollector(HttpContextCollector httpContextCollector) {
+        this.httpContextCollector = httpContextCollector;
         return this;
     }
 
