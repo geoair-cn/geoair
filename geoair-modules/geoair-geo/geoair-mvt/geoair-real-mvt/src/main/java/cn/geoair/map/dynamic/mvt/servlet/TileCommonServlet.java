@@ -11,7 +11,7 @@ import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
- 
+
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -21,9 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
- 
+
 public class TileCommonServlet extends HttpServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     /**
      * 输出响应内容
      */
@@ -87,6 +88,7 @@ public class TileCommonServlet extends HttpServlet {
             }
 
             response.setContentType("application/octet-stream");
+            response.setContentLengthLong(data.length);
         } else {
             response.setContentType("text/plain; charset=utf-8");
             response.setStatus(500);

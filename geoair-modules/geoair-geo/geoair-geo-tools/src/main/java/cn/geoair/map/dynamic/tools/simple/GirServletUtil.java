@@ -131,6 +131,7 @@ public class GirServletUtil extends ServletUtil {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         response.setContentType(contentType);
+        response.setContentLengthLong(re.length);
         try {
             byteArrayInputStream = new ByteArrayInputStream(re);
             outputStream = response.getOutputStream();
