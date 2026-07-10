@@ -125,6 +125,9 @@ public class Log4Gir {
 
         @Override
         public void fatal(Throwable t, String format, Object... arguments) {
+            if (!isFatalEnabled()) {
+                return;
+            }
             logger.error(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -140,6 +143,9 @@ public class Log4Gir {
 
         @Override
         public void error(Throwable t, String format, Object... arguments) {
+            if (!isErrorEnabled()) {
+                return;
+            }
             logger.error(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -155,11 +161,17 @@ public class Log4Gir {
 
         @Override
         public void warn(Throwable t, String format, Object... arguments) {
+            if (!isWarnEnabled()) {
+                return;
+            }
             logger.warn(GuStrFormatter.format(format, arguments), t);
         }
 
         @Override
         public void info(String format, Object... arguments) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             logger.info(GuStrFormatter.format(format, arguments));
         }
 
@@ -170,6 +182,9 @@ public class Log4Gir {
 
         @Override
         public void info(Throwable t, String format, Object... arguments) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             logger.info(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -185,6 +200,9 @@ public class Log4Gir {
 
         @Override
         public void debug(Throwable t, String format, Object... arguments) {
+            if (!isDebugEnabled()) {
+                return;
+            }
             logger.debug(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -200,6 +218,9 @@ public class Log4Gir {
 
         @Override
         public void trace(Throwable t, String format, Object... arguments) {
+            if (!isTraceEnabled()) {
+                return;
+            }
             logger.trace(GuStrFormatter.format(format, arguments), t);
         }
     }
@@ -265,6 +286,9 @@ public class Log4Gir {
 
         @Override
         public void fatal(Throwable t, String format, Object... arguments) {
+            if (!isFatalEnabled()) {
+                return;
+            }
             logger.fatal(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -284,6 +308,9 @@ public class Log4Gir {
 
         @Override
         public void error(Throwable t, String format, Object... arguments) {
+            if (!isErrorEnabled()) {
+                return;
+            }
             logger.error(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -304,6 +331,9 @@ public class Log4Gir {
 
         @Override
         public void warn(Throwable t, String format, Object... arguments) {
+            if (!isWarnEnabled()) {
+                return;
+            }
             logger.warn(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -324,6 +354,9 @@ public class Log4Gir {
 
         @Override
         public void info(Throwable t, String format, Object... arguments) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             logger.info(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -343,6 +376,9 @@ public class Log4Gir {
 
         @Override
         public void debug(Throwable t, String format, Object... arguments) {
+            if (!isDebugEnabled()) {
+                return;
+            }
             logger.debug(GuStrFormatter.format(format, arguments), t);
         }
 
@@ -362,6 +398,9 @@ public class Log4Gir {
 
         @Override
         public void trace(Throwable t, String format, Object... arguments) {
+            if (!isTraceEnabled()) {
+                return;
+            }
             logger.trace(GuStrFormatter.format(format, arguments), t);
         }
     }
