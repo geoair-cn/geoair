@@ -115,7 +115,6 @@ public class HttpContextLoggingFilter implements Filter {
         if (requestBodyCollector != null) {
             Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
             context.setResponseHeaders(responseHeaders);
-            requestBodyCollector.collectResponseBody(response, context::setResponseBody);
         }
         String contentType = response.getContentType();
         context.setContentType(contentType);
