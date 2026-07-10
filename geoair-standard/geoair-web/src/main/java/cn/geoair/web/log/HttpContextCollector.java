@@ -25,7 +25,7 @@ public interface HttpContextCollector {
      * 前置校验器。
      * <p>
      * 在请求处理之前执行，用于校验请求的合法性。
-     * 如果校验失败，可以设置错误响应并返回 false。
+     * 如果校验失败，请抛出异常
      *
      * @param request  HTTP 请求对象
      * @param response HTTP 响应对象
