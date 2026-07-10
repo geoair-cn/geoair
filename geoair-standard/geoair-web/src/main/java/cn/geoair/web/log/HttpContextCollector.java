@@ -98,5 +98,27 @@ public interface HttpContextCollector {
      */
     Map<String, String> collectResponseHeaders(HttpServletResponse response);
 
+    /**
+     * 如果有异常，这里采集异常的堆栈
+     *
+     * @param exception
+     * @return
+     */
+    default String collectExceptionStackTrace(Exception exception) {
+        StackTraceElement[] elements = exception.getStackTrace();
+        if (elements != null && elements.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            int maxLines = Math.min(10, elements.length);
+            for (int i = 0; i < maxLines; i++) {
+                sb.append(elements[i].toString()).append("\n");
+            }
+            if (elements.length > 10) {
+                sb.append("... [truncated]");
+            }
+            return sb.toString();
+        }
+        return exception.getMessage();
+    }
+
 
 }
