@@ -12,7 +12,10 @@ import java.io.IOException;
  * 包括MIME类型字符串、文件扩展名、格式名称等元数据。
  */
 public class MimeType {
-
+    /**
+     * 日志记录器
+     */
+    private static GiLogger log = GirLoggerFactory.getLogger(MimeType.class);
     /**
      * MIME类型字符串，如 "image/png"
      */
@@ -38,10 +41,7 @@ public class MimeType {
      */
     protected boolean supportsTiling;
 
-    /**
-     * 日志记录器
-     */
-    private static GiLogger log = GirLoggerFactory.getLogger(MimeType.class);
+
 
     /**
      * 构造方法，创建MIME类型实例
