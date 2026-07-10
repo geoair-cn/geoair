@@ -13,6 +13,7 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
+import cn.geoair.web.mime.GirImageMime;
 
 
 /**
@@ -92,7 +93,7 @@ public class FuserCacheUtils {
      * @param layerName   图层名称
      * @param imageFormat 图片格式
      */
-    public static void deleteCacheByRequestGrid(String layerName, Integer z, Integer x, Integer y, CacheTileFuserExec cacheTileFuser, ImageMime imageFormat) {
+    public static void deleteCacheByRequestGrid(String layerName, Integer z, Integer x, Integer y, CacheTileFuserExec cacheTileFuser, GirImageMime imageFormat) {
         // 删除当前瓦片缓存
         cacheTileFuser.delCache(z, x, y);
 
@@ -107,7 +108,7 @@ public class FuserCacheUtils {
      * @param cacheFuser  缓存融合执行器
      * @param imageFormat 图片格式
      */
-    public static void deleteOriginalGridCache(String layerName, FuserExec cacheFuser, ImageMime imageFormat) {
+    public static void deleteOriginalGridCache(String layerName, FuserExec cacheFuser, GirImageMime imageFormat) {
         if (!(cacheFuser instanceof CacheTileFuserExec)) {
             return;
         }

@@ -2,13 +2,11 @@ package cn.geoair.map.tile.forge.fuser.utils;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.unit.DataSizeUtil;
-import cn.hutool.extra.spring.EnableSpringUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -328,7 +326,7 @@ public class HttpTileRequestUtils {
      * @return 瓦片 Resource，失败返回 null
      */
     public static Resource requestTile(String url, Proxy proxy, int timeout,
-                                       ImageMime srcFormat, String logContext) {
+                                       GiMimeType srcFormat, String logContext) {
         return requestTile(url, proxy, timeout, srcFormat, logContext, null);
     }
 
@@ -336,7 +334,7 @@ public class HttpTileRequestUtils {
      * 简单瓦片请求（不重试，带自定义请求头）
      */
     public static Resource requestTile(String url, Proxy proxy, int timeout,
-                                       ImageMime srcFormat, String logContext,
+                                       GiMimeType srcFormat, String logContext,
                                        Map<String, String> headers) {
         HttpResponse response = null;
         try {

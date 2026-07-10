@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -19,7 +19,7 @@ public class TileOriginalPreCacheTask implements Runnable {
                                     int zoom, Geometry geometry4326,
                                     CountDownLatch latch, AtomicLong totalCount,
                                     AtomicLong successCount, AtomicLong failCount,
-                                    ImageMime format) {
+                                    GirImageMime format) {
         TileTaskConfig config = TileTaskConfig.forOriginalPreCache(layerName, originalCacheName, zoom, geometry4326, format)
                 .setLatch(latch)
                 .setTotalCount(totalCount)
@@ -32,7 +32,7 @@ public class TileOriginalPreCacheTask implements Runnable {
      * 便捷创建方法
      */
     public static TileOriginalPreCacheTask of(String layerName, String originalCacheName,
-                                               int zoom, Geometry geometry4326, ImageMime format) {
+                                               int zoom, Geometry geometry4326, GirImageMime format) {
         return new TileOriginalPreCacheTask(layerName, originalCacheName, zoom, geometry4326,
                 null, null, null, null, format);
     }
@@ -40,7 +40,7 @@ public class TileOriginalPreCacheTask implements Runnable {
     /**
      * 便捷创建方法（使用默认缓存名）
      */
-    public static TileOriginalPreCacheTask of(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
+    public static TileOriginalPreCacheTask of(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
         return new TileOriginalPreCacheTask(layerName, null, zoom, geometry4326,
                 null, null, null, null, format);
     }
@@ -62,7 +62,7 @@ public class TileOriginalPreCacheTask implements Runnable {
         private String originalCacheName;
         private int zoom;
         private Geometry geometry4326;
-        private ImageMime format;
+        private GirImageMime format;
         private CountDownLatch latch;
         private AtomicLong totalCount;
         private AtomicLong successCount;
@@ -88,7 +88,7 @@ public class TileOriginalPreCacheTask implements Runnable {
             return this;
         }
 
-        public Builder format(ImageMime format) {
+        public Builder format(GirImageMime format) {
             this.format = format;
             return this;
         }

@@ -1,6 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.web.mime.GirImageMime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,7 @@ public class TileTaskConfig {
     private String layerName;
     private int zoom;
     private Geometry geometry4326;
-    private ImageMime format;
+    private GirImageMime format;
     private TaskType taskType;
     // 可选参数（原始网格检查需要）
     private String originalCacheName;
@@ -46,7 +46,7 @@ public class TileTaskConfig {
     /**
      * 快速创建预缓存任务配置
      */
-    public static TileTaskConfig forPreCache(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
+    public static TileTaskConfig forPreCache(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
         return TileTaskConfig.builder()
                 .layerName(layerName)
                 .zoom(zoom)
@@ -58,7 +58,7 @@ public class TileTaskConfig {
     /**
      * 快速创建检查修复任务配置
      */
-    public static TileTaskConfig forCheckAndRepair(String layerName, int zoom, Geometry geometry4326, ImageMime format) {
+    public static TileTaskConfig forCheckAndRepair(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
         return TileTaskConfig.builder()
                 .layerName(layerName)
                 .zoom(zoom)
@@ -71,7 +71,7 @@ public class TileTaskConfig {
      * 快速创建原始网格检查修复任务配置
      */
     public static TileTaskConfig forOriginalCheckAndRepair(String layerName, String originalCacheName,
-                                                           int zoom, Geometry geometry4326, ImageMime format) {
+                                                           int zoom, Geometry geometry4326, GirImageMime format) {
         return TileTaskConfig.builder()
                 .layerName(layerName)
                 .zoom(zoom)
@@ -86,7 +86,7 @@ public class TileTaskConfig {
      * 快速创建原始网格预缓存任务配置
      */
     public static TileTaskConfig forOriginalPreCache(String layerName, String originalCacheName,
-                                                     int zoom, Geometry geometry4326, ImageMime format) {
+                                                     int zoom, Geometry geometry4326, GirImageMime format) {
         return TileTaskConfig.builder()
                 .layerName(layerName)
                 .zoom(zoom)
