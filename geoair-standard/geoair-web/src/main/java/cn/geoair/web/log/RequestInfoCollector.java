@@ -45,13 +45,6 @@ public interface RequestInfoCollector {
      */
     Map<String, String> collectResponseHeaders(HttpServletResponse response);
 
-    /**
-     * 采集响应体。
-     *
-     * @param response HTTP 响应
-     * @return 请求头键值对，如果无需采集则返回 null
-     */
-    HttpServletResponse collectResponseBody(HttpServletResponse response, Consumer<byte[]> responseBodyConsumer);
 
     /**
      * 采集请求参数。

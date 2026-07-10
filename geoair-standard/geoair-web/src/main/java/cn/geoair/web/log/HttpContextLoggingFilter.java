@@ -42,7 +42,7 @@ public class HttpContextLoggingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
+        ResponseBodyContext.clear();
         if (!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) {
             chain.doFilter(request, response);
             return;
@@ -64,29 +64,57 @@ public class HttpContextLoggingFilter implements Filter {
         }
 
         HttpContext context = HttpContext.of();
+        context.setRequestStartTime(System.currentTimeMillis());
+        context.setThreadName(Thread.currentThread().getName());
+        String methodStr = httpRequest.getMethod();
+        context.setMethod(GirHttpMethod.resolve(methodStr));
+        context.setUri(httpRequest.getRequestURI());
+        context.setQueryString(httpRequest.getQueryString());
+        context.setUserAgent(httpRequest.getHeader("User-Agent"));
+        context.setRequestBodySize((long) request.getContentLength());
 
-        collectRequestInfo(httpRequest, context);
         RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
         if (requestBodyCollector != null) {
+            context.setClientIp(requestBodyCollector.collectClientIp(httpRequest));
+            context.setRequestHeaders(requestBodyCollector.collectRequestHeaders(httpRequest));
+            context.setRequestParams(requestBodyCollector.collectRequestParameters(httpRequest));
             HttpServletRequest httpServletRequest = requestBodyCollector.collectRequestBody(httpRequest, context::setRequestBody);
             if (httpServletRequest != null) {
                 httpRequest = httpServletRequest;
             }
         }
 
-
-        context.setRequestStartTime(System.currentTimeMillis());
-        context.setThreadName(Thread.currentThread().getName());
-
         try {
-            if (requestBodyCollector != null) {
-                HttpServletResponse httpServletResponse = requestBodyCollector.collectResponseBody(httpResponse, context::setResponseBody);
-                if (httpServletResponse != null) {
-                    httpResponse = httpServletResponse;
+
+            chain.doFilter(httpRequest, httpResponse);
+
+
+            context.setStatusCode(httpResponse.getStatus());
+            context.setResponseStartTime(System.currentTimeMillis());
+            String contentType = response.getContentType();
+            context.setContentType(contentType);
+            context.setContentEncoding(httpResponse.getHeader("Content-Encoding"));
+            if (contentType != null) {
+                context.setResponseMimeType(GutilMimeType.fromContentType(contentType));
+            }
+            String contentLengthStr = httpResponse.getHeader("Content-Length");
+            if (contentLengthStr != null) {
+                try {
+                    context.setResponseBodySize(Long.parseLong(contentLengthStr));
+                } catch (NumberFormatException e) {
+
                 }
             }
-            chain.doFilter(httpRequest, httpResponse);
-            collectResponseInfo(httpResponse, context);
+
+            if (requestBodyCollector != null) {
+                Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(httpResponse);
+                context.setResponseHeaders(responseHeaders);
+                if (ResponseBodyContext.hasBody()) {
+                    context.setResponseBody(ResponseBodyContext.getBytes());
+                }
+            }
+
+
         } catch (Exception e) {
             collectExceptionInfo(context, e);
             context.setStatusCode(500);
@@ -95,51 +123,8 @@ public class HttpContextLoggingFilter implements Filter {
             context.setResponseEndTime(System.currentTimeMillis());
             context.setDuration(context.getResponseEndTime() - context.getRequestStartTime());
             loggingFilterConfig.getContextConsumer().accept(context);
+            ResponseBodyContext.clear();
         }
-    }
-
-
-    private void collectRequestInfo(HttpServletRequest request, HttpContext context) {
-        String methodStr = request.getMethod();
-        context.setMethod(GirHttpMethod.resolve(methodStr));
-        context.setUri(request.getRequestURI());
-        context.setQueryString(request.getQueryString());
-        RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
-        if (requestBodyCollector != null) {
-            context.setClientIp(requestBodyCollector.collectClientIp(request));
-            context.setRequestHeaders(requestBodyCollector.collectRequestHeaders(request));
-            context.setRequestParams(requestBodyCollector.collectRequestParameters(request));
-        }
-        context.setUserAgent(request.getHeader("User-Agent"));
-        context.setRequestBodySize((long) request.getContentLength());
-    }
-
-
-    private void collectResponseInfo(HttpServletResponse response, HttpContext context) {
-        context.setStatusCode(response.getStatus());
-        context.setResponseStartTime(System.currentTimeMillis());
-        RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
-        if (requestBodyCollector != null) {
-            Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
-            context.setResponseHeaders(responseHeaders);
-        }
-        String contentType = response.getContentType();
-        context.setContentType(contentType);
-        if (contentType != null) {
-            context.setResponseMimeType(GutilMimeType.fromContentType(contentType));
-        }
-
-
-        String contentLengthStr = response.getHeader("Content-Length");
-        if (contentLengthStr != null) {
-            try {
-                context.setResponseBodySize(Long.parseLong(contentLengthStr));
-            } catch (NumberFormatException e) {
-
-            }
-        }
-
-        context.setContentEncoding(response.getHeader("Content-Encoding"));
     }
 
 

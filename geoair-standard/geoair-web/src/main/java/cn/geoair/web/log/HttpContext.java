@@ -1,8 +1,10 @@
 package cn.geoair.web.log;
 
+import cn.geoair.base.Gir;
 import cn.geoair.web.enums.GirHttpMethod;
 import cn.geoair.web.mime.GiMimeType;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -390,7 +392,6 @@ public class HttpContext {
     }
 
 
-
     public GirHttpMethod getMethod() {
         return method;
     }
@@ -487,5 +488,37 @@ public class HttpContext {
         return contentEncoding;
     }
 
+    public String toJSONString() {
+        return Gir.toJson(this).toJSONString();
+    }
 
+    @Override
+    public String toString() {
+        return "HttpContext{" +
+               "method=" + method +
+               ", uri='" + uri + '\'' +
+               ", queryString='" + queryString + '\'' +
+               ", clientIp='" + clientIp + '\'' +
+               ", userAgent='" + userAgent + '\'' +
+               ", requestBody='" + requestBody + '\'' +
+               ", requestBodySize=" + requestBodySize +
+               ", responseBody=" + Arrays.toString(responseBody) +
+               ", responseBodySize=" + responseBodySize +
+               ", responseMimeType=" + responseMimeType +
+               ", statusCode=" + statusCode +
+               ", requestStartTime=" + requestStartTime +
+               ", responseStartTime=" + responseStartTime +
+               ", responseEndTime=" + responseEndTime +
+               ", duration=" + duration +
+               ", threadName='" + threadName + '\'' +
+               ", errorMessage='" + errorMessage + '\'' +
+               ", errorType='" + errorType + '\'' +
+               ", stackTrace='" + stackTrace + '\'' +
+               ", requestHeaders=" + requestHeaders +
+               ", requestParams=" + requestParams +
+               ", responseHeaders=" + responseHeaders +
+               ", contentType='" + contentType + '\'' +
+               ", contentEncoding='" + contentEncoding + '\'' +
+               '}';
+    }
 }
