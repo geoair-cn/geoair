@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletOutputStream;
@@ -158,4 +159,21 @@ public class GirServletUtil extends ServletUtil {
             IoUtil.close(outputStream);
         }
     }
+
+    public static Map<String, String> getResponseHeaderMap(HttpServletResponse response) {
+        Map<String, String> headers = new HashMap<>();
+        Collection<String> headerNames = response.getHeaderNames();
+        if (headerNames == null || headerNames.isEmpty()) {
+            return headers;
+        }
+        for (String name : headerNames) {
+            String value = response.getHeader(name);
+            if (value != null) {
+                headers.put(name, value);
+            }
+        }
+
+        return headers;
+    }
+
 }
