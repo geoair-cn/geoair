@@ -115,7 +115,7 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
-            logger.error(GuStrFormatter.format(format, arguments));
+            logger.error(format, arguments);
         }
 
         @Override
@@ -130,7 +130,7 @@ public class Log4Gir {
 
         @Override
         public void error(String format, Object... arguments) {
-            logger.error(GuStrFormatter.format(format, arguments));
+            logger.error(format, arguments); // 最后一个参数如果是Throwable ,slf4j会自动识别并处理
         }
 
         @Override
@@ -145,7 +145,7 @@ public class Log4Gir {
 
         @Override
         public void warn(String format, Object... arguments) {
-            logger.warn(GuStrFormatter.format(format, arguments));
+            logger.warn(format, arguments);
         }
 
         @Override
@@ -175,7 +175,7 @@ public class Log4Gir {
 
         @Override
         public void debug(String format, Object... arguments) {
-            logger.debug(GuStrFormatter.format(format, arguments));
+            logger.debug(format, arguments);
         }
 
         @Override
@@ -190,7 +190,7 @@ public class Log4Gir {
 
         @Override
         public void trace(String format, Object... arguments) {
-            logger.trace(GuStrFormatter.format(format, arguments));
+            logger.trace(format, arguments);
         }
 
         @Override
@@ -251,7 +251,8 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
-            logger.fatal(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.fatal(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -266,7 +267,8 @@ public class Log4Gir {
 
         @Override
         public void error(String format, Object... arguments) {
-            logger.error(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -281,7 +283,9 @@ public class Log4Gir {
 
         @Override
         public void warn(String format, Object... arguments) {
-            logger.warn(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.warn(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+
         }
 
         @Override
@@ -296,7 +300,9 @@ public class Log4Gir {
 
         @Override
         public void info(String format, Object... arguments) {
-            logger.info(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.info(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+
         }
 
         @Override
@@ -311,7 +317,8 @@ public class Log4Gir {
 
         @Override
         public void debug(String format, Object... arguments) {
-            logger.debug(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.debug(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -326,7 +333,8 @@ public class Log4Gir {
 
         @Override
         public void trace(String format, Object... arguments) {
-            logger.trace(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.trace(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -402,7 +410,8 @@ public class Log4Gir {
 
         @Override
         public void error(String format, Object... arguments) {
-            logger.error(format, arguments);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
         }
 
         @Override

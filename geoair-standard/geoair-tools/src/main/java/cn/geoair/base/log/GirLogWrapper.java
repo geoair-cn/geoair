@@ -272,7 +272,6 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void error(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-
         recordLog(GemLogLevel.ERROR, format, info, arguments);
     }
 

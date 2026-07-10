@@ -3,6 +3,7 @@ package cn.geoair.base.log;
 import cn.geoair.base.tool.GkConsole;
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilStr;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +93,9 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void fatal(String format, Object... arguments) {
-        log(GemLogLevel.FATAL, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.FATAL, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+
     }
 
     @Override
@@ -119,7 +122,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void error(String format, Object... arguments) {
-        log(GemLogLevel.ERROR, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.ERROR, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
