@@ -1,7 +1,11 @@
 package cn.geoair.web.log;
 
+import cn.geoair.base.Gir;
+import cn.geoair.base.data.result.GiResult;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -23,12 +27,29 @@ public interface HttpContextCollector {
      * 在请求处理之前执行，用于校验请求的合法性。
      * 如果校验失败，可以设置错误响应并返回 false。
      *
-     * @param request HTTP 请求对象
+     * @param request  HTTP 请求对象
      * @param response HTTP 响应对象
-     * @return true 表示校验通过，继续执行；false 表示校验失败，终止执行
+     * @return 校验失败 请抛出异常
      */
-    boolean preValidate(HttpServletRequest request, HttpServletResponse response);
+    void preValidate(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
+    /**
+     * preValidate这一步抛出来的异常在这里进行写流返回
+     *
+     * @param exception
+     * @param response
+     * @throws Exception
+     */
+    default void exceptionToResponse(Exception exception, HttpServletResponse response) {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        String message = exception.getMessage();
+        GiResult<Object> objectGiResult = GiResult.failureMsg(message).andCode(403);
+        try {
+            response.getWriter().write(Gir.toJson(objectGiResult).toString());
+        } catch (IOException e) {
+        }
+    }
 
     // ==================== 请求信息采集 ====================
 
@@ -45,7 +66,7 @@ public interface HttpContextCollector {
      * <p>
      * 实现者需要将请求包装为可重复读取的版本，并通过 Consumer 回调传递 body 字符串。
      *
-     * @param request HTTP 请求对象
+     * @param request             HTTP 请求对象
      * @param requestBodyConsumer 请求体消费者
      * @return 可重复读取的 HttpServletRequest
      */
@@ -76,7 +97,6 @@ public interface HttpContextCollector {
      * @return 响应头键值对，如果无需采集则返回空 Map
      */
     Map<String, String> collectResponseHeaders(HttpServletResponse response);
-
 
 
 }
