@@ -16,18 +16,6 @@ import java.util.Map;
  *   <li><b>运行时信息</b>：处理线程名、异常信息等</li>
  *   <li><b>网络信息</b>：客户端IP、User-Agent等</li>
  * </ul>
- *
- * <p><b>使用场景：</b>
- * <ul>
- *   <li>访问日志记录（Access Log）</li>
- *   <li>性能监控与慢请求分析</li>
- *   <li>问题排查与调试</li>
- *   <li>安全审计与合规记录</li>
- * </ul>
- *
- * @author GeoAir Team
- * @version 1.0
- * @since 2026-07-10
  */
 public class HttpContext {
 
@@ -234,7 +222,7 @@ public class HttpContext {
      * <p>
      * 注意：对于 JSON 等非表单请求体，参数会为空，数据在 {@link #requestBody} 中。
      */
-    private Map<String, String> parameters;
+    private Map<String, String> requestParams;
 
     // ==================== 响应头 ====================
 
@@ -293,17 +281,9 @@ public class HttpContext {
      */
     private Long responseTime;
 
-    public GirHttpMethod method() {
-        return method;
-    }
-
     public HttpContext setMethod(GirHttpMethod method) {
         this.method = method;
         return this;
-    }
-
-    public String uri() {
-        return uri;
     }
 
     public HttpContext setUri(String uri) {
@@ -311,17 +291,9 @@ public class HttpContext {
         return this;
     }
 
-    public String queryString() {
-        return queryString;
-    }
-
     public HttpContext setQueryString(String queryString) {
         this.queryString = queryString;
         return this;
-    }
-
-    public String clientIp() {
-        return clientIp;
     }
 
     public HttpContext setClientIp(String clientIp) {
@@ -329,17 +301,9 @@ public class HttpContext {
         return this;
     }
 
-    public String userAgent() {
-        return userAgent;
-    }
-
     public HttpContext setUserAgent(String userAgent) {
         this.userAgent = userAgent;
         return this;
-    }
-
-    public String requestBody() {
-        return requestBody;
     }
 
     public HttpContext setRequestBody(String requestBody) {
@@ -347,17 +311,9 @@ public class HttpContext {
         return this;
     }
 
-    public Long requestBodySize() {
-        return requestBodySize;
-    }
-
     public HttpContext setRequestBodySize(Long requestBodySize) {
         this.requestBodySize = requestBodySize;
         return this;
-    }
-
-    public byte[] responseBody() {
-        return responseBody;
     }
 
     public HttpContext setResponseBody(byte[] responseBody) {
@@ -365,17 +321,9 @@ public class HttpContext {
         return this;
     }
 
-    public Long responseBodySize() {
-        return responseBodySize;
-    }
-
     public HttpContext setResponseBodySize(Long responseBodySize) {
         this.responseBodySize = responseBodySize;
         return this;
-    }
-
-    public GiMimeType responseMimeType() {
-        return responseMimeType;
     }
 
     public HttpContext setResponseMimeType(GiMimeType responseMimeType) {
@@ -383,17 +331,9 @@ public class HttpContext {
         return this;
     }
 
-    public int statusCode() {
-        return statusCode;
-    }
-
     public HttpContext setStatusCode(int statusCode) {
         this.statusCode = statusCode;
         return this;
-    }
-
-    public long requestStartTime() {
-        return requestStartTime;
     }
 
     public HttpContext setRequestStartTime(long requestStartTime) {
@@ -401,17 +341,9 @@ public class HttpContext {
         return this;
     }
 
-    public long responseStartTime() {
-        return responseStartTime;
-    }
-
     public HttpContext setResponseStartTime(long responseStartTime) {
         this.responseStartTime = responseStartTime;
         return this;
-    }
-
-    public long responseEndTime() {
-        return responseEndTime;
     }
 
     public HttpContext setResponseEndTime(long responseEndTime) {
@@ -419,17 +351,9 @@ public class HttpContext {
         return this;
     }
 
-    public long duration() {
-        return duration;
-    }
-
     public HttpContext setDuration(long duration) {
         this.duration = duration;
         return this;
-    }
-
-    public String threadName() {
-        return threadName;
     }
 
     public HttpContext setThreadName(String threadName) {
@@ -437,17 +361,9 @@ public class HttpContext {
         return this;
     }
 
-    public String errorMessage() {
-        return errorMessage;
-    }
-
     public HttpContext setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
         return this;
-    }
-
-    public String errorType() {
-        return errorType;
     }
 
     public HttpContext setErrorType(String errorType) {
@@ -455,17 +371,9 @@ public class HttpContext {
         return this;
     }
 
-    public String stackTrace() {
-        return stackTrace;
-    }
-
     public HttpContext setStackTrace(String stackTrace) {
         this.stackTrace = stackTrace;
         return this;
-    }
-
-    public Map<String, String> requestHeaders() {
-        return requestHeaders;
     }
 
     public HttpContext setRequestHeaders(Map<String, String> requestHeaders) {
@@ -473,17 +381,9 @@ public class HttpContext {
         return this;
     }
 
-    public Map<String, String> parameters() {
-        return parameters;
-    }
-
-    public HttpContext setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+    public HttpContext setRequestParams(Map<String, String> requestParams) {
+        this.requestParams = requestParams;
         return this;
-    }
-
-    public Map<String, String> responseHeaders() {
-        return responseHeaders;
     }
 
     public HttpContext setResponseHeaders(Map<String, String> responseHeaders) {
@@ -491,17 +391,9 @@ public class HttpContext {
         return this;
     }
 
-    public String contentType() {
-        return contentType;
-    }
-
     public HttpContext setContentType(String contentType) {
         this.contentType = contentType;
         return this;
-    }
-
-    public String contentEncoding() {
-        return contentEncoding;
     }
 
     public HttpContext setContentEncoding(String contentEncoding) {
@@ -509,12 +401,108 @@ public class HttpContext {
         return this;
     }
 
-    public Long responseTime() {
-        return responseTime;
-    }
-
     public HttpContext setResponseTime(Long responseTime) {
         this.responseTime = responseTime;
         return this;
+    }
+
+    public GirHttpMethod getMethod() {
+        return method;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getQueryString() {
+        return queryString;
+    }
+
+    public String getClientIp() {
+        return clientIp;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    public Long getRequestBodySize() {
+        return requestBodySize;
+    }
+
+    public byte[] getResponseBody() {
+        return responseBody;
+    }
+
+    public Long getResponseBodySize() {
+        return responseBodySize;
+    }
+
+    public GiMimeType getResponseMimeType() {
+        return responseMimeType;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public long getRequestStartTime() {
+        return requestStartTime;
+    }
+
+    public long getResponseStartTime() {
+        return responseStartTime;
+    }
+
+    public long getResponseEndTime() {
+        return responseEndTime;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public String getThreadName() {
+        return threadName;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public String getErrorType() {
+        return errorType;
+    }
+
+    public String getStackTrace() {
+        return stackTrace;
+    }
+
+    public Map<String, String> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public Map<String, String> getRequestParams() {
+        return requestParams;
+    }
+
+    public Map<String, String> getResponseHeaders() {
+        return responseHeaders;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public Long getResponseTime() {
+        return responseTime;
     }
 }
