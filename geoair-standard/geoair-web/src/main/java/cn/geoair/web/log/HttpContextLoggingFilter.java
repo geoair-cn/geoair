@@ -72,6 +72,12 @@ public class HttpContextLoggingFilter implements Filter {
         context.setThreadName(Thread.currentThread().getName());
 
         try {
+            if (requestBodyCollector != null) {
+                HttpServletResponse httpServletResponse = requestBodyCollector.collectResponseBody(httpResponse, context::setResponseBody);
+                if (httpServletResponse != null) {
+                    httpResponse = httpServletResponse;
+                }
+            }
             chain.doFilter(httpRequest, httpResponse);
             collectResponseInfo(httpResponse, context);
         } catch (Exception e) {
@@ -106,8 +112,11 @@ public class HttpContextLoggingFilter implements Filter {
         context.setStatusCode(response.getStatus());
         context.setResponseStartTime(System.currentTimeMillis());
         RequestInfoCollector requestBodyCollector = loggingFilterConfig.getRequestBodyCollector();
-        Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
-        context.setResponseHeaders(responseHeaders);
+        if (requestBodyCollector != null) {
+            Map<String, String> responseHeaders = requestBodyCollector.collectResponseHeaders(response);
+            context.setResponseHeaders(responseHeaders);
+            requestBodyCollector.collectResponseBody(response, context::setResponseBody);
+        }
         String contentType = response.getContentType();
         context.setContentType(contentType);
         if (contentType != null) {
