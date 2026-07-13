@@ -145,7 +145,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
 
         // 检查总数是否变化（如果变化则重新启动）
         if (totalCount != null && !totalCount.equals(allCount)) {
-            log.debug("总数发生变化: {} -> {}, 重新启动进度", totalCount, allCount);
+            log.trace("总数发生变化: {} -> {}, 重新启动进度", totalCount, allCount);
             doStart(allCount);
         }
 
@@ -175,7 +175,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
             percentUpdateConsumer.start(allCount);
             started = true;
             totalCount = allCount;
-            log.debug("进度已启动，总数: {}", allCount);
+            log.trace("进度已启动，总数: {}", allCount);
         } else {
             log.warn("进度更新消费者为null，无法启动");
         }
@@ -207,7 +207,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);
             }
-            log.debug("进度更新: {}%", updatePercent);
+            log.trace("进度更新: {}%", updatePercent);
         }
     }
 
@@ -220,7 +220,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);
             }
-            log.debug("进度更新: {:.2f}%", updatePercent);
+            log.trace("进度更新: {}%", updatePercent);
         }
     }
 
@@ -239,7 +239,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
         doubleLastPercent[0] = 0.0;
         started = false;
         totalCount = null;
-        log.debug("进度状态已重置");
+        log.trace("进度状态已重置");
     }
 
     /**
