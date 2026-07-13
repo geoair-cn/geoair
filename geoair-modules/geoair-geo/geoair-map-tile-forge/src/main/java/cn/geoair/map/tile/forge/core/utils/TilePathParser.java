@@ -138,6 +138,7 @@ public class TilePathParser {
     public static void main(String[] args) {
         String[] testPaths = {
                 "_alllayers/L04/R0000C0000.bundle",
+                "_alllayers/L04/R0000C0f000.bundle",
                 "layers/L10/R001C002.bundlx",
                 "config/conf.xml",
                 "data/conf.cdi",
