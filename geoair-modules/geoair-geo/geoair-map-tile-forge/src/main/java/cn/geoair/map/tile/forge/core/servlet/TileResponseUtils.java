@@ -103,28 +103,12 @@ public class TileResponseUtils {
 
         BufferedImage enhanced = GirImageUtil.unSharpMask(image, radius, amount, threshold);
 
-        String format = detectImageFormat(tileData);
+        String format = GirImageUtil.detectImageFormat(tileData);
 
         return GirImageUtil.imageToBytes(enhanced, format);
     }
 
-    /**
-     * 检测图片格式
-     */
-    private static String detectImageFormat(byte[] bytes) {
-        if (bytes.length < 4) {
-            return "png";
-        }
-        // PNG: 89 50 4E 47
-        if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
-            return "png";
-        }
-        // JPEG: FF D8
-        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) {
-            return "jpg";
-        }
-        return "png";
-    }
+
 
     /**
      * 解析浮点数

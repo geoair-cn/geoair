@@ -359,7 +359,27 @@ public class GirImageUtil {
         return Math.min(255, Math.max(0, value));
     }
 
-
+    /**
+     * 检测图片格式
+     */
+    public static String detectImageFormat(byte[] bytes) {
+        if (bytes.length < 4) {
+            return "png";
+        }
+        // PNG: 89 50 4E 47
+        if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+            return "png";
+        }
+        // JPEG: FF D8
+        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) {
+            return "jpg";
+        }
+        // WebP: 52 49 46 46
+        if (bytes[0] == 0x52 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x46) {
+            return "webp";
+        }
+        return "png";
+    }
 
     /**
      * 保存 BufferedImage 到文件
