@@ -114,9 +114,12 @@ public class TilePathParser {
                 bundleFileName, bundlePath
         );
     }
-    private static final Pattern PATH_PATTERN = Pattern.compile(
-            ".*/(L\\d+/R\\d+C\\d+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json))",Pattern.CASE_INSENSITIVE
-    );
+
+    //    private static final Pattern PATH_PATTERN = Pattern.compile(
+//            ".*/(L\\d+/R\\d+C\\d+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json))",Pattern.CASE_INSENSITIVE
+//    );
+    private static final Pattern PATH_PATTERN = Pattern.compile(".*/(L\\d+/[^/]+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json))", Pattern.CASE_INSENSITIVE);
+
     public static String getSubBundlePath(String bundlePath) {
 
         // 空值校验
@@ -135,6 +138,7 @@ public class TilePathParser {
     public static void main(String[] args) {
         String[] testPaths = {
                 "_alllayers/L04/R0000C0000.bundle",
+                "_alllayers/L04/R0000C0f000.bundle",
                 "layers/L10/R001C002.bundlx",
                 "config/conf.xml",
                 "data/conf.cdi",
@@ -151,8 +155,8 @@ public class TilePathParser {
 
             System.out.printf("输入路径: %-40s | 普通匹配: %-30s",
                     (path == null ? "null" : path),
-                    (result == null ? "无匹配" : result) )
-        ;
+                    (result == null ? "无匹配" : result))
+            ;
         }
     }
     // ------------------------------ 通用工具方法 ------------------------------
@@ -374,8 +378,8 @@ public class TilePathParser {
         @Override
         public String toString() {
             return String.format("CompactCacheTileInfo{level=%d, bundleRow=%d, bundleCol=%d, " +
-                            "tileIndexInBundle=%d, actualTileRow=%d, actualTileCol=%d, " +
-                            "bundleFileName='%s', originalBundlePath='%s'}",
+                                 "tileIndexInBundle=%d, actualTileRow=%d, actualTileCol=%d, " +
+                                 "bundleFileName='%s', originalBundlePath='%s'}",
                     level, bundleRow, bundleCol, tileIndexInBundle,
                     actualTileRow, actualTileCol, bundleFileName, originalBundlePath);
         }
