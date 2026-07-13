@@ -84,12 +84,7 @@ public class TileResponseUtils {
         buildTileResponse(tileRequest, response, false);
     }
 
-    /**
-     * 判断是否需要增强
-     */
-    private static boolean needEnhance(String sharpenAmount, String sharpenRadius, String sharpenThreshold) {
-        return GutilObject.isNotEmpty(sharpenAmount) || GutilObject.isNotEmpty(sharpenRadius) || GutilObject.isNotEmpty(sharpenThreshold);
-    }
+
 
     /**
      * 执行瓦片增强
