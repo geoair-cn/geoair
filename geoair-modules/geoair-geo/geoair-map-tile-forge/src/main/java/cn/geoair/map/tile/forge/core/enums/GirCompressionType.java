@@ -24,7 +24,7 @@ public enum GirCompressionType implements GiVisualValuable<String> {
     /**
      * TAR.GZ压缩（BZIP2算法，method=12）
      */
-    TAR_GZ("TAR.GZ压缩（BZIP2）", 12, new TarGzHandler());
+    TAR_GZ("BZIP2压缩（BZIP2）", 12, new Bzip2Handler());
 
     // 文本描述
     private final String text;
