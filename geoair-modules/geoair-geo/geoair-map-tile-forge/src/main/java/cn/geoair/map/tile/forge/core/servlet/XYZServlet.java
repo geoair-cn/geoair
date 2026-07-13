@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.TileRequest;
@@ -78,14 +79,15 @@ public class XYZServlet extends D3TilesServlet {
                 String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
                 String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
                 String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
-                String sharpenAmount = request.getParameter(TileParamEnums.SHARPEN_AMOUNT.getValue());
-                String sharpenRadius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
-                String sharpenThreshold = request.getParameter(TileParamEnums.SHARPEN_THRESHOLD.getValue());
+                String enhance = request.getParameter(TileParamEnums.ENHANCE.getValue());
+                if (GutilObject.isEmpty(enhance)) {
+                    enhance = TileParamEnums.ENHANCE.getDefaultValue();
+                }
 
                 int wmtsY = Integer.parseInt(y);
 
-                if (gridSet == null) {
-                    gridSet = "EPSG:3857";
+                if (GutilObject.isEmpty(gridSet))  {
+                    gridSet =TileParamEnums.GRID_SET.getDefaultValue();
                 }
 
                 int xInt = Integer.parseInt(x);
@@ -107,7 +109,7 @@ public class XYZServlet extends D3TilesServlet {
                 }
                 TileRequest tileRequest = null;
                 tileRequest = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
-                TileResponseUtils.buildTileResponse(tileRequest, response, sharpenAmount, sharpenRadius, sharpenThreshold);
+                TileResponseUtils.buildTileResponse(tileRequest, response, Boolean.parseBoolean(enhance));
             } else {
                 TileRequest layerTile = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
                 TileResponseUtils.buildTileResponse(layerTile, response);
