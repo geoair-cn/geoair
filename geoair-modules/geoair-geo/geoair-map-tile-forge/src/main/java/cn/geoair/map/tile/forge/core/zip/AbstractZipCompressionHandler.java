@@ -81,22 +81,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return chunks;
     }
 
-    /**
-     * 根据中央目录条目中的compressionMethod自动适配解压逻辑
-     */
-    @Override
-    public byte[] decompressChunk(byte[] compressedData, CentralDirectoryModel entry) throws IOException {
-        if (compressedData == null || compressedData.length == 0) {
-            return new byte[0];
-        }
-        // 1. 获取压缩方法代码并匹配枚举
-        int methodCode = (int) entry.getCompressionMethod();
-        GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
-//        log.debug("使用[{}]适配器处理解压，预期大小: {}字节", type.getText(), entry.getUncompressedSize());
-
-        // 2. 调用对应适配器的解压方法
-        return type.getHandler().decompress(compressedData, entry.getUncompressedSize());
-    }
 
     @Override
     public CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize) {
@@ -177,13 +161,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 entry.setDataOffset(estimatedOffset);
             }
         }
-
-        if (entry.getCompressedSize() > MAX_CHUNK_SIZE) {
+        if (entry.getCompressedSize() > MAX_CHUNK_SIZE && entry.getDecompressionHandler().supportStreamingDecompress()) {
             return readLargeEntryData(entry, source);
         }
 
         byte[] compressedData = readRange(source, entry.getDataOffset(), entry.getDataOffset() + entry.getCompressedSize() - 1);
-        return decompressChunk(compressedData, entry);
+        return entry.getDecompressionHandler().decompress(compressedData, entry.getUncompressedSize());
     }
 
     @Override
@@ -1336,7 +1319,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 int chunkSize = (int) Math.min(totalCompressed, MAX_CHUNK_SIZE);
                 byte[] compressedChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
                 byte[] decompress = handler.decompress(compressedChunk, chunkSize);
-                if (decompress != null&&decompress.length!=0) {
+                if (decompress != null && decompress.length != 0) {
                     out.write(decompress);
                 }
                 currentOffset += chunkSize;
@@ -1348,7 +1331,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 log.warn("解压大小不匹配，预期:{}, 实际:{}", totalUncompressed, out.size());
             }
             return out.toByteArray();
-        }   finally {
+        } finally {
             out.close();
         }
     }

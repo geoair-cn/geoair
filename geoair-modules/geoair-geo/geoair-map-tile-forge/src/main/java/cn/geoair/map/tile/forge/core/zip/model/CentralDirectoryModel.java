@@ -1,6 +1,10 @@
 package cn.geoair.map.tile.forge.core.zip.model;
 
+import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
+import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
 import lombok.Data;
+
+import javax.persistence.Transient;
 
 /**
  * ZIP 中央目录中的单个文件条目
@@ -41,4 +45,16 @@ public class CentralDirectoryModel {
         this.name = name;
         this.entrySize = entrySize;
     }
+
+    @Transient
+    public DecompressionHandler getDecompressionHandler() {
+        int methodCode = (int) this.getCompressionMethod();
+        GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
+        DecompressionHandler handler = type.getHandler();
+        if (handler == null) {
+            throw  new RuntimeException("Unknown compression method: " + methodCode);
+        }
+        return handler;
+    }
+
 }

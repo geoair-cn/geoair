@@ -56,14 +56,6 @@ public interface ICompressionHandler {
     CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize);
 
 
-    /**
-     * 解压分块数据
-     *
-     * @param compressedData 压缩数据
-     * @param entry          中央目录条目
-     * @return 解压后的字节数组
-     */
-    byte[] decompressChunk(byte[] compressedData, CentralDirectoryModel entry) throws IOException;
 
     /**
      * 获取文件大小（字节）
