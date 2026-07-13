@@ -3,7 +3,6 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
@@ -26,7 +25,7 @@ public class TileResponseUtils {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     /**
-     * 构建瓦片响应（带图像增强支持）
+     * 构建瓦片响应
      */
     public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response,
                                          boolean enhance) throws Exception {
@@ -85,7 +84,6 @@ public class TileResponseUtils {
     }
 
 
-
     /**
      * 执行瓦片增强
      */
@@ -102,7 +100,6 @@ public class TileResponseUtils {
 
         return GirImageUtil.imageToBytes(enhanced, format);
     }
-
 
 
     /**
