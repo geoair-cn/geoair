@@ -1,10 +1,8 @@
 package cn.geoair.base.util;
 
-import cn.geoair.base.percent.GirDoublePercentConsumer;
-import cn.geoair.base.percent.GirIntPercentConsumer;
-import cn.geoair.base.percent.GiPercentConsumer;
+import cn.geoair.base.percent.GiPercentUpdateConsumer;
 
-import java.util.function.Consumer;
+import cn.geoair.base.percent.GirPercentConsumer;
 
 /**
  * 进度条工具类
@@ -185,12 +183,12 @@ public class GutilPercent {
     }
 
 
-    public static GiPercentConsumer getPercentConsumerDouble(Consumer<Double> percentUpdateConsumer, double step) {
-        return new GirDoublePercentConsumer(step, percentUpdateConsumer);
+    public static GirPercentConsumer getPercentConsumerDouble(GiPercentUpdateConsumer percentUpdateConsumer, double step) {
+        return new GirPercentConsumer(step, percentUpdateConsumer);
     }
 
-    public static GiPercentConsumer getPercentConsumerDouble(Consumer<Double> percentUpdateConsumer) {
-        return new GirDoublePercentConsumer(percentUpdateConsumer);
+    public static GirPercentConsumer getPercentConsumerDouble(GiPercentUpdateConsumer percentUpdateConsumer) {
+        return new GirPercentConsumer(percentUpdateConsumer);
     }
 
 
@@ -323,12 +321,12 @@ public class GutilPercent {
     }
 
 
-    public static GiPercentConsumer getPercentConsumerInt(Consumer<Integer> percentUpdateConsumer, int step) {
-        return new GirIntPercentConsumer(step, percentUpdateConsumer);
+    public static GirPercentConsumer getPercentConsumerInt(GiPercentUpdateConsumer percentUpdateConsumer, int step) {
+        return new GirPercentConsumer(step, percentUpdateConsumer);
     }
 
-    public static GiPercentConsumer getPercentConsumerInt(Consumer<Integer> percentUpdateConsumer) {
-        return new GirIntPercentConsumer(percentUpdateConsumer);
+    public static GirPercentConsumer getPercentConsumerInt(GiPercentUpdateConsumer percentUpdateConsumer) {
+        return new GirPercentConsumer(percentUpdateConsumer);
     }
 
 
