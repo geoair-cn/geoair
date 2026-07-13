@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
 import cn.geoair.web.GirWeb;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.ServletOutputStream;
@@ -27,8 +28,8 @@ public class TileResponseUtils {
     /**
      * 构建瓦片响应
      */
-    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response,
-                                         boolean enhance) throws Exception {
+    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response
+    ) throws Exception {
         // 1. 校验瓦片是否存在
         if (!tileRequest.isExists()) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -40,7 +41,7 @@ public class TileResponseUtils {
         String mimeType = tileRequest.getMimeType().getFormat();
 
 
-        if (enhance) {
+        if (needEnhance()) {
             HttpServletRequest request = GirWeb.getRequest();
             String sharpenAmount = request.getParameter(TileParamEnums.SHARPEN_AMOUNT.getValue());
             String sharpenRadius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
@@ -76,13 +77,14 @@ public class TileResponseUtils {
         IoUtil.close(outputStream);
     }
 
-    /**
-     * 重载方法：兼容不传参数的情况
-     */
-    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response) throws Exception {
-        buildTileResponse(tileRequest, response, false);
-    }
 
+    private static boolean needEnhance() {
+        HttpServletRequest request = GirWeb.getRequest();
+        String sharpenAmount = request.getParameter(TileParamEnums.SHARPEN_AMOUNT.getValue());
+        String sharpenRadius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
+        String sharpenThreshold = request.getParameter(TileParamEnums.SHARPEN_THRESHOLD.getValue());
+        return StrUtil.isNotBlank(sharpenAmount) || StrUtil.isNotBlank(sharpenRadius) || StrUtil.isNotBlank(sharpenThreshold);
+    }
 
     /**
      * 执行瓦片增强
