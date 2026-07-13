@@ -2,9 +2,10 @@ package cn.geoair.map.tile.forge.core.zip.model;
 
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
 import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
-import javax.persistence.Transient;
+
 
 /**
  * ZIP 中央目录中的单个文件条目
