@@ -3,7 +3,6 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
@@ -27,7 +26,7 @@ public class TileResponseUtils {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     /**
-     * 构建瓦片响应（带图像增强支持）
+     * 构建瓦片响应
      */
     public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response,
                                          boolean enhance) throws Exception {
@@ -85,12 +84,6 @@ public class TileResponseUtils {
         buildTileResponse(tileRequest, response, false);
     }
 
-    /**
-     * 判断是否需要增强
-     */
-    private static boolean needEnhance(String sharpenAmount, String sharpenRadius, String sharpenThreshold) {
-        return GutilObject.isNotEmpty(sharpenAmount) || GutilObject.isNotEmpty(sharpenRadius) || GutilObject.isNotEmpty(sharpenThreshold);
-    }
 
     /**
      * 执行瓦片增强
@@ -104,28 +97,11 @@ public class TileResponseUtils {
 
         BufferedImage enhanced = GirImageUtil.unSharpMask(image, radius, amount, threshold);
 
-        String format = detectImageFormat(tileData);
+        String format = GirImageUtil.detectImageFormat(tileData);
 
         return GirImageUtil.imageToBytes(enhanced, format);
     }
 
-    /**
-     * 检测图片格式
-     */
-    private static String detectImageFormat(byte[] bytes) {
-        if (bytes.length < 4) {
-            return "png";
-        }
-        // PNG: 89 50 4E 47
-        if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
-            return "png";
-        }
-        // JPEG: FF D8
-        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) {
-            return "jpg";
-        }
-        return "png";
-    }
 
     /**
      * 解析浮点数

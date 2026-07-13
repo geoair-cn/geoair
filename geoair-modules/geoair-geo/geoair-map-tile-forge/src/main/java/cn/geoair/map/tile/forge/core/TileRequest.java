@@ -64,7 +64,7 @@ public class TileRequest implements Serializable {
      */
     private boolean exists;
 
-    private String httpUrl;
+
 
 
     public void mimeTypeBySpring(MediaType mimeType) {
