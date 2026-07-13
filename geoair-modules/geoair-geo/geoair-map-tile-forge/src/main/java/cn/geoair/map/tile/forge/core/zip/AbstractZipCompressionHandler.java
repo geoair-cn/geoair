@@ -23,8 +23,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 /**
  * ZIP压缩文件处理抽象基类
