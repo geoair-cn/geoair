@@ -2,13 +2,11 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.fuser.utils.GirImageUtils;
+import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 
@@ -139,7 +137,7 @@ public class MbtilesInfo {
             return null;
         }
         try  {
-            BufferedImage bufferedImage = GirImageUtils.bytesToImage(tileData);
+            BufferedImage bufferedImage = GirImageUtil.bytesToImage(tileData);
             if (bufferedImage == null) {
                 log.warn("无法解析瓦片数据为图片: z={}, x={}, y={}, 数据大小={}",
                         zoomLevel, tileColumn, tileRow, tileData.length);

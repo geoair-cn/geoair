@@ -6,12 +6,15 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import cn.geoair.map.tile.forge.core.TileRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -72,9 +75,13 @@ public class XYZServlet extends D3TilesServlet {
         GirMapTileType mapTileType = arcGisGirLayerConfigContext.getMapTileType();
         try {
             if (mapTileType == GirMapTileType.XYZ) {
-                String zxyType = request.getParameter("zxyType");
-                String gridSet = request.getParameter("gridSet");
-                String originType = request.getParameter("originType");
+                String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
+                String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
+                String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
+                String sharpenAmount = request.getParameter(TileParamEnums.SHARPEN_AMOUNT.getValue());
+                String sharpenRadius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
+                String sharpenThreshold = request.getParameter(TileParamEnums.SHARPEN_THRESHOLD.getValue());
+
                 int wmtsY = Integer.parseInt(y);
 
                 if (gridSet == null) {
@@ -100,7 +107,7 @@ public class XYZServlet extends D3TilesServlet {
                 }
                 TileRequest tileRequest = null;
                 tileRequest = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
-                TileResponseUtils.buildTileResponse(tileRequest, response);
+                TileResponseUtils.buildTileResponse(tileRequest, response, sharpenAmount, sharpenRadius, sharpenThreshold);
             } else {
                 TileRequest layerTile = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
                 TileResponseUtils.buildTileResponse(layerTile, response);
