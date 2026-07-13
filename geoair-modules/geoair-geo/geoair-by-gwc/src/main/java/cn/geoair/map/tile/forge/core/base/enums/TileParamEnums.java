@@ -32,17 +32,17 @@ public enum TileParamEnums implements GiVisualValuable<String> {
     /**
      * 锐化强度：0.5 ~ 3.0
      */
-    SHARPEN_AMOUNT("sharpenAmount"),
+    SHARPEN_AMOUNT("sa"),
 
     /**
      * 模糊半径：0.5 ~ 3.0
      */
-    SHARPEN_RADIUS("sharpenRadius"),
+    SHARPEN_RADIUS("sr"),
 
     /**
      * 亮度阈值：0 ~ 30
      */
-    SHARPEN_THRESHOLD("sharpenThreshold"),
+    SHARPEN_THRESHOLD("sp"),
 
 
     ;
@@ -53,7 +53,9 @@ public enum TileParamEnums implements GiVisualValuable<String> {
         this.value = value;
     }
 
-
+    public String getValue() {
+        return value;
+    }
 
     public static TileParamEnums fromValue(String value) {
         for (TileParamEnums key : values()) {

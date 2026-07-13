@@ -81,7 +81,7 @@ public class GirImageUtil {
      * @param threshold 亮度阈值（推荐 0 - 10，忽略微小变化）
      * @return 锐化后的 BufferedImage
      */
-    private static BufferedImage unSharpMask(BufferedImage src, float radius, float amount, int threshold) {
+    public static BufferedImage unSharpMask(BufferedImage src, float radius, float amount, int threshold) {
         BufferedImage blurred = gaussianBlur(src, radius);
 
         int width = src.getWidth();
@@ -104,7 +104,7 @@ public class GirImageUtil {
         return result;
     }
 
-    private static int enhanceChannel(int src, int blur, float amount, int threshold) {
+    public static int enhanceChannel(int src, int blur, float amount, int threshold) {
         int diff = src - blur;
         if (Math.abs(diff) < threshold) {
             return clamp(src);
@@ -112,7 +112,7 @@ public class GirImageUtil {
         return clamp((int) (src + diff * amount));
     }
 
-    private static BufferedImage gaussianBlur(BufferedImage src, float radius) {
+    public static BufferedImage gaussianBlur(BufferedImage src, float radius) {
         float[] matrix = {
                 1 / 16f, 2 / 16f, 1 / 16f,
                 2 / 16f, 4 / 16f, 2 / 16f,
@@ -126,7 +126,7 @@ public class GirImageUtil {
 
     // ========== 3. 饱和度增强 ==========
 
-    private static BufferedImage enhanceSaturation(BufferedImage src, float factor) {
+    public static BufferedImage enhanceSaturation(BufferedImage src, float factor) {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage result = new BufferedImage(width, height, src.getType());
@@ -146,7 +146,7 @@ public class GirImageUtil {
         return result;
     }
 
-    private static float[] rgbToHsv(int rgb) {
+    public static float[] rgbToHsv(int rgb) {
         float r = ((rgb >> 16) & 0xFF) / 255f;
         float g = ((rgb >> 8) & 0xFF) / 255f;
         float b = (rgb & 0xFF) / 255f;
@@ -170,7 +170,7 @@ public class GirImageUtil {
         return new float[]{h, s, v};
     }
 
-    private static int hsvToRgb(float[] hsv) {
+    public static int hsvToRgb(float[] hsv) {
         float h = hsv[0], s = hsv[1], v = hsv[2];
         int hi = (int) (h / 60) % 6;
         float f = h / 60 - hi;
@@ -218,7 +218,7 @@ public class GirImageUtil {
 
     // ========== 4. Gamma 校正 ==========
 
-    private static BufferedImage gammaCorrection(BufferedImage src, float gamma) {
+    public static BufferedImage gammaCorrection(BufferedImage src, float gamma) {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage result = new BufferedImage(width, height, src.getType());
@@ -243,7 +243,7 @@ public class GirImageUtil {
 
     // ========== 5. 中值滤波去噪 ==========
 
-    private static BufferedImage medianFilter(BufferedImage src) {
+    public static BufferedImage medianFilter(BufferedImage src) {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage result = new BufferedImage(width, height, src.getType());
@@ -278,7 +278,7 @@ public class GirImageUtil {
 
     // ========== 6. 局部直方图均衡化 ==========
 
-    private static BufferedImage localHistogramEqualization(BufferedImage src) {
+    public static BufferedImage localHistogramEqualization(BufferedImage src) {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage result = new BufferedImage(width, height, src.getType());
@@ -324,7 +324,7 @@ public class GirImageUtil {
 
     // ========== 7. 色阶调整 ==========
 
-    private static BufferedImage levelsAdjust(BufferedImage src, int blackPoint, int whitePoint) {
+    public static BufferedImage levelsAdjust(BufferedImage src, int blackPoint, int whitePoint) {
         int width = src.getWidth();
         int height = src.getHeight();
         BufferedImage result = new BufferedImage(width, height, src.getType());

@@ -1,43 +1,156 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
+
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
+import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.io.IoUtil;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 
 /**
  * @author ：张俊
- * @date ：Created in 2026/7/3 14:32
- * @description： TODO
+ * @date ：Created in 2026/7/13
+ * @description： 瓦片响应构建工具
  */
 public class TileResponseUtils {
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     /**
-     * 构建瓦片响应
+     * 构建瓦片响应（带图像增强支持）
      */
-    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response) throws Exception {
+    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response,
+                                         String sharpenAmount, String sharpenRadius, String sharpenThreshold) throws Exception {
         // 1. 校验瓦片是否存在
         if (!tileRequest.isExists()) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
             return;
         }
-        response.setHeader("Cache-Control", "public, max-age=86400");
-        response.setHeader("Last-Modified", tileRequest.getLastModified() + "");
-        if (tileRequest.getSize() > 0) {
-            response.setContentLengthLong(tileRequest.getSize());
+
+
+        byte[] tileData = tileRequest.getBytes();
+        String mimeType = tileRequest.getMimeType().getFormat();
+
+
+        if (needEnhance(sharpenAmount, sharpenRadius, sharpenThreshold)) {
+            try {
+                // 解析参数
+                float amount = parseFloat(sharpenAmount, 1.2f);
+                float radius = parseFloat(sharpenRadius, 1.5f);
+                int threshold = parseInt(sharpenThreshold, 5);
+
+                // 执行 USM 锐化
+                tileData = enhanceTile(tileData, radius, amount, threshold);
+
+                // 更新响应长度
+                response.setContentLengthLong(tileData.length);
+            } catch (Exception e) {
+
+
+                // 增强失败时使用原始数据
+                log.error("图像增强失败，使用原始数据", e);
+            }
         }
-        response.setContentType(tileRequest.getMimeType().getFormat());
+
+        // 4. 设置响应头
+        response.setHeader("Cache-Control", "public, max-age=86400");
+        response.setHeader("Last-Modified", String.valueOf(tileRequest.getLastModified()));
+        response.setContentType(mimeType);
         response.setStatus(HttpStatus.OK.value());
 
-        // 3. 转换输入流为字节数组并返回
-        byte[] tileData = tileRequest.getBytes();
+        // 5. 输出数据
         ServletOutputStream outputStream = response.getOutputStream();
         IoUtil.copy(new ByteArrayInputStream(tileData), outputStream);
         IoUtil.close(outputStream);
-
     }
 
+    /**
+     * 重载方法：兼容不传参数的情况
+     */
+    public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response) throws Exception {
+        buildTileResponse(tileRequest, response, null, null, null);
+    }
+
+    /**
+     * 判断是否需要增强
+     */
+    private static boolean needEnhance(String sharpenAmount, String sharpenRadius, String sharpenThreshold) {
+        return GutilObject.isNotEmpty(sharpenAmount) || GutilObject.isNotEmpty(sharpenRadius) || GutilObject.isNotEmpty(sharpenThreshold);
+    }
+
+    /**
+     * 执行瓦片增强
+     */
+    private static byte[] enhanceTile(byte[] tileData, float radius, float amount, int threshold) throws Exception {
+        // 1. 字节转 BufferedImage
+        BufferedImage image = GirImageUtil.bytesToImage(tileData);
+        if (image == null) {
+            return tileData;
+        }
+
+        // 2. 执行 USM 锐化（调用你的工具类）
+        BufferedImage enhanced = GirImageUtil.unSharpMask(image, radius, amount, threshold);
+
+        // 3. 检测原图格式
+        String format = detectImageFormat(tileData);
+
+        // 4. 转回字节数组
+        return GirImageUtil.imageToBytes(enhanced, format);
+    }
+
+    /**
+     * 检测图片格式
+     */
+    private static String detectImageFormat(byte[] bytes) {
+        if (bytes.length < 4) {
+            return "png";
+        }
+        // PNG: 89 50 4E 47
+        if ((bytes[0] & 0xFF) == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47) {
+            return "png";
+        }
+        // JPEG: FF D8
+        if ((bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8) {
+            return "jpg";
+        }
+        return "png";
+    }
+
+    /**
+     * 解析浮点数
+     */
+    private static float parseFloat(String value, float defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            float parsed = Float.parseFloat(value);
+            // 限制范围
+            return Math.max(0.1f, Math.min(5.0f, parsed));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 解析整数
+     */
+    private static int parseInt(String value, int defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            int parsed = Integer.parseInt(value);
+            // 限制范围
+            return Math.max(0, Math.min(50, parsed));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }
