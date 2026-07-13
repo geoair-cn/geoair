@@ -4,12 +4,13 @@ package cn.geoair.map.tile.forge.core.zip;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
+import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
 import cn.hutool.core.io.unit.DataSizeUtil;
- 
+
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -1323,41 +1324,33 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         long totalCompressed = entry.getCompressedSize();
         long totalUncompressed = entry.getUncompressedSize();
         long currentOffset = entry.getDataOffset();
+        int methodCode = (int) entry.getCompressionMethod();
+        GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
+//        log.debug("使用[{}]适配器处理解压，预期大小: {}字节", type.getText(), entry.getUncompressedSize());
 
-        Inflater inflater = new Inflater(true);
+        // 2. 调用对应适配器的解压方法
+        DecompressionHandler handler = type.getHandler();
+
         ByteArrayOutputStream out = new ByteArrayOutputStream((int) Math.min(totalUncompressed, Integer.MAX_VALUE));
 
         try {
             while (totalCompressed > 0) {
                 int chunkSize = (int) Math.min(totalCompressed, MAX_CHUNK_SIZE);
                 byte[] compressedChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
-
-                inflater.setInput(compressedChunk);
-                byte[] buffer = new byte[BUFFER_SIZE];
-                while (!inflater.finished() && !inflater.needsInput()) {
-                    int inflated = inflater.inflate(buffer);
-                    if (inflated > 0) {
-                        out.write(buffer, 0, inflated);
-                    }
+                byte[] decompress = handler.decompress(compressedChunk, chunkSize);
+                if (decompress != null&&decompress.length!=0) {
+                    out.write(decompress);
                 }
-
                 currentOffset += chunkSize;
                 totalCompressed -= chunkSize;
 
-                // 如果还有数据需要解压，重置inflater
-                if (totalCompressed > 0) {
-                    inflater.reset();
-                }
             }
 
             if (out.size() != totalUncompressed && totalUncompressed > 0) {
                 log.warn("解压大小不匹配，预期:{}, 实际:{}", totalUncompressed, out.size());
             }
             return out.toByteArray();
-        } catch (DataFormatException e) {
-            throw new IOException("数据解压失败", e);
-        } finally {
-            inflater.end();
+        }   finally {
             out.close();
         }
     }
