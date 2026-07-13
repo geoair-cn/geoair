@@ -6,10 +6,13 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
+import cn.geoair.web.GirWeb;
 import cn.hutool.core.io.IoUtil;
 import org.springframework.http.HttpStatus;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -26,7 +29,7 @@ public class TileResponseUtils {
      * 构建瓦片响应（带图像增强支持）
      */
     public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response,
-                                         String sharpenAmount, String sharpenRadius, String sharpenThreshold) throws Exception {
+                                         boolean enhance) throws Exception {
         // 1. 校验瓦片是否存在
         if (!tileRequest.isExists()) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
@@ -38,14 +41,18 @@ public class TileResponseUtils {
         String mimeType = tileRequest.getMimeType().getFormat();
 
 
-        if (needEnhance(sharpenAmount, sharpenRadius, sharpenThreshold)) {
+        if (enhance) {
+            HttpServletRequest request = GirWeb.getRequest();
+            String sharpenAmount = request.getParameter(TileParamEnums.SHARPEN_AMOUNT.getValue());
+            String sharpenRadius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
+            String sharpenThreshold = request.getParameter(TileParamEnums.SHARPEN_THRESHOLD.getValue());
             try {
-                // 解析参数
+
                 float amount = parseFloat(sharpenAmount, 1.2f);
                 float radius = parseFloat(sharpenRadius, 1.5f);
                 int threshold = parseInt(sharpenThreshold, 5);
 
-                // 执行 USM 锐化
+
                 tileData = enhanceTile(tileData, radius, amount, threshold);
 
                 // 更新响应长度
@@ -74,7 +81,7 @@ public class TileResponseUtils {
      * 重载方法：兼容不传参数的情况
      */
     public static void buildTileResponse(TileRequest tileRequest, HttpServletResponse response) throws Exception {
-        buildTileResponse(tileRequest, response, null, null, null);
+        buildTileResponse(tileRequest, response, false);
     }
 
     /**
@@ -88,19 +95,16 @@ public class TileResponseUtils {
      * 执行瓦片增强
      */
     private static byte[] enhanceTile(byte[] tileData, float radius, float amount, int threshold) throws Exception {
-        // 1. 字节转 BufferedImage
+
         BufferedImage image = GirImageUtil.bytesToImage(tileData);
         if (image == null) {
             return tileData;
         }
 
-        // 2. 执行 USM 锐化（调用你的工具类）
         BufferedImage enhanced = GirImageUtil.unSharpMask(image, radius, amount, threshold);
 
-        // 3. 检测原图格式
         String format = detectImageFormat(tileData);
 
-        // 4. 转回字节数组
         return GirImageUtil.imageToBytes(enhanced, format);
     }
 
