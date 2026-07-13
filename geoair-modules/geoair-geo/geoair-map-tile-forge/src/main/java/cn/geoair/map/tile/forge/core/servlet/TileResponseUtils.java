@@ -10,6 +10,7 @@ import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
 import cn.geoair.web.GirWeb;
 import cn.hutool.core.io.IoUtil;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 
