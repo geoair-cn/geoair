@@ -25,7 +25,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
- 
+
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +39,10 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
  * &#064;date ：Created in 2025/11/13 17:59
  * &#064;description：本地ZIP压缩V1版本瓦片存储支持类，用于处理ArcGIS紧凑型缓存V1格式的瓦片数据读取
  */
- 
+
 public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirectoryGetter {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public LocalZipCompactV1TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }
@@ -188,11 +189,16 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         TileCentralDirectoryModel tileCentralDirectoryEntry = new TileCentralDirectoryModel();
         BeanUtil.copyProperties(centralDirectoryModel, tileCentralDirectoryEntry);
         String name = centralDirectoryModel.getName();
-        String subBundlePath = TilePathParser.getSubBundlePath(name);
-        if (subBundlePath == null) {
-            return null;
+
+        if (name.toLowerCase().contains("conf")) {
+            tileCentralDirectoryEntry.setFileName(name);
+        } else {
+            String subBundlePath = TilePathParser.getSubBundlePath(name);
+            if (subBundlePath == null) {
+                return null;
+            }
+            tileCentralDirectoryEntry.setFileName(subBundlePath);
         }
-        tileCentralDirectoryEntry.setFileName(subBundlePath);
         tileCentralDirectoryEntry.setStorageType("COMPACT");
         return tileCentralDirectoryEntry;
     }

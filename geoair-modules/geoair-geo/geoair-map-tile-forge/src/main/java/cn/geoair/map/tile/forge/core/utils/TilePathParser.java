@@ -118,7 +118,7 @@ public class TilePathParser {
     //    private static final Pattern PATH_PATTERN = Pattern.compile(
 //            ".*/(L\\d+/R\\d+C\\d+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json))",Pattern.CASE_INSENSITIVE
 //    );
-    private static final Pattern PATH_PATTERN = Pattern.compile(".*/(L\\d+/[^/]+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json))", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PATH_PATTERN = Pattern.compile(".*/(L\\d+/[^/]+\\.(?:bundle|bundlx)|conf\\.(?:xml|cdi|json|properties))", Pattern.CASE_INSENSITIVE);
 
     public static String getSubBundlePath(String bundlePath) {
 
