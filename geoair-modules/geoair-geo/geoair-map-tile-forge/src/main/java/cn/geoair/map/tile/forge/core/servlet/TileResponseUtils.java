@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 
 /**
