@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple.response;
 
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 瓦片响应构建工具

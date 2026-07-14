@@ -11,9 +11,10 @@ import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.web.GirWeb;
 import cn.geoair.web.mime.GirImageMime;
 import cn.hutool.core.util.StrUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;

@@ -5,8 +5,8 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseDefaultOpt;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseOpt;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 瓦片响应构建工具

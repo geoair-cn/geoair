@@ -5,13 +5,11 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.map.tile.forge.core.TileRequest;
-import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 
@@ -19,14 +17,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import cn.geoair.map.tile.forge.core.TileRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
