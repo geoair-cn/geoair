@@ -29,7 +29,10 @@ public enum TileParamEnums implements GiVisualValuable<String> {
      */
     FORMAT("format", "png"),
 
-
+    /**
+     * 是否启用图像增强：true / false
+     */
+    ENHANCE("enhance", "false"),
 
     /**
      * 锐化强度：0.5 ~ 3.0
