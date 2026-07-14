@@ -7,10 +7,14 @@ import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 @GaApi(text = "矢量瓦片服务", tags = {"矢量瓦片服务"})
 public class VectorTileV2Servlet extends TileCommonServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public VectorTileV2Servlet() {
         log.info("初始化矢量瓦片 Servlet 完成");
     }
@@ -71,14 +76,15 @@ public class VectorTileV2Servlet extends TileCommonServlet {
 
         TileRequestParams params = GirRealMvtHelper.getInstance().getTileRequestParams(layerName);
         if (ObjectUtil.isEmpty(params)) {
-            toResponse(response, "参数错误001".getBytes(StandardCharsets.UTF_8), "text/plain; charset=utf-8");
+            TileResponse error = TileResponse.error(StrUtil.format("参数错误:{}", layerName));
+            GirTileResponseUtil.buildFromTileResponse(error, response);
             return;
         }
         if (minZoomStr != null) {
             params.setMinZoom(Integer.parseInt(minZoomStr));
         }
         if (isGeoStr != null) {
-            params.setGeo(Boolean.parseBoolean(isGeoStr));
+            params.setGeoIs(Boolean.parseBoolean(isGeoStr));
         }
 
         // 执行业务
@@ -102,7 +108,8 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         String minZoomStr = request.getParameter("minZoom");
 
         if (ObjectUtil.isEmpty(paramTile)) {
-            toResponse(response, "参数错误001".getBytes(StandardCharsets.UTF_8), "text/plain; charset=utf-8");
+            TileResponse error = TileResponse.error(StrUtil.format("参数错误:{}", layerName));
+            GirTileResponseUtil.buildFromTileResponse(error, response);
             return;
         }
 
@@ -119,9 +126,9 @@ public class VectorTileV2Servlet extends TileCommonServlet {
 
         try {
             BoxReferencedEnvelope boxReferencedEnvelope;
-            int gridSrid = params.isGeo() ? 4326 : 3857;
+            int gridSrid = params.isGeoIs() ? 4326 : 3857;
 
-            if (!params.isGeo()) {
+            if (!params.isGeoIs()) {
                 boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(z, x, y, 3857);
             } else {
                 boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
@@ -134,7 +141,6 @@ public class VectorTileV2Servlet extends TileCommonServlet {
             re.put("bbox4326", convert.toText());
         } catch (Exception ignored) {
         }
-
         String json = JSON.toJSONString(re, JSONWriter.Feature.PrettyFormat);
         toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json; charset=utf-8");
     }

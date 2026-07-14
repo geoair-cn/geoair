@@ -3,6 +3,8 @@ package cn.geoair.map.tile.forge.core.servlet;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -14,6 +16,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+
 import org.springframework.stereotype.Component;
 
 
@@ -53,14 +57,16 @@ public class D3TilesServlet extends HttpServlet {
             layerConfigContext
                     = getGirLayerConfigContext(fileId, fileName, serviceName);
         } catch (Exception e) {
-            GirServletUtil.toResponse(response, e.getMessage().getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+            GirTileResponseUtil.buildFromException(e, response);
             return;
         }
         try {
             TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
-            TileResponseUtils.buildTileResponse(layerTile, response);
+            TileResponse tileResponse = layerTile.toTileResponse();
+            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            GirTileResponseUtil.buildFromException(e, response);
         }
     }
 

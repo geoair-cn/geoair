@@ -4,8 +4,12 @@ package cn.geoair.map.tile.forge.core.servlet;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
@@ -63,31 +67,27 @@ public class XYZServlet extends D3TilesServlet {
                 format = split[1];
             }
         }
-        GirLayerConfigContext arcGisGirLayerConfigContext = null;
+        GirLayerConfigContext layerConfigContext = null;
         try {
-            arcGisGirLayerConfigContext
+            layerConfigContext
                     = getGirLayerConfigContext(type, fileId, fileName, serviceName);
         } catch (Exception e) {
-            GirServletUtil.toResponse(response, e.getMessage().getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+            log.error(e.getMessage(), e);
+            GirTileResponseUtil.buildFromException(e, response);
             return;
         }
-        arcGisGirLayerConfigContext.setFormat("png");
+        layerConfigContext.setFormat("png");
 
-        GirMapTileType mapTileType = arcGisGirLayerConfigContext.getMapTileType();
+        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         try {
             if (mapTileType == GirMapTileType.XYZ) {
                 String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
                 String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
                 String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
-                String enhance = request.getParameter(TileParamEnums.ENHANCE.getValue());
-                if (GutilObject.isEmpty(enhance)) {
-                    enhance = TileParamEnums.ENHANCE.getDefaultValue();
-                }
-
                 int wmtsY = Integer.parseInt(y);
 
-                if (GutilObject.isEmpty(gridSet))  {
-                    gridSet =TileParamEnums.GRID_SET.getDefaultValue();
+                if (GutilObject.isEmpty(gridSet)) {
+                    gridSet = TileParamEnums.GRID_SET.getDefaultValue();
                 }
 
                 int xInt = Integer.parseInt(x);
@@ -108,14 +108,33 @@ public class XYZServlet extends D3TilesServlet {
                     }
                 }
                 TileRequest tileRequest = null;
-                tileRequest = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, zInt + "", wmtsY + "", xInt + "");
-                TileResponseUtils.buildTileResponse(tileRequest, response, Boolean.parseBoolean(enhance));
+                try {
+                    tileRequest = gMapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                    TileResponse tileResponse = tileRequest.toTileResponse();
+                    tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    TileResponse tileResponse = TileResponse.error(e.getMessage());
+                    tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+                    return;
+                }
+
             } else {
-                TileRequest layerTile = gMapTileService.getLayerTile(arcGisGirLayerConfigContext, z, y, x);
-                TileResponseUtils.buildTileResponse(layerTile, response);
+                try {
+                    TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
+                    TileResponse tileResponse = layerTile.toTileResponse();
+                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    GirTileResponseUtil.buildFromException(e, response);
+                }
+
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            GirTileResponseUtil.buildFromException(e, response);
         }
 
     }

@@ -2,13 +2,19 @@ package cn.geoair.map.dynamic.mvt.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.tool.GkSystemClock;
 import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
 import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.web.mime.GirApplicationMime;
+import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.IoUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
@@ -61,7 +67,8 @@ public class TileCommonServlet extends HttpServlet {
 
         if (!result.isSuccess()) {
             String msg = result.getMessage();
-            GirServletUtil.toResponse(response, msg.getBytes(Charset.defaultCharset()), "text/plain; charset=utf-8");
+            TileResponse error = TileResponse.error(msg);
+            GirTileResponseUtil.buildFromTileResponse(error, response);
             return;
         }
 
@@ -73,41 +80,20 @@ public class TileCommonServlet extends HttpServlet {
         request.getSession();
 
         boolean success = tileData.isSuccessIs();
-        if (success) {
-            String httpUrl = tileData.getHttpUrl();
-            if (httpUrl != null) {
-                response.sendRedirect(httpUrl);
-                return;
-            }
-
-            if (Objects.isNull(data) || data.length == 0) {
-                log.info("未读取瓦片：layer={}, z={}, x={}, y={}", layerName, zoom, col, row);
-                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                return;
-            }
-
-            response.setContentType("application/octet-stream");
-            response.setContentLengthLong(data.length);
-        } else {
-            response.setContentType("text/plain; charset=utf-8");
-            response.setStatus(500);
+        String httpUrl = tileData.getHttpUrl();
+        if (httpUrl != null) {
+            response.sendRedirect(httpUrl);
+            return;
         }
+        TileResponse tileResponse = TileResponse.of().
+                setBytesAndUpdateSize(data).
+                setMimeType(GirApplicationMime.mapboxVector)
+                .setSuccess(success)
+                .setLastModified(GkSystemClock.now())
+                .setDataSource("real-mvt")
+                .setCoordinate(TileZxyApo.of().setZ(zoom).setX(col).setY(row))
+                .setGridEpsgStr(params.isGeoIs() ? "EPSG:4490" : "EPSG:3857");
+        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
 
-        // 跨域头
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
-        response.setHeader("Content-Disposition", "inline");
-
-        // 输出 PBF
-        try (ServletOutputStream out = response.getOutputStream()) {
-            out.write(data);
-            out.flush();
-        } catch (Exception e) {
-            log.error("瓦片输出异常", e);
-            if (!response.isCommitted()) {
-                response.reset();
-                response.sendError(500, "查询失败：" + e.getMessage());
-            }
-        }
     }
 }

@@ -22,13 +22,13 @@ import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
- 
+
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/19 11:29 @description： TODO
  */
- 
+
 public abstract class AbstractITileExecutor implements ITileExecutor {
 	public static GiLogger log = GirLoggerFactory.getLogger();
 	abstract void getRecordByStream(VectorTileBuilderConsumer vectorTileBuilder);
@@ -90,7 +90,7 @@ public abstract class AbstractITileExecutor implements ITileExecutor {
 		this.requestParams = requestParams;
 		this.layerName = layerName;
 		// 初始化执行器（从Params获取数据源ID和Schema）
-		gridSrid = requestParams.isGeo() ? 4326 : 3857;
+		gridSrid = requestParams.isGeoIs() ? 4326 : 3857;
 		String srid = requestParams.getSrid();
 		if (StrUtil.isEmpty(srid) || srid.equals("0")) {
 			if (StrUtil.isNotBlank(requestParams.getTransform())) {

@@ -14,9 +14,8 @@ import com.alibaba.fastjson2.JSONObject;
 import java.util.List;
 
 import lombok.Data;
- 
 
- 
+
 @Data
 public class TileRequestParams {
     public static GiLogger log = GirLoggerFactory.getLogger();
@@ -46,7 +45,7 @@ public class TileRequestParams {
     private int minZoom;
 
     @GaModelField(text = "true就是4490网格，false就是3857网格")
-    private boolean isGeo = false;
+    private boolean geoIs = false;
 
     @GaModelField(text = "坐标系转换，与isGeo相匹配，保证数据与网格的坐标系一致")
     private String transform;
