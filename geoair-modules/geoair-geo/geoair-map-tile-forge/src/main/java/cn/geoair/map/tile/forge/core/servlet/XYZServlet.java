@@ -6,7 +6,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
-import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
+import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;

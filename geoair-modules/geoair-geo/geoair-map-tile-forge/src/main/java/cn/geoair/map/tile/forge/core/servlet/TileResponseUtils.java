@@ -5,7 +5,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirImageUtil;
 import cn.geoair.map.tile.forge.core.TileRequest;
-import cn.geoair.map.tile.forge.core.base.enums.TileParamEnums;
+import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.web.GirWeb;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
