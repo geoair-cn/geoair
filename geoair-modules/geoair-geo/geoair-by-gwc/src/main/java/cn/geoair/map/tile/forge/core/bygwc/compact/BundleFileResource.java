@@ -3,6 +3,8 @@ package cn.geoair.map.tile.forge.core.bygwc.compact;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.hutool.core.io.IoUtil;
+import org.apache.commons.io.input.BoundedInputStream;
 
 
 import java.io.File;
@@ -98,19 +100,29 @@ public class BundleFileResource {
      * @throws IOException 当发生I/O异常时抛出
      */
     public InputStream getInputStream() throws IOException {
+        // 这里有bug，从这里tileOffset跳过了之后，直接读到了文件末尾，会导致这个流特别大
+//        FileInputStream fis = new FileInputStream(bundleFilePath);
+//        long skipped = fis.skip(tileOffset);
+//        if (skipped != tileOffset) {
+//            log.error(
+//                    "tried to skip to tile offset "
+//                            + tileOffset
+//                            + " in "
+//                            + bundleFilePath
+//                            + " but skipped "
+//                            + skipped
+//                            + " instead.");
+//        }
+//
+//        return fis;
+
         FileInputStream fis = new FileInputStream(bundleFilePath);
         long skipped = fis.skip(tileOffset);
         if (skipped != tileOffset) {
-            log.error(
-                    "tried to skip to tile offset "
-                            + tileOffset
-                            + " in "
-                            + bundleFilePath
-                            + " but skipped "
-                            + skipped
-                            + " instead.");
+            log.error("tried to skip to tile offset {} in {} but skipped {} instead.",
+                    tileOffset, bundleFilePath, skipped);
         }
-        return fis;
+        return new BoundedInputStream(fis, tileSize);
     }
 
     /**
