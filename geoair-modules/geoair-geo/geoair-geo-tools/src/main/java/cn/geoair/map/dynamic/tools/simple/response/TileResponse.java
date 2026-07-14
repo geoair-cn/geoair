@@ -20,6 +20,10 @@ public class TileResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static TileResponse of() {
+        return new TileResponse();
+    }
+
     /**
      * 瓦片输入流
      */
@@ -62,9 +66,14 @@ public class TileResponse implements Serializable {
     private String errorMessage;
 
     /**
-     * 瓦片坐标信息（便于调试和日志）
+     * 瓦片坐标信息
      */
     private TileZxyApo coordinate;
+
+    /**
+     * 请求网格坐标系
+     */
+    private String gridEpsgStr;
 
     /**
      * 瓦片数据来源（缓存/数据库/实时生成）
@@ -97,9 +106,6 @@ public class TileResponse implements Serializable {
     private Map<String, Object> extras;
 
 
-
-
-
     // ========== 便捷方法 ==========
 
     /**
@@ -119,10 +125,9 @@ public class TileResponse implements Serializable {
     /**
      * 创建失败的响应
      */
-    public static TileResponse error(String errorCode, String errorMessage) {
+    public static TileResponse error(String errorMessage) {
         TileResponse response = new TileResponse();
         response.setSuccess(false);
-        response.setErrorCode(errorCode);
         response.setErrorMessage(errorMessage);
         response.setExists(false);
         return response;

@@ -1,5 +1,6 @@
 package cn.geoair.map.tile.forge.core;
 
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
@@ -65,8 +66,6 @@ public class TileRequest implements Serializable {
     private boolean exists;
 
 
-
-
     public void mimeTypeBySpring(MediaType mimeType) {
         String type = mimeType.getSubtype();
         this.mimeType = GutilMimeType.fromExtension(type);
@@ -83,6 +82,38 @@ public class TileRequest implements Serializable {
         tileRequest.setSize(0);
         tileRequest.setBytes(new byte[0]);
         return tileRequest;
+    }
+
+    /**
+     * 将TileRequest转换为TileResponse
+     *
+     * @return TileResponse对象
+     */
+    public TileResponse toTileResponse() {
+        TileResponse response = new TileResponse();
+
+        response.setBytes(this.bytes);
+        response.setSize(this.size);
+        response.setLastModified(this.lastModified);
+        response.setMimeType(this.mimeType);
+        response.setExists(this.exists);
+
+
+        response.setSuccess(this.exists);
+
+        if (!this.exists) {
+            response.setErrorCode("TILE_NOT_FOUND");
+            response.setErrorMessage("Tile not found: " + this.layerName);
+        }
+
+        if (this.storageType != null) {
+            response.setDataSource(this.storageType.name().toLowerCase());
+        }
+
+        response.setVersion("1.0");
+
+
+        return response;
     }
 
 }

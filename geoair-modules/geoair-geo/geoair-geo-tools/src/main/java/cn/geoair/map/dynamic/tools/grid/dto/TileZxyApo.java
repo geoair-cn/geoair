@@ -19,6 +19,10 @@ public class TileZxyApo {
 
     private int y; // 行号
 
+    public static TileZxyApo of() {
+        return new TileZxyApo();
+    }
+
     public TileZxyApo() {
     }
 

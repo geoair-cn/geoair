@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple;
 
 import cn.geoair.base.data.result.GiResult;
+import cn.geoair.base.exception.GirExceptionResultConverter;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -39,6 +41,11 @@ public class GirTileResponseUtil {
     /**
      * 从TileResponse对象构建响应
      */
+    public static void buildFromException(Exception exception, HttpServletResponse response) throws IOException {
+        TileResponse error = TileResponse.error(exception.getMessage());
+        buildFromTileResponse(error, response, -1);
+    }
+
     public static void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response) throws IOException {
         buildFromTileResponse(tileResponse, response, null);
     }
@@ -361,18 +368,18 @@ public class GirTileResponseUtil {
     /**
      * 处理错误（带错误码和消息）
      */
-    private static void handleError(int httpCode, HttpServletResponse response, TileResponse tileResponse) throws IOException {
-        response.setStatus(httpCode);
-        response.setContentType("application/json");
+    public static void handleError(int httpCode, HttpServletResponse response, TileResponse tileResponse) {
         TileZxyApo coordinate = tileResponse.getCoordinate();
         if (GutilObject.isNotEmpty(coordinate) && httpCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());
+            response.setHeader("X-Tile-Requset-Grid-Epsg", tileResponse.getGridEpsgStr());
         }
         GiResult result = GiResult.failureMsg(tileResponse.getErrorMessage()).andCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         String json = GirJSON.toJson(result).toJSONString();
-        response.getWriter().write(json);
+        GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json,charset=utf-8", httpCode);
     }
+
 
     // ==================== 参数解析工具 ====================
 
