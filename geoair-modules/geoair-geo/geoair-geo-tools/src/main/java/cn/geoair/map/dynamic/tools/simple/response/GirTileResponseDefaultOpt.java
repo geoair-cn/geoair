@@ -78,7 +78,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
                 tileResponse.setBytesAndUpdateSize(finalBytes);
             }
         }
-
+        setSysHeaders(response, tileResponse);
         // 设置缓存头
         setCacheHeaders(response, tileResponse, cacheMaxAge);
 
@@ -337,6 +337,19 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         response.setHeader("Expires", formatHttpDate(expires));
     }
 
+
+    private static void setSysHeaders(HttpServletResponse response, TileResponse tileResponse) {
+        String dataSource = tileResponse.getDataSource();
+        if (GutilObject.isNotEmpty(dataSource)) {
+            response.setHeader("X-Tile-DataSource", dataSource);
+        }
+        String version = tileResponse.getVersion();
+        if (GutilObject.isNotEmpty(version)) {
+            response.setHeader("X-Tile-Version", version);
+        }
+
+    }
+
     /**
      * 格式化HTTP日期
      */
@@ -362,6 +375,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
      */
     public static void handleError(int httpCode, HttpServletResponse response, TileResponse tileResponse) {
         TileZxyApo coordinate = tileResponse.getCoordinate();
+        setSysHeaders(response, tileResponse);
         if (GutilObject.isNotEmpty(coordinate) && httpCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());

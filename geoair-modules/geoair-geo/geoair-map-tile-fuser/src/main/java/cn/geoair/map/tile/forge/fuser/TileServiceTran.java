@@ -4,9 +4,10 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.TextMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
@@ -19,7 +20,6 @@ import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.util.StrUtil;
 
 import javax.servlet.http.HttpServletResponse;
-import java.nio.charset.StandardCharsets;
 
 /**
  * XYZ 瓦片图层叠加服务转换类
@@ -78,7 +78,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
         BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, DEFAULT_SRID);
         BoundingBox bounds = buildBoundingBox(box);
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, false);
+        processTileRequest(layerName, z, x, y, bounds, outputFormat, false, 4326);
     }
 
     /**
@@ -95,7 +95,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
         BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, DEFAULT_SRID);
         BoundingBox bounds = buildBoundingBox(box);
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, true);
+        processTileRequest(layerName, z, x, y, bounds, outputFormat, true, 4326);
     }
 
     // ==================== 公开方法 - Grid4490 服务 ====================
@@ -127,7 +127,7 @@ public class TileServiceTran {
 
         BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, false);
+        processTileRequest(layerName, z, x, y, bounds, outputFormat, false, 3857);
     }
 
     /**
@@ -144,7 +144,7 @@ public class TileServiceTran {
                 layerName, z, x, y, outputFormat);
         BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
         BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, true);
+        processTileRequest(layerName, z, x, y, bounds, outputFormat, true, 3857);
     }
 
     // ==================== 核心处理方法 ====================
@@ -161,7 +161,7 @@ public class TileServiceTran {
      * @param deleteCache  是否删除缓存
      */
     private void processTileRequest(String layerName, Integer z, Integer x, Integer y,
-                                    BoundingBox bounds, String outputFormat, boolean deleteCache) {
+                                    BoundingBox bounds, String outputFormat, boolean deleteCache, int requestGridSrid) {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
 
         try {
@@ -198,8 +198,15 @@ public class TileServiceTran {
             // 生成瓦片
             byte[] imageBytes = cacheTileFuser.toImageBytes();
 
-            // 返回响应
-            byteToResponse(layerName, z, x, y, imageBytes, response, fromFormat);
+
+            TileResponse tileResponse = TileResponse.of()
+                    .setBytes(imageBytes)
+                    .setLastModified(System.currentTimeMillis())
+                    .setSuccess(true)
+                    .setMimeType(fromFormat)
+                    .setDataSource("fuser").setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
+                    .setGridEpsgStr("EPSG:" + requestGridSrid);
+            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
 
         } catch (Exception e) {
             String errorMsg = StrUtil.format("生成瓦片失败: layerName={}, z={}, x={}, y={}",
@@ -207,23 +214,14 @@ public class TileServiceTran {
             log.error(errorMsg, e);
 
             String fullErrorMsg = errorMsg + "，异常信息：" + e.getMessage();
-            GirServletUtil.toResponse(response, fullErrorMsg.getBytes(StandardCharsets.UTF_8),
-                    TextMime.txt.getMimeType() + ";charset=UTF-8");
+            TileResponse error = TileResponse.error(fullErrorMsg)
+                    .setDataSource("fuser").setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
+                    .setGridEpsgStr("EPSG:" + requestGridSrid);
+            ;
+            GirTileResponseUtil.buildFromTileResponse(error, response);
         }
     }
 
-    public static void byteToResponse(String layerName, Integer z, Integer x, Integer y, byte[] imageBytes, HttpServletResponse response, GiMimeType fromFormat) {
-        if (imageBytes != null && imageBytes.length > 0) {
-            GirServletUtil.toResponse(response, imageBytes, fromFormat.getMimeType());
-            log.debug("瓦片生成成功: layer={}, z={}, x={}, y={}, size={} bytes",
-                    layerName, z, x, y, imageBytes.length);
-        } else {
-            String errorMsg = "获取瓦片失败！";
-            log.debug("瓦片生成失败（返回空数据）: layer={}, z={}, x={}, y={}", layerName, z, x, y);
-            GirServletUtil.toResponse(response, errorMsg.getBytes(StandardCharsets.UTF_8),
-                    TextMime.txt.getMimeType() + ";charset=UTF-8");
-        }
-    }
 
     // ==================== 缓存管理方法 ====================
 
