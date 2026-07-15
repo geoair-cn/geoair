@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -10,30 +9,26 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.TileRequest;
-import cn.hutool.core.io.IoUtil;
 
 
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-@Component
 public class D3TilesServlet extends HttpServlet {
+
     public static GiLogger log = GirLoggerFactory.getLogger();
-    @Resource
-    GirMapTileService gMapTileService;
+
+    protected GirMapTileService mapTileService;
+
+    public D3TilesServlet(GirMapTileService mapTileService) {
+        this.mapTileService = mapTileService;
+    }
 
     Pattern pattern = Pattern.compile("/3dTilesService/([^/]+)/([^/]+)/([^/]+)(/.*)?");
 
@@ -63,7 +58,7 @@ public class D3TilesServlet extends HttpServlet {
             return;
         }
         try {
-            TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
+            TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
             TileResponse tileResponse = layerTile.toTileResponse();
             GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
         } catch (Exception e) {

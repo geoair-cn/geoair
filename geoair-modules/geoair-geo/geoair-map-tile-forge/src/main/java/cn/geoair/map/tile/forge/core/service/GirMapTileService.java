@@ -14,13 +14,17 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 
-@Service
-public class GirMapTileService extends TileStorageSupportAdapter {
+
+public class GirMapTileService {
     public static GiLogger log = GirLoggerFactory.getLogger();
     static GirMapTileService self = null;
+    GirLayerConfigContextHelper contextHelper;
+    TileStorageSupportAdapter tileStorageSupportAdapter;
 
-    public GirMapTileService(GirLayerConfigContextHelper contextHelper) {
-        super(contextHelper);
+    public GirMapTileService(GirLayerConfigContextHelper contextHelper, TileStorageSupportAdapter tileStorageSupportAdapter) {
+        this.contextHelper = contextHelper;
+        this.tileStorageSupportAdapter = tileStorageSupportAdapter;
+        self = this;
     }
 
     public static GirMapTileService getInstance() {
@@ -47,7 +51,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
 
     public TileRequest getLayerTile(GirLayerConfigContext config, String z, String y, String x) throws Exception {
         // 2. 通过适配器获取对应的TileStorageSupport实例
-        ITileStorageSupport storageSupport = super.getSupport(config);
+        ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
 
         // 3. 调用实例方法获取瓦片数据
         return storageSupport.getTileData(config, z, x, y);
@@ -62,7 +66,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         // 2. 通过适配器获取对应的TileStorageSupport实例
-        ITileStorageSupport storageSupport = super.getSupport(config);
+        ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
         TileRequest tileRequest = new TileRequest();
         if (storageSupport instanceof ArcgisConfigXmlGetter) {
             ArcgisConfigXmlGetter arcgisConfigXmlGetter = (ArcgisConfigXmlGetter) storageSupport;
@@ -96,7 +100,7 @@ public class GirMapTileService extends TileStorageSupportAdapter {
         GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
-        ITileStorageSupport storageSupport = super.getSupport(config);
+        ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
         log.info("开始预缓存图层：{}, 执行器 {}", layerName, storageSupport.getClass().getName());
         // 创建新线程来执行预缓存任务
         Thread precacheThread = new Thread(() -> {

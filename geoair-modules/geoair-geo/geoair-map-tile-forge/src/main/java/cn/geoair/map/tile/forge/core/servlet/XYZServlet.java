@@ -5,7 +5,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -14,14 +13,13 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
 
+import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,9 +28,13 @@ import java.util.regex.Pattern;
  * url构建逻辑参考 TileUrlBuilder
  */
 
-@Component
+
 public class XYZServlet extends D3TilesServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    public XYZServlet(GirMapTileService mapTileService) {
+        super(mapTileService);
+    }
 
     Pattern pattern = Pattern.compile("/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 
@@ -104,7 +106,7 @@ public class XYZServlet extends D3TilesServlet {
                 }
                 TileRequest tileRequest = null;
                 try {
-                    tileRequest = gMapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                    tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
                     TileResponse tileResponse = tileRequest.toTileResponse();
                     tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
                     GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
@@ -118,7 +120,7 @@ public class XYZServlet extends D3TilesServlet {
 
             } else {
                 try {
-                    TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
+                    TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, z, y, x);
                     TileResponse tileResponse = layerTile.toTileResponse();
                     GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
                 } catch (Exception e) {

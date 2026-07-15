@@ -319,7 +319,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         int maxAge = cacheMaxAge != null ? cacheMaxAge : 86400;
 
         // Cache-Control
-        response.setHeader("Cache-Control", String.format("public, max-age=%d, immutable", maxAge));
+        response.setHeader("Cache-Control", String.format("public, max-age=%d", maxAge));
 
         // Last-Modified
         if (tileResponse.getLastModified() > 0) {

@@ -22,18 +22,22 @@ import java.io.File;
 @ConfigurationProperties(prefix = "geoair.file.temp")
 public class TileTempPathConfig {
 
-    static TileTempPathConfig tileTempPathConfig;
+    public TileTempPathConfig() {
+        instance = this;
+    }
+
+    static TileTempPathConfig instance;
 
     public static TileTempPathConfig getInstance() {
-        if (tileTempPathConfig == null) {
+        if (instance == null) {
             try {
-                tileTempPathConfig = Gir.beans.getBean(TileTempPathConfig.class);
+                instance = Gir.beans.getBean(TileTempPathConfig.class);
             } catch (Exception e) {
                 Gir.log.error("无法在beans中获取到TileTempPathConfig对象，使用默认对象");
                 return new TileTempPathConfig();
             }
         }
-        return tileTempPathConfig;
+        return instance;
     }
 
     /**

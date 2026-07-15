@@ -3,27 +3,28 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
 
-import org.springframework.stereotype.Component;
+import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-@Component
 public class D3TerrainServlet extends D3TilesServlet {
+
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    public D3TerrainServlet(GirMapTileService mapTileService) {
+        super(mapTileService);
+    }
 
     Pattern pattern = Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
 
@@ -66,7 +67,7 @@ public class D3TerrainServlet extends D3TilesServlet {
 
         layerConfigContext.setFormat(format);
         try {
-            TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
+            TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, z, y, x);
             TileResponse tileResponse = layerTile.toTileResponse();
             GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
         } catch (Exception e) {

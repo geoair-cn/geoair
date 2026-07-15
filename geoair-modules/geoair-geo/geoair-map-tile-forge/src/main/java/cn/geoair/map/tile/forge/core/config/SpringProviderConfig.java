@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "geoair.provider")
 public class SpringProviderConfig extends ProviderConfig {
+
+    public SpringProviderConfig() {
+        instance = this;
+    }
+
     /**
      * 配置实例对象
      */
@@ -28,20 +33,6 @@ public class SpringProviderConfig extends ProviderConfig {
     public static SpringProviderConfig getInstance() {
         return instance = instance == null ? SpringUtil.getBean(SpringProviderConfig.class) : instance;
     }
-
-    /**
-     * 服务提供者站点地址
-     */
-    private String providerSite = "XXXX";
-
-    /**
-     * 服务提供者名称
-     */
-    private String providerName = "http://www.XXXX.cn";
-    /**
-     * 服务提供者简介
-     */
-    private String abstractInfo = "";
 
 
 }

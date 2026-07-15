@@ -12,11 +12,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 import com.amazonaws.services.s3.model.S3Object;
- 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.nio.file.Paths;
 
@@ -24,11 +22,20 @@ import java.nio.file.Paths;
  * S3客户端抽象基类
  * 封装S3配置参数和客户端初始化逻辑，
  */
- 
-@Component
+
+
 public class S3ClientGetter {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    GirS3ConfigProperties s3Config;
     static S3ClientGetter instance;
+
+    public S3ClientGetter(GirS3ConfigProperties s3Config) {
+        this.s3Config = s3Config;
+        initS3Client();
+        instance = this;
+    }
+
 
     public static S3ClientGetter getInstance() {
         return instance = null == instance ? SpringUtil.getBean(S3ClientGetter.class) : instance;
@@ -41,10 +48,10 @@ public class S3ClientGetter {
     /**
      * 初始化S3客户端（PostConstruct确保在Bean初始化时执行）
      */
-    @PostConstruct
+
     protected void initS3Client() {
         try {
-            GirS3ConfigProperties s3Config = GirS3ConfigProperties.getInstance();
+
             // 校验必要参数
             if (StringUtils.isBlank(s3Config.getAccessKeyId()) || StringUtils.isBlank(s3Config.getSecretKey())) {
                 throw new RuntimeException("AWS访问密钥（accessKeyId/secretKey）未配置");
