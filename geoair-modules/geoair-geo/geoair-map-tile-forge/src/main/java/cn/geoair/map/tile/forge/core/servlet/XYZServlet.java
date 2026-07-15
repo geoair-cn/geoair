@@ -76,63 +76,50 @@ public class XYZServlet extends D3TilesServlet {
         }
         layerConfigContext.setFormat("png");
 
-        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         try {
-            if (mapTileType == GirMapTileType.XYZ) {
-                String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
-                String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
-                String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
-                int wmtsY = Integer.parseInt(y);
 
-                if (GutilObject.isEmpty(gridSet)) {
-                    gridSet = TileParamEnums.GRID_SET.getDefaultValue();
+            String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
+            String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
+            String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
+            int wmtsY = Integer.parseInt(y);
+
+            if (GutilObject.isEmpty(gridSet)) {
+                gridSet = TileParamEnums.GRID_SET.getDefaultValue();
+            }
+
+            int xInt = Integer.parseInt(x);
+            int zInt = Integer.parseInt(z);
+
+            if (Objects.equals(zxyType, "zyx")) {
+                int temp = xInt;
+                xInt = wmtsY;
+                wmtsY = temp;
+            }
+
+            if (StringUtils.equals(originType, "tms")) {
+                if (Objects.equals(gridSet, "EPSG:4326") || Objects.equals(gridSet, "EPSG:4490")) {
+                    zInt = zInt - 1;
+                    wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);
+                } else {
+                    wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);
                 }
-
-                int xInt = Integer.parseInt(x);
-                int zInt = Integer.parseInt(z);
-
-                if (Objects.equals(zxyType, "zyx")) {
-                    int temp = xInt;
-                    xInt = wmtsY;
-                    wmtsY = temp;
+            }
+            TileRequest tileRequest = null;
+            try {
+                tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                TileResponse tileResponse = tileRequest.toTileResponse();
+                if (!tileResponse.isSuccess()) {
+                    String format1 = StrUtil.format("无法找到瓦片 z:{}, x:{}, y:{}", z, x, y);
+                    tileResponse.setErrorMessage(format1);
                 }
-
-                if (StringUtils.equals(originType, "tms")) {
-                    if (Objects.equals(gridSet, "EPSG:4326") || Objects.equals(gridSet, "EPSG:4490")) {
-                        zInt = zInt - 1;
-                        wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);
-                    } else {
-                        wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);
-                    }
-                }
-                TileRequest tileRequest = null;
-                try {
-                    tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
-                    TileResponse tileResponse = tileRequest.toTileResponse();
-                    if (!tileResponse.isSuccess()) {
-                        String format1 = StrUtil.format("无法找到瓦片 z:{}, x:{}, y:{}", z, x, y);
-                        tileResponse.setErrorMessage(format1);
-                    }
-                    tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
-                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    TileResponse tileResponse = TileResponse.error(e.getMessage());
-                    tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
-                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-                    return;
-                }
-
-            } else {
-                try {
-                    TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, z, y, x);
-                    TileResponse tileResponse = layerTile.toTileResponse();
-                    GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                    GirTileResponseUtil.buildFromException(e, response);
-                }
-
+                tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                TileResponse tileResponse = TileResponse.error(e.getMessage());
+                tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+                return;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
