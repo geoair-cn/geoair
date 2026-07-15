@@ -58,11 +58,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
         // 检查是否有效
         if (!tileResponse.isValid()) {
-            if (!tileResponse.isSuccess()) {
-                handleError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response, tileResponse);
-            } else {
-                handleError(HttpServletResponse.SC_NOT_FOUND, response, tileResponse);
-            }
+            handleError(HttpServletResponse.SC_NOT_FOUND, response, tileResponse);
             return;
         }
 
@@ -381,21 +377,21 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
     public static void handleError(int httpCode, HttpServletResponse response, TileResponse tileResponse) {
         TileZxyApo coordinate = tileResponse.getCoordinate();
         setSysHeaders(response, tileResponse);
-        if (GutilObject.isNotEmpty(coordinate) && httpCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            if (GutilObject.isNotEmpty(coordinate)) {
-                try {
-                    response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());
-                } catch (Exception e) {
-                }
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        if (GutilObject.isNotEmpty(coordinate)) {
+            try {
+                response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());
+            } catch (Exception e) {
             }
-
         }
-        GiResult result = GiResult.failureMsg(tileResponse.getErrorMessage()).andCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        String errorMessage = tileResponse.getErrorMessage();
+        if (GutilObject.isEmpty(errorMessage) && GutilObject.isNotEmpty(coordinate)) {
+            errorMessage = StrUtil.format("无法找到瓦片  {}", coordinate.getZxyString());
+        }
+        GiResult result = GiResult.failureMsg(errorMessage).andCode(HttpServletResponse.SC_NOT_FOUND);
         String json = GirJSON.toJson(result).toJSONString();
         GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json,charset=utf-8", httpCode);
     }
-
 
 
     /**
