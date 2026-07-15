@@ -106,8 +106,8 @@ public class TileRequest implements Serializable {
             response.setErrorMessage("Tile not found: " + this.layerName);
         }
 
-        if (this.storageType != null) {
-            response.setDataSource(this.storageType.name().toLowerCase());
+        if (this.mapTileType != null) {
+            response.setDataSource(this.mapTileType.name().toLowerCase());
         }
 
         response.setVersion("1.0");
