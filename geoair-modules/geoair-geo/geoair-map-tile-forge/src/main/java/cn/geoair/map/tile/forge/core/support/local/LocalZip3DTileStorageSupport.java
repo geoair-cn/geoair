@@ -152,6 +152,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
             throw new GirException("三维数据中缺失{}关键元素", finalRootFileNameSuffix);
         }
         String outerMostTileSetPath = findOuterMostPath(allTileSetPaths);
+        log.info("zip中找到{}，判断为合法的三维数据：{}", outerMostTileSetPath);
         log.info("选中最外层的路径: {}", outerMostTileSetPath);
         String name = FileUtil.getName(outerMostTileSetPath);
         String rootPath = outerMostTileSetPath.replace(name, "");

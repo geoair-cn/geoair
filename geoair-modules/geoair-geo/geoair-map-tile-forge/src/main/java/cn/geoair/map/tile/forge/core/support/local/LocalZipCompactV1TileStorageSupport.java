@@ -262,6 +262,8 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
 
         if (StrUtil.isEmpty(tileSetJsonPath)) {
             throw new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
+        }else{
+            log.info("zip中找到conf.xml，判断为合法的arcgis紧凑型瓦片文件包：{}", tileSetJsonPath);
         }
         String name = FileUtil.getName(tileSetJsonPath);
         String rootPath = tileSetJsonPath.replace("conf.xml", "")
