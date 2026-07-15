@@ -12,8 +12,6 @@ import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import lombok.Getter;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-
 
 
 public class GirMapTileService {
