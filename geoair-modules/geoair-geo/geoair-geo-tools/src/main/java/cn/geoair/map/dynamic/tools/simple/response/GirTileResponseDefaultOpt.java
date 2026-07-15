@@ -233,7 +233,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
             // 转换为字节数组
             byte[] result = GirImageUtil.imageToBytes(enhanced, format);
-            if (result == null || result.length == 0) {
+            if (result.length == 0) {
                 log.warn("图像转换失败，使用原始数据");
                 return tileData;
             }
@@ -347,6 +347,11 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         if (GutilObject.isNotEmpty(version)) {
             response.setHeader("X-Tile-Version", version);
         }
+        String gridEpsgStr = tileResponse.getGridEpsgStr();
+        if (GutilObject.isNotEmpty(gridEpsgStr)) {
+            response.setHeader("X-Tile-Grid-Epsg", gridEpsgStr);
+        }
+
 
     }
 
@@ -378,8 +383,13 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         setSysHeaders(response, tileResponse);
         if (GutilObject.isNotEmpty(coordinate) && httpCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());
-            response.setHeader("X-Tile-Requset-Grid-Epsg", tileResponse.getGridEpsgStr());
+            if (GutilObject.isNotEmpty(coordinate)) {
+                try {
+                    response.setHeader("X-Tile-Bounding-Box", coordinate.toBox4326WktString());
+                } catch (Exception e) {
+                }
+            }
+
         }
         GiResult result = GiResult.failureMsg(tileResponse.getErrorMessage()).andCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         String json = GirJSON.toJson(result).toJSONString();
@@ -387,7 +397,6 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
     }
 
 
-    // ==================== 参数解析工具 ====================
 
     /**
      * 解析浮点数（带范围限制）

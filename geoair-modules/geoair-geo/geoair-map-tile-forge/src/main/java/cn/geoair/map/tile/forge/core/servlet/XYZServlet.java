@@ -14,6 +14,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
 
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
+import cn.hutool.core.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletException;
@@ -108,6 +109,10 @@ public class XYZServlet extends D3TilesServlet {
                 try {
                     tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
                     TileResponse tileResponse = tileRequest.toTileResponse();
+                    if (!tileResponse.isSuccess()) {
+                        String format1 = StrUtil.format("无法找到瓦片 z:{}, x:{}, y:{}", z, x, y);
+                        tileResponse.setErrorMessage(format1);
+                    }
                     tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
                     GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
                 } catch (Exception e) {
