@@ -202,7 +202,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
      * 处理int类型进度
      */
     private void handleIntProgress(Long allCount, Long currentCount) {
-        int updatePercent = GutilPercent.getUpdatePercentInt(allCount, currentCount, intStep, intLastPercent);
+        int updatePercent = GutilPercent.getUpdatePercentInt(currentCount, allCount, intStep, intLastPercent);
         if (updatePercent != -1) {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);
@@ -215,7 +215,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
      * 处理double类型进度
      */
     private void handleDoubleProgress(Long allCount, Long currentCount) {
-        double updatePercent = GutilPercent.getUpdatePercentDouble(allCount, currentCount, doubleStep, doubleLastPercent);
+        double updatePercent = GutilPercent.getUpdatePercentDouble(currentCount, allCount, doubleStep, doubleLastPercent);
         if (updatePercent != -1.0) {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);

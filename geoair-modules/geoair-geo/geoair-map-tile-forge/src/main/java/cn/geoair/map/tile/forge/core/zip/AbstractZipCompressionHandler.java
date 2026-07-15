@@ -514,7 +514,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
         // ===================== 固定配置 =====================
         final int BATCH_SIZE = 500;                    // 每批解析多少条
-        final int QUEUE_CAPACITY = 2000;               // 队列大小（防内存爆）
+        final int QUEUE_CAPACITY = 2000;
         int threads = Math.min(Runtime.getRuntime().availableProcessors() * 2, 8);
 
         EocdInfo finalEocd = eocd;
@@ -535,23 +535,30 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         BlockingQueue<CentralDirectoryModel> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
         ExecutorService producerExecutor = Executors.newWorkStealingPool(threads);
         AtomicBoolean producerFinish = new AtomicBoolean(false);
+        AtomicBoolean shouldStop = new AtomicBoolean(false);
         AtomicLong entryCount = new AtomicLong(0);
-
-        // ===================== 启动消费者线程（单线程、无重复、安全入库） =====================
         Thread consumerThread = new Thread(() -> {
             try {
-                while (true) {
+                while (!shouldStop.get()) {
                     // 队列获取，超时判断是否结束
                     CentralDirectoryModel entry = queue.poll(100, TimeUnit.MILLISECONDS);
                     if (entry == null && producerFinish.get()) {
-                        break; // 生产完毕 + 队列空 → 结束
+                        break;
                     }
                     if (entry == null) continue;
 
-                    // ===================== 你原来的业务逻辑（原样不动） =====================
                     try {
-                        entryConsumer.accept(entry, totalEntries, entryCount.incrementAndGet() - 1);
+                        long index = entryCount.incrementAndGet() - 1;
+                        boolean result = entryConsumer.accept(entry, totalEntries, index);
+                        // 如果消费者返回false，设置停止标志
+                        if (!result) {
+                            shouldStop.set(true);
+                            log.info("消费者返回false，停止扫描，当前已处理：{} 条", index + 1);
+                            break;
+                        }
+
                     } catch (Exception e) {
+                        shouldStop.set(true); // 异常时也停止
                         log.error("消费条目异常", e);
                     }
                 }
@@ -560,12 +567,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             }
         }, "zip-entry-consumer");
         consumerThread.start();
-
-        // ===================== 生产者：多线程解析，往队列放 =====================
         try {
-            while (remaining > 0) {
+            while (remaining > 0 && !shouldStop.get()) {
                 List<EntryPosition> batch = new ArrayList<>(BATCH_SIZE);
-                while (batch.size() < BATCH_SIZE && remaining > 0) {
+                while (batch.size() < BATCH_SIZE && remaining > 0 && !shouldStop.get()) {
                     long headerEnd = currentOffset + 45;
                     if (headerEnd >= fileLength) break;
 
@@ -591,6 +596,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 // 并行解析
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
                 for (EntryPosition pos : batch) {
+                    if (shouldStop.get()) break;
                     futures.add(CompletableFuture.runAsync(() -> {
                         try {
                             long entryOffset = pos.offset;
@@ -674,8 +680,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                             );
                             entry.setDirectoryIs(isDirectory);
 
-                            // ===================== 放入队列（阻塞，满了会等，不会爆内存） =====================
-                            queue.put(entry);
+                            if (!shouldStop.get()) {
+                                queue.put(entry);
+                            }
 
                         } catch (Exception e) {
                             log.error("解析条目失败", e);
@@ -683,8 +690,17 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     }, producerExecutor));
                 }
 
-                // 等待本批次解析完成
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get(10, TimeUnit.HOURS);
+                if (!futures.isEmpty() && !shouldStop.get()) {
+                    try {
+                        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                                .get(10, TimeUnit.HOURS);
+                    } catch (Exception e) {
+                        log.warn("等待批次完成超时或异常", e);
+                    }
+                }
+                if (shouldStop.get()) {
+                    break;
+                }
             }
 
         } catch (Exception e) {
@@ -695,6 +711,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             producerExecutor.shutdown();
         }
 
+        if (shouldStop.get()) {
+            queue.clear();
+            log.info("因停止标志，清空队列中未处理的数据");
+        }
         // 等待消费者消费完
         try {
             consumerThread.join();

@@ -8,7 +8,7 @@ public interface TerminatingConsumer<T> {
      * @param t            消费对象
      * @param allCount     总数
      * @param currentCount 当前消费数量
-     * @return 是否继续遍历，一个停止条件
+     * @return 是否继续遍历，一个停止条件 返回false的时候就停止
      */
     boolean accept(T t, Long allCount, Long currentCount);
 }

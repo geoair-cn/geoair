@@ -161,6 +161,8 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
         if (StrUtil.isEmpty(tileSetJsonPath)) {
             throw new RuntimeException("三维地形中缺失layer.json关键元素");
+        }else{
+            log.info("zip中找到layer.json，判断为合法的三维地形文件：{}", tileSetJsonPath);
         }
         String rootPath = tileSetJsonPath.replace("layer.json", "");
         return RootPathInfo.of().setRootFileName("layer.json").setRootPath(rootPath);

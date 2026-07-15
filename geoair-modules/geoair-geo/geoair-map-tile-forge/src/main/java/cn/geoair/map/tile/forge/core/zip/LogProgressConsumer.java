@@ -16,7 +16,7 @@ import cn.geoair.base.util.GutilPercent;
 public class LogProgressConsumer implements ProgressConsumer {
     GiLogger log = GirLoggerFactory.getLogger();
 
-    GirPercentConsumer percentConsumerInt = GutilPercent.getPercentConsumerInt(new GiPercentUpdateConsumer() {
+    GirPercentConsumer percentConsumerInt = GutilPercent.getPercentConsumerInt( new GiPercentUpdateConsumer() {
         @Override
         public void start(Number allCount) {
 
@@ -26,7 +26,7 @@ public class LogProgressConsumer implements ProgressConsumer {
         public void update(Number updatePercent) {
             log.info("当前进度: {}%  {}", updatePercent, GutilPercent.getProgressDisplay(updatePercent.doubleValue()));
         }
-    });
+    },1);
 
     @Override
     public void accept(Long allCount, Long currentCount) {

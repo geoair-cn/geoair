@@ -274,7 +274,9 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
         String tileSetJsonPath = checkPath.get();
 
         if (StrUtil.isEmpty(tileSetJsonPath)) {
-            throw new RuntimeException("xyz瓦片总缺失XYZ组合");
+            throw new RuntimeException("xyz瓦片缺失XYZ组合");
+        }else{
+            log.info("zip中找到xyz组合索引，判断为合法的xyz文件：{}", tileSetJsonPath);
         }
 
         return RootPathInfo.of();
