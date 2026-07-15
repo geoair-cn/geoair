@@ -22,7 +22,7 @@ import java.util.Arrays;
  * @description： 图像处理工具类
  */
 
-public class GirImageUtil {
+public class GirImageUtil extends ImgUtil {
 
     private static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -569,8 +569,6 @@ public class GirImageUtil {
         }
         return String.valueOf(value).replace(".", "");
     }
-
-
 
 
 }

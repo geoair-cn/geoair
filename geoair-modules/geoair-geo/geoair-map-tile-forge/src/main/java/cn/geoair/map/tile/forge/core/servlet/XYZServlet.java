@@ -17,8 +17,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import cn.geoair.map.tile.forge.core.service.GirMapTileService;
+import cn.hutool.core.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 
 import java.io.IOException;
@@ -30,9 +31,13 @@ import java.util.regex.Pattern;
  * url构建逻辑参考 TileUrlBuilder
  */
 
-@Component
+
 public class XYZServlet extends D3TilesServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    public XYZServlet(GirMapTileService mapTileService) {
+        super(mapTileService);
+    }
 
     Pattern pattern = Pattern.compile("/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 
@@ -104,8 +109,12 @@ public class XYZServlet extends D3TilesServlet {
                 }
                 TileRequest tileRequest = null;
                 try {
-                    tileRequest = gMapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                    tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
                     TileResponse tileResponse = tileRequest.toTileResponse();
+                    if (!tileResponse.isSuccess()) {
+                        String format1 = StrUtil.format("无法找到瓦片 z:{}, x:{}, y:{}", z, x, y);
+                        tileResponse.setErrorMessage(format1);
+                    }
                     tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
                     GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
                 } catch (Exception e) {
@@ -118,7 +127,7 @@ public class XYZServlet extends D3TilesServlet {
 
             } else {
                 try {
-                    TileRequest layerTile = gMapTileService.getLayerTile(layerConfigContext, z, y, x);
+                    TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, z, y, x);
                     TileResponse tileResponse = layerTile.toTileResponse();
                     GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
                 } catch (Exception e) {

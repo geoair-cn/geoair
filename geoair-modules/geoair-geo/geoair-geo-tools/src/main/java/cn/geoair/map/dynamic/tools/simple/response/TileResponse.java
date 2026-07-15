@@ -76,7 +76,7 @@ public class TileResponse implements Serializable {
     private String gridEpsgStr;
 
     /**
-     * 瓦片数据来源（缓存/数据库/实时生成）
+     * 瓦片数据来源
      */
     private String dataSource;
 

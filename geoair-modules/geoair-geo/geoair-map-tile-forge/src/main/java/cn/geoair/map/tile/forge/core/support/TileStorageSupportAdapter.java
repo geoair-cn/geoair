@@ -11,6 +11,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 
 
 import cn.hutool.extra.spring.SpringUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -24,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class TileStorageSupportAdapter {
-
+    @Getter
     protected GirLayerConfigContextHelper contextHelper;
 
     static TileStorageSupportAdapter instance;
@@ -35,6 +36,7 @@ public class TileStorageSupportAdapter {
 
     public TileStorageSupportAdapter(GirLayerConfigContextHelper contextHelper) {
         this.contextHelper = contextHelper;
+        instance = this;
     }
 
     /**
