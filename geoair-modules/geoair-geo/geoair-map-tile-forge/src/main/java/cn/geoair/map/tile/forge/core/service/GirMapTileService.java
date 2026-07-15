@@ -10,6 +10,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import lombok.Getter;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 public class GirMapTileService {
     public static GiLogger log = GirLoggerFactory.getLogger();
     static GirMapTileService self = null;
+    @Getter
     GirLayerConfigContextHelper contextHelper;
+    @Getter
     TileStorageSupportAdapter tileStorageSupportAdapter;
 
     public GirMapTileService(GirLayerConfigContextHelper contextHelper, TileStorageSupportAdapter tileStorageSupportAdapter) {
