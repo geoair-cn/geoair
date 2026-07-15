@@ -18,7 +18,6 @@ import java.io.File;
  * 用于管理瓦片操作过程中的本地临时文件存储路径
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "geoair.file.temp")
 public class TileTempPathConfig {
 

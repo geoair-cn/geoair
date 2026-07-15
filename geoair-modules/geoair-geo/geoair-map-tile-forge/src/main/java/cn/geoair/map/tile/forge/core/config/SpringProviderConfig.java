@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
  * @description：服务提供者配置类，用于读取geoair.provider前缀的配置属性
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "geoair.provider")
 public class SpringProviderConfig extends ProviderConfig {
 

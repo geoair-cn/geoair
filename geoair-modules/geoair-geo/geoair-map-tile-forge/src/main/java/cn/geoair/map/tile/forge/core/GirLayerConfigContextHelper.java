@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.core;
 
 
-import cn.geoair.base.Gir;
+import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface GirLayerConfigContextHelper {
 
     static GirLayerConfigContextHelper getInstance() {
-        return Gir.beans.getBean(GirLayerConfigContextHelper.class);
+        return GirService.getPxyBeanC(GirLayerConfigContextHelper.class);
     }
 
     /**

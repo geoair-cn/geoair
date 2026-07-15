@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  * &#064;description： 配置属性类
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "geoair.s3")
 public class GirS3ConfigProperties {
     static GirS3ConfigProperties instance;
