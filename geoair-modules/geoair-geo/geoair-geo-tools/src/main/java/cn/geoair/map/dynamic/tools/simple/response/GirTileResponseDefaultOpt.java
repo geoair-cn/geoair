@@ -58,7 +58,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
         // 检查是否有效
         if (!tileResponse.isValid()) {
-            handleError(HttpServletResponse.SC_NOT_FOUND, response, tileResponse);
+            handleError(422, response, tileResponse);
             return;
         }
 
