@@ -389,7 +389,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         if (GutilObject.isEmpty(errorMessage) && GutilObject.isNotEmpty(coordinate)) {
             errorMessage = StrUtil.format("无法找到瓦片  {}", coordinate.getZxyString());
         }
-        GiResult result = GiResult.failureMsg(errorMessage).andCode(HttpServletResponse.SC_NOT_FOUND);
+        GiResult result = GiResult.failureMsg(errorMessage).andCode(httpCode);
         String json = GirJSON.toJson(result).toJSONString();
         GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json,charset=utf-8", httpCode);
     }
