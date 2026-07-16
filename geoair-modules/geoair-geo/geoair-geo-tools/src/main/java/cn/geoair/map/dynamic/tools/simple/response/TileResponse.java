@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.tools.simple.response;
 
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+import cn.geoair.map.dynamic.tools.simple.collection.map.GirFastStrObjMap;
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.GirImageMime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * @author ：张俊
@@ -25,7 +25,7 @@ public class TileResponse implements Serializable {
     }
 
     /**
-     * 瓦片输入流
+     * 瓦片输入字节
      */
     private byte[] bytes;
 
@@ -88,7 +88,7 @@ public class TileResponse implements Serializable {
     /**
      * 缓存控制头（Expires、Cache-Control等）
      */
-    private Map<String, String> cacheHeaders;
+    private GirFastStrObjMap<String> cacheHeaders;
 
 
     /**
@@ -103,7 +103,7 @@ public class TileResponse implements Serializable {
     /**
      * 扩展数据（用于传递额外信息）
      */
-    private Map<String, Object> extras;
+    private GirFastStrObjMap<String> extrasHeaders;
 
 
     // ========== 便捷方法 ==========
@@ -154,7 +154,7 @@ public class TileResponse implements Serializable {
      * 获取内容长度（兼容HTTP Content-Length）
      */
     public int getContentLength() {
-        return bytes != null ? bytes.length : 0;
+        return bytes != null ? bytes.length : (int) size;
     }
 
     /**

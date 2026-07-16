@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.geoair.map.dynamic.adv.query.result.OptNullGeomAndBasicTypeFromObjectGetter;
+import cn.geoair.map.dynamic.tools.simple.collection.map.OptNullGeomAndBasicTypeFromObjectGetter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Pair;
 

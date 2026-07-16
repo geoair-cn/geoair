@@ -1,4 +1,4 @@
-package cn.geoair.map.dynamic.adv.query.result;
+package cn.geoair.map.dynamic.tools.simple.collection.map;
 
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;

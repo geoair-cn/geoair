@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 /**
  * 瓦片响应构建工具
@@ -90,10 +89,13 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
         // 如果有自定义缓存头，额外设置
         if (GutilObject.isNotEmpty(tileResponse.getCacheHeaders())) {
-            for (Map.Entry<String, String> entry : tileResponse.getCacheHeaders().entrySet()) {
-                response.setHeader(entry.getKey(), entry.getValue());
-            }
+            tileResponse.getCacheHeaders().forEach(response::setHeader);
         }
+
+        if (GutilObject.isNotEmpty(tileResponse.getExtrasHeaders())) {
+            tileResponse.getExtrasHeaders().forEach(response::setHeader);
+        }
+
 
         GirServletUtil.toResponse(response, finalBytes, tileResponse.getMimeType().getFormat());
 

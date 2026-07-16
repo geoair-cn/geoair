@@ -21,4 +21,5 @@ public interface GirTileResponseOpt {
     void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response);
 
 
+
 }

@@ -1,10 +1,10 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
+import cn.geoair.map.dynamic.tools.simple.collection.map.OptNullGeomAndBasicTypeFromObjectGetter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.CamelCaseLinkedMap;
-import cn.hutool.core.map.CamelCaseMap;
 import cn.hutool.core.map.CaseInsensitiveLinkedMap;
 import cn.hutool.db.Entity;
 
