@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.simple.response;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 
 /**
  * 瓦片响应构建工具
@@ -18,6 +19,7 @@ public interface GirTileResponseOpt {
      * 从TileResponse对象构建响应
      */
     void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response);
+
 
 
 }
