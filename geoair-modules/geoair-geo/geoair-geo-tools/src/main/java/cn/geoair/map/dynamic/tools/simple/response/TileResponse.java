@@ -21,6 +21,10 @@ public class TileResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * http状态码
+     */
+    Integer httpCode;
 
     /**
      * 最后修改时间戳
@@ -99,8 +103,6 @@ public class TileResponse implements Serializable {
     protected GirFastStrObjMap<String> extrasHeaders;
 
 
-
-
     /**
      * 创建失败的响应
      */
@@ -146,6 +148,7 @@ public class TileResponse implements Serializable {
         }
         return eTag;
     }
+
     public InputStream toInputStream() {
         return null;
     }
