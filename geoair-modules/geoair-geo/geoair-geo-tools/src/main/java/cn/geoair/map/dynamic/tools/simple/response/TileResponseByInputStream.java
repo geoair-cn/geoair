@@ -36,15 +36,17 @@ public class TileResponseByInputStream extends TileResponse {
 
 
     public InputStream toInputStream() {
+        // 2. 如果原始输入流不可用，从缓存的字节数组创建
+
+        if (bytes != null && bytes.length > 0) {
+            return new ByteArrayInputStream(bytes);
+        }
         // 1. 检查原始输入流是否可用
         if (isInputStreamAvailable(inputStream)) {
             return inputStream;
         }
 
-        // 2. 如果原始输入流不可用，从缓存的字节数组创建
-        if (bytes != null && bytes.length > 0) {
-            return new ByteArrayInputStream(bytes);
-        }
+
 
         // 3. 都没有则返回null
         return null;
@@ -63,7 +65,7 @@ public class TileResponseByInputStream extends TileResponse {
             // 如果流已关闭，会抛出IOException
             int available = is.available();
             // available() 返回 -1 表示流已结束或关闭
-            return available >= 0;
+            return available > 0;
         } catch (IOException e) {
             // 抛出IOException通常表示流已关闭或不可读
             return false;

@@ -63,8 +63,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             return;
         }
 
-        // 如果是图片类型，尝试应用锐化
-        tileResponse.toByteArrays();
+
         byte[] finalBytes;
         SharpeningResult sharpeningResult = null;
 
