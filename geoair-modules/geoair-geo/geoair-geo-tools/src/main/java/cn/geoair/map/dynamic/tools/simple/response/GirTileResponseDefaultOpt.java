@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -63,7 +64,8 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
 
         // 如果是图片类型，尝试应用锐化
-        byte[] finalBytes = tileResponse.getBytes();
+        tileResponse.getBytes();
+        byte[] finalBytes;
         SharpeningResult sharpeningResult = null;
 
         if (tileResponse.getMimeType() instanceof GirImageMime) {
@@ -96,8 +98,12 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             tileResponse.getExtrasHeaders().forEach(response::setHeader);
         }
 
-
-        GirServletUtil.toResponse(response, finalBytes, tileResponse.getMimeType().getFormat());
+        InputStream inputStream = tileResponse.getInputStream();
+        if (GutilObject.isNotEmpty(inputStream)) {
+            GirServletUtil.toResponse(response, inputStream, tileResponse.getMimeType().getFormat());
+        } else {
+            handleNotFound(response);
+        }
 
 
     }

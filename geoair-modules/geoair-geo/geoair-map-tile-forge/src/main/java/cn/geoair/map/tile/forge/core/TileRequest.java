@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core;
 
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 
@@ -90,8 +91,7 @@ public class TileRequest implements Serializable {
      * @return TileResponse对象
      */
     public TileResponse toTileResponse() {
-        TileResponse response = new TileResponse();
-
+        TileResponseByByte response = new TileResponseByByte();
         response.setBytes(this.bytes);
         response.setSize(this.size);
         response.setLastModified(this.lastModified);

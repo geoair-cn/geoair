@@ -13,6 +13,7 @@ import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
 import cn.geoair.web.mime.GirApplicationMime;
 import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.IoUtil;
@@ -85,7 +86,7 @@ public class TileCommonServlet extends HttpServlet {
             response.sendRedirect(httpUrl);
             return;
         }
-        TileResponse tileResponse = TileResponse.of().
+        TileResponse tileResponse = TileResponseByByte.of().
                 setBytesAndUpdateSize(data).
                 setMimeType(GirApplicationMime.mapboxVector)
                 .setSuccess(success)
