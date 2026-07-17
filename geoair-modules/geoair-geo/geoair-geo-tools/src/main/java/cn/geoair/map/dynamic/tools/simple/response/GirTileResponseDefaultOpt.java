@@ -69,7 +69,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         SharpeningResult sharpeningResult = null;
 
         if (tileResponse.getMimeType() instanceof GirImageMime) {
-            sharpeningResult = applySharpeningIfNeededWithResult(tileResponse.getBytes());
+            sharpeningResult = applySharpeningIfNeededWithResult(tileResponse);
             if (sharpeningResult.isApplied()) {
                 finalBytes = sharpeningResult.getData();
                 // 更新tileResponse对象
@@ -254,31 +254,28 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
     /**
      * 预锐化处理（带结果返回）
      */
-    public static SharpeningResult applySharpeningIfNeededWithResult(byte[] tileData) {
+    public static SharpeningResult applySharpeningIfNeededWithResult(TileResponse tileResponse) {
         long startTime = System.currentTimeMillis();
 
-        if (tileData == null || tileData.length == 0) {
-            return new SharpeningResult(tileData, false, null, 0);
-        }
-
         if (!shouldApplySharpening()) {
-            return new SharpeningResult(tileData, false, null, 0);
+            return new SharpeningResult(null, false, null, 0);
         }
 
         SharpeningParams params = parseSharpeningParams();
         if (params == null || !params.isValid()) {
-            return new SharpeningResult(tileData, false, null, 0);
+            return new SharpeningResult(null, false, null, 0);
         }
 
         try {
-            byte[] enhancedData = enhanceTile(tileData, params.getRadius(), params.getAmount(), params.getThreshold());
+            byte[] bytes = tileResponse.getBytes();
+            byte[] enhancedData = enhanceTile(bytes, params.getRadius(), params.getAmount(), params.getThreshold());
             long elapsedTime = System.currentTimeMillis() - startTime;
 
-            boolean applied = enhancedData != tileData && enhancedData.length > 0;
+            boolean applied = enhancedData != bytes && enhancedData.length > 0;
             return new SharpeningResult(enhancedData, applied, params, elapsedTime);
         } catch (Exception e) {
             log.error("预锐化处理失败", e);
-            return new SharpeningResult(tileData, false, null, 0);
+            return new SharpeningResult(null, false, null, 0);
         }
     }
 

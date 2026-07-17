@@ -51,7 +51,6 @@ public class TileResponseByByte extends TileResponse {
      * 设置瓦片字节并自动更新size
      */
     public TileResponse setBytesAndUpdateSize(byte[] bytes) {
-        // 由子类实现
         this.bytes = bytes;
         this.size = bytes != null ? (long) bytes.length : 0;
         this.exists = bytes != null && bytes.length > 0;
