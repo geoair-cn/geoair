@@ -27,12 +27,12 @@ public class TileResponseByByte extends TileResponse {
      */
     private byte[] bytes;
 
-    public InputStream getInputStream() {
+    public InputStream toInputStream() {
         return new ByteArrayInputStream(bytes);
     }
 
 
-    public byte[] getBytes() {
+    public byte[] toByteArrays() {
         return bytes;
     }
 

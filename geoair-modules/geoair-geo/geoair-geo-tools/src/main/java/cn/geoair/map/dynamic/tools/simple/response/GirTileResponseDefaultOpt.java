@@ -64,7 +64,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
 
         // 如果是图片类型，尝试应用锐化
-        tileResponse.getBytes();
+        tileResponse.toByteArrays();
         byte[] finalBytes;
         SharpeningResult sharpeningResult = null;
 
@@ -98,7 +98,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             tileResponse.getExtrasHeaders().forEach(response::setHeader);
         }
 
-        InputStream inputStream = tileResponse.getInputStream();
+        InputStream inputStream = tileResponse.toInputStream();
         if (GutilObject.isNotEmpty(inputStream)) {
             GirServletUtil.toResponse(response, inputStream, tileResponse.getMimeType().getFormat());
         } else {
@@ -267,7 +267,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
 
         try {
-            byte[] bytes = tileResponse.getBytes();
+            byte[] bytes = tileResponse.toByteArrays();
             byte[] enhancedData = enhanceTile(bytes, params.getRadius(), params.getAmount(), params.getThreshold());
             long elapsedTime = System.currentTimeMillis() - startTime;
 
