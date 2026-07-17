@@ -171,6 +171,8 @@ public class TileResponseByInputStream extends TileResponse {
                 long available = inputStream.available();
                 if (available > 0) {
                     this.size = available;
+                    this.setSuccess(true);
+                    this.setExists(true);
                 }
             } catch (Exception e) {
                 // 忽略异常
