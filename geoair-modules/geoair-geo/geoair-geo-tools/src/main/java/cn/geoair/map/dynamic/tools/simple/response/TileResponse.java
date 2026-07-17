@@ -99,9 +99,6 @@ public class TileResponse implements Serializable {
     protected GirFastStrObjMap<String> extrasHeaders;
 
 
-    public InputStream getInputStream() {
-        return null;
-    }
 
 
     /**
@@ -149,9 +146,12 @@ public class TileResponse implements Serializable {
         }
         return eTag;
     }
+    public InputStream toInputStream() {
+        return null;
+    }
 
 
-    public byte[] getBytes() {
+    public byte[] toByteArrays() {
         return new byte[0];
     }
 

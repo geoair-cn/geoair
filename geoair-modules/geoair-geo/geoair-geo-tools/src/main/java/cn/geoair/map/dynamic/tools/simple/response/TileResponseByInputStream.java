@@ -35,7 +35,7 @@ public class TileResponseByInputStream extends TileResponse {
     }
 
 
-    public InputStream getInputStream() {
+    public InputStream toInputStream() {
         // 1. 检查原始输入流是否可用
         if (isInputStreamAvailable(inputStream)) {
             return inputStream;
@@ -74,7 +74,7 @@ public class TileResponseByInputStream extends TileResponse {
      * 获取字节数组
      * 如果已有缓存则直接返回，否则从InputStream读取
      */
-    public byte[] getBytes() {
+    public byte[] toByteArrays() {
         // 如果已有缓存则直接返回
         if (bytes != null && bytes.length > 0) {
             return bytes;
