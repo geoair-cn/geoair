@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
@@ -199,7 +200,7 @@ public class TileServiceTran {
             byte[] imageBytes = cacheTileFuser.toImageBytes();
 
 
-            TileResponse tileResponse = TileResponse.of()
+            TileResponse tileResponse = TileResponseByByte.of()
                     .setBytes(imageBytes)
                     .setLastModified(System.currentTimeMillis())
                     .setSuccess(true)

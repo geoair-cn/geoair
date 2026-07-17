@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -139,6 +140,19 @@ public class GirServletUtil extends ServletUtil {
         } catch (Exception e) {
         } finally {
             IoUtil.close(byteArrayInputStream);
+            IoUtil.close(outputStream);
+        }
+    }
+
+    public static void toResponse(HttpServletResponse response, InputStream inputStream, String contentType) {
+        ServletOutputStream outputStream = null;
+        response.setContentType(contentType);
+        try {
+            outputStream = response.getOutputStream();
+            IoUtil.copy(inputStream, outputStream);
+        } catch (Exception e) {
+        } finally {
+            IoUtil.close(inputStream);
             IoUtil.close(outputStream);
         }
     }
