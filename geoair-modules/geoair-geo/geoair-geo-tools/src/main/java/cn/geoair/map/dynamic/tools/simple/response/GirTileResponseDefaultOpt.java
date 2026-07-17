@@ -47,18 +47,19 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         buildFromTileResponse(tileResponse, response, null);
     }
 
-    /**
-     * 从TileResponse对象构建响应（支持自定义缓存时间）
-     */
+
     public static void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response, Integer cacheMaxAge) {
+
+
         if (tileResponse == null) {
-            handleNotFound(response);
+            handleNotFound(HttpServletResponse.SC_NO_CONTENT, response);
             return;
         }
 
+        Integer httpCode = tileResponse.getHttpCode();
         // 检查是否有效
         if (!tileResponse.isValid()) {
-            handleError(422, response, tileResponse);
+            handleError(GutilObject.isNotEmpty(httpCode) ? httpCode : 422, response, tileResponse);
             return;
         }
 
@@ -85,7 +86,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
 
         response.setContentLengthLong(tileResponse.getContentLength());
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(GutilObject.isNotEmpty(httpCode) ? httpCode : HttpServletResponse.SC_OK);
 
         // 如果有自定义缓存头，额外设置
         if (GutilObject.isNotEmpty(tileResponse.getCacheHeaders())) {
@@ -100,7 +101,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         if (GutilObject.isNotEmpty(inputStream)) {
             GirServletUtil.toResponse(response, inputStream, tileResponse.getMimeType().getFormat());
         } else {
-            handleNotFound(response);
+            handleNotFound(HttpServletResponse.SC_NO_CONTENT, response);
         }
 
 
@@ -369,8 +370,8 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
     /**
      * 处理瓦片不存在
      */
-    private static void handleNotFound(HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    private static void handleNotFound(int httpCode, HttpServletResponse response) {
+        response.setStatus(httpCode);
         response.setHeader("Cache-Control", "no-cache");
     }
 
