@@ -42,26 +42,14 @@ public class JtsGeometryAdvTypeHandler extends AdvBaseTypeHandler<Geometry> {
         }
         if (GirPostGisTran.isNetConvert()) {
             try {
-                net.postgis.jdbc.PGgeometry pgGeometry = new net.postgis.jdbc.PGgeometry();
-                pgGeometry.setValue(wkt);
-                pgGeometry.setType("geometry");
-                if (value.getSRID() != 0 && pgGeometry.getGeometry() != null) {
-                    pgGeometry.getGeometry().setSrid(value.getSRID());
-                }
-                return pgGeometry;
+                return GirPostGisNetTran.toPGGeometry(value);
             } catch (Exception e) {
                 return wkt;
             }
         }
         if (GirPostGisTran.isOrgConvert()) {
             try {
-                org.postgis.PGgeometry pgGeometry = new org.postgis.PGgeometry();
-                pgGeometry.setValue(wkt);
-                pgGeometry.setType("geometry");
-                if (value.getSRID() != 0 && pgGeometry.getGeometry() != null) {
-                    pgGeometry.getGeometry().setSrid(value.getSRID());
-                }
-                return pgGeometry;
+                return GirPostGisOrgTran.toPGGeometry(value);
             } catch (Exception e) {
                 return wkt;
             }
