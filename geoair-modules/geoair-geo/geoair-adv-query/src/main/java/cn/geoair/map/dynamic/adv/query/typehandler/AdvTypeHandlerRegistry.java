@@ -16,6 +16,7 @@ public class AdvTypeHandlerRegistry {
 
     private final AdvTypeHandler<Object> defaultHandler = new ObjectAdvTypeHandler();
 
+
     private AdvTypeHandlerRegistry() {
         register(new JtsGeometryAdvTypeHandler());
         register(new StringAdvTypeHandler());
