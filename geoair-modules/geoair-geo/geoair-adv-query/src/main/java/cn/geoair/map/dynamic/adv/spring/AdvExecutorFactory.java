@@ -45,6 +45,9 @@ public class AdvExecutorFactory {
             case ORACLE:
                 log.trace("检测到ORACLE数据源，创建GirSpringOracleAdvExecutor执行器");
                 return GirSpringOracleAdvExecutor.newInstance(dataSource, dataSourceName);
+            case ANSI:
+                log.trace("检测到达梦数据源，创建GirSpringDmAdvExecutor执行器");
+                return GirSpringDmAdvExecutor.newInstance(dataSource, dataSourceName);
             default:
                 throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
         }
@@ -70,9 +73,11 @@ public class AdvExecutorFactory {
                 return DialectName.MYSQL;
             } else if (dbProductName.contains("POSTGRESQL") || dbProductName.contains("PG")) {
                 return DialectName.POSTGRESQL;
-            } else if (dbProductName.contains("ORACLE")  ) {
+            } else if (dbProductName.contains("ORACLE")) {
                 return DialectName.ORACLE;
-            }else {
+            } else if (dbProductName.contains("DAMENG") || dbProductName.equals("DM") || dbProductName.contains("DM DBMS")) {
+                return DialectName.ANSI;
+            } else {
                 throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);
             }
         } catch (SQLException e) {
