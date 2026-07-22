@@ -18,6 +18,13 @@ public class AdvTypeHandlerRegistry {
 
     private AdvTypeHandlerRegistry() {
         register(new JtsGeometryAdvTypeHandler());
+        register(new StringAdvTypeHandler());
+        register(new CharacterAdvTypeHandler());
+        register(new BooleanAdvTypeHandler());
+        register(new NumberAdvTypeHandler());
+        register(new TemporalAdvTypeHandler());
+        register(new ByteArrayAdvTypeHandler());
+        register(new EnumAdvTypeHandler());
     }
 
     public static AdvTypeHandlerRegistry getInstance() {
