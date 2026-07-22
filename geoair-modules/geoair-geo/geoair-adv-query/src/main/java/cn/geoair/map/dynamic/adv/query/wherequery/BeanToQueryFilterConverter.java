@@ -138,7 +138,12 @@ public class BeanToQueryFilterConverter {
                 fieldMap.put(key, entry.getValue());
             }
         } else {
-            fieldMap = GirAdvSqlUtils.getRowData(bean, options.isToUnderlineCase(), options.isIgnoreNull(), ListUtil.empty());
+            fieldMap = GirAdvSqlUtils.getRowData(
+                    bean,
+                    options.isToUnderlineCase(),
+                    options.isIgnoreNull(),
+                    options.isIgnoreEmptyString(),
+                    ListUtil.empty());
         }
 
         return fieldMap;
