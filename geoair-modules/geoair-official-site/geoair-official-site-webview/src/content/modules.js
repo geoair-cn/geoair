@@ -205,84 +205,8 @@ const geoModules = [
     route: '/modules/geo/adv-query',
     title: 'geoair-adv-query',
     group: 'geo',
-    summary: 'GeoAir 的高级空间查询执行器，围绕多数据库方言、空间过滤、动态 SQL、分页与 Lambda 条件构造，提供一套更贴近 GIS 业务的数据库访问方式。',
+    summary: '空间查询执行器模块，负责多数据库方言下的查询请求组织、条件构造与 SQL 生成。',
     tags: ['空间查询', 'PostGIS', 'SQL', 'BBox', '动态数据源'],
-    capabilities: [
-      '统一聚合 CRUD、DDL、空间查询、分页和事务相关能力，适合作为 GIS 数据访问层的核心执行入口。',
-      '适配 PostgreSQL + PostGIS、MySQL 与 Oracle Spatial，适合存在多数据库方言差异的空间项目。',
-      '支持 BBox、距离、相交、质心、几何修复等常见空间操作，并与 Geometry / WKT / GeoJSON 等对象模型衔接。',
-      '内置 Fluent Lambda 条件构造器与动态 SQL 标签能力，便于把复杂 GIS 查询组织成可维护代码。'
-    ],
-    quickStart: `DialectTableNameProcessor dialect = PgDialectTableNameUtil.getInstance();\nIDsDataSourceOpt dataSourceGetter = MockDataSourceGetter.getInstance();\nGirAdvSqlComposer sqlBuilder = new GirAdvSqlComposer(dialect, dataSourceGetter);\n\nGirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status")\n  .where(GirAdvWhereFilter.of()\n    .eq("name", "张三")\n    .eq("status", 1))\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);`,
-    example: '适合空间检索、专题图查询、多租户 GIS 服务和跨数据库空间访问场景。',
-    detailSections: [
-      {
-        title: '模块定位',
-        items: [
-          '它不是单纯的 SQL 拼接工具，而是把空间查询、数据库方言差异和分页能力统一到同一执行入口。',
-          '如果 geoair-geo-tools 负责 Geometry 处理，那么 geoair-adv-query 更偏向“如何把空间对象查出来、筛出来、分页出来”。',
-          '在真实 GIS 系统里，它通常位于 Service 与数据库之间，承担高级空间数据访问层的职责。'
-        ]
-      },
-      {
-        title: '核心接口组成',
-        items: [
-          'IAdvExecutor 聚合了数据源获取、事务模板、基础 CRUD、DDL、空间操作、条件构造与分页查询能力。',
-          'IAdvGeoOpt 负责相交、距离、BBox 等空间操作，适合地图范围查询、缓冲区分析和空间筛选。',
-          'IAdvWhereSelectOpt 负责 Fluent 风格的查询构造，适合把复杂业务条件写成更可维护的链式表达。',
-          'IAdvSimplePageOpt 负责分页能力，适合地图要素列表、表格数据和条件检索页面。'
-        ]
-      },
-      {
-        title: '适用场景',
-        items: [
-          '地图框选查询：前端传入 bbox，后端根据范围筛选点、线、面要素。',
-          '专题图筛选：按行业、状态、行政区划等属性条件叠加空间条件做组合查询。',
-          '多库适配：同一套 GIS 查询能力需要兼容 PostGIS、MySQL 或 Oracle Spatial。',
-          '空间数据服务：为地图接口、要素检索、统计分析或矢量瓦片查询提供底层执行能力。'
-        ]
-      },
-      {
-        title: '仓库中现有示例位置',
-        items: [
-          'geoair-adv-query 的相关示例已放在 geoair-adv-query 模块的 src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test 包下。',
-          '其中 WhereQueryExample、LambdaFilterExample、GirAdvQueryRequestExample 和 GirAdvQueryRequest1Example 直接展示了该模块当前真实 API 的使用方式。',
-          '官网中的 geoair-adv-query 示例说明应当以这些 test 示例为准，而不是脱离源码的伪接口。'
-        ]
-      },
-    ],
-    usageExamples: [
-      {
-        title: '示例1：基础查询（WhereQueryExample / GirAdvQueryRequestExample）',
-        description: '从最基础的 table + fields + where 开始，直接对应仓库里的示例写法。',
-        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status")\n  .where(GirAdvWhereFilter.of()\n    .eq("name", "张三")\n    .eq("status", 1))\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);`
-      },
-      {
-        title: '示例2：比较与范围查询（WhereQueryExample）',
-        description: '适合展示 gt / ge / lt / between / in 这些当前模块里真实可用的条件构造能力。',
-        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "age")\n  .where(GirAdvWhereFilter.of()\n    .gt("age", 18)\n    .in("id", Arrays.asList(1, 2, 3, 4, 5))\n    .between("age", 18, 30))\n  .build();`
-      },
-      {
-        title: '示例3：复杂嵌套条件（WhereQueryExample）',
-        description: '适合说明 group / or / notGroup 等组合查询能力，这部分仓库中已有较多现成样例。',
-        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "age", "status", "dept_id", "role")\n  .where(GirAdvWhereFilter.of()\n    .like("name", "张")\n    .group(group -> group\n      .gt("age", 18)\n      .or()\n      .eq("status", 1))\n    .group(group -> group\n      .eq("dept_id", 100)\n      .or()\n      .eq("role", "admin")))\n  .build();`
-      },
-      {
-        title: '示例4：分页与排序（WhereQueryExample / GirAdvQueryRequest1Example）',
-        description: '演示 page、orderByAsc、orderByDesc 以及 OrderApo 的真实用法。',
-        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status", "create_time")\n  .where(GirAdvWhereFilter.of().eq("status", 1))\n  .orderByDesc("create_time")\n  .orderByAsc("id")\n  .page(2, 10)\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildPageSql(query);`
-      },
-      {
-        title: '示例5：Lambda 风格条件（LambdaFilterExample / GirAdvQueryRequest1Example）',
-        description: '如果项目里已经建立了实体映射，可以直接用 Lambda 风格构造条件。',
-        code: `GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)\n  .eq(User::getName, "张三")\n  .ge(User::getAge, 18)\n  .eq(User::getStatus, 1);\n\nGirAdvWhereFilter whereFilter = wrapper.toWhereFilter();`
-      },
-      {
-        title: '示例6：SQL 表达式与函数（LambdaFilterExample / GirAdvQueryRequestExample）',
-        description: '适合补充 expr、exprEq、exprGt 这类表达式查询能力，特别适合复杂 GIS / 统计场景。',
-        code: `GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)\n  .exprEq("YEAR(create_time)", 2024)\n  .exprGt("salary * 1.1", new BigDecimal("10000"))\n  .exprLike("CONCAT(first_name, ' ', last_name)", "张%");`
-      }
-    ],
     sourceExamples: [
       {
         title: 'WhereQueryExample',
@@ -303,6 +227,11 @@ const geoModules = [
         title: 'GirAdvQueryRequest1Example',
         path: 'geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test/GirAdvQueryRequest1Example.java',
         description: '覆盖 Lambda builder、排序 API、动态条件构建、字段别名和业务型查询组织方式。'
+      },
+      {
+        title: 'geoair-adv-query GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query',
+        description: '直接跳到 geoair-adv-query 模块目录。'
       }
     ],
     related: ['geo-tools', 'dynamic-ds', 'db-service']
@@ -322,6 +251,11 @@ const geoModules = [
         description: '展示 geoair-mvt-tools 中的瓦片范围计算与 TileExecParams 构造。'
       },
       {
+        title: 'PipelineBuilderExample',
+        path: 'geoair-geo/geoair-mvt/geoair-mvt-tools/src/test/java/cn/geoair/map/dynamic/mvt/tools/test/PipelineBuilderExample.java',
+        description: '展示 PipelineBuilder 的坐标转换与几何简化流程。'
+      },
+      {
         title: 'GirRealMvtEntryExample',
         path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
         description: '展示 geoair-real-mvt 中的 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 入口。'
@@ -330,6 +264,16 @@ const geoModules = [
         title: 'TileRequestParamsExample',
         path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
         description: '展示 TileRequestParams 的参数组织与 Base32 编解码。'
+      },
+      {
+        title: 'TileExecutorConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileExecutorConfigExample.java',
+        description: '展示 TileExecutorConfig 的低级别优化策略和密度优化策略配置。'
+      },
+      {
+        title: 'TileGlobalConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileGlobalConfigExample.java',
+        description: '展示 TileGlobalConfig 如何组合 TileRequestParams、TileExecParams 和 TileExecutorConfig。'
       },
       {
         title: 'TileSliceParameterExample',
@@ -407,6 +351,11 @@ const geoModules = [
         title: 'LayerTileGetterRouteExample',
         path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/LayerTileGetterRouteExample.java',
         description: '展示不同 SrcType / gridSrid 如何路由到不同的 LayerTileGetter 实现。'
+      },
+      {
+        title: 'FuserExecContractExample',
+        path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/FuserExecContractExample.java',
+        description: '展示 FuserExec 这一层输出契约：图像字节、输出格式、源格式和源范围。'
       },
       {
         title: 'geoair-map-tile-fuser GitHub 目录',
@@ -504,77 +453,8 @@ const businessModules = [
     route: '/modules/dynamic-ds',
     title: 'geoair-dynamic-ds',
     group: 'business',
-    summary: '运行时动态多数据源模块，重点围绕线程级数据源上下文、AOP 切换、读写分离 builder、SQL 读写识别与 Spring 集成展开。',
+    summary: '动态数据源相关模块，围绕 Spring 切面切库、线程上下文和主从读写分离 builder 展开。',
     tags: ['动态数据源', 'AOP', '读写分离', 'Spring', 'SQLParser'],
-    capabilities: [
-      '通过 GirDynamicStackDataSource 维护线程内数据源栈，支持嵌套调用场景下的数据源切换与恢复。',
-      '通过 EnableDynamicDs + GirDynamicDataSourceAspect + GirDsAspectDoAroundApiHelper 参与 Spring AOP 的切库过程。',
-      '通过 GirReadWriteDataSourceBuilder 构建主从读写分离数据源，并支持轮询、权重等从库策略。',
-      '通过 SQLParserUtil / WithStatementTest 等测试用例验证 SELECT、WITH、INSERT、UPDATE、DELETE 的读写识别。'
-    ],
-    quickStart: `@EnableDynamicDs\n@SpringBootApplication\npublic class Application {\n}\n\n// 切面执行前会根据注解计算路由键\n// GirDsAspectDoAroundApiHelper#doBefore -> GirDynamicStackDataSource.pushDataSource(dataSourceKey)\n// onFinally -> GirDynamicStackDataSource.popDataSource()` ,
-    example: '适合已经接入 Spring、需要在业务方法级别切换数据源，或需要构建主从读写分离能力的项目。',
-    detailSections: [
-      {
-        title: '模块里真正的核心入口',
-        items: [
-          'EnableDynamicDs 只是开启动态数据源切面能力，本身通过 @Import 引入 GirDynamicDataSourceAspect。',
-          'GirDsAspectDoAroundApiHelper 负责在切面前后调用 pushDataSource / popDataSource，是真正把注解和线程上下文连接起来的关键接口。',
-          'GirDynamicStackDataSource 继承 AbstractRoutingDataSource，用一个 ThreadLocal<Stack<String>> 管理当前线程的数据源栈。',
-          '如果关注读写分离，则核心类不是手动注册器，而是 GirReadWriteDataSourceBuilder、GirReadWriteDataSource 和 SQLParserUtil。'
-        ]
-      },
-      {
-        title: 'Spring 接入链路',
-        items: [
-          '在 Spring Boot 应用中，通过 @EnableDynamicDs 启用动态数据源切面。',
-          '切面在进入方法前会根据 GirDsDataSource / GirDataSourceChange 注解计算 dataSourceKey。',
-          'GirDsAspectDoAroundApiHelper#doBefore 调用 GirDynamicStackDataSource.pushDataSource(dataSourceKey)。',
-          '方法执行完成后，在 onFinally 中调用 GirDynamicStackDataSource.popDataSource() 恢复上层上下文。'
-        ]
-      },
-      {
-        title: '仓库中现有示例位置',
-        items: [
-          '主从读写分离 builder 示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/BuilderTest.java。',
-          'SQL 读写识别示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/SQLParserUtilTest.java。',
-          'WITH 语句识别示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/WithStatementTest.java。',
-          '官网中的 dynamic-ds 示例应以这些 test 示例和主源码类为准。'
-        ]
-      }
-    ],
-    usageExamples: [
-      {
-        title: '示例1：启用动态数据源切面（EnableDynamicDs）',
-        description: '这是模块在 Spring 中的真实启用方式，源码就是一个通过 @Import 引入切面的启用注解。',
-        code: `@EnableDynamicDs\n@SpringBootApplication\npublic class Application {\n}`
-      },
-      {
-        title: '示例2：切面前后如何维护数据源栈（GirDsAspectDoAroundApiHelper）',
-        description: '这是仓库里真实存在的切换逻辑，不是手写伪 API。',
-        code: `default void doBefore(Method method, ProceedingJoinPoint point) {\n    String dataSourceKey = getDataSourceKey(groupName, rwType);\n    if (dataSourceKey != null) {\n        GirDynamicStackDataSource.pushDataSource(dataSourceKey);\n    }\n}\n\ndefault void onFinally(Method method, ProceedingJoinPoint point) {\n    GirDynamicStackDataSource.popDataSource();\n}`
-      },
-      {
-        title: '示例3：主从读写分离 builder（BuilderTest）',
-        description: '这一段直接贴近你仓库里的 BuilderTest，用现有 builder API 组织主从库。',
-        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder()\n  .master("master_db")\n  .slaves("slave1", "slave2", "slave3")\n  .slaveStrategy(LoadStrategyType.ROUND_ROBIN)\n  .slaveGroupName("mySlaveGroup")\n  .build();`
-      },
-      {
-        title: '示例4：混合添加从库（BuilderTest）',
-        description: '适合展示 addSlave + slaveStrategy 这种更细粒度的 builder 方式。',
-        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder()\n  .master("master_db")\n  .addSlave("slave1")\n  .addSlave("slave2")\n  .addSlave("slave3")\n  .slaveStrategy(LoadStrategyType.WEIGHT)\n  .build();`
-      },
-      {
-        title: '示例5：静态快速构建方式（BuilderTest）',
-        description: '仓库里也提供了静态快速方法，用 ID 列表直接构建。',
-        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder\n  .build("master_db", Arrays.asList("slave1", "slave2", "slave3"));`
-      },
-      {
-        title: '示例6：SQL 读写识别（SQLParserUtilTest / WithStatementTest）',
-        description: '这一部分不是数据库连接示例，而是读写分离判断逻辑的测试入口。',
-        code: `SQLType type1 = SQLParserUtil.getSQLType("SELECT * FROM user");\nSQLType type2 = SQLParserUtil.getSQLType("WITH temp AS (SELECT id FROM user) SELECT * FROM temp");\nboolean isRead = SQLParserUtil.isReadOperation("SELECT * FROM user");\nboolean isWrite = SQLParserUtil.isWriteOperation("UPDATE user SET name = 'new' WHERE id = 1");`
-      }
-    ],
     sourceExamples: [
       {
         title: 'BuilderTest',
@@ -595,6 +475,11 @@ const businessModules = [
         title: 'EnableDynamicDs / GirDsAspectDoAroundApiHelper',
         path: 'geoair-dynamic-ds/src/main/java/cn/geoair/comp/dynamic/ds/datasource/EnableDynamicDs.java 等主源码类',
         description: '说明 Spring 场景下如何启用切面，以及切面前后如何调用 pushDataSource / popDataSource。'
+      },
+      {
+        title: 'geoair-dynamic-ds GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-dynamic-ds',
+        description: '直接跳到 geoair-dynamic-ds 模块目录。'
       }
     ],
     related: ['adv-query', 'db-service']

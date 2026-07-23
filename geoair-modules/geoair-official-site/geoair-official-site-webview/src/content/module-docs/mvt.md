@@ -25,6 +25,11 @@
 - `AdvMvtTileUtils`
 - `AdvMvtDensityUtils`
 
+对应测试示例：
+
+- `AdvMvtTileUtilsExample`
+- `PipelineBuilderExample`
+
 ### geoair-real-mvt
 
 这一层偏在线实时服务，负责：
@@ -41,6 +46,14 @@
 - `VectorTileExecutorV2`
 - `TileRequestParams`
 - `TileGlobalConfig`
+- `TileExecutorConfig`
+
+对应测试示例：
+
+- `GirRealMvtEntryExample`
+- `TileRequestParamsExample`
+- `TileExecutorConfigExample`
+- `TileGlobalConfigExample`
 
 ### geoair-static-mvt-spark
 
@@ -57,6 +70,11 @@
 - `SparkVectorTileGeneratorAll`
 - `VectorTileCommonUtils`
 - `SparkTaskSerializableUtil`
+- `TileSliceParameter`
+
+对应测试示例：
+
+- `TileSliceParameterExample`
 
 ## 核心入口
 
@@ -66,23 +84,11 @@
 GirRealMvtHelper helper = GirRealMvtHelper.getInstance();
 ```
 
-这个入口负责：
-
-- 提供矢量瓦片构建器消费者
-- 校验请求参数
-- 解析当前请求里的 `TileRequestParams`
-
 ### 实时执行器入口
 
 ```java
 VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, layerName);
 ```
-
-这类执行器负责：
-
-- 组装实际 SQL
-- 根据瓦片范围做 `ST_Intersects` 查询
-- 控制分页、密度、裁剪与输出字段
 
 ### 工具层入口
 
@@ -118,10 +124,7 @@ Envelope tileEnvelope = AdvMvtTileUtils.getTileRect(10, 845, 388, 4326);
 TileExecParams params = AdvMvtTileUtils.getTileExecParamsNotHasSql(10, 845, 388, 4326, 4326);
 ```
 
-适用场景：
-
-- 调试某一层级、某一块瓦片对应的几何范围
-- 在实时瓦片生成前先确认当前瓦片的空间边界
+对应测试：`AdvMvtTileUtilsExample`
 
 ### 示例2：获取实时 MVT 辅助入口
 
@@ -131,10 +134,7 @@ TileRequestParams requestParams = helper.getTileRequestParams("road_layer");
 ParamCheckResult result = helper.checkTileRequestParams(requestParams, "road_layer");
 ```
 
-适用场景：
-
-- 统一处理请求参数
-- 在服务层提前校验请求是否合法
+对应测试：`GirRealMvtEntryExample`
 
 ### 示例3：构建实时瓦片执行器
 
@@ -143,22 +143,28 @@ VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, 
 TileGlobalConfig config = executor.getTileGlobalConfig();
 ```
 
-适用场景：
+对应测试：`GirRealMvtEntryExample`、`TileGlobalConfigExample`
 
-- 进入实时矢量瓦片执行链
-- 在服务端查看某一层当前请求的执行上下文
-
-### 示例4：离线 Spark 生成器
+### 示例4：执行器配置对象
 
 ```java
-SparkVectorTileGenerator generator = new SparkVectorTileGenerator(sparkSession);
-generator.doGenerate(parameter);
+TileExecutorConfig config = new TileExecutorConfig()
+    .setLowLevelOptStrategy(TileExecutorConfig.LowLevelOptStrategy.PAGING)
+    .setDensityOptStrategy(TileExecutorConfig.DensityOptStrategy.DENSITY_MERGING);
 ```
 
-适用场景：
+对应测试：`TileExecutorConfigExample`
 
-- 需要把大批量数据库要素切成静态矢量瓦片
-- 希望结果落库或落文件，而不是实时按请求生成
+### 示例5：离线 Spark 生成参数
+
+```java
+TileSliceParameter parameter = new TileSliceParameter()
+    .setLayerName("road_layer")
+    .setMinZoom(6)
+    .setMaxZoom(14);
+```
+
+对应测试：`TileSliceParameterExample`
 
 ## 核心源码入口
 
@@ -173,11 +179,13 @@ generator.doGenerate(parameter);
 
 ## 测试建议
 
-建议把示例重点放在：
+建议优先从以下顺序阅读：
 
-- `AdvMvtTileUtils` 的瓦片范围计算
-- `GirRealMvtHelper` 的参数解析与入口调用
-- `VectorTileExecutorV2` 的执行配置读取
-- `SparkVectorTileGenerator` 的离线生成入口
+1. `AdvMvtTileUtilsExample`
+2. `GirRealMvtEntryExample`
+3. `TileRequestParamsExample`
+4. `TileExecutorConfigExample`
+5. `TileGlobalConfigExample`
+6. `TileSliceParameterExample`
 
-这几类示例更适合做 test / example，因为它们能直接体现模块结构和职责，而不是只停留在 DTO 层。
+这样可以从工具层一路读到实时服务层，再进入离线切片层。

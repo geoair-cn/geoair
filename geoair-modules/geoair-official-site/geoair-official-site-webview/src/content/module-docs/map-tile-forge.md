@@ -17,12 +17,9 @@
 
 - `GirMapTileService`
 
-它负责：
+对应测试示例：
 
-- 根据图层名查找图层配置
-- 通过 `TileStorageSupportAdapter` 获取正确的存储支持实现
-- 读取瓦片数据或能力描述
-- 触发预缓存逻辑
+- `GirMapTileForgeExample`
 
 ### 存储适配层
 
@@ -31,17 +28,9 @@
 - `TileStorageSupportAdapter`
 - `ITileStorageSupport`
 
-这层负责根据：
+对应测试示例：
 
-- `GirStorageType`
-- `GirMapTileType`
-
-选择正确的具体实现，例如：
-
-- `LocalZipXYZTileStorageSupport`
-- `LocalUnzippedXYZTileStorageSupport`
-- `S3ZipCompactV1TileStorageSupport`
-- `S3UnzippedCompactV2TileStorageSupport`
+- `TileStorageSupportAdapterRouteExample`
 
 ### 图层配置模型
 
@@ -49,23 +38,28 @@
 
 - `GirLayerConfigContext`
 
-这层负责保存：
+对应测试示例：
 
-- 图层名
-- 瓦片类型
-- 存储类型
-- 对象路径 / objectKey
-- 其他图层级配置
+- `GirLayerConfigContextExample`
 
-### Web 服务层
+### 枚举与返回对象
 
-核心入口是：
+关键对象包括：
 
-- `XYZServlet`
-- `D3TilesServlet`
-- `D3TerrainServlet`
+- `GirStorageType`
+- `GirMapTileType`
+- `TileRequest`
 
-这层负责把读取到的瓦片数据通过 HTTP 暴露出去。
+对应测试示例：
+
+- `TileForgeEnumExample`
+- `TileRequestExample`
+
+### ZIP XYZ 快速验证
+
+对应测试示例：
+
+- `XyzTest`
 
 ## 核心服务链路
 
@@ -86,67 +80,46 @@ TileRequest tileRequest = GirMapTileService.getInstance()
     .getLayerTile("base_layer", "10", "388", "845");
 ```
 
-适用场景：
+对应测试：`GirMapTileForgeExample`
 
-- 统一从图层服务中读取 XYZ 瓦片
-- 前端通过图层名访问瓦片服务时的主入口
-
-### 示例2：按配置对象读取瓦片
-
-```java
-GirLayerConfigContext config = contextHelper.getByLayerName("base_layer")
-    .orElseThrow(() -> new RuntimeException("图层配置不存在"));
-
-TileRequest tileRequest = GirMapTileService.getInstance()
-    .getLayerTile(config, "10", "388", "845");
-```
-
-适用场景：
-
-- 已经拿到图层配置对象，想跳过二次查找
-- 后台任务或测试代码中直接控制图层配置
-
-### 示例3：根据图层配置选择存储支持实现
+### 示例2：根据图层配置选择存储支持实现
 
 ```java
 ITileStorageSupport support = tileStorageSupportAdapter.getSupport(config);
 TileRequest tileRequest = support.getTileData(config, "10", "845", "388");
 ```
 
-适用场景：
+对应测试：`TileStorageSupportAdapterRouteExample`
 
-- 调试某个图层最终会走到哪一种存储支持实现
-- 新增存储类型或瓦片类型时验证适配链路
-
-### 示例4：触发预缓存
+### 示例3：图层配置对象
 
 ```java
-GirMapTileService.getInstance().preCacheTiles("base_layer");
+GirLayerConfigContext context = new GirLayerConfigContext()
+    .setDataId("base_layer")
+    .setStorageType(GirStorageType.LOCAL_ZIP)
+    .setMapTileType(GirMapTileType.XYZ)
+    .setObjectKey("E:/tiles/base_layer.zip");
 ```
 
-适用场景：
+对应测试：`GirLayerConfigContextExample`
 
-- 预热瓦片缓存
-- 新图层上线后先把热点瓦片缓存准备好
-
-### 示例5：直接走 XYZ ZIP 测试链路
+### 示例4：读取结果对象
 
 ```java
-GirLayerConfigContext context = new GirLayerConfigContext();
-context.setDataId("XYZ")
-    .setMapTileType(GirMapTileType.XYZ)
-    .setStorageType(GirStorageType.LOCAL_ZIP)
-    .setObjectKey("E:/tiles/example.zip");
+TileRequest empty = TileRequest.emptyByContext(context);
+```
 
+对应测试：`TileRequestExample`
+
+### 示例5：本地 ZIP XYZ 预缓存
+
+```java
 TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
 ITileStorageSupport support = adapter.getSupport(context);
 support.preCacheTiles(context, new LogProgressConsumer());
 ```
 
-适用场景：
-
-- 本地 ZIP XYZ 瓦片快速验证
-- 对照已有 `XyzTest` 理解图层配置和支持实现的关系
+对应测试：`XyzTest`
 
 ## 核心源码入口
 
@@ -161,11 +134,13 @@ support.preCacheTiles(context, new LogProgressConsumer());
 
 ## 测试建议
 
-建议重点补和维护这些示例：
+建议阅读顺序：
 
-- 基于 `GirMapTileService` 的服务入口示例
-- 基于 `TileStorageSupportAdapter` 的适配选择示例
-- 基于 `XyzTest` 的 ZIP XYZ 预缓存示例
-- 基于图层配置对象的本地 / S3 / 压缩格式切换示例
+1. `GirLayerConfigContextExample`
+2. `TileForgeEnumExample`
+3. `TileStorageSupportAdapterRouteExample`
+4. `GirMapTileForgeExample`
+5. `TileRequestExample`
+6. `XyzTest`
 
-这些 test 能直接帮助理解模块的“配置 -> 适配 -> 读取 -> 输出”主流程。
+这样能先建立配置模型，再理解适配器选择逻辑，最后看服务入口和预缓存流程。
