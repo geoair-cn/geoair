@@ -47,7 +47,7 @@ export const siteMeta = {
   footer: {
     organization: 'GeoAir',
     maintainer: '张逢吉',
-    email: '1159856928@qq.com',
+    email: 'zhangjun7570@qq.com',
     license: 'Apache License 2.0',
     repo: 'https://github.com/geoair-cn/geoair'
   }

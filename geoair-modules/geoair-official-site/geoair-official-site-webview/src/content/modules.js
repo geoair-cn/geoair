@@ -55,15 +55,30 @@ const standardModules = [
     route: '/standard/base',
     title: 'geoair-base',
     group: 'standard',
-    summary: '接口与抽象定义层，提供 GiResult、GiDao、GiCache、Gir 等核心抽象。',
+    summary: '基础抽象层，负责定义 Bean、缓存、结果模型、环境访问和统一门面入口。',
     tags: ['SPI', '接口层', '零外部依赖'],
-    capabilities: [
-      '定义 Bean、缓存、结果、分页、实体与环境读取等统一接口。',
-      '通过 Gir 门面为日志、配置、Bean 和 JSON 提供统一入口。',
-      '为 geoair-core 与业务模块提供稳定的抽象边界。'
+    sourceExamples: [
+      {
+        title: 'GirBeanHelper',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-base/src/main/java/cn/geoair/base/bean',
+        description: 'Bean 获取相关目录。'
+      },
+      {
+        title: 'GirBeanHelperExample',
+        path: 'geoair-standard/geoair-base/src/test/java/cn/geoair/base/test/GirBeanHelperExample.java',
+        description: '展示 GirBeanHelper 默认入口与兜底逻辑。'
+      },
+      {
+        title: 'GirCacheHelper',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-base/src/main/java/cn/geoair/base/cache',
+        description: '缓存辅助类相关目录。'
+      },
+      {
+        title: 'GiResult / GirResultExample',
+        path: 'geoair-standard/geoair-base/src/test/java/cn/geoair/base/test/GirResultExample.java',
+        description: '展示统一结果模型的最小用法。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: `GiResult<String> result = GiResult.successMsg("操作成功").andValue("data");`,
     related: ['core', 'web', 'orm']
   },
   {
@@ -71,15 +86,25 @@ const standardModules = [
     route: '/standard/core',
     title: 'geoair-core',
     group: 'standard',
-    summary: '基于 Spring 的 SPI 默认实现层，把抽象接口落到 Bean、日志、JSON 与环境等具体实现。',
+    summary: '基础抽象层的默认实现，负责把 Bean、缓存、JSON 和日志能力接到具体实现上。',
     tags: ['Spring', 'SPI 实现', '适配层'],
-    capabilities: [
-      '适配 Spring Context、Spring Environment 与 Servlet API。',
-      '提供 Jackson、FastJSON、Gson、Hutool JSON 等多实现选择。',
-      '为日志、缓存和类型转换提供默认实现。'
+    sourceExamples: [
+      {
+        title: 'SpringContextBean4Gir',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-core/src/main/java/cn/geoair/spi/bean',
+        description: 'Spring 容器适配目录。'
+      },
+      {
+        title: 'Cache4Gir',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-core/src/main/java/cn/geoair/spi/cache',
+        description: '缓存 SPI 实现目录。'
+      },
+      {
+        title: 'GirJacksonJsonExample',
+        path: 'geoair-standard/geoair-core/src/test/java/cn/geoair/spi/test/GirJacksonJsonExample.java',
+        description: '展示 GirJacksonJson 的最小 JSON 序列化入口。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-core</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '当工程运行在 Spring 环境中时，geoair-core 会把 Gir 门面对接到底层容器和配置系统。',
     related: ['base', 'web']
   },
   {
@@ -87,15 +112,25 @@ const standardModules = [
     route: '/standard/web',
     title: 'geoair-web',
     group: 'standard',
-    summary: 'Web 公共组件集合，覆盖会话、权限、请求日志、CORS、Cookie 与统一 Web 结果。',
+    summary: 'Web 工具层，负责请求响应门面、会话管理、结果模型和分页参数提供。',
     tags: ['Web', '会话', '权限'],
-    capabilities: [
-      '支持 Session、Cookie、Token 与 Spring Session 等多种会话策略。',
-      '提供 GiWebResult 与 Web 分页模型。',
-      '封装请求日志采集、跨域处理和 MIME 类型解析。'
+    sourceExamples: [
+      {
+        title: 'GirWeb',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web',
+        description: 'Web 门面入口与核心目录。'
+      },
+      {
+        title: 'GirCookieSession / GirTokenSession',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web/session',
+        description: '会话管理相关目录。'
+      },
+      {
+        title: 'GirWebResult',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web/data/result',
+        description: 'Web 结果模型目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-web</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '适合在需要统一 Web 入口、登录态与 API 输出格式的服务端项目中直接接入。',
     related: ['base', 'core']
   },
   {
@@ -103,15 +138,20 @@ const standardModules = [
     route: '/standard/orm',
     title: 'geoair-orm',
     group: 'standard',
-    summary: '通过 SPI 抽象对接 MyBatis、MyBatis-Plus、TK Mapper 与 Spring Data JPA。',
+    summary: 'ORM 适配层，负责把多种 ORM 框架接回统一的持久化抽象。',
     tags: ['ORM', 'MyBatis', 'JPA'],
-    capabilities: [
-      '统一 Entity 解析、Example 构造与 CRUD 执行入口。',
-      '兼容不同 ORM 实现，降低框架切换成本。',
-      '适合配合 GPA 架构和实体模型一起使用。'
+    sourceExamples: [
+      {
+        title: 'geoair-orm GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-orm',
+        description: '直接跳到 geoair-orm 模块目录。'
+      },
+      {
+        title: 'TkEntityHelper',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-orm/geoair-orm-mybatis-tk/src/main/java/cn/geoair/orm/tkmapper/util',
+        description: 'TK Mapper 工具相关目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-orm</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n  <type>pom</type>\n</dependency>`,
-    example: '在同一组织存在不同 ORM 技术栈时，可以用 geoair-orm 维持统一上层编码方式。',
     related: ['base', 'core']
   },
   {
@@ -119,15 +159,20 @@ const standardModules = [
     route: '/standard/sdk',
     title: 'geoair-sdk',
     group: 'standard',
-    summary: '统一 SDK 输出层，用于对外封装与交付 GeoAir 的公共能力。',
+    summary: 'SDK 侧工具与配置层，负责配置、body、file 和一些面向交付的辅助能力。',
     tags: ['SDK', '对外输出'],
-    capabilities: [
-      '统一对外暴露框架能力。',
-      '帮助上层项目减少直接依赖内部细节。',
-      '作为能力聚合入口，适合二次封装与分发。'
+    sourceExamples: [
+      {
+        title: 'geoair-sdk GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-sdk',
+        description: '直接跳到 geoair-sdk 模块目录。'
+      },
+      {
+        title: 'body 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-sdk/src/main/java/cn/geoair/sdk/body',
+        description: '请求体与 multipart 相关目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-sdk</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '当项目要把 GeoAir 能力打包成对外组件时，可以从 geoair-sdk 开始构建。',
     related: ['base', 'tools']
   },
   {
@@ -135,15 +180,20 @@ const standardModules = [
     route: '/standard/tools',
     title: 'geoair-tools',
     group: 'standard',
-    summary: '底层工具库，提供方法分派、集合、反射、控制台输出等基础能力。',
+    summary: '底层轻量工具层，提供控制台输出和一些基础辅助能力。',
     tags: ['工具类', '反射', '基础设施'],
-    capabilities: [
-      '支撑 Gir 门面与方法句柄分派机制。',
-      '提供控制台、表格输出和常见工具方法。',
-      '为标准基础库和业务模块复用底层能力。'
+    sourceExamples: [
+      {
+        title: 'geoair-tools GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-tools',
+        description: '直接跳到 geoair-tools 模块目录。'
+      },
+      {
+        title: 'GkConsole / GkConsoleTable',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-tools/src/main/java/cn/geoair/base/tool',
+        description: '控制台与表格输出相关目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-tools</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '适合需要在不引入更重依赖的前提下，复用底层工具方法的内部模块。',
     related: ['base', 'sdk']
   }
 ]
@@ -419,15 +469,25 @@ const businessModules = [
     route: '/modules/apidoc',
     title: 'geoair-apidoc',
     group: 'business',
-    summary: '基于 Knife4j 的 API 文档模块，同时支持 OpenAPI 3 和 Swagger 2。',
+    summary: '接口文档配置模块，负责文档分组、主页信息和 Spring 中的文档配置组织。',
     tags: ['API 文档', 'Knife4j', 'Spring Boot Starter'],
-    capabilities: [
-      '自动扫描 Controller 包路径并按包分组。',
-      '支持文档导出和零配置启动。',
-      '兼容 OpenAPI 3 与 Swagger 2 两条规范。'
+    sourceExamples: [
+      {
+        title: 'GirOpenApiConfig',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-apidoc/geoair-knife4j-core/src/main/java/cn/geoair/comp/knife4j/ext/core/config',
+        description: '抽象配置基类目录。'
+      },
+      {
+        title: 'DocketInfo / ApiModelInfo',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-apidoc/geoair-knife4j-core/src/main/java/cn/geoair/comp/knife4j/ext/core/model',
+        description: '文档分组和主页信息模型目录。'
+      },
+      {
+        title: 'Swagger2Configuration demo',
+        path: 'geoair-apidoc/geoair-knife4j-spring-boot-demo/src/main/java/cn/geoair/comp/demo/knife4j/config/Swagger2Configuration.java',
+        description: '仓库里现有的 Swagger2Configuration 示例。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '访问 /doc.html 即可查看文档页面，适合 Spring Boot 服务快速接入。',
     related: ['code-generator', 'db-service']
   },
   {
@@ -435,15 +495,25 @@ const businessModules = [
     route: '/modules/code-generator',
     title: 'geoair-code-generator',
     group: 'business',
-    summary: '从数据库表结构生成 Entity、Mapper、Service、Controller 以及 Vue 组件代码。',
+    summary: '代码生成模块，负责把数据库表结构组织成后端与前端的基础代码骨架。',
     tags: ['代码生成', '模板', 'Vue'],
-    capabilities: [
-      '支持生成后端与前端基础代码。',
-      '支持按项目规范自定义模板。',
-      '减少重复样板代码，提升交付速度。'
+    sourceExamples: [
+      {
+        title: 'geoair-code-generator GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-code-generator',
+        description: '直接跳到 geoair-code-generator 模块目录。'
+      },
+      {
+        title: 'geoair-code-gen-module',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-code-generator/geoair-code-gen-module',
+        description: '核心生成逻辑目录。'
+      },
+      {
+        title: 'geoair-code-gen-demo',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-code-generator/geoair-code-gen-demo',
+        description: '代码生成 demo 目录。'
+      }
     ],
-    quickStart: '适合新建 CRUD 业务模块时快速拉起基础代码。',
-    example: '从库表直接生成 Entity、Mapper 和管理页面，缩短业务起步时间。',
     related: ['apidoc', 'db-service']
   },
   {
@@ -518,6 +588,11 @@ const businessModules = [
         description: 'SQL 执行器相关目录。'
       },
       {
+        title: 'DbServiceDtoExample',
+        path: 'geoair-db-service/geoair-db-service-core/src/test/java/cn/geoair/comp/db/service/core/test/DbServiceDtoExample.java',
+        description: '展示 DsDataSourceApo、SQLTaskDto、ResponseDto 这几类核心 DTO 的基本使用方式。'
+      },
+      {
         title: 'geoair-db-service-webview',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-db-service/geoair-db-service-webview',
         description: '前端管理界面目录。'
@@ -537,6 +612,11 @@ const businessModules = [
         title: 'GirJtsJacksonUtils',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/utils',
         description: 'JTS 与 Jackson 的工具层目录。'
+      },
+      {
+        title: 'JtsJacksonModuleExample',
+        path: 'geoair-message-jts-jackson/src/test/java/cn/geoair/comp/message/converter/jts/jackson/test/JtsJacksonModuleExample.java',
+        description: '展示 JtsExtModule 如何注册到 ObjectMapper。'
       },
       {
         title: 'JtsExtModule',
@@ -563,6 +643,11 @@ const businessModules = [
         title: 'PgGeometryTypeHandler',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-mybatis/src/main/java/cn/geoair/comp/message/converter/jts/mybatis/typehander',
         description: 'Geometry TypeHandler 相关目录。'
+      },
+      {
+        title: 'PgGeometryTypeHandlerExample',
+        path: 'geoair-message-jts-mybatis/src/test/java/cn/geoair/comp/message/converter/jts/mybatis/test/PgGeometryTypeHandlerExample.java',
+        description: '展示 PgGeometryTypeHandler 与 Geometry/JdbcType.OTHER 的基本对应关系。'
       },
       {
         title: 'GirMyBatisConfigurationCustomizer',

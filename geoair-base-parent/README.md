@@ -298,7 +298,7 @@ geoair-framework (根 POM)
 
 ## 👥 开发者信息
 - **作者**: 张逢吉
-- **邮箱**: 1159856928@qq.com
+- **邮箱**: zhangjun7570@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
 - **Gitee 仓库**: https://github.com/geoair-cn/geoair

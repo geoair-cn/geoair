@@ -111,6 +111,6 @@ public class DemoController {
 ## 联系方式
 
 - 开发者：张逢吉
-- 邮箱：1159856928@qq.com
+- 邮箱：zhangjun7570@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
