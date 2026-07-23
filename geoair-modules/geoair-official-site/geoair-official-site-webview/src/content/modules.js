@@ -170,15 +170,84 @@ const geoModules = [
     route: '/modules/geo/adv-query',
     title: 'geoair-adv-query',
     group: 'geo',
-    summary: '高级空间查询执行器，统一管理 CRUD、DDL、空间过滤、分页与多数据库方言。',
-    tags: ['空间查询', 'PostGIS', 'SQL'],
+    summary: 'GeoAir 的高级空间查询执行器，围绕多数据库方言、空间过滤、动态 SQL、分页与 Lambda 条件构造，提供一套更贴近 GIS 业务的数据库访问方式。',
+    tags: ['空间查询', 'PostGIS', 'SQL', 'BBox', '动态数据源'],
     capabilities: [
-      '适配 PostgreSQL + PostGIS、MySQL 与 Oracle Spatial。',
-      '支持 BBox、距离、质心、修复等空间操作。',
-      '提供 Fluent Lambda 条件构造器与分页能力。'
+      '统一聚合 CRUD、DDL、空间查询、分页和事务相关能力，适合作为 GIS 数据访问层的核心执行入口。',
+      '适配 PostgreSQL + PostGIS、MySQL 与 Oracle Spatial，适合存在多数据库方言差异的空间项目。',
+      '支持 BBox、距离、相交、质心、几何修复等常见空间操作，并与 Geometry / WKT / GeoJSON 等对象模型衔接。',
+      '内置 Fluent Lambda 条件构造器与动态 SQL 标签能力，便于把复杂 GIS 查询组织成可维护代码。'
     ],
-    quickStart: `executor.wSelectList(User.class, builder -> builder\n  .select("name", "geom")\n  .where(w -> w.eq(User::getAge, 18).gt(User::getScore, 90)));`,
-    example: '适合空间检索、专题图查询和跨数据库 GIS 服务。',
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-adv-query</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>\n\n@Resource\nprivate IAdvExecutor executor;\n\nList<User> users = executor.wSelectList(User.class, builder -> builder\n  .select("id", "name", "geom")\n  .where(w -> w.eq(User::getStatus, 1))\n  .orderBy(o -> o.desc(User::getId)));`,
+    example: '适合空间检索、专题图查询、多租户 GIS 服务和跨数据库空间访问场景。',
+    detailSections: [
+      {
+        title: '模块定位',
+        items: [
+          '它不是单纯的 SQL 拼接工具，而是把空间查询、数据库方言差异和分页能力统一到同一执行入口。',
+          '如果 geoair-geo-tools 负责 Geometry 处理，那么 geoair-adv-query 更偏向“如何把空间对象查出来、筛出来、分页出来”。',
+          '在真实 GIS 系统里，它通常位于 Service 与数据库之间，承担高级空间数据访问层的职责。'
+        ]
+      },
+      {
+        title: '核心接口组成',
+        items: [
+          'IAdvExecutor 聚合了数据源获取、事务模板、基础 CRUD、DDL、空间操作、条件构造与分页查询能力。',
+          'IAdvGeoOpt 负责相交、距离、BBox 等空间操作，适合地图范围查询、缓冲区分析和空间筛选。',
+          'IAdvWhereSelectOpt 负责 Fluent 风格的查询构造，适合把复杂业务条件写成更可维护的链式表达。',
+          'IAdvSimplePageOpt 负责分页能力，适合地图要素列表、表格数据和条件检索页面。'
+        ]
+      },
+      {
+        title: '适用场景',
+        items: [
+          '地图框选查询：前端传入 bbox，后端根据范围筛选点、线、面要素。',
+          '专题图筛选：按行业、状态、行政区划等属性条件叠加空间条件做组合查询。',
+          '多库适配：同一套 GIS 查询能力需要兼容 PostGIS、MySQL 或 Oracle Spatial。',
+          '空间数据服务：为地图接口、要素检索、统计分析或矢量瓦片查询提供底层执行能力。'
+        ]
+      },
+      {
+        title: '和其他模块的关系',
+        items: [
+          '通常与 geoair-geo-tools 配合：前者负责查，后者负责算、转和处理 Geometry。',
+          '在多租户或多数据源系统中，常与 geoair-dynamic-ds 配合完成运行时库切换。',
+          '如果上层还需要数据库可视化管理或数据服务配置，可以继续配合 geoair-db-service。'
+        ]
+      }
+    ],
+    usageExamples: [
+      {
+        title: '基础条件查询',
+        description: '适合后台列表、业务筛选和属性检索，先从常规字段过滤开始。',
+        code: `List<User> users = executor.wSelectList(User.class, builder -> builder\n  .select("id", "name", "status")\n  .where(w -> w.eq(User::getStatus, 1)\n    .like(User::getName, "新区"))\n  .orderBy(o -> o.desc(User::getId)));`
+      },
+      {
+        title: '地图范围 BBox 查询',
+        description: '当前端地图缩放或拖拽后，可用 bbox 只查询视域内要素，减少全量返回。',
+        code: `String bbox = "116.30,39.85,116.55,40.02";\n\nList<Map<String, Object>> rows = executor.wSelectMapList("poi_table", builder -> builder\n  .select("id", "name", "geom")\n  .whereGeo(g -> g.bbox("geom", bbox))\n  .limit(500));`
+      },
+      {
+        title: '属性条件 + 空间相交组合查询',
+        description: '适合专题图、行政区分析或图层筛选，把属性条件和空间条件放在一次查询里。',
+        code: `String polygonWkt = "POLYGON((116.3 39.8,116.6 39.8,116.6 40.0,116.3 40.0,116.3 39.8))";\n\nList<RiverEntity> rivers = executor.wSelectList(RiverEntity.class, builder -> builder\n  .select("id", "river_name", "geom")\n  .where(w -> w.eq(RiverEntity::getLevel, 2))\n  .whereGeo(g -> g.intersectsWkt("geom", polygonWkt, 4326)));`
+      },
+      {
+        title: '分页空间检索',
+        description: '适合前端表格、分页列表和管理端检索结果页。',
+        code: `GiPager<CompanyEntity> pager = executor.wSelectPage(CompanyEntity.class, builder -> builder\n  .page(1, 20)\n  .select("id", "company_name", "geom")\n  .where(w -> w.eq(CompanyEntity::getDeleted, 0))\n  .whereGeo(g -> g.distanceLt("geom", 116.40, 39.90, 3000, 4326)));`
+      },
+      {
+        title: '动态数据源联合使用',
+        description: '适合一套系统同时连接业务库、专题库或租户库时，先切库再执行空间查询。',
+        code: `GirDynamicStackDataSource.push("tenant-gis-ds");\ntry {\n  List<Map<String, Object>> plots = executor.wSelectMapList("land_plot", builder -> builder\n    .select("id", "plot_name", "geom")\n    .whereGeo(g -> g.bbox("geom", "116.1,39.7,116.7,40.1")));\n} finally {\n  GirDynamicStackDataSource.poll();\n}`
+      },
+      {
+        title: '动态 SQL 片段查询',
+        description: '适合条件项很多、是否拼接由入参决定的 GIS 检索接口。',
+        code: `String sql = "" +\n  "SELECT id, name, geom FROM project_layer " +\n  "<where>" +\n  "  <if test='status != null'> AND status = #{status} </if>" +\n  "  <if test='keyword != null and keyword != \"\"'> AND name like concat('%', #{keyword}, '%') </if>" +\n  "</where>";\n\nList<Map<String, Object>> rows = executor.dynamicSelect(sql, params);`
+      }
+    ],
     related: ['geo-tools', 'dynamic-ds', 'db-service']
   },
   {

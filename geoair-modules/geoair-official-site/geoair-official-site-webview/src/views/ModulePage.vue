@@ -41,6 +41,37 @@
             description="先明确依赖和入口，再逐步深入到具体实现。"
           />
           <CodeBlock :title="`${moduleItem.title} 接入示例`" :code="moduleItem.quickStart" />
+
+          <template v-if="detailSections.length">
+            <SectionIntro
+              eyebrow="深度说明"
+              title="模块拆解与使用建议"
+              description="针对该模块的职责边界、使用方式和常见落地场景做更细化说明。"
+            />
+            <div class="detail-sections">
+              <article v-for="section in detailSections" :key="section.title" class="surface-card detail-card">
+                <h3>{{ section.title }}</h3>
+                <ul>
+                  <li v-for="item in section.items" :key="item">{{ item }}</li>
+                </ul>
+              </article>
+            </div>
+          </template>
+
+          <template v-if="usageExamples.length">
+            <SectionIntro
+              eyebrow="示例"
+              title="更多可复制的查询片段"
+              description="这些示例覆盖基础检索、空间范围查询、组合条件、分页与动态数据源等典型场景。"
+            />
+            <div class="example-list">
+              <article v-for="example in usageExamples" :key="example.title" class="example-item">
+                <h3>{{ example.title }}</h3>
+                <p>{{ example.description }}</p>
+                <CodeBlock :title="example.title" :code="example.code" />
+              </article>
+            </div>
+          </template>
         </div>
 
         <div>
