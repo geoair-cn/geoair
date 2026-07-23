@@ -12,8 +12,10 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeatureType;
+
 
 public class CsvGeoFileWriter implements GeoFileWriter {
 

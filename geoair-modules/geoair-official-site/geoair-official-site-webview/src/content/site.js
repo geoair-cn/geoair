@@ -1,7 +1,7 @@
 export const siteMeta = {
   name: 'GeoAir Framework',
   shortName: 'GeoAir',
-  version: 'J8-dev-SNAPSHOT',
+  version: 'J17-dev-SNAPSHOT',
   tagline: 'GIS Java 工具与模块集合',
   description: 'GeoAir Framework 基于 Maven 多模块组织方式，聚焦 GIS 开发中常见的空间处理、动态数据源、瓦片服务、矢量瓦片和数据库相关能力。',
   heroActions: [
@@ -32,7 +32,7 @@ export const siteMeta = {
   quickStart: {
     title: '五分钟接入',
     summary: '继承父 POM 或导入依赖管理后，按需添加模块依赖即可开始使用。',
-    code: `<parent>\n    <groupId>cn.geoair.devkit</groupId>\n    <artifactId>geoair-base-parent</artifactId>\n    <version>J8-dev-SNAPSHOT</version>\n</parent>\n\n<dependency>\n    <groupId>cn.geoair.devkit</groupId>\n    <artifactId>geoair-geo-tools</artifactId>\n    <version>J8-dev-SNAPSHOT</version>\n</dependency>`
+    code: `<parent>\n    <groupId>cn.geoair.devkit</groupId>\n    <artifactId>geoair-base-parent</artifactId>\n    <version>J17-dev-SNAPSHOT</version>\n</parent>\n\n<dependency>\n    <groupId>cn.geoair.devkit</groupId>\n    <artifactId>geoair-geo-tools</artifactId>\n    <version>J17-dev-SNAPSHOT</version>\n</dependency>`
   },
   sampleCode: {
     title: '统一入口示例',

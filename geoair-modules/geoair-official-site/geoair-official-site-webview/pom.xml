@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-official-site</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-official-site-webview</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J17-dev-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-official-site-webview</name>
 
@@ -41,7 +41,7 @@
 
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <maven.install.skip>true</maven.install.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

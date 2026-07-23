@@ -14,7 +14,7 @@ GeoAir Framework 是一个**面向企业级 GIS（地理信息系统）开发的
 ## 🏗️ 整体架构
 
 ```
-geoair-framework (根 POM, J8-dev-SNAPSHOT)
+geoair-framework (根 POM, J17-dev-SNAPSHOT)
 │
 ├── geoair-dependencies-bom/         ← 依赖版本管理中心（5 个领域 BOM）
 │   ├── geoair-geotools-dependencies/     GeoTools 28.6.1 + JTS 1.19.0
@@ -92,7 +92,7 @@ geoair-framework
 | `23.1.0` | 2023-08-01 | 初始版本：标准库、GIS 空间处理、动态数据源、瓦片工具 |
 | `23.1.2-M2` | 2026-03-13 | Bug 修复、性能优化、新功能模块 |
 | `J8.1.0-RC2` | 2026-03-15 | 统一 Group ID 为 `cn.geoair.devkit`；新版本号体系 `J8.x.x`；兼容 JDK 11+ |
-| `J8-dev-SNAPSHOT` | 当前开发版 | 持续迭代中 |
+| `J17-dev-SNAPSHOT` | 当前开发版 | 持续迭代中 |
 
 > **版本号规则**: `J8` 表示基于 Java 8 开发（兼容 JDK 11+），后跟主版本号、次版本号。旧版 `23.x.x` 建议逐步迁移至 `J8.x.x` 体系。
 

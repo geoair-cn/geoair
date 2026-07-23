@@ -5,9 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeatureType;
+
 
 final class CsvSchemaSupport {
 

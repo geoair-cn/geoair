@@ -11,7 +11,7 @@ const dependencyModules = [
       '降低多模块工程中的依赖冲突与升级成本。',
       '为父 POM 与下游业务模块提供稳定基线。'
     ],
-    quickStart: `<dependencyManagement>\n  <dependencies>\n    <dependency>\n      <groupId>cn.geoair.devkit</groupId>\n      <artifactId>geoair-base-parent</artifactId>\n      <version>J8-dev-SNAPSHOT</version>\n      <type>pom</type>\n      <scope>import</scope>\n    </dependency>\n  </dependencies>\n</dependencyManagement>`,
+    quickStart: `<dependencyManagement>\n  <dependencies>\n    <dependency>\n      <groupId>cn.geoair.devkit</groupId>\n      <artifactId>geoair-base-parent</artifactId>\n      <version>J17-dev-SNAPSHOT</version>\n      <type>pom</type>\n      <scope>import</scope>\n    </dependency>\n  </dependencies>\n</dependencyManagement>`,
     example: '适合希望统一 GeoTools、Spring Boot 与 API 文档组件版本的 Maven 多模块项目。',
     related: ['base-parent', 'framework-bom']
   },
@@ -27,7 +27,7 @@ const dependencyModules = [
       '统一编码、测试、发布与插件配置。',
       '作为标准库与业务模块的共同继承入口。'
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
+    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base-parent</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</parent>`,
     example: '适合新建业务系统、Starter 或空间服务时直接继承，减少重复 Maven 配置。',
     related: ['dependencies-bom', 'framework-bom', 'base']
   },
@@ -43,7 +43,7 @@ const dependencyModules = [
       '为 API、业务项目与 Starter 保持清晰边界。',
       '让组织内部工程继承方式更统一。'
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-project-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
+    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-project-parent</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</parent>`,
     example: '当项目已经确定是标准业务工程或 Starter 时，可以直接选择对应父 POM。',
     related: ['base-parent']
   }
@@ -62,7 +62,7 @@ const standardModules = [
       '通过 Gir 门面为日志、配置、Bean 和 JSON 提供统一入口。',
       '为 geoair-core 与业务模块提供稳定的抽象边界。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: `GiResult<String> result = GiResult.successMsg("操作成功").andValue("data");`,
     related: ['core', 'web', 'orm']
   },
@@ -78,7 +78,7 @@ const standardModules = [
       '提供 Jackson、FastJSON、Gson、Hutool JSON 等多实现选择。',
       '为日志、缓存和类型转换提供默认实现。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-core</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-core</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '当工程运行在 Spring 环境中时，geoair-core 会把 Gir 门面对接到底层容器和配置系统。',
     related: ['base', 'web']
   },
@@ -94,7 +94,7 @@ const standardModules = [
       '提供 GiWebResult 与 Web 分页模型。',
       '封装请求日志采集、跨域处理和 MIME 类型解析。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-web</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-web</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '适合在需要统一 Web 入口、登录态与 API 输出格式的服务端项目中直接接入。',
     related: ['base', 'core']
   },
@@ -110,7 +110,7 @@ const standardModules = [
       '兼容不同 ORM 实现，降低框架切换成本。',
       '适合配合 GPA 架构和实体模型一起使用。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-orm</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n  <type>pom</type>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-orm</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n  <type>pom</type>\n</dependency>`,
     example: '在同一组织存在不同 ORM 技术栈时，可以用 geoair-orm 维持统一上层编码方式。',
     related: ['base', 'core']
   },
@@ -126,7 +126,7 @@ const standardModules = [
       '帮助上层项目减少直接依赖内部细节。',
       '作为能力聚合入口，适合二次封装与分发。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-sdk</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-sdk</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '当项目要把 GeoAir 能力打包成对外组件时，可以从 geoair-sdk 开始构建。',
     related: ['base', 'tools']
   },
@@ -142,7 +142,7 @@ const standardModules = [
       '提供控制台、表格输出和常见工具方法。',
       '为标准基础库和业务模块复用底层能力。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-tools</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-tools</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '适合需要在不引入更重依赖的前提下，复用底层工具方法的内部模块。',
     related: ['base', 'sdk']
   }
@@ -443,7 +443,7 @@ const geoModules = [
       '适合作为空间几何处理的基础依赖入口。',
       '便于下游模块减少零散依赖声明。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-jts-all</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-jts-all</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '适合做 Geometry 序列化、空间分析和空间数据库映射的通用基础。',
     related: ['geo-tools', 'message-jts-jackson', 'message-jts-mybatis']
   }
@@ -462,7 +462,7 @@ const businessModules = [
       '支持文档导出和零配置启动。',
       '兼容 OpenAPI 3 与 Swagger 2 两条规范。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '访问 /doc.html 即可查看文档页面，适合 Spring Boot 服务快速接入。',
     related: ['code-generator', 'db-service']
   },
@@ -494,7 +494,7 @@ const businessModules = [
       '下含多个可独立接入的 GIS 子模块。',
       '是构建地图平台、空间分析和空间服务的核心基础。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '如果你的项目要处理坐标、Geometry、空间查询或瓦片服务，geoair-geo 是最先需要了解的模块组。',
     related: geoModules.map(item => item.slug),
     children: geoModules.map(item => item.slug)
