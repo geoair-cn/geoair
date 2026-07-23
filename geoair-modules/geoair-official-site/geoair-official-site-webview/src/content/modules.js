@@ -4,15 +4,25 @@ const dependencyModules = [
     route: '/standard/dependencies-bom',
     title: 'geoair-dependencies-bom',
     group: 'standard',
-    summary: '集中管理 GeoTools、Spring、OpenAPI 与通用第三方依赖版本，保证多模块项目的一致性。',
+    summary: '依赖版本管理中心，负责按领域组织第三方依赖版本。',
     tags: ['BOM', 'Maven', '依赖管理'],
-    capabilities: [
-      '统一管理 5 个领域 BOM 与第三方版本。',
-      '降低多模块工程中的依赖冲突与升级成本。',
-      '为父 POM 与下游业务模块提供稳定基线。'
+    sourceExamples: [
+      {
+        title: 'geoair-dependencies-bom GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-dependencies-bom',
+        description: '直接跳到 geoair-dependencies-bom 模块目录。'
+      },
+      {
+        title: 'geoair-geotools-dependencies',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-dependencies-bom/geoair-geotools-dependencies',
+        description: 'GeoTools 相关依赖定义目录。'
+      },
+      {
+        title: 'geoair-openapi-dependencies',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-dependencies-bom/geoair-openapi-dependencies',
+        description: 'OpenAPI / Swagger 相关依赖定义目录。'
+      }
     ],
-    quickStart: `<dependencyManagement>\n  <dependencies>\n    <dependency>\n      <groupId>cn.geoair.devkit</groupId>\n      <artifactId>geoair-base-parent</artifactId>\n      <version>J8-dev-SNAPSHOT</version>\n      <type>pom</type>\n      <scope>import</scope>\n    </dependency>\n  </dependencies>\n</dependencyManagement>`,
-    example: '适合希望统一 GeoTools、Spring Boot 与 API 文档组件版本的 Maven 多模块项目。',
     related: ['base-parent', 'framework-bom']
   },
   {
@@ -20,15 +30,20 @@ const dependencyModules = [
     route: '/standard/base-parent',
     title: 'geoair-base-parent',
     group: 'standard',
-    summary: 'GeoAir 的核心父 POM，聚合依赖管理、构建配置与发布能力。',
+    summary: '基础父 POM，负责聚合依赖管理、构建配置与统一继承入口。',
     tags: ['Parent POM', '构建', '发布'],
-    capabilities: [
-      '导入 GeoAir 所需的依赖版本管理。',
-      '统一编码、测试、发布与插件配置。',
-      '作为标准库与业务模块的共同继承入口。'
+    sourceExamples: [
+      {
+        title: 'geoair-base-parent GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-base-parent',
+        description: '直接跳到 geoair-base-parent 模块目录。'
+      },
+      {
+        title: 'geoair-base-parent pom.xml',
+        path: 'https://github.com/geoair-cn/geoair/blob/master/geoair-framework/geoair-base-parent/pom.xml',
+        description: '父 POM 本身的构建与依赖配置。'
+      }
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
-    example: '适合新建业务系统、Starter 或空间服务时直接继承，减少重复 Maven 配置。',
     related: ['dependencies-bom', 'framework-bom', 'base']
   },
   {
@@ -36,15 +51,25 @@ const dependencyModules = [
     route: '/standard/framework-bom',
     title: 'geoair-framework-bom',
     group: 'standard',
-    summary: '按工程类型拆分父 POM，分别服务于 API 项目、普通业务项目与 Spring Boot Starter。',
+    summary: '面向不同项目类型的父 POM 集合，负责 API / 项目 / Starter 三类模板。',
     tags: ['工程类型', 'Maven', '父 POM'],
-    capabilities: [
-      '提供不同项目形态的父工程模板。',
-      '为 API、业务项目与 Starter 保持清晰边界。',
-      '让组织内部工程继承方式更统一。'
+    sourceExamples: [
+      {
+        title: 'geoair-framework-bom GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-framework-bom',
+        description: '直接跳到 geoair-framework-bom 模块目录。'
+      },
+      {
+        title: 'geoair-project-parent',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-framework-bom/geoair-project-parent',
+        description: '普通业务项目父工程目录。'
+      },
+      {
+        title: 'geoair-spring-boot-starter-parent',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-framework-bom/geoair-spring-boot-starter-parent',
+        description: 'Starter 父工程目录。'
+      }
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-project-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
-    example: '当项目已经确定是标准业务工程或 Starter 时，可以直接选择对应父 POM。',
     related: ['base-parent']
   }
 ]
