@@ -40,6 +40,7 @@ public class AdvBeanMappingMeta {
     }
 
     private final Class<?> beanClass;
+    private final boolean mapType;
     private final List<AdvBeanPropertyMeta> properties = new ArrayList<>();
     private final List<AdvBeanPropertyMeta> idProperties = new ArrayList<>();
     private final Map<String, AdvBeanPropertyMeta> exactLookup = new LinkedHashMap<>();
@@ -47,6 +48,7 @@ public class AdvBeanMappingMeta {
 
     private AdvBeanMappingMeta(Class<?> beanClass) {
         this.beanClass = beanClass;
+        this.mapType = Map.class.isAssignableFrom(beanClass);
         build();
     }
 
@@ -54,11 +56,18 @@ public class AdvBeanMappingMeta {
         return beanClass;
     }
 
+    public boolean isMapType() {
+        return mapType;
+    }
+
     public List<AdvBeanPropertyMeta> getProperties() {
         return Collections.unmodifiableList(properties);
     }
 
     public List<AdvBeanPropertyMeta> getWritableProperties(List<String> ignoreFieldNames) {
+        if (mapType) {
+            return Collections.emptyList();
+        }
         if (ignoreFieldNames == null || ignoreFieldNames.isEmpty()) {
             List<AdvBeanPropertyMeta> all = new ArrayList<>();
             for (AdvBeanPropertyMeta property : properties) {
@@ -98,6 +107,9 @@ public class AdvBeanMappingMeta {
     }
 
     public AdvBeanPropertyMeta resolvePropertyByColumnOrProperty(String name) {
+        if (mapType) {
+            return null;
+        }
         String cleanedName = cleanName(name);
         if (StrUtil.isBlank(cleanedName)) {
             return null;
@@ -110,17 +122,23 @@ public class AdvBeanMappingMeta {
     }
 
     public String resolveColumnName(String fieldOrColumnName, boolean toUnderlineCase) {
+        if (StrUtil.isBlank(fieldOrColumnName)) {
+            return fieldOrColumnName;
+        }
+        if (mapType) {
+            return toUnderlineCase ? StrUtil.toUnderlineCase(fieldOrColumnName) : fieldOrColumnName;
+        }
         AdvBeanPropertyMeta property = resolvePropertyByColumnOrProperty(fieldOrColumnName);
         if (property != null) {
             return property.resolveColumnName(toUnderlineCase);
-        }
-        if (StrUtil.isBlank(fieldOrColumnName)) {
-            return fieldOrColumnName;
         }
         return toUnderlineCase ? StrUtil.toUnderlineCase(fieldOrColumnName) : fieldOrColumnName;
     }
 
     private void build() {
+        if (mapType) {
+            return;
+        }
         BeanDesc beanDesc = BeanUtil.getBeanDesc(beanClass);
         Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
         if (propMap == null || propMap.isEmpty()) {

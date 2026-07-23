@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ：张逢吉
@@ -36,6 +38,10 @@ public class AdvBeanMapper {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
         AdvBeanMappingMeta mappingMeta = AdvBeanMappingMeta.of(beanType);
+        if (mappingMeta.isMapType()) {
+            mapCurrentRowToMap(rs, bean, beanType, columnCount, metaData);
+            return bean;
+        }
         for (int i = 1; i <= columnCount; i++) {
             String columnLabel = metaData.getColumnLabel(i);
             AdvBeanPropertyMeta propertyMeta = mappingMeta.resolvePropertyByColumnOrProperty(columnLabel);
@@ -56,8 +62,31 @@ public class AdvBeanMapper {
         return bean;
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> void mapCurrentRowToMap(ResultSet rs,
+                                        T bean,
+                                        Class<T> beanType,
+                                        int columnCount,
+                                        ResultSetMetaData metaData) throws SQLException {
+        Map<String, Object> map = (Map<String, Object>) bean;
+        for (int i = 1; i <= columnCount; i++) {
+            String columnLabel = metaData.getColumnLabel(i);
+            Object rawValue = rs.getObject(i);
+            Class<?> valueType = rawValue == null ? Object.class : rawValue.getClass();
+            Object convertedValue = typeHandlerRegistry.convertForRead(
+                    rawValue,
+                    valueType,
+                    AdvTypeHandlerContext.of(beanType, columnLabel, columnLabel, valueType));
+            map.put(columnLabel, convertedValue);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     private <T> T createBean(Class<T> beanType) {
         try {
+            if (Map.class.isAssignableFrom(beanType)) {
+                return (T) new LinkedHashMap<String, Object>();
+            }
             return beanType.newInstance();
         } catch (Exception e) {
             throw new RuntimeException("创建对象失败：" + beanType.getName(), e);
