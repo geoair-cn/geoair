@@ -10,14 +10,12 @@ import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import org.springdoc.core.GroupedOpenApi;
-import org.springdoc.core.SpringDocConfigProperties;
-import org.springdoc.core.SwaggerUiConfigProperties;
+
+import java.util.*;
+
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springdoc.core.properties.SpringDocConfigProperties;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -83,7 +81,7 @@ public class GirSpringDocApiRunner
         properties.setDefaultSupportFormData(true);
         properties.setModelAndViewAllowed(true);
 
-        List<SpringDocConfigProperties.GroupConfig> groupConfigs = properties.getGroupConfigs();
+        Set<SpringDocConfigProperties.GroupConfig> groupConfigs = properties.getGroupConfigs();
         for (DocketInfo docketInfo : resolveDocketInfos()) {
             SpringDocConfigProperties.GroupConfig groupConfig =
                     new SpringDocConfigProperties.GroupConfig();
