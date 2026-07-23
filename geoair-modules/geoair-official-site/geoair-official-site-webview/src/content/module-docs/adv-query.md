@@ -24,6 +24,164 @@
 2. `GirAdvWhereFilter` / `GirAdvWhereLambdaFilter` 负责描述“查询条件怎么组织”
 3. `GirAdvSqlComposer` 负责把请求对象编译成 SQL 与参数
 
+## IAdvBase*Opt 分层说明
+
+`adv-query` 并不是把所有基础能力堆在一个接口里，而是先拆成几组基础操作，再由 `IAdvBaseOpt` 聚合起来。
+
+### IAdvBaseAccessOpt
+
+这一层负责“写入 / 插入”相关能力，重点包括：
+
+- `bInsertBySql(...)`
+- `bInsertOne(...)`
+- `bInsertSelectiveOne(...)`
+- `bInsertBatch(...)`
+- `bInsertIgnore(...)`
+- `bInsertIgnoreBatch(...)`
+
+如果你的场景是新增数据、批量导入数据或插入冲突忽略，这一层是基础入口。
+
+### IAdvBaseSelectOpt
+
+这一层负责“查询 / 映射”相关能力，重点包括：
+
+- `bSelectOne(...)`
+- `bSelectList(...)`
+- `bSelectListStream(...)`
+- `bSelectListToValueList(...)`
+- `bSelectNumber(...)`
+- `bSelectRecordRowCount(...)`
+- `bSelectObjOne(...)`
+- `bSelectObjList(...)`
+- `bSelectObjListStream(...)`
+
+这一层是整个 `adv-query` 最常用的一组基础查询能力，既支持：
+
+- 直接查 `GirAdvOneRow`
+- 查纯值列表
+- 查对象映射
+- 流式查询
+
+### IAdvBaseUpdateOpt
+
+这一层负责“更新 / upsert”相关能力，重点包括：
+
+- `bUpdateBySql(...)`
+- `bUpdateByPK(...)`
+- `bUpdateBatchByPK(...)`
+- `bUpdateByWhere(...)`
+- `bUpsert(...)`
+- `bUpsertBatch(...)`
+
+如果你的场景是按主键更新、按条件更新、批量更新或 upsert，这一层是基础入口。
+
+### IAdvBaseDeleteOpt
+
+这一层负责“删除”相关能力，重点包括：
+
+- `bDeleteBySql(...)`
+- `bDeleteByPK(...)`
+- `bDeleteByPKs(...)`
+- `bDeleteByMap(...)`
+- `bDeleteByWhere(...)`
+
+适合处理：
+
+- 自定义 SQL 删除
+- 按主键删除
+- 批量删除
+- Lambda / Filter 条件删除
+
+### IAdvBaseOpt
+
+`IAdvBaseOpt` 本身不新增方法，而是把：
+
+- `IAdvBaseSelectOpt`
+- `IAdvBaseDeleteOpt`
+- `IAdvBaseAccessOpt`
+- `IAdvBaseUpdateOpt`
+
+统一聚合成一个基础操作总接口。
+
+所以当你看到实现类同时具备查、增、改、删能力时，本质上就是通过 `IAdvBaseOpt` 把这四组基础接口拼起来了。
+
+## typehandler 使用与注册逻辑
+
+`adv-query` 自己内部就有一套类型处理链，不是完全依赖外部 ORM。
+
+### 入口对象
+
+最关键的三个类是：
+
+- `AdvTypeHandlerRegistry`
+- `AdvPreparedStatementBinder`
+- `JtsGeometryAdvTypeHandler`
+
+### 注册逻辑
+
+`AdvTypeHandlerRegistry` 在构造时会默认注册一组处理器：
+
+- `JtsGeometryAdvTypeHandler`
+- `StringAdvTypeHandler`
+- `CharacterAdvTypeHandler`
+- `BooleanAdvTypeHandler`
+- `NumberAdvTypeHandler`
+- `TemporalAdvTypeHandler`
+- `ByteArrayAdvTypeHandler`
+- `EnumAdvTypeHandler`
+
+也就是说，这个模块本身已经预置了：
+
+- 空间类型处理
+- 字符串处理
+- 数值处理
+- 时间类型处理
+- 布尔类型处理
+- 枚举处理
+- 字节数组处理
+
+如果没有匹配到任何具体 handler，则会回退到：
+
+- `ObjectAdvTypeHandler`
+
+### 写入绑定逻辑
+
+`AdvPreparedStatementBinder` 会在绑定参数时调用：
+
+```java
+Object jdbcValue = typeHandlerRegistry.convertForWrite(
+    value,
+    value == null ? Object.class : value.getClass(),
+    AdvTypeHandlerContext.simple(null));
+preparedStatement.setObject(index, jdbcValue);
+```
+
+也就是说，参数在真正进入 JDBC 之前，会先通过注册表做一次“Java 类型 -> JDBC 可写值”的转换。
+
+### 空间类型处理逻辑
+
+`JtsGeometryAdvTypeHandler` 负责 Geometry 类型，它的读写逻辑大致是：
+
+#### 读取时
+尝试把以下对象还原成 `Geometry`：
+
+- `Geometry`
+- `String`（WKT / WKB / GeoJSON）
+- `PGobject`
+- PostGIS 不同驱动返回对象
+- MySQL Geometry 二进制
+- Oracle Spatial SDO Geometry
+
+#### 写入时
+优先把 Geometry 转成：
+
+- PostGIS Net 驱动对象
+- PostGIS Org 驱动对象
+- Oracle Spatial 兼容值
+- 如果都不适用，则回退成 WKT 字符串
+
+这意味着 `adv-query` 本身就已经把“空间对象参数如何进 JDBC”这件事抽象掉了。
+
 ## 适用场景
 
 适合：
@@ -34,6 +192,7 @@
 - 分页列表与排序
 - 自定义 SQL + 统一分页封装
 - 需要把查询能力抽成通用层的 GIS 服务
+- 需要在 JDBC 写入 / 查询过程中自动处理 Geometry 参数与结果
 
 ## 真实示例位置
 
@@ -149,6 +308,10 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query`
 - 示例目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test`
+- typehandler 目录：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/query/typehandler`
+- 参数绑定目录：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/query/mapping`
 
 ## 阅读建议
 
@@ -158,5 +321,8 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
 2. `LambdaFilterExample`
 3. `GirAdvQueryRequestExample`
 4. `GirAdvQueryRequest1Example`
+5. `AdvTypeHandlerRegistry`
+6. `AdvPreparedStatementBinder`
+7. `JtsGeometryAdvTypeHandler`
 
-先看基础串式条件，再看 Lambda 风格，再看复杂查询请求对象的组织方式，会更容易把这套 API 吃透。
+先看查询请求怎么组织，再看类型参数如何进入 JDBC，会更容易把这套 API 吃透。

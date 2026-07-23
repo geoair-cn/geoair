@@ -504,15 +504,25 @@ const businessModules = [
     route: '/modules/db-service',
     title: 'geoair-db-service',
     group: 'business',
-    summary: '数据库可视化服务模块，前后端配合提供 SQL 编辑、数据浏览与表结构管理。',
+    summary: '数据库服务与管理界面组合模块，覆盖数据源管理、SQL 执行与前端可视化界面。',
     tags: ['数据库管理', 'Vue2', '可视化'],
-    capabilities: [
-      '提供数据库访问抽象层与可视化 Web 管理界面。',
-      '前端技术栈为 Vue2 + Element UI + ECharts。',
-      '适合作为数据库运维和数据服务配置入口。'
+    sourceExamples: [
+      {
+        title: 'DsApiService',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-db-service/geoair-db-service-core/src/main/java/cn/geoair/comp/db/service/core/basic/service',
+        description: '数据库 API 服务层相关目录。'
+      },
+      {
+        title: 'GirDsSQLExecutor',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-db-service/geoair-db-service-core/src/main/java/cn/geoair/comp/db/service/core/basic/executor',
+        description: 'SQL 执行器相关目录。'
+      },
+      {
+        title: 'geoair-db-service-webview',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-db-service/geoair-db-service-webview',
+        description: '前端管理界面目录。'
+      }
     ],
-    quickStart: '包含 geoair-db-service-core、starter 与 webview 三部分。',
-    example: '可作为数据库 Web 管理入口，也能为其他模块提供数据访问支持。',
     related: ['dynamic-ds', 'apidoc']
   },
   {
@@ -520,15 +530,25 @@ const businessModules = [
     route: '/modules/message-jts-jackson',
     title: 'geoair-message-jts-jackson',
     group: 'business',
-    summary: 'JTS Geometry 与 JSON 之间的序列化转换模块，支持 GeoJSON 输出。',
+    summary: 'JTS Geometry 与 Jackson 之间的序列化转换模块，主要负责 Geometry JSON 输出和自动注册。',
     tags: ['Jackson', 'JTS', 'GeoJSON'],
-    capabilities: [
-      '自动注册 GeometrySerializer 与 GeometryDeserializer。',
-      '支持 Point、Polygon、Multi* 与 GeometryCollection。',
-      '适合把空间对象直接暴露为 API 返回值。'
+    sourceExamples: [
+      {
+        title: 'GirJtsJacksonUtils',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/utils',
+        description: 'JTS 与 Jackson 的工具层目录。'
+      },
+      {
+        title: 'JtsExtModule',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/serializer/jts',
+        description: 'JTS 序列化模块相关目录。'
+      },
+      {
+        title: 'GirJacksonJtsAutoConfiguration',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/auto',
+        description: '自动装配相关目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-message-jts-jackson</artifactId>\n</dependency>`,
-    example: '在 REST API 中返回空间对象时，可以直接输出 GeoJSON 风格的结构。',
     related: ['jts-all', 'message-jts-mybatis']
   },
   {
@@ -536,15 +556,20 @@ const businessModules = [
     route: '/modules/message-jts-mybatis',
     title: 'geoair-message-jts-mybatis',
     group: 'business',
-    summary: 'JTS Geometry 与数据库空间字段之间的 MyBatis TypeHandler 映射模块。',
+    summary: 'JTS Geometry 与 MyBatis 类型处理层的桥接模块，负责空间字段映射与配置接入。',
     tags: ['MyBatis', 'JTS', '空间字段'],
-    capabilities: [
-      '自动把数据库空间字段映射为 JTS Geometry。',
-      '支持 PostGIS、Oracle Spatial 等空间数据库。',
-      '让业务层直接面向 Geometry 编程。'
+    sourceExamples: [
+      {
+        title: 'PgGeometryTypeHandler',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-mybatis/src/main/java/cn/geoair/comp/message/converter/jts/mybatis/typehander',
+        description: 'Geometry TypeHandler 相关目录。'
+      },
+      {
+        title: 'GirMyBatisConfigurationCustomizer',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-mybatis/src/main/java/cn/geoair/comp/message/converter/jts/mybatis/config',
+        description: 'MyBatis 配置扩展相关目录。'
+      }
     ],
-    quickStart: '适合 MyBatis 项目直接读写空间字段。',
-    example: '查询结果可以直接得到 Geometry 对象，无需手工解析数据库二进制或文本格式。',
     related: ['message-jts-jackson', 'jts-all']
   }
 ]
