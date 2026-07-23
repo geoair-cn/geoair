@@ -35,61 +35,69 @@
     <section class="page-section">
       <div class="section-block module-grid">
         <div>
-          <div id="capabilities">
-            <SectionIntro
-              eyebrow="核心能力"
-              :title="`${moduleItem.title} 能解决什么问题`"
-              description="以官网化方式提炼出能力边界，帮助快速判断该模块是否适合当前项目。"
-            />
-            <div class="surface-card capability-card">
-              <ul>
-                <li v-for="item in moduleItem.capabilities || []" :key="item">{{ item }}</li>
-              </ul>
-            </div>
-          </div>
-
-          <div id="quick-start">
-            <SectionIntro
-              eyebrow="快速接入"
-              title="最短使用路径"
-              description="先明确依赖和入口，再逐步深入到具体实现。"
-            />
-            <CodeBlock :title="`${moduleItem.title} 接入示例`" :code="moduleItem.quickStart" />
-          </div>
-
-          <template v-if="detailSections.length">
-            <div id="details">
-              <SectionIntro
-                eyebrow="深度说明"
-                title="模块拆解与使用建议"
-                description="针对该模块的职责边界、使用方式和常见落地场景做更细化说明。"
-              />
-              <div class="detail-sections">
-                <article v-for="section in detailSections" :key="section.title" class="surface-card detail-card">
-                  <h3>{{ section.title }}</h3>
-                  <ul>
-                    <li v-for="item in section.items" :key="item">{{ item }}</li>
-                  </ul>
-                </article>
-              </div>
+          <template v-if="moduleDoc">
+            <div id="doc-body">
+              <MarkdownArticle :document="moduleDoc" />
             </div>
           </template>
 
-          <template v-if="usageExamples.length">
-            <div id="examples">
+          <template v-else>
+            <div id="capabilities">
               <SectionIntro
-                eyebrow="示例"
-                title="更多可复制的查询片段"
-                description="这些示例覆盖基础检索、空间范围查询、组合条件、分页与动态数据源等典型场景。"
+                eyebrow="核心能力"
+                :title="`${moduleItem.title} 能解决什么问题`"
+                description="以官网化方式提炼出能力边界，帮助快速判断该模块是否适合当前项目。"
               />
-              <div class="example-list">
-                <article v-for="example in usageExamples" :key="example.title" class="example-item">
-                  <h3>{{ example.title }}</h3>
-                  <p>{{ example.description }}</p>
-                  <CodeBlock :title="example.title" :code="example.code" />
-                </article>
+              <div class="surface-card capability-card">
+                <ul>
+                  <li v-for="item in moduleItem.capabilities || []" :key="item">{{ item }}</li>
+                </ul>
               </div>
             </div>
+
+            <div id="quick-start">
+              <SectionIntro
+                eyebrow="快速接入"
+                title="最短使用路径"
+                description="先明确依赖和入口，再逐步深入到具体实现。"
+              />
+              <CodeBlock :title="`${moduleItem.title} 接入示例`" :code="moduleItem.quickStart" />
+            </div>
+
+            <template v-if="detailSections.length">
+              <div id="details">
+                <SectionIntro
+                  eyebrow="深度说明"
+                  title="模块拆解与使用建议"
+                  description="针对该模块的职责边界、使用方式和常见落地场景做更细化说明。"
+                />
+                <div class="detail-sections">
+                  <article v-for="section in detailSections" :key="section.title" class="surface-card detail-card">
+                    <h3>{{ section.title }}</h3>
+                    <ul>
+                      <li v-for="item in section.items" :key="item">{{ item }}</li>
+                    </ul>
+                  </article>
+                </div>
+              </div>
+            </template>
+
+            <template v-if="usageExamples.length">
+              <div id="examples">
+                <SectionIntro
+                  eyebrow="示例"
+                  title="更多可复制的查询片段"
+                  description="这些示例覆盖基础检索、空间范围查询、组合条件、分页与动态数据源等典型场景。"
+                />
+                <div class="example-list">
+                  <article v-for="example in usageExamples" :key="example.title" class="example-item">
+                    <h3>{{ example.title }}</h3>
+                    <p>{{ example.description }}</p>
+                    <CodeBlock :title="example.title" :code="example.code" />
+                  </article>
+                </div>
+              </div>
+            </template>
           </template>
         </div>
 
@@ -147,13 +155,16 @@
 <script>
 import SectionIntro from '@/components/SectionIntro.vue'
 import CodeBlock from '@/components/CodeBlock.vue'
+import MarkdownArticle from '@/components/module/MarkdownArticle.vue'
 import { getModuleBySlug, getSectionByKey } from '@/content/modules'
+import { getModuleDoc } from '@/content/module-docs'
 
 export default {
   name: 'ModulePage',
   components: {
     SectionIntro,
-    CodeBlock
+    CodeBlock,
+    MarkdownArticle
   },
   props: {
     slug: {
@@ -180,7 +191,20 @@ export default {
     moduleItem() {
       return getModuleBySlug(this.slug)
     },
+    moduleDoc() {
+      return getModuleDoc(this.slug)
+    },
     navItems() {
+      const docItems = this.moduleDoc && this.moduleDoc.toc
+        ? this.moduleDoc.toc.map(item => ({ id: item.id, label: item.title }))
+        : []
+      if (docItems.length) {
+        return [
+          ...docItems,
+          ...(this.sourceExamples.length ? [{ id: 'sources', label: '源码示例' }] : []),
+          { id: 'related', label: '关联模块' }
+        ]
+      }
       return [
         { id: 'capabilities', label: '核心能力' },
         { id: 'quick-start', label: '快速接入' },

@@ -128,6 +128,90 @@ pre {
   max-width: 760px;
 }
 
+.markdown-body {
+  color: var(--text-secondary);
+  line-height: 1.85;
+}
+
+.markdown-body h2,
+.markdown-body h3 {
+  color: var(--text-main);
+  line-height: 1.25;
+  scroll-margin-top: 124px;
+}
+
+.markdown-body h2 {
+  font-size: 28px;
+  margin: 36px 0 14px;
+}
+
+.markdown-body h3 {
+  font-size: 21px;
+  margin: 28px 0 12px;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 14px;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 20px;
+}
+
+.markdown-body li {
+  margin-bottom: 8px;
+}
+
+.markdown-body code {
+  background: rgba(37, 99, 235, 0.08);
+  color: #1d4ed8;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.markdown-body .markdown-code-block {
+  margin: 18px 0 22px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.markdown-body .markdown-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.markdown-body .markdown-code-header button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.markdown-body .markdown-code-block pre {
+  margin: 0;
+  padding: 18px 16px;
+  white-space: pre-wrap;
+  color: #e5eefc;
+  overflow-x: auto;
+}
+
+.markdown-body .markdown-code-block code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
 .grid-columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
