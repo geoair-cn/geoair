@@ -153,7 +153,7 @@ Apache License 2.0
 ## 开发团队
 
 - **开发者**：zhangfengji
-- **邮箱**：1159856928@qq.com
+- **邮箱**：zhangjun7570@qq.com
 - **组织**：geoair
 - **官网**：https://xmt.geoair.cn/
 

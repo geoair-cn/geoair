@@ -169,7 +169,7 @@ user.save();  // 直接调用保存
 ## 👥 开发者
 
 - **作者**: 张逢吉
-- **邮箱**: 1159856928@qq.com
+- **邮箱**: zhangjun7570@qq.com
 - **组织**: GeoAir
 - **官网**: https://xmt.geoair.cn/
 

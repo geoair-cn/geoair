@@ -64,14 +64,14 @@
     </license>
   </licenses>
 
-  <developers>
-    <developer>
-      <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
-      <organization>geoair</organization>
-      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-    </developer>
-  </developers>
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>zhangjun7570@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
 
   <scm>
     <connection>https://github.com/geoair-cn/geoair.git</connection>
