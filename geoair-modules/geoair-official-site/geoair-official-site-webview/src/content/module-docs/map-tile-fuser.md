@@ -19,12 +19,9 @@
 
 - `GirFuser`
 
-它提供短入口：
+对应测试示例：
 
-- `getLayerTileGetter(layerName)`
-- `getPxyLayerInfo(layerName)`
-
-适合业务代码快速拿到图层读取器或图层配置。
+- `GirMapTileFuserExample`
 
 ### 图层帮助器
 
@@ -32,7 +29,7 @@
 
 - `GirFuserLayerTileHelper`
 
-它负责：
+这层负责：
 
 - 根据图层名查出 `PxyLayerInfo`
 - 结合缓存工厂，构造最终的 `LayerTileGetter`
@@ -43,20 +40,21 @@
 
 - `TileGetterFactory`
 
-这层根据：
+对应测试示例：
 
+- `LayerTileGetterRouteExample`
+
+### 核心配置模型
+
+最重要的配置实体是：
+
+- `PxyLayerInfo`
 - `SrcType`
-- `gridSrid`
-- 是否启用缓存
+- `OriginType`
 
-选择不同实现，例如：
+对应测试示例：
 
-- `GoogleLocalFileTileGetter`
-- `GoogleWebTileGetter`
-- `Grid4490LocalFileTileGetter`
-- `Grid4490WebTileGetter`
-- `MBTilesTileGetter`
-- `CachedTileGetter`
+- `TileFuserConfigExample`
 
 ### 融合执行层
 
@@ -64,33 +62,9 @@
 
 - `FuserExec`
 
-它负责定义融合输出的最小能力：
+对应测试示例：
 
-- `toImageBytes()`
-- `getOutputFormat()`
-- `getSrcFormat()`
-- `getSrcRange()`
-
-这是最终把融合结果转成图像字节的执行层抽象。
-
-## 核心配置模型
-
-这一层最重要的配置实体是：
-
-- `PxyLayerInfo`
-
-它定义：
-
-- `layerName`
-- `path`
-- `srcType`
-- `originType`
-- `imageType`
-- `gridSrid`
-- `enableCache`
-- 代理配置
-
-所以在这个模块里，很多行为不是直接由 API 参数决定，而是由 `PxyLayerInfo` 决定。
+- `FuserExecContractExample`
 
 ## 核心 API 示例
 
@@ -100,10 +74,7 @@
 LayerTileGetter tileGetter = GirFuser.getLayerTileGetter("base_layer");
 ```
 
-适用场景：
-
-- 业务代码中只知道图层名，想直接拿到读取器
-- 把图层读取逻辑封装在统一服务后调用
+对应测试：`GirMapTileFuserExample`
 
 ### 示例2：按图层名读取 PxyLayerInfo
 
@@ -111,41 +82,30 @@ LayerTileGetter tileGetter = GirFuser.getLayerTileGetter("base_layer");
 PxyLayerInfo layerInfo = GirFuser.getPxyLayerInfo("base_layer");
 ```
 
-适用场景：
+对应测试：`GirMapTileFuserExample`
 
-- 调试当前图层到底用的是哪种来源和网格体系
-- 页面或后台任务需要查看图层配置
-
-### 示例3：通过帮助器构造 LayerTileGetter
-
-```java
-PxyLayerInfo pxyLayerInfo = helper.getPxyLayerInfo("base_layer");
-LayerTileGetter tileGetter = helper.getLayerTileGetter("base_layer");
-```
-
-适用场景：
-
-- 你已经在 Spring 中注入了 `GirFuserLayerTileHelper`
-- 想在获取 getter 前先看配置对象
-
-### 示例4：通过工厂按配置创建获取器
+### 示例3：通过工厂按配置创建获取器
 
 ```java
 LayerTileGetter tileGetter = TileGetterFactory.create(pxyLayerInfo);
 ```
 
-如果要显式带缓存：
+对应测试：`LayerTileGetterRouteExample`
+
+### 示例4：配置不同来源类型
 
 ```java
-LayerTileGetter tileGetter = TileGetterFactory.create(pxyLayerInfo, tileCache);
+PxyLayerInfo webLayer = new PxyLayerInfo()
+    .setLayerName("web_layer")
+    .setPath("https://tile.example.com/{z}/{x}/{y}.png")
+    .setSrcType(SrcType.WEB.getCode())
+    .setOriginType(OriginType.TMS.getMode())
+    .setGridSrid(4490);
 ```
 
-适用场景：
+对应测试：`TileFuserConfigExample`
 
-- 需要调试配置最终路由到哪一种具体 getter
-- 新增 getter 类型或缓存策略时做单点验证
-
-### 示例5：融合执行接口
+### 示例5：融合执行契约
 
 ```java
 byte[] imageBytes = fuserExec.toImageBytes();
@@ -153,10 +113,7 @@ ImageMime outputMime = fuserExec.getOutputFormat();
 RangeApo srcRange = fuserExec.getSrcRange();
 ```
 
-适用场景：
-
-- 需要获取融合后的最终图像输出
-- 需要分析源瓦片覆盖范围和输出格式
+对应测试：`FuserExecContractExample`
 
 ## 核心源码入口
 
@@ -171,11 +128,11 @@ RangeApo srcRange = fuserExec.getSrcRange();
 
 ## 测试建议
 
-建议重点补和维护这些示例：
+建议阅读顺序：
 
-- 基于 `GirFuser` 的快速入口示例
-- 基于 `TileGetterFactory` 的 getter 路由示例
-- 基于 `PxyLayerInfo` 的本地 / 网络 / MBTiles 配置示例
-- 基于 `FuserExec` 的输出格式和范围读取示例
+1. `TileFuserConfigExample`
+2. `LayerTileGetterRouteExample`
+3. `GirMapTileFuserExample`
+4. `FuserExecContractExample`
 
-这几类示例能把这个模块最核心的“图层配置 -> getter 选择 -> 融合输出”链路讲清楚。
+这样可以先理解配置模型，再理解 getter 路由，最后再看融合执行契约。
