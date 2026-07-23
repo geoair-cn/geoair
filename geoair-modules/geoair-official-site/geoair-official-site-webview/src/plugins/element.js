@@ -13,6 +13,7 @@ import {
   CollapseItem,
   Backtop,
   Empty,
+  Input,
   Message
 } from 'element-ui'
 
@@ -29,5 +30,6 @@ Vue.use(Collapse)
 Vue.use(CollapseItem)
 Vue.use(Backtop)
 Vue.use(Empty)
+Vue.use(Input)
 
 Vue.prototype.$message = Message

@@ -12,15 +12,30 @@
       <div class="section-block docs-layout">
         <div>
           <SectionIntro
-            eyebrow="核心文档"
-            title="建议阅读顺序"
-            description="先总览，再看标准基础库与业务模块，最后按场景进入具体模块。"
+            eyebrow="快速搜索"
+            title="按模块名、路由、说明检索文档入口"
+            description="搜索结果同时覆盖 README 入口和官网中的模块详情页，可以直接跳转到你关心的模块。"
           />
+          <div class="search-panel surface-card">
+            <el-input v-model.trim="keyword" placeholder="例如：adv-query、dynamic-ds、GeoServer、数据库服务" clearable />
+            <div class="search-meta">
+              <span>共 {{ filteredEntries.length }} 条结果</span>
+            </div>
+          </div>
+
           <div class="doc-grid">
-            <a v-for="item in siteMeta.docLinks" :key="item.href" class="doc-item surface-card" :href="item.href" target="_blank" rel="noreferrer">
-              <strong>{{ item.title }}</strong>
-              <p>{{ item.description }}</p>
-            </a>
+            <template v-for="item in filteredEntries">
+              <router-link v-if="item.to" :key="`${item.title}-${item.kind}`" class="doc-item surface-card" :to="item.to">
+                <strong>{{ item.title }}</strong>
+                <span class="doc-kind">{{ item.kind }}</span>
+                <p>{{ item.description }}</p>
+              </router-link>
+              <a v-else :key="`${item.title}-${item.kind}`" class="doc-item surface-card" :href="item.href" target="_blank" rel="noreferrer">
+                <strong>{{ item.title }}</strong>
+                <span class="doc-kind">{{ item.kind }}</span>
+                <p>{{ item.description }}</p>
+              </a>
+            </template>
           </div>
         </div>
 
@@ -41,6 +56,7 @@
 <script>
 import SectionIntro from '@/components/SectionIntro.vue'
 import { siteMeta } from '@/content/site'
+import { allModules } from '@/content/modules'
 
 export default {
   name: 'DocsPage',
@@ -49,7 +65,34 @@ export default {
   },
   data() {
     return {
+      keyword: '',
       siteMeta
+    }
+  },
+  computed: {
+    searchableEntries() {
+      const docEntries = this.siteMeta.docLinks.map(item => ({
+        ...item,
+        kind: 'README / 外部文档',
+        text: `${item.title} ${item.description}`.toLowerCase()
+      }))
+
+      const moduleEntries = allModules.map(item => ({
+        title: item.title,
+        description: `${item.summary} 路由：${item.route}`,
+        to: item.route,
+        kind: '官网模块页',
+        text: `${item.title} ${item.summary} ${item.route} ${(item.tags || []).join(' ')}`.toLowerCase()
+      }))
+
+      return [...docEntries, ...moduleEntries]
+    },
+    filteredEntries() {
+      const keyword = this.keyword.toLowerCase()
+      if (!keyword) {
+        return this.searchableEntries
+      }
+      return this.searchableEntries.filter(item => item.text.includes(keyword))
     }
   }
 }
@@ -73,7 +116,7 @@ export default {
 }
 
 .hero-copy {
-  max-width: 820px;
+  max-width: 980px;
   color: var(--text-secondary);
   font-size: 17px;
 }
@@ -84,8 +127,19 @@ export default {
 
 .docs-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 28px;
+}
+
+.search-panel {
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.search-meta {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .doc-grid {
@@ -105,12 +159,25 @@ export default {
 
   p {
     color: var(--text-secondary);
+    margin-top: 8px;
   }
+}
+
+.doc-kind {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #edf3ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .reading-card {
   padding: 24px;
   align-self: start;
+  position: sticky;
+  top: 148px;
 
   h3 {
     font-size: 22px;
@@ -129,6 +196,10 @@ export default {
 @media (max-width: 960px) {
   .docs-layout {
     grid-template-columns: 1fr;
+  }
+
+  .reading-card {
+    position: static;
   }
 }
 </style>

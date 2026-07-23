@@ -34,7 +34,7 @@ export default {
   --shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
   --shadow-card: 0 10px 24px rgba(15, 23, 42, 0.08);
   --radius-card: 8px;
-  --content-width: 1180px;
+  --content-gutter: clamp(20px, 3vw, 40px);
 }
 
 * {
@@ -86,9 +86,10 @@ pre {
 }
 
 .section-block {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 24px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--content-gutter);
 }
 
 .surface-card {

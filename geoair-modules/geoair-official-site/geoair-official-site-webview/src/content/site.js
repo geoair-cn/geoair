@@ -2,8 +2,8 @@ export const siteMeta = {
   name: 'GeoAir Framework',
   shortName: 'GeoAir',
   version: 'J8-dev-SNAPSHOT',
-  tagline: '企业级 GIS Java 基础框架',
-  description: 'GeoAir Framework 采用 Maven 多模块与 SPI 解耦架构，覆盖标准基础库、GIS 空间处理、动态数据源、API 文档、代码生成与数据库服务等能力。',
+  tagline: 'GIS Java 工具与模块集合',
+  description: 'GeoAir Framework 基于 Maven 多模块组织方式，聚焦 GIS 开发中常见的空间处理、动态数据源、瓦片服务、矢量瓦片和数据库相关能力。',
   heroActions: [
     { label: '快速开始', href: '#quick-start', type: 'primary' },
     { label: '查看模块', to: '/modules', type: 'default' },
@@ -21,8 +21,8 @@ export const siteMeta = {
       description: '以 geoair-base、geoair-core、geoair-web 和 geoair-orm 为核心，把日志、配置、JSON、ORM 与 Web 能力收敛成统一入口。'
     },
     {
-      title: '面向 GIS 场景而不是通用演示',
-      description: '模块设计围绕企业级地理信息系统开发，强调空间数据处理、坐标体系、空间查询和瓦片服务等真实场景。'
+      title: '面向 GIS 日常开发，而不是泛化叙事',
+      description: '模块说明优先落在真实代码、真实数据流和常见 GIS 场景上，尽量让读者能直接对照源码和测试。'
     },
     {
       title: '模块可拆分，接入可以渐进',

@@ -154,16 +154,117 @@ const geoModules = [
     route: '/modules/geo/tools',
     title: 'geoair-geo-tools',
     group: 'geo',
-    summary: 'GIS 工具集，统一封装坐标转换、格式互转、空间测量、几何合并与瓦片坐标计算。',
-    tags: ['GIS', '坐标转换', 'GeoTools'],
+    summary: 'GIS 工具集总入口，统一封装坐标转换、格式互转、空间测量、几何合并、SRID 转换与瓦片计算。',
+    tags: ['GIS', 'GeoTools API', '统一入口'],
     capabilities: [
-      '支持 WGS84、GCJ02、BD09、EPSG:3857、EPSG:4490 等常见坐标体系。',
-      '支持 GeoJSON、WKT、WKB、JTS Geometry 与 PGGeometry 互转。',
-      '提供面积、长度、距离、Geometry 合并与瓦片索引计算。'
+      '通过 GirGeoTools.defaultInstance() 统一获取 Coordinate / Format / Measure / Merge / SRID / Tile 能力。',
+      '适合在一个页面里顺着“坐标 / 格式 / 测量 / 合并 / SRID / 瓦片”逐段阅读和快速定位。',
+      '是 geoair-geo 模块里最接近日常开发工具箱的一层。'
     ],
-    quickStart: `GirGeoTools tools = GirGeoTools.defaultInstance();\ndouble[] gcj02 = tools.getCoordinateOpt().wgs84ToGcj02(116.40, 39.90);`,
-    example: '适合地图服务、空间分析和地理数据导入导出等基础场景。',
-    related: ['geo', 'adv-query', 'file-tran']
+    quickStart: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`,
+    example: '如果你的项目既要处理 Geometry，又要做坐标、投影、瓦片或测量，这一层通常是最先接触的入口。',
+    detailSections: [
+      {
+        title: '坐标转换',
+        items: [
+          '核心接口是 GirCoordinateConvertOpt。',
+          '支持 WGS84 / GCJ02 / BD09 / 墨卡托互转。',
+          '支持经纬度、Point、批量坐标数组和 Geometry 全类型转换。'
+        ]
+      },
+      {
+        title: '格式转换',
+        items: [
+          '核心接口是 GirGeoFormatOpt。',
+          '支持 GeoJSON / WKT / WKB / PGGeometry / JTS Geometry 互转。',
+          '同时提供 WKTReader / WKBReader / WKBWriter / GeometryJSON 等底层入口。'
+        ]
+      },
+      {
+        title: '测量计算',
+        items: [
+          '核心接口是 GirGeoMeasureOpt。',
+          '支持面积、长度、点点距离、点线距离、线线距离和单位换算。',
+          '提供常规计算和基于 UTM 投影的精确计算两套方法。'
+        ]
+      },
+      {
+        title: '几何合并',
+        items: [
+          '核心接口是 GirGeoMergeOpt。',
+          '支持 mergeToMultiPoint / mergeToMultiLineString / mergeToMultiPolygon。',
+          '支持把线或面合并成单个 Geometry。'
+        ]
+      },
+      {
+        title: 'SRID 转换与瓦片计算',
+        items: [
+          'GirSridConvertOpt 负责 Geometry / Envelope / 点坐标在不同 SRID 之间的转换。',
+          'GirTileConverterOpt 负责 XYZ、Envelope、Geometry、层级元数据之间的互转。',
+          'GirBingMapQuadKeyOpt 负责 Bing QuadKey 的生成、解析和层级推导。'
+        ]
+      }
+    ],
+    usageExamples: [
+      {
+        title: '示例1：统一入口获取各类 API',
+        description: '先通过 GirGeoTools.defaultInstance() 获取各类接口，再按能力分段使用。',
+        code: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`
+      },
+      {
+        title: '示例2：坐标转换与 Geometry 偏移',
+        description: '适合点位偏移和 Geometry 全量坐标转换。',
+        code: `double[] gcj02 = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToGcj02(116.40, 39.90);\nGeometry geom = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToMercatorGeometry(geometry);`
+      },
+      {
+        title: '示例3：格式转换',
+        description: '适合在 GeoJSON、WKT 和 JTS Geometry 之间切换。',
+        code: `Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt().geojsonToJtsGeometry(geojson, false);\nString wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, false);`
+      },
+      {
+        title: '示例4：面积与长度计算',
+        description: '适合面积统计、线长统计和距离分析。',
+        code: `double area = GirGeoTools.defaultInstance().getMeasureOpt().calculateArea(polygon, 4326, GirGeoMeasureOpt.UNIT_SQUARE_KILOMETER);\ndouble length = GirGeoTools.defaultInstance().getMeasureOpt().calculateLength(lineString, 4326, GirGeoMeasureOpt.UNIT_KILOMETER);`
+      },
+      {
+        title: '示例5：几何合并与 SRID 转换',
+        description: '适合把碎片面或线段整合后再统一转换投影。',
+        code: `MultiLineString multiLine = GirGeoTools.defaultInstance().getMergeOpt().mergeToMultiLineString(lineStrings);\nGeometry geom3857 = GirGeoTools.defaultInstance().getSridOpt().convert(geometry4326, 4326, 3857);`
+      },
+      {
+        title: '示例6：瓦片范围与 QuadKey',
+        description: '适合做切片、范围计算和 Bing QuadKey 互转。',
+        code: `BoxReferencedEnvelope tileBox = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(10, 845, 388, 4326);\nString quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(845, 388, 10);`
+      }
+    ],
+    sourceExamples: [
+      {
+        title: 'GirGeoToolsOverviewExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsOverviewExample.java',
+        description: '统一入口示例，展示如何从 GirGeoTools 获取各类 API。'
+      },
+      {
+        title: 'GirGeoToolsCoordinateExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsCoordinateExample.java',
+        description: '坐标转换示例，覆盖单点、Point、批量、Geometry、DMS 和墨卡托转换。'
+      },
+      {
+        title: 'GirGeoToolsFormatExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsFormatExample.java',
+        description: '格式转换示例，覆盖 GeoJSON、WKT、WKB 和 Point 构造。'
+      },
+      {
+        title: 'GirGeoToolsMeasureExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsMeasureExample.java',
+        description: '测量示例，覆盖面积、长度、点点距离、点线距离和单位换算。'
+      },
+      {
+        title: 'geoair-geo-tools 源码目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-geo-tools/src/main/java/cn/geoair/map/dynamic/tools',
+        description: '直接跳到 geoair-geo-tools 主源码目录。'
+      }
+    ],
+    related: ['adv-query', 'file-tran', 'mvt', 'map-tile-forge', 'map-tile-fuser']
   },
   {
     slug: 'adv-query',
@@ -178,7 +279,7 @@ const geoModules = [
       '支持 BBox、距离、相交、质心、几何修复等常见空间操作，并与 Geometry / WKT / GeoJSON 等对象模型衔接。',
       '内置 Fluent Lambda 条件构造器与动态 SQL 标签能力，便于把复杂 GIS 查询组织成可维护代码。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-adv-query</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>\n\n@Resource\nprivate IAdvExecutor executor;\n\nList<User> users = executor.wSelectList(User.class, builder -> builder\n  .select("id", "name", "geom")\n  .where(w -> w.eq(User::getStatus, 1))\n  .orderBy(o -> o.desc(User::getId)));`,
+    quickStart: `DialectTableNameProcessor dialect = PgDialectTableNameUtil.getInstance();\nIDsDataSourceOpt dataSourceGetter = MockDataSourceGetter.getInstance();\nGirAdvSqlComposer sqlBuilder = new GirAdvSqlComposer(dialect, dataSourceGetter);\n\nGirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status")\n  .where(GirAdvWhereFilter.of()\n    .eq("name", "张三")\n    .eq("status", 1))\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);`,
     example: '适合空间检索、专题图查询、多租户 GIS 服务和跨数据库空间访问场景。',
     detailSections: [
       {
@@ -248,23 +349,141 @@ const geoModules = [
         code: `GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)\n  .exprEq("YEAR(create_time)", 2024)\n  .exprGt("salary * 1.1", new BigDecimal("10000"))\n  .exprLike("CONCAT(first_name, ' ', last_name)", "张%");`
       }
     ],
+    sourceExamples: [
+      {
+        title: 'WhereQueryExample',
+        path: 'geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test/WhereQueryExample.java',
+        description: '覆盖基础条件、比较、范围、模糊、NULL、条件组、嵌套、分页、自定义 SQL、排序等串式查询写法。'
+      },
+      {
+        title: 'LambdaFilterExample',
+        path: 'geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test/LambdaFilterExample.java',
+        description: '覆盖 Lambda 条件构造、模糊、IN、BETWEEN、NULL 判断和表达式条件。'
+      },
+      {
+        title: 'GirAdvQueryRequestExample',
+        path: 'geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test/GirAdvQueryRequestExample.java',
+        description: '覆盖 GROUP BY、HAVING、DISTINCT、自定义 SQL、分页、SQL 视图和复杂业务场景。'
+      },
+      {
+        title: 'GirAdvQueryRequest1Example',
+        path: 'geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test/GirAdvQueryRequest1Example.java',
+        description: '覆盖 Lambda builder、排序 API、动态条件构建、字段别名和业务型查询组织方式。'
+      }
+    ],
     related: ['geo-tools', 'dynamic-ds', 'db-service']
   },
   {
-    slug: 'file-tran',
-    route: '/modules/geo/file-tran',
-    title: 'geoair-file-tran',
+    slug: 'geo-tools-overview',
+    route: '/modules/geo/tools/overview',
+    title: 'geoair-geo-tools 总览',
     group: 'geo',
-    summary: '空间文件与数据库互转模块，使用 Reader -> Transformer -> Writer 管道处理 GeoJSON、Shapefile、PostGIS 等格式。',
-    tags: ['文件转换', 'Shapefile', 'GeoJSON'],
+    summary: '从 GirGeoTools 统一入口进入，梳理 coordinate、format、measure、merge、srid、tile 等核心能力。',
+    tags: ['GeoTools API', '总览'],
     capabilities: [
-      '支持 GeoJSON、Shapefile、PostGIS、GeoPackage、CSV、FlatGeobuf 等格式。',
-      '适合批处理导入导出与空间数据迁移。',
-      '支持进度监听、消费者回调与异常处理。'
+      '通过 GirGeoTools.defaultInstance() 统一获取各类工具接口。',
+      '适合先建立整体能力地图，再进入具体 API 页。',
+      '把原本分散的几何、坐标、瓦片能力汇总成一个统一入口。'
     ],
-    quickStart: 'GeoFileReader -> GeoFileTran -> GeoFileWriter',
-    example: '适合把历史 Shapefile 数据批量迁移到 PostGIS，或导出成 GeoJSON。',
-    related: ['geo-tools', 'adv-query']
+    quickStart: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`,
+    example: '先从总览页确认统一入口，再按“坐标 / 格式 / 测量 / 合并 / SRID / 瓦片”拆分阅读。',
+    related: ['geo-tools-coordinate', 'geo-tools-format', 'geo-tools-measure', 'geo-tools-merge', 'geo-tools-srid', 'geo-tools-tile']
+  },
+  {
+    slug: 'geo-tools-coordinate',
+    route: '/modules/geo/tools/coordinate',
+    title: '坐标转换 API',
+    group: 'geo',
+    summary: '介绍 GirCoordinateConvertOpt 的单点、批量、Point、Geometry 和 DMS / 墨卡托转换能力。',
+    tags: ['坐标转换', 'WGS84', 'GCJ02', 'BD09'],
+    capabilities: [
+      '支持 WGS84 / GCJ02 / BD09 互转。',
+      '支持经纬度、Point、批量坐标、Geometry 全类型转换。',
+      '支持 DMS 与 DD、WGS84 与墨卡托转换。'
+    ],
+    quickStart: `GirCoordinateConvertOpt coordinateOpt = GirGeoTools.defaultInstance().getCoordinateOpt();\ndouble[] gcj02 = coordinateOpt.wgs84ToGcj02(116.40, 39.90);\nPoint bdPoint = coordinateOpt.wgs84ToBd09(point);\nGeometry mercatorGeom = coordinateOpt.wgs84ToMercatorGeometry(geometry);`,
+    example: '适合地图点位偏移、批量坐标转换、Geometry 坐标系偏移处理。',
+    related: ['geo-tools-overview', 'geo-tools-srid', 'geo-tools-format']
+  },
+  {
+    slug: 'geo-tools-format',
+    route: '/modules/geo/tools/format',
+    title: '格式转换 API',
+    group: 'geo',
+    summary: '介绍 GirGeoFormatOpt 在 GeoJSON、WKT、WKB、JTS Geometry、PGGeometry 之间的转换能力。',
+    tags: ['GeoJSON', 'WKT', 'WKB', 'JTS'],
+    capabilities: [
+      '支持 GeoJSON <-> JTS Geometry。',
+      '支持 WKT / WKB / PGGeometry 与 JTS 互转。',
+      '提供 Point 构造、Reader / Writer / GeometryJSON 等底层入口。'
+    ],
+    quickStart: `GirGeoFormatOpt formatOpt = GirGeoTools.defaultInstance().getFormatOpt();\nGeometry geometry = formatOpt.geojsonToJtsGeometry(geojson, false);\nString wkt = formatOpt.jtsGeometryToWktString(geometry, false);\nString geojsonText = formatOpt.wktToGeojson(wkt, false);`,
+    example: '适合文件导入导出、接口交换、数据库字段转换和 Geometry 调试。',
+    related: ['geo-tools-overview', 'geo-tools-coordinate', 'geo-tools-srid']
+  },
+  {
+    slug: 'geo-tools-measure',
+    route: '/modules/geo/tools/measure',
+    title: '测量计算 API',
+    group: 'geo',
+    summary: '介绍 GirGeoMeasureOpt 在面积、长度、点线距离、线线距离、单位换算和 UTM 投影计算上的用法。',
+    tags: ['面积', '长度', '距离', 'UTM'],
+    capabilities: [
+      '支持 calculateArea / calculateLength / calculateAreaByUTM / calculateLengthByUTM。',
+      '支持点点、点线、点面、线线最短距离。',
+      '支持 m/km/m²/km²/acre/hectare 等单位转换。'
+    ],
+    quickStart: `GirGeoMeasureOpt measureOpt = GirGeoTools.defaultInstance().getMeasureOpt();\ndouble area = measureOpt.calculateArea(polygon, 4326, GirGeoMeasureOpt.UNIT_SQUARE_KILOMETER);\ndouble length = measureOpt.calculateLength(lineString, 4326, GirGeoMeasureOpt.UNIT_KILOMETER);\ndouble distance = measureOpt.calculatePointToPointDistance(point1, point2, 4326, GirGeoMeasureOpt.UNIT_METER);`,
+    example: '适合面积统计、缓冲分析前的距离计算、线路长度评估和坐标单位换算。',
+    related: ['geo-tools-overview', 'geo-tools-srid', 'geo-tools-merge']
+  },
+  {
+    slug: 'geo-tools-merge',
+    route: '/modules/geo/tools/merge',
+    title: '几何合并 API',
+    group: 'geo',
+    summary: '介绍 GirGeoMergeOpt 如何把点、线、面合并成 MultiGeometry 或单个 Geometry。',
+    tags: ['MultiPoint', 'MultiLineString', 'MultiPolygon'],
+    capabilities: [
+      '支持 mergeToMultiPoint / mergeToMultiLineString / mergeToMultiPolygon。',
+      '支持 mergeToSingleLineString 与 mergeToSinglePolygon。',
+      '支持 Geometry、坐标数组和 WKT 多种输入形式。'
+    ],
+    quickStart: `GirGeoMergeOpt mergeOpt = GirGeoTools.defaultInstance().getMergeOpt();\nMultiLineString multiLine = mergeOpt.mergeToMultiLineString(lineStrings);\nPolygon polygon = mergeOpt.mergeToSinglePolygon(polygons);`,
+    example: '适合把分段线、碎片面或离散点集合整合成统一几何结果。',
+    related: ['geo-tools-overview', 'geo-tools-format', 'geo-tools-measure']
+  },
+  {
+    slug: 'geo-tools-srid',
+    route: '/modules/geo/tools/srid',
+    title: 'SRID 转换 API',
+    group: 'geo',
+    summary: '介绍 GirSridConvertOpt 在 Geometry、Envelope、单点和 CRS / MathTransform 层面的转换能力。',
+    tags: ['SRID', 'EPSG:4326', 'EPSG:3857', 'CRS'],
+    capabilities: [
+      '支持 Geometry / Envelope / 点坐标转换。',
+      '支持 CRS 获取、地理坐标系判断和转换缓存清理。',
+      '提供 WGS84 / WebMercator / CGCS2000 等便捷方法。'
+    ],
+    quickStart: `GirSridConvertOpt sridOpt = GirGeoTools.defaultInstance().getSridOpt();\nGeometry geom3857 = sridOpt.convert(geometry4326, 4326, 3857);\ndouble[] point3857 = sridOpt.convertPoint(116.40, 39.90, 4326, 3857);\nGeometry wgs84Geom = sridOpt.webMercatorToWgs84(geometry3857);`,
+    example: '适合地图投影切换、包围盒重投影和服务端坐标统一。',
+    related: ['geo-tools-overview', 'geo-tools-coordinate', 'geo-tools-tile']
+  },
+  {
+    slug: 'geo-tools-tile',
+    route: '/modules/geo/tools/tile',
+    title: '瓦片与 QuadKey API',
+    group: 'geo',
+    summary: '介绍 GirTileConverterOpt 与 GirBingMapQuadKeyOpt 在 XYZ、Envelope、Geometry、层级元数据和 QuadKey 上的能力。',
+    tags: ['XYZ', 'Envelope', 'QuadKey', '瓦片'],
+    capabilities: [
+      '支持 xyzToWkt / xyzToTileBox / tileRangeByBox / tileRangeByGeom。',
+      '支持 zxyListByGeom / zxyListByBox / boundsFromTileZxyApos。',
+      '支持 QuadKey 生成、解析、父子级别和目标级别范围推导。'
+    ],
+    quickStart: `GirTileConverterOpt tileOpt = GirGeoTools.defaultInstance().getTileGrid4326Opt();\nBoxReferencedEnvelope tileBox = tileOpt.xyzToTileBox(10, 845, 388, 4326);\nRangeApo range = tileOpt.tileRangeByBox(10, envelope, 4326);\nGirBingMapQuadKeyOpt bingOpt = GirGeoTools.defaultInstance().getTileGridBingMapOpt();\nString quadKey = bingOpt.xyzToQuadKey(845, 388, 10);`,
+    example: '适合矢量瓦片、栅格切片、地图视域裁剪和 Bing QuadKey 互转。',
+    related: ['geo-tools-overview', 'geo-tools-srid', 'mvt', 'map-tile-forge']
   },
   {
     slug: 'mvt',
@@ -419,70 +638,97 @@ const businessModules = [
     route: '/modules/dynamic-ds',
     title: 'geoair-dynamic-ds',
     group: 'business',
-    summary: '运行时动态多数据源模块，围绕数据源初始化、注册、切换、读写分离与事务模板，提供一套贴近实际项目的动态数据源能力。',
-    tags: ['动态数据源', 'AOP', '读写分离', 'Druid', '事务'],
+    summary: '运行时动态多数据源模块，重点围绕线程级数据源上下文、AOP 切换、读写分离 builder、SQL 读写识别与 Spring 集成展开。',
+    tags: ['动态数据源', 'AOP', '读写分离', 'Spring', 'SQLParser'],
     capabilities: [
-      '支持通过 DataSourceDruidFastCreate 快速创建 Druid 数据源，并注册到 AdvDynamicDataSourceStorage。',
-      '支持通过 GirDynamicStackDataSource.pushDataSource / popDataSource 进行线程级数据源切换。',
-      '支持 GirReadWriteDataSourceBuilder 构建主从读写分离数据源，并通过 SQLParserUtil 判断读写类型。',
-      '支持与 Spring、AOP、事务模板协同，用于多租户、多业务库和 GIS 专题库场景。'
+      '通过 GirDynamicStackDataSource 维护线程内数据源栈，支持嵌套调用场景下的数据源切换与恢复。',
+      '通过 EnableDynamicDs + GirDynamicDataSourceAspect + GirDsAspectDoAroundApiHelper 参与 Spring AOP 的切库过程。',
+      '通过 GirReadWriteDataSourceBuilder 构建主从读写分离数据源，并支持轮询、权重等从库策略。',
+      '通过 SQLParserUtil / WithStatementTest 等测试用例验证 SELECT、WITH、INSERT、UPDATE、DELETE 的读写识别。'
     ],
-    quickStart: `DataSource master = DataSourceDruidFastCreate.create(builder -> builder\n  .setUrl("jdbc:postgresql://127.0.0.1:5432/geoair_master")\n  .setUsername("postgres")\n  .setPassword("postgres")\n  .setValidationQuery("SELECT 1"));\n\nDynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", master);\n\nGirDynamicStackDataSource.pushDataSource("master_db");\ntry {\n  // 在这里执行 JDBC / ORM / 空间查询逻辑\n} finally {\n  GirDynamicStackDataSource.popDataSource();\n}`,
-    example: '适合一套系统同时连接多个业务库、租户库或 GIS 数据源，并且需要显式管理数据源初始化与切换的场景。',
+    quickStart: `@EnableDynamicDs\n@SpringBootApplication\npublic class Application {\n}\n\n// 切面执行前会根据注解计算路由键\n// GirDsAspectDoAroundApiHelper#doBefore -> GirDynamicStackDataSource.pushDataSource(dataSourceKey)\n// onFinally -> GirDynamicStackDataSource.popDataSource()` ,
+    example: '适合已经接入 Spring、需要在业务方法级别切换数据源，或需要构建主从读写分离能力的项目。',
     detailSections: [
       {
-        title: '推荐理解顺序',
+        title: '模块里真正的核心入口',
         items: [
-          '先看 DataSourceDruidFastCreate：它负责把 URL、账号和连接池参数快速组装成 Druid 数据源。',
-          '再看 AdvDynamicDataSourceStorage：它实现了 DynamicDataSourceManager，负责数据源注册、缓存、获取和释放。',
-          '如果项目里存在显式切库逻辑，再看 GirDynamicStackDataSource：它用栈维护线程内数据源上下文，支持嵌套切换。',
-          '如果项目要做主从读写分离，再继续看 GirReadWriteDataSourceBuilder、GirReadWriteDataSource 和 SQLParserUtil。'
+          'EnableDynamicDs 只是开启动态数据源切面能力，本身通过 @Import 引入 GirDynamicDataSourceAspect。',
+          'GirDsAspectDoAroundApiHelper 负责在切面前后调用 pushDataSource / popDataSource，是真正把注解和线程上下文连接起来的关键接口。',
+          'GirDynamicStackDataSource 继承 AbstractRoutingDataSource，用一个 ThreadLocal<Stack<String>> 管理当前线程的数据源栈。',
+          '如果关注读写分离，则核心类不是手动注册器，而是 GirReadWriteDataSourceBuilder、GirReadWriteDataSource 和 SQLParserUtil。'
         ]
       },
       {
-        title: '典型接入链路',
+        title: 'Spring 接入链路',
         items: [
-          '步骤1：通过 DataSourceDruidFastCreate.create(...) 初始化真实数据源。',
-          '步骤2：通过 DynamicDataSourceManager.registerDataSource(...) 注册数据源 ID。',
-          '步骤3：业务执行前通过 GirDynamicStackDataSource.pushDataSource(...) 压栈切换。',
-          '步骤4：业务结束后通过 popDataSource() 恢复上一个数据源上下文。',
-          '步骤5：如果使用主从模式，则通过 GirReadWriteDataSourceBuilder.builder() 组装主从数据源。'
+          '在 Spring Boot 应用中，通过 @EnableDynamicDs 启用动态数据源切面。',
+          '切面在进入方法前会根据 GirDsDataSource / GirDataSourceChange 注解计算 dataSourceKey。',
+          'GirDsAspectDoAroundApiHelper#doBefore 调用 GirDynamicStackDataSource.pushDataSource(dataSourceKey)。',
+          '方法执行完成后，在 onFinally 中调用 GirDynamicStackDataSource.popDataSource() 恢复上层上下文。'
         ]
       },
       {
         title: '仓库中现有示例位置',
         items: [
-          '读写分离 builder 示例位于 dynamic-ds 模块的 test 包。',
-          'SQLParserUtil 与 WITH 语句识别示例也位于 dynamic-ds 模块的 test 包。',
-          '官网中的说明将以这些 test 示例为准，而不是使用脱离仓库的伪 API。'
+          '主从读写分离 builder 示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/BuilderTest.java。',
+          'SQL 读写识别示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/SQLParserUtilTest.java。',
+          'WITH 语句识别示例位于 src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/WithStatementTest.java。',
+          '官网中的 dynamic-ds 示例应以这些 test 示例和主源码类为准。'
         ]
       }
     ],
     usageExamples: [
       {
-        title: '示例1：从数据源初始化开始',
-        description: '使用 DataSourceDruidFastCreate 先创建 Druid 数据源，再注册进 DynamicDataSourceManager。',
-        code: `DataSource master = DataSourceDruidFastCreate.create(builder -> builder\n  .setUrl("jdbc:postgresql://127.0.0.1:5432/geoair_master")\n  .setUsername("postgres")\n  .setPassword("postgres")\n  .setValidationQuery("SELECT 1")\n  .setInitialSize(1)\n  .setMaxActive(20));\n\nDynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", master);`
+        title: '示例1：启用动态数据源切面（EnableDynamicDs）',
+        description: '这是模块在 Spring 中的真实启用方式，源码就是一个通过 @Import 引入切面的启用注解。',
+        code: `@EnableDynamicDs\n@SpringBootApplication\npublic class Application {\n}`
       },
       {
-        title: '示例2：手动切换当前线程数据源',
-        description: '当业务代码需要明确指定当前线程访问哪个库时，使用 push / pop 维护切换栈。',
-        code: `GirDynamicStackDataSource.pushDataSource("tenant_gis_ds");\ntry {\n  String current = GirDynamicStackDataSource.getCurrentDataSource();\n  // 在这里执行查询、保存或空间检索\n} finally {\n  GirDynamicStackDataSource.popDataSource();\n}`
+        title: '示例2：切面前后如何维护数据源栈（GirDsAspectDoAroundApiHelper）',
+        description: '这是仓库里真实存在的切换逻辑，不是手写伪 API。',
+        code: `default void doBefore(Method method, ProceedingJoinPoint point) {\n    String dataSourceKey = getDataSourceKey(groupName, rwType);\n    if (dataSourceKey != null) {\n        GirDynamicStackDataSource.pushDataSource(dataSourceKey);\n    }\n}\n\ndefault void onFinally(Method method, ProceedingJoinPoint point) {\n    GirDynamicStackDataSource.popDataSource();\n}`
       },
       {
-        title: '示例3：注册多个数据源并按 ID 获取',
-        description: '适合多租户或多个专题库场景，先注册，再按 ID 获取或延迟创建。',
-        code: `DynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", masterDs);\nmanager.registerDataSource("slave_db", slaveDs);\n\nboolean exists = manager.containsDataSource("slave_db");\nAdvDataSourceWrapper wrapper = manager.getDataSourceById("slave_db");`
-      },
-      {
-        title: '示例4：构建主从读写分离数据源',
-        description: '这类写法与仓库里的 BuilderTest 一致，适合作为读写分离接入入口。',
+        title: '示例3：主从读写分离 builder（BuilderTest）',
+        description: '这一段直接贴近你仓库里的 BuilderTest，用现有 builder API 组织主从库。',
         code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder()\n  .master("master_db")\n  .slaves("slave1", "slave2", "slave3")\n  .slaveStrategy(LoadStrategyType.ROUND_ROBIN)\n  .slaveGroupName("mySlaveGroup")\n  .build();`
       },
       {
-        title: '示例5：SQLParserUtil 判断读写类型',
-        description: '适合解释读写分离是如何识别 SELECT、WITH、INSERT、UPDATE、DELETE 的。',
-        code: `SQLType type = SQLParserUtil.getSQLType("WITH temp AS (SELECT id FROM users) SELECT * FROM temp");\nboolean isRead = SQLParserUtil.isReadOperation("SELECT * FROM users");\nboolean isWrite = SQLParserUtil.isWriteOperation("UPDATE users SET status = 1 WHERE id = 1");`
+        title: '示例4：混合添加从库（BuilderTest）',
+        description: '适合展示 addSlave + slaveStrategy 这种更细粒度的 builder 方式。',
+        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder()\n  .master("master_db")\n  .addSlave("slave1")\n  .addSlave("slave2")\n  .addSlave("slave3")\n  .slaveStrategy(LoadStrategyType.WEIGHT)\n  .build();`
+      },
+      {
+        title: '示例5：静态快速构建方式（BuilderTest）',
+        description: '仓库里也提供了静态快速方法，用 ID 列表直接构建。',
+        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder\n  .build("master_db", Arrays.asList("slave1", "slave2", "slave3"));`
+      },
+      {
+        title: '示例6：SQL 读写识别（SQLParserUtilTest / WithStatementTest）',
+        description: '这一部分不是数据库连接示例，而是读写分离判断逻辑的测试入口。',
+        code: `SQLType type1 = SQLParserUtil.getSQLType("SELECT * FROM user");\nSQLType type2 = SQLParserUtil.getSQLType("WITH temp AS (SELECT id FROM user) SELECT * FROM temp");\nboolean isRead = SQLParserUtil.isReadOperation("SELECT * FROM user");\nboolean isWrite = SQLParserUtil.isWriteOperation("UPDATE user SET name = 'new' WHERE id = 1");`
+      }
+    ],
+    sourceExamples: [
+      {
+        title: 'BuilderTest',
+        path: 'geoair-dynamic-ds/src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/BuilderTest.java',
+        description: '覆盖主从 builder、批量 slaves、addSlave、权重策略和静态快速 build 方式。'
+      },
+      {
+        title: 'SQLParserUtilTest',
+        path: 'geoair-dynamic-ds/src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/SQLParserUtilTest.java',
+        description: '覆盖 SELECT、INSERT、UPDATE、DELETE、SHOW、DESC、EXPLAIN 和复杂 SQL 的读写识别。'
+      },
+      {
+        title: 'WithStatementTest',
+        path: 'geoair-dynamic-ds/src/test/java/cn/geoair/comp/dynamic/ds/readwrite/test/WithStatementTest.java',
+        description: '专门覆盖 WITH / RECURSIVE / INSERT ... RETURNING / UPDATE / DELETE 等 CTE 语句识别。'
+      },
+      {
+        title: 'EnableDynamicDs / GirDsAspectDoAroundApiHelper',
+        path: 'geoair-dynamic-ds/src/main/java/cn/geoair/comp/dynamic/ds/datasource/EnableDynamicDs.java 等主源码类',
+        description: '说明 Spring 场景下如何启用切面，以及切面前后如何调用 pushDataSource / popDataSource。'
       }
     ],
     related: ['adv-query', 'db-service']
