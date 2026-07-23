@@ -5,6 +5,7 @@
 *.iws
 .cache
 node_modules
+dist
 bin/
 gen/
 logs
