@@ -11,7 +11,7 @@ const dependencyModules = [
       '降低多模块工程中的依赖冲突与升级成本。',
       '为父 POM 与下游业务模块提供稳定基线。'
     ],
-    quickStart: `<dependencyManagement>\n  <dependencies>\n    <dependency>\n      <groupId>cn.geoair.devkit</groupId>\n      <artifactId>geoair-base-parent</artifactId>\n      <version>J8-dev-SNAPSHOT</version>\n      <type>pom</type>\n      <scope>import</scope>\n    </dependency>\n  </dependencies>\n</dependencyManagement>`,
+    quickStart: `<dependencyManagement>\n  <dependencies>\n    <dependency>\n      <groupId>cn.geoair.devkit</groupId>\n      <artifactId>geoair-base-parent</artifactId>\n      <version>J17-dev-SNAPSHOT</version>\n      <type>pom</type>\n      <scope>import</scope>\n    </dependency>\n  </dependencies>\n</dependencyManagement>`,
     example: '适合希望统一 GeoTools、Spring Boot 与 API 文档组件版本的 Maven 多模块项目。',
     related: ['base-parent', 'framework-bom']
   },
@@ -27,7 +27,7 @@ const dependencyModules = [
       '统一编码、测试、发布与插件配置。',
       '作为标准库与业务模块的共同继承入口。'
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
+    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-base-parent</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</parent>`,
     example: '适合新建业务系统、Starter 或空间服务时直接继承，减少重复 Maven 配置。',
     related: ['dependencies-bom', 'framework-bom', 'base']
   },
@@ -43,7 +43,7 @@ const dependencyModules = [
       '为 API、业务项目与 Starter 保持清晰边界。',
       '让组织内部工程继承方式更统一。'
     ],
-    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-project-parent</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</parent>`,
+    quickStart: `<parent>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-project-parent</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</parent>`,
     example: '当项目已经确定是标准业务工程或 Starter 时，可以直接选择对应父 POM。',
     related: ['base-parent']
   }
@@ -528,7 +528,7 @@ const businessModules = [
       '下含多个可独立接入的 GIS 子模块。',
       '是构建地图平台、空间分析和空间服务的核心基础。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '如果你的项目要处理坐标、Geometry、空间查询或瓦片服务，geoair-geo 是最先需要了解的模块组。',
     related: geoModules.map(item => item.slug),
     children: geoModules.map(item => item.slug)
