@@ -4,9 +4,18 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.exception.GeoFileWriteException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import org.geotools.data.DefaultTransaction;
 import org.geotools.api.data.Transaction;
 
@@ -18,13 +27,6 @@ import org.geotools.api.feature.Property;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class ShpGeoFileWriter implements GeoFileWriter {
 
@@ -49,20 +51,21 @@ public class ShpGeoFileWriter implements GeoFileWriter {
 
     @Override
     public void setWriteConfig(WriteConfig writeConfig) {
-        this.writeConfig = writeConfig;
+        this.writeConfig = writeConfig == null ? new WriteConfig() : writeConfig;
     }
 
     @Override
     public GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer consumer) {
         try {
-            if (headerWritten) return this;
+            if (headerWritten) {
+                return this;
+            }
 
             this.featureType = featureType;
 
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
-
+                        GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder tb =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
                 tb.init(featureType);
@@ -74,7 +77,8 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             this.headerWritten = true;
             log.info("Shapefile 写入器初始化完成：{}", featureType.getName());
         } catch (Exception e) {
-            if (consumer != null) consumer.accept(e);
+            notifyException(consumer, e);
+            throw new GeoFileWriteException("初始化 Shapefile 写入表头失败", e);
         }
         return this;
     }
@@ -85,7 +89,9 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             if (!headerWritten || featureType == null) {
                 throw new IllegalStateException("请先调用 writeHeader");
             }
-            if (row == null || row.isEmpty()) return this;
+            if (row == null || row.isEmpty()) {
+                return this;
+            }
 
             featureBuilder.reset();
             row.forEach((k, v) -> featureBuilder.set(k, v));
@@ -93,11 +99,11 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             SimpleFeature feature = featureBuilder.buildFeature(UUID.randomUUID().toString());
             featureCollection.add(feature);
         } catch (Exception e) {
-            if (consumer != null) consumer.accept(e);
+            notifyException(consumer, e);
+            throw new GeoFileWriteException("写入 Shapefile 单行数据失败", e);
         }
         return this;
     }
-
 
     @Override
     public void close() throws MalformedURLException {
@@ -115,7 +121,10 @@ public class ShpGeoFileWriter implements GeoFileWriter {
         Transaction transaction = null;
 
         try {
-            dataStore = (ShapefileDataStore) org.geotools.api.data.DataStoreFinder.getDataStore(params);
+            dataStore = (ShapefileDataStore) new ShapefileDataStoreFactory().createNewDataStore(params);
+            if (dataStore == null) {
+                throw new GeoFileWriteException("初始化 ShapefileDataStore 失败");
+            }
             dataStore.createSchema(featureType);
             dataStore.forceSchemaCRS(featureType.getCoordinateReferenceSystem());
 
@@ -124,7 +133,6 @@ public class ShpGeoFileWriter implements GeoFileWriter {
 
             try (org.geotools.api.data.FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
                          dataStore.getFeatureWriterAppend(typeName, transaction)) {
-
                 for (SimpleFeature source : (Iterable<SimpleFeature>) featureCollection) {
                     SimpleFeature target = writer.next();
                     for (Property prop : source.getProperties()) {
@@ -134,12 +142,10 @@ public class ShpGeoFileWriter implements GeoFileWriter {
                     }
                     writer.write();
                 }
-
             }
 
             transaction.commit();
             log.info("Shapefile 写入完成，共 {} 条，路径：{}", featureCollection.size(), shpFile.getAbsolutePath());
-
         } catch (Exception e) {
             if (transaction != null) {
                 try {
@@ -148,10 +154,23 @@ public class ShpGeoFileWriter implements GeoFileWriter {
                     log.error("shp 回滚失败", ex);
                 }
             }
-            throw new RuntimeException("shp 文件写入失败", e);
+            throw new GeoFileWriteException("shp 文件写入失败", e);
         } finally {
-            if (transaction != null) try { transaction.close(); } catch (Exception ignored) {}
-            if (dataStore != null) dataStore.dispose();
+            if (transaction != null) {
+                try {
+                    transaction.close();
+                } catch (Exception ignored) {
+                }
+            }
+            if (dataStore != null) {
+                dataStore.dispose();
+            }
+        }
+    }
+
+    private void notifyException(ExceptionConsumer consumer, Exception e) {
+        if (consumer != null) {
+            consumer.accept(e);
         }
     }
 }

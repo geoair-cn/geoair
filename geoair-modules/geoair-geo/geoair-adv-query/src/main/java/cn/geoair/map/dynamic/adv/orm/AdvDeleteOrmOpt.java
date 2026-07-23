@@ -37,7 +37,7 @@ public interface AdvDeleteOrmOpt<T extends GiEntityRemovable<PK>, PK extends Ser
     default void gtcDeleteByPK(PK pk) {
         Class<T> modelClass = getModelClass();
         String tableName = GirAdvSqlUtils.getTableName(modelClass);
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(modelClass, true);
         String idKey = idByAnnotation.get(0);
         GirSpringAdvExecutor.getInstance().bDeleteByPK(tableName, idKey, pk);
     }
@@ -53,7 +53,7 @@ public interface AdvDeleteOrmOpt<T extends GiEntityRemovable<PK>, PK extends Ser
     default void gtcDeleteByPK(List<PK> pks) {
         Class<T> modelClass = getModelClass();
         String tableName = GirAdvSqlUtils.getTableName(modelClass);
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(modelClass, true);
         String idKey = idByAnnotation.get(0);
         GirSpringAdvExecutor.getInstance().bDeleteByPKs(tableName, idKey, new HashSet<>(pks));
     }

@@ -156,11 +156,12 @@
       <version>${sdoutl.version}</version>
 
     </dependency>
-    <!--        <dependency>-->
-    <!--            <groupId>com.dm</groupId>-->
-    <!--            <artifactId>DmJdbcDriver</artifactId>-->
-    <!--            <version>${dm.jdbc.version}</version>-->
-    <!--        </dependency>-->
+    <dependency>
+      <groupId>com.dm</groupId>
+      <artifactId>DmJdbcDriver</artifactId>
+      <version>${dm.jdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
     <!--达梦空间支持-->
     <dependency>
       <groupId>com.dameng</groupId>

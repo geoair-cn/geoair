@@ -6,6 +6,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
@@ -38,6 +39,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected DialectTableNameProcessor dialectTableNameProcessor;
     protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseAccessOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
+
+    private final AdvPreparedStatementBinder preparedStatementBinder = new AdvPreparedStatementBinder();
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
@@ -161,7 +164,12 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
 
         return bInsertOne(tableName, rowData);
     }
@@ -253,7 +261,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 for (Map<String, Object> row : batch) {
                     int paramIndex = 1;
                     for (String header : headers) {
-                        pstmt.setObject(paramIndex++, row.get(header));
+                        preparedStatementBinder.bind(pstmt, paramIndex++, row.get(header));
                     }
                     pstmt.addBatch();
                 }
@@ -340,7 +348,12 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
             rowsData.add(rowData);
         }
 
@@ -452,13 +465,18 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
 
         List<String> finalConflictKeys = conflictKeys;
         if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
             finalConflictKeys = new ArrayList<>();
             for (String key : conflictKeys) {
-                finalConflictKeys.add(StrUtil.toUnderlineCase(key));
+                finalConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
             }
         }
 
@@ -562,12 +580,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
 
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
             List<String> finalConflictKeys = conflictKeys;
             if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
                 finalConflictKeys = new ArrayList<>();
                 for (String key : conflictKeys) {
-                    finalConflictKeys.add(StrUtil.toUnderlineCase(key));
+                    finalConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
                 }
             }
             Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);

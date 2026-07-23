@@ -149,7 +149,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             throw new IllegalArgumentException("更新的实体对象不能为空");
         }
         String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
-        List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
         if (CollUtil.isEmpty(idKeys)) {
             throw new IllegalArgumentException("实体对象中未找到主键字段");
         }
@@ -176,7 +176,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
             if (CollUtil.isNotEmpty(idKeys)) {
                 idKey = idKeys.get(0);
             }
@@ -189,7 +189,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -219,7 +224,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             throw new IllegalArgumentException("更新的实体对象不能为空");
         }
         String tableName = GirAdvSqlUtils.getTableName(entity.getClass());
-        List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
         if (CollUtil.isEmpty(idKeys)) {
             throw new IllegalArgumentException("实体对象中未找到主键字段");
         }
@@ -250,7 +255,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
             if (CollUtil.isNotEmpty(idKeys)) {
                 idKey = idKeys.get(0);
             }
@@ -416,7 +421,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (strategy == null) {
             T first = entities.iterator().next();
             String tableName = GirAdvSqlUtils.getTableName(first.getClass());
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             bUpdateBatchByPK(tableName, idKeys.get(0), entities);
             return;
         }
@@ -429,7 +434,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
             T first = entities.iterator().next();
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             idKey = idKeys.get(0);
         }
 
@@ -478,7 +483,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (strategy == null) {
             T first = entities.iterator().next();
             String tableName = GirAdvSqlUtils.getTableName(first.getClass());
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             bUpdateBatchByPKSelective(tableName, idKeys.get(0), entities);
             return;
         }
@@ -492,7 +497,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
             T first = entities.iterator().next();
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             idKey = idKeys.get(0);
         }
 
@@ -560,7 +565,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean ignoreNullValue = strategy != null && strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy != null ? strategy.getIgnoreFieldNames() : ListUtil.empty();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
 
         return bUpdateByWhere(tableName, rowData, whereFilter.toWhereFilter());
     }
@@ -675,7 +685,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (entity == null) {
             throw new IllegalArgumentException("UPSERT的实体对象不能为空");
         }
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
         if (GutilObject.isEmpty(idByAnnotation)) {
             throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行UPSERT");
         }
@@ -702,7 +712,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         List<String> conflictKeys = strategy.getConflictKeys();
         if (CollUtil.isEmpty(conflictKeys)) {
-            List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+            List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
             if (CollUtil.isNotEmpty(idByAnnotation)) {
                 conflictKeys = idByAnnotation;
             }
@@ -715,12 +725,17 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
 
         if (toUnderlineCase) {
             List<String> underlineConflictKeys = new ArrayList<>();
             for (String key : conflictKeys) {
-                underlineConflictKeys.add(StrUtil.toUnderlineCase(key));
+                underlineConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
             }
             conflictKeys = underlineConflictKeys;
         }
@@ -742,7 +757,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (entity == null) {
             throw new IllegalArgumentException("UPSERT的实体对象不能为空");
         }
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
         if (GutilObject.isEmpty(idByAnnotation)) {
             throw new IllegalArgumentException("实体对象中未找到主键字段，无法执行UPSERT");
         }
@@ -865,7 +880,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         if (CollUtil.isEmpty(conflictKeys)) {
             T first = entities.iterator().next();
-            conflictKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            conflictKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             if (CollUtil.isEmpty(conflictKeys)) {
                 throw new IllegalArgumentException("冲突判定字段不能为空");
             }
@@ -897,7 +912,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<String> conflictKeys = strategy.getConflictKeys();
         if (CollUtil.isEmpty(conflictKeys)) {
             T first = entities.iterator().next();
-            conflictKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            conflictKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             if (CollUtil.isEmpty(conflictKeys)) {
                 throw new IllegalArgumentException("冲突判定字段不能为空");
             }
@@ -911,11 +926,16 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (toUnderlineCase) {
             finalConflictKeys = new ArrayList<>();
             for (String key : conflictKeys) {
-                finalConflictKeys.add(StrUtil.toUnderlineCase(key));
+                finalConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entities.iterator().next().getClass(), key, true));
             }
         }
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, ignoreNullValue, ignoreFieldNames);
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
+                entity,
+                toUnderlineCase,
+                ignoreNullValue,
+                strategy.isIgnoreEmptyString(),
+                ignoreFieldNames);
             allRows.add(rowData);
         }
         bUpsertBatch(tableName, allRows, finalConflictKeys, strategy.getBatchSize());
@@ -939,7 +959,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         if (CollUtil.isEmpty(conflictKeys)) {
             T first = entities.iterator().next();
-            conflictKeys = GirAdvSqlUtils.getIdByAnnotation(first.getClass());
+            conflictKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
             if (CollUtil.isEmpty(conflictKeys)) {
                 throw new IllegalArgumentException("冲突判定字段不能为空");
             }

@@ -1,147 +1,178 @@
-# GeoAir Standard 模块使用指南
+# GeoAir Standard — 标准基础库
 
-## 模块介绍
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](../LICENSE)
+[![JDK](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/downloads/#java8)
 
-GeoAir Standard 是 GeoAir 框架的基础标准库，设计初衷是通过 SPI 实现相关常用的工具，提供了一系列基础组件和工具类，为上层应用提供支持。
+## 📖 模块介绍
 
-## 目录结构
+GeoAir Standard 是框架的**基础标准库**，采用 **SPI（Service Provider Interface）** 解耦架构设计：
+
+- **`geoair-base`** — 接口/抽象层：定义纯 Java 接口，零外部依赖
+- **`geoair-core`** — 实现层：基于 Spring 提供默认 SPI 实现
+- **`geoair-web`** — Web 层公共组件（会话、权限、日志、MIME）
+- **`geoair-orm`** — ORM 多框架集成抽象
+- **`geoair-sdk`** — 统一 SDK 输出
+- **`geoair-tools`** — 底层工具（方法分派、反射、集合等）
+
+## 🗂️ 目录结构
 
 ```
-goair-standard/
-├── geoair-base/      # 基础核心模块
-├── geoair-web/       # Web 相关模块
-├── geoair-tools/     # 工具类模块
-├── geoair-core/      # 核心功能模块
-├── geoair-orm/       # ORM 相关模块
-│   ├── geoair-orm-base/         # ORM 基础模块
-│   ├── geoair-orm-mybatis/      # MyBatis 集成模块
-│   ├── geoair-orm-mybatis-tk/   # MyBatis-Plus 集成模块
-│   ├── geoair-orm-springjpa/    # Spring JPA 集成模块
-│   └── geoair-orm-spi/          # ORM SPI 模块
-└── geoair-sdk/       # SDK 输出工具模块
+geoair-standard/
+├── geoair-base/        ← 接口定义层（158+ Java 文件）
+│   ├── api/                注解 @GaApi / @GaApiAction
+│   ├── bean/               Bean 容器抽象 GiBeanFactory
+│   ├── cache/              缓存抽象 GiCache
+│   ├── convert/            数据转换 GiConverter
+│   ├── data/               数据模型（model/page/result/tuples）
+│   ├── env/                环境配置 GiPropertier / GiEnvironmenter
+│   ├── exception/          异常处理
+│   ├── gpa/                通用持久化架构（DAO/Entity/ID生成）
+│   ├── json/               JSON 抽象 GirJSON
+│   ├── lang/               语言基础（调用者检测等）
+│   ├── log/                日志抽象 GiLogger
+│   ├── sp/                 SPI 加载机制 @GkSP + GirSpHelper
+│   ├── tool/               内建工具（Console/ConsoleTable）
+│   ├── util/               基础工具（AOP/Bean）
+│   └── Gir.java            ！！！核心门面类 ！！！
+│
+├── geoair-core/         ← SPI 实现层（15 Java 文件）
+│   └── cn/geoair/spi/
+│       ├── bean/            SpringContextBean4Gir（Spring Bean 容器适配）
+│       ├── cache/           Cache4Gir（JSR/Spring 缓存适配）
+│       ├── convert/         类型转换
+│       ├── env/             SpringEnvironment4Gir（环境/属性适配）
+│       ├── json/            Json4Gir + 5 种 JSON 实现
+│       ├── log/             Log4Gir + 3 种日志适配
+│       ├── util/            ID 生成 / 泛型工具
+│       └── web/             SpringServlet4Gir（Servlet 适配）
+│
+├── geoair-web/          ← Web 公共组件（38 Java 文件）
+│   └── cn/geoair/web/
+│       ├── session/         会话管理（Cookie/Token/Spring Session）
+│       ├── permission/      权限模型
+│       ├── log/             HTTP 请求/响应日志采集
+│       ├── mime/            MIME 类型注册与解析（SPI 驱动）
+│       ├── data/            Web 分页 / Web 结果
+│       ├── util/            CORS / Cookie / Servlet 工具
+│       ├── module/          模块化架构
+│       └── enums/           HTTP 方法枚举
+│
+├── geoair-orm/          ← ORM 集成
+│   ├── geoair-orm-spi/      抽象层（EntityResolve/Example/EntityHelper）
+│   ├── geoair-orm-mybatis/  MyBatis 实现
+│   ├── geoair-orm-mybatis-plus/ MyBatis-Plus 实现
+│   ├── geoair-orm-mybatis-tk/  TK Mapper 实现
+│   ├── geoair-orm-springjpa/   Spring Data JPA 实现
+│   └── geoair-orm-base/     基础模块
+│
+├── geoair-sdk/          ← SDK 统一输出
+└── geoair-tools/        ← 底层工具库
 ```
 
-## 模块说明
+## 📐 命名规范
 
-### 1. geoair-base
+框架采用严格的前缀命名约定：
 
-基础核心模块，提供了框架的核心功能，包括：
+| 前缀 | 含义 | 示例 |
+|------|------|------|
+| `Ga*` | **An**notation 注解 | `@GaApi`, `@GaModel`, `@GkSP` |
+| `Gi*` | **I**nterface 接口 | `GiCache`, `GiDao`, `GiResult` |
+| `Gir*` | **I**mplementation + **R**ealization 实现/工具类 | `GirResult`, `GirSpHelper` |
+| `Gutil*` | **Util**ity 工具类 | `GutilAop`, `GutilCookie` |
+| `Gfun*` | **Fun**ction 函数接口 | `GfunPageExcute` |
+| `Gk*` | **K**it 内建工具/数据结构 | `GkPair`, `GkConsole` |
+| `Gem*` | **E**num **M**odel 枚举模型 | `GemBoolean` |
 
-- API 注解：`@GaApi`、`@GaApiAction` 等
-- Bean 管理：`GiBeanFactory`、`GirBeanHelper` 等
-- 缓存：`GiCache`、`GirCacheHelper` 等
-- 转换：`GiConverter`、`GirConverterFactory` 等
-- 数据模型：`GiModelable`、`GiTypeModelable` 等
-- 分页：`GiPageParam`、`GiPager` 等
-- 结果处理：`GiResult`、`GirResult` 等
-- 环境配置：`GiEnvironmenter`、`GirEnvironmentHelper` 等
-- 异常处理：`GirExceptionResultConverter` 等
-- GPA（通用持久化架构）：`GiDao`、`GiEntityable` 等
-- JSON 处理：`GirJSON` 等
-- SPI 加载：`GirSpHelper`、`GkSpLoader` 等
-- 工具类：`GutilAop`、`GutilBean` 等
+## 🔌 SPI 机制
 
-### 2. geoair-web
+框架的核心解耦机制是通过自定义 SPI 实现的：
 
-Web 相关模块，提供了 Web 应用所需的功能。
-#  geoair 开发基础工程
+```
+应用代码
+    ↓ 调用
+Gir.property / Gir.log / Gir.beans ...   ← 门面入口
+    ↓ 委托
+GirPropertyHelper / GirLoggerFactory ...  ← Helper 层（@GaMethodHandDefine）
+    ↓ 方法分派
+GkMethodHand.invokeSelf()                 ← 方法句柄分派
+    ↓ 查找实现
+SpringEnvironment4Gir / Log4Gir ...       ← 实现层（@GaMethodHandImpl）
+    ↓ 实际执行
+Spring Environment / SLF4J / Jackson ...  ← 底层库
+```
 
-### 3. geoair-tools
-## 工程结构
-*  geoair-base    标准库 [README](./ geoair-base/README.md)
+**关键设计:**
+- `@GkSP` 注解标记需要 SPI 发现的服务接口
+- `GirSpHelper.load(Class)` 按优先级链加载：BeanFactory → JDK ServiceLoader → PlaceHolder
+- `GkMethodHand` 提供方法级别的动态绑定（编译时不依赖 Spring）
+- 支持单例缓存、弱引用、线程安全
 
-工具类模块，提供了各种工具类。
-*  geoair-core    工具库 [README](./ geoair-core/README.md)
+## 🧩 核心门面: Gir 类
 
-### 4. geoair-core
-*  geoair-web    可复用的公共组件和一些通用实现 [README](./ geoair-web/README.md)
+```java
+// 统一入口，无需关心底层实现
+Gir.log.info("Hello");           // 日志 → 自动发现 SLF4J/Log4j/...
+Gir.property.getProperty("key"); // 配置 → 自动适配 Spring Environment
+Gir.beans.getBean(User.class);   // Bean  → 自动适配 Spring Context
+Gir.toJson(obj);                 // JSON  → 自动选择 Jackson/FastJSON/...
+Gir.println(obj);                // 控制台输出
+Gir.printTable("a", "b", "c");   // 表格输出
+```
 
-核心功能模块，提供了框架的核心功能。
-*  geoair-sdk    统一的sdk输出工具
+## 📊 GPA 持久化架构
 
-### 5. geoair-orm
+通过 Entity 接口组合实现类似 Active Record 的编程模型：
 
-ORM 相关模块，提供了多种 ORM 框架的集成：
+```
+GiEntityable<PK>              基础实体
+  ├── GiEntitySaveable         可新增 → entity.save()
+  ├── GiEntityRemovable        可删除 → entity.removeSelf()
+  ├── GiEntityAlterable        可更新 → entity.updateByPK()
+  ├── GiEntityQueryable        可查询 → entity.queryBySelf()
+  └── GiEntityVisuable         可视化查询
+       └── GiCrudEntity       全 CRUD
+            └── GiLogicCrudEntity  逻辑删除版
+```
 
-- **geoair-orm-base**：ORM 基础模块
-- **geoair-orm-mybatis**：MyBatis 集成模块
-- **geoair-orm-mybatis-tk**：MyBatis-Plus 集成模块
-- **geoair-orm-springjpa**：Spring JPA 集成模块
-- **geoair-orm-spi**：ORM SPI 模块
+```java
+// 实体即 DAO 的 Active Record 风格
+User user = new User();
+user.setName("张三");
+user.save();  // 直接调用保存
+```
 
-### 6. geoair-sdk
-
-统一的 SDK 输出工具模块。
-
-## 快速开始
-
-### 1. 引入依赖
-
-在 Maven 项目中，添加以下依赖：
+## 🚀 快速开始
 
 ```xml
+<!-- 引入整个 standard -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
     <version>J17-dev-SNAPSHOT</version>
     <type>pom</type>
 </dependency>
-```
 
-### 2. 选择需要的子模块
-
-根据需要，引入具体的子模块依赖，例如：
-
-```xml
-<!-- 基础核心模块 -->
+<!-- 或按需引入 -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base</artifactId>
     <version>J17-dev-SNAPSHOT</version>
 </dependency>
-
-<!-- ORM 模块 -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm-mybatis</artifactId>
     <version>J17-dev-SNAPSHOT</version>
+    
 </dependency>
 ```
 
-## 功能特性
+## 👥 开发者
 
-- 提供了丰富的基础组件和工具类
-- 支持 SPI 机制，便于扩展
-- 提供了多种 ORM 框架的集成
-- 提供了 Web 应用所需的功能
-- 提供了统一的 SDK 输出工具
+- **作者**: 张逢吉
+- **邮箱**: 1159856928@qq.com
+- **组织**: GeoAir
+- **官网**: https://xmt.geoair.cn/
 
-## 依赖关系
+## 📄 许可证
 
-- **geoair-standard** 依赖于 **geoair-base-parent**
-- 各个子模块之间相互独立，可以根据需要单独引入
-
-## 版本历史
-
-- J17-dev-SNAPSHOT：当前开发版本
-
-## 贡献指南
-
-1. Fork 本项目
-2. 创建 feature 分支
-3. 提交代码
-4. 推送到远程分支
-5. 创建 Pull Request
-
-## 许可证
-
-本项目采用 Apache License 2.0 许可证，详见 [LICENSE](LICENSE) 文件。
-
-## 联系方式
-
-- 开发者：张逢吉
-- 邮箱：1159856928@qq.com
-- 组织：geoair
-- 官网：https://xmt.geoair.cn/
-
-*  geoair-orm    orm框架
+Apache License 2.0 — 详见 [LICENSE](../LICENSE)

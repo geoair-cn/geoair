@@ -168,7 +168,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdByAnnotation(entity.getClass());
+            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
             if (CollUtil.isNotEmpty(idKeys)) {
                 idKey = idKeys.get(0);
             }
