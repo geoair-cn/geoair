@@ -53,7 +53,7 @@
 <parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-base-parent</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J17-dev-SNAPSHOT</version>
 </parent>
 ```
 

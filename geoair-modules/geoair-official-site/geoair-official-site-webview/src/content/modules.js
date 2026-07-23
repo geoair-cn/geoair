@@ -553,7 +553,7 @@ const businessModules = [
       '下含多个可独立接入的 GIS 子模块。',
       '是构建地图平台、空间分析和空间服务的核心基础。'
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
+    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
     example: '如果你的项目要处理坐标、Geometry、空间查询或瓦片服务，geoair-geo 是最先需要了解的模块组。',
     related: geoModules.map(item => item.slug),
     children: geoModules.map(item => item.slug)
