@@ -33,15 +33,24 @@
     </nav>
 
     <section class="page-section">
-      <div class="section-block module-grid">
-        <div>
-          <template v-if="moduleDoc">
-            <div id="doc-body">
-              <MarkdownArticle :document="moduleDoc" />
-            </div>
-          </template>
+      <div class="section-block module-page-layout" :class="{ 'has-md': !!moduleDoc }">
+        <aside v-if="moduleDoc && navItems.length" class="left-sidebar surface-card">
+          <div class="sidebar-title">当前页面</div>
+          <button v-for="item in navItems" :key="item.id" type="button" class="sidebar-link" @click="scrollToSection(item.id)">
+            {{ item.label }}
+          </button>
+        </aside>
 
-          <template v-else>
+        <div class="module-main">
+          <div class="module-grid">
+            <div>
+              <template v-if="moduleDoc">
+                <div id="doc-body">
+                  <MarkdownArticle :document="moduleDoc" />
+                </div>
+              </template>
+
+              <template v-else>
             <div id="capabilities">
               <SectionIntro
                 eyebrow="核心能力"

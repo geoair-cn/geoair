@@ -490,64 +490,68 @@ const geoModules = [
     route: '/modules/geo/mvt',
     title: 'geoair-mvt',
     group: 'geo',
-    summary: '矢量瓦片能力集合，包含实时 MVT 服务、离线 Spark 生成与工具库。',
+    summary: '矢量瓦片相关模块集合，覆盖实时 MVT、离线 Spark 生成和工具层处理。',
     tags: ['MVT', '矢量瓦片', 'Spark'],
-    capabilities: [
-      '提供实时矢量瓦片服务与离线批处理生成。',
-      '支持密度优化、简化、PBF 编码与管道构建。',
-      '可与 PostGIS 空间查询和地图前端配合使用。'
-    ],
-    quickStart: 'geoair-mvt-tools + geoair-real-mvt + geoair-static-mvt-spark',
-    example: '适合地图平台的高缩放级别要素渲染与海量图层切片预生成。',
-    related: ['geo-tools', 'map-tile-forge', 'map-tile-fuser']
+    related: ['geo-tools', 'map-tile-forge', 'map-tile-fuser'],
+    sourceExamples: [
+      {
+        title: 'GirMvtModuleExample',
+        path: 'geoair-geo/geoair-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirMvtModuleExample.java',
+        description: '展示 GirRealMvtHelper、AdvMvtTileUtils、VectorTileExecutorV2 的入口调用方式。'
+      },
+      {
+        title: 'geoair-mvt GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt',
+        description: '直接跳到 geoair-mvt 模块目录。'
+      }
+    ]
   },
   {
     slug: 'map-tile-forge',
     route: '/modules/geo/map-tile-forge',
     title: 'geoair-map-tile-forge',
     group: 'geo',
-    summary: '统一栅格瓦片服务层，支持多种存储格式、存储后端与压缩方式。',
+    summary: '瓦片读取与服务适配层，负责统一图层配置、存储类型适配与瓦片输出。',
     tags: ['瓦片服务', 'S3', '栅格地图'],
-    capabilities: [
-      '支持 XYZ、ArcGIS Compact、3D Terrain 与 Cesium 3D Tiles。',
-      '可对接本地文件与 AWS S3。',
-      '内置缓存层与多种压缩部署模式。'
-    ],
-    quickStart: '适合提供统一瓦片读取与发布入口。',
-    example: '适合把历史离线瓦片和对象存储中的瓦片统一暴露为地图服务。',
-    related: ['mvt', 'map-tile-fuser', 'by-gwc']
+    related: ['mvt', 'map-tile-fuser', 'by-gwc'],
+    sourceExamples: [
+      {
+        title: 'GirMapTileForgeExample',
+        path: 'geoair-geo/geoair-map-tile-forge/src/test/java/cn/geoair/map/tile/forge/core/test/GirMapTileForgeExample.java',
+        description: '展示 GirMapTileService、TileStorageSupportAdapter 和 ITileStorageSupport 的主入口。'
+      },
+      {
+        title: 'XyzTest',
+        path: 'geoair-geo/geoair-map-tile-forge/src/test/java/test/XyzTest.java',
+        description: '展示基于 GirLayerConfigContext 的本地 ZIP XYZ 预缓存流程。'
+      },
+      {
+        title: 'geoair-map-tile-forge GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-map-tile-forge',
+        description: '直接跳到 geoair-map-tile-forge 模块目录。'
+      }
+    ]
   },
   {
     slug: 'map-tile-fuser',
     route: '/modules/geo/map-tile-fuser',
     title: 'geoair-map-tile-fuser',
     group: 'geo',
-    summary: '多源瓦片融合模块，负责拼接连续栅格图像并做缓存预热与完整性校验。',
+    summary: '多源瓦片融合层，负责根据图层配置创建 getter、接入缓存并输出融合结果。',
     tags: ['瓦片融合', '缓存', '影像拼接'],
-    capabilities: [
-      '支持多数据源并行拉取与边缘裁剪。',
-      '根据金字塔层级自适应选择分辨率。',
-      '可对接本地文件、网络源和 MBTiles。'
-    ],
-    quickStart: '适合需要把多个瓦片源拼成统一底图服务的场景。',
-    example: '在多部门地图服务并存的情况下，可以用它统一输出连续图层。',
-    related: ['map-tile-forge', 'mvt']
-  },
-  {
-    slug: 'geoserver',
-    route: '/modules/geo/geoserver',
-    title: 'geoair-geoserver',
-    group: 'geo',
-    summary: '以嵌入式方式运行 GeoServer，并支持数据源、工作区与图层的编程式发布。',
-    tags: ['GeoServer', 'OGC', 'WMS/WFS'],
-    capabilities: [
-      '无需独立容器即可在应用中集成 GeoServer。',
-      '支持图层、工作区和 PostGIS 图层自动发布。',
-      '适合构建 WMS、WFS 等 OGC 服务。'
-    ],
-    quickStart: '适合需要将 OGC 能力嵌入现有 Spring 服务的 GIS 系统。',
-    example: '当应用既要做业务逻辑又要提供标准地图服务时，这个模块能减少部署复杂度。',
-    related: ['by-gwc', 'geo-tools']
+    related: ['map-tile-forge', 'mvt'],
+    sourceExamples: [
+      {
+        title: 'GirMapTileFuserExample',
+        path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/GirMapTileFuserExample.java',
+        description: '展示 GirFuser、PxyLayerInfo、TileGetterFactory 的入口关系。'
+      },
+      {
+        title: 'geoair-map-tile-fuser GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-map-tile-fuser',
+        description: '直接跳到 geoair-map-tile-fuser 模块目录。'
+      }
+    ]
   },
   {
     slug: 'by-gwc',
@@ -563,7 +567,7 @@ const geoModules = [
     ],
     quickStart: '适合复用历史 ArcGIS 缓存资产，而不重建原始服务。',
     example: '对于已有大规模 ArcGIS 缓存的组织，可以低成本接入现有瓦片。',
-    related: ['map-tile-forge', 'geoserver']
+    related: ['map-tile-forge']
   },
   {
     slug: 'jts-all',
