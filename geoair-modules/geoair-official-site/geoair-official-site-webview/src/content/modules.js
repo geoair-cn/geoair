@@ -369,15 +369,25 @@ const geoModules = [
     route: '/modules/geo/by-gwc',
     title: 'geoair-by-gwc',
     group: 'geo',
-    summary: '直接读取 ArcGIS Compact Cache 格式的瓦片缓存，无需依赖 ArcGIS Server。',
+    summary: '直接读取 ArcGIS Compact Cache 相关缓存结构，负责 GridSet 组织与 WMTS 能力描述生成。',
     tags: ['ArcGIS', 'GeoWebCache', '缓存直读'],
-    capabilities: [
-      '支持 ArcGIS Compact Cache V1/V2 格式。',
-      '解析 bundlx 和 bundle 文件，按偏移量读取切片。',
-      '自动生成 WMTS 能力文档。'
+    sourceExamples: [
+      {
+        title: 'ArcGISCompactCache / V1 / V2',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-by-gwc/src/main/java/cn/geoair/map/tile/forge/core/bygwc/compact',
+        description: 'ArcGIS Compact Cache 读取相关核心目录。'
+      },
+      {
+        title: 'GridSetBuilder',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-by-gwc/src/main/java/cn/geoair/map/tile/forge/core/bygwc/layer',
+        description: 'GridSet 与图层网格组织相关目录。'
+      },
+      {
+        title: 'GetCapabilitiesGenerator',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-by-gwc/src/main/java/cn/geoair/map/tile/forge/core/bygwc/wmts',
+        description: 'WMTS 能力描述生成相关目录。'
+      }
     ],
-    quickStart: '适合复用历史 ArcGIS 缓存资产，而不重建原始服务。',
-    example: '对于已有大规模 ArcGIS 缓存的组织，可以低成本接入现有瓦片。',
     related: ['map-tile-forge']
   },
   {
@@ -385,15 +395,20 @@ const geoModules = [
     route: '/modules/geo/jts-all',
     title: 'geoair-jts-all',
     group: 'geo',
-    summary: 'JTS 相关能力的聚合打包模块，便于统一引入几何处理基础设施。',
+    summary: 'JTS 相关能力的聚合桥接模块，用于统一引入 Geometry 基础依赖。',
     tags: ['JTS', 'Geometry'],
-    capabilities: [
-      '统一汇总 JTS 相关依赖与扩展能力。',
-      '适合作为空间几何处理的基础依赖入口。',
-      '便于下游模块减少零散依赖声明。'
+    sourceExamples: [
+      {
+        title: 'geoair-jts-all GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-jts-all',
+        description: '直接跳到 geoair-jts-all 模块目录。'
+      },
+      {
+        title: 'Test',
+        path: 'geoair-geo/geoair-jts-all/src/main/java/cn/geoair/map/dynamic/jts/all/geojsonjackson/Test.java',
+        description: '当前模块中可直接看到的轻量测试入口。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-jts-all</artifactId>\n  <version>J8-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '适合做 Geometry 序列化、空间分析和空间数据库映射的通用基础。',
     related: ['geo-tools', 'message-jts-jackson', 'message-jts-mybatis']
   }
 ]
