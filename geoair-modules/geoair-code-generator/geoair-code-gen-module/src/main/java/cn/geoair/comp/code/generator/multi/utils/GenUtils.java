@@ -35,7 +35,7 @@ public class GenUtils {
                 Map<String, String> map = new HashMap<>();
                 for (String e : en) {
                     if (e.contains(":")) {
-                        String[] ls = e.split(":", 2); // 限制分割次数，避免值包含冒号
+                        String[] ls = e.split(":", 2);
                         map.put(ls[0], ls[1]);
                     }
                 }
@@ -50,29 +50,30 @@ public class GenUtils {
             column.setColumnComment(emms[0]);
         }
 
-        // 设置java字段名
         column.setJavaField(StringUtils.toCamelCase(column.getColumnName()));
 
-        // 处理数据库类型转换
-        String dataType = column.getColumnType();
+        String dataType = normalizeDbType(column.getColumnType());
         if (StringUtils.isEmpty(dataType)) {
+            if (StringUtils.isEmpty(column.getJavaType())) {
+                column.setJavaType(GenConstants.TYPE_STRING);
+            }
             return;
         }
 
         if (arraysContains(GenConstants.COLUMNTYPE_TIME, dataType)) {
             column.setJavaType(GenConstants.TYPE_DATE);
         } else if (arraysContains(GenConstants.COLUMNTYPE_NUMBER, dataType)) {
-            handleNumberType(column, dataType);
-        }
-        if (dataType.equals("geometry")) {
+            handleNumberType(column);
+        } else if (isGeometryType(dataType)) {
             column.setJavaType(GenConstants.TYPE_Geometry);
-        }
-        if (dataType.equals("geography")) {
-            column.setJavaType(GenConstants.TYPE_Geometry);
-        }
-        if (dataType.equals("uuid")) {
+        } else if ("uuid".equals(dataType)) {
             column.setJavaType(GenConstants.TYPE_STRING);
         }
+
+        if (StringUtils.isEmpty(column.getJavaType())) {
+            column.setJavaType(GenConstants.TYPE_STRING);
+        }
+
         Gir.log.info(
                 column.getJavaField()
                         + ": 转换后"
@@ -82,14 +83,76 @@ public class GenUtils {
     }
 
     /** 处理数字类型转换 */
-    private static void handleNumberType(GenTableColumn column, String dataType) {
-        String columnType = column.getColumnType();
-        GenConstants.convertDbTypeToJavaType(columnType, column);
+    private static void handleNumberType(GenTableColumn column) {
+        String scale = column.getNumericPrecisionRadix();
+        String precision = column.getNumericPrecision();
+        if (StringUtils.isNotEmpty(scale) && !"0".equals(scale.trim())) {
+            column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
+            return;
+        }
+
+        Integer precisionValue = null;
+        if (StringUtils.isNotEmpty(precision)) {
+            try {
+                precisionValue = Integer.valueOf(precision.trim());
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (precisionValue != null) {
+            if (precisionValue <= 9) {
+                column.setJavaType(GenConstants.TYPE_INTEGER);
+            } else if (precisionValue <= 18) {
+                column.setJavaType(GenConstants.TYPE_LONG);
+            } else {
+                column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
+            }
+            return;
+        }
+
+        GenConstants.convertDbTypeToJavaType(normalizeDbType(column.getColumnType()), column);
+        if (StringUtils.isEmpty(column.getJavaType())) {
+            column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
+        }
     }
 
     /** 校验数组是否包含指定值 */
     public static boolean arraysContains(String[] arr, String targetValue) {
-        return arr != null && Arrays.asList(arr).contains(targetValue);
+        if (arr == null || StringUtils.isEmpty(targetValue)) {
+            return false;
+        }
+        String normalizedTarget = normalizeDbType(targetValue);
+        for (String value : arr) {
+            String normalizedValue = normalizeDbType(value);
+            if (StringUtils.isEmpty(normalizedValue)) {
+                continue;
+            }
+            if (normalizedTarget.equals(normalizedValue)
+                    || normalizedTarget.startsWith(normalizedValue + " ")
+                    || normalizedTarget.startsWith(normalizedValue + "(")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isGeometryType(String dataType) {
+        return "geometry".equals(dataType)
+                || "geography".equals(dataType)
+                || "sdo_geometry".equals(dataType)
+                || "mgeometry".equals(dataType);
+    }
+
+    private static String normalizeDbType(String dataType) {
+        if (StringUtils.isEmpty(dataType)) {
+            return "";
+        }
+        String normalized = dataType.trim().toLowerCase();
+        int idx = normalized.indexOf('(');
+        if (idx > 0) {
+            normalized = normalized.substring(0, idx);
+        }
+        return normalized.trim();
     }
 
     public static String getBusinessName(String tableName) {
@@ -101,7 +164,6 @@ public class GenUtils {
         if (StringUtils.isEmpty(tableName)) {
             return "";
         }
-        // 移除表前缀
         if (config != null
                 && config.isRemovePre()
                 && StringUtils.isNotEmpty(config.getTablePrefix())) {
@@ -116,7 +178,6 @@ public class GenUtils {
         if (StringUtils.isEmpty(text) || searchList == null || searchList.length == 0) {
             return text;
         }
-        // 按前缀长度降序排序，优先替换长前缀
         Arrays.sort(searchList, (a, b) -> b.length() - a.length());
         for (String searchString : searchList) {
             if (StringUtils.isNotEmpty(searchString) && text.startsWith(searchString)) {

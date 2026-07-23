@@ -14,7 +14,7 @@ public class GenConstants {
 
     /** 数据库时间类型 */
     public static final String[] COLUMNTYPE_TIME = {
-        "datetime", "time", "date", "timestamp", "timestamptz"
+        "datetime", "time", "date", "timestamp", "timestamptz", "timestamp with time zone"
     };
 
     /** 数据库数字类型 */
@@ -32,6 +32,7 @@ public class GenConstants {
         "bigint",
         "float",
         "double",
+        "double precision",
         "serial",
         "bigserial",
         "decimal",

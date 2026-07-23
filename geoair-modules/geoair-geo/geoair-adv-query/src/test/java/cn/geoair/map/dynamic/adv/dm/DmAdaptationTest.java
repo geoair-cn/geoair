@@ -73,26 +73,20 @@ public class DmAdaptationTest {
     }
 
     @Test
-    public void shouldBuildInsertIgnoreSqlWithAllConflictKeys() {
-        DmAdvBaseAccessOpt accessOpt = new DmAdvBaseAccessOpt(AdvQueryGlobalConfig::of);
-        accessOpt.setDataSourceGetter(buildDataSourceGetter());
+    public void shouldBuildValidUpsertWhenAllFieldsAreConflictKeys() {
+        DmAdvBaseUpdateOpt updateOpt = new DmAdvBaseUpdateOpt(AdvQueryGlobalConfig::of);
+        updateOpt.setDataSourceGetter(buildDataSourceGetter());
 
         LinkedHashMap<String, Object> rowData = new LinkedHashMap<>();
         rowData.put("id", 1L);
         rowData.put("code", "A001");
-        rowData.put("name", "达梦");
 
-        Pair<String, List<Object>> insertIgnoreSql =
-                accessOpt.getInsertIgnoreSql("demo_table", rowData, Arrays.asList("id", "code"));
-        String sql = insertIgnoreSql.getKey();
+        Pair<String, List<Object>> upsertSql =
+                updateOpt.getUpsertSql("demo_table", rowData, Arrays.asList("id", "code"));
+        String sql = upsertSql.getKey();
 
-        Assert.assertTrue(
-                sql.contains(
-                        "INSERT INTO \"demo_table\" (\"id\",\"code\",\"name\") SELECT * FROM (SELECT ? AS \"id\", ? AS \"code\", ? AS \"name\" FROM DUAL) source"));
-        Assert.assertTrue(
-                sql.contains(
-                        "WHERE NOT EXISTS (SELECT 1 FROM \"demo_table\" target WHERE target.\"id\" = source.\"id\" AND target.\"code\" = source.\"code\")"));
-        Assert.assertEquals(new ArrayList<Object>(rowData.values()), insertIgnoreSql.getValue());
+        Assert.assertTrue(sql.contains("WHEN MATCHED THEN UPDATE SET target.\"id\" = source.\"id\""));
+        Assert.assertEquals(new ArrayList<Object>(rowData.values()), upsertSql.getValue());
     }
 
     @Test
@@ -126,7 +120,7 @@ public class DmAdaptationTest {
             if (sql.contains("SYS_CONTEXT('USERENV', 'DB_NAME')")) {
                 return row("database_name", "");
             }
-            if (sql.contains("SELECT USER AS \"schema_name\" FROM DUAL")) {
+            if (sql.contains("SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA')")) {
                 return row("schema_name", "SYSDBA");
             }
             return null;

@@ -50,6 +50,10 @@ public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
         String onCondition = java.util.Arrays.stream(conflictFieldArray)
                 .map(field -> StrUtil.format("target.{} = source.{}", field.trim(), field.trim()))
                 .collect(Collectors.joining(" AND "));
+        if (StrUtil.isBlank(updateClause)) {
+            String firstConflictField = conflictFieldArray[0].trim();
+            updateClause = StrUtil.format("target.{} = source.{}", firstConflictField, firstConflictField);
+        }
         return StrUtil.format(
                 "MERGE INTO {} target USING ({}) source ON ({}) WHEN MATCHED THEN UPDATE SET {} WHEN NOT MATCHED THEN INSERT ({}) VALUES ({})",
                 tableName, usingClause, onCondition, updateClause, fields, insertValues);
