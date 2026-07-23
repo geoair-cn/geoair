@@ -208,44 +208,44 @@ const geoModules = [
         ]
       },
       {
-        title: '和其他模块的关系',
+        title: '仓库中现有示例位置',
         items: [
-          '通常与 geoair-geo-tools 配合：前者负责查，后者负责算、转和处理 Geometry。',
-          '在多租户或多数据源系统中，常与 geoair-dynamic-ds 配合完成运行时库切换。',
-          '如果上层还需要数据库可视化管理或数据服务配置，可以继续配合 geoair-db-service。'
+          'geoair-adv-query 的相关示例已放在 geoair-adv-query 模块的 src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test 包下。',
+          '其中 WhereQueryExample、LambdaFilterExample、GirAdvQueryRequestExample 和 GirAdvQueryRequest1Example 直接展示了该模块当前真实 API 的使用方式。',
+          '官网中的 geoair-adv-query 示例说明应当以这些 test 示例为准，而不是脱离源码的伪接口。'
         ]
-      }
+      },
     ],
     usageExamples: [
       {
-        title: '基础条件查询',
-        description: '适合后台列表、业务筛选和属性检索，先从常规字段过滤开始。',
-        code: `List<User> users = executor.wSelectList(User.class, builder -> builder\n  .select("id", "name", "status")\n  .where(w -> w.eq(User::getStatus, 1)\n    .like(User::getName, "新区"))\n  .orderBy(o -> o.desc(User::getId)));`
+        title: '示例1：基础查询（WhereQueryExample / GirAdvQueryRequestExample）',
+        description: '从最基础的 table + fields + where 开始，直接对应仓库里的示例写法。',
+        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status")\n  .where(GirAdvWhereFilter.of()\n    .eq("name", "张三")\n    .eq("status", 1))\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildSelectSql(query);`
       },
       {
-        title: '地图范围 BBox 查询',
-        description: '当前端地图缩放或拖拽后，可用 bbox 只查询视域内要素，减少全量返回。',
-        code: `String bbox = "116.30,39.85,116.55,40.02";\n\nList<Map<String, Object>> rows = executor.wSelectMapList("poi_table", builder -> builder\n  .select("id", "name", "geom")\n  .whereGeo(g -> g.bbox("geom", bbox))\n  .limit(500));`
+        title: '示例2：比较与范围查询（WhereQueryExample）',
+        description: '适合展示 gt / ge / lt / between / in 这些当前模块里真实可用的条件构造能力。',
+        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "age")\n  .where(GirAdvWhereFilter.of()\n    .gt("age", 18)\n    .in("id", Arrays.asList(1, 2, 3, 4, 5))\n    .between("age", 18, 30))\n  .build();`
       },
       {
-        title: '属性条件 + 空间相交组合查询',
-        description: '适合专题图、行政区分析或图层筛选，把属性条件和空间条件放在一次查询里。',
-        code: `String polygonWkt = "POLYGON((116.3 39.8,116.6 39.8,116.6 40.0,116.3 40.0,116.3 39.8))";\n\nList<RiverEntity> rivers = executor.wSelectList(RiverEntity.class, builder -> builder\n  .select("id", "river_name", "geom")\n  .where(w -> w.eq(RiverEntity::getLevel, 2))\n  .whereGeo(g -> g.intersectsWkt("geom", polygonWkt, 4326)));`
+        title: '示例3：复杂嵌套条件（WhereQueryExample）',
+        description: '适合说明 group / or / notGroup 等组合查询能力，这部分仓库中已有较多现成样例。',
+        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "age", "status", "dept_id", "role")\n  .where(GirAdvWhereFilter.of()\n    .like("name", "张")\n    .group(group -> group\n      .gt("age", 18)\n      .or()\n      .eq("status", 1))\n    .group(group -> group\n      .eq("dept_id", 100)\n      .or()\n      .eq("role", "admin")))\n  .build();`
       },
       {
-        title: '分页空间检索',
-        description: '适合前端表格、分页列表和管理端检索结果页。',
-        code: `GiPager<CompanyEntity> pager = executor.wSelectPage(CompanyEntity.class, builder -> builder\n  .page(1, 20)\n  .select("id", "company_name", "geom")\n  .where(w -> w.eq(CompanyEntity::getDeleted, 0))\n  .whereGeo(g -> g.distanceLt("geom", 116.40, 39.90, 3000, 4326)));`
+        title: '示例4：分页与排序（WhereQueryExample / GirAdvQueryRequest1Example）',
+        description: '演示 page、orderByAsc、orderByDesc 以及 OrderApo 的真实用法。',
+        code: `GirAdvQueryRequest query = GirAdvQueryRequest.builder()\n  .table("user")\n  .fields("id", "name", "status", "create_time")\n  .where(GirAdvWhereFilter.of().eq("status", 1))\n  .orderByDesc("create_time")\n  .orderByAsc("id")\n  .page(2, 10)\n  .build();\n\nGirAdvSqlComposer.SqlBuildResult result = sqlBuilder.buildPageSql(query);`
       },
       {
-        title: '动态数据源联合使用',
-        description: '适合一套系统同时连接业务库、专题库或租户库时，先切库再执行空间查询。',
-        code: `GirDynamicStackDataSource.push("tenant-gis-ds");\ntry {\n  List<Map<String, Object>> plots = executor.wSelectMapList("land_plot", builder -> builder\n    .select("id", "plot_name", "geom")\n    .whereGeo(g -> g.bbox("geom", "116.1,39.7,116.7,40.1")));\n} finally {\n  GirDynamicStackDataSource.poll();\n}`
+        title: '示例5：Lambda 风格条件（LambdaFilterExample / GirAdvQueryRequest1Example）',
+        description: '如果项目里已经建立了实体映射，可以直接用 Lambda 风格构造条件。',
+        code: `GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)\n  .eq(User::getName, "张三")\n  .ge(User::getAge, 18)\n  .eq(User::getStatus, 1);\n\nGirAdvWhereFilter whereFilter = wrapper.toWhereFilter();`
       },
       {
-        title: '动态 SQL 片段查询',
-        description: '适合条件项很多、是否拼接由入参决定的 GIS 检索接口。',
-        code: `String sql = "" +\n  "SELECT id, name, geom FROM project_layer " +\n  "<where>" +\n  "  <if test='status != null'> AND status = #{status} </if>" +\n  "  <if test='keyword != null and keyword != \"\"'> AND name like concat('%', #{keyword}, '%') </if>" +\n  "</where>";\n\nList<Map<String, Object>> rows = executor.dynamicSelect(sql, params);`
+        title: '示例6：SQL 表达式与函数（LambdaFilterExample / GirAdvQueryRequestExample）',
+        description: '适合补充 expr、exprEq、exprGt 这类表达式查询能力，特别适合复杂 GIS / 统计场景。',
+        code: `GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)\n  .exprEq("YEAR(create_time)", 2024)\n  .exprGt("salary * 1.1", new BigDecimal("10000"))\n  .exprLike("CONCAT(first_name, ' ', last_name)", "张%");`
       }
     ],
     related: ['geo-tools', 'dynamic-ds', 'db-service']
@@ -419,15 +419,72 @@ const businessModules = [
     route: '/modules/dynamic-ds',
     title: 'geoair-dynamic-ds',
     group: 'business',
-    summary: '运行时动态多数据源模块，支持 AOP 切换、读写分离、连接池适配与事务管理。',
-    tags: ['动态数据源', 'AOP', '读写分离'],
+    summary: '运行时动态多数据源模块，围绕数据源初始化、注册、切换、读写分离与事务模板，提供一套贴近实际项目的动态数据源能力。',
+    tags: ['动态数据源', 'AOP', '读写分离', 'Druid', '事务'],
     capabilities: [
-      '支持 Druid、Hikari、BoneCP、C3P0、DBCP2 等连接池。',
-      '通过注解和 ThreadLocal 路由动态切换数据源。',
-      '支持 SQL 解析下的读写分离与编程式事务。'
+      '支持通过 DataSourceDruidFastCreate 快速创建 Druid 数据源，并注册到 AdvDynamicDataSourceStorage。',
+      '支持通过 GirDynamicStackDataSource.pushDataSource / popDataSource 进行线程级数据源切换。',
+      '支持 GirReadWriteDataSourceBuilder 构建主从读写分离数据源，并通过 SQLParserUtil 判断读写类型。',
+      '支持与 Spring、AOP、事务模板协同，用于多租户、多业务库和 GIS 专题库场景。'
     ],
-    quickStart: '@EnableDynamicDs',
-    example: '适合一套系统同时连接多个业务库、租户库或 GIS 数据源的场景。',
+    quickStart: `DataSource master = DataSourceDruidFastCreate.create(builder -> builder\n  .setUrl("jdbc:postgresql://127.0.0.1:5432/geoair_master")\n  .setUsername("postgres")\n  .setPassword("postgres")\n  .setValidationQuery("SELECT 1"));\n\nDynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", master);\n\nGirDynamicStackDataSource.pushDataSource("master_db");\ntry {\n  // 在这里执行 JDBC / ORM / 空间查询逻辑\n} finally {\n  GirDynamicStackDataSource.popDataSource();\n}`,
+    example: '适合一套系统同时连接多个业务库、租户库或 GIS 数据源，并且需要显式管理数据源初始化与切换的场景。',
+    detailSections: [
+      {
+        title: '推荐理解顺序',
+        items: [
+          '先看 DataSourceDruidFastCreate：它负责把 URL、账号和连接池参数快速组装成 Druid 数据源。',
+          '再看 AdvDynamicDataSourceStorage：它实现了 DynamicDataSourceManager，负责数据源注册、缓存、获取和释放。',
+          '如果项目里存在显式切库逻辑，再看 GirDynamicStackDataSource：它用栈维护线程内数据源上下文，支持嵌套切换。',
+          '如果项目要做主从读写分离，再继续看 GirReadWriteDataSourceBuilder、GirReadWriteDataSource 和 SQLParserUtil。'
+        ]
+      },
+      {
+        title: '典型接入链路',
+        items: [
+          '步骤1：通过 DataSourceDruidFastCreate.create(...) 初始化真实数据源。',
+          '步骤2：通过 DynamicDataSourceManager.registerDataSource(...) 注册数据源 ID。',
+          '步骤3：业务执行前通过 GirDynamicStackDataSource.pushDataSource(...) 压栈切换。',
+          '步骤4：业务结束后通过 popDataSource() 恢复上一个数据源上下文。',
+          '步骤5：如果使用主从模式，则通过 GirReadWriteDataSourceBuilder.builder() 组装主从数据源。'
+        ]
+      },
+      {
+        title: '仓库中现有示例位置',
+        items: [
+          '读写分离 builder 示例位于 dynamic-ds 模块的 test 包。',
+          'SQLParserUtil 与 WITH 语句识别示例也位于 dynamic-ds 模块的 test 包。',
+          '官网中的说明将以这些 test 示例为准，而不是使用脱离仓库的伪 API。'
+        ]
+      }
+    ],
+    usageExamples: [
+      {
+        title: '示例1：从数据源初始化开始',
+        description: '使用 DataSourceDruidFastCreate 先创建 Druid 数据源，再注册进 DynamicDataSourceManager。',
+        code: `DataSource master = DataSourceDruidFastCreate.create(builder -> builder\n  .setUrl("jdbc:postgresql://127.0.0.1:5432/geoair_master")\n  .setUsername("postgres")\n  .setPassword("postgres")\n  .setValidationQuery("SELECT 1")\n  .setInitialSize(1)\n  .setMaxActive(20));\n\nDynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", master);`
+      },
+      {
+        title: '示例2：手动切换当前线程数据源',
+        description: '当业务代码需要明确指定当前线程访问哪个库时，使用 push / pop 维护切换栈。',
+        code: `GirDynamicStackDataSource.pushDataSource("tenant_gis_ds");\ntry {\n  String current = GirDynamicStackDataSource.getCurrentDataSource();\n  // 在这里执行查询、保存或空间检索\n} finally {\n  GirDynamicStackDataSource.popDataSource();\n}`
+      },
+      {
+        title: '示例3：注册多个数据源并按 ID 获取',
+        description: '适合多租户或多个专题库场景，先注册，再按 ID 获取或延迟创建。',
+        code: `DynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();\nmanager.registerDataSource("master_db", masterDs);\nmanager.registerDataSource("slave_db", slaveDs);\n\nboolean exists = manager.containsDataSource("slave_db");\nAdvDataSourceWrapper wrapper = manager.getDataSourceById("slave_db");`
+      },
+      {
+        title: '示例4：构建主从读写分离数据源',
+        description: '这类写法与仓库里的 BuilderTest 一致，适合作为读写分离接入入口。',
+        code: `GirReadWriteDataSource dataSource = GirReadWriteDataSourceBuilder.builder()\n  .master("master_db")\n  .slaves("slave1", "slave2", "slave3")\n  .slaveStrategy(LoadStrategyType.ROUND_ROBIN)\n  .slaveGroupName("mySlaveGroup")\n  .build();`
+      },
+      {
+        title: '示例5：SQLParserUtil 判断读写类型',
+        description: '适合解释读写分离是如何识别 SELECT、WITH、INSERT、UPDATE、DELETE 的。',
+        code: `SQLType type = SQLParserUtil.getSQLType("WITH temp AS (SELECT id FROM users) SELECT * FROM temp");\nboolean isRead = SQLParserUtil.isReadOperation("SELECT * FROM users");\nboolean isWrite = SQLParserUtil.isWriteOperation("UPDATE users SET status = 1 WHERE id = 1");`
+      }
+    ],
     related: ['adv-query', 'db-service']
   },
   {

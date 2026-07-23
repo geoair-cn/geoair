@@ -5,7 +5,7 @@ export const siteMeta = {
   tagline: '企业级 GIS Java 基础框架',
   description: 'GeoAir Framework 采用 Maven 多模块与 SPI 解耦架构，覆盖标准基础库、GIS 空间处理、动态数据源、API 文档、代码生成与数据库服务等能力。',
   heroActions: [
-    { label: '快速开始', to: '/#quick-start', type: 'primary' },
+    { label: '快速开始', href: '#quick-start', type: 'primary' },
     { label: '查看模块', to: '/modules', type: 'default' },
     { label: '仓库地址', href: 'https://github.com/geoair-cn/geoair', type: 'ghost' }
   ],

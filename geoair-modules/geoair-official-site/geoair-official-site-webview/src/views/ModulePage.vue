@@ -154,6 +154,12 @@ export default {
       return children
         .map(slug => getModuleBySlug(slug))
         .filter(Boolean)
+    },
+    detailSections() {
+      return (this.moduleItem && this.moduleItem.detailSections) || []
+    },
+    usageExamples() {
+      return (this.moduleItem && this.moduleItem.usageExamples) || []
     }
   }
 }
@@ -255,6 +261,57 @@ export default {
 .related-list {
   display: grid;
   gap: 16px;
+}
+
+.detail-sections,
+.example-list {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.detail-card,
+.example-item {
+  padding: 22px;
+}
+
+.detail-card h3,
+.example-item h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.detail-card ul {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-card li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--text-secondary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+}
+
+.example-item {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+}
+
+.example-item p {
+  color: var(--text-secondary);
+  margin-bottom: 14px;
 }
 
 .related-item {
