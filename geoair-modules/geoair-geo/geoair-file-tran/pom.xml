@@ -36,6 +36,7 @@
 
   <modules>
     <module>geoair-file-core</module>
+    <module>geoair-file-csv</module>
     <module>geoair-file-geojson</module>
     <module>geoair-file-postgis</module>
     <module>geoair-file-shp</module>
@@ -59,6 +60,11 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-file-core</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-csv</artifactId>
         <version>${geoair.version}</version>
       </dependency>
       <dependency>

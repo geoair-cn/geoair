@@ -22,7 +22,7 @@ public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
     @Override
     protected String buildUpsertFieldClause(String field) {
-        return StrUtil.format("{} = VALUES({})", field, field);
+        return StrUtil.format("target.{} = source.{}", field, field);
     }
 
     @Override
@@ -33,31 +33,32 @@ public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                                             String updateClause) {
         String[] fieldArray = fields.split(",");
         StringBuilder usingBuilder = new StringBuilder("SELECT ");
+        StringBuilder insertValueBuilder = new StringBuilder();
         for (int i = 0; i < fieldArray.length; i++) {
+            String field = fieldArray[i].trim();
             if (i > 0) {
                 usingBuilder.append(", ");
+                insertValueBuilder.append(", ");
             }
-            usingBuilder.append("? AS ").append(fieldArray[i].trim());
+            usingBuilder.append("? AS ").append(field);
+            insertValueBuilder.append("source.").append(field);
         }
+        usingBuilder.append(" FROM DUAL");
         String usingClause = usingBuilder.toString();
+        String insertValues = insertValueBuilder.toString();
         String[] conflictFieldArray = conflictFields.split(",");
         String onCondition = java.util.Arrays.stream(conflictFieldArray)
                 .map(field -> StrUtil.format("target.{} = source.{}", field.trim(), field.trim()))
                 .collect(Collectors.joining(" AND "));
         return StrUtil.format(
                 "MERGE INTO {} target USING ({}) source ON ({}) WHEN MATCHED THEN UPDATE SET {} WHEN NOT MATCHED THEN INSERT ({}) VALUES ({})",
-                tableName, usingClause, onCondition, updateClause, fields, placeholders);
+                tableName, usingClause, onCondition, updateClause, fields, insertValues);
     }
 
     public String buildBatchUpdateWithForall(String tableName,
                                              String idKey,
                                              Set<String> updateFields,
                                              int batchSize) {
-        String setClause = updateFields.stream()
-                .map(field -> StrUtil.format("{} = {}_new.{}", field, tableName, field))
-                .collect(Collectors.joining(", "));
-        return StrUtil.format(
-                "BEGIN FOR i IN 1..{} LOOP UPDATE {} SET {} WHERE {} = ?; END LOOP; END;",
-                batchSize, tableName, setClause, idKey);
+        throw new UnsupportedOperationException("DM 暂未实现 buildBatchUpdateWithForall 的可执行批量更新语句");
     }
 }

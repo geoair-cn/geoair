@@ -8,13 +8,13 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
-  <artifactId>geoair-file-core</artifactId>
+  <artifactId>geoair-file-csv</artifactId>
   <version>J8-dev-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>geoair-file-core</name>
+  <name>geoair-file-csv</name>
 
-  <description>geoair-file-tran
-        核心接口声明层</description>
+  <description>geoair-file-csv
+        csv格式的实现类</description>
 
   <url>https://github.com/geoair-cn/geoair</url>
 
@@ -49,22 +49,9 @@
   <dependencies>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-dynamic-ds</artifactId>
+      <artifactId>geoair-file-core</artifactId>
       <version>${geoair.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-geo-tools</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-adv-query</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -73,7 +60,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-referencing</artifactId>
+      <artifactId>gt-main</artifactId>
       <version>${geotools.version}</version>
     </dependency>
     <dependency>

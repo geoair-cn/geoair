@@ -13,4 +13,7 @@ public class WriteConfig {
 
     /** 输出的srid */
     private int outPutSrid = 4326;
+
+    /** 目标已存在时是否允许覆盖 */
+    private boolean overwrite = false;
 }

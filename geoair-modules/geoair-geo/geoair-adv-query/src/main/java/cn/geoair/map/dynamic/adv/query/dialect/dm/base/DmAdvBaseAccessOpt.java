@@ -22,9 +22,28 @@ public class DmAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String[] fieldArray = fields.split(",");
-        String pkField = fieldArray[0].trim();
+        StringBuilder sourceSelectBuilder = new StringBuilder("SELECT ");
+        for (int i = 0; i < fieldArray.length; i++) {
+            String field = fieldArray[i].trim();
+            if (i > 0) {
+                sourceSelectBuilder.append(", ");
+            }
+            sourceSelectBuilder.append("? AS ").append(field);
+        }
+        sourceSelectBuilder.append(" FROM DUAL");
+
+        List<String> effectiveConflictKeys = conflictKeys;
+        if (effectiveConflictKeys == null || effectiveConflictKeys.isEmpty()) {
+            effectiveConflictKeys = java.util.Collections.singletonList(fieldArray[0].trim());
+        }
+        String conflictCondition = effectiveConflictKeys.stream()
+                .map(field -> {
+                    String trimmedField = field.trim();
+                    return StrUtil.format("target.{} = source.{}", trimmedField, trimmedField);
+                })
+                .collect(java.util.stream.Collectors.joining(" AND "));
         return StrUtil.format(
-                "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM {} WHERE {} = ?)",
-                tableName, fields, placeholders, tableName, pkField);
+                "INSERT INTO {} ({}) SELECT * FROM ({}) source WHERE NOT EXISTS (SELECT 1 FROM {} target WHERE {})",
+                tableName, fields, sourceSelectBuilder, tableName, conflictCondition);
     }
 }

@@ -45,7 +45,7 @@ public class AdvExecutorFactory {
             case ORACLE:
                 log.trace("检测到ORACLE数据源，创建GirSpringOracleAdvExecutor执行器");
                 return GirSpringOracleAdvExecutor.newInstance(dataSource, dataSourceName);
-            case ANSI:
+            case DM:
                 log.trace("检测到达梦数据源，创建GirSpringDmAdvExecutor执行器");
                 return GirSpringDmAdvExecutor.newInstance(dataSource, dataSourceName);
             default:
@@ -76,7 +76,7 @@ public class AdvExecutorFactory {
             } else if (dbProductName.contains("ORACLE")) {
                 return DialectName.ORACLE;
             } else if (dbProductName.contains("DAMENG") || dbProductName.equals("DM") || dbProductName.contains("DM DBMS")) {
-                return DialectName.ANSI;
+                return DialectName.DM;
             } else {
                 throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);
             }

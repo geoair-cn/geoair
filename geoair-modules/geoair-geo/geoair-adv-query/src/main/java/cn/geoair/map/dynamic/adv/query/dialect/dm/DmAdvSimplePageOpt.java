@@ -6,7 +6,6 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
-import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import java.util.List;
 
@@ -49,13 +48,11 @@ public class DmAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
         return advGeoPreOpt;
     }
 
-    protected Long executeCountSqlWithParam(String countSql, GirSqlParam sqlParam) {
-        GirAdvOneRow result = getAdvBaseOpt().bSelectOne(countSql, sqlParam);
-        return result != null ? result.getLong("COUNT") : 0L;
-    }
-
+    @Override
     public void convertPageOriginalResults(List<GirAdvOneRow> records) {
         for (GirAdvOneRow record : records) {
+            record.remove("rn");
+            record.remove("RN");
             record.remove("RN_TEMP");
         }
     }

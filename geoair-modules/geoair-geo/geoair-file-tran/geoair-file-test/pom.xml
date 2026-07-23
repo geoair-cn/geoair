@@ -63,6 +63,11 @@
     </dependency>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-file-csv</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-file-geojson</artifactId>
       <version>${geoair.version}</version>
     </dependency>
