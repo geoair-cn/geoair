@@ -156,87 +156,6 @@ const geoModules = [
     group: 'geo',
     summary: 'GIS 工具集总入口，统一封装坐标转换、格式互转、空间测量、几何合并、SRID 转换与瓦片计算。',
     tags: ['GIS', 'GeoTools API', '统一入口'],
-    capabilities: [
-      '通过 GirGeoTools.defaultInstance() 统一获取 Coordinate / Format / Measure / Merge / SRID / Tile 能力。',
-      '适合在一个页面里顺着“坐标 / 格式 / 测量 / 合并 / SRID / 瓦片”逐段阅读和快速定位。',
-      '是 geoair-geo 模块里最接近日常开发工具箱的一层。'
-    ],
-    quickStart: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`,
-    example: '如果你的项目既要处理 Geometry，又要做坐标、投影、瓦片或测量，这一层通常是最先接触的入口。',
-    detailSections: [
-      {
-        title: '坐标转换',
-        items: [
-          '核心接口是 GirCoordinateConvertOpt。',
-          '支持 WGS84 / GCJ02 / BD09 / 墨卡托互转。',
-          '支持经纬度、Point、批量坐标数组和 Geometry 全类型转换。'
-        ]
-      },
-      {
-        title: '格式转换',
-        items: [
-          '核心接口是 GirGeoFormatOpt。',
-          '支持 GeoJSON / WKT / WKB / PGGeometry / JTS Geometry 互转。',
-          '同时提供 WKTReader / WKBReader / WKBWriter / GeometryJSON 等底层入口。'
-        ]
-      },
-      {
-        title: '测量计算',
-        items: [
-          '核心接口是 GirGeoMeasureOpt。',
-          '支持面积、长度、点点距离、点线距离、线线距离和单位换算。',
-          '提供常规计算和基于 UTM 投影的精确计算两套方法。'
-        ]
-      },
-      {
-        title: '几何合并',
-        items: [
-          '核心接口是 GirGeoMergeOpt。',
-          '支持 mergeToMultiPoint / mergeToMultiLineString / mergeToMultiPolygon。',
-          '支持把线或面合并成单个 Geometry。'
-        ]
-      },
-      {
-        title: 'SRID 转换与瓦片计算',
-        items: [
-          'GirSridConvertOpt 负责 Geometry / Envelope / 点坐标在不同 SRID 之间的转换。',
-          'GirTileConverterOpt 负责 XYZ、Envelope、Geometry、层级元数据之间的互转。',
-          'GirBingMapQuadKeyOpt 负责 Bing QuadKey 的生成、解析和层级推导。'
-        ]
-      }
-    ],
-    usageExamples: [
-      {
-        title: '示例1：统一入口获取各类 API',
-        description: '先通过 GirGeoTools.defaultInstance() 获取各类接口，再按能力分段使用。',
-        code: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`
-      },
-      {
-        title: '示例2：坐标转换与 Geometry 偏移',
-        description: '适合点位偏移和 Geometry 全量坐标转换。',
-        code: `double[] gcj02 = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToGcj02(116.40, 39.90);\nGeometry geom = GirGeoTools.defaultInstance().getCoordinateOpt().wgs84ToMercatorGeometry(geometry);`
-      },
-      {
-        title: '示例3：格式转换',
-        description: '适合在 GeoJSON、WKT 和 JTS Geometry 之间切换。',
-        code: `Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt().geojsonToJtsGeometry(geojson, false);\nString wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, false);`
-      },
-      {
-        title: '示例4：面积与长度计算',
-        description: '适合面积统计、线长统计和距离分析。',
-        code: `double area = GirGeoTools.defaultInstance().getMeasureOpt().calculateArea(polygon, 4326, GirGeoMeasureOpt.UNIT_SQUARE_KILOMETER);\ndouble length = GirGeoTools.defaultInstance().getMeasureOpt().calculateLength(lineString, 4326, GirGeoMeasureOpt.UNIT_KILOMETER);`
-      },
-      {
-        title: '示例5：几何合并与 SRID 转换',
-        description: '适合把碎片面或线段整合后再统一转换投影。',
-        code: `MultiLineString multiLine = GirGeoTools.defaultInstance().getMergeOpt().mergeToMultiLineString(lineStrings);\nGeometry geom3857 = GirGeoTools.defaultInstance().getSridOpt().convert(geometry4326, 4326, 3857);`
-      },
-      {
-        title: '示例6：瓦片范围与 QuadKey',
-        description: '适合做切片、范围计算和 Bing QuadKey 互转。',
-        code: `BoxReferencedEnvelope tileBox = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(10, 845, 388, 4326);\nString quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(845, 388, 10);`
-      }
-    ],
     sourceExamples: [
       {
         title: 'GirGeoToolsOverviewExample',
@@ -259,9 +178,24 @@ const geoModules = [
         description: '测量示例，覆盖面积、长度、点点距离、点线距离和单位换算。'
       },
       {
-        title: 'geoair-geo-tools 源码目录',
-        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-geo-tools/src/main/java/cn/geoair/map/dynamic/tools',
-        description: '直接跳到 geoair-geo-tools 主源码目录。'
+        title: 'GirGeoToolsMergeExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsMergeExample.java',
+        description: '几何合并示例，覆盖点、线、面合并到 MultiGeometry 和单 Geometry。'
+      },
+      {
+        title: 'GirGeoToolsTileExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsTileExample.java',
+        description: '瓦片与 QuadKey 示例，覆盖 xyzToTileBox、tileRangeByBox 和 xyzToQuadKey。'
+      },
+      {
+        title: 'GirGeoToolsSridExample',
+        path: 'geoair-geo/geoair-geo-tools/src/test/java/cn/geoair/map/dynamic/tools/test/GirGeoToolsSridExample.java',
+        description: 'SRID 转换示例，覆盖 Geometry、Envelope 和单点坐标转换。'
+      },
+      {
+        title: 'geoair-geo-tools GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-geo-tools',
+        description: '直接跳到 geoair-geo-tools 模块目录。'
       }
     ],
     related: ['adv-query', 'file-tran', 'mvt', 'map-tile-forge', 'map-tile-fuser']
@@ -374,118 +308,6 @@ const geoModules = [
     related: ['geo-tools', 'dynamic-ds', 'db-service']
   },
   {
-    slug: 'geo-tools-overview',
-    route: '/modules/geo/tools/overview',
-    title: 'geoair-geo-tools 总览',
-    group: 'geo',
-    summary: '从 GirGeoTools 统一入口进入，梳理 coordinate、format、measure、merge、srid、tile 等核心能力。',
-    tags: ['GeoTools API', '总览'],
-    capabilities: [
-      '通过 GirGeoTools.defaultInstance() 统一获取各类工具接口。',
-      '适合先建立整体能力地图，再进入具体 API 页。',
-      '把原本分散的几何、坐标、瓦片能力汇总成一个统一入口。'
-    ],
-    quickStart: `GirGeoTools tools = GirGeoTools.defaultInstance();\nGirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();\nGirGeoFormatOpt formatOpt = tools.getFormatOpt();\nGirGeoMeasureOpt measureOpt = tools.getMeasureOpt();\nGirGeoMergeOpt mergeOpt = tools.getMergeOpt();\nGirSridConvertOpt sridOpt = tools.getSridOpt();\nGirTileConverterOpt tileOpt = tools.getTileGrid4326Opt();`,
-    example: '先从总览页确认统一入口，再按“坐标 / 格式 / 测量 / 合并 / SRID / 瓦片”拆分阅读。',
-    related: ['geo-tools-coordinate', 'geo-tools-format', 'geo-tools-measure', 'geo-tools-merge', 'geo-tools-srid', 'geo-tools-tile']
-  },
-  {
-    slug: 'geo-tools-coordinate',
-    route: '/modules/geo/tools/coordinate',
-    title: '坐标转换 API',
-    group: 'geo',
-    summary: '介绍 GirCoordinateConvertOpt 的单点、批量、Point、Geometry 和 DMS / 墨卡托转换能力。',
-    tags: ['坐标转换', 'WGS84', 'GCJ02', 'BD09'],
-    capabilities: [
-      '支持 WGS84 / GCJ02 / BD09 互转。',
-      '支持经纬度、Point、批量坐标、Geometry 全类型转换。',
-      '支持 DMS 与 DD、WGS84 与墨卡托转换。'
-    ],
-    quickStart: `GirCoordinateConvertOpt coordinateOpt = GirGeoTools.defaultInstance().getCoordinateOpt();\ndouble[] gcj02 = coordinateOpt.wgs84ToGcj02(116.40, 39.90);\nPoint bdPoint = coordinateOpt.wgs84ToBd09(point);\nGeometry mercatorGeom = coordinateOpt.wgs84ToMercatorGeometry(geometry);`,
-    example: '适合地图点位偏移、批量坐标转换、Geometry 坐标系偏移处理。',
-    related: ['geo-tools-overview', 'geo-tools-srid', 'geo-tools-format']
-  },
-  {
-    slug: 'geo-tools-format',
-    route: '/modules/geo/tools/format',
-    title: '格式转换 API',
-    group: 'geo',
-    summary: '介绍 GirGeoFormatOpt 在 GeoJSON、WKT、WKB、JTS Geometry、PGGeometry 之间的转换能力。',
-    tags: ['GeoJSON', 'WKT', 'WKB', 'JTS'],
-    capabilities: [
-      '支持 GeoJSON <-> JTS Geometry。',
-      '支持 WKT / WKB / PGGeometry 与 JTS 互转。',
-      '提供 Point 构造、Reader / Writer / GeometryJSON 等底层入口。'
-    ],
-    quickStart: `GirGeoFormatOpt formatOpt = GirGeoTools.defaultInstance().getFormatOpt();\nGeometry geometry = formatOpt.geojsonToJtsGeometry(geojson, false);\nString wkt = formatOpt.jtsGeometryToWktString(geometry, false);\nString geojsonText = formatOpt.wktToGeojson(wkt, false);`,
-    example: '适合文件导入导出、接口交换、数据库字段转换和 Geometry 调试。',
-    related: ['geo-tools-overview', 'geo-tools-coordinate', 'geo-tools-srid']
-  },
-  {
-    slug: 'geo-tools-measure',
-    route: '/modules/geo/tools/measure',
-    title: '测量计算 API',
-    group: 'geo',
-    summary: '介绍 GirGeoMeasureOpt 在面积、长度、点线距离、线线距离、单位换算和 UTM 投影计算上的用法。',
-    tags: ['面积', '长度', '距离', 'UTM'],
-    capabilities: [
-      '支持 calculateArea / calculateLength / calculateAreaByUTM / calculateLengthByUTM。',
-      '支持点点、点线、点面、线线最短距离。',
-      '支持 m/km/m²/km²/acre/hectare 等单位转换。'
-    ],
-    quickStart: `GirGeoMeasureOpt measureOpt = GirGeoTools.defaultInstance().getMeasureOpt();\ndouble area = measureOpt.calculateArea(polygon, 4326, GirGeoMeasureOpt.UNIT_SQUARE_KILOMETER);\ndouble length = measureOpt.calculateLength(lineString, 4326, GirGeoMeasureOpt.UNIT_KILOMETER);\ndouble distance = measureOpt.calculatePointToPointDistance(point1, point2, 4326, GirGeoMeasureOpt.UNIT_METER);`,
-    example: '适合面积统计、缓冲分析前的距离计算、线路长度评估和坐标单位换算。',
-    related: ['geo-tools-overview', 'geo-tools-srid', 'geo-tools-merge']
-  },
-  {
-    slug: 'geo-tools-merge',
-    route: '/modules/geo/tools/merge',
-    title: '几何合并 API',
-    group: 'geo',
-    summary: '介绍 GirGeoMergeOpt 如何把点、线、面合并成 MultiGeometry 或单个 Geometry。',
-    tags: ['MultiPoint', 'MultiLineString', 'MultiPolygon'],
-    capabilities: [
-      '支持 mergeToMultiPoint / mergeToMultiLineString / mergeToMultiPolygon。',
-      '支持 mergeToSingleLineString 与 mergeToSinglePolygon。',
-      '支持 Geometry、坐标数组和 WKT 多种输入形式。'
-    ],
-    quickStart: `GirGeoMergeOpt mergeOpt = GirGeoTools.defaultInstance().getMergeOpt();\nMultiLineString multiLine = mergeOpt.mergeToMultiLineString(lineStrings);\nPolygon polygon = mergeOpt.mergeToSinglePolygon(polygons);`,
-    example: '适合把分段线、碎片面或离散点集合整合成统一几何结果。',
-    related: ['geo-tools-overview', 'geo-tools-format', 'geo-tools-measure']
-  },
-  {
-    slug: 'geo-tools-srid',
-    route: '/modules/geo/tools/srid',
-    title: 'SRID 转换 API',
-    group: 'geo',
-    summary: '介绍 GirSridConvertOpt 在 Geometry、Envelope、单点和 CRS / MathTransform 层面的转换能力。',
-    tags: ['SRID', 'EPSG:4326', 'EPSG:3857', 'CRS'],
-    capabilities: [
-      '支持 Geometry / Envelope / 点坐标转换。',
-      '支持 CRS 获取、地理坐标系判断和转换缓存清理。',
-      '提供 WGS84 / WebMercator / CGCS2000 等便捷方法。'
-    ],
-    quickStart: `GirSridConvertOpt sridOpt = GirGeoTools.defaultInstance().getSridOpt();\nGeometry geom3857 = sridOpt.convert(geometry4326, 4326, 3857);\ndouble[] point3857 = sridOpt.convertPoint(116.40, 39.90, 4326, 3857);\nGeometry wgs84Geom = sridOpt.webMercatorToWgs84(geometry3857);`,
-    example: '适合地图投影切换、包围盒重投影和服务端坐标统一。',
-    related: ['geo-tools-overview', 'geo-tools-coordinate', 'geo-tools-tile']
-  },
-  {
-    slug: 'geo-tools-tile',
-    route: '/modules/geo/tools/tile',
-    title: '瓦片与 QuadKey API',
-    group: 'geo',
-    summary: '介绍 GirTileConverterOpt 与 GirBingMapQuadKeyOpt 在 XYZ、Envelope、Geometry、层级元数据和 QuadKey 上的能力。',
-    tags: ['XYZ', 'Envelope', 'QuadKey', '瓦片'],
-    capabilities: [
-      '支持 xyzToWkt / xyzToTileBox / tileRangeByBox / tileRangeByGeom。',
-      '支持 zxyListByGeom / zxyListByBox / boundsFromTileZxyApos。',
-      '支持 QuadKey 生成、解析、父子级别和目标级别范围推导。'
-    ],
-    quickStart: `GirTileConverterOpt tileOpt = GirGeoTools.defaultInstance().getTileGrid4326Opt();\nBoxReferencedEnvelope tileBox = tileOpt.xyzToTileBox(10, 845, 388, 4326);\nRangeApo range = tileOpt.tileRangeByBox(10, envelope, 4326);\nGirBingMapQuadKeyOpt bingOpt = GirGeoTools.defaultInstance().getTileGridBingMapOpt();\nString quadKey = bingOpt.xyzToQuadKey(845, 388, 10);`,
-    example: '适合矢量瓦片、栅格切片、地图视域裁剪和 Bing QuadKey 互转。',
-    related: ['geo-tools-overview', 'geo-tools-srid', 'mvt', 'map-tile-forge']
-  },
-  {
     slug: 'mvt',
     route: '/modules/geo/mvt',
     title: 'geoair-mvt',
@@ -495,9 +317,24 @@ const geoModules = [
     related: ['geo-tools', 'map-tile-forge', 'map-tile-fuser'],
     sourceExamples: [
       {
-        title: 'GirMvtModuleExample',
-        path: 'geoair-geo/geoair-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirMvtModuleExample.java',
-        description: '展示 GirRealMvtHelper、AdvMvtTileUtils、VectorTileExecutorV2 的入口调用方式。'
+        title: 'AdvMvtTileUtilsExample',
+        path: 'geoair-geo/geoair-mvt/geoair-mvt-tools/src/test/java/cn/geoair/map/dynamic/mvt/tools/test/AdvMvtTileUtilsExample.java',
+        description: '展示 geoair-mvt-tools 中的瓦片范围计算与 TileExecParams 构造。'
+      },
+      {
+        title: 'GirRealMvtEntryExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
+        description: '展示 geoair-real-mvt 中的 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 入口。'
+      },
+      {
+        title: 'TileRequestParamsExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
+        description: '展示 TileRequestParams 的参数组织与 Base32 编解码。'
+      },
+      {
+        title: 'TileSliceParameterExample',
+        path: 'geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/test/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/test/TileSliceParameterExample.java',
+        description: '展示 TileSliceParameter 的离线切片参数组织与 Base32 编解码。'
       },
       {
         title: 'geoair-mvt GitHub 目录',
@@ -519,6 +356,21 @@ const geoModules = [
         title: 'GirMapTileForgeExample',
         path: 'geoair-geo/geoair-map-tile-forge/src/test/java/cn/geoair/map/tile/forge/core/test/GirMapTileForgeExample.java',
         description: '展示 GirMapTileService、TileStorageSupportAdapter 和 ITileStorageSupport 的主入口。'
+      },
+      {
+        title: 'GirLayerConfigContextExample',
+        path: 'geoair-geo/geoair-map-tile-forge/src/test/java/cn/geoair/map/tile/forge/core/test/GirLayerConfigContextExample.java',
+        description: '展示 GirLayerConfigContext 的核心字段组织方式。'
+      },
+      {
+        title: 'TileForgeEnumExample',
+        path: 'geoair-geo/geoair-map-tile-forge/src/test/java/cn/geoair/map/tile/forge/core/test/TileForgeEnumExample.java',
+        description: '展示 GirStorageType 与 GirMapTileType 的枚举值和取值范围。'
+      },
+      {
+        title: 'TileRequestExample',
+        path: 'geoair-geo/geoair-map-tile-forge/src/test/java/cn/geoair/map/tile/forge/core/test/TileRequestExample.java',
+        description: '展示 TileRequest 返回对象的基本结构和 emptyByContext 用法。'
       },
       {
         title: 'XyzTest',
@@ -545,6 +397,16 @@ const geoModules = [
         title: 'GirMapTileFuserExample',
         path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/GirMapTileFuserExample.java',
         description: '展示 GirFuser、PxyLayerInfo、TileGetterFactory 的入口关系。'
+      },
+      {
+        title: 'TileFuserConfigExample',
+        path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/TileFuserConfigExample.java',
+        description: '展示 SrcType、OriginType、PxyLayerInfo 这些配置模型的组合方式。'
+      },
+      {
+        title: 'LayerTileGetterRouteExample',
+        path: 'geoair-geo/geoair-map-tile-fuser/src/test/java/cn/geoair/map/tile/forge/fuser/test/LayerTileGetterRouteExample.java',
+        description: '展示不同 SrcType / gridSrid 如何路由到不同的 LayerTileGetter 实现。'
       },
       {
         title: 'geoair-map-tile-fuser GitHub 目录',
