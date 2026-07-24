@@ -3,7 +3,7 @@
     <header class="site-header">
       <div class="section-block header-inner">
         <router-link class="brand" to="/">
-          <span class="brand-mark">GA</span>
+          <img class="brand-logo" :src="logoGeoAir" alt="GeoAir logo" />
           <span class="brand-text">
             <strong>{{ siteMeta.name }}</strong>
             <small>{{ siteMeta.tagline }}</small>
@@ -51,13 +51,15 @@
 
 <script>
 import { siteMeta, topNav } from '@/content/site'
+import logoGeoAir from '@/assets/logo-geoair.svg'
 
 export default {
   name: 'SiteShell',
   data() {
     return {
       siteMeta,
-      topNav
+      topNav,
+      logoGeoAir
     }
   },
   methods: {
@@ -99,16 +101,11 @@ export default {
   color: #fff;
 }
 
-.brand-mark {
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #2563eb, #0f766e);
-  font-weight: 700;
-  letter-spacing: 1px;
+.brand-logo {
+  width: 220px;
+  height: 56px;
+  display: block;
+  flex-shrink: 0;
 }
 
 .brand-text {
@@ -196,6 +193,11 @@ export default {
 }
 
 @media (max-width: 900px) {
+  .brand-logo {
+    width: 176px;
+    height: 45px;
+  }
+
   .header-inner {
     height: auto;
     padding-top: 16px;

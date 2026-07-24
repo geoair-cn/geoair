@@ -2,7 +2,7 @@
 
 `geoair-message-jts-mybatis` 负责把 JTS Geometry 与 MyBatis 的类型处理层接起来。
 
-如果你的需求是：
+适用场景包括：
 
 - 在 MyBatis 中直接映射 Geometry 字段
 - 对接不同 PostGIS JDBC 版本
@@ -35,6 +35,35 @@
 
 这一层负责把 Geometry TypeHandler 接入 MyBatis 配置链。
 
+## 对应测试示例
+
+当前新增的最小 test 是：
+
+- `PgGeometryTypeHandlerExample`
+
+它演示的是：
+
+- `PgGeometryTypeHandler`
+- `Geometry`
+- `JdbcType.OTHER`
+
+## 和上层模块的关系
+
+这一层通常会和：
+
+- `geoair-jts-all`
+- `geoair-geo-tools`
+- `geoair-adv-query`
+- MyBatis DAO / Mapper 层
+
+配合使用。
+
+典型关系是：
+
+1. `geo-tools` 负责生成或处理 Geometry
+2. `message-jts-mybatis` 负责把 Geometry 映射到数据库字段和查询结果
+3. `adv-query` 或 Mapper 层负责组织查询与更新逻辑
+
 ## GitHub 源码入口
 
 - 模块目录：
@@ -49,8 +78,9 @@
 建议顺序：
 
 1. `PgGeometryTypeHandler`
-2. `OrgPgGeometryTypeHandler` / `NetPgGeometryTypeHandler`
-3. `GirMyBatisConfigurationCustomizer`
-4. `GirMybatisJtsAutoConfiguration`
+2. `PgGeometryTypeHandlerExample`
+3. `OrgPgGeometryTypeHandler` / `NetPgGeometryTypeHandler`
+4. `GirMyBatisConfigurationCustomizer`
+5. `GirMybatisJtsAutoConfiguration`
 
-先理解字段映射本身，再看它如何被挂进 MyBatis 配置。
+先理解字段映射和最小示例，再回头看配置接入链会更顺。
