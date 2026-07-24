@@ -1,24 +1,19 @@
 package cn.geoair.spi.test;
 
-import cn.geoair.spi.json.GirJacksonJson;
 import cn.geoair.base.json.GirJSON;
-
-import java.util.HashMap;
-import java.util.Map;
+import cn.geoair.spi.json.GirJacksonJson;
 
 /**
- * GirJacksonJson 最小示例
+ * GirJacksonJson 入口示例
  */
 public class GirJacksonJsonExample {
 
     public static void main(String[] args) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("name", "geoair");
-        payload.put("version", "J8-dev-SNAPSHOT");
+        GirJSON json = GirJacksonJson.toJson("{\"name\":\"geoair\",\"version\":1}");
+        String jsonText = json.toJSONString();
+        String name = json.getByPath("name", String.class);
 
-        GirJSON json = GirJacksonJson.toJson(payload);
-        String text = json.toJSONString();
-
-        System.out.println("json = " + text);
+        System.out.println("jsonText = " + jsonText);
+        System.out.println("name = " + name);
     }
 }

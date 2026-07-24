@@ -39,7 +39,7 @@
 - `bInsertIgnore(...)`
 - `bInsertIgnoreBatch(...)`
 
-如果你的场景是新增数据、批量导入数据或插入冲突忽略，这一层是基础入口。
+在需要新增数据、批量导入数据或插入冲突忽略的场景下，这一层是基础入口。
 
 ### IAdvBaseSelectOpt
 
@@ -73,7 +73,7 @@
 - `bUpsert(...)`
 - `bUpsertBatch(...)`
 
-如果你的场景是按主键更新、按条件更新、批量更新或 upsert，这一层是基础入口。
+在需要按主键更新、按条件更新、批量更新或 upsert 的场景下，这一层是基础入口。
 
 ### IAdvBaseDeleteOpt
 

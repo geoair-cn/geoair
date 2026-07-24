@@ -2,7 +2,7 @@
 
 `geoair-file-tran` 负责空间文件与数据库之间的读写和转换。它不是单个 Reader 或 Writer，而是一套由核心抽象和具体格式实现组成的管道。
 
-如果你在 GIS 场景里要做：
+适用于以下 GIS 文件处理场景：
 
 - GeoJSON 导入导出
 - Shapefile 读写

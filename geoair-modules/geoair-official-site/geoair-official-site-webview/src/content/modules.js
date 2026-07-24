@@ -361,9 +361,10 @@ const geoModules = [
     route: '/modules/geo/mvt',
     title: 'geoair-mvt',
     group: 'geo',
-    summary: '矢量瓦片相关模块集合，覆盖实时 MVT、离线 Spark 生成和工具层处理。',
+    summary: '矢量瓦片模块总览页，负责串起工具层、实时矢量瓦片和 Spark 静态切片三个部分。',
     tags: ['MVT', '矢量瓦片', 'Spark'],
     related: ['geo-tools', 'map-tile-forge', 'map-tile-fuser'],
+    children: ['real-mvt', 'static-mvt-spark'],
     sourceExamples: [
       {
         title: 'AdvMvtTileUtilsExample',
@@ -376,36 +377,78 @@ const geoModules = [
         description: '展示 PipelineBuilder 的坐标转换与几何简化流程。'
       },
       {
-        title: 'GirRealMvtEntryExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
-        description: '展示 geoair-real-mvt 中的 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 入口。'
-      },
-      {
-        title: 'TileRequestParamsExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
-        description: '展示 TileRequestParams 的参数组织与 Base32 编解码。'
-      },
-      {
-        title: 'TileExecutorConfigExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileExecutorConfigExample.java',
-        description: '展示 TileExecutorConfig 的低级别优化策略和密度优化策略配置。'
-      },
-      {
-        title: 'TileGlobalConfigExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileGlobalConfigExample.java',
-        description: '展示 TileGlobalConfig 如何组合 TileRequestParams、TileExecParams 和 TileExecutorConfig。'
-      },
-      {
-        title: 'TileSliceParameterExample',
-        path: 'geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/test/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/test/TileSliceParameterExample.java',
-        description: '展示 TileSliceParameter 的离线切片参数组织与 Base32 编解码。'
-      },
-      {
         title: 'geoair-mvt GitHub 目录',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt',
         description: '直接跳到 geoair-mvt 模块目录。'
       }
     ]
+  },
+  {
+    slug: 'real-mvt',
+    route: '/modules/geo/mvt/real-mvt',
+    title: 'geoair-real-mvt',
+    group: 'geo',
+    summary: '实时矢量瓦片服务层，负责请求参数组织、执行器构建、数据库查询与实时 PBF 输出，并支持 4490 / 3857 双网格。',
+    tags: ['实时矢量瓦片', 'MVT', 'PBF'],
+    sourceExamples: [
+      {
+        title: 'GirRealMvtEntryExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
+        description: '展示 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 的入口。'
+      },
+      {
+        title: 'TileRequestParamsExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
+        description: '展示实时瓦片请求参数的组织与 Base32 编解码。'
+      },
+      {
+        title: 'TileExecutorConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileExecutorConfigExample.java',
+        description: '展示执行器配置对象的常见参数。'
+      },
+      {
+        title: 'TileGlobalConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileGlobalConfigExample.java',
+        description: '展示 TileGlobalConfig 如何组合请求参数、执行参数与执行器配置。'
+      },
+      {
+        title: 'geoair-real-mvt GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-real-mvt',
+        description: '直接跳到 geoair-real-mvt 模块目录。'
+      }
+    ],
+    related: ['mvt', 'static-mvt-spark', 'geo-tools']
+  },
+  {
+    slug: 'static-mvt-spark',
+    route: '/modules/geo/mvt/static-mvt-spark',
+    title: 'geoair-static-mvt-spark',
+    group: 'geo',
+    summary: '基于 Java + Spark 的静态矢量瓦片切片层，负责离线切片任务参数组织、任务启动和 PBF 生成。',
+    tags: ['Spark 静态切片', 'MVT', 'Tippecanoe 替代'],
+    sourceExamples: [
+      {
+        title: 'TileSliceParameterExample',
+        path: 'geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/test/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/test/TileSliceParameterExample.java',
+        description: '展示离线切片参数对象的组织与 Base32 编解码。'
+      },
+      {
+        title: 'SparkJavaTileLocalApp',
+        path: 'https://github.com/geoair-cn/geoair/blob/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/main/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/SparkJavaTileLocalApp.java',
+        description: '本地 Spark 模式启动静态切片的入口。'
+      },
+      {
+        title: 'SparkVectorTileGenerator',
+        path: 'https://github.com/geoair-cn/geoair/blob/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/main/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/impl/SparkVectorTileGenerator.java',
+        description: '静态矢量瓦片主执行器。'
+      },
+      {
+        title: 'geoair-static-mvt-spark GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark',
+        description: '直接跳到 geoair-static-mvt-spark 模块目录。'
+      }
+    ],
+    related: ['mvt', 'real-mvt', 'geo-tools']
   },
   {
     slug: 'map-tile-forge',
