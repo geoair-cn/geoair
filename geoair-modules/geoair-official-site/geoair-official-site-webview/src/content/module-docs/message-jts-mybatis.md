@@ -28,6 +28,21 @@
 - 不同驱动实现的兼容
 - 把数据库字段转换成 JTS Geometry
 
+`PgGeometryTypeHandler` 本身是一个总入口，它会根据：
+
+- `GirPostGisTran.isNetConvert()`
+- `GirPostGisTran.isOrgConvert()`
+
+决定委托给：
+
+- `NetPgGeometryTypeHandler`
+- `OrgPgGeometryTypeHandler`
+
+这意味着：
+
+- 使用者面对的是统一的 `PgGeometryTypeHandler`
+- 底层驱动差异由模块内部再做分发
+
 ### MyBatis 配置扩展
 
 - `GirMyBatisConfigurationCustomizer`
@@ -35,17 +50,18 @@
 
 这一层负责把 Geometry TypeHandler 接入 MyBatis 配置链。
 
-## 对应测试示例
+## 最小示例
 
-当前新增的最小 test 是：
+```java
+PgGeometryTypeHandler handler = new PgGeometryTypeHandler();
+Geometry geometry = new WKTReader().read("POINT (116.40 39.90)");
 
-- `PgGeometryTypeHandlerExample`
+System.out.println(handler.getClass().getSimpleName());
+System.out.println(geometry);
+System.out.println(JdbcType.OTHER);
+```
 
-它演示的是：
-
-- `PgGeometryTypeHandler`
-- `Geometry`
-- `JdbcType.OTHER`
+对应测试：`PgGeometryTypeHandlerExample`
 
 ## 和上层模块的关系
 
@@ -72,6 +88,8 @@
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-mybatis/src/main/java/cn/geoair/comp/message/converter/jts/mybatis/typehander`
 - config 目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-mybatis/src/main/java/cn/geoair/comp/message/converter/jts/mybatis/config`
+- 测试目录：
+  - `geoair-message-jts-mybatis/src/test/java/cn/geoair/comp/message/converter/jts/mybatis/test/PgGeometryTypeHandlerExample.java`
 
 ## 阅读建议
 

@@ -34,17 +34,17 @@
 
 负责在 Spring 环境中自动装配这些能力。
 
-## 对应测试示例
+## 最小示例
 
-当前新增的最小 test 是：
+```java
+ObjectMapper objectMapper = new ObjectMapper();
+objectMapper.registerModule(new JtsExtModule());
 
-- `JtsJacksonModuleExample`
+Envelope envelope = new Envelope(116.35, 116.55, 39.85, 40.05);
+String json = objectMapper.writeValueAsString(envelope);
+```
 
-它演示的是：
-
-- 创建 `ObjectMapper`
-- `registerModule(new JtsExtModule())`
-- 对 JTS 对象做序列化
+对应测试：`JtsJacksonModuleExample`
 
 ## 和上层模块的关系
 
@@ -70,6 +70,8 @@
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/serializer/jts`
 - auto config 目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-message-jts-jackson/src/main/java/cn/geoair/comp/message/converter/jts/jackson/auto`
+- 测试目录：
+  - `geoair-message-jts-jackson/src/test/java/cn/geoair/comp/message/converter/jts/jackson/test/JtsJacksonModuleExample.java`
 
 ## 阅读建议
 

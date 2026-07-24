@@ -39,7 +39,7 @@
     <module>geoair-file-tran</module>
     <module>geoair-geo-tools</module>
     <module>geoair-jts-all</module>
-    <module>geoair-geoserver</module>
+<!--    <module>geoair-geoserver</module>-->
     <module>geoair-map-tile-forge</module>
     <module>geoair-map-tile-fuser</module>
     <module>geoair-by-gwc</module>
