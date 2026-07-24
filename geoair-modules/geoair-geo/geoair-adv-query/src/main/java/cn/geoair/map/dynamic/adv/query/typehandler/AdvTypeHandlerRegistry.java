@@ -16,7 +16,6 @@ public class AdvTypeHandlerRegistry {
 
     private final AdvTypeHandler<Object> defaultHandler = new ObjectAdvTypeHandler();
 
-
     private AdvTypeHandlerRegistry() {
         register(new JtsGeometryAdvTypeHandler());
         register(new StringAdvTypeHandler());
@@ -38,14 +37,12 @@ public class AdvTypeHandlerRegistry {
         }
     }
 
-    public Object convertForRead(
-            Object value, Class<?> javaType, AdvTypeHandlerContext context) {
+    public Object convertForRead(Object value, Class<?> javaType, AdvTypeHandlerContext context) {
         AdvTypeHandler handler = resolve(javaType, value);
         return handler.convertForRead(value, javaType, context);
     }
 
-    public Object convertForWrite(
-            Object value, Class<?> javaType, AdvTypeHandlerContext context) {
+    public Object convertForWrite(Object value, Class<?> javaType, AdvTypeHandlerContext context) {
         AdvTypeHandler handler = resolve(javaType, value);
         return handler.convertForWrite(value, javaType, context);
     }

@@ -1,24 +1,16 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
+
 import it.geosolutions.imageio.stream.output.ImageOutputStreamAdapter;
+
 import org.eclipse.imagen.media.colorindexer.ColorIndexer;
 import org.eclipse.imagen.media.colorindexer.Quantizer;
 import org.geotools.image.ImageWorker;
 import org.geotools.image.ImageWorker.PNGImageWriteParam;
 import org.geotools.util.logging.Logging;
 
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
@@ -31,9 +23,18 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+
 /**
- * Class implementing the ImageEncoder interface, the user should only create a new bean for instantiating a new encoder
- * object.
+ * Class implementing the ImageEncoder interface, the user should only create a new bean for
+ * instantiating a new encoder object.
  */
 public class ImageEncoderImpl implements ImageEncoder {
 
@@ -45,12 +46,16 @@ public class ImageEncoderImpl implements ImageEncoder {
 
     /** Boolean indicating is aggressive outputstream is supported */
     private final boolean isAggressiveOutputStreamSupported;
+
     /** Supported Mimetypes */
     private final List<String> supportedMimeTypes;
+
     /** ImageReaderSpi object used */
     private ImageWriterSpi spi;
+
     /** Map containing the input parameters used by the WriteHelper object */
     private Map<String, String> inputParams;
+
     /** Helper object used for preparing Image and ImageWriteParam for writing the image */
     private WriteHelper helper;
 
@@ -68,7 +73,10 @@ public class ImageEncoderImpl implements ImageEncoder {
                 "image/png;%20mode=24bit") {
             @Override
             public ImageWriteParam prepareParameters(
-                    ImageWriter writer, String compression, boolean compressUsed, float compressionRate) {
+                    ImageWriter writer,
+                    String compression,
+                    boolean compressUsed,
+                    float compressionRate) {
                 ImageWriteParam params = null;
 
                 if ("com.sun.imageio.plugins.png.PNGImageWriter"
@@ -92,7 +100,10 @@ public class ImageEncoderImpl implements ImageEncoder {
         JPEG("image/jpeg") {
             @Override
             protected ImageWriteParam prepareParameters(
-                    ImageWriter writer, String compression, boolean compressUsed, float compressionRate) {
+                    ImageWriter writer,
+                    String compression,
+                    boolean compressUsed,
+                    float compressionRate) {
                 ImageWriteParam params = writer.getDefaultWriteParam();
                 params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
                 if (compressUsed) {
@@ -125,7 +136,8 @@ public class ImageEncoderImpl implements ImageEncoder {
                 imageWorker.forceComponentColorModel(false, false, true);
                 imageWorker.rescaleToBytes();
 
-                if (imageWorker.getRenderedImage().getColorModel().getTransparency() == Transparency.OPAQUE) {
+                if (imageWorker.getRenderedImage().getColorModel().getTransparency()
+                        == Transparency.OPAQUE) {
                     return imageWorker.getRenderedImage();
                 }
 
@@ -154,7 +166,9 @@ public class ImageEncoderImpl implements ImageEncoder {
             String compression = inputParams.get("COMPRESSION");
             // Boolean indicating if compression is present
             boolean compressUsed =
-                    compression != null && !compression.isEmpty() && !compression.equalsIgnoreCase("null");
+                    compression != null
+                            && !compression.isEmpty()
+                            && !compression.equalsIgnoreCase("null");
             // Selection of the compression rate
             String compressionRateValue = inputParams.get("COMPRESSION_RATE");
             // Initial value for the compression rate
@@ -168,13 +182,17 @@ public class ImageEncoderImpl implements ImageEncoder {
                 }
             }
             // Creation of the ImageWriteParams
-            ImageWriteParam params = prepareParameters(writer, compression, compressUsed, compressionRate);
+            ImageWriteParam params =
+                    prepareParameters(writer, compression, compressUsed, compressionRate);
 
             return params;
         }
 
         protected ImageWriteParam prepareParameters(
-                ImageWriter writer, String compression, boolean compressUsed, float compressionRate) {
+                ImageWriter writer,
+                String compression,
+                boolean compressUsed,
+                float compressionRate) {
             // Parameters creation
             ImageWriteParam params = writer.getDefaultWriteParam();
             params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
@@ -223,15 +241,18 @@ public class ImageEncoderImpl implements ImageEncoder {
     }
 
     /**
-     * Encodes the selected image with the defined output object. The user can set the aggressive outputStream if
-     * supported.
+     * Encodes the selected image with the defined output object. The user can set the aggressive
+     * outputStream if supported.
      *
      * @param image Image to write.
      * @param destination Destination object where the image is written.
-     * @param aggressiveOutputStreamOptimization Parameter used if aggressive outputStream optimization must be used.
+     * @param aggressiveOutputStreamOptimization Parameter used if aggressive outputStream
+     *     optimization must be used.
      */
     @Override
-    @SuppressWarnings("PMD.CloseResource") // the caller is in charge of destination's life cycle if its a stream
+    @SuppressWarnings(
+            "PMD.CloseResource") // the caller is in charge of destination's life cycle if its a
+    // stream
     public void encode(
             RenderedImage image,
             Object destination,
@@ -315,8 +336,8 @@ public class ImageEncoderImpl implements ImageEncoder {
     /**
      * Indicates if optimization on OutputStream can be used
      *
-     * @return isAggressiveOutputStreamSupported Boolean indicating if the selected encoder supports an aggressive
-     *     output stream optimization
+     * @return isAggressiveOutputStreamSupported Boolean indicating if the selected encoder supports
+     *     an aggressive output stream optimization
      */
     @Override
     public boolean isAggressiveOutputStreamSupported() {
@@ -324,19 +345,23 @@ public class ImageEncoderImpl implements ImageEncoder {
     }
 
     /**
-     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the defined MimeTypes
-     * and Spi classes.
+     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the
+     * defined MimeTypes and Spi classes.
      */
     public ImageEncoderImpl(
             boolean aggressiveOutputStreamOptimization,
             List<String> supportedMimeTypes,
             Map<String, String> inputParams) {
-        this(aggressiveOutputStreamOptimization, supportedMimeTypes, inputParams, null); // No preferred SPI
+        this(
+                aggressiveOutputStreamOptimization,
+                supportedMimeTypes,
+                inputParams,
+                null); // No preferred SPI
     }
 
     /**
-     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the defined MimeTypes
-     * and Spi classes.
+     * Creates a new Instance of ImageEncoder supporting or not OutputStream optimization, with the
+     * defined MimeTypes and Spi classes.
      */
     public ImageEncoderImpl(
             boolean aggressiveOutputStreamOptimization,
@@ -368,7 +393,8 @@ public class ImageEncoderImpl implements ImageEncoder {
         if (this.spi == null) {
             if (backupSPI == null) {
                 throw new IllegalArgumentException(
-                        "No ImageWriterSpi found for the selected mimetypes: " + supportedMimeTypes);
+                        "No ImageWriterSpi found for the selected mimetypes: "
+                                + supportedMimeTypes);
             } else {
                 LOGGER.log(
                         Level.WARNING,

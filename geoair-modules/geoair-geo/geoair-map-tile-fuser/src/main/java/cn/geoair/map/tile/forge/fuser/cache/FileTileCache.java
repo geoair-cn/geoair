@@ -15,11 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author 张俊
  * @date Created in 2023/12/4
- * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
- * 注意：
- * 缓存的结果，全部转换成wmts原点
+ * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png 注意： 缓存的结果，全部转换成wmts原点
  */
-
 public class FileTileCache implements TileCache {
     private static GiLogger log = GirLoggerFactory.getLogger();
     // 缓存根目录
@@ -31,7 +28,6 @@ public class FileTileCache implements TileCache {
     // 缓存图层 Y 轴翻转配置
     private final ConcurrentHashMap<String, Boolean> layerReverseCache = new ConcurrentHashMap<>();
 
-
     public FileTileCache() {
         this(FileUtil.getTmpDirPath() + "/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
     }
@@ -39,7 +35,6 @@ public class FileTileCache implements TileCache {
     public FileTileCache(String cacheRoot) {
         this(cacheRoot, 7 * 24 * 60 * 60 * 1000L, true);
     }
-
 
     public FileTileCache(String cacheRoot, long expireTime, boolean enabled) {
         this.cacheRoot = cacheRoot.endsWith("/") ? cacheRoot : cacheRoot + "/";
@@ -67,13 +62,11 @@ public class FileTileCache implements TileCache {
      * @return true: 需要翻转（Google 坐标系 → TMS 坐标系）
      */
     private boolean isNeedReverseY(String layerName) {
-        return layerReverseCache.computeIfAbsent(layerName, k ->  FuserCacheUtils.fileCheckIsNeedReverseY(layerName));
+        return layerReverseCache.computeIfAbsent(
+                layerName, k -> FuserCacheUtils.fileCheckIsNeedReverseY(layerName));
     }
 
-
-    /**
-     * 获取缓存文件路径（支持 Y 轴翻转）
-     */
+    /** 获取缓存文件路径（支持 Y 轴翻转） */
     private Path getCachePath(String layerName, int z, int x, int y, GiMimeType format) {
         boolean needReverse = isNeedReverseY(layerName);
         int storeY = FuserCacheUtils.getStoreY(z, y, needReverse);
@@ -81,7 +74,6 @@ public class FileTileCache implements TileCache {
         String subDir = layerName + "/" + z + "/" + x;
         return Paths.get(cacheRoot, subDir, storeY + "." + format.getFileExtension());
     }
-
 
     @Override
     public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
@@ -134,7 +126,11 @@ public class FileTileCache implements TileCache {
             }
 
             // 写入缓存文件
-            Files.write(cachePath, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(
+                    cachePath,
+                    data,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
             log.debug("保存瓦片到缓存成功: {} - ({},{},{})", layerName, z, x, y);
             return true;
 
@@ -158,7 +154,12 @@ public class FileTileCache implements TileCache {
 
         try {
             // 生成临时目录名（原目录名 + 时间戳 + 随机数）
-            String tempDirName = layerName + "_deleting_" + System.currentTimeMillis() + "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    layerName
+                            + "_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = Paths.get(cacheRoot, tempDirName);
 
             // 原子性的重命名操作
@@ -190,38 +191,38 @@ public class FileTileCache implements TileCache {
         }
     }
 
-
     private void asyncDeleteDirectory(Path path) {
         // 使用线程池异步删除，避免阻塞主线程
-        Thread deleteThread = new Thread(() -> {
-            try {
-                log.info("开始异步删除临时目录: {}", path);
-                deleteDirectorySync(path);
-                log.info("异步删除临时目录成功: {}", path);
-            } catch (IOException e) {
-                log.error("异步删除临时目录失败: {}", path, e);
-            }
-        });
-        deleteThread.setDaemon(true);  // 设置为守护线程
+        Thread deleteThread =
+                new Thread(
+                        () -> {
+                            try {
+                                log.info("开始异步删除临时目录: {}", path);
+                                deleteDirectorySync(path);
+                                log.info("异步删除临时目录成功: {}", path);
+                            } catch (IOException e) {
+                                log.error("异步删除临时目录失败: {}", path, e);
+                            }
+                        });
+        deleteThread.setDaemon(true); // 设置为守护线程
         deleteThread.setName("cache-delete-" + System.currentTimeMillis());
         deleteThread.start();
     }
 
-
     private void deleteDirectorySync(Path path) throws IOException {
         if (Files.exists(path)) {
             Files.walk(path)
-                    .sorted((a, b) -> -a.compareTo(b))  // 先删除文件，再删除目录
-                    .forEach(p -> {
-                        try {
-                            Files.deleteIfExists(p);
-                        } catch (IOException e) {
-                            log.error("删除文件/目录失败: {}", p, e);
-                        }
-                    });
+                    .sorted((a, b) -> -a.compareTo(b)) // 先删除文件，再删除目录
+                    .forEach(
+                            p -> {
+                                try {
+                                    Files.deleteIfExists(p);
+                                } catch (IOException e) {
+                                    log.error("删除文件/目录失败: {}", p, e);
+                                }
+                            });
         }
     }
-
 
     @Override
     public boolean delete(String layerName, Integer z, Integer x) {
@@ -247,9 +248,12 @@ public class FileTileCache implements TileCache {
         }
 
         try {
-            String tempDirName = targetPath.getFileName().toString() +
-                                 "_deleting_" + System.currentTimeMillis() +
-                                 "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    targetPath.getFileName().toString()
+                            + "_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = targetPath.resolveSibling(tempDirName);
 
             Files.move(targetPath, tempPath, StandardCopyOption.ATOMIC_MOVE);
@@ -304,7 +308,11 @@ public class FileTileCache implements TileCache {
 
         try {
             // 生成临时目录名（根目录 + 时间戳 + 随机数）
-            String tempDirName = "cache_root_deleting_" + System.currentTimeMillis() + "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    "cache_root_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = cacheRootPath.resolveSibling(tempDirName);
 
             // 原子性的重命名操作
@@ -335,20 +343,20 @@ public class FileTileCache implements TileCache {
         }
     }
 
-
     private void clearAllSync(Path path) throws IOException {
         if (Files.exists(path)) {
             // 遍历目录，删除所有子文件和子目录，但保留根目录本身
             Files.walk(path)
-                    .filter(p -> !p.equals(path))  // 排除根目录本身
-                    .sorted((a, b) -> -a.compareTo(b))  // 先删除文件，再删除目录
-                    .forEach(p -> {
-                        try {
-                            Files.deleteIfExists(p);
-                        } catch (IOException e) {
-                            log.error("删除文件/目录失败: {}", p, e);
-                        }
-                    });
+                    .filter(p -> !p.equals(path)) // 排除根目录本身
+                    .sorted((a, b) -> -a.compareTo(b)) // 先删除文件，再删除目录
+                    .forEach(
+                            p -> {
+                                try {
+                                    Files.deleteIfExists(p);
+                                } catch (IOException e) {
+                                    log.error("删除文件/目录失败: {}", p, e);
+                                }
+                            });
             log.info("直接清空缓存根目录成功: {}", path);
         }
     }
@@ -367,13 +375,14 @@ public class FileTileCache implements TileCache {
 
             return Files.walk(cacheRootPath)
                     .filter(Files::isRegularFile)
-                    .mapToLong(path -> {
-                        try {
-                            return Files.size(path);
-                        } catch (IOException e) {
-                            return 0;
-                        }
-                    })
+                    .mapToLong(
+                            path -> {
+                                try {
+                                    return Files.size(path);
+                                } catch (IOException e) {
+                                    return 0;
+                                }
+                            })
                     .sum();
         } catch (IOException e) {
             log.error("获取缓存大小失败", e);

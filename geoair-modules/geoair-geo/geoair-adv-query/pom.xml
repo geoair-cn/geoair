@@ -4,16 +4,15 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-adv-query</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-adv-query</name>
-  <description>
-    提供基于数据源的完整 CRUD 操作 API，
+  <description>提供基于数据源的完整 CRUD 操作 API，
     专为动态查询场景设计，内置 MyBatis 标签支持、GIS 空间数据处理、分页查询、
     DDL 操作等功能。
     【核心特性】
@@ -51,9 +50,7 @@
     • 多租户多数据源动态切换
     • 大数据批量导入（分批次插入/更新）
     • 数据库迁移与结构同步（DDL 操作）
-    • 复杂条件业务查询（Lambda 条件构建器）
-
-  </description>
+    • 复杂条件业务查询（Lambda 条件构建器）</description>
 
   <url>https://github.com/geoair-cn/geoair</url>
 
@@ -64,14 +61,14 @@
     </license>
   </licenses>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>zhangjun7570@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zhangjun7570@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
 
   <scm>
     <connection>https://github.com/geoair-cn/geoair.git</connection>
@@ -80,7 +77,7 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <geotools.version>34.3</geotools.version>
@@ -142,15 +139,13 @@
       <version>${net.postgis.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>${jakarta-persistence.version}</version>
+    </dependency>
 
-      <dependency>
-          <groupId>jakarta.persistence</groupId>
-          <artifactId>jakarta.persistence-api</artifactId>
-          <version>${jakarta-persistence.version}</version>
-      </dependency>
-
-
-      <dependency>
+    <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-jdbc</artifactId>
       <version>${org.postgis.version}</version>
@@ -189,20 +184,17 @@
       <optional>true</optional>
     </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
 
-    </dependencies>
+  </dependencies>
 
   <build>
-    <plugins>
-
-
-    </plugins>
+    <plugins></plugins>
   </build>
 
 </project>

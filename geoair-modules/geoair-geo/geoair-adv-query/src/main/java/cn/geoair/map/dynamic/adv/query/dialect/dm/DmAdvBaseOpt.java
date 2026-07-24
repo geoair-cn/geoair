@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseUpdateOpt;
+
 import java.util.function.Supplier;
 
 /**
@@ -20,7 +21,9 @@ import java.util.function.Supplier;
  */
 public class DmAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public DmAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public DmAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
     }
 

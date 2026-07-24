@@ -4,57 +4,51 @@ import cn.geoair.base.exception.GirException;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
+import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
-import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
-import cn.geoair.web.util.GutilMimeType;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.IdUtil;
-
-import cn.hutool.core.util.StrUtil;
-
-import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
-import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.cache.ZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
+import cn.geoair.web.util.GutilMimeType;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * 本地ZIP瓦片存储支持类
- * 提供从ZIP压缩包中读取3DTiles瓦片数据的功能
+ * 本地ZIP瓦片存储支持类 提供从ZIP压缩包中读取3DTiles瓦片数据的功能
  *
  * @author 张俊
  * @since 2025/11/17
  */
-
-public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter
+        implements ZipDirectoryGetter, ITileStorageSupport {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public LocalZip3DTileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
     }
 
-    /**
-     * 压缩处理器实例，用于处理ZIP文件的解压缩操作
-     */
+    /** 压缩处理器实例，用于处理ZIP文件的解压缩操作 */
     protected ICompressionHandler compressionHandler = null;
 
     /**
-     * 获取压缩处理器实例
-     * 使用懒加载单例模式，确保只有一个压缩处理器实例存在
+     * 获取压缩处理器实例 使用懒加载单例模式，确保只有一个压缩处理器实例存在
      *
      * @return ICompressionHandler 压缩处理器实例
      */
@@ -65,14 +59,16 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         return compressionHandler;
     }
 
-
     @Override
-    public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String fileName, String x, String y) throws Exception {
+    public TileRequest getTileData(
+            GirLayerConfigContext layerConfigContext, String fileName, String x, String y)
+            throws Exception {
 
         // 3Dtile就Z有用，其他的我全部都不要了。z就是一个web请求路径
 
         TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
+        String tempDirAbsolutePath =
+                TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
         String inLocalPathBuilder = tempDirAbsolutePath + File.separator + fileName;
         String inLocalPath = inLocalPathBuilder.trim();
         File localTileFile = new File(inLocalPath);
@@ -85,32 +81,37 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
             tileRequest.setLastModified(localTileFile.lastModified());
             tileRequest.setSize(localTileFile.length());
             tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
+            tileRequest.setMimeType(
+                    GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
         }
         return tileRequest;
     }
 
-    protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String inLocalPath) {
+    protected boolean byPreCache(
+            GirLayerConfigContext layerConfigContext, String z, String inLocalPath) {
         try {
-            TileCentralDirectoryModel zipDirectoryByFileName = getZipDirectoryBFileName(layerConfigContext, z);
+            TileCentralDirectoryModel zipDirectoryByFileName =
+                    getZipDirectoryBFileName(layerConfigContext, z);
             if (zipDirectoryByFileName == null) {
                 return false;
             }
-            getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), inLocalPath);
+            getICompressionHandler()
+                    .readAndDecompressEntryToLocal(
+                            zipDirectoryByFileName, layerConfigContext.getObjectKey(), inLocalPath);
             return true;
         } catch (Exception e) {
             log.error("getTileDataByPreZipCache error:", e);
             return false;
         }
-
     }
-
 
     @Override
-    public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
+    public void preCacheTiles(
+            GirLayerConfigContext layerConfigContext,
+            TileCache tileCache,
+            ProgressConsumer progressConsumer) {
         this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
     }
-
 
     @Override
     public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
@@ -121,9 +122,10 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         return tileCentralDirectoryEntry;
     }
 
-
     @Override
-    public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
+    public RootPathInfo preCheckZipAndGetRoot(
+            GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler)
+            throws IOException {
         GirMapTileType mapTileType = layerConfigContext.getMapTileType();
         List<String> allTileSetPaths = new ArrayList<>();
         String finalRootFileNameSuffix = "json";
@@ -134,18 +136,20 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         }
 
         String finalRootFileNameSuffix1 = finalRootFileNameSuffix;
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            // 跳过目录
-            if (centralDirectoryEntry.isDirectoryIs()) {
-                return true;
-            }
-            String entryName = centralDirectoryEntry.getName();
-            String suffix = FileUtil.getSuffix(entryName);
-            if (suffix.equals(finalRootFileNameSuffix1)) {
-                allTileSetPaths.add(entryName);
-            }
-            return true;
-        });
+        iCompressionHandler.scanAllEntries(
+                layerConfigContext.getObjectKey(),
+                (centralDirectoryEntry, allCount, currentCount) -> {
+                    // 跳过目录
+                    if (centralDirectoryEntry.isDirectoryIs()) {
+                        return true;
+                    }
+                    String entryName = centralDirectoryEntry.getName();
+                    String suffix = FileUtil.getSuffix(entryName);
+                    if (suffix.equals(finalRootFileNameSuffix1)) {
+                        allTileSetPaths.add(entryName);
+                    }
+                    return true;
+                });
 
         // 校验是否找到tileset.json
         if (allTileSetPaths.isEmpty()) {
@@ -156,8 +160,14 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         log.info("选中最外层的路径: {}", outerMostTileSetPath);
         String name = FileUtil.getName(outerMostTileSetPath);
         String rootPath = outerMostTileSetPath.replace(name, "");
-        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath)
-                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "tilesetS3MB.scp" : "tileset.json");
+        return RootPathInfo.of()
+                .setRootFileName(name)
+                .setRootPath(rootPath)
+                .setRootFilePath(outerMostTileSetPath)
+                .setRootFileStandardName(
+                        mapTileType.equals(GirMapTileType.S3M)
+                                ? "tilesetS3MB.scp"
+                                : "tileset.json");
     }
 
     /**
@@ -188,11 +198,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
     }
 
     /**
-     * 计算路径的层级（以/为分隔符）
-     * 示例：
-     * - tileset.json → 0层
-     * - dir/tileset.json → 1层
-     * - dir/sub/tileset.json → 2层
+     * 计算路径的层级（以/为分隔符） 示例： - tileset.json → 0层 - dir/tileset.json → 1层 - dir/sub/tileset.json → 2层
      */
     private int getPathLevel(String path) {
         if (StrUtil.isEmpty(path)) {
@@ -213,6 +219,4 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
         }
         return level;
     }
-
-
 }

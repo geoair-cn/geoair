@@ -1,9 +1,11 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
 import cn.geoair.base.Gir;
+
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.codec.binary.Base64;
 
 public class DESUtils {
 

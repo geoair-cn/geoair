@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../geoair-base-parent</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-modules</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-modules</name>
 
@@ -43,7 +43,7 @@
     <module>geoair-db-service</module>
     <module>geoair-message-jts-jackson</module>
     <module>geoair-message-jts-mybatis</module>
-<!--    <module>geoair-official-site</module>-->
+    <!--    <module>geoair-official-site</module>-->
 
   </modules>
 
@@ -67,7 +67,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
 
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
@@ -136,8 +135,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>
-
-  </build>
+  <build></build>
 
 </project>

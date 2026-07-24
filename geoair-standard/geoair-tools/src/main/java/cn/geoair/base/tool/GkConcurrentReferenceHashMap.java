@@ -2,6 +2,7 @@ package cn.geoair.base.tool;
 
 import cn.geoair.base.util.GutilAssert;
 import cn.geoair.base.util.GutilObject;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

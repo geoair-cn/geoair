@@ -14,19 +14,23 @@ import cn.geoair.comp.db.service.core.dao.GirDsApiGroupDao;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.extra.spring.SpringUtil;
+
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+
+import jakarta.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @program: dbApi
@@ -34,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author: 武汉刘德华
  * @create: 2021-01-19 17:27
  */
-
 @Service
 public class DsApiConfigService {
     public static GiLogger log = GirLoggerFactory.getLogger();
@@ -185,16 +188,14 @@ public class DsApiConfigService {
         // .filter(t -> t.getGroupId() != null)
         // .collect(Collectors.toList());
         List<JSONObject> list =
-                groupApos
-                        .stream()
+                groupApos.stream()
                         .sorted(Comparator.comparing(GroupApo::getUpdateTime))
                         .map(
                                 g -> {
                                     List<ApiConfigApo> apiConfigApos =
                                             girDsApiConfigDao.selectByGroup(g.getId());
                                     List<JSONObject> children =
-                                            apiConfigApos
-                                                    .stream()
+                                            apiConfigApos.stream()
                                                     .sorted(
                                                             Comparator.comparing(
                                                                     ApiConfigApo::getUpdateTime))

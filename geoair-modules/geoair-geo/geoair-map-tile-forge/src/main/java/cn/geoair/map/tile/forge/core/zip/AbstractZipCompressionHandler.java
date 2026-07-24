@@ -1,6 +1,5 @@
 package cn.geoair.map.tile.forge.core.zip;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
@@ -10,7 +9,6 @@ import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
 import cn.hutool.core.io.unit.DataSizeUtil;
-
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -24,11 +22,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * ZIP压缩文件处理抽象基类
- * 封装通用的ZIP解析、解压逻辑，子类只需实现文件读取的具体细节
- */
-
+/** ZIP压缩文件处理抽象基类 封装通用的ZIP解析、解压逻辑，子类只需实现文件读取的具体细节 */
 public abstract class AbstractZipCompressionHandler implements ICompressionHandler {
     public static GiLogger log = GirLoggerFactory.getLogger();
     // ------------------------------ 通用常量（子类共享） ------------------------------
@@ -45,9 +39,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     private static final int ZIP64_EXTRA_FIELD_ID = 0x0001;
     private static final long ZIP64_MAGIC_NUMBER = 0xFFFFFFFFL;
 
-
     @Override
-    public void readFileFromZipToLocal(String zipSource, String targetFilePathInZip, String localOutputPath) throws IOException {
+    public void readFileFromZipToLocal(
+            String zipSource, String targetFilePathInZip, String localOutputPath)
+            throws IOException {
         byte[] fileData = readFileFromZip(zipSource, targetFilePathInZip);
         byteToLocal(localOutputPath, fileData);
     }
@@ -56,7 +51,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     public byte[] readFileFromZip(String zipSource, String targetFilePathInZip) throws IOException {
         long zipFileSize = getFileSize(zipSource);
         EocdInfo eocd = parseEocd(zipFileSize, zipSource);
-        CentralDirectoryModel targetEntry = findEntryInCentralDir(eocd, targetFilePathInZip, zipSource);
+        CentralDirectoryModel targetEntry =
+                findEntryInCentralDir(eocd, targetFilePathInZip, zipSource);
         if (targetEntry == null) {
             throw new IOException("ZIP文件[" + zipSource + "]中未找到目标路径：" + targetFilePathInZip);
         }
@@ -64,7 +60,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException {
+    public List<byte[]> readFileByChunks(
+            String source, long startOffset, long totalSize, int chunkSize) throws IOException {
         List<byte[]> chunks = new ArrayList<>();
         long remaining = totalSize;
         long currentOffset = startOffset;
@@ -81,11 +78,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return chunks;
     }
 
-
     @Override
-    public CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize) {
+    public CompletableFuture<List<byte[]>> asyncReadFileByChunks(
+            String source, long startOffset, long totalSize, int chunkSize) {
         try {
-            return CompletableFuture.completedFuture(readFileByChunks(source, startOffset, totalSize, chunkSize));
+            return CompletableFuture.completedFuture(
+                    readFileByChunks(source, startOffset, totalSize, chunkSize));
         } catch (IOException e) {
             log.error("异步分块读取失败，source:{}", source, e);
             CompletableFuture<List<byte[]>> future = new CompletableFuture<>();
@@ -104,7 +102,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 long eocdPosition = searchStart + i;
                 EocdInfo eocd = parseStandardEocd(tailBytes, i);
 
-                if (eocd.getTotalEntries() == 65535 || eocd.getCentralDirOffset() == ZIP64_MAGIC_NUMBER || eocd.getCentralDirSize() == ZIP64_MAGIC_NUMBER) {
+                if (eocd.getTotalEntries() == 65535
+                        || eocd.getCentralDirOffset() == ZIP64_MAGIC_NUMBER
+                        || eocd.getCentralDirSize() == ZIP64_MAGIC_NUMBER) {
                     long locatorPosition = eocdPosition - 20;
                     return parseZip64Eocd(locatorPosition, fileSize, source);
                 }
@@ -115,12 +115,16 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public CentralDirectoryModel findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException {
+    public CentralDirectoryModel findEntryInCentralDir(
+            EocdInfo eocd, String targetPath, String source) throws IOException {
         String normalizedTarget = normalizePath(targetPath);
         boolean isFolderCheck = isFolderPath(targetPath);
 
-        log.debug("开始查找路径：原始路径=[{}]，标准化路径=[{}]，是否文件夹=[{}]",
-                targetPath, normalizedTarget, isFolderCheck);
+        log.debug(
+                "开始查找路径：原始路径=[{}]，标准化路径=[{}]，是否文件夹=[{}]",
+                targetPath,
+                normalizedTarget,
+                isFolderCheck);
 
         long totalDirSize = eocd.getCentralDirSize();
         long currentOffset = eocd.getCentralDirOffset();
@@ -133,7 +137,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             log.trace("读取中央目录块 {}：偏移={}, 大小={}", chunkCount, currentOffset, chunkSize);
 
             byte[] dirChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
-            CentralDirectoryModel entry = findEntryInDirChunk(dirChunk, normalizedTarget, isFolderCheck, currentOffset, source);
+            CentralDirectoryModel entry =
+                    findEntryInDirChunk(
+                            dirChunk, normalizedTarget, isFolderCheck, currentOffset, source);
 
             if (entry != null) {
                 log.debug("找到目标路径：{}", targetPath);
@@ -149,34 +155,47 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source) throws IOException {
+    public byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source)
+            throws IOException {
         if (Objects.isNull(entry.getDataOffset())) {
             try {
-                LocalFileHeader header = readLocalFileHeader(entry.getLocalHeaderOffset(), source, getFileSize(source));
+                LocalFileHeader header =
+                        readLocalFileHeader(
+                                entry.getLocalHeaderOffset(), source, getFileSize(source));
                 entry.setDataOffset(header.getDataOffset());
             } catch (Exception e) {
                 log.warn("读取本地文件头失败，尝试直接使用偏移量估算", e);
                 // 估算数据偏移量（本地文件头固定30字节 + 文件名长度 + 扩展字段长度）
-                long estimatedOffset = estimateDataOffset(entry.getLocalHeaderOffset(), source, getFileSize(source));
+                long estimatedOffset =
+                        estimateDataOffset(
+                                entry.getLocalHeaderOffset(), source, getFileSize(source));
                 entry.setDataOffset(estimatedOffset);
             }
         }
-        if (entry.getCompressedSize() > MAX_CHUNK_SIZE && entry.getDecompressionHandler().supportStreamingDecompress()) {
+        if (entry.getCompressedSize() > MAX_CHUNK_SIZE
+                && entry.getDecompressionHandler().supportStreamingDecompress()) {
             return readLargeEntryData(entry, source);
         }
 
-        byte[] compressedData = readRange(source, entry.getDataOffset(), entry.getDataOffset() + entry.getCompressedSize() - 1);
-        return entry.getDecompressionHandler().decompress(compressedData, entry.getUncompressedSize());
+        byte[] compressedData =
+                readRange(
+                        source,
+                        entry.getDataOffset(),
+                        entry.getDataOffset() + entry.getCompressedSize() - 1);
+        return entry.getDecompressionHandler()
+                .decompress(compressedData, entry.getUncompressedSize());
     }
 
     @Override
-    public void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String localOutputPath) throws IOException {
+    public void readAndDecompressEntryToLocal(
+            CentralDirectoryModel entry, String source, String localOutputPath) throws IOException {
         byte[] bytes = readAndDecompressEntry(entry, source);
         byteToLocal(localOutputPath, bytes);
     }
 
     @Override
-    public List<String> checkedPathsInZip(String zipSource, List<String> checkedPaths) throws IOException {
+    public List<String> checkedPathsInZip(String zipSource, List<String> checkedPaths)
+            throws IOException {
         if (checkedPaths == null || checkedPaths.isEmpty()) {
             return Collections.emptyList();
         }
@@ -196,7 +215,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             // 文件夹路径添加带/和不带/两种形式
             if (isFolder) {
-                String altNormalized = normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized + "/";
+                String altNormalized =
+                        normalized.endsWith("/")
+                                ? normalized.substring(0, normalized.length() - 1)
+                                : normalized + "/";
                 pathMap.put(altNormalized, path);
                 pathTypeMap.put(altNormalized, isFolder);
             }
@@ -239,9 +261,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return result;
     }
 
-    /**
-     * 读取ZIP64中央目录结束记录（处理大于4GB的ZIP文件）
-     */
+    /** 读取ZIP64中央目录结束记录（处理大于4GB的ZIP文件） */
     private EocdInfo readZip64Eocd(long fileSize, String source) throws IOException {
         long fileLength = fileSize;
         // 1. 查找ZIP64定位器（位于ZIP文件末尾，固定20字节）
@@ -259,7 +279,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         long totalDisks = readInt(locatorData, 16) & ZIP64_MAGIC_NUMBER; // 总磁盘数
 
         // 2. 读取ZIP64 EOCD记录（最小长度56字节，实际可能更长）
-        byte[] zip64EocdData = readRange(source, zip64EocdOffset, zip64EocdOffset + 55); // 先读取基础56字节
+        byte[] zip64EocdData =
+                readRange(source, zip64EocdOffset, zip64EocdOffset + 55); // 先读取基础56字节
         if (zip64EocdData.length < 56 || readInt(zip64EocdData, 0) != ZIP64_EOCD_SIGNATURE) {
             throw new IOException("无效的ZIP64中央目录结束记录（签名不匹配）");
         }
@@ -280,7 +301,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         int eocdTotalLength = (int) (eocdSize + 4); // 总长度=EOCD大小+4字节签名
         if (eocdTotalLength > 56) {
             // 读取注释长度字段（位于EOCD末尾）
-            byte[] commentLengthData = readRange(source, zip64EocdOffset + eocdTotalLength - 2, zip64EocdOffset + eocdTotalLength - 1);
+            byte[] commentLengthData =
+                    readRange(
+                            source,
+                            zip64EocdOffset + eocdTotalLength - 2,
+                            zip64EocdOffset + eocdTotalLength - 1);
             commentLength = readShort(commentLengthData, 0) & 0xFFFFL;
         }
 
@@ -292,11 +317,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 totalEntries,
                 centralDirSize,
                 centralDirOffset,
-                commentLength
-        );
+                commentLength);
     }
 
-    public void scanAllEntries1(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
+    public void scanAllEntries1(
+            EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer)
+            throws IOException {
         // 优先使用ZIP64 EOCD（若存在）
         EocdInfo finalEocd = eocd;
         long fileSize = eocd.getFileSize();
@@ -304,8 +330,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             EocdInfo zip64Eocd = readZip64Eocd(fileSize, source);
             if (zip64Eocd != null) {
                 finalEocd = zip64Eocd;
-                log.info("使用ZIP64中央目录信息：offset={}, size={}, entries={}",
-                        finalEocd.getCentralDirOffset(), finalEocd.getCentralDirSize(), finalEocd.getTotalEntries());
+                log.info(
+                        "使用ZIP64中央目录信息：offset={}, size={}, entries={}",
+                        finalEocd.getCentralDirOffset(),
+                        finalEocd.getCentralDirSize(),
+                        finalEocd.getTotalEntries());
             }
         } catch (Exception e) {
             log.warn("读取ZIP64 EOCD失败，使用普通EOCD", e);
@@ -331,20 +360,22 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 break;
             }
 
-//            byte[] signatureBytes = readRange(source, currentOffset, signatureEnd);
-//            if (signatureBytes.length < 4) {
-//                log.warn("读取签名数据不足：{}字节", signatureBytes.length);
-//                break;
-//            }
+            //            byte[] signatureBytes = readRange(source, currentOffset, signatureEnd);
+            //            if (signatureBytes.length < 4) {
+            //                log.warn("读取签名数据不足：{}字节", signatureBytes.length);
+            //                break;
+            //            }
 
-//            int signature = ByteBuffer.wrap(signatureBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            //            int signature =
+            // ByteBuffer.wrap(signatureBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
 
-//            if (signature != CENTRAL_DIR_SIGNATURE) {
-//                log.debug("无效的中央目录签名：{}，偏移量：{}", Integer.toHexString(signature), currentOffset);
-//                currentOffset++;
-//                remaining--;
-//                continue;
-//            }
+            //            if (signature != CENTRAL_DIR_SIGNATURE) {
+            //                log.debug("无效的中央目录签名：{}，偏移量：{}", Integer.toHexString(signature),
+            // currentOffset);
+            //                currentOffset++;
+            //                remaining--;
+            //                continue;
+            //            }
 
             // 读取条目头部（46字节固定长度）
             long headerEnd = currentOffset + 45;
@@ -403,9 +434,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             long headerOffset = headerOffset32;
 
             // 如果任何字段是ZIP64占位符，强制扫描整个扩展字段
-            boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
+            boolean needZip64Parsing =
+                    (compressedSize32 == ZIP64_MAGIC_NUMBER
+                            || uncompressedSize32 == ZIP64_MAGIC_NUMBER
+                            || headerOffset32 == ZIP64_MAGIC_NUMBER);
 
             if (needZip64Parsing && extraLen > 0) {
                 // 直接扫描整个扩展字段数据，不依赖结构解析
@@ -422,7 +454,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                         log.debug("{}: 找到ZIP64扩展字段，大小：{}", fileName, dataSize);
 
                         // 解析ZIP64扩展字段内容
-                        ByteBuffer buffer = ByteBuffer.wrap(extraData, pos + 4, Math.min(dataSize, extraData.length - pos - 4));
+                        ByteBuffer buffer =
+                                ByteBuffer.wrap(
+                                        extraData,
+                                        pos + 4,
+                                        Math.min(dataSize, extraData.length - pos - 4));
                         buffer.order(ByteOrder.LITTLE_ENDIAN);
 
                         if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
@@ -456,7 +492,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             Long dataOffset = null;
             if (headerOffset >= 0 && headerOffset < fileLength) {
                 try {
-                    LocalFileHeader localHeader = readLocalFileHeader(headerOffset, source, fileSize);
+                    LocalFileHeader localHeader =
+                            readLocalFileHeader(headerOffset, source, fileSize);
                     dataOffset = localHeader.getDataOffset();
                 } catch (Exception e) {
                     log.warn("读取本地文件头失败：fileName={}, headerOffset={}", fileName, headerOffset, e);
@@ -464,15 +501,19 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     dataOffset = estimateDataOffset(headerOffset, source, fileSize);
                 }
             } else {
-                log.warn("headerOffset超出文件范围：{}（文件长度：{}），fileName={}",
-                        headerOffset, fileLength, fileName);
+                log.warn(
+                        "headerOffset超出文件范围：{}（文件长度：{}），fileName={}",
+                        headerOffset,
+                        fileLength,
+                        fileName);
                 // 尝试修复偏移量
                 if (headerOffset >= fileLength) {
                     log.warn("{}: 尝试修复过大的偏移量", fileName);
                     headerOffset = fileLength - 100000; // 向后偏移
                     if (headerOffset > 0) {
                         try {
-                            LocalFileHeader localHeader = readLocalFileHeader(headerOffset, source, fileSize);
+                            LocalFileHeader localHeader =
+                                    readLocalFileHeader(headerOffset, source, fileSize);
                             dataOffset = localHeader.getDataOffset();
                         } catch (Exception e) {
                             dataOffset = estimateDataOffset(headerOffset, source, fileSize);
@@ -482,15 +523,15 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             }
 
             // 创建条目并消费
-            CentralDirectoryModel entry = new CentralDirectoryModel(
-                    headerOffset,
-                    dataOffset,
-                    compressionMethod,
-                    compressedSize,
-                    uncompressedSize,
-                    fileName,
-                    entryTotalLength
-            );
+            CentralDirectoryModel entry =
+                    new CentralDirectoryModel(
+                            headerOffset,
+                            dataOffset,
+                            compressionMethod,
+                            compressedSize,
+                            uncompressedSize,
+                            fileName,
+                            entryTotalLength);
             entry.setDirectoryIs(isDirectory);
             Long allCount = totalEntries;
             Long currentCount = entryCount; // 重新赋值一下，面得accept里面修改了变量的值
@@ -510,10 +551,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         log.info("中央目录扫描完成：共解析{}个条目", entryCount);
     }
 
-
-    public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
+    public void scanAllEntries(
+            EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer)
+            throws IOException {
         // ===================== 固定配置 =====================
-        final int BATCH_SIZE = 500;                    // 每批解析多少条
+        final int BATCH_SIZE = 500; // 每批解析多少条
         final int QUEUE_CAPACITY = 2000;
         int threads = Math.min(Runtime.getRuntime().availableProcessors() * 2, 8);
 
@@ -537,35 +579,40 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         AtomicBoolean producerFinish = new AtomicBoolean(false);
         AtomicBoolean shouldStop = new AtomicBoolean(false);
         AtomicLong entryCount = new AtomicLong(0);
-        Thread consumerThread = new Thread(() -> {
-            try {
-                while (!shouldStop.get()) {
-                    // 队列获取，超时判断是否结束
-                    CentralDirectoryModel entry = queue.poll(100, TimeUnit.MILLISECONDS);
-                    if (entry == null && producerFinish.get()) {
-                        break;
-                    }
-                    if (entry == null) continue;
+        Thread consumerThread =
+                new Thread(
+                        () -> {
+                            try {
+                                while (!shouldStop.get()) {
+                                    // 队列获取，超时判断是否结束
+                                    CentralDirectoryModel entry =
+                                            queue.poll(100, TimeUnit.MILLISECONDS);
+                                    if (entry == null && producerFinish.get()) {
+                                        break;
+                                    }
+                                    if (entry == null) continue;
 
-                    try {
-                        long index = entryCount.incrementAndGet() - 1;
-                        boolean result = entryConsumer.accept(entry, totalEntries, index);
-                        // 如果消费者返回false，设置停止标志
-                        if (!result) {
-                            shouldStop.set(true);
-                            log.info("消费者返回false，停止扫描，当前已处理：{} 条", index + 1);
-                            break;
-                        }
+                                    try {
+                                        long index = entryCount.incrementAndGet() - 1;
+                                        boolean result =
+                                                entryConsumer.accept(entry, totalEntries, index);
+                                        // 如果消费者返回false，设置停止标志
+                                        if (!result) {
+                                            shouldStop.set(true);
+                                            log.info("消费者返回false，停止扫描，当前已处理：{} 条", index + 1);
+                                            break;
+                                        }
 
-                    } catch (Exception e) {
-                        shouldStop.set(true); // 异常时也停止
-                        log.error("消费条目异常", e);
-                    }
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }, "zip-entry-consumer");
+                                    } catch (Exception e) {
+                                        shouldStop.set(true); // 异常时也停止
+                                        log.error("消费条目异常", e);
+                                    }
+                                }
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
+                        },
+                        "zip-entry-consumer");
         consumerThread.start();
         try {
             while (remaining > 0 && !shouldStop.get()) {
@@ -597,97 +644,154 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 List<CompletableFuture<Void>> futures = new ArrayList<>();
                 for (EntryPosition pos : batch) {
                     if (shouldStop.get()) break;
-                    futures.add(CompletableFuture.runAsync(() -> {
-                        try {
-                            long entryOffset = pos.offset;
-                            int entryLen = pos.totalLength;
-                            long entryEnd = entryOffset + entryLen - 1;
-                            byte[] entryData = readRange(source, entryOffset, entryEnd);
-
-                            // -------------- 你原有解析逻辑 --------------
-                            long compressionMethod = readShort(entryData, 10) & 0xFFFF;
-                            long compressedSize32 = readInt(entryData, 20) & ZIP64_MAGIC_NUMBER;
-                            long uncompressedSize32 = readInt(entryData, 24) & ZIP64_MAGIC_NUMBER;
-                            long headerOffset32 = readInt(entryData, 42) & ZIP64_MAGIC_NUMBER;
-
-                            int nameLen = readShort(entryData, 28) & 0xFFFF;
-                            String fileName = "";
-                            if (nameLen > 0 && 46 + nameLen <= entryData.length) {
-                                fileName = decodeFileName(entryData, 46, nameLen);
-                                fileName = normalizePath(fileName);
-                            }
-
-                            boolean isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-                            long compressedSize = compressedSize32;
-                            long uncompressedSize = uncompressedSize32;
-                            long headerOffset = headerOffset32;
-                            int extraLen = readShort(entryData, 30) & 0xFFFF;
-
-                            boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
-
-                            if (needZip64Parsing && extraLen > 0) {
-                                int extraPos = 46 + nameLen;
-                                byte[] extraData = Arrays.copyOfRange(entryData, extraPos, extraPos + extraLen);
-                                int p = 0;
-                                while (p + 4 <= extraData.length) {
-                                    int hid = (extraData[p] & 0xFF) | ((extraData[p + 1] & 0xFF) << 8);
-                                    int dsz = (extraData[p + 2] & 0xFF) | ((extraData[p + 3] & 0xFF) << 8);
-                                    if (hid == ZIP64_EXTRA_FIELD_ID) {
-                                        ByteBuffer buf = ByteBuffer.wrap(extraData, p + 4, Math.min(dsz, extraData.length - p - 4));
-                                        buf.order(ByteOrder.LITTLE_ENDIAN);
-                                        if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            uncompressedSize = buf.getLong();
-                                        if (compressedSize32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            compressedSize = buf.getLong();
-                                        if (headerOffset32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            headerOffset = buf.getLong();
-                                        break;
-                                    }
-                                    p += 4 + dsz;
-                                }
-                                if (headerOffset == ZIP64_MAGIC_NUMBER) {
-                                    headerOffset = estimateLocalHeaderOffset(entryOffset, fileLength, source);
-                                }
-                            }
-
-                            Long dataOffset = null;
-                            if (headerOffset >= 0 && headerOffset < fileLength) {
-                                try {
-                                    LocalFileHeader lh = readLocalFileHeader(headerOffset, source, fileSize);
-                                    dataOffset = lh.getDataOffset();
-                                } catch (Exception e) {
-                                    dataOffset = estimateDataOffset(headerOffset, source, fileSize);
-                                }
-                            } else {
-                                if (headerOffset >= fileLength) {
-                                    headerOffset = fileLength - 100000;
-                                    if (headerOffset > 0) {
+                    futures.add(
+                            CompletableFuture.runAsync(
+                                    () -> {
                                         try {
-                                            LocalFileHeader lh = readLocalFileHeader(headerOffset, source, fileSize);
-                                            dataOffset = lh.getDataOffset();
+                                            long entryOffset = pos.offset;
+                                            int entryLen = pos.totalLength;
+                                            long entryEnd = entryOffset + entryLen - 1;
+                                            byte[] entryData =
+                                                    readRange(source, entryOffset, entryEnd);
+
+                                            // -------------- 你原有解析逻辑 --------------
+                                            long compressionMethod =
+                                                    readShort(entryData, 10) & 0xFFFF;
+                                            long compressedSize32 =
+                                                    readInt(entryData, 20) & ZIP64_MAGIC_NUMBER;
+                                            long uncompressedSize32 =
+                                                    readInt(entryData, 24) & ZIP64_MAGIC_NUMBER;
+                                            long headerOffset32 =
+                                                    readInt(entryData, 42) & ZIP64_MAGIC_NUMBER;
+
+                                            int nameLen = readShort(entryData, 28) & 0xFFFF;
+                                            String fileName = "";
+                                            if (nameLen > 0 && 46 + nameLen <= entryData.length) {
+                                                fileName = decodeFileName(entryData, 46, nameLen);
+                                                fileName = normalizePath(fileName);
+                                            }
+
+                                            boolean isDirectory =
+                                                    isDirectory(
+                                                            fileName,
+                                                            compressedSize32,
+                                                            uncompressedSize32);
+                                            long compressedSize = compressedSize32;
+                                            long uncompressedSize = uncompressedSize32;
+                                            long headerOffset = headerOffset32;
+                                            int extraLen = readShort(entryData, 30) & 0xFFFF;
+
+                                            boolean needZip64Parsing =
+                                                    (compressedSize32 == ZIP64_MAGIC_NUMBER
+                                                            || uncompressedSize32
+                                                                    == ZIP64_MAGIC_NUMBER
+                                                            || headerOffset32
+                                                                    == ZIP64_MAGIC_NUMBER);
+
+                                            if (needZip64Parsing && extraLen > 0) {
+                                                int extraPos = 46 + nameLen;
+                                                byte[] extraData =
+                                                        Arrays.copyOfRange(
+                                                                entryData,
+                                                                extraPos,
+                                                                extraPos + extraLen);
+                                                int p = 0;
+                                                while (p + 4 <= extraData.length) {
+                                                    int hid =
+                                                            (extraData[p] & 0xFF)
+                                                                    | ((extraData[p + 1] & 0xFF)
+                                                                            << 8);
+                                                    int dsz =
+                                                            (extraData[p + 2] & 0xFF)
+                                                                    | ((extraData[p + 3] & 0xFF)
+                                                                            << 8);
+                                                    if (hid == ZIP64_EXTRA_FIELD_ID) {
+                                                        ByteBuffer buf =
+                                                                ByteBuffer.wrap(
+                                                                        extraData,
+                                                                        p + 4,
+                                                                        Math.min(
+                                                                                dsz,
+                                                                                extraData.length
+                                                                                        - p
+                                                                                        - 4));
+                                                        buf.order(ByteOrder.LITTLE_ENDIAN);
+                                                        if (uncompressedSize32 == ZIP64_MAGIC_NUMBER
+                                                                && buf.remaining() >= 8)
+                                                            uncompressedSize = buf.getLong();
+                                                        if (compressedSize32 == ZIP64_MAGIC_NUMBER
+                                                                && buf.remaining() >= 8)
+                                                            compressedSize = buf.getLong();
+                                                        if (headerOffset32 == ZIP64_MAGIC_NUMBER
+                                                                && buf.remaining() >= 8)
+                                                            headerOffset = buf.getLong();
+                                                        break;
+                                                    }
+                                                    p += 4 + dsz;
+                                                }
+                                                if (headerOffset == ZIP64_MAGIC_NUMBER) {
+                                                    headerOffset =
+                                                            estimateLocalHeaderOffset(
+                                                                    entryOffset,
+                                                                    fileLength,
+                                                                    source);
+                                                }
+                                            }
+
+                                            Long dataOffset = null;
+                                            if (headerOffset >= 0 && headerOffset < fileLength) {
+                                                try {
+                                                    LocalFileHeader lh =
+                                                            readLocalFileHeader(
+                                                                    headerOffset, source, fileSize);
+                                                    dataOffset = lh.getDataOffset();
+                                                } catch (Exception e) {
+                                                    dataOffset =
+                                                            estimateDataOffset(
+                                                                    headerOffset, source, fileSize);
+                                                }
+                                            } else {
+                                                if (headerOffset >= fileLength) {
+                                                    headerOffset = fileLength - 100000;
+                                                    if (headerOffset > 0) {
+                                                        try {
+                                                            LocalFileHeader lh =
+                                                                    readLocalFileHeader(
+                                                                            headerOffset,
+                                                                            source,
+                                                                            fileSize);
+                                                            dataOffset = lh.getDataOffset();
+                                                        } catch (Exception e) {
+                                                            dataOffset =
+                                                                    estimateDataOffset(
+                                                                            headerOffset,
+                                                                            source,
+                                                                            fileSize);
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            CentralDirectoryModel entry =
+                                                    new CentralDirectoryModel(
+                                                            headerOffset,
+                                                            dataOffset,
+                                                            compressionMethod,
+                                                            compressedSize,
+                                                            uncompressedSize,
+                                                            fileName,
+                                                            entryLen);
+                                            entry.setDirectoryIs(isDirectory);
+
+                                            if (!shouldStop.get()) {
+                                                queue.put(entry);
+                                            }
+
                                         } catch (Exception e) {
-                                            dataOffset = estimateDataOffset(headerOffset, source, fileSize);
+                                            log.error("解析条目失败", e);
                                         }
-                                    }
-                                }
-                            }
-
-                            CentralDirectoryModel entry = new CentralDirectoryModel(
-                                    headerOffset, dataOffset, compressionMethod,
-                                    compressedSize, uncompressedSize, fileName, entryLen
-                            );
-                            entry.setDirectoryIs(isDirectory);
-
-                            if (!shouldStop.get()) {
-                                queue.put(entry);
-                            }
-
-                        } catch (Exception e) {
-                            log.error("解析条目失败", e);
-                        }
-                    }, producerExecutor));
+                                    },
+                                    producerExecutor));
                 }
 
                 if (!futures.isEmpty() && !shouldStop.get()) {
@@ -725,10 +829,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         log.info("中央目录扫描+消费完成：共解析 {} 个条目", entryCount.get());
     }
 
-
-    /**
-     * 估算本地文件头偏移量（备选方案）
-     */
+    /** 估算本地文件头偏移量（备选方案） */
     private long estimateLocalHeaderOffset(long centralDirOffset, long fileLength, String source) {
         // 从中央目录位置向前查找本地文件头
         long searchStart = Math.max(0, centralDirOffset - 1000000); // 向前1MB
@@ -741,10 +842,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             // 查找本地文件头签名
             for (int i = 0; i < searchData.length - 3; i++) {
-                int sig = (searchData[i] & 0xFF) |
-                          ((searchData[i + 1] & 0xFF) << 8) |
-                          ((searchData[i + 2] & 0xFF) << 16) |
-                          ((searchData[i + 3] & 0xFF) << 24);
+                int sig =
+                        (searchData[i] & 0xFF)
+                                | ((searchData[i + 1] & 0xFF) << 8)
+                                | ((searchData[i + 2] & 0xFF) << 16)
+                                | ((searchData[i + 3] & 0xFF) << 24);
 
                 if (sig == LOCAL_FILE_HEADER_SIGNATURE) {
                     long foundOffset = searchStart + i;
@@ -760,15 +862,17 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return Math.max(0, centralDirOffset - 10000);
     }
 
-    private static boolean isDirectory(String fileName, long compressedSize32, long uncompressedSize32) {
+    private static boolean isDirectory(
+            String fileName, long compressedSize32, long uncompressedSize32) {
         boolean isDirectory = false;
         // 规则1：文件名以路径分隔符结尾（ZIP标准目录标识）
         if (fileName.endsWith("/") || fileName.endsWith("\\")) {
             isDirectory = true;
         }
         // 规则2：压缩大小和未压缩大小均为0且包含路径分隔符（兼容部分工具创建的目录条目）
-        else if (compressedSize32 == 0 && uncompressedSize32 == 0
-                 && (fileName.contains("/") || fileName.contains("\\"))) {
+        else if (compressedSize32 == 0
+                && uncompressedSize32 == 0
+                && (fileName.contains("/") || fileName.contains("\\"))) {
             isDirectory = true;
         }
         // 规则3：文件名本身是盘符或根目录（特殊情况处理）
@@ -778,17 +882,18 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return isDirectory;
     }
 
-    public void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
+    public void scanAllEntries(
+            String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer)
+            throws IOException {
         long fileSize = getFileSize(source);
         EocdInfo eocdInfo = parseEocd(fileSize, source);
         eocdInfo.setFileSize(fileSize);
         scanAllEntries(eocdInfo, source, entryConsumer);
     }
 
-    /**
-     * 估算数据偏移量（当无法读取本地文件头时使用）
-     */
-    private long estimateDataOffset(long headerOffset, String source, long fileSize) throws IOException {
+    /** 估算数据偏移量（当无法读取本地文件头时使用） */
+    private long estimateDataOffset(long headerOffset, String source, long fileSize)
+            throws IOException {
         if (headerOffset == ZIP64_MAGIC_NUMBER) {
             log.error("无法估算偏移量：headerOffset是ZIP64占位符");
             // 尝试从文件开头开始查找
@@ -818,10 +923,9 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         }
     }
 
-    /**
-     * 读取本地文件头（增强容错版）
-     */
-    private LocalFileHeader readLocalFileHeader(long offset, String source, long fileSize) throws IOException {
+    /** 读取本地文件头（增强容错版） */
+    private LocalFileHeader readLocalFileHeader(long offset, String source, long fileSize)
+            throws IOException {
         // 首先检查是否是ZIP64占位符
         if (offset == ZIP64_MAGIC_NUMBER) {
             throw new IOException("headerOffset是ZIP64占位符，未解析真实值");
@@ -878,8 +982,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             }
 
             if (!found) {
-                throw new IOException("无效的本地文件头签名：0x" + Integer.toHexString(signature) +
-                                      "，偏移量：" + offset);
+                throw new IOException(
+                        "无效的本地文件头签名：0x" + Integer.toHexString(signature) + "，偏移量：" + offset);
             }
         }
 
@@ -899,10 +1003,14 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return new LocalFileHeader(nameLen, extraLen, dataOffset);
     }
 
-    /**
-     * 在中央目录分块中查找目标路径（支持文件和文件夹）
-     */
-    private CentralDirectoryModel findEntryInDirChunk(byte[] dirChunk, String normalizedTarget, boolean isFolderCheck, long chunkOffset, String source) throws IOException {
+    /** 在中央目录分块中查找目标路径（支持文件和文件夹） */
+    private CentralDirectoryModel findEntryInDirChunk(
+            byte[] dirChunk,
+            String normalizedTarget,
+            boolean isFolderCheck,
+            long chunkOffset,
+            String source)
+            throws IOException {
         int pos = 0;
 
         // 处理跨分块的情况：回退查找可能的签名
@@ -951,13 +1059,15 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             if (isFolderCheck) {
                 // 文件夹匹配逻辑
-                String folderTargetWithSlash = normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
-                String folderFileWithSlash = normalizedFile.endsWith("/") ? normalizedFile : normalizedFile + "/";
+                String folderTargetWithSlash =
+                        normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
+                String folderFileWithSlash =
+                        normalizedFile.endsWith("/") ? normalizedFile : normalizedFile + "/";
 
                 // 精确匹配文件夹
-                if (normalizedFile.equals(normalizedTarget) ||
-                    normalizedFile.equals(folderTargetWithSlash) ||
-                    folderFileWithSlash.equals(normalizedTarget)) {
+                if (normalizedFile.equals(normalizedTarget)
+                        || normalizedFile.equals(folderTargetWithSlash)
+                        || folderFileWithSlash.equals(normalizedTarget)) {
                     isMatch = true;
                 }
                 // 子文件/子文件夹匹配
@@ -988,20 +1098,26 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     if (headerId == 0x7075 || headerId == 0x0007) {
                         int dataPtr = currentExtraPos + 4;
                         if (dataPtr + nameLen <= currentExtraPos + dataSize) {
-                            unicodeFileName = new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
+                            unicodeFileName =
+                                    new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
                             String normalizedUnicodeFile = normalizePath(unicodeFileName);
 
                             // 重新检查匹配
                             if (isFolderCheck) {
-                                String folderTargetWithSlash = normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
-                                if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                    normalizedUnicodeFile.startsWith(folderTargetWithSlash)) {
+                                String folderTargetWithSlash =
+                                        normalizedTarget.endsWith("/")
+                                                ? normalizedTarget
+                                                : normalizedTarget + "/";
+                                if (normalizedUnicodeFile.equals(normalizedTarget)
+                                        || normalizedUnicodeFile.startsWith(
+                                                folderTargetWithSlash)) {
                                     isMatch = true;
                                     normalizedFile = normalizedUnicodeFile;
                                 }
                             } else {
-                                if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                    normalizedUnicodeFile.equalsIgnoreCase(normalizedTarget)) {
+                                if (normalizedUnicodeFile.equals(normalizedTarget)
+                                        || normalizedUnicodeFile.equalsIgnoreCase(
+                                                normalizedTarget)) {
                                     isMatch = true;
                                     normalizedFile = normalizedUnicodeFile;
                                 }
@@ -1015,9 +1131,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             }
 
             if (isMatch) {
-                log.debug("找到匹配路径：ZIP内路径=[{}]（{}），目标路径=[{}]（{}）",
-                        normalizedFile, isFolderEntry ? "文件夹" : "文件",
-                        normalizedTarget, isFolderCheck ? "文件夹" : "文件");
+                log.debug(
+                        "找到匹配路径：ZIP内路径=[{}]（{}），目标路径=[{}]（{}）",
+                        normalizedFile,
+                        isFolderEntry ? "文件夹" : "文件",
+                        normalizedTarget,
+                        isFolderCheck ? "文件夹" : "文件");
 
                 // 解析核心字段
                 long headerOffset32 = readInt(dirChunk, pos + 42) & ZIP64_MAGIC_NUMBER;
@@ -1036,17 +1155,25 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     int extraPosInChunk = 0;
 
                     while (extraPosInChunk + 4 <= extraData.length) {
-                        int headerId = (extraData[extraPosInChunk] & 0xFF) |
-                                       ((extraData[extraPosInChunk + 1] & 0xFF) << 8);
-                        int dataSize = (extraData[extraPosInChunk + 2] & 0xFF) |
-                                       ((extraData[extraPosInChunk + 3] & 0xFF) << 8);
+                        int headerId =
+                                (extraData[extraPosInChunk] & 0xFF)
+                                        | ((extraData[extraPosInChunk + 1] & 0xFF) << 8);
+                        int dataSize =
+                                (extraData[extraPosInChunk + 2] & 0xFF)
+                                        | ((extraData[extraPosInChunk + 3] & 0xFF) << 8);
 
                         if (headerId == ZIP64_EXTRA_FIELD_ID) {
-                            ByteBuffer buffer = ByteBuffer.wrap(extraData, extraPosInChunk + 4,
-                                    Math.min(dataSize, extraData.length - extraPosInChunk - 4));
+                            ByteBuffer buffer =
+                                    ByteBuffer.wrap(
+                                            extraData,
+                                            extraPosInChunk + 4,
+                                            Math.min(
+                                                    dataSize,
+                                                    extraData.length - extraPosInChunk - 4));
                             buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-                            if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
+                            if (uncompressedSize32 == ZIP64_MAGIC_NUMBER
+                                    && buffer.remaining() >= 8) {
                                 uncompressedSize = buffer.getLong();
                             }
                             if (compressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
@@ -1067,20 +1194,22 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 // 如果ZIP64解析失败，尝试估算
                 if (headerOffset == ZIP64_MAGIC_NUMBER) {
                     log.warn("{}: ZIP64扩展字段解析失败，尝试估算偏移量", fileName);
-                    headerOffset = estimateLocalHeaderOffset(chunkOffset + pos, getFileSize(source), source);
+                    headerOffset =
+                            estimateLocalHeaderOffset(
+                                    chunkOffset + pos, getFileSize(source), source);
                 }
 
                 boolean isDirectory = false;
                 isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-                CentralDirectoryModel centralDirectoryModel = new CentralDirectoryModel(
-                        headerOffset,
-                        null,
-                        compressionMethod,
-                        compressedSize,
-                        uncompressedSize,
-                        unicodeFileName != null ? unicodeFileName : fileName,
-                        (int) (chunkOffset + pos)
-                );
+                CentralDirectoryModel centralDirectoryModel =
+                        new CentralDirectoryModel(
+                                headerOffset,
+                                null,
+                                compressionMethod,
+                                compressedSize,
+                                uncompressedSize,
+                                unicodeFileName != null ? unicodeFileName : fileName,
+                                (int) (chunkOffset + pos));
                 centralDirectoryModel.setDirectoryIs(isDirectory);
                 return centralDirectoryModel;
             }
@@ -1092,10 +1221,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return null;
     }
 
-    /**
-     * 在中央目录块中查找所有匹配的路径（支持文件和文件夹）
-     */
-    private void findAllMatchingPaths(byte[] dirChunk, Set<String> checkPaths, Set<String> existsPaths, Map<String, Boolean> pathTypeMap) {
+    /** 在中央目录块中查找所有匹配的路径（支持文件和文件夹） */
+    private void findAllMatchingPaths(
+            byte[] dirChunk,
+            Set<String> checkPaths,
+            Set<String> existsPaths,
+            Map<String, Boolean> pathTypeMap) {
         int pos = 0;
 
         // 处理跨分块的情况
@@ -1145,16 +1276,17 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
                 if (isFolderCheck) {
                     // 文件夹匹配
-                    String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
-                    if (normalizedFile.equals(checkPath) ||
-                        normalizedFile.equals(folderCheckWithSlash) ||
-                        normalizedFile.startsWith(folderCheckWithSlash)) {
+                    String folderCheckWithSlash =
+                            checkPath.endsWith("/") ? checkPath : checkPath + "/";
+                    if (normalizedFile.equals(checkPath)
+                            || normalizedFile.equals(folderCheckWithSlash)
+                            || normalizedFile.startsWith(folderCheckWithSlash)) {
                         matchFound = true;
                     }
                 } else {
                     // 文件匹配
-                    if (normalizedFile.equals(checkPath) ||
-                        normalizedFile.equalsIgnoreCase(checkPath)) {
+                    if (normalizedFile.equals(checkPath)
+                            || normalizedFile.equalsIgnoreCase(checkPath)) {
                         matchFound = true;
                     }
                 }
@@ -1176,7 +1308,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                     if (headerId == 0x7075 || headerId == 0x0007) {
                         int dataPtr = currentExtraPos + 4;
                         if (dataPtr + nameLen <= currentExtraPos + dataSize) {
-                            String unicodeFileName = new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
+                            String unicodeFileName =
+                                    new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
                             String normalizedUnicodeFile = normalizePath(unicodeFileName);
 
                             // 再次检查匹配
@@ -1188,14 +1321,16 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
                                 boolean matchFound = false;
                                 if (isFolderCheck) {
-                                    String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
-                                    if (normalizedUnicodeFile.equals(checkPath) ||
-                                        normalizedUnicodeFile.startsWith(folderCheckWithSlash)) {
+                                    String folderCheckWithSlash =
+                                            checkPath.endsWith("/") ? checkPath : checkPath + "/";
+                                    if (normalizedUnicodeFile.equals(checkPath)
+                                            || normalizedUnicodeFile.startsWith(
+                                                    folderCheckWithSlash)) {
                                         matchFound = true;
                                     }
                                 } else {
-                                    if (normalizedUnicodeFile.equals(checkPath) ||
-                                        normalizedUnicodeFile.equalsIgnoreCase(checkPath)) {
+                                    if (normalizedUnicodeFile.equals(checkPath)
+                                            || normalizedUnicodeFile.equalsIgnoreCase(checkPath)) {
                                         matchFound = true;
                                     }
                                 }
@@ -1218,21 +1353,19 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         }
     }
 
-    /**
-     * 解码文件名（支持多编码容错）
-     */
+    /** 解码文件名（支持多编码容错） */
     private String decodeFileName(byte[] data, int offset, int length) {
         if (length <= 0) {
             return "";
         }
         // 尝试多种编码
-        List<Charset> charsets = Arrays.asList(
-                StandardCharsets.UTF_8,
-                Charset.forName("GBK"),
-                Charset.forName("ISO-8859-1"),
-                Charset.forName("CP437"),
-                Charset.defaultCharset()
-        );
+        List<Charset> charsets =
+                Arrays.asList(
+                        StandardCharsets.UTF_8,
+                        Charset.forName("GBK"),
+                        Charset.forName("ISO-8859-1"),
+                        Charset.forName("CP437"),
+                        Charset.defaultCharset());
 
         for (Charset charset : charsets) {
             try {
@@ -1247,9 +1380,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return bytesToHex(data, offset, length);
     }
 
-    /**
-     * 字节数组转十六进制字符串（用于调试）
-     */
+    /** 字节数组转十六进制字符串（用于调试） */
     private String bytesToHex(byte[] data, int offset, int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -1258,19 +1389,17 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return sb.toString();
     }
 
-    /**
-     * 解析标准EOCD结构
-     */
+    /** 解析标准EOCD结构 */
     private EocdInfo parseStandardEocd(byte[] data, int offset) {
-//        return new EocdInfo(
-//                (long) readShort(data, offset + 4),
-//                (long) readShort(data, offset + 6),
-//                (long) readShort(data, offset + 8),
-//                (long) readShort(data, offset + 10),
-//                readInt(data, offset + 12) & ZIP64_MAGIC_NUMBER,
-//                readInt(data, offset + 16) & ZIP64_MAGIC_NUMBER,
-//                (long) readShort(data, offset + 20)
-//        );
+        //        return new EocdInfo(
+        //                (long) readShort(data, offset + 4),
+        //                (long) readShort(data, offset + 6),
+        //                (long) readShort(data, offset + 8),
+        //                (long) readShort(data, offset + 10),
+        //                readInt(data, offset + 12) & ZIP64_MAGIC_NUMBER,
+        //                readInt(data, offset + 16) & ZIP64_MAGIC_NUMBER,
+        //                (long) readShort(data, offset + 20)
+        //        );
         return new EocdInfo(
                 (long) readShort(data, offset + 4) & 0xFFFFL, // 转为无符号
                 (long) readShort(data, offset + 6) & 0xFFFFL,
@@ -1278,14 +1407,12 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 (long) readShort(data, offset + 10) & 0xFFFFL, // 关键：totalEntries转无符号
                 readInt(data, offset + 12) & ZIP64_MAGIC_NUMBER,
                 readInt(data, offset + 16) & ZIP64_MAGIC_NUMBER,
-                (long) readShort(data, offset + 20) & 0xFFFFL
-        );
+                (long) readShort(data, offset + 20) & 0xFFFFL);
     }
 
-    /**
-     * 解析ZIP64 EOCD结构
-     */
-    private EocdInfo parseZip64Eocd(long locatorPosition, long fileSize, String source) throws IOException {
+    /** 解析ZIP64 EOCD结构 */
+    private EocdInfo parseZip64Eocd(long locatorPosition, long fileSize, String source)
+            throws IOException {
         // 确保定位器位置有效
         if (locatorPosition < 0 || locatorPosition + 19 >= fileSize) {
             locatorPosition = Math.max(0, fileSize - 20);
@@ -1314,37 +1441,37 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 readLong(zip64Eocd, 32),
                 readLong(zip64Eocd, 40),
                 readLong(zip64Eocd, 48),
-                0L
-        );
+                0L);
     }
 
-    /**
-     * 读取大文件的压缩数据（分块解压）
-     */
-    private byte[] readLargeEntryData(CentralDirectoryModel entry, String source) throws IOException {
+    /** 读取大文件的压缩数据（分块解压） */
+    private byte[] readLargeEntryData(CentralDirectoryModel entry, String source)
+            throws IOException {
         long totalCompressed = entry.getCompressedSize();
         long totalUncompressed = entry.getUncompressedSize();
         long currentOffset = entry.getDataOffset();
         int methodCode = (int) entry.getCompressionMethod();
         GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
-//        log.debug("使用[{}]适配器处理解压，预期大小: {}字节", type.getText(), entry.getUncompressedSize());
+        //        log.debug("使用[{}]适配器处理解压，预期大小: {}字节", type.getText(),
+        // entry.getUncompressedSize());
 
         // 2. 调用对应适配器的解压方法
         DecompressionHandler handler = type.getHandler();
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Math.min(totalUncompressed, Integer.MAX_VALUE));
+        ByteArrayOutputStream out =
+                new ByteArrayOutputStream((int) Math.min(totalUncompressed, Integer.MAX_VALUE));
 
         try {
             while (totalCompressed > 0) {
                 int chunkSize = (int) Math.min(totalCompressed, MAX_CHUNK_SIZE);
-                byte[] compressedChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
+                byte[] compressedChunk =
+                        readRange(source, currentOffset, currentOffset + chunkSize - 1);
                 byte[] decompress = handler.decompress(compressedChunk, chunkSize);
                 if (decompress != null && decompress.length != 0) {
                     out.write(decompress);
                 }
                 currentOffset += chunkSize;
                 totalCompressed -= chunkSize;
-
             }
 
             if (out.size() != totalUncompressed && totalUncompressed > 0) {
@@ -1371,51 +1498,47 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
     protected int readInt(byte[] data, int offset) {
         if (offset + 4 > data.length) {
-            throw new IndexOutOfBoundsException("读取int越界，offset:" + offset + ", length:" + data.length);
+            throw new IndexOutOfBoundsException(
+                    "读取int越界，offset:" + offset + ", length:" + data.length);
         }
         return ByteBuffer.wrap(data, offset, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     protected short readShort(byte[] data, int offset) {
         if (offset + 2 > data.length) {
-            throw new IndexOutOfBoundsException("读取short越界，offset:" + offset + ", length:" + data.length);
+            throw new IndexOutOfBoundsException(
+                    "读取short越界，offset:" + offset + ", length:" + data.length);
         }
         return ByteBuffer.wrap(data, offset, 2).order(ByteOrder.LITTLE_ENDIAN).getShort();
     }
 
     protected long readLong(byte[] data, int offset) {
         if (offset + 8 > data.length) {
-            throw new IndexOutOfBoundsException("读取long越界，offset:" + offset + ", length:" + data.length);
+            throw new IndexOutOfBoundsException(
+                    "读取long越界，offset:" + offset + ", length:" + data.length);
         }
         return ByteBuffer.wrap(data, offset, 8).order(ByteOrder.LITTLE_ENDIAN).getLong();
     }
 
-    /**
-     * 读取指定范围的字节数据（子类需根据存储类型实现：S3或本地文件）
-     */
+    /** 读取指定范围的字节数据（子类需根据存储类型实现：S3或本地文件） */
     protected abstract byte[] readRange(String source, long start, long end) throws IOException;
 
-    /**
-     * 获取文件大小（子类实现）
-     */
+    /** 获取文件大小（子类实现） */
     @Override
     public abstract long getFileSize(String source);
 
-    /**
-     * 判断路径是否为文件夹路径
-     */
+    /** 判断路径是否为文件夹路径 */
     private boolean isFolderPath(String path) {
         if (path == null || path.isEmpty()) {
             return false;
         }
-        return path.endsWith("/") || path.endsWith("\\") ||
-               path.endsWith(File.separator) ||
-               !path.contains(".") && !path.matches(".+\\.[a-zA-Z0-9]+$");
+        return path.endsWith("/")
+                || path.endsWith("\\")
+                || path.endsWith(File.separator)
+                || !path.contains(".") && !path.matches(".+\\.[a-zA-Z0-9]+$");
     }
 
-    /**
-     * 标准化路径（支持文件夹）
-     */
+    /** 标准化路径（支持文件夹） */
     private String normalizePath(String path) {
         if (path == null || path.isEmpty()) {
             return "";
@@ -1462,5 +1585,4 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
         return normalized;
     }
-
 }

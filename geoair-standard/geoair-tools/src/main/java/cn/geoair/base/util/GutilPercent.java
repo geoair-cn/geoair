@@ -1,26 +1,22 @@
 package cn.geoair.base.util;
 
 import cn.geoair.base.percent.GiPercentUpdateConsumer;
-
 import cn.geoair.base.percent.GirPercentConsumer;
 
-/**
- * 进度条工具类
- * 支持 int, long, float, double 等多种数值类型
- */
+/** 进度条工具类 支持 int, long, float, double 等多种数值类型 */
 public class GutilPercent {
 
     // 默认步长：每10%更新一次
     public static final int DEFAULT_STEP = 10;
     public static final double DEFAULT_STEP_DOUBLE = 10.0;
 
-
-    public static double getUpdatePercentDouble(Number current, Number total, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            Number current, Number total, double[] lastPercent) {
         return getUpdatePercentDouble(current, total, DEFAULT_STEP_DOUBLE, lastPercent);
     }
 
-
-    public static double getUpdatePercentDouble(Number current, Number total, double step, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            Number current, Number total, double step, double[] lastPercent) {
         // 参数校验
         if (total == null || current == null || lastPercent == null || lastPercent.length == 0) {
             return -1.0;
@@ -69,7 +65,6 @@ public class GutilPercent {
         return -1.0;
     }
 
-
     public static double getUpdatePercentDouble(int current, int total) {
         if (total <= 0) {
             return 0.0;
@@ -78,7 +73,6 @@ public class GutilPercent {
         return Math.round(percent * 100.0) / 100.0;
     }
 
-
     public static double getUpdatePercentDouble(long current, long total) {
         if (total <= 0) {
             return 0.0;
@@ -86,7 +80,6 @@ public class GutilPercent {
         double percent = Math.min((double) current / total * 100, 100.0);
         return Math.round(percent * 100.0) / 100.0;
     }
-
 
     public static double getUpdatePercentDouble(float current, float total) {
         if (total <= 0) {
@@ -104,7 +97,6 @@ public class GutilPercent {
         return Math.round(percent * 100.0) / 100.0;
     }
 
-
     public static double getUpdatePercentDouble(Number current, Number total) {
         if (total == null || current == null) {
             return 0.0;
@@ -118,43 +110,50 @@ public class GutilPercent {
         return Math.round(percent * 100.0) / 100.0;
     }
 
-
     public static double getUpdatePercentDouble(int current, int total, double[] lastPercent) {
-        return getUpdatePercentDouble((Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
+        return getUpdatePercentDouble(
+                (Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
     }
 
-    public static double getUpdatePercentDouble(int current, int total, double step, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            int current, int total, double step, double[] lastPercent) {
         return getUpdatePercentDouble((Number) current, (Number) total, step, lastPercent);
     }
 
     public static double getUpdatePercentDouble(long current, long total, double[] lastPercent) {
-        return getUpdatePercentDouble((Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
+        return getUpdatePercentDouble(
+                (Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
     }
 
-    public static double getUpdatePercentDouble(long current, long total, double step, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            long current, long total, double step, double[] lastPercent) {
         return getUpdatePercentDouble((Number) current, (Number) total, step, lastPercent);
     }
 
     public static double getUpdatePercentDouble(float current, float total, double[] lastPercent) {
-        return getUpdatePercentDouble((Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
+        return getUpdatePercentDouble(
+                (Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
     }
 
-    public static double getUpdatePercentDouble(float current, float total, double step, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            float current, float total, double step, double[] lastPercent) {
         return getUpdatePercentDouble((Number) current, (Number) total, step, lastPercent);
     }
 
-    public static double getUpdatePercentDouble(double current, double total, double[] lastPercent) {
-        return getUpdatePercentDouble((Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
+    public static double getUpdatePercentDouble(
+            double current, double total, double[] lastPercent) {
+        return getUpdatePercentDouble(
+                (Number) current, (Number) total, DEFAULT_STEP_DOUBLE, lastPercent);
     }
 
-    public static double getUpdatePercentDouble(double current, double total, double step, double[] lastPercent) {
+    public static double getUpdatePercentDouble(
+            double current, double total, double step, double[] lastPercent) {
         return getUpdatePercentDouble((Number) current, (Number) total, step, lastPercent);
     }
 
     public static String getProgressBar(double percent) {
         return getProgressBar(percent, 50);
     }
-
 
     public static String getProgressBar(double percent, int width) {
         if (width <= 0) width = 50;
@@ -172,32 +171,30 @@ public class GutilPercent {
         return sb.toString();
     }
 
-
     public static String getProgressDisplay(double percent) {
         return getProgressBar(percent) + String.format(" %5.2f%%", percent);
     }
-
 
     public static String getProgressDisplay(double percent, int width) {
         return getProgressBar(percent, width) + String.format(" %5.2f%%", percent);
     }
 
-
-    public static GirPercentConsumer getPercentConsumerDouble(GiPercentUpdateConsumer percentUpdateConsumer, double step) {
+    public static GirPercentConsumer getPercentConsumerDouble(
+            GiPercentUpdateConsumer percentUpdateConsumer, double step) {
         return new GirPercentConsumer(step, percentUpdateConsumer);
     }
 
-    public static GirPercentConsumer getPercentConsumerDouble(GiPercentUpdateConsumer percentUpdateConsumer) {
+    public static GirPercentConsumer getPercentConsumerDouble(
+            GiPercentUpdateConsumer percentUpdateConsumer) {
         return new GirPercentConsumer(percentUpdateConsumer);
     }
-
 
     public static int getUpdatePercentInt(Number current, Number total, int[] lastPercent) {
         return getUpdatePercentInt(current, total, DEFAULT_STEP, lastPercent);
     }
 
-
-    public static int getUpdatePercentInt(Number current, Number total, int step, int[] lastPercent) {
+    public static int getUpdatePercentInt(
+            Number current, Number total, int step, int[] lastPercent) {
         // 参数校验
         if (total == null || current == null || lastPercent == null || lastPercent.length == 0) {
             return -1;
@@ -242,14 +239,12 @@ public class GutilPercent {
         return -1;
     }
 
-
     public static int getUpdatePercentInt(int current, int total) {
         if (total <= 0) {
             return 0;
         }
         return (int) Math.min((double) current / total * 100, 100);
     }
-
 
     public static int getUpdatePercentInt(long current, long total) {
         if (total <= 0) {
@@ -258,7 +253,6 @@ public class GutilPercent {
         return (int) Math.min((double) current / total * 100, 100);
     }
 
-
     public static int getUpdatePercentInt(float current, float total) {
         if (total <= 0) {
             return 0;
@@ -266,14 +260,12 @@ public class GutilPercent {
         return (int) Math.min((double) current / total * 100, 100);
     }
 
-
     public static int getUpdatePercentInt(double current, double total) {
         if (total <= 0) {
             return 0;
         }
         return (int) Math.min(current / total * 100, 100);
     }
-
 
     public static int getUpdatePercentInt(Number current, Number total) {
         if (total == null || current == null) {
@@ -286,7 +278,6 @@ public class GutilPercent {
         double currentDouble = current.doubleValue();
         return (int) Math.min(currentDouble / totalDouble * 100, 100);
     }
-
 
     public static int getUpdatePercentInt(int current, int total, int[] lastPercent) {
         return getUpdatePercentInt((Number) current, (Number) total, DEFAULT_STEP, lastPercent);
@@ -316,28 +307,26 @@ public class GutilPercent {
         return getUpdatePercentInt((Number) current, (Number) total, DEFAULT_STEP, lastPercent);
     }
 
-    public static int getUpdatePercentInt(double current, double total, int step, int[] lastPercent) {
+    public static int getUpdatePercentInt(
+            double current, double total, int step, int[] lastPercent) {
         return getUpdatePercentInt((Number) current, (Number) total, step, lastPercent);
     }
 
-
-    public static GirPercentConsumer getPercentConsumerInt(GiPercentUpdateConsumer percentUpdateConsumer, int step) {
+    public static GirPercentConsumer getPercentConsumerInt(
+            GiPercentUpdateConsumer percentUpdateConsumer, int step) {
         return new GirPercentConsumer(step, percentUpdateConsumer);
     }
 
-    public static GirPercentConsumer getPercentConsumerInt(GiPercentUpdateConsumer percentUpdateConsumer) {
+    public static GirPercentConsumer getPercentConsumerInt(
+            GiPercentUpdateConsumer percentUpdateConsumer) {
         return new GirPercentConsumer(percentUpdateConsumer);
     }
-
 
     public static String getProgressBar(int percent) {
         return getProgressBar(percent, 50);
     }
 
-
-    /**
-     * 获取进度条字符串（自定义宽度）
-     */
+    /** 获取进度条字符串（自定义宽度） */
     public static String getProgressBar(int percent, int width) {
         if (width <= 0) width = 50;
         int filled = Math.min(percent * width / 100, width);
@@ -354,19 +343,13 @@ public class GutilPercent {
         return sb.toString();
     }
 
-    /**
-     * 获取完整进度显示（进度条+百分比）
-     */
+    /** 获取完整进度显示（进度条+百分比） */
     public static String getProgressDisplay(int percent) {
         return getProgressBar(percent) + String.format(" %3d%%", percent);
     }
 
-    /**
-     * 获取完整进度显示（自定义宽度）
-     */
+    /** 获取完整进度显示（自定义宽度） */
     public static String getProgressDisplay(int percent, int width) {
         return getProgressBar(percent, width) + String.format(" %3d%%", percent);
     }
-
-
 }

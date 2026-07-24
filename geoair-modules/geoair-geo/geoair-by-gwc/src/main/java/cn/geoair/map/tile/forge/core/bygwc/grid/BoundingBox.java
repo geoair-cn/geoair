@@ -17,7 +17,6 @@ package cn.geoair.map.tile.forge.core.bygwc.grid;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 
-
 import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -121,7 +120,9 @@ public class BoundingBox implements Serializable {
         coords[3] = maxy;
     }
 
-    /** @return [minx, miny, maxx, maxy] */
+    /**
+     * @return [minx, miny, maxx, maxy]
+     */
     public double[] getCoords() {
         return coords.clone();
     }

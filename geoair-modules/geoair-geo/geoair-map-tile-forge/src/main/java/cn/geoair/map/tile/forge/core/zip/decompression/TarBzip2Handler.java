@@ -8,9 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-/**
- * TAR.BZIP2解压适配器
- */
+/** TAR.BZIP2解压适配器 */
 public class TarBzip2Handler implements DecompressionHandler {
 
     private static final int BUFFER_SIZE = 8192;
@@ -18,9 +16,9 @@ public class TarBzip2Handler implements DecompressionHandler {
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
-             BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais);
-             TarArchiveInputStream tis = new TarArchiveInputStream(bzis);
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais);
+                TarArchiveInputStream tis = new TarArchiveInputStream(bzis);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             TarArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {
@@ -36,7 +34,8 @@ public class TarBzip2Handler implements DecompressionHandler {
 
             byte[] result = baos.toByteArray();
             if (expectedSize > 0 && result.length != expectedSize) {
-                throw new IOException("TAR.BZIP2解压大小不匹配，预期:" + expectedSize + ", 实际:" + result.length);
+                throw new IOException(
+                        "TAR.BZIP2解压大小不匹配，预期:" + expectedSize + ", 实际:" + result.length);
             }
             return result;
         }

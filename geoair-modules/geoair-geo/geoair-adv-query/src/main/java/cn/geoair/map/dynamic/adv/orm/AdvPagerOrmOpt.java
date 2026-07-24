@@ -16,7 +16,6 @@ import java.util.List;
 public interface AdvPagerOrmOpt<M extends GiEntityQueryable<PK>, PK extends Serializable>
         extends GiPagerDao<M, PK> {
 
-
     /**
      * 分页查询单表所有记录
      *
@@ -25,7 +24,6 @@ public interface AdvPagerOrmOpt<M extends GiEntityQueryable<PK>, PK extends Seri
     @Override
     default GiPager<M> gtcSearchPageAll(GiPageParam pageParam) {
         throw new UnsupportedOperationException();
-
     }
 
     /**

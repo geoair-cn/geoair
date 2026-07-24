@@ -9,7 +9,8 @@ import java.util.Base64;
 
 public class StdRawDeserializer extends JsonDeserializer<byte[]> {
     @Override
-    public byte[] deserialize(JsonParser parser, DeserializationContext context) throws IOException {
+    public byte[] deserialize(JsonParser parser, DeserializationContext context)
+            throws IOException {
         String value = parser.getValueAsString();
         if (value == null || value.isEmpty()) {
             return new byte[0];

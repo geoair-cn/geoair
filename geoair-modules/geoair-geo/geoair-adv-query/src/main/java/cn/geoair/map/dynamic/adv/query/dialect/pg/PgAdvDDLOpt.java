@@ -14,16 +14,14 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
+import org.postgresql.jdbc.PgResultSetMetaData;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.postgresql.jdbc.PgResultSetMetaData;
-
-/**
- * PostgreSQL DDL操作实现类
- */
+/** PostgreSQL DDL操作实现类 */
 public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
@@ -185,12 +183,12 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         // 处理长度/精度
         if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
                 && (newField.getUdtName().contains("char")
-                || newField.getUdtName().contains("varchar"))) {
+                        || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
                 && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
                 && (newField.getUdtName().contains("numeric")
-                || newField.getUdtName().contains("decimal"))) {
+                        || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -461,7 +459,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                                 ? ""
                                 : StrUtil.format(
-                                "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
+                                        "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
         return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
 
@@ -690,30 +688,30 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS SELECT * FROM source
-//        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
-//                dstTableName, srcTableName);
-        return StrUtil.format(
-                "INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
+        //        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
+        //                dstTableName, srcTableName);
+        return StrUtil.format("INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target (LIKE source INCLUDING ALL)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
-                dstTableName, srcTableName);
+        return StrUtil.format(
+                "CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
+                dstTableName,
+                srcTableName);
     }
 
     @Override
     protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
-                dstTableName, sql);
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})", dstTableName, sql);
     }
 
     @Override
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) WITH NO DATA
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA",
-                dstTableName, sql);
+        return StrUtil.format(
+                "CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA", dstTableName, sql);
     }
 }

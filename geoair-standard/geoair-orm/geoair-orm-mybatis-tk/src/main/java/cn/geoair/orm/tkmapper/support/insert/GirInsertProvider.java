@@ -1,10 +1,12 @@
 package cn.geoair.orm.tkmapper.support.insert;
 
-import java.util.Set;
 import org.apache.ibatis.mapping.MappedStatement;
+
 import tk.mybatis.mapper.MapperException;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.*;
+
+import java.util.Set;
 
 /** gtcInsertProvider实现类 */
 public class GirInsertProvider extends MapperTemplate {

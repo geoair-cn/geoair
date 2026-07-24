@@ -9,25 +9,25 @@ import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
 
-import cn.geoair.map.dynamic.tools.GirGeoTools;
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureStore;
 import org.geotools.api.data.Transaction;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.*;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 public class PostgisGeoFileWriter implements GeoFileWriter {
 
@@ -119,7 +119,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirGeoTools.defaultInstance().getSridOpt()
+                            GirGeoTools.defaultInstance()
+                                    .getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");
@@ -181,9 +182,15 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put(PostgisNGDataStoreFactory.DBTYPE.key, "postgis");
-            params.put(PostgisNGDataStoreFactory.HOST.key, extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.HOST.key,
+                    extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.PORT.key,
+                    extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.DATABASE.key,
+                    extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());

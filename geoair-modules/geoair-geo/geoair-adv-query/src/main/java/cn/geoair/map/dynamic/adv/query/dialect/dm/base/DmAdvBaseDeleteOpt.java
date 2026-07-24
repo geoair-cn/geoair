@@ -4,6 +4,7 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmDialectTableNameUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.function.Supplier;
 
 /**
@@ -26,7 +27,8 @@ public class DmAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
     }
 
     @Override
-    protected String buildDeleteBatchByConditionSql(String tableName, String whereClause, int batchSize) {
+    protected String buildDeleteBatchByConditionSql(
+            String tableName, String whereClause, int batchSize) {
         return StrUtil.format("DELETE FROM {} WHERE {} AND ROWNUM <= ?", tableName, whereClause);
     }
 }

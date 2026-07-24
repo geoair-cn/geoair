@@ -3,7 +3,9 @@ package cn.geoair.base.data.common;
 import cn.geoair.base.data.GiVisualValuable;
 import cn.geoair.base.data.model.annotation.GaModelField;
 
-/** @author Ray */
+/**
+ * @author Ray
+ */
 public enum GemBoolean implements GiVisualValuable<Integer> {
     是(1),
     否(0);

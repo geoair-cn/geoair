@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
 import java.util.List;
 
 /**
@@ -20,8 +21,11 @@ public class DmAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvDDLOpt advDDLOpt;
 
-    public DmAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
-                              IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
+    public DmAdvSimplePageOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvGeoPreOpt advGeoPreOpt,
+            IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.advDDLOpt = advDDLOpt;

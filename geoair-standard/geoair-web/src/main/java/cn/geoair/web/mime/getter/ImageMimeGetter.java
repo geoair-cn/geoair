@@ -1,17 +1,15 @@
 package cn.geoair.web.mime.getter;
 
+import static cn.geoair.web.mime.GirImageMime.*;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.IMimeTypeGetter;
 
-import static cn.geoair.web.mime.GirImageMime.*;
-
 public class ImageMimeGetter implements IMimeTypeGetter {
 
-
     private static GiLogger log = GirLoggerFactory.getLogger(ImageMimeGetter.class);
-
 
     @Override
     public GiMimeType checkForFormat(String formatStr) {
@@ -57,7 +55,7 @@ public class ImageMimeGetter implements IMimeTypeGetter {
         if (fileExtension.equalsIgnoreCase("png")) {
             return png;
         } else if (fileExtension.equalsIgnoreCase("jpeg")
-                   || fileExtension.equalsIgnoreCase("jpg")) {
+                || fileExtension.equalsIgnoreCase("jpg")) {
             return jpeg;
         } else if (fileExtension.equalsIgnoreCase("gif")) {
             return gif;
@@ -76,5 +74,4 @@ public class ImageMimeGetter implements IMimeTypeGetter {
         }
         return null;
     }
-
 }

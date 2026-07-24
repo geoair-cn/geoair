@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
 import lombok.Data;
+
 import org.locationtech.jts.geom.Envelope;
 
 /**
@@ -75,6 +76,4 @@ public class RangeApo {
     public Envelope getEnvelope() {
         return envelope;
     }
-
-
 }

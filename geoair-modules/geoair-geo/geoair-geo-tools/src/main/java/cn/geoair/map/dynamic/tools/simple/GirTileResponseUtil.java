@@ -5,12 +5,11 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseDefaultOpt;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseOpt;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+
 import jakarta.servlet.http.HttpServletResponse;
 
-
 /**
- * 瓦片响应构建工具
- * 基于TileResponse对象进行响应构建
+ * 瓦片响应构建工具 基于TileResponse对象进行响应构建
  *
  * @author 张俊
  * @date 2026/7/13
@@ -43,13 +42,16 @@ public class GirTileResponseUtil {
         return this;
     }
 
-
     public static void buildFromException(Exception exception, HttpServletResponse response) {
-        GirTileResponseUtil.getInstance().getTileResponseOpt().buildFromException(exception, response);
+        GirTileResponseUtil.getInstance()
+                .getTileResponseOpt()
+                .buildFromException(exception, response);
     }
 
-
-    public static void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response) {
-        GirTileResponseUtil.getInstance().getTileResponseOpt().buildFromTileResponse(tileResponse, response);
+    public static void buildFromTileResponse(
+            TileResponse tileResponse, HttpServletResponse response) {
+        GirTileResponseUtil.getInstance()
+                .getTileResponseOpt()
+                .buildFromTileResponse(tileResponse, response);
     }
 }

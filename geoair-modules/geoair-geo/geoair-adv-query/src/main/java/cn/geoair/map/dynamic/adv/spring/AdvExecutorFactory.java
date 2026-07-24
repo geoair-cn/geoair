@@ -6,16 +6,17 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.extra.spring.SpringUtil;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
- 
 
 /** 高级查询执行器工厂，根据数据源类型自动创建对应执行器 */
- 
 public class AdvExecutorFactory {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     /**
      * 根据数据源类型获取对应的执行器实例
      *
@@ -75,7 +76,9 @@ public class AdvExecutorFactory {
                 return DialectName.POSTGRESQL;
             } else if (dbProductName.contains("ORACLE")) {
                 return DialectName.ORACLE;
-            } else if (dbProductName.contains("DAMENG") || dbProductName.equals("DM") || dbProductName.contains("DM DBMS")) {
+            } else if (dbProductName.contains("DAMENG")
+                    || dbProductName.equals("DM")
+                    || dbProductName.contains("DM DBMS")) {
                 return DialectName.DM;
             } else {
                 throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);

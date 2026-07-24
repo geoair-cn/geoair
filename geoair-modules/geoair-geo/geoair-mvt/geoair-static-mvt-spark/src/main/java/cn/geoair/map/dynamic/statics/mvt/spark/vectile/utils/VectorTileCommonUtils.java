@@ -2,38 +2,31 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfTileParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
-
-import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.bean.BeanUtil;
+
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.GeometryFixer;
+
+import scala.Tuple2;
+import scala.Tuple4;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
- 
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.util.GeometryFixer;
-import scala.Tuple2;
-import scala.Tuple4;
-
-/**
- * 矢量瓦片生成通用工具类 抽离与运行环境无关的核心算法
- */
- 
+/** 矢量瓦片生成通用工具类 抽离与运行环境无关的核心算法 */
 public class VectorTileCommonUtils {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    /**
-     * 通用空间要素转换（单条要素）
-     */
+
+    /** 通用空间要素转换（单条要素） */
     public static GirAdvOneRow transformSingleFeature(
             GirAdvOneRow feature, TileSliceParameter parameter) {
         if (feature == null) return null;
@@ -57,7 +50,8 @@ public class VectorTileCommonUtils {
         }
         // 坐标系转换
         Geometry convertedGeom =
-                GirGeoTools.defaultInstance().getSridOpt()
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
                         .convert(
                                 geometry,
                                 parameter.getSourceDataSrid(),
@@ -66,9 +60,7 @@ public class VectorTileCommonUtils {
         return feature;
     }
 
-    /**
-     * 通用要素映射到瓦片（单条要素）
-     */
+    /** 通用要素映射到瓦片（单条要素） */
     @Deprecated
     public static Map<String, List<GirAdvOneRow>> mapSingleFeatureToTiles(
             GirAdvOneRow feature,
@@ -99,22 +91,27 @@ public class VectorTileCommonUtils {
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
                     try {
-                        String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                        String quadKey =
+                                GirGeoTools.defaultInstance()
+                                        .getTileGridBingMapOpt()
+                                        .xyzToQuadKey(x, y, zoom);
                         // String tileId = zoom + "#" + y + "#" + x;
                         tileMap.computeIfAbsent(quadKey, k -> new ArrayList<>()).add(feature);
                     } catch (Exception e) {
                         // 这个日志不打印，因为会抢占IO
-//                        Geometry convert = GirAdvTools.getSridOpt().convert(geom, outGridSrid, 4326);
-//                        String wktString= GirAdvTools.getFormatOpt().jtsGeometryToWktString(convert, true);
-//                        log.error("瓦片边界计算异常 ! wktString :{},xmin:{},xmax:{},ymin:{},ymax:{},outGrid:{} ", wktString, xmin, xmax, ymin, ymax,outGridSrid);
+                        //                        Geometry convert =
+                        // GirAdvTools.getSridOpt().convert(geom, outGridSrid, 4326);
+                        //                        String wktString=
+                        // GirAdvTools.getFormatOpt().jtsGeometryToWktString(convert, true);
+                        //                        log.error("瓦片边界计算异常 ! wktString
+                        // :{},xmin:{},xmax:{},ymin:{},ymax:{},outGrid:{} ", wktString, xmin, xmax,
+                        // ymin, ymax,outGridSrid);
                     }
-
                 }
             }
         }
         return tileMap;
     }
-
 
     public static Iterator<Tuple2<String, List<GirAdvOneRow>>> mapSingleFeatureToTilesStream(
             GirAdvOneRow feature,
@@ -161,7 +158,10 @@ public class VectorTileCommonUtils {
 
             for (int y = ymin; y <= ymax; y++) {
                 for (int x = xmin; x <= xmax; x++) {
-                    String quadKey = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(x, y, zoom);
+                    String quadKey =
+                            GirGeoTools.defaultInstance()
+                                    .getTileGridBingMapOpt()
+                                    .xyzToQuadKey(x, y, zoom);
                     // String tileId = zoom + "#" + y + "#" + x;
                     tileMap.put(quadKey, feature);
                 }
@@ -170,9 +170,7 @@ public class VectorTileCommonUtils {
         return tileMap;
     }
 
-    /**
-     * 通用瓦片要素聚合
-     */
+    /** 通用瓦片要素聚合 */
     public static List<GirAdvOneRow> aggregateTileFeatures(
             List<GirAdvOneRow> list1, List<GirAdvOneRow> list2) {
         return Stream.concat(list1.stream(), list2.stream()).collect(Collectors.toList());
@@ -215,16 +213,15 @@ public class VectorTileCommonUtils {
         return limitList;
     }
 
-    /**
-     * 通用PBF生成
-     */
+    /** 通用PBF生成 */
     public static PbfInfo generateSingleTilePbf(
             String tileId,
             List<GirAdvOneRow> features,
             TileSliceParameter parameter,
             PbfTargetInfo pbfTargetInfo)
             throws Exception {
-        TileZxyApo tileZxyApo = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
+        TileZxyApo tileZxyApo =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
         int zoom = tileZxyApo.getZ();
         int y = tileZxyApo.getY();
         int x = tileZxyApo.getX();
@@ -247,9 +244,7 @@ public class VectorTileCommonUtils {
                 tileId, rawPbf, features, envelope, zoom, pbfTileParameter);
     }
 
-    /**
-     * 通用PG写入参数构建
-     */
+    /** 通用PG写入参数构建 */
     public static Map<String, String> buildPgWriteParams(TileSliceParameter parameter) {
         PgConnectInfoWithTable pgInfo = parameter.getOutPutConnectWithTable();
         Map<String, String> params = pgInfo.toParams();

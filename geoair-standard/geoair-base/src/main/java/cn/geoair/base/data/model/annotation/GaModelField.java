@@ -21,9 +21,7 @@ public @interface GaModelField {
     @Deprecated
     public String name() default NULL;
 
-    /**
-     * 名称 ,如果是PO对象，这个字段描述的就是数据库字段名称
-     */
+    /** 名称 ,如果是PO对象，这个字段描述的就是数据库字段名称 */
     public String columnName() default NULL;
 
     public String alias() default NULL; // 别名
@@ -31,6 +29,7 @@ public @interface GaModelField {
     public String text() default NULL; // 文本
 
     public String describe() default NULL; // 一段描述，大白话
+
     // public String describe() default NULL;//一段描述，大白话
 
     public boolean isID() default false; // 是否主键
@@ -54,6 +53,4 @@ public @interface GaModelField {
     public String tag() default NULL; // 标记
 
     public GaParameter[] cfg() default {}; // 参数
-
-
 }

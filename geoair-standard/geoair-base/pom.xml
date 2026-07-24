@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-base</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-base</name>
   <description>标准库</description>
@@ -54,10 +54,7 @@
       <version>${jakarta-annotation.version}</version>
     </dependency>
 
-
   </dependencies>
 
-  <build>
-
-  </build>
+  <build></build>
 </project>

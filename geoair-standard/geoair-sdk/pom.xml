@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-sdk</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-sdk</name>
 
@@ -51,7 +51,7 @@
     </dependency>
 
     <dependency>
-       <groupId>jakarta.servlet</groupId>
+      <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>${jakarta-servlet.version}</version>
       <scope>provided</scope>

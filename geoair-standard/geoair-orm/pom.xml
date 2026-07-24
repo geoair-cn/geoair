@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-orm</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-orm</name>
   <description>geoair-orm</description>
@@ -58,8 +58,6 @@
     </dependencies>
   </dependencyManagement>
   <build>
-    <plugins>
-
-    </plugins>
+    <plugins></plugins>
   </build>
 </project>

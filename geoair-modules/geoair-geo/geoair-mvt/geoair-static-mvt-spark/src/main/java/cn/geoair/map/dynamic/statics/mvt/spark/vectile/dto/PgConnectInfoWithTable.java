@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.hutool.core.util.StrUtil;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -19,8 +20,7 @@ public class PgConnectInfoWithTable extends PgConnectInfoSimple {
 
     private String tableName; // 表名（可选，null表示未传）
 
-    public PgConnectInfoWithTable() {
-    }
+    public PgConnectInfoWithTable() {}
 
     public PgConnectInfoWithTable(String url) {
         // pg路径：pg://user@pa/ip:port/db/a.b

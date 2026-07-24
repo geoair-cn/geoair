@@ -53,12 +53,8 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
      */
     public GirAdvOneRow toCamelCase() {
         return new GirAdvOneRow(
-                new CamelCaseLinkedMap<String, Object>
-                        (
-                                new CaseInsensitiveLinkedMap<String, Object>
-                                        (this)
-                        )
-        );
+                new CamelCaseLinkedMap<String, Object>(
+                        new CaseInsensitiveLinkedMap<String, Object>(this)));
     }
 
     /**
@@ -73,7 +69,6 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         }
         return oneRow;
     }
-
 
     /**
      * 转换成简单地mapList
@@ -142,7 +137,6 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         }
         return list;
     }
-
 
     public static List<GirAdvOneRow> ofByEntityList(List<Entity> rows) {
         if (rows == null || rows.isEmpty()) {

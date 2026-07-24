@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-apidoc</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
 
   <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-knife4j-springdoc-spring-boot-starter</name>
 
@@ -42,9 +42,7 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties>
-
-  </properties>
+  <properties></properties>
   <dependencies>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
@@ -85,7 +83,6 @@
       </exclusions>
     </dependency>
 
-
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -96,8 +93,6 @@
       <artifactId>hutool-all</artifactId>
       <version>${hutool.version}</version>
     </dependency>
-
-
 
     <dependency>
       <groupId>org.springframework</groupId>

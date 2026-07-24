@@ -1,15 +1,11 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
-
 import cn.hutool.core.util.ZipUtil;
+
 import java.io.IOException;
 
-/**
- * GZIP解压适配器
- */
+/** GZIP解压适配器 */
 public class GzipHandler implements DecompressionHandler {
-
-
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {

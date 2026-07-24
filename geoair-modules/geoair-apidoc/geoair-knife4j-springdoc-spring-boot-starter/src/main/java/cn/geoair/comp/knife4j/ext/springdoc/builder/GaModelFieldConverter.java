@@ -3,15 +3,18 @@ package cn.geoair.comp.knife4j.ext.springdoc.builder;
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.hutool.core.util.TypeUtil;
+
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.oas.models.media.Schema;
+
+import org.springframework.core.annotation.AnnotationUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Optional;
-import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * GaModelFieldConverter class.

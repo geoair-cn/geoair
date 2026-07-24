@@ -6,15 +6,17 @@ import cn.geoair.base.gpa.dao.GiDeleteDao;
 import cn.geoair.base.gpa.entity.GiEntityRemovable;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
 import tk.mybatis.mapper.common.base.BaseDeleteMapper;
 import tk.mybatis.mapper.common.example.DeleteByExampleMapper;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public interface TkDeleteMapper<T extends GiEntityRemovable<PK>, PK extends Serializable>
         extends MyBatisMapper<T, PK>,

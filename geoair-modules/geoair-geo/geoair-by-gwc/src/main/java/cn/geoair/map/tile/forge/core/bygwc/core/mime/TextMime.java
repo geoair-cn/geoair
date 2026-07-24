@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
 import cn.geoair.web.mime.GirTextMime;
@@ -13,11 +12,13 @@ public class TextMime extends MimeType {
     public static final TextMime txtCss = new TextMime(GirTextMime.txtCss, true);
     public static final TextMime txtJs = new TextMime(GirTextMime.txtJs, true);
 
-
-    private TextMime(
-            GirTextMime girTextMime,
-            boolean noop) {
-        super(girTextMime.getMimeType(), girTextMime.getFileExtension(), girTextMime.getInternalName(), girTextMime.getFormat(), false);
+    private TextMime(GirTextMime girTextMime, boolean noop) {
+        super(
+                girTextMime.getMimeType(),
+                girTextMime.getFileExtension(),
+                girTextMime.getInternalName(),
+                girTextMime.getFormat(),
+                false);
     }
 
     protected static TextMime checkForFormat(String formatStr) throws MimeException {

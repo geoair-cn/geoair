@@ -11,9 +11,7 @@ import java.util.List;
  */
 public interface ICommonRunner {
 
-
     List<GenTableColumn> getTableColumnsByTableName(String tableName);
-
 
     List<GenTable> selectDbTableListByNames(String[] tableNames);
 }

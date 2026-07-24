@@ -4,16 +4,14 @@ import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
+
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算
- */
+/** WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算 */
 public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
     // 公共常量（4326坐标系基础参数）
@@ -42,16 +40,12 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         super(advToolsConfig);
     }
 
-    /**
-     * 数值范围限制（工具方法）
-     */
+    /** 数值范围限制（工具方法） */
     protected double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
 
-    /**
-     * 将几何图形从源坐标系转换为WGS84(4326)
-     */
+    /** 将几何图形从源坐标系转换为WGS84(4326) */
     protected Geometry transform(Geometry geometry, int srcSrid) {
         if (geometry == null || geometry.isEmpty()) return null;
         return sridConvertOpt.convert(geometry, srcSrid, 4326);
@@ -65,8 +59,8 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
      * <p>注意：转换后的等轴Y索引可能是浮点数，需根据业务需求取整（默认向下取整）
      *
      * @param separateAxisY 非等轴Y索引（XYZ规范，原点左上角）
-     * @param zoom          缩放级别（0-30）
-     * @param roundingType  取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
+     * @param zoom 缩放级别（0-30）
+     * @param roundingType 取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
      * @return 等轴Y索引（XYZ规范，原点左上角）
      * @throws IllegalArgumentException 入参不合法时抛出
      */
@@ -119,9 +113,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         return finalEqualY;
     }
 
-    /**
-     * 取整方式枚举（便于明确业务规则）
-     */
+    /** 取整方式枚举（便于明确业务规则） */
     public enum RoundingType {
         FLOOR, // 向下取整
         CEIL, // 向上取整
@@ -133,8 +125,8 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
      *
      * <p>与convertSeparateAxisYToEqualAxisY互为逆运算
      *
-     * @param equalAxisY   等轴Y索引（XYZ规范）
-     * @param zoom         缩放级别（0-30）
+     * @param equalAxisY 等轴Y索引（XYZ规范）
+     * @param zoom 缩放级别（0-30）
      * @param roundingType 取整方式
      * @return 非等轴Y索引（XYZ规范）
      */
@@ -185,23 +177,18 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
     // ========== 子类需实现的差异化核心方法 ==========
 
-    /**
-     * 计算经度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回360/2^z）
-     */
+    /** 计算经度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回360/2^z） */
     protected abstract double calculateTileLonSpan(int z);
 
-    /**
-     * 计算纬度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回180/2^z）
-     */
+    /** 计算纬度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回180/2^z） */
     protected abstract double calculateTileLatSpan(int z);
-
 
     /**
      * 根据最大分辨率层级获取瓦片元数据（支持自定义瓦片尺寸和DPI）
      *
-     * @param maxZoom       最大分辨率层级（最大缩放级别）
+     * @param maxZoom 最大分辨率层级（最大缩放级别）
      * @param tilePixelSize 瓦片像素尺寸（例如：256、512）
-     * @param dpi           屏幕DPI（例如：72、96、300）
+     * @param dpi 屏幕DPI（例如：72、96、300）
      * @return 瓦片层级元数据对象
      */
     public TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi) {
@@ -220,8 +207,9 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
         double scale = groundResolutionDegree * EPSG4326_TO_METERS / (0.0254 / dpi);
         // 计算每像素代表的实际长度（毫米）
-//        double mmPerPixel = groundResolutionDegree * 1000;
-        double mmPerPixel = ((2 * Math.PI * EARTH_RADIUS) / (Math.pow(2, maxZoom) * tilePixelSize)) * 1000;
+        //        double mmPerPixel = groundResolutionDegree * 1000;
+        double mmPerPixel =
+                ((2 * Math.PI * EARTH_RADIUS) / (Math.pow(2, maxZoom) * tilePixelSize)) * 1000;
         // 全局范围（4326坐标系）
         Envelope extent = new Envelope(MIN_LON, MAX_LON, MIN_LAT, MAX_LAT);
 
@@ -238,13 +226,10 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
                 dpi,
                 mmPerPixel,
                 extent,
-                "EPSG:4326"
-        );
+                "EPSG:4326");
     }
 
-    /**
-     * 获取指定层级的度/像素分辨率
-     */
+    /** 获取指定层级的度/像素分辨率 */
     public double getResolution(int zoom, int tilePixelSize) {
         validateXyz(zoom, 0, 0);
         double tileLonSpan = calculateTileLonSpan(zoom);
@@ -258,26 +243,26 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
      * @return 瓦片层级元数据对象
      */
     public TileLevelMetadata getTileLevelMetadata(int maxZoom) {
-        int defaultTileSize = advToolsConfig.getTilePixelSize() > 0
-                ? advToolsConfig.getTilePixelSize() : 256;
-        int defaultDpi = advToolsConfig.getDpi() > 0
-                ? advToolsConfig.getDpi() : 96;
+        int defaultTileSize =
+                advToolsConfig.getTilePixelSize() > 0 ? advToolsConfig.getTilePixelSize() : 256;
+        int defaultDpi = advToolsConfig.getDpi() > 0 ? advToolsConfig.getDpi() : 96;
         return getTileLevelMetadata(maxZoom, defaultTileSize, defaultDpi);
     }
 
     /**
      * 批量获取多个层级的瓦片元数据
      *
-     * @param minZoom       最小层级
-     * @param maxZoom       最大层级
+     * @param minZoom 最小层级
+     * @param maxZoom 最大层级
      * @param tilePixelSize 瓦片像素尺寸
-     * @param dpi           屏幕DPI
+     * @param dpi 屏幕DPI
      * @return 层级元数据列表
      */
-    public List<TileLevelMetadata> getTileLevelMetadataList(int minZoom, int maxZoom,
-                                                            int tilePixelSize, double dpi) {
+    public List<TileLevelMetadata> getTileLevelMetadataList(
+            int minZoom, int maxZoom, int tilePixelSize, double dpi) {
         if (minZoom < 0 || maxZoom < minZoom) {
-            throw new IllegalArgumentException("层级参数无效: minZoom=" + minZoom + ", maxZoom=" + maxZoom);
+            throw new IllegalArgumentException(
+                    "层级参数无效: minZoom=" + minZoom + ", maxZoom=" + maxZoom);
         }
 
         List<TileLevelMetadata> metadataList = new ArrayList<>();
@@ -291,7 +276,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
      * 根据地面分辨率反推合适的瓦片层级
      *
      * @param targetResolution 目标地面分辨率（米/像素）
-     * @param tilePixelSize    瓦片像素尺寸
+     * @param tilePixelSize 瓦片像素尺寸
      * @return 最合适的瓦片层级
      */
     public int getZoomByResolution(double targetResolution, int tilePixelSize) {
@@ -301,7 +286,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
         // 计算每个层级的度/像素分辨率，找到最接近的
         for (int z = 0; z <= 22; z++) {
-            double resolutionDegree = getResolution(z, tilePixelSize);  // 度/像素
+            double resolutionDegree = getResolution(z, tilePixelSize); // 度/像素
 
             if (resolutionDegree <= targetResolution) {
                 return z;
@@ -313,9 +298,9 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     /**
      * 根据比例尺反推合适的瓦片层级
      *
-     * @param targetScale   目标比例尺（例如：10000 表示 1:10000）
+     * @param targetScale 目标比例尺（例如：10000 表示 1:10000）
      * @param tilePixelSize 瓦片像素尺寸
-     * @param dpi           屏幕DPI
+     * @param dpi 屏幕DPI
      * @return 最合适的瓦片层级
      */
     public int getZoomByScale(double targetScale, int tilePixelSize, double dpi) {
@@ -330,14 +315,14 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         return getZoomByResolution(targetResolution, tilePixelSize);
     }
 
-
     @Override
-    public BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
+    public BoxReferencedEnvelope boundsFromTileRange(
+            long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid) {
         validateXyz(zoom, (int) minTileX, (int) minTileY);
         // 计算四个角的瓦片边界
         // 左下角瓦片
         double minX = tileXToCoordinateX((int) minTileX, zoom);
-        double minY = tileYToCoordinateY((int) (maxTileY), zoom);  // 注意Y轴方向
+        double minY = tileYToCoordinateY((int) (maxTileY), zoom); // 注意Y轴方向
 
         // 右上角瓦片
         double maxX = tileXToCoordinateX((int) (maxTileX), zoom);

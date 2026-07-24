@@ -24,8 +24,10 @@ import java.util.function.Supplier;
  */
 public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(dataSourceGetter,configAdvQueryGetter);
+    public PgAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        super(dataSourceGetter, configAdvQueryGetter);
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */

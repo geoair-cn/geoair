@@ -2,17 +2,14 @@ package cn.geoair.map.tile.forge.core.cache.delegate;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.cache.TileCache;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
-import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.hutool.bloomfilter.BloomFilter;
 import cn.hutool.bloomfilter.BloomFilterUtil;
-
- 
-
 
 import java.util.Map;
 import java.util.Objects;
@@ -21,33 +18,28 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * 带缓存的瓦片存储委派包装类
- */
- 
+/** 带缓存的瓦片存储委派包装类 */
 public class CachedTileStorage implements ITileStorageSupport {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     private final ITileStorageSupport delegate;
     private final TileCache tileCache;
 
-
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors() * 2,
-            r -> {
-                Thread t = new Thread(r);
-                t.setName("tile-cache-thread-" + t.getId());
-                t.setDaemon(true); // 守护线程，避免应用退出时阻塞
-                return t;
-            }
-    );
+    private static final ExecutorService executorService =
+            Executors.newFixedThreadPool(
+                    Runtime.getRuntime().availableProcessors() * 2,
+                    r -> {
+                        Thread t = new Thread(r);
+                        t.setName("tile-cache-thread-" + t.getId());
+                        t.setDaemon(true); // 守护线程，避免应用退出时阻塞
+                        return t;
+                    });
 
     private static final int EXPECTED_TILE_COUNT = 100000;
 
     private static final int MAX_LAYER_COUNT = 100;
 
     private final Map<String, BloomFilter> layerBloomFilters = new ConcurrentHashMap<>();
-
 
     public CachedTileStorage(ITileStorageSupport delegate) {
         this.delegate = Objects.requireNonNull(delegate, "瓦片存储实现不能为空");
@@ -60,9 +52,7 @@ public class CachedTileStorage implements ITileStorageSupport {
         return new CachedTileStorage(delegate);
     }
 
-    /**
-     * 获取指定图层的布隆过滤器（懒加载，首次使用时创建）
-     */
+    /** 获取指定图层的布隆过滤器（懒加载，首次使用时创建） */
     private BloomFilter getBloomFilterByLayer(String layerName) {
         // 双重检查锁定：避免重复创建过滤器
         if (!layerBloomFilters.containsKey(layerName)) {
@@ -70,7 +60,10 @@ public class CachedTileStorage implements ITileStorageSupport {
                 if (!layerBloomFilters.containsKey(layerName)) {
                     // 校验图层数上限，避免内存溢出
                     if (layerBloomFilters.size() >= MAX_LAYER_COUNT) {
-                        log.warn("已达最大图层数({})，新图层[{}]的布隆过滤器创建失败，可能导致缓存穿透", MAX_LAYER_COUNT, layerName);
+                        log.warn(
+                                "已达最大图层数({})，新图层[{}]的布隆过滤器创建失败，可能导致缓存穿透",
+                                MAX_LAYER_COUNT,
+                                layerName);
                         return null;
                     }
                     // 创建布隆过滤器：LongMap支持大容量，MurmurHash3哈希算法（默认）
@@ -83,7 +76,9 @@ public class CachedTileStorage implements ITileStorageSupport {
     }
 
     @Override
-    public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
+    public TileRequest getTileData(
+            GirLayerConfigContext layerConfigContext, String z, String x, String y)
+            throws Exception {
         Objects.requireNonNull(layerConfigContext, "图层配置不能为空");
         String layerName = layerConfigContext.getDataId();
         Objects.requireNonNull(layerName, "图层名不能为空");
@@ -128,9 +123,7 @@ public class CachedTileStorage implements ITileStorageSupport {
         return tileData;
     }
 
-    /**
-     * 补全TileRequest的必要字段（避免缓存中字段缺失）
-     */
+    /** 补全TileRequest的必要字段（避免缓存中字段缺失） */
     private void fillTileRequestFields(TileRequest tile, GirLayerConfigContext layerConfigContext) {
         if (tile.getLayerName() == null) {
             tile.setLayerName(layerConfigContext.getLayerName());
@@ -141,13 +134,11 @@ public class CachedTileStorage implements ITileStorageSupport {
         if (tile.getStorageType() == null) {
             tile.setStorageType(layerConfigContext.getStorageType());
         }
-
     }
 
-    /**
-     * 异步将瓦片写入缓存（避免阻塞查询主线程）
-     */
-    private void asyncPutTileToCache(String layerName, String tileKey, TileRequest originalTile, String fileFormat) {
+    /** 异步将瓦片写入缓存（避免阻塞查询主线程） */
+    private void asyncPutTileToCache(
+            String layerName, String tileKey, TileRequest originalTile, String fileFormat) {
         try {
             // 拷贝字节数组（避免原始流被关闭导致数据丢失）
             byte[] tileBytes = originalTile.getBytes().clone();
@@ -164,23 +155,22 @@ public class CachedTileStorage implements ITileStorageSupport {
             cacheTile.setStorageType(originalTile.getStorageType());
 
             // 提交异步任务
-            executorService.submit(() -> {
-                try {
-                    tileCache.putTile(tileKey, cacheTile, fileFormat);
-                    log.trace("异步缓存瓦片成功：{}", tileKey);
-                } catch (Exception e) {
-                    log.error("异步缓存瓦片失败：{}", tileKey, e);
-                }
-            });
+            executorService.submit(
+                    () -> {
+                        try {
+                            tileCache.putTile(tileKey, cacheTile, fileFormat);
+                            log.trace("异步缓存瓦片成功：{}", tileKey);
+                        } catch (Exception e) {
+                            log.error("异步缓存瓦片失败：{}", tileKey, e);
+                        }
+                    });
         } catch (Exception e) {
             log.error("构建缓存瓦片数据失败：{}", tileKey, e);
             // 异常时不影响主线程返回原始数据
         }
     }
 
-    /**
-     * 关闭资源（线程池+布隆过滤器）
-     */
+    /** 关闭资源（线程池+布隆过滤器） */
     private void shutdown() {
         log.info("开始关闭CachedTileStorage资源...");
         // 关闭线程池（等待已提交任务执行完成）
@@ -199,11 +189,11 @@ public class CachedTileStorage implements ITileStorageSupport {
         log.info("CachedTileStorage资源关闭完成");
     }
 
-
     @Override
-    public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
+    public void preCacheTiles(
+            GirLayerConfigContext layerConfigContext,
+            TileCache tileCache,
+            ProgressConsumer progressConsumer) {
         delegate.preCacheTiles(layerConfigContext, tileCache, progressConsumer);
     }
-
-
 }

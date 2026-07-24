@@ -22,9 +22,18 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+
 import com.alibaba.druid.pool.DruidPooledConnection;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,12 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @program: dbApi
@@ -46,7 +49,6 @@ import org.springframework.web.multipart.MultipartFile;
  * @create: 2021-01-19 17:27
  */
 @RestController
-
 @RequestMapping("/ds_api/apiConfig")
 @GaApi(tags = "GirDs api配置")
 public class GirDsApiConfigController {
@@ -313,7 +315,8 @@ public class GirDsApiConfigController {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
             IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            List<GirAdvOneRow> girAdvOneRows =
+                    iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
             return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
@@ -336,7 +339,8 @@ public class GirDsApiConfigController {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
             IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            List<GirAdvOneRow> girAdvOneRows = iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            List<GirAdvOneRow> girAdvOneRows =
+                    iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
             return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());

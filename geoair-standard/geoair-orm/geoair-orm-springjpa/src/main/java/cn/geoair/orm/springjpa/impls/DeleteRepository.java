@@ -2,12 +2,14 @@ package cn.geoair.orm.springjpa.impls;
 
 import cn.geoair.base.gpa.dao.GiDeleteDao;
 import cn.geoair.base.gpa.entity.GiEntityRemovable;
-import java.io.Serializable;
-import java.util.List;
+
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
+import java.util.List;
 
 @NoRepositoryBean
 public interface DeleteRepository<T extends GiEntityRemovable<PK>, PK extends Serializable>

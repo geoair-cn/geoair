@@ -6,13 +6,13 @@ import cn.geoair.base.gpa.dao.GiPagerDao;
 import cn.geoair.base.gpa.entity.GiEntityQueryable;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.springjpa.support.GirSpringJpaPageHelper;
-import java.io.Serializable;
-import java.util.List;
+
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +20,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+
+import java.io.Serializable;
+import java.util.List;
 
 public interface PagerRepository<T extends GiEntityQueryable<PK>, PK extends Serializable>
         extends JpaRepository<T, PK>, JpaSpecificationExecutor<T>, GiPagerDao<T, PK> {

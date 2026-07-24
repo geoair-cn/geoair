@@ -12,7 +12,9 @@ import cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
+
 import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 /**
@@ -34,8 +36,7 @@ public class AdvExecutorDm extends AbstractPxyAdvExecutor {
         super(dataSource, dataSourceName);
     }
 
-    public AdvExecutorDm() {
-    }
+    public AdvExecutorDm() {}
 
     public AdvExecutorDm(Connection connection) {
         super(connection);
@@ -89,7 +90,12 @@ public class AdvExecutorDm extends AbstractPxyAdvExecutor {
         if (simplePageOpt == null) {
             synchronized (this) {
                 if (simplePageOpt == null) {
-                    simplePageOpt = new DmAdvSimplePageOpt(getDataSourceGetter(), getAdvBaseOpt(), getGeoOpt(), getAdvDDLOpt());
+                    simplePageOpt =
+                            new DmAdvSimplePageOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getGeoOpt(),
+                                    getAdvDDLOpt());
                 }
             }
         }
@@ -101,7 +107,8 @@ public class AdvExecutorDm extends AbstractPxyAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new DmAdvGeoOpt(getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
+                    geoOpt =
+                            new DmAdvGeoOpt(getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
                 }
             }
         }
@@ -113,7 +120,12 @@ public class AdvExecutorDm extends AbstractPxyAdvExecutor {
         if (iAdvWhereSelectOpt == null) {
             synchronized (this) {
                 if (iAdvWhereSelectOpt == null) {
-                    iAdvWhereSelectOpt = new DmAdvWhereSelectOpt(getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
+                    iAdvWhereSelectOpt =
+                            new DmAdvWhereSelectOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getSimplePageOpt(),
+                                    getGeoOpt());
                 }
             }
         }

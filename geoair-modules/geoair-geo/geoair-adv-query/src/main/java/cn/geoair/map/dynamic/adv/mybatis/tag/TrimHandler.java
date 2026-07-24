@@ -3,9 +3,11 @@ package cn.geoair.map.dynamic.adv.mybatis.tag;
 import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
 import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
 import cn.geoair.map.dynamic.adv.mybatis.node.TrimSqlNode;
+
+import org.dom4j.Element;
+
 import java.util.Arrays;
 import java.util.List;
-import org.dom4j.Element;
 
 public class TrimHandler implements TagHandler {
 

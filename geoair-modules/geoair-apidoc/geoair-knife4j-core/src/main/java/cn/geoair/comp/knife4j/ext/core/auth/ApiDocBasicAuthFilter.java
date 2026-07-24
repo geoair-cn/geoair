@@ -1,14 +1,13 @@
 package cn.geoair.comp.knife4j.ext.core.auth;
 
-
 import cn.geoair.base.Gir;
 import cn.hutool.core.codec.Base64;
 
 import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 
 public class ApiDocBasicAuthFilter implements Filter {
 
@@ -17,18 +16,21 @@ public class ApiDocBasicAuthFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(
+            ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
         String uri = httpRequest.getRequestURI();
 
         // 只对 swagger 路径进行验证
-        boolean isSwaggerPath = uri.contains("/swagger-ui/") ||
-                uri.contains("/swagger-ui.html") ||
-                uri.contains("/v3/api-docs") ||
-                uri.contains("/swagger-resources") ||
-                uri.contains("/webjars/");
+        boolean isSwaggerPath =
+                uri.contains("/swagger-ui/")
+                        || uri.contains("/swagger-ui.html")
+                        || uri.contains("/v3/api-docs")
+                        || uri.contains("/swagger-resources")
+                        || uri.contains("/webjars/");
 
         if (isSwaggerPath) {
             String authHeader = httpRequest.getHeader("Authorization");
@@ -41,7 +43,9 @@ public class ApiDocBasicAuthFilter implements Filter {
                 String USERNAME = Gir.property.getProperty("geoair.apidoc.auth.username");
                 String PASSWORD = Gir.property.getProperty("geoair.apidoc.auth.password");
 
-                if (values.length == 2 && USERNAME.equals(values[0]) && PASSWORD.equals(values[1])) {
+                if (values.length == 2
+                        && USERNAME.equals(values[0])
+                        && PASSWORD.equals(values[1])) {
                     filterChain.doFilter(servletRequest, servletResponse);
                     return;
                 }

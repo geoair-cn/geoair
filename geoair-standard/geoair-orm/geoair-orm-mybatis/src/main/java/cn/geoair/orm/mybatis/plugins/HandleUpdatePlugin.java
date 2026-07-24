@@ -1,10 +1,5 @@
 package cn.geoair.orm.mybatis.plugins;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.Interceptor;
@@ -14,15 +9,19 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 @Intercepts(
-    value = {
-        @Signature(
-            type = Executor.class,
-            method = "update",
-            args = {MappedStatement.class, Object.class}
-        )
-    }
-)
+        value = {
+            @Signature(
+                    type = Executor.class,
+                    method = "update",
+                    args = {MappedStatement.class, Object.class})
+        })
 @Component
 public class HandleUpdatePlugin implements Interceptor {
 

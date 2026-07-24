@@ -15,9 +15,9 @@ public interface TileCache {
      * 从缓存获取瓦片
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 瓦片字节数组，不存在则返回null
      */
@@ -27,10 +27,10 @@ public interface TileCache {
      * 保存瓦片到缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
-     * @param data      瓦片数据
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
+     * @param data 瓦片数据
      * @param format
      * @return 是否保存成功
      */
@@ -48,8 +48,8 @@ public interface TileCache {
      * 删除指定瓦片的缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
+     * @param z 层级
+     * @param x X坐标
      * @return 是否删除成功
      */
     boolean delete(String layerName, Integer z, Integer x);
@@ -58,17 +58,15 @@ public interface TileCache {
      * 删除指定瓦片的缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 是否删除成功
      */
     boolean delete(String layerName, int z, int x, int y, GiMimeType format);
 
-    /**
-     * 清空所有缓存
-     */
+    /** 清空所有缓存 */
     void clearAll();
 
     /**
@@ -82,9 +80,9 @@ public interface TileCache {
      * 检查缓存是否存在
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 是否存在
      */

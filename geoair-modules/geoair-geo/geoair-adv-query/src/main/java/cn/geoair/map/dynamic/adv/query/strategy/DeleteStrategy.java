@@ -17,30 +17,19 @@ import java.util.List;
 @Accessors(chain = true)
 public class DeleteStrategy {
 
-    /**
-     * 主键字段名（优先级高于注解）
-     */
+    /** 主键字段名（优先级高于注解） */
     String idKey;
 
-    /**
-     * 表名（优先级高于注解）
-     */
+    /** 表名（优先级高于注解） */
     String tableName;
 
-    /**
-     * 需要忽略的字段列表（实体属性名，用于逻辑删除时排除某些字段）
-     */
+    /** 需要忽略的字段列表（实体属性名，用于逻辑删除时排除某些字段） */
     List<String> ignoreFieldNames = new ArrayList<>();
 
-    /**
-     * 是否对实体类进行驼峰转下划线
-     */
+    /** 是否对实体类进行驼峰转下划线 */
     boolean toUnderlineCase = true;
 
-
-    /**
-     * 辅助方法：添加忽略字段
-     */
+    /** 辅助方法：添加忽略字段 */
     public DeleteStrategy ignoreField(String... fieldNames) {
         this.ignoreFieldNames.addAll(Arrays.asList(fieldNames));
         return this;

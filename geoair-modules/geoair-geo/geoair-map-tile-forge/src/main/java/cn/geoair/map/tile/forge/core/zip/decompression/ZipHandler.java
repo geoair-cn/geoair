@@ -1,16 +1,11 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
-
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-/**
- * ZIP(DEFLATE算法)解压适配器
- */
+/** ZIP(DEFLATE算法)解压适配器 */
 public class ZipHandler implements DecompressionHandler {
-
-
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {

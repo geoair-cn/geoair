@@ -15,8 +15,7 @@ public class TileExecutorFactory {
      * @param layerName 图层名称
      * @return 对应版本的 ITileExecutor 实例
      */
-    public static ITileExecutor getInstance(
-            TileRequestParams params, String layerName) {
+    public static ITileExecutor getInstance(TileRequestParams params, String layerName) {
 
         return VectorTileExecutorV2.getInstance(params, layerName);
     }

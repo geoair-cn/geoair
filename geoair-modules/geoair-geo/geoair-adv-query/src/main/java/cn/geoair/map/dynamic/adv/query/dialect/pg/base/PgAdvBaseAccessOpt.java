@@ -9,9 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑
- */
+/** PostgreSQL插入操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
 public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
     public PgAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
@@ -26,13 +24,13 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     // PG默认主键字段
     private static final String PG_DEFAULT_PRIMARY_KEY = "id";
 
-
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String conflictFields = "";
         if (GutilObject.isNotEmpty(conflictKeys)) {
             conflictFields = StrUtil.join(",", conflictKeys);
-            conflictFields=   StrUtil.wrap(conflictFields,"(",")");
+            conflictFields = StrUtil.wrap(conflictFields, "(", ")");
         }
         return StrUtil.format(
                 "INSERT INTO {} ({}) VALUES ({}) {} {} DO NOTHING",
@@ -42,6 +40,4 @@ public class PgAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
                 PG_CONFLICT_CLAUSE,
                 conflictFields);
     }
-
-
 }

@@ -1,52 +1,52 @@
-//package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
+// package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
 //
-//import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-//import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-//import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
-//import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-//import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-//import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoBase;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
-//import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
-//import cn.hutool.core.lang.caller.CallerUtil;
-//import cn.hutool.core.util.IdUtil;
-//import cn.hutool.core.util.StrUtil;
-//import cn.hutool.json.JSONObject;
-//import cn.hutool.json.JSONUtil;
-//import cn.hutool.log.Log;
-//import cn.hutool.log.LogFactory;
+// import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+// import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
+// import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
+// import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+// import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+// import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoBase;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
+// import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
+// import cn.hutool.core.lang.caller.CallerUtil;
+// import cn.hutool.core.util.IdUtil;
+// import cn.hutool.core.util.StrUtil;
+// import cn.hutool.json.JSONObject;
+// import cn.hutool.json.JSONUtil;
+// import cn.hutool.log.Log;
+// import cn.hutool.log.LogFactory;
 //
-//import lombok.extern.slf4j.Slf4j;
+// import lombok.extern.slf4j.Slf4j;
 //
-//import org.apache.commons.lang3.StringUtils;
-//import org.apache.spark.api.java.JavaFutureAction;
-//import org.apache.spark.api.java.JavaPairRDD;
-//import org.apache.spark.api.java.JavaRDD;
-//import org.apache.spark.api.java.JavaSparkContext;
-//import org.apache.spark.api.java.function.VoidFunction;
-//import org.apache.spark.sql.*;
-//import org.apache.spark.storage.StorageLevel;
+// import org.apache.commons.lang3.StringUtils;
+// import org.apache.spark.api.java.JavaFutureAction;
+// import org.apache.spark.api.java.JavaPairRDD;
+// import org.apache.spark.api.java.JavaRDD;
+// import org.apache.spark.api.java.JavaSparkContext;
+// import org.apache.spark.api.java.function.VoidFunction;
+// import org.apache.spark.sql.*;
+// import org.apache.spark.storage.StorageLevel;
 //
-//import scala.Tuple2;
+// import scala.Tuple2;
 //
-//import java.io.Serializable;
-//import java.sql.Connection;
-//import java.sql.DriverManager;
-//import java.sql.PreparedStatement;
-//import java.util.*;
-//import java.util.concurrent.atomic.AtomicLong;
+// import java.io.Serializable;
+// import java.sql.Connection;
+// import java.sql.DriverManager;
+// import java.sql.PreparedStatement;
+// import java.util.*;
+// import java.util.concurrent.atomic.AtomicLong;
 //
-//import javax.sql.DataSource;
+// import javax.sql.DataSource;
 //
-//@Slf4j
-//public class SparkVectorTileGeneratorAll implements Serializable {
+// @Slf4j
+// public class SparkVectorTileGeneratorAll implements Serializable {
 //
 //    private transient SparkSession sparkSession;
 //
@@ -132,7 +132,8 @@
 //            instance.setSaveFeatureList(true);
 //            JavaRDD<Tuple2<String, PbfInfo>> pbfRDD =
 //                    aggregatedRDDByZoom.map(
-//                            new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, instance));
+//                            new SparkTaskSerializableUtil.GeneratePbfFunction(parameter,
+// instance));
 //            // 抽样500个pbf瓦片,然后转成rdd，避免oom，无解
 //            JavaFutureAction<List<Tuple2<String, PbfInfo>>> listJavaFutureAction =
 //                    pbfRDD.takeAsync(500);
@@ -176,7 +177,8 @@
 //            createTableDDL(parameter.getTableNameLabel(), parameter);
 //        }
 //
-//        if (parameter.isCreateBoundary() && StrUtil.isNotBlank(parameter.getTableNameBoundary())) {
+//        if (parameter.isCreateBoundary() && StrUtil.isNotBlank(parameter.getTableNameBoundary()))
+// {
 //            log.info("开始流式写入Boundary图层，表名：{}", parameter.getTableNameBoundary());
 //            createTableDDL(parameter.getTableNameBoundary(), parameter);
 //        }
@@ -231,7 +233,8 @@
 //
 //                                // ===== 初始化三个表的PreparedStatement =====
 //                                String insertSqlTemplate =
-//                                        "INSERT INTO %s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//                                        "INSERT INTO %s (id, z, x, tms_y, y, grid_srid, tile_data,
+// layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 //                                // Root表
 //                                if (StringUtils.isNotBlank(rootTableName)) {
 //                                    rootPstmt =
@@ -254,7 +257,8 @@
 //                                            conn.prepareStatement(
 //                                                    String.format(
 //                                                            insertSqlTemplate,
-//                                                            StrUtil.wrap(boundaryTableName, "\"")));
+//                                                            StrUtil.wrap(boundaryTableName,
+// "\"")));
 //                                }
 //
 //                                // 初始化PBF生成函数
@@ -352,7 +356,8 @@
 //                                        && !labelBatchRows.isEmpty()) {
 //                                    executeBatchInsert(labelPstmt, labelBatchRows);
 //                                    conn.commit();
-//                                    log.info("分区内Label表剩余批次写入完成，累计写入瓦片数：{}", labelBatchCount.get());
+//                                    log.info("分区内Label表剩余批次写入完成，累计写入瓦片数：{}",
+// labelBatchCount.get());
 //                                }
 //                                // 3. Boundary表剩余数据
 //                                if (StringUtils.isNotBlank(boundaryTableName)
@@ -407,7 +412,8 @@
 //    }
 //
 //    /** 执行批次插入 */
-//    private void executeBatchInsert(PreparedStatement pstmt, List<Row> batchRows) throws Exception {
+//    private void executeBatchInsert(PreparedStatement pstmt, List<Row> batchRows) throws Exception
+// {
 //        for (Row row : batchRows) {
 //            // 按schema顺序设置参数
 //            pstmt.setString(1, IdUtil.getSnowflakeNextIdStr()); // z
@@ -426,7 +432,8 @@
 //    }
 //
 //    /** 按ID分片读取PostGIS数据（仅此处persist rawFeatures） */
-//    private JavaRDD<GirAdvOneRow> readDataByIdPage(TileSliceParameter parameter) throws Exception {
+//    private JavaRDD<GirAdvOneRow> readDataByIdPage(TileSliceParameter parameter) throws Exception
+// {
 //        if (parameter == null || parameter.getInputConnectInfo() == null) {
 //            throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
 //        }
@@ -445,8 +452,10 @@
 //                Optional.ofNullable(parameter.getMaxPartionNum()).orElse(DEFAULT_MAX_PARTITION);
 //        int calcPartitionNum = (int) Math.ceil((double) totalCount / maxRowPerPartition);
 //        maxPartionNum =
-//                Math.min(Math.min(maxPartionNum, calcPartitionNum), (int) Math.max(1, totalCount));
-//        log.info("ID分页分片数量：{}（总数据量：{}，单分区最大条数：{}）", maxPartionNum, totalCount, maxRowPerPartition);
+//                Math.min(Math.min(maxPartionNum, calcPartitionNum), (int) Math.max(1,
+// totalCount));
+//        log.info("ID分页分片数量：{}（总数据量：{}，单分区最大条数：{}）", maxPartionNum, totalCount,
+// maxRowPerPartition);
 //
 //        int countPerTask = (int) Math.ceil((double) totalCount / maxPartionNum);
 //        countPerTask = Math.min(Math.max(countPerTask, 100), maxRowPerPartition);
@@ -552,4 +561,4 @@
 //            iAdvExecutor.dExecuteDDL(sqlDDL, tableName, "创建表");
 //        }
 //    }
-//}
+// }

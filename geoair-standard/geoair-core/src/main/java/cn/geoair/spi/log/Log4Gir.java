@@ -7,6 +7,7 @@ import cn.geoair.base.log.*;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.text.GuStrFormatter;
 import cn.geoair.base.util.GutilClass;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,16 +20,15 @@ public class Log4Gir {
         CONSOLE
     }
 
-
     private static LogType logType;
 
     static {
         GkMethodHand.implFromClass(GirLogger.class);
         GkMethodHand.implFromClass(GirLoggerFactory.class);
-        if (GutilClass.isPresent(
-                "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
+        if (GutilClass.isPresent("cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.HUTOOL);
-        } else if (GutilClass.isPresent("org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
+        } else if (GutilClass.isPresent(
+                "org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
             Log4Gir.setLogType(LogType.SLF4J);
         } else if (GutilClass.isPresent(
                 "org.apache.commons.logging.LogFactory", ApacheCommonsLog.class.getClassLoader())) {
@@ -45,18 +45,15 @@ public class Log4Gir {
     @GaMethodHandImpl(
             implClass = GirLogger.class,
             implMethod = "getLoger",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     public static GiLogger getLoger(String name) {
         return getLogger(name);
     }
 
-
     @GaMethodHandImpl(
             implClass = GirLoggerFactory.class,
             implMethod = "getLogger",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     public static GiLogger getLogger(String name) {
         switch (logType) {
             case SLF4J:
@@ -276,7 +273,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.fatal(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            logger.fatal(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -298,7 +296,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.error(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            logger.error(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -320,8 +319,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.warn(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
-
+            logger.warn(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -343,8 +342,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.info(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
-
+            logger.info(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -366,7 +365,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.debug(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            logger.debug(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -388,7 +388,8 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.trace(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            logger.trace(
+                    GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
         }
 
         @Override
@@ -492,7 +493,6 @@ public class Log4Gir {
                 FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
                 logger.warn(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
             }
-
         }
 
         @Override
@@ -547,7 +547,6 @@ public class Log4Gir {
                 FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
                 logger.trace(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
             }
-
         }
 
         @Override

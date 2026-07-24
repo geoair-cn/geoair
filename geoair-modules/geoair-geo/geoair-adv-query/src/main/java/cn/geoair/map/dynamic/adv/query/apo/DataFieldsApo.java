@@ -4,12 +4,14 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author yulei
@@ -66,8 +68,7 @@ public class DataFieldsApo implements Serializable {
 
     public List<FieldBySchemaApo> getDataFieldList(boolean includeGeom) {
         return Collections.unmodifiableList(
-                dataFieldList
-                        .stream()
+                dataFieldList.stream()
                         .map(
                                 fieldBySchemaApo -> {
                                     FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();
@@ -80,8 +81,7 @@ public class DataFieldsApo implements Serializable {
 
     public Optional<FieldBySchemaApo> getDataField(
             Function<FieldBySchemaApo, FieldBySchemaApo> mapper) {
-        return dataFieldList
-                .stream()
+        return dataFieldList.stream()
                 .map(
                         fieldBySchemaApo -> {
                             FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();
@@ -94,8 +94,7 @@ public class DataFieldsApo implements Serializable {
     }
 
     public <R> List<R> getFieldList(Function<FieldBySchemaApo, R> mapper, boolean includeGeom) {
-        return this.dataFieldList
-                .stream()
+        return this.dataFieldList.stream()
                 .map(
                         fieldBySchemaApo -> {
                             FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();
@@ -119,15 +118,13 @@ public class DataFieldsApo implements Serializable {
         if (ObjectUtil.isEmpty(dataFieldList)) {
             return Collections.emptyList();
         }
-        return dataFieldList
-                .stream()
+        return dataFieldList.stream()
                 .map(FieldBySchemaApo::getColumnName)
                 .collect(Collectors.toList());
     }
 
     public Optional<FieldBySchemaApo> getGeomField() {
-        return this.dataFieldList
-                .stream()
+        return this.dataFieldList.stream()
                 .map(
                         fieldBySchemaApo -> {
                             FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();
@@ -139,8 +136,7 @@ public class DataFieldsApo implements Serializable {
     }
 
     public List<FieldBySchemaApo> getGeomFields() {
-        return this.dataFieldList
-                .stream()
+        return this.dataFieldList.stream()
                 .map(
                         fieldBySchemaApo -> {
                             FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();
@@ -152,8 +148,7 @@ public class DataFieldsApo implements Serializable {
     }
 
     public List<FieldBySchemaApo> getPrimaryKeys() {
-        return this.dataFieldList
-                .stream()
+        return this.dataFieldList.stream()
                 .map(
                         fieldBySchemaApo -> {
                             FieldBySchemaApo copyFieldBySchemaApo = new FieldBySchemaApo();

@@ -6,7 +6,6 @@ import cn.hutool.core.img.Img;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
@@ -16,12 +15,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
+
 /**
  * @author ：张俊
  * @date ：Created in 2026/7/1 13:15
  * @description： 图像处理工具类
  */
-
 public class GirImageUtil extends ImgUtil {
 
     private static GiLogger log = GirLoggerFactory.getLogger();
@@ -44,7 +44,8 @@ public class GirImageUtil extends ImgUtil {
         }
     }
 
-    public static void compressImage(File inputFile, File outputFile, float quality) throws IOException {
+    public static void compressImage(File inputFile, File outputFile, float quality)
+            throws IOException {
         if (inputFile == null || !inputFile.exists()) {
             throw new IllegalArgumentException("输入文件不存在或为空");
         }
@@ -59,29 +60,25 @@ public class GirImageUtil extends ImgUtil {
             throw new IllegalArgumentException("无法解析图片数据，请确认输入为有效图片");
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Img.from(image)
-                .setQuality(quality)
-                .write(outputStream);
+        Img.from(image).setQuality(quality).write(outputStream);
         return outputStream.toByteArray();
     }
 
-
     // ========== 各等级增强实现 ==========
-
 
     // ========== 1. USM 锐化 ==========
 
     /**
-     * USM 锐化（Unsharp Mask）
-     * 原理：原图 - 高斯模糊图 = 边缘细节，再把细节加回原图
+     * USM 锐化（Unsharp Mask） 原理：原图 - 高斯模糊图 = 边缘细节，再把细节加回原图
      *
-     * @param src       原始图片
-     * @param radius    模糊半径（推荐 1.0 - 3.0）
-     * @param amount    锐化强度（推荐 0.5 - 2.0）
+     * @param src 原始图片
+     * @param radius 模糊半径（推荐 1.0 - 3.0）
+     * @param amount 锐化强度（推荐 0.5 - 2.0）
      * @param threshold 亮度阈值（推荐 0 - 10，忽略微小变化）
      * @return 锐化后的 BufferedImage
      */
-    public static BufferedImage unSharpMask(BufferedImage src, float radius, float amount, int threshold) {
+    public static BufferedImage unSharpMask(
+            BufferedImage src, float radius, float amount, int threshold) {
         BufferedImage blurred = gaussianBlur(src, radius);
 
         int width = src.getWidth();
@@ -93,8 +90,12 @@ public class GirImageUtil extends ImgUtil {
                 int rgbSrc = src.getRGB(x, y);
                 int rgbBlur = blurred.getRGB(x, y);
 
-                int r = enhanceChannel((rgbSrc >> 16) & 0xFF, (rgbBlur >> 16) & 0xFF, amount, threshold);
-                int g = enhanceChannel((rgbSrc >> 8) & 0xFF, (rgbBlur >> 8) & 0xFF, amount, threshold);
+                int r =
+                        enhanceChannel(
+                                (rgbSrc >> 16) & 0xFF, (rgbBlur >> 16) & 0xFF, amount, threshold);
+                int g =
+                        enhanceChannel(
+                                (rgbSrc >> 8) & 0xFF, (rgbBlur >> 8) & 0xFF, amount, threshold);
                 int b = enhanceChannel(rgbSrc & 0xFF, rgbBlur & 0xFF, amount, threshold);
 
                 int a = (rgbSrc >> 24) & 0xFF;
@@ -114,15 +115,14 @@ public class GirImageUtil extends ImgUtil {
 
     public static BufferedImage gaussianBlur(BufferedImage src, float radius) {
         float[] matrix = {
-                1 / 16f, 2 / 16f, 1 / 16f,
-                2 / 16f, 4 / 16f, 2 / 16f,
-                1 / 16f, 2 / 16f, 1 / 16f
+            1 / 16f, 2 / 16f, 1 / 16f,
+            2 / 16f, 4 / 16f, 2 / 16f,
+            1 / 16f, 2 / 16f, 1 / 16f
         };
         Kernel kernel = new Kernel(3, 3, matrix);
         ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
         return op.filter(src, null);
     }
-
 
     // ========== 3. 饱和度增强 ==========
 
@@ -167,7 +167,7 @@ public class GirImageUtil extends ImgUtil {
             h *= 60;
             if (h < 0) h += 360;
         }
-        return new float[]{h, s, v};
+        return new float[] {h, s, v};
     }
 
     public static int hsvToRgb(float[] hsv) {
@@ -211,9 +211,9 @@ public class GirImageUtil extends ImgUtil {
                 b = q;
                 break;
         }
-        return (clamp((int) (r * 255)) << 16) |
-               (clamp((int) (g * 255)) << 8) |
-               clamp((int) (b * 255));
+        return (clamp((int) (r * 255)) << 16)
+                | (clamp((int) (g * 255)) << 8)
+                | clamp((int) (b * 255));
     }
 
     // ========== 4. Gamma 校正 ==========
@@ -292,9 +292,11 @@ public class GirImageUtil extends ImgUtil {
                 for (int dy = -half; dy < half; dy++) {
                     for (int dx = -half; dx < half; dx++) {
                         int rgb = src.getRGB(x + dx, y + dy);
-                        int gray = (int) (0.299 * ((rgb >> 16) & 0xFF) +
-                                          0.587 * ((rgb >> 8) & 0xFF) +
-                                          0.114 * (rgb & 0xFF));
+                        int gray =
+                                (int)
+                                        (0.299 * ((rgb >> 16) & 0xFF)
+                                                + 0.587 * ((rgb >> 8) & 0xFF)
+                                                + 0.114 * (rgb & 0xFF));
                         hist[gray]++;
                     }
                 }
@@ -359,9 +361,7 @@ public class GirImageUtil extends ImgUtil {
         return Math.min(255, Math.max(0, value));
     }
 
-    /**
-     * 检测图片格式
-     */
+    /** 检测图片格式 */
     public static String detectImageFormat(byte[] bytes) {
         if (bytes.length < 4) {
             return "png";
@@ -381,9 +381,7 @@ public class GirImageUtil extends ImgUtil {
         return "png";
     }
 
-    /**
-     * 保存 BufferedImage 到文件
-     */
+    /** 保存 BufferedImage 到文件 */
     private static void saveImage(BufferedImage image, String basePath, String name, String ext) {
         try {
             File output = new File(basePath, name + ext);
@@ -398,9 +396,7 @@ public class GirImageUtil extends ImgUtil {
         }
     }
 
-    /**
-     * 统计生成的文件数量
-     */
+    /** 统计生成的文件数量 */
     private static int countFiles(String basePath, String fileName) {
         File dir = new File(basePath);
         File[] files = dir.listFiles((d, name) -> name.startsWith(fileName));
@@ -409,7 +405,8 @@ public class GirImageUtil extends ImgUtil {
 
     public static void main(String[] args) throws IOException {
 
-        File testFile = new File("H:\\tmp\\gwc_fuser\\tile_cache\\osm_original_grid\\4\\10/2101.png");
+        File testFile =
+                new File("H:\\tmp\\gwc_fuser\\tile_cache\\osm_original_grid\\4\\10/2101.png");
         if (!testFile.exists()) {
             System.out.println("测试文件不存在，请修改路径: " + testFile.getAbsolutePath());
             return;
@@ -428,7 +425,6 @@ public class GirImageUtil extends ImgUtil {
         System.out.println("原图类型: " + originalImage.getType());
         System.out.println();
 
-
         System.out.println("【测试1: radius 参数测试】");
         System.out.println("固定条件: amount=1.2, threshold=5");
         float[] radiusValues = {0.5f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f};
@@ -438,7 +434,6 @@ public class GirImageUtil extends ImgUtil {
             System.out.println("  radius=" + radius + " 完成");
         }
         System.out.println();
-
 
         System.out.println("【测试2: amount 参数测试】");
         System.out.println("固定条件: radius=1.5, threshold=5");
@@ -538,16 +533,19 @@ public class GirImageUtil extends ImgUtil {
         System.out.println("共生成 " + countFiles(basePath, fileName) + " 个测试图片");
         System.out.println();
         System.out.println("【USM 参数选择指南】");
-        System.out.println("  ┌─────────────┬──────────┬──────────┬───────────┬─────────────────────┐");
+        System.out.println(
+                "  ┌─────────────┬──────────┬──────────┬───────────┬─────────────────────┐");
         System.out.println("  │ 场景        │ radius   │ amount   │ threshold │ 说明                │");
-        System.out.println("  ├─────────────┼──────────┼──────────┼───────────┼─────────────────────┤");
+        System.out.println(
+                "  ├─────────────┼──────────┼──────────┼───────────┼─────────────────────┤");
         System.out.println("  │ 轻度锐化    │ 1.0      │ 0.5-0.8  │ 8-10      │ 已经很清晰的图      │");
         System.out.println("  │ 标准锐化    │ 1.5      │ 1.0-1.5  │ 5-8       │ 大多数场景推荐      │");
         System.out.println("  │ 重度锐化    │ 2.0      │ 1.8-2.5  │ 2-5       │ 模糊的图            │");
         System.out.println("  │ 去噪锐化    │ 1.2      │ 0.8-1.0  │ 10-15     │ 有噪点的图          │");
         System.out.println("  │ 边缘增强    │ 2.5-3.0  │ 0.8-1.2  │ 5-8       │ 增强轮廓            │");
         System.out.println("  │ 极致锐化    │ 2.0-3.0  │ 2.5-3.0  │ 0-2       │ 严重模糊，可能有噪点│");
-        System.out.println("  └─────────────┴──────────┴──────────┴───────────┴─────────────────────┘");
+        System.out.println(
+                "  └─────────────┴──────────┴──────────┴───────────┴─────────────────────┘");
         System.out.println();
         System.out.println("【参数说明】");
         System.out.println("  • radius（模糊半径）: 控制边缘检测范围，越大边缘越粗，推荐 1.0-3.0");
@@ -560,15 +558,11 @@ public class GirImageUtil extends ImgUtil {
         System.out.println("  3. 最后看极端测试，了解参数极限效果");
     }
 
-    /**
-     * 格式化浮点数，去掉多余的小数点
-     */
+    /** 格式化浮点数，去掉多余的小数点 */
     private static String formatFloat(float value) {
         if (value == (int) value) {
             return String.valueOf((int) value);
         }
         return String.valueOf(value).replace(".", "");
     }
-
-
 }

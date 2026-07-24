@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-orm-mybatis-tk</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>jar</packaging>
 
   <name>geoair-mybatis-tk</name>
@@ -80,8 +80,8 @@
       <version>${mapper-module.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>persistence-api</artifactId>
           <groupId>jakarta.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -91,8 +91,8 @@
       <version>${mapper-module.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>persistence-api</artifactId>
           <groupId>jakarta.persistence</groupId>
+          <artifactId>persistence-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

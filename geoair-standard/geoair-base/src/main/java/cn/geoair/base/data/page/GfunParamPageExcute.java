@@ -2,10 +2,13 @@ package cn.geoair.base.data.page;
 
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
-/** @author Ray */
+/**
+ * @author Ray
+ */
 @FunctionalInterface
 public interface GfunParamPageExcute<P, R> {
 

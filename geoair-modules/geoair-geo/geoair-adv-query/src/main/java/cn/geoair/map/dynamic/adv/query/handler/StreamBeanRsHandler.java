@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.handler;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMapper;
 import cn.hutool.db.handler.RsHandler;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

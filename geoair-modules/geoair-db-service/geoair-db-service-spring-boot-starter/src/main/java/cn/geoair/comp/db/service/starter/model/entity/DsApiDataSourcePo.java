@@ -6,13 +6,16 @@ import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.gpa.entity.GiCrudEntity;
 import cn.geoair.base.gpa.id.GiEntityIdGenerator;
 import cn.hutool.core.bean.BeanUtil;
+
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.util.Date;
-import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * 数据源信息(DbapiDatasource)实体类

@@ -17,16 +17,17 @@ import java.util.function.Supplier;
 /**
  * Oracle数据库的动态高级查询基础操作实现类
  *
- * <p>实现了IAdvBaseOpt接口，通过组合方式复用各细分操作类（插入/查询/更新/删除）的实现， 统一对外提供Oracle数据库的全量基础操作，
- * 封装了代理对象的初始化和数据源注入。
+ * <p>实现了IAdvBaseOpt接口，通过组合方式复用各细分操作类（插入/查询/更新/删除）的实现， 统一对外提供Oracle数据库的全量基础操作， 封装了代理对象的初始化和数据源注入。
  *
  * @author 张逢吉
  * @date 2025/10/9 10:16
  */
 public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public OracleAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(dataSourceGetter,configAdvQueryGetter);
+    public OracleAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        super(dataSourceGetter, configAdvQueryGetter);
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */

@@ -10,8 +10,5 @@ import javax.sql.DataSource;
  * @date ：Created in 2026/6/18 17:11
  * @description： 默认的数据源获取器
  */
-public interface DataSourceGetterFunction extends GkSerializableFunction<PgConnectInfoSimple, DataSource> {
-
-
-
-}
+public interface DataSourceGetterFunction
+        extends GkSerializableFunction<PgConnectInfoSimple, DataSource> {}

@@ -1,6 +1,7 @@
 package cn.geoair.base.gpa.section;
 
 import cn.geoair.base.data.model.GiModelable;
+
 import java.io.Serializable;
 
 /**

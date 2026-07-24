@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.test.shp2pg;
 
+import static cn.geoair.base.Gir.log;
+
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
@@ -17,8 +19,6 @@ import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
 import cn.hutool.core.util.StrUtil;
 
 import java.io.IOException;
-
-import static cn.geoair.base.Gir.log;
 
 public class PgToShp {
 

@@ -4,6 +4,7 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 
 import java.sql.Connection;
 import java.util.function.Supplier;
+
 import javax.sql.DataSource;
 
 /**
@@ -39,7 +40,7 @@ public interface IDsDataSourceOpt {
      *
      * <p>使用已有的 {@link DataSource} 对象初始化数据源获取器。
      *
-     * @param dataSource     数据源对象
+     * @param dataSource 数据源对象
      * @param dataSourceName 数据源的名称
      */
     void initByDataSource(DataSource dataSource, String dataSourceName);
@@ -98,7 +99,6 @@ public interface IDsDataSourceOpt {
      */
     String getDataSourceId();
 
-
     /**
      * 获取数据源的描述对象
      *
@@ -116,6 +116,4 @@ public interface IDsDataSourceOpt {
      * @return 数据源对象
      */
     DataSource getDataSource();
-
-
 }

@@ -6,7 +6,9 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.util.GutilClass;
+
 import java.util.concurrent.Callable;
+
 import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.cache.processor.EntryProcessor;
@@ -40,10 +42,9 @@ public class Cache4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirCacheHelper.class,
-        implMethod = "getCache",
-        type = ImplType.expectfirst
-    )
+            implClass = GirCacheHelper.class,
+            implMethod = "getCache",
+            type = ImplType.expectfirst)
     public static GiCache getCache(String name) {
         switch (cacheType) {
             case SPRING:

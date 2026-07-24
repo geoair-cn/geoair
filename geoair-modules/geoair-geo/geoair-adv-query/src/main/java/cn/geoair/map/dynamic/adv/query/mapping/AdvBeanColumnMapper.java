@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.mapping;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,14 @@ public class AdvBeanColumnMapper {
         }
         AdvBeanMappingMeta mappingMeta = AdvBeanMappingMeta.of(bean.getClass());
         if (mappingMeta.isMapType()) {
-            fillFromMap(rowData, (Map<?, ?>) bean, bean.getClass(), toUnderlineCase, ignoreNullValue, ignoreEmptyString, ignoreFieldNames);
+            fillFromMap(
+                    rowData,
+                    (Map<?, ?>) bean,
+                    bean.getClass(),
+                    toUnderlineCase,
+                    ignoreNullValue,
+                    ignoreEmptyString,
+                    ignoreFieldNames);
             return rowData;
         }
         for (AdvBeanPropertyMeta property : mappingMeta.getWritableProperties(ignoreFieldNames)) {
@@ -40,26 +48,28 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName = property.resolveColumnName(toUnderlineCase);
-            Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                    value,
-                    property.getPropertyType(),
-                    AdvTypeHandlerContext.of(
-                            bean.getClass(),
-                            property.getPropertyName(),
-                            columnName,
-                            property.getPropertyType()));
+            Object jdbcValue =
+                    typeHandlerRegistry.convertForWrite(
+                            value,
+                            property.getPropertyType(),
+                            AdvTypeHandlerContext.of(
+                                    bean.getClass(),
+                                    property.getPropertyName(),
+                                    columnName,
+                                    property.getPropertyType()));
             rowData.put(columnName, jdbcValue);
         }
         return rowData;
     }
 
-    private void fillFromMap(Map<String, Object> rowData,
-                             Map<?, ?> source,
-                             Class<?> beanType,
-                             boolean toUnderlineCase,
-                             boolean ignoreNullValue,
-                             boolean ignoreEmptyString,
-                             List<String> ignoreFieldNames) {
+    private void fillFromMap(
+            Map<String, Object> rowData,
+            Map<?, ?> source,
+            Class<?> beanType,
+            boolean toUnderlineCase,
+            boolean ignoreNullValue,
+            boolean ignoreEmptyString,
+            List<String> ignoreFieldNames) {
         if (source == null || source.isEmpty()) {
             return;
         }
@@ -78,12 +88,17 @@ public class AdvBeanColumnMapper {
             if (ignoreEmptyString && value instanceof String && ((String) value).trim().isEmpty()) {
                 continue;
             }
-            String columnName = toUnderlineCase ? cn.hutool.core.util.StrUtil.toUnderlineCase(propertyName) : propertyName;
+            String columnName =
+                    toUnderlineCase
+                            ? cn.hutool.core.util.StrUtil.toUnderlineCase(propertyName)
+                            : propertyName;
             Class<?> valueType = value == null ? Object.class : value.getClass();
-            Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                    value,
-                    valueType,
-                    AdvTypeHandlerContext.of(beanType, propertyName, columnName, valueType));
+            Object jdbcValue =
+                    typeHandlerRegistry.convertForWrite(
+                            value,
+                            valueType,
+                            AdvTypeHandlerContext.of(
+                                    beanType, propertyName, columnName, valueType));
             rowData.put(columnName, jdbcValue);
         }
     }

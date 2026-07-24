@@ -49,7 +49,6 @@ public class MysqlDialectTableNameUtil extends AbstractExecDialectTableUtil {
         return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);
     }
 
-
     @Override
     public String tbBuildPageSql(String noPageSql) {
         return StrUtil.format("{} LIMIT {}, {}", noPageSql, "?", "?");

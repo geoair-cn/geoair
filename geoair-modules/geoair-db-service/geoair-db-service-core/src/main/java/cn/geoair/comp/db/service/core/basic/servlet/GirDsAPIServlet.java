@@ -15,10 +15,20 @@ import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,29 +38,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-
 
 @Component
 public class GirDsAPIServlet extends HttpServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    @Autowired
-    DsApiConfigService dsApiConfigService;
+    @Autowired DsApiConfigService dsApiConfigService;
 
-    @Autowired
-    GirDsServiceProperties girDsServiceProperties;
+    @Autowired GirDsServiceProperties girDsServiceProperties;
 
-    @Autowired
-    DsApiService dsApiService;
+    @Autowired DsApiService dsApiService;
 
-    @Autowired
-    GirDsSQLExecutor girDsSqlExecutor;
+    @Autowired GirDsSQLExecutor girDsSqlExecutor;
 
     ApiConfigApo config;
 
@@ -74,14 +72,20 @@ public class GirDsAPIServlet extends HttpServlet {
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
+            GirServletUtil.toResponse(
+                    response,
+                    json.getBytes(Charset.defaultCharset()),
+                    "application/json; charset=utf-8");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             ResponseDto responseDto = ResponseDto.fail(e.toString());
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
+            GirServletUtil.toResponse(
+                    response,
+                    json.getBytes(Charset.defaultCharset()),
+                    "application/json; charset=utf-8");
             log.error(e.toString(), e);
         }
     }

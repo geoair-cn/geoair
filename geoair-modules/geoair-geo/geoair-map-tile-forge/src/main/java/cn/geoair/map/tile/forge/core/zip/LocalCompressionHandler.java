@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.core.zip;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
- 
 
 import java.io.File;
 import java.io.IOException;
@@ -10,12 +9,13 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
- 
 public class LocalCompressionHandler extends AbstractZipCompressionHandler {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize ) throws IOException {
-      
+    public List<byte[]> readFileByChunks(
+            String source, long startOffset, long totalSize, int chunkSize) throws IOException {
+
         List<byte[]> chunks = new ArrayList<>();
         long remaining = totalSize;
         long currentOffset = startOffset;
@@ -57,6 +57,4 @@ public class LocalCompressionHandler extends AbstractZipCompressionHandler {
         }
         return file.length();
     }
-
-
 }

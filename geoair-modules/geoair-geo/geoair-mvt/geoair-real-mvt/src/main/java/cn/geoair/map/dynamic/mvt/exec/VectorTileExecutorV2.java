@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
@@ -21,20 +20,21 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
- 
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 /** 矢量瓦片查询工具 V2版本，该版本把客户端传入的sql全部当做一个临时表进行处理 */
- 
 public class VectorTileExecutorV2 extends AbstractITileExecutor {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     @Override
     public TileGlobalConfig getTileGlobalConfig() {
         TileGlobalConfig tileGlobalConfig = new TileGlobalConfig();
@@ -307,8 +307,7 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         List<GirAdvOneRow> transList = girAdvOneRows;
         if (needTransform) {
             transList =
-                    girAdvOneRows
-                            .stream()
+                    girAdvOneRows.stream()
                             .peek(this::featuresTransform)
                             .collect(Collectors.toList());
         }
@@ -334,7 +333,10 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             Geometry geometry = wkbReader.read(decode);
             // 将geom转到extent坐标系下
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry =
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .convert(geometry, sourceDataSrid, gridSrid);
             }
             // 内存裁剪数据
             Geometry finalGeometry = geometry;
@@ -375,58 +377,59 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         Long maxPageSize = tileExecutorConfig.getMaxPageSize();
 
         PageActuator<GirAdvOneRow> pageActuatorOpt =
-                GirGeoTools.defaultInstance().getPageActuatorOpt(
-                        new PageConditionDef<GirAdvOneRow>() {
+                GirGeoTools.defaultInstance()
+                        .getPageActuatorOpt(
+                                new PageConditionDef<GirAdvOneRow>() {
 
-                            @Override
-                            public Long getTotalRecordCount() {
-                                return totalCount;
-                            }
+                                    @Override
+                                    public Long getTotalRecordCount() {
+                                        return totalCount;
+                                    }
 
-                            @Override
-                            public void setPageConfig(PageConfig pageConfig) {
-                                pageConfig.setMaxPageNo(maxPageNumber);
-                                pageConfig.setPageSize(maxPageSize);
-//                                pageConfig.setTotalCount(totalCount);
-                                pageConfig.setPageNumStartByZero(false);
-                                pageConfig.setParallelConsumeRecordIs(true);
-                                pageConfig.setParallelExecPageIs(true);
-                                pageConfig.setSaveResultListIs(true);
-                            }
+                                    @Override
+                                    public void setPageConfig(PageConfig pageConfig) {
+                                        pageConfig.setMaxPageNo(maxPageNumber);
+                                        pageConfig.setPageSize(maxPageSize);
+                                        //
+                                        // pageConfig.setTotalCount(totalCount);
+                                        pageConfig.setPageNumStartByZero(false);
+                                        pageConfig.setParallelConsumeRecordIs(true);
+                                        pageConfig.setParallelExecPageIs(true);
+                                        pageConfig.setSaveResultListIs(true);
+                                    }
 
-                            @Override
-                            public boolean handlePageException(
-                                    Integer pageNo, Integer pageSize, Exception e) {
-                                log.warn(
-                                        "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
-                                        pageNo,
-                                        pageSize,
-                                        e.getMessage());
-                                return true;
-                            }
+                                    @Override
+                                    public boolean handlePageException(
+                                            Integer pageNo, Integer pageSize, Exception e) {
+                                        log.warn(
+                                                "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
+                                                pageNo,
+                                                pageSize,
+                                                e.getMessage());
+                                        return true;
+                                    }
 
-                            @Override
-                            public List<GirAdvOneRow> getPageRecords(
-                                    Integer pageNo, Integer pageSize) {
-                                String orderSql =
-                                        iAdvExecutor.pBuildSqlWithOrder(
-                                                excuteSQL,
-                                                ListUtil.of(
-                                                        OrderApo.create(
-                                                                orderFileIdName,
-                                                                AdvEnumsOrder.升序)));
-                                String pageSQL =
-                                        iAdvExecutor.pBuildPageSql(
-                                                orderSql, pageSize, pageNo, false);
-                                List<GirAdvOneRow> girAdvOneRows =
-                                        iAdvExecutor.bSelectList(pageSQL);
-                                return girAdvOneRows
-                                        .stream()
-                                        .parallel()
-                                        .peek(featuresTransform)
-                                        .collect(Collectors.toList());
-                            }
-                        });
+                                    @Override
+                                    public List<GirAdvOneRow> getPageRecords(
+                                            Integer pageNo, Integer pageSize) {
+                                        String orderSql =
+                                                iAdvExecutor.pBuildSqlWithOrder(
+                                                        excuteSQL,
+                                                        ListUtil.of(
+                                                                OrderApo.create(
+                                                                        orderFileIdName,
+                                                                        AdvEnumsOrder.升序)));
+                                        String pageSQL =
+                                                iAdvExecutor.pBuildPageSql(
+                                                        orderSql, pageSize, pageNo, false);
+                                        List<GirAdvOneRow> girAdvOneRows =
+                                                iAdvExecutor.bSelectList(pageSQL);
+                                        return girAdvOneRows.stream()
+                                                .parallel()
+                                                .peek(featuresTransform)
+                                                .collect(Collectors.toList());
+                                    }
+                                });
         pageActuatorOpt.execute();
 
         return pageActuatorOpt.getFinalDataList();

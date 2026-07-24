@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-mvt</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-static-mvt-spark</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
 
   <packaging>jar</packaging>
   <name>geoair-static-mvt-spark</name>
@@ -42,15 +42,15 @@
 
   <properties>
     <java.version>17</java.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-<!--    <hadoop-version>3.2.0</hadoop-version>-->
+    <!--    <hadoop-version>3.2.0</hadoop-version>-->
     <hadoop-version>3.4.0</hadoop-version>
     <spark.version>4.0.0</spark.version>
     <scala.version>2.13</scala.version>
-<!--    <spark.version>3.5.6</spark.version>-->
+    <!--    <spark.version>3.5.6</spark.version>-->
     <janino.version>3.1.9</janino.version>
     <commons.text.version>1.15.0</commons.text.version>
   </properties>
@@ -73,28 +73,28 @@
           <artifactId>javax.servlet-api</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.slf4j</groupId>
           <artifactId>log4j-over-slf4j</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>log4j-slf4j2-impl</artifactId>
           <groupId>org.apache.logging.log4j</groupId>
+          <artifactId>log4j-slf4j2-impl</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>netty-all</artifactId>
           <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
+          <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>guava</artifactId>
           <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -122,12 +122,12 @@
       <version>${spark.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>shapeless_2.13</artifactId>
           <groupId>com.chuusai</groupId>
+          <artifactId>shapeless_2.13</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>cats-kernel_2.13</artifactId>
           <groupId>org.typelevel</groupId>
+          <artifactId>cats-kernel_2.13</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -169,24 +169,24 @@
       <version>${hadoop-version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>log4j-over-slf4j</artifactId>
           <groupId>org.slf4j</groupId>
+          <artifactId>log4j-over-slf4j</artifactId>
         </exclusion>
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
+          <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>guava</artifactId>
           <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -197,25 +197,25 @@
     </dependency>
   </dependencies>
 
-  <build>
-
-  </build>
+  <build></build>
   <profiles>
     <profile>
       <id>package-spark-with-dependencies</id>
+      <dependencies></dependencies>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>3.6.0</version>
+            <configuration></configuration>
             <executions>
               <execution>
                 <id>make-with-dependencies</id>
-                <phase>package</phase>
                 <goals>
                   <goal>single</goal>
                 </goals>
+                <phase>package</phase>
                 <configuration>
                   <!-- 指定自定义装配文件 -->
                   <descriptors>
@@ -227,13 +227,9 @@
               </execution>
 
             </executions>
-            <configuration></configuration>
           </plugin>
         </plugins>
       </build>
-      <dependencies>
-
-      </dependencies>
     </profile>
   </profiles>
 

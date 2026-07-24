@@ -7,6 +7,18 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
+import org.geotools.api.data.FeatureSource;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.locationtech.jts.geom.Geometry;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -16,18 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.geotools.api.data.DataStore;
-import org.geotools.api.data.DataStoreFinder;
-import org.geotools.api.data.FeatureSource;
-
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.Property;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 
 public class ShpGeoFileReader implements GeoFileReader {
 
@@ -65,7 +65,9 @@ public class ShpGeoFileReader implements GeoFileReader {
             File shpFile = new File(linkInfo.getShpFilePath());
             Map<String, Object> params = new HashMap<>();
             params.put(ShapefileDataStoreFactory.URLP.key, shpFile.toURI().toURL());
-            params.put(ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
+            params.put(
+                    ShapefileDataStoreFactory.DBFCHARSET.key,
+                    Charset.forName(linkInfo.getCharset()));
 
             dataStore = DataStoreFinder.getDataStore(params);
             if (dataStore == null) {

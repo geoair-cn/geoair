@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.compact;
 
 import com.google.common.cache.Cache;
@@ -14,8 +13,8 @@ import com.google.common.cache.CacheBuilder;
  */
 public class BundlxCache {
     /**
-     * Cache key representing a specific tile location.
-     * Uses zoom level, row, and column to uniquely identify a tile.
+     * Cache key representing a specific tile location. Uses zoom level, row, and column to uniquely
+     * identify a tile.
      */
     public static class CacheKey {
         /** Zoom level of the tile. */
@@ -72,9 +71,7 @@ public class BundlxCache {
         }
     }
 
-    /**
-     * Cache entry containing information about a tile's location in a bundle file.
-     */
+    /** Cache entry containing information about a tile's location in a bundle file. */
     public static class CacheEntry {
         /**
          * Constructs a new CacheEntry with the specified bundle file path, offset, and size.

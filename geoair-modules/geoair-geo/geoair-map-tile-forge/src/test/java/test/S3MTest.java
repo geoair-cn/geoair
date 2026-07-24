@@ -14,13 +14,14 @@ import cn.geoair.map.tile.forge.core.zip.LogProgressConsumer;
  */
 public class S3MTest {
     public static void main(String[] args) {
-        GirLayerConfigContext
-                context = new GirLayerConfigContext();
-        context.setDataId("111").setMapTileType(GirMapTileType.S3M).setStorageType(GirStorageType.LOCAL_ZIP).setObjectKey("E:\\gis测试数据\\测试数据\\s3m.zip");
-        TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
+        GirLayerConfigContext context = new GirLayerConfigContext();
+        context.setDataId("111")
+                .setMapTileType(GirMapTileType.S3M)
+                .setStorageType(GirStorageType.LOCAL_ZIP)
+                .setObjectKey("E:\\gis测试数据\\测试数据\\s3m.zip");
+        TileStorageSupportAdapter adapter =
+                new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
         ITileStorageSupport support = adapter.getSupport(context);
         support.preCacheTiles(context, new LogProgressConsumer());
-
     }
-
 }

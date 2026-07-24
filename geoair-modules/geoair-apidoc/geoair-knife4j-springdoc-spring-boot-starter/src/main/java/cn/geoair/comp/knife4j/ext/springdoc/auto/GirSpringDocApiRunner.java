@@ -7,11 +7,10 @@ import cn.geoair.comp.knife4j.ext.core.auto.AutoApiConfigScanner;
 import cn.geoair.comp.knife4j.ext.core.config.GirOpenApiConfig;
 import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-
-import java.util.*;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.properties.SpringDocConfigProperties;
@@ -29,6 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+
+import java.util.*;
 
 /**
  * GirSpringDocApiRunner class.
@@ -164,7 +165,8 @@ public class GirSpringDocApiRunner
                         () ->
                                 GroupedOpenApi.builder()
                                         .group(finalGroupName)
-                                        .packagesToScan(docketInfo.getBasePackages().toArray(new String[0]))
+                                        .packagesToScan(
+                                                docketInfo.getBasePackages().toArray(new String[0]))
                                         .build());
 
         builder.setLazyInit(false);

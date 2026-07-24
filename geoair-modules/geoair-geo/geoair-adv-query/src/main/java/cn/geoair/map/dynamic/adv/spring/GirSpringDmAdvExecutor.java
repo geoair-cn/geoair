@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.spring;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.AdvExecutorDm;
 import cn.hutool.extra.spring.SpringUtil;
+
 import javax.sql.DataSource;
 
 /**
@@ -23,8 +24,7 @@ public class GirSpringDmAdvExecutor extends AdvExecutorDm implements IAdvExecuto
         return advExecutor;
     }
 
-    public static GirSpringDmAdvExecutor newInstance(
-            DataSource dataSource, String dataSourceName) {
+    public static GirSpringDmAdvExecutor newInstance(DataSource dataSource, String dataSourceName) {
         GirSpringDmAdvExecutor advExecutor = new GirSpringDmAdvExecutor();
         advExecutor.initByDataSource(dataSource, dataSourceName);
         return advExecutor;

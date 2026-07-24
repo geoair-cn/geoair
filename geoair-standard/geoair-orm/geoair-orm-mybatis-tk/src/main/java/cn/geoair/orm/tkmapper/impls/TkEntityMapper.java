@@ -2,6 +2,7 @@ package cn.geoair.orm.tkmapper.impls;
 
 import cn.geoair.base.gpa.entity.GiCrudEntity;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
+
 import java.io.Serializable;
 
 public interface TkEntityMapper<T extends GiCrudEntity<PK>, PK extends Serializable>

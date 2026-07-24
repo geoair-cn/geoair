@@ -1,26 +1,23 @@
 package cn.geoair.comp.dynamic.ds.readwrite.proxy;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import javax.sql.DataSource;
+
 /**
- * 读写分离 Connection 代理
- * 职责：拦截 Statement 创建，管理事务上下文
+ * 读写分离 Connection 代理 职责：拦截 Statement 创建，管理事务上下文
  *
  * @author 张俊
  * @date Created in 2026/5/28
  */
 public class ReadWriteSplitConnection implements Connection {
-
 
     private final GirReadWriteDataSource dataSource;
     private Connection currentConnection;
@@ -37,24 +34,31 @@ public class ReadWriteSplitConnection implements Connection {
 
     public ReadWriteSplitConnection(DataSource masterDataSource, GirGroupSource slaveGroup) {
         this.dataSource = new GirReadWriteDataSource(masterDataSource, slaveGroup);
-        RdLog.getInstance().trace("创建 ReadWriteSplitConnection 实例，主库: {}, 从库组: {}",
-                masterDataSource, slaveGroup);
+        RdLog.getInstance()
+                .trace(
+                        "创建 ReadWriteSplitConnection 实例，主库: {}, 从库组: {}",
+                        masterDataSource,
+                        slaveGroup);
     }
 
-    public ReadWriteSplitConnection(DataSource masterDataSource, GirGroupSource slaveGroup,
-                                    String username, String password) {
+    public ReadWriteSplitConnection(
+            DataSource masterDataSource,
+            GirGroupSource slaveGroup,
+            String username,
+            String password) {
         this(masterDataSource, slaveGroup);
         this.username = username;
         this.password = password;
         RdLog.getInstance().trace("使用用户名创建连接实例，username: {}", username);
     }
 
-    /**
-     * 根据SQL获取或创建连接
-     */
+    /** 根据SQL获取或创建连接 */
     protected Connection getConnection(String sql) {
-        RdLog.getInstance().trace("getConnection 被调用，SQL: {}, 当前事务状态: transactionUsedMaster={}",
-                sql, transactionUsedMaster);
+        RdLog.getInstance()
+                .trace(
+                        "getConnection 被调用，SQL: {}, 当前事务状态: transactionUsedMaster={}",
+                        sql,
+                        transactionUsedMaster);
 
         this.pendingSql = sql;
 
@@ -70,8 +74,10 @@ public class ReadWriteSplitConnection implements Connection {
 
         // 根据SQL类型选择数据源
         DataSource targetDs = dataSource.getDataSourceBySQL(sql);
-        RdLog.getInstance().trace("根据SQL路由选择数据源类型: {}",
-                targetDs instanceof GirGroupSource ? "从库(GirGroupSource)" : "主库");
+        RdLog.getInstance()
+                .trace(
+                        "根据SQL路由选择数据源类型: {}",
+                        targetDs instanceof GirGroupSource ? "从库(GirGroupSource)" : "主库");
 
         if (targetDs instanceof GirGroupSource) {
             return getSlaveConnection();
@@ -80,9 +86,7 @@ public class ReadWriteSplitConnection implements Connection {
         }
     }
 
-    /**
-     * 获取当前连接（不切换）
-     */
+    /** 获取当前连接（不切换） */
     private Connection getCurrentConnection() {
         if (currentConnection == null) {
             RdLog.getInstance().trace("当前连接为空，默认使用主库连接");
@@ -93,8 +97,11 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     private Connection getMasterConnection() {
-        RdLog.getInstance().trace("准备获取主库连接，当前连接状态: currentConnection={}, autoCommit={}",
-                currentConnection, autoCommit);
+        RdLog.getInstance()
+                .trace(
+                        "准备获取主库连接，当前连接状态: currentConnection={}, autoCommit={}",
+                        currentConnection,
+                        autoCommit);
 
         try {
             if (currentConnection != null && !isMasterConnection()) {
@@ -126,7 +133,11 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     private Connection getSlaveConnection() {
-        RdLog.getInstance().trace("准备获取从库连接，当前连接状态: currentConnection={}, autoCommit={}", currentConnection, autoCommit);
+        RdLog.getInstance()
+                .trace(
+                        "准备获取从库连接，当前连接状态: currentConnection={}, autoCommit={}",
+                        currentConnection,
+                        autoCommit);
 
         try {
             if (currentConnection != null && isMasterConnection()) {
@@ -163,8 +174,8 @@ public class ReadWriteSplitConnection implements Connection {
             if (currentConnection instanceof ReadWritePxyConnection) {
                 ReadWritePxyConnection pxy = (ReadWritePxyConnection) currentConnection;
                 result = !pxy.slaveIs;
-                RdLog.getInstance().trace("判断连接类型: 当前连接是 {}, 是否主库: {}",
-                        pxy.slaveIs ? "从库" : "主库", result);
+                RdLog.getInstance()
+                        .trace("判断连接类型: 当前连接是 {}, 是否主库: {}", pxy.slaveIs ? "从库" : "主库", result);
             } else {
                 RdLog.getInstance().trace("当前连接不是 ReadWritePxyConnection 类型，默认为主库");
             }
@@ -191,10 +202,7 @@ public class ReadWriteSplitConnection implements Connection {
         }
     }
 
-
-    /**
-     * 标记事务结束
-     */
+    /** 标记事务结束 */
     private void markTransactionEnd() {
         RdLog.getInstance().trace("标记事务结束，transactionUsedMaster 原值: {}", transactionUsedMaster);
         transactionUsedMaster = null;
@@ -233,8 +241,11 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        RdLog.getInstance().trace("setAutoCommit 被调用，参数 autoCommit={}，当前 autoCommit={}",
-                autoCommit, this.autoCommit);
+        RdLog.getInstance()
+                .trace(
+                        "setAutoCommit 被调用，参数 autoCommit={}，当前 autoCommit={}",
+                        autoCommit,
+                        this.autoCommit);
 
         this.autoCommit = autoCommit;
         if (autoCommit) {
@@ -252,8 +263,10 @@ public class ReadWriteSplitConnection implements Connection {
                 RdLog.getInstance().trace("setAutoCommit(false) 开启新事务，等待第一个SQL确定数据源");
                 RdLog.getInstance().trace("事务开始（setAutoCommit(false)），等待第一个SQL确定数据源");
             } else {
-                RdLog.getInstance().trace("setAutoCommit(false) 但在事务中，保持当前数据源类型: {}",
-                        transactionUsedMaster ? "主库" : "从库");
+                RdLog.getInstance()
+                        .trace(
+                                "setAutoCommit(false) 但在事务中，保持当前数据源类型: {}",
+                                transactionUsedMaster ? "主库" : "从库");
             }
         }
 
@@ -273,7 +286,8 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public void commit() throws SQLException {
-        RdLog.getInstance().trace("commit 被调用，当前事务状态: transactionUsedMaster={}", transactionUsedMaster);
+        RdLog.getInstance()
+                .trace("commit 被调用，当前事务状态: transactionUsedMaster={}", transactionUsedMaster);
         if (currentConnection != null && !currentConnection.isClosed()) {
             RdLog.getInstance().trace("对底层连接执行 commit");
             currentConnection.commit();
@@ -286,7 +300,8 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public void rollback() throws SQLException {
-        RdLog.getInstance().trace("rollback 被调用，当前事务状态: transactionUsedMaster={}", transactionUsedMaster);
+        RdLog.getInstance()
+                .trace("rollback 被调用，当前事务状态: transactionUsedMaster={}", transactionUsedMaster);
         if (currentConnection != null && !currentConnection.isClosed()) {
             RdLog.getInstance().trace("对底层连接执行 rollback");
             currentConnection.rollback();
@@ -327,8 +342,11 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
-        RdLog.getInstance().trace("setReadOnly 被调用，readOnly={}, transactionUsedMaster={}",
-                readOnly, transactionUsedMaster);
+        RdLog.getInstance()
+                .trace(
+                        "setReadOnly 被调用，readOnly={}, transactionUsedMaster={}",
+                        readOnly,
+                        transactionUsedMaster);
 
         // 如果是读操作，可以设置只读（从库）
         if (readOnly && transactionUsedMaster == null) {
@@ -381,7 +399,10 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public int getTransactionIsolation() throws SQLException {
-        int result = currentConnection != null ? currentConnection.getTransactionIsolation() : Connection.TRANSACTION_NONE;
+        int result =
+                currentConnection != null
+                        ? currentConnection.getTransactionIsolation()
+                        : Connection.TRANSACTION_NONE;
         RdLog.getInstance().trace("getTransactionIsolation 被调用，返回: {}", result);
         return result;
     }
@@ -409,21 +430,31 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        RdLog.getInstance().trace("createStatement 被调用，resultSetType={}, resultSetConcurrency={}",
-                resultSetType, resultSetConcurrency);
+    public Statement createStatement(int resultSetType, int resultSetConcurrency)
+            throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "createStatement 被调用，resultSetType={}, resultSetConcurrency={}",
+                        resultSetType,
+                        resultSetConcurrency);
         return new ReadWriteSplitStatement(this, resultSetType, resultSetConcurrency);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        RdLog.getInstance().trace("prepareStatement 被调用，SQL: {}, resultSetType={}, resultSetConcurrency={}",
-                sql, resultSetType, resultSetConcurrency);
+    public PreparedStatement prepareStatement(
+            String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "prepareStatement 被调用，SQL: {}, resultSetType={}, resultSetConcurrency={}",
+                        sql,
+                        resultSetType,
+                        resultSetConcurrency);
         return new ReadWriteSplitPreparedStatement(this, sql, resultSetType, resultSetConcurrency);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
+    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency)
+            throws SQLException {
         RdLog.getInstance().trace("prepareCall 被调用，SQL: {}，存储过程默认使用主库", sql);
         Connection conn = getMasterConnection();
         RdLog.getInstance().trace("获取主库连接用于 prepareCall");
@@ -458,7 +489,10 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public int getHoldability() throws SQLException {
-        int result = currentConnection != null ? currentConnection.getHoldability() : ResultSet.HOLD_CURSORS_OVER_COMMIT;
+        int result =
+                currentConnection != null
+                        ? currentConnection.getHoldability()
+                        : ResultSet.HOLD_CURSORS_OVER_COMMIT;
         RdLog.getInstance().trace("getHoldability 被调用，返回: {}", result);
         return result;
     }
@@ -504,21 +538,38 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        RdLog.getInstance().trace("createStatement 被调用，resultSetType={}, resultSetConcurrency={}, resultSetHoldability={}",
-                resultSetType, resultSetConcurrency, resultSetHoldability);
-        return new ReadWriteSplitStatement(this, resultSetType, resultSetConcurrency, resultSetHoldability);
+    public Statement createStatement(
+            int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "createStatement 被调用，resultSetType={}, resultSetConcurrency={}, resultSetHoldability={}",
+                        resultSetType,
+                        resultSetConcurrency,
+                        resultSetHoldability);
+        return new ReadWriteSplitStatement(
+                this, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        RdLog.getInstance().trace("prepareStatement 被调用，SQL: {}, resultSetType={}, resultSetConcurrency={}, resultSetHoldability={}",
-                sql, resultSetType, resultSetConcurrency, resultSetHoldability);
-        return new ReadWriteSplitPreparedStatement(this, sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    public PreparedStatement prepareStatement(
+            String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "prepareStatement 被调用，SQL: {}, resultSetType={}, resultSetConcurrency={}, resultSetHoldability={}",
+                        sql,
+                        resultSetType,
+                        resultSetConcurrency,
+                        resultSetHoldability);
+        return new ReadWriteSplitPreparedStatement(
+                this, sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+    public CallableStatement prepareCall(
+            String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
+            throws SQLException {
         RdLog.getInstance().trace("prepareCall 被调用，SQL: {}，存储过程默认使用主库", sql);
         Connection conn = getMasterConnection();
         RdLog.getInstance().trace("获取主库连接用于 prepareCall");
@@ -526,20 +577,34 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
-        RdLog.getInstance().trace("prepareStatement 被调用，SQL: {}, autoGeneratedKeys: {}", sql, autoGeneratedKeys);
+    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
+            throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "prepareStatement 被调用，SQL: {}, autoGeneratedKeys: {}",
+                        sql,
+                        autoGeneratedKeys);
         return new ReadWriteSplitPreparedStatement(this, sql, autoGeneratedKeys);
     }
 
     @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
-        RdLog.getInstance().trace("prepareStatement 被调用，SQL: {}, columnIndexes 长度: {}", sql, columnIndexes != null ? columnIndexes.length : 0);
+        RdLog.getInstance()
+                .trace(
+                        "prepareStatement 被调用，SQL: {}, columnIndexes 长度: {}",
+                        sql,
+                        columnIndexes != null ? columnIndexes.length : 0);
         return new ReadWriteSplitPreparedStatement(this, sql, columnIndexes);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
-        RdLog.getInstance().trace("prepareStatement 被调用，SQL: {}, columnNames 长度: {}", sql, columnNames != null ? columnNames.length : 0);
+    public PreparedStatement prepareStatement(String sql, String[] columnNames)
+            throws SQLException {
+        RdLog.getInstance()
+                .trace(
+                        "prepareStatement 被调用，SQL: {}, columnNames 长度: {}",
+                        sql,
+                        columnNames != null ? columnNames.length : 0);
         return new ReadWriteSplitPreparedStatement(this, sql, columnNames);
     }
 
@@ -593,10 +658,12 @@ public class ReadWriteSplitConnection implements Connection {
         }
     }
 
-
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        RdLog.getInstance().trace("setClientInfo 被调用，properties 大小: {}", properties != null ? properties.size() : 0);
+        RdLog.getInstance()
+                .trace(
+                        "setClientInfo 被调用，properties 大小: {}",
+                        properties != null ? properties.size() : 0);
         if (currentConnection != null) {
             currentConnection.setClientInfo(properties);
             RdLog.getInstance().trace("已设置 ClientInfo 到底层连接");
@@ -615,13 +682,20 @@ public class ReadWriteSplitConnection implements Connection {
     @Override
     public Properties getClientInfo() throws SQLException {
         Properties result = currentConnection != null ? currentConnection.getClientInfo() : null;
-        RdLog.getInstance().trace("getClientInfo 被调用，返回 properties 大小: {}", result != null ? result.size() : 0);
+        RdLog.getInstance()
+                .trace(
+                        "getClientInfo 被调用，返回 properties 大小: {}",
+                        result != null ? result.size() : 0);
         return result;
     }
 
     @Override
     public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-        RdLog.getInstance().trace("createArrayOf 被调用，typeName: {}, elements 长度: {}", typeName, elements != null ? elements.length : 0);
+        RdLog.getInstance()
+                .trace(
+                        "createArrayOf 被调用，typeName: {}, elements 长度: {}",
+                        typeName,
+                        elements != null ? elements.length : 0);
         Array array = getCurrentConnection().createArrayOf(typeName, elements);
         RdLog.getInstance().trace("创建 Array 成功");
         return array;
@@ -629,7 +703,11 @@ public class ReadWriteSplitConnection implements Connection {
 
     @Override
     public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-        RdLog.getInstance().trace("createStruct 被调用，typeName: {}, attributes 长度: {}", typeName, attributes != null ? attributes.length : 0);
+        RdLog.getInstance()
+                .trace(
+                        "createStruct 被调用，typeName: {}, attributes 长度: {}",
+                        typeName,
+                        attributes != null ? attributes.length : 0);
         Struct struct = getCurrentConnection().createStruct(typeName, attributes);
         RdLog.getInstance().trace("创建 Struct 成功");
         return struct;
@@ -652,7 +730,6 @@ public class ReadWriteSplitConnection implements Connection {
         RdLog.getInstance().trace("getSchema 被调用，返回: {}", result);
         return result;
     }
-
 
     @Override
     public void abort(Executor executor) throws SQLException {
@@ -720,16 +797,19 @@ public class ReadWriteSplitConnection implements Connection {
     }
 
     public void markTransactionStart(boolean useMaster) {
-        RdLog.getInstance().trace("markTransactionStart 被调用，useMaster: {}，当前事务状态: transactionUsedMaster={}",
-                useMaster, transactionUsedMaster);
+        RdLog.getInstance()
+                .trace(
+                        "markTransactionStart 被调用，useMaster: {}，当前事务状态: transactionUsedMaster={}",
+                        useMaster,
+                        transactionUsedMaster);
 
         if (transactionUsedMaster == null) {
             transactionUsedMaster = useMaster;
             RdLog.getInstance().trace("事务状态已设置: {}", useMaster ? "主库" : "从库");
             RdLog.getInstance().debug("事务开始，使用数据源类型: {}", useMaster ? "主库" : "从库");
         } else {
-            RdLog.getInstance().trace("事务已开始，状态为 {}，忽略新的事务标记请求",
-                    transactionUsedMaster ? "主库" : "从库");
+            RdLog.getInstance()
+                    .trace("事务已开始，状态为 {}，忽略新的事务标记请求", transactionUsedMaster ? "主库" : "从库");
         }
     }
 

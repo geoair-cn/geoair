@@ -1,6 +1,7 @@
 package cn.geoair.comp.db.service.core.config;
 
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class GirDsServiceProperties {
 
-    String version = "J17-dev-SNAPSHOT";
+    String version = "J17.1.5";
 
     /** 配置API接口的访问路径 */
     String realApiContext = "/dsApiServer";

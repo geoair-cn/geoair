@@ -2,10 +2,7 @@ package cn.geoair.comp.dynamic.ds.tx;
 
 import java.sql.Connection;
 
-/**
- * 线程事务连接持有器接口
- * 用于管理当前线程的事务连接，支持连接挂起和恢复
- */
+/** 线程事务连接持有器接口 用于管理当前线程的事务连接，支持连接挂起和恢复 */
 public interface IDsTransactionConnectionHolder {
 
     /**
@@ -30,9 +27,7 @@ public interface IDsTransactionConnectionHolder {
      */
     Connection pop();
 
-    /**
-     * 移除当前线程的所有连接并清理资源
-     */
+    /** 移除当前线程的所有连接并清理资源 */
     void remove();
 
     /**

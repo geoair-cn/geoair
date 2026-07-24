@@ -15,8 +15,6 @@
  */
 package cn.geoair.comp.dynamic.ds.readwrite.proxy.druid;
 
-
-
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,5 +45,4 @@ public final class JdbcParameterDate implements JdbcParameter {
     public int getSqlType() {
         return Types.DATE;
     }
-
 }

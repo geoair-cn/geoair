@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-db-service</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service-webview</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-db-service-webview</name>
 
@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.5</geoair.version>
     <maven.install.skip>true</maven.install.skip>
     <maven.deploy.skip>true</maven.deploy.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,15 +49,10 @@
 
   </properties>
 
-  <dependencies>
-
-  </dependencies>
+  <dependencies></dependencies>
 
   <build>
-    <plugins>
-
-
-    </plugins>
+    <plugins></plugins>
   </build>
   <profiles>
     <profile>
@@ -74,15 +69,15 @@
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>0.9.0</version>
             <extensions>false</extensions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
             <executions>
               <execution>
                 <id>injected-central-publishing</id>
                 <phase>none</phase>
               </execution>
             </executions>
-            <configuration>
-              <publishingServerId>skip</publishingServerId>
-            </configuration>
           </plugin>
         </plugins>
       </build>

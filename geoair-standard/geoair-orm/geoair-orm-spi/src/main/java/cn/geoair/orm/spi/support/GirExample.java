@@ -1,19 +1,19 @@
-//package cn.geoair.orm.spi.support;
+// package cn.geoair.orm.spi.support;
 //
-//import cn.geoair.base.util.GutilReflection;
-//import cn.geoair.base.util.GutilStr;
-//import cn.geoair.orm.spi.entity.GirEntityColumn;
-//import cn.geoair.orm.spi.entity.GirEntityField;
-//import cn.geoair.orm.spi.entity.GirEntityTable;
-//import java.lang.reflect.Field;
-//import java.util.*;
+// import cn.geoair.base.util.GutilReflection;
+// import cn.geoair.base.util.GutilStr;
+// import cn.geoair.orm.spi.entity.GirEntityColumn;
+// import cn.geoair.orm.spi.entity.GirEntityField;
+// import cn.geoair.orm.spi.entity.GirEntityTable;
+// import java.lang.reflect.Field;
+// import java.util.*;
 //
-///**
+/// **
 // * 通用的Example查询对象
 // *
 // * @author zhangjun
 // */
-//public class GirExample {
+// public class GirExample {
 //
 //    protected String orderByClause;
 //
@@ -520,7 +520,8 @@
 //            for (String property : properties) {
 //                // 属性和列对应Map中有此属性
 //                if (propertyMap.get(property) != null) {
-//                    Object value = GutilReflection.getFieldValue(property, fieldMap.get(property));
+//                    Object value = GutilReflection.getFieldValue(property,
+// fieldMap.get(property));
 //                    // 属性值不为空
 //                    if (value != null) {
 //                        andEqualTo(property, value);
@@ -675,7 +676,8 @@
 //            for (String property : properties) {
 //                // 属性和列对应Map中有此属性
 //                if (propertyMap.get(property) != null) {
-//                    Object value = GutilReflection.getFieldValue(property, fieldMap.get(property));
+//                    Object value = GutilReflection.getFieldValue(property,
+// fieldMap.get(property));
 //                    // 属性值不为空
 //                    if (value != null) {
 //                        orEqualTo(property, value);
@@ -696,7 +698,8 @@
 //            for (String property : strings) {
 //                // 属性和列对应Map中有此属性
 //                if (propertyMap.get(property) != null) {
-//                    Object value = GutilReflection.getFieldValue(property, fieldMap.get(property));
+//                    Object value = GutilReflection.getFieldValue(property,
+// fieldMap.get(property));
 //                    // 属性值不为空
 //                    if (value != null) {
 //                        orEqualTo(property, value);
@@ -1221,4 +1224,4 @@
 //    public void setTableName(String tableName) {
 //        this.tableName = tableName;
 //    }
-//}
+// }

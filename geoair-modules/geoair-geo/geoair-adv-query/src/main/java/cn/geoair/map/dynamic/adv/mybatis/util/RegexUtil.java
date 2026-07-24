@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.mybatis.util;
 
 import cn.geoair.base.Gir;
+
 import java.util.regex.Pattern;
 
 public class RegexUtil {
