@@ -1,6 +1,11 @@
 package cn.geoair.comp.db.service.core.basic.apo;
 
+import cn.geoair.comp.db.service.core.basic.util.DESUtils;
+import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
+import com.alibaba.druid.pool.DruidDataSource;
 import java.io.Serializable;
+import java.util.function.Consumer;
+import javax.sql.DataSource;
 import lombok.Data;
 
 /**
@@ -40,4 +45,30 @@ public class DsDataSourceApo implements Serializable {
     String createTime;
 
     String updateTime;
+
+    public static DataSource toDataSource(DsDataSourceApo ds) {
+        DataSourceDruidFastCreate druidFastCreate = new DataSourceDruidFastCreate();
+        druidFastCreate.setUrl(ds.getUrl());
+        druidFastCreate.setUsername(ds.getUsername());
+        try {
+            druidFastCreate.setPassword(DESUtils.decrypt(ds.getPassword()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        druidFastCreate.setConfigurator(
+                new Consumer<DruidDataSource>() {
+                    @Override
+                    public void accept(DruidDataSource druidDataSource) {
+                        druidDataSource.setName(ds.getName());
+
+                        druidDataSource.setRemoveAbandoned(true);
+                        druidDataSource.setRemoveAbandonedTimeout(300); // 5分钟自动回收
+
+                        druidDataSource.setDriverClassName(ds.getDriver());
+                        druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
+                        druidDataSource.setBreakAfterAcquireFailure(true);
+                    }
+                });
+        return druidFastCreate.toDataSource();
+    }
 }

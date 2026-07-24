@@ -218,11 +218,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerAddBeforeEvent(${ClassName}Po po) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.addBefore${ClassName}Event(po);
-            } catch (Exception e) {
-                log.error("触发【新增前】事件失败", e);
-            }
+            event.addBefore${ClassName}Event(po);
         }
     }
 
@@ -232,11 +228,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerAddAfterEvent(${ClassName}Po po) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.addAfter${ClassName}Event(po);
-            } catch (Exception e) {
-                log.error("触发【新增后】事件失败", e);
-            }
+            event.addAfter${ClassName}Event(po);
         }
     }
 
@@ -246,11 +238,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerUpdateBeforeEvent(${ClassName}Po oldPo, ${ClassName}Po newPo) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.updateBefore${ClassName}Event(oldPo, newPo);
-            } catch (Exception e) {
-                log.error("触发【更新前】事件失败", e);
-            }
+            event.updateBefore${ClassName}Event(oldPo, newPo);
         }
     }
 
@@ -260,11 +248,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerUpdateAfterEvent(${ClassName}Po oldPo, ${ClassName}Po newPo, boolean success) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.updateAfter${ClassName}Event(oldPo, newPo, success);
-            } catch (Exception e) {
-                log.error("触发【更新后】事件失败", e);
-            }
+            event.updateAfter${ClassName}Event(oldPo, newPo, success);
         }
     }
 
@@ -274,11 +258,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerDeleteBeforeEvent(${ClassName}Po po) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.deleteBefore${ClassName}Event(po);
-            } catch (Exception e) {
-                log.error("触发【删除前】事件失败", e);
-            }
+            event.deleteBefore${ClassName}Event(po);
         }
     }
 
@@ -288,11 +268,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {
     private void triggerDeleteAfterEvent(${ClassName}Po po, boolean success) {
         List<${ClassName}Event> events = ${ClassName}Event.getInstances();
         for (${ClassName}Event event : events) {
-            try {
-                event.deleteAfter${ClassName}Event(po, success);
-            } catch (Exception e) {
-                log.error("触发【删除后】事件失败", e);
-            }
+            event.deleteAfter${ClassName}Event(po, success);
         }
     }
 }

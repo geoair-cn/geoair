@@ -1,0 +1,95 @@
+package cn.geoair.map.tile.forge.core.bygwc.core.mime;
+
+import cn.geoair.web.mime.GirApplicationMime;
+import cn.geoair.web.mime.MimeException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class ApplicationMime extends MimeType {
+
+    public static final String MAPBOX_TILES_LEGACY_MIME =
+            "application/x-protobuf;type=mapbox-vector";
+
+    protected boolean vector;
+    public static final ApplicationMime bil16 =
+            new ApplicationMime(GirApplicationMime.bil16, false);
+    public static final ApplicationMime bil32 =
+            new ApplicationMime(GirApplicationMime.bil32, false);
+    public static final ApplicationMime json = new ApplicationMime(GirApplicationMime.json, false);
+    /** 超图软件的自定义格式 */
+    public static final ApplicationMime scp = new ApplicationMime(GirApplicationMime.scp, false);
+
+    public static final ApplicationMime stream =
+            new ApplicationMime(GirApplicationMime.stream, false);
+    public static final ApplicationMime topojson =
+            new ApplicationMime(GirApplicationMime.topojson, true);
+    public static final ApplicationMime geojson =
+            new ApplicationMime(GirApplicationMime.geojson, true);
+    public static final ApplicationMime utfgrid =
+            new ApplicationMime(GirApplicationMime.utfgrid, true);
+    public static final ApplicationMime mapboxVector =
+            new ApplicationMime(GirApplicationMime.mapboxVector, true);
+
+    static Set<ApplicationMime> ALL =
+            Collections.unmodifiableSet(
+                    new HashSet<>(
+                            Arrays.asList(
+                                    bil16,
+                                    bil32,
+                                    json,
+                                    topojson,
+                                    geojson,
+                                    utfgrid,
+                                    mapboxVector,
+                                    scp)));
+
+    private static Map<String, ApplicationMime> BY_FORMAT =
+            ALL.stream()
+                    .collect(
+                            Collectors.toMap(
+                                    ApplicationMime::getFormat, // key 映射
+                                    Function.identity() // value 就是元素本身
+                                    ));
+
+    private static Map<String, ApplicationMime> BY_EXTENSION =
+            ALL.stream()
+                    .collect(
+                            Collectors.toMap(
+                                    ApplicationMime::getFileExtension, // key 映射
+                                    Function.identity() // value 就是元素本身
+                                    ));
+
+    private ApplicationMime(GirApplicationMime girApplicationMime, boolean vector) {
+        super(
+                girApplicationMime.getMimeType(),
+                girApplicationMime.getFileExtension(),
+                girApplicationMime.getInternalName(),
+                girApplicationMime.getFormat(),
+                false);
+        this.vector = vector;
+    }
+
+    protected static ApplicationMime checkForFormat(String formatStr) throws MimeException {
+        ApplicationMime mimeType = BY_FORMAT.get(formatStr);
+        if (mimeType == null && formatStr.equals(MAPBOX_TILES_LEGACY_MIME)) {
+            return mapboxVector;
+        }
+        return mimeType;
+    }
+
+    protected static ApplicationMime checkForExtension(String fileExtension) throws MimeException {
+        ApplicationMime mimeType = BY_EXTENSION.get(fileExtension);
+        return mimeType;
+    }
+
+    @Override
+    public boolean isVector() {
+        return vector;
+    }
+
+    public static void main(String[] args) {
+        ApplicationMime scp1 = checkForExtension("scp");
+        System.out.println(scp1);
+    }
+}

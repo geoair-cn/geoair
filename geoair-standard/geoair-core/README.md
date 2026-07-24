@@ -83,7 +83,7 @@ goair-core/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-core</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
 </dependency>
 ```
 该工程作为基础开发库的解耦实现，给 geoair-base库提供了基础能力
@@ -137,7 +137,7 @@ log.error("This is an error message");
 
 ## 版本历史
 
-- J8.1.4：当前开发版本
+- J8.1.5：当前开发版本
 
 ## 贡献指南
 
@@ -154,7 +154,7 @@ log.error("This is an error message");
 ## 联系方式
 
 - 开发者：张逢吉
-- 邮箱：1159856928@qq.com
+- 邮箱：zhangjun7570@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
 

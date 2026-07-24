@@ -85,14 +85,14 @@ ORM SPI 模块，提供了 ORM 框架的 SPI 接口。
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm-mybatis-plus</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
 </dependency>
 
 <!-- 或 MyBatis 集成 -->
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm-mybatis</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
 </dependency>
 ```
 
@@ -135,7 +135,7 @@ public void test() {
 
 ## 版本历史
 
-- J8.1.4：当前开发版本
+- J8.1.5：当前开发版本
 
 ## 贡献指南
 
@@ -152,7 +152,7 @@ public void test() {
 ## 联系方式
 
 - 开发者：张逢吉
-- 邮箱：1159856928@qq.com
+- 邮箱：zhangjun7570@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
 

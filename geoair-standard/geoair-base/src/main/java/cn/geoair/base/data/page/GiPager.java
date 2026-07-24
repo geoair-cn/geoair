@@ -12,8 +12,8 @@ import java.util.Objects;
 /**
  * 分页结果集接口
  *
- * @author Ray
  * @param <T> 分页数据的泛型类型
+ * @author Ray
  */
 public interface GiPager<T> extends GiValuable<Iterable<T>> {
 
@@ -22,14 +22,23 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
      *
      * @return 返回分页查询的总记录数
      */
-    public long total();
+    long total();
 
     /**
      * 获取分页查询参数
      *
      * @return 返回分页查询条件参数对象
      */
-    public GiPageParam pageParam();
+    GiPageParam pageParam();
+
+    /**
+     * 判断页码是否从0开始
+     *
+     * <p>当返回true时，表示页码从0开始计数，起始页为第0页； 当返回false时，表示页码从1开始计数，起始页为第1页。
+     *
+     * @return true表示页码从0开始，false表示页码从1开始
+     */
+    boolean isPageNumStartZero();
 
     /**
      * 设置分页数据
@@ -39,7 +48,9 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
      * @param pageParam 分页参数
      * @return 返回设置后的GiPager对象
      */
-    public GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam);
+    GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam);
+
+    GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero);
 
     /**
      * 获取泛型类型的实际类
@@ -82,7 +93,7 @@ public interface GiPager<T> extends GiValuable<Iterable<T>> {
      * @param clz Pager数据类型
      * @return 对应类型的GiPager实例
      */
-    public static <T> GiPager<T> ofClass(Class<T> clz) {
+    static <T> GiPager<T> ofClass(Class<T> clz) {
         return GirSpHelper.load(GiPageConfig.class).getPagerProvider().getPager(clz);
     }
 }

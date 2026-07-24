@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-orm</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-orm-springjpa</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>jar</packaging>
 
   <name>geoair-springjpa</name>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>

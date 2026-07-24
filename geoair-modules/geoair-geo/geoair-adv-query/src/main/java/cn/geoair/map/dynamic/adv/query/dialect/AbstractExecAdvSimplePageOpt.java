@@ -97,8 +97,10 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
                         dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSqlStatement),
                         tableAlias);
         String sqlWithOrder = pBuildSqlWithOrder(refactorNoPageSql, orders, tableAlias);
-        long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
-        String pageSql = dialectTableNameProcessor.tbBuildPageSql(sqlWithOrder, pageSize, offset);
+
+        String pageSql =
+                dialectTableNameProcessor.tbBuildPageSql(
+                        sqlWithOrder, pageNum, pageSize, pageNumStartZero);
 
         Map<String, Object> resultMap =
                 Stream.of("count", "list")
@@ -138,11 +140,18 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         }
 
         int lastPageNum = calculateLastPageNum(total, pageSize);
-
+        long pageOffset =
+                dialectTableNameProcessor.getPageOffset(pageNum, pageSize, pageNumStartZero);
         // 8. 通用：构建分页结果
         PageApo<GirAdvOneRow> pageApo =
                 GirAdvQueryCommonUtils.createPageApo(
-                        total, pageNum, pageSize, pageNumStartZero, lastPageNum, offset, records);
+                        total,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        lastPageNum,
+                        pageOffset,
+                        records);
 
         // 9. 通用：组装字段元数据
         if (hasFieldsInfo) {
@@ -161,8 +170,8 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
     public String pBuildPageSql(
             String noPageSql, int pageSize, int pageNum, boolean pageNumStartZero) {
         String cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(noPageSql);
-        long offset = calculateOffset(pageNum, pageSize, pageNumStartZero);
-        return dialectTableNameProcessor.tbBuildPageSql(cleanSql, pageSize, offset);
+        return dialectTableNameProcessor.tbBuildPageSql(
+                cleanSql, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
@@ -672,10 +681,6 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
     /** 带参数获取SQL字段元数据 */
     protected DataFieldsApo getColumnsBySQLWithParam(String noPageSql, GirSqlParam sqlParam) {
         return getAdvDDLOpt().dGetColumnsBySQL(noPageSql, sqlParam);
-    }
-
-    protected long calculateOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
-        return pageNumStartZero ? (long) pageNum * pageSize : (long) (pageNum - 1) * pageSize;
     }
 
     protected int calculateLastPageNum(long total, int pageSize) {

@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-db-service</name>
 
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -46,13 +46,13 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- 数据库驱动版本 -->
     <ojdbc.version>21.5.0.0</ojdbc.version>
-<!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
+    <!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
     <sdoutl.version>23.26</sdoutl.version>
     <dm.jdbc.version>18</dm.jdbc.version>
     <dameng.geoutil.version>1.0</dameng.geoutil.version>
@@ -156,7 +156,7 @@
       </dependency>
 
       <dependency>
-       <groupId>com.oracle.database.jdbc</groupId>
+        <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc8</artifactId>
         <version>${ojdbc.version}</version>
       </dependency>
@@ -228,7 +228,6 @@
 
   <build>
     <plugins>
-
 
     </plugins>
   </build>

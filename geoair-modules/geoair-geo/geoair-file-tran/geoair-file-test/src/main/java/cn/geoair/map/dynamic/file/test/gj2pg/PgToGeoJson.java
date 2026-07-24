@@ -14,6 +14,7 @@ import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.file.geojson.GeoJsonGeoFileWriter;
 import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.*;
+import cn.hutool.core.util.StrUtil;
 import java.io.IOException;
 
 public class PgToGeoJson {
@@ -75,9 +76,9 @@ public class PgToGeoJson {
                         .setProgressListener(
                                 progress -> {
                                     log.info(
-                                            String.format(
-                                                    "进度更新：已处理 %d 条，成功率 %.2f%%，状态 %s",
-                                                    progress.getTotalCount(),
+                                            StrUtil.format(
+                                                    "进度更新：已处理 {} 条，成功率 {}%，状态{}s",
+                                                    progress.getBatchTotalCount(),
                                                     progress.getSuccessRate(),
                                                     progress.getStatus()));
                                 });

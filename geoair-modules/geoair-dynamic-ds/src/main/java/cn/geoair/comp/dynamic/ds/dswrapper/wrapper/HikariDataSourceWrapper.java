@@ -1,13 +1,15 @@
 package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 
 /** HikariCP数据源包装器 */
-@Slf4j
 public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     public HikariDataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);

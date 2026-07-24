@@ -1,6 +1,5 @@
 package cn.geoair.base.log;
 
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -149,9 +148,7 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void trace(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-        if (info.logger.isTraceEnabled()) {
-            recordLog(GemLogLevel.TRACE, format, info, arguments);
-        }
+        recordLog(GemLogLevel.TRACE, format, info, arguments);
     }
 
     @Override
@@ -267,7 +264,6 @@ public abstract class GirLogWrapper implements GiLogger {
     @Override
     public void error(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
-
         recordLog(GemLogLevel.ERROR, format, info, arguments);
     }
 

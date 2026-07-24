@@ -158,6 +158,17 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
         return startFragment + " as " + aliasTableName;
     }
 
+    @Override
+    public String tbBuildPageSql(
+            String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
+        long offset = getPageOffset(pageNum, pageSize, pageNumStartZero);
+        return tbBuildPageSql(noPageSql, pageSize, offset);
+    }
+
+    public long getPageOffset(int pageNum, int pageSize, boolean pageNumStartZero) {
+        return pageNumStartZero ? (long) pageNum * pageSize : (long) (pageNum - 1) * pageSize;
+    }
+
     /** 获取数据库专属的引号字符（PG："，MySQL：`） */
     protected abstract String getQuoteChar();
 

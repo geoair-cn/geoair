@@ -1,0 +1,18 @@
+<svg width="220" height="56" viewBox="0 0 220 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="geoairLogoGradient" x1="6" y1="6" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="48" height="48" rx="14" fill="url(#geoairLogoGradient)"/>
+  <path d="M18 18.5C18 17.1193 19.1193 16 20.5 16H35.5C36.8807 16 38 17.1193 38 18.5V24.7C38 25.3147 37.7737 25.908 37.3641 26.366L32.3834 31.9338C31.9093 32.4637 31.2427 32.7663 30.5317 32.7663H26.3703C25.6593 32.7663 24.9927 32.4637 24.5186 31.9338L19.5379 26.366C19.1283 25.908 18.902 25.3147 18.902 24.7L18 18.5Z" fill="white" fill-opacity="0.98"/>
+  <path d="M23 22H33" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M23 26H30" stroke="#0F766E" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="28" cy="36.5" r="3.5" fill="white" fill-opacity="0.96"/>
+  <path d="M65 21.5C65 15.1487 70.1487 10 76.5 10H94.5V17.2H77.7C74.2744 17.2 71.5 19.9744 71.5 23.4V32.6C71.5 36.0256 74.2744 38.8 77.7 38.8H88.5V31.1H79.9V24.3H94.8V46H76.5C70.1487 46 65 40.8513 65 34.5V21.5Z" fill="white"/>
+  <path d="M103 10H110.1V24.4H124.8V10H131.9V46H124.8V31.2H110.1V46H103V10Z" fill="white"/>
+  <path d="M140.9 46H133.3L146.8 10H155.6L169 46H161.4L158.7 38.3H143.6L140.9 46ZM145.9 31.8H156.4L151.2 17L145.9 31.8Z" fill="white"/>
+  <path d="M173.5 10H180.6V46H173.5V10Z" fill="white"/>
+  <path d="M189 10H206.2C212.3 10 216.1 13.7 216.1 19.5V22.3C216.1 26.4 214.3 29.4 210.8 31L217.4 46H209.7L204.2 32.4H196.1V46H189V10ZM196.1 17V25.9H205C207.3 25.9 208.9 24.3 208.9 22V20.9C208.9 18.6 207.3 17 205 17H196.1Z" fill="white"/>
+</svg>

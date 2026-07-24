@@ -25,6 +25,12 @@ public class GenTableColumn {
     /** 列类型 */
     private String columnType;
 
+    /** 数值精度 */
+    private String numericPrecision;
+
+    /** 数值小数位 */
+    private String numericPrecisionRadix;
+
     /** JAVA类型 */
     private String javaType;
 

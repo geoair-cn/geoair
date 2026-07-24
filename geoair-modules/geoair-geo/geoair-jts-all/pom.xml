@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-jts-all</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
 
   <packaging>jar</packaging>
   <name>geoair-jts-all</name>
@@ -29,7 +29,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -43,7 +43,7 @@
 
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <geotools.version>28.6.1</geotools.version>
@@ -182,7 +182,6 @@
       <version>${geotools.version}</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-wmts</artifactId>
@@ -252,7 +251,7 @@
 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-s3-geotiff </artifactId>
+      <artifactId>gt-s3-geotiff</artifactId>
       <version>${geotools.version}</version>
     </dependency>
 

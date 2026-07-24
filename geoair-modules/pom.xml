@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../geoair-base-parent</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-modules</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-modules</name>
 
@@ -29,7 +29,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -41,7 +41,9 @@
     <module>geoair-geo</module>
     <module>geoair-dynamic-ds</module>
     <module>geoair-db-service</module>
-    <module>geoair-message-converter</module>
+    <module>geoair-message-jts-jackson</module>
+    <module>geoair-message-jts-mybatis</module>
+    <module>geoair-official-site</module>
 
   </modules>
 

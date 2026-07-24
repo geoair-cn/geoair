@@ -16,6 +16,7 @@ import cn.geoair.map.dynamic.file.shp.ShpGeoFileReader;
 import cn.geoair.map.dynamic.file.shp.ShpLinkInfo;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import java.io.IOException;
 import java.util.function.Consumer;
 import org.locationtech.jts.geom.Geometry;
@@ -112,9 +113,9 @@ public class ShpToPg {
                         .setProgressListener(
                                 progress -> {
                                     log.info(
-                                            String.format(
-                                                    "进度更新：已处理 %d 条，成功率 %.2f%%，状态 %s",
-                                                    progress.getTotalCount(),
+                                            StrUtil.format(
+                                                    "进度更新：已处理 {} 条，成功率 {}%，状态{}s",
+                                                    progress.getBatchTotalCount(),
                                                     progress.getSuccessRate(),
                                                     progress.getStatus()));
                                 });

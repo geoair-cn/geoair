@@ -8,6 +8,8 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletOutputStream;
@@ -122,6 +124,7 @@ public class GirServletUtil extends ServletUtil {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         response.setContentType(contentType);
+        response.setContentLengthLong(re.length);
         try {
             byteArrayInputStream = new ByteArrayInputStream(re);
             outputStream = response.getOutputStream();
@@ -129,6 +132,20 @@ public class GirServletUtil extends ServletUtil {
         } catch (Exception e) {
         } finally {
             IoUtil.close(byteArrayInputStream);
+            IoUtil.close(outputStream);
+        }
+    }
+
+    public static void toResponse(
+            HttpServletResponse response, InputStream inputStream, String contentType) {
+        ServletOutputStream outputStream = null;
+        response.setContentType(contentType);
+        try {
+            outputStream = response.getOutputStream();
+            IoUtil.copy(inputStream, outputStream);
+        } catch (Exception e) {
+        } finally {
+            IoUtil.close(inputStream);
             IoUtil.close(outputStream);
         }
     }
@@ -149,5 +166,21 @@ public class GirServletUtil extends ServletUtil {
             IoUtil.close(byteArrayInputStream);
             IoUtil.close(outputStream);
         }
+    }
+
+    public static Map<String, String> getResponseHeaderMap(HttpServletResponse response) {
+        Map<String, String> headers = new HashMap<>();
+        Collection<String> headerNames = response.getHeaderNames();
+        if (headerNames == null || headerNames.isEmpty()) {
+            return headers;
+        }
+        for (String name : headerNames) {
+            String value = response.getHeader(name);
+            if (value != null) {
+                headers.put(name, value);
+            }
+        }
+
+        return headers;
     }
 }

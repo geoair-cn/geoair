@@ -1,5 +1,7 @@
 package cn.geoair.comp.dynamic.ds.readwrite.proxy;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.readwrite.GirGroupByIdDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.GirReadWriteDataSource;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
@@ -9,19 +11,19 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
- * 读写分离 PreparedStatement 代理（参考 Druid 完整实现）
+ * 读写分离 PreparedStatement 代理（完整修复版本）
  *
  * @author 张俊
  * @date Created in 2026/5/28
  */
 public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         implements PreparedStatement {
+
+    private static final GiLogger LOGGER =
+            GirLoggerFactory.getLogger(ReadWriteSplitPreparedStatement.class);
 
     private final String sql;
     private JdbcParameter[] parameters;
@@ -41,12 +43,17 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
     private int[] columnIndexes;
     private String[] columnNames;
 
+    // 缓存路由结果
+    private String cachedDataSourceType;
+    private boolean routed = false;
+
+    // 标记是否已关闭
+    private volatile boolean closed = false;
+
     public ReadWriteSplitPreparedStatement(ReadWriteSplitConnection connection, String sql) {
         super(connection);
         this.sql = sql;
-
-        // 解析 SQL 中的参数数量（跳过引号内的 ?）
-        this.parameters = new JdbcParameter[getParamCount(sql)];
+        this.parameters = new JdbcParameter[Math.max(4, getParamCount(sql))];
     }
 
     public ReadWriteSplitPreparedStatement(
@@ -115,22 +122,29 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         return paramCount;
     }
 
-    /** 设置参数（JDBC 索引从 1 开始） */
+    /** 设置参数（JDBC 索引从 1 开始） 修复：支持乱序设置参数 */
     private void setParameter(int jdbcIndex, JdbcParameter parameter) {
-        int index = jdbcIndex - 1;
-
-        if (jdbcIndex > parametersSize) {
-            parametersSize = jdbcIndex;
+        if (closed) {
+            throw new IllegalStateException("PreparedStatement has been closed");
         }
-        if (parametersSize >= parameters.length) {
-            int oldCapacity = parameters.length;
-            int newCapacity = oldCapacity + (oldCapacity >> 1);
-            if (newCapacity <= 4) {
-                newCapacity = 4;
-            }
+
+        int index = jdbcIndex - 1;
+        if (index < 0) {
+            throw new IllegalArgumentException("Parameter index must be >= 1");
+        }
+
+        // 确保数组容量足够
+        if (index >= parameters.length) {
+            int newCapacity = Math.max(index + 1, parameters.length * 2);
             parameters = Arrays.copyOf(parameters, newCapacity);
         }
+
         parameters[index] = parameter;
+
+        // 更新实际参数数量（最大有效索引+1）
+        if (index + 1 > parametersSize) {
+            parametersSize = index + 1;
+        }
 
         // 清空懒加载的 Map
         if (paramMap != null) {
@@ -138,11 +152,11 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         }
     }
 
-    /** 获取所有参数 */
+    /** 获取所有参数（只返回非空参数） */
     public Map<Integer, JdbcParameter> getParameters() {
         if (paramMap == null) {
-            paramMap = new HashMap<>(parametersSize);
-            for (int i = 0; i < parametersSize; ++i) {
+            paramMap = new HashMap<>();
+            for (int i = 0; i < parametersSize; i++) {
                 if (parameters[i] != null) {
                     paramMap.put(i + 1, parameters[i]);
                 }
@@ -151,10 +165,24 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         return paramMap;
     }
 
+    /** 检查是否已关闭 */
+    private void checkClosed() throws SQLException {
+        if (closed) {
+            throw new SQLException("PreparedStatement has been closed");
+        }
+    }
+
     /** 获取真实的 PreparedStatement */
     private PreparedStatement getRealPreparedStatement() throws SQLException {
-        if (realStatement != null) {
+        checkClosed();
+
+        if (realStatement != null && !realStatement.isClosed()) {
             return realStatement;
+        }
+
+        // 如果 realStatement 已关闭但未置空，重新创建
+        if (realStatement != null && realStatement.isClosed()) {
+            realStatement = null;
         }
 
         // 根据 SQL 路由获取连接
@@ -193,21 +221,43 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         return conn.getConnection(sql);
     }
 
-    /** 获取目标数据源类型 */
+    /** 获取目标数据源类型（带缓存） */
     private String getTargetDataSourceType() throws SQLException {
+        if (cachedDataSourceType != null) {
+            return cachedDataSourceType;
+        }
+
         ReadWriteSplitConnection conn = (ReadWriteSplitConnection) getConnection();
         GirReadWriteDataSource ds = conn.getDataSource();
         if (ds == null) {
-            return "未知";
+            cachedDataSourceType = "未知";
+        } else {
+            cachedDataSourceType =
+                    ds.getDataSourceBySQL(sql) instanceof GirGroupByIdDataSource ? "从库" : "主库";
         }
-        return ds.getDataSourceBySQL(sql) instanceof GirGroupByIdDataSource ? "从库" : "主库";
+        routed = true;
+        return cachedDataSourceType;
     }
 
     /** 应用缓存的所有参数到真实 Statement */
     private void applyCachedParameters() throws SQLException {
+        applyCachedParameters(false);
+    }
+
+    /**
+     * 应用缓存的所有参数到真实 Statement
+     *
+     * @param clearFirst 是否先清除真实Statement的已有参数
+     */
+    private void applyCachedParameters(boolean clearFirst) throws SQLException {
         if (realStatement == null) {
             return;
         }
+
+        if (clearFirst) {
+            realStatement.clearParameters();
+        }
+
         for (int i = 0; i < parametersSize; i++) {
             JdbcParameter param = parameters[i];
             if (param != null) {
@@ -241,6 +291,43 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
                 break;
             case Types.TINYINT:
                 stmt.setByte(index, (Byte) value);
+                break;
+            case JdbcParameter.TYPE.BYTES:
+                stmt.setBytes(index, (byte[]) value);
+                break;
+            case JdbcParameter.TYPE.URL:
+                stmt.setURL(index, (URL) value);
+                break;
+            case JdbcParameter.TYPE.NCharacterInputStream:
+                if (length == -1) {
+                    stmt.setNCharacterStream(index, (Reader) value);
+                } else {
+                    stmt.setNCharacterStream(index, (Reader) value, length);
+                }
+                break;
+            case JdbcParameter.TYPE.UnicodeStream:
+                stmt.setUnicodeStream(index, (InputStream) value, (int) length);
+                break;
+            case JdbcParameter.TYPE.CharacterInputStream:
+                if (length == -1) {
+                    stmt.setCharacterStream(index, (Reader) value);
+                } else {
+                    stmt.setCharacterStream(index, (Reader) value, length);
+                }
+                break;
+            case JdbcParameter.TYPE.AsciiInputStream:
+                if (length == -1) {
+                    stmt.setAsciiStream(index, (InputStream) value);
+                } else {
+                    stmt.setAsciiStream(index, (InputStream) value, length);
+                }
+                break;
+            case JdbcParameter.TYPE.BinaryInputStream:
+                if (length == -1) {
+                    stmt.setBinaryStream(index, (InputStream) value);
+                } else {
+                    stmt.setBinaryStream(index, (InputStream) value, length);
+                }
                 break;
             case Types.SMALLINT:
                 stmt.setShort(index, (Short) value);
@@ -302,82 +389,106 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
                 }
                 break;
             default:
+                if (param instanceof JdbcParameterImpl) {
+                    JdbcParameterImpl impl = (JdbcParameterImpl) param;
+                    if (impl.getScaleOrLength() != -1) {
+                        stmt.setObject(index, value, sqlType, impl.getScaleOrLength());
+                        break;
+                    }
+                }
                 stmt.setObject(index, value, sqlType);
         }
     }
 
+    // ==================== 参数设置方法 ====================
+
     @Override
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameterNull(sqlType));
     }
 
     @Override
     public void setBoolean(int parameterIndex, boolean x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.BOOLEAN, x));
     }
 
     @Override
     public void setByte(int parameterIndex, byte x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.TINYINT, x));
     }
 
     @Override
     public void setShort(int parameterIndex, short x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.SMALLINT, x));
     }
 
     @Override
     public void setInt(int parameterIndex, int x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParemeter(x));
     }
 
     @Override
     public void setLong(int parameterIndex, long x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setFloat(int parameterIndex, float x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.FLOAT, x));
     }
 
     @Override
     public void setDouble(int parameterIndex, double x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.DOUBLE, x));
     }
 
     @Override
     public void setBigDecimal(int parameterIndex, BigDecimal x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setString(int parameterIndex, String x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setBytes(int parameterIndex, byte[] x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BYTES, x));
     }
 
     @Override
     public void setDate(int parameterIndex, java.sql.Date x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(x));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.TIME, x));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.TIMESTAMP, x));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x, length));
     }
@@ -386,41 +497,50 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
     @Deprecated
     public void setUnicodeStream(int parameterIndex, InputStream x, int length)
             throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.UnicodeStream, x, length));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, int length) throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x, length));
     }
 
     @Override
     public void clearParameters() throws SQLException {
-        if (parametersSize > 0) {
-            for (int i = 0; i < parametersSize; i++) {
-                parameters[i] = null;
-            }
-            parametersSize = 0;
-            if (paramMap != null) {
-                paramMap = null;
-            }
+        checkClosed();
+        clearParametersInternal();
+    }
+
+    /** 内部清理参数方法 - 不检查closed状态 */
+    private void clearParametersInternal() {
+        if (parameters != null) {
+            Arrays.fill(parameters, 0, Math.min(parametersSize, parameters.length), null);
+        }
+        parametersSize = 0;
+        if (paramMap != null) {
+            paramMap = null;
         }
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(targetSqlType, x));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x) throws SQLException {
+        checkClosed();
         setObjectParameter(parameterIndex, x);
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, int length)
             throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex,
                 createParameter(JdbcParameter.TYPE.CharacterInputStream, reader, length));
@@ -428,72 +548,86 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public void setRef(int parameterIndex, Ref x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.REF, x));
     }
 
     @Override
     public void setBlob(int parameterIndex, Blob x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.BLOB, x));
     }
 
     @Override
     public void setClob(int parameterIndex, Clob x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.CLOB, x));
     }
 
     @Override
     public void setArray(int parameterIndex, Array x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.ARRAY, x));
     }
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
+        checkClosed();
         return getRealPreparedStatement().getMetaData();
     }
 
     @Override
     public void setDate(int parameterIndex, java.sql.Date x, Calendar cal) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.DATE, x, cal));
     }
 
     @Override
     public void setTime(int parameterIndex, Time x, Calendar cal) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.TIME, x, cal));
     }
 
     @Override
     public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.TIMESTAMP, x, cal));
     }
 
     @Override
     public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, JdbcParameterNull.valueOf(sqlType));
     }
 
     @Override
     public void setURL(int parameterIndex, URL x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.URL, x));
     }
 
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
+        checkClosed();
         return getRealPreparedStatement().getParameterMetaData();
     }
 
     @Override
     public void setRowId(int parameterIndex, RowId x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.ROWID, x));
     }
 
     @Override
     public void setNString(int parameterIndex, String value) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.NVARCHAR, value));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value, long length)
             throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex,
                 createParameter(JdbcParameter.TYPE.NCharacterInputStream, value, length));
@@ -501,38 +635,45 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public void setNClob(int parameterIndex, NClob value) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.NCLOB, value));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.CLOB, reader, length));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream, long length)
             throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.BLOB, inputStream, length));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.NCLOB, reader, length));
     }
 
     @Override
     public void setSQLXML(int parameterIndex, SQLXML xmlObject) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.SQLXML, xmlObject));
     }
 
     @Override
     public void setObject(int parameterIndex, Object x, int targetSqlType, int scaleOrLength)
             throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(x, targetSqlType, scaleOrLength));
     }
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x, length));
     }
@@ -540,6 +681,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x, long length)
             throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x, length));
     }
@@ -547,6 +689,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader, long length)
             throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex,
                 createParameter(JdbcParameter.TYPE.CharacterInputStream, reader, length));
@@ -554,38 +697,45 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.AsciiInputStream, x));
     }
 
     @Override
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(JdbcParameter.TYPE.BinaryInputStream, x));
     }
 
     @Override
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.CharacterInputStream, reader));
     }
 
     @Override
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException {
+        checkClosed();
         setParameter(
                 parameterIndex, createParameter(JdbcParameter.TYPE.NCharacterInputStream, value));
     }
 
     @Override
     public void setClob(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.CLOB, reader));
     }
 
     @Override
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.BLOB, inputStream));
     }
 
     @Override
     public void setNClob(int parameterIndex, Reader reader) throws SQLException {
+        checkClosed();
         setParameter(parameterIndex, createParameter(Types.NCLOB, reader));
     }
 
@@ -593,36 +743,56 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public ResultSet executeQuery() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
         return stmt.executeQuery();
     }
 
     @Override
     public int executeUpdate() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
         return stmt.executeUpdate();
     }
 
     @Override
     public boolean execute() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
         return stmt.execute();
     }
 
     @Override
     public void addBatch() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
+        // 重新应用所有参数，确保当前参数被正确设置
+        applyCachedParameters(true);
         stmt.addBatch();
     }
 
     @Override
     public int[] executeBatch() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
-        return stmt.executeBatch();
+        try {
+            return stmt.executeBatch();
+        } finally {
+            // 执行完成后清除参数
+            clearParametersInternal();
+            if (realStatement != null) {
+                try {
+                    realStatement.clearParameters();
+                } catch (SQLException e) {
+                    // 忽略清理异常
+                }
+            }
+        }
     }
 
     @Override
     public void clearBatch() throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.clearBatch();
         }
@@ -630,28 +800,49 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
+        checkClosed();
         PreparedStatement stmt = getRealPreparedStatement();
         return stmt.getGeneratedKeys();
     }
 
     // ==================== 关闭和资源释放 ====================
 
+    /** 修复：先清理参数，再标记关闭，避免 checkClosed 异常 */
     @Override
     public void close() throws SQLException {
-        if (realStatement != null && !realStatement.isClosed()) {
-            realStatement.close();
+        if (closed) {
+            return;
         }
-        realStatement = null;
-        clearParameters();
+
+        SQLException savedException = null;
+        try {
+            if (realStatement != null && !realStatement.isClosed()) {
+                realStatement.close();
+            }
+        } catch (SQLException e) {
+            savedException = e;
+        } finally {
+            // 先清理参数（不检查closed状态）
+            clearParametersInternal();
+
+            // 然后标记为已关闭
+            closed = true;
+            realStatement = null;
+
+            if (savedException != null) {
+                throw savedException;
+            }
+        }
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return realStatement == null || realStatement.isClosed();
+        return closed || (realStatement != null && realStatement.isClosed());
     }
 
     @Override
     public Connection getConnection() throws SQLException {
+        checkClosed();
         return super.getConnection();
     }
 
@@ -659,21 +850,25 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public ResultSet getResultSet() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getResultSet() : null;
     }
 
     @Override
     public int getUpdateCount() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getUpdateCount() : -1;
     }
 
     @Override
     public boolean getMoreResults() throws SQLException {
+        checkClosed();
         return realStatement != null && realStatement.getMoreResults();
     }
 
     @Override
     public void setFetchSize(int rows) throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.setFetchSize(rows);
         }
@@ -681,11 +876,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public int getFetchSize() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getFetchSize() : 0;
     }
 
     @Override
     public void setFetchDirection(int direction) throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.setFetchDirection(direction);
         }
@@ -693,11 +890,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public int getFetchDirection() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getFetchDirection() : ResultSet.FETCH_FORWARD;
     }
 
     @Override
     public void setMaxRows(int max) throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.setMaxRows(max);
         }
@@ -705,11 +904,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public int getMaxRows() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getMaxRows() : 0;
     }
 
     @Override
     public void setQueryTimeout(int seconds) throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.setQueryTimeout(seconds);
         }
@@ -717,11 +918,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public int getQueryTimeout() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getQueryTimeout() : 0;
     }
 
     @Override
     public void cancel() throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.cancel();
         }
@@ -729,11 +932,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
+        checkClosed();
         return realStatement != null ? realStatement.getWarnings() : null;
     }
 
     @Override
     public void clearWarnings() throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.clearWarnings();
         }
@@ -741,6 +946,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public void setCursorName(String name) throws SQLException {
+        checkClosed();
         if (realStatement != null) {
             realStatement.setCursorName(name);
         }
@@ -748,6 +954,7 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
 
     @Override
     public boolean getMoreResults(int current) throws SQLException {
+        checkClosed();
         return realStatement != null && realStatement.getMoreResults(current);
     }
 
@@ -784,6 +991,8 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         throw new SQLException("No statement available");
     }
 
+    // ==================== 私有辅助方法 ====================
+
     private void setObjectParameter(int parameterIndex, Object x) {
         if (x == null) {
             setParameter(parameterIndex, createParameterNull(Types.OTHER));
@@ -791,6 +1000,8 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         }
 
         Class<?> clazz = x.getClass();
+
+        // 基础类型
         if (clazz == Byte.class) {
             setParameter(parameterIndex, createParameter(Types.TINYINT, x));
             return;
@@ -831,13 +1042,14 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
             return;
         }
 
-        if (clazz == java.sql.Date.class || clazz == java.util.Date.class) {
-            setParameter(parameterIndex, createParameter((java.util.Date) x));
+        if (clazz == Boolean.class) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.BOOLEAN, x));
             return;
         }
 
-        if (clazz == java.sql.Timestamp.class) {
-            setParameter(parameterIndex, createParameter((java.sql.Timestamp) x));
+        // 日期时间类型
+        if (clazz == java.sql.Date.class) {
+            setParameter(parameterIndex, createParameter((java.sql.Date) x));
             return;
         }
 
@@ -846,13 +1058,53 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
             return;
         }
 
-        if (clazz == Boolean.class) {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.BOOLEAN, x));
+        if (clazz == java.sql.Timestamp.class) {
+            setParameter(parameterIndex, createParameter((java.sql.Timestamp) x));
             return;
         }
 
+        if (clazz == java.util.Date.class) {
+            setParameter(parameterIndex, createParameter((java.util.Date) x));
+            return;
+        }
+
+        // Java 8 时间类型
+        String className = x.getClass().getName();
+        if (className.equals("java.time.LocalTime")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x));
+            return;
+        }
+
+        if (className.equals("java.time.LocalDate")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.DATE, x));
+            return;
+        }
+
+        if (className.equals("java.time.LocalDateTime")
+                || className.equals("java.time.ZonedDateTime")) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
+            return;
+        }
+
+        // 二进制和流类型
         if (clazz == byte[].class) {
             setParameter(parameterIndex, new JdbcParameterImpl(JdbcParameter.TYPE.BYTES, x));
+            return;
+        }
+
+        if (x instanceof URL) {
+            setParameter(parameterIndex, new JdbcParameterImpl(JdbcParameter.TYPE.URL, x));
+            return;
+        }
+
+        if (x instanceof UUID) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.VARCHAR, x.toString()));
+            return;
+        }
+
+        if (x instanceof Enum) {
+            setParameter(
+                    parameterIndex, new JdbcParameterImpl(Types.VARCHAR, ((Enum<?>) x).name()));
             return;
         }
 
@@ -884,30 +1136,21 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
             return;
         }
 
-        String className = x.getClass().getName();
-
-        if (className.equals("java.time.LocalTime")) {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIME, x));
+        if (x instanceof RowId) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.ROWID, x));
             return;
         }
 
-        if (className.equals("java.time.LocalDate")) {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.DATE, x));
+        if (x instanceof SQLXML) {
+            setParameter(parameterIndex, new JdbcParameterImpl(Types.SQLXML, x));
             return;
         }
 
-        if (className.equals("java.time.LocalDateTime")) {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
-            return;
-        }
-
-        if (className.equals("java.time.ZonedDateTime")) {
-            setParameter(parameterIndex, new JdbcParameterImpl(Types.TIMESTAMP, x));
-            return;
-        }
-
-        setParameter(parameterIndex, createParameter(Types.OTHER, null));
+        // 其他类型，使用 setObject
+        setParameter(parameterIndex, new JdbcParameterImpl(Types.OTHER, x));
     }
+
+    // ==================== 参数创建方法 ====================
 
     private JdbcParameter createParemeter(int x) {
         return JdbcParameterInt.valueOf(x);
@@ -925,7 +1168,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (x == null) {
             return JdbcParameterNull.DATE;
         }
+        return new JdbcParameterDate(x);
+    }
 
+    private JdbcParameter createParameter(java.sql.Date x) {
+        if (x == null) {
+            return JdbcParameterNull.DATE;
+        }
         return new JdbcParameterDate(x);
     }
 
@@ -933,7 +1182,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (x == null) {
             return JdbcParameterNull.DECIMAL;
         }
-
         return JdbcParameterDecimal.valueOf(x);
     }
 
@@ -941,11 +1189,9 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (x == null) {
             return JdbcParameterNull.VARCHAR;
         }
-
         if (x.isEmpty()) {
             return JdbcParameterString.empty;
         }
-
         return new JdbcParameterString(x);
     }
 
@@ -953,7 +1199,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (x == null) {
             return JdbcParameterNull.TIMESTAMP;
         }
-
         return new JdbcParameterTimestamp(x);
     }
 
@@ -961,7 +1206,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (x == null) {
             return JdbcParameterNull.valueOf(sqlType);
         }
-
         return new JdbcParameterImpl(sqlType, x, -1, null, scaleOrLength);
     }
 
@@ -969,7 +1213,6 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (value == null) {
             return JdbcParameterNull.valueOf(sqlType);
         }
-
         return new JdbcParameterImpl(sqlType, value, length);
     }
 
@@ -977,15 +1220,13 @@ public class ReadWriteSplitPreparedStatement extends ReadWriteSplitStatement
         if (value == null) {
             return JdbcParameterNull.valueOf(sqlType);
         }
-
         return new JdbcParameterImpl(sqlType, value);
     }
 
-    public JdbcParameter createParameter(int sqlType, Object value, Calendar calendar) {
+    private JdbcParameter createParameter(int sqlType, Object value, Calendar calendar) {
         if (value == null) {
             return JdbcParameterNull.valueOf(sqlType);
         }
-
         return new JdbcParameterImpl(sqlType, value, calendar);
     }
 }

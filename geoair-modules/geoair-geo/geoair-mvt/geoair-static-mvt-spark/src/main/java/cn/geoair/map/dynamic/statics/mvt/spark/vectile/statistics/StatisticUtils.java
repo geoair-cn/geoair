@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
@@ -12,7 +14,6 @@ import cn.hutool.log.StaticLog;
 import com.alibaba.fastjson2.JSON;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
@@ -23,9 +24,8 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
 
-@Slf4j
 public class StatisticUtils {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     private static final int MAX_VALUE_COUNT_PER_FIELD = 100;
 
     private static final String LOG_PREFIX = "[瓦片要素统计]";

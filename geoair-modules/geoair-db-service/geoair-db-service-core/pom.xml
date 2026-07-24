@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-db-service</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service-core</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-db-service-core</name>
 
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -40,7 +40,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -140,7 +140,7 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-     <groupId>com.oracle.database.jdbc</groupId>
+      <groupId>com.oracle.database.jdbc</groupId>
       <artifactId>ojdbc8</artifactId>
       <version>${ojdbc.version}</version>
     </dependency>
@@ -156,11 +156,12 @@
       <version>${sdoutl.version}</version>
 
     </dependency>
-    <!--        <dependency>-->
-    <!--            <groupId>com.dm</groupId>-->
-    <!--            <artifactId>DmJdbcDriver</artifactId>-->
-    <!--            <version>${dm.jdbc.version}</version>-->
-    <!--        </dependency>-->
+    <dependency>
+      <groupId>com.dm</groupId>
+      <artifactId>DmJdbcDriver</artifactId>
+      <version>${dm.jdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
     <!--达梦空间支持-->
     <dependency>
       <groupId>com.dameng</groupId>
@@ -223,7 +224,6 @@
 
   <build>
     <plugins>
-
 
     </plugins>
   </build>

@@ -3,6 +3,7 @@ package cn.geoair.comp.dynamic.ds;
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
@@ -72,7 +73,9 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return iAdvDataSourceInitHelper;
     }
 
-    private AdvDynamicDataSourceStorage() {}
+    private AdvDynamicDataSourceStorage() {
+        GutilShutdownHook.getInstance().registerTask(this::cleanCache);
+    }
 
     // 数据源映射
     private final Map<String, AdvDataSourceWrapper> dataSourceMap = new ConcurrentHashMap<>();
@@ -84,8 +87,12 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             Set<Map.Entry<String, AdvDataSourceWrapper>> entries = dataSourceMap.entrySet();
             entries.forEach(
                     entry -> {
-                        // 关闭数据源，释放连接
-                        entry.getValue().close();
+                        try {
+                            // 关闭数据源，释放连接
+                            entry.getValue().close();
+                        } catch (Exception e) {
+                            log.error(e, e.getMessage());
+                        }
                     });
             dataSourceMap.clear();
         }

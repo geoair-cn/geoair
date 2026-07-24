@@ -4,13 +4,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geo</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-geo</name>
   <description>空间处理相关的模块</description>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -39,8 +39,11 @@
     <module>geoair-file-tran</module>
     <module>geoair-geo-tools</module>
     <module>geoair-jts-all</module>
-    <module>geoair-geoserver</module>
-    <module>geoair-geo-demo</module>
+    <!--    <module>geoair-geoserver</module>-->
+    <module>geoair-map-tile-forge</module>
+    <module>geoair-map-tile-fuser</module>
+    <module>geoair-by-gwc</module>
+    <!--    <module>geoair-geo-demo</module>-->
   </modules>
 
   <scm>
@@ -50,7 +53,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -173,6 +176,5 @@
       <url>https://repo.osgeo.org/repository/release/</url>
     </pluginRepository>
   </pluginRepositories>
-
 
 </project>

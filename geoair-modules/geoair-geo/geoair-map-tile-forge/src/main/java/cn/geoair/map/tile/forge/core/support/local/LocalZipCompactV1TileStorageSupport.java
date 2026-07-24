@@ -1,0 +1,350 @@
+package cn.geoair.map.tile.forge.core.support.local;
+
+import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUNDLE_EXT;
+import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUNDLX_EXT;
+
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache;
+import cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCacheV1;
+import cn.geoair.map.tile.forge.core.bygwc.compact.BundleFileResource;
+import cn.geoair.map.tile.forge.core.cache.TileCache;
+import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
+import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisZipDirectoryGetter;
+import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
+import cn.geoair.map.tile.forge.core.utils.TilePathParser;
+import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
+import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
+import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
+import cn.geoair.map.tile.forge.core.zip.model.RootPathInfo;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+
+/**
+ * @author ：张俊 &#064;date ：Created in 2025/11/13 17:59
+ *     &#064;description：本地ZIP压缩V1版本瓦片存储支持类，用于处理ArcGIS紧凑型缓存V1格式的瓦片数据读取
+ */
+public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirectoryGetter {
+    public static GiLogger log = GirLoggerFactory.getLogger();
+
+    public LocalZipCompactV1TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
+        super(contextHelper);
+    }
+
+    protected ICompressionHandler compressionHandler = null;
+
+    public ICompressionHandler getICompressionHandler() {
+        if (compressionHandler == null) {
+            compressionHandler = new LocalCompressionHandler();
+        }
+        return compressionHandler;
+    }
+
+    @Override
+    public TileRequest getTileData(
+            GirLayerConfigContext layerConfigContext, String z, String x, String y)
+            throws Exception {
+        // 初始化瓦片请求对象
+        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
+        try {
+            // 创建缓存访问器，用于构建文件路径
+            String tempDirAbsolutePath =
+                    TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
+
+            LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
+            if (!layerPerFileDao.cacheEnableIs(layerConfigContext)) {
+                byZip(layerConfigContext, z, y, x, tempDirAbsolutePath);
+            } else {
+                byPreCache(layerConfigContext, z, y, x, tempDirAbsolutePath);
+            }
+            // 创建本地缓存访问器，从解压后的文件中读取瓦片数据
+            String tilePathPrefix = layerConfigContext.getTilePathPrefix();
+            String rootPath = tempDirAbsolutePath;
+            if (!StrUtil.isEmpty(tilePathPrefix)) {
+                rootPath = rootPath + File.separator + tilePathPrefix;
+            }
+            ArcGISCompactCache localCache = getArcGISCompactCache(rootPath);
+            BundleFileResource bundleFileResource =
+                    localCache.getBundleFileResource(
+                            Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
+
+            // 如果找到瓦片资源，设置返回数据
+            if (bundleFileResource != null) {
+                long size = bundleFileResource.getSize();
+                tileRequest.setExists(true);
+                tileRequest.setBytes(IoUtil.readBytes(bundleFileResource.getInputStream()));
+                tileRequest.setSize(size);
+                tileRequest.setLastModified(bundleFileResource.getLastModified());
+            }
+        } catch (Exception e) {
+            log.info("getTileData error:{}", e.getMessage());
+        }
+
+        return tileRequest;
+    }
+
+    ArcGISCompactCache getArcGISCompactCache(String pathToCacheRoot) {
+        return new ArcGISCompactCacheV1(pathToCacheRoot);
+    }
+
+    protected void byZip(
+            GirLayerConfigContext layerConfigContext,
+            String z,
+            String y,
+            String x,
+            String tempDirAbsolutePath)
+            throws IOException {
+        ArcGISCompactCache arcGISCompactCache =
+                getArcGISCompactCache(layerConfigContext.getTilePathPrefix());
+        String filePath =
+                arcGISCompactCache.buildBundleFilePath(
+                        Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
+        boolean b =
+                zipBundleFileToLocal(layerConfigContext, filePath, tempDirAbsolutePath, BUNDLX_EXT);
+        if (!b) {
+            // 上一个不存在，第二个肯定也是不存在的
+            return;
+        }
+        zipBundleFileToLocal(layerConfigContext, filePath, tempDirAbsolutePath, BUNDLE_EXT);
+    }
+
+    protected void byPreCache(
+            GirLayerConfigContext layerConfigContext,
+            String z,
+            String y,
+            String x,
+            String tempDirAbsolutePath)
+            throws IOException {
+        ArcGISCompactCache arcGISCompactCache = getArcGISCompactCache(File.separator);
+        String filePath =
+                arcGISCompactCache.buildBundleFilePath(
+                        Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
+        boolean b =
+                preCacheBundleFileToLocal(
+                        layerConfigContext, filePath, tempDirAbsolutePath, BUNDLX_EXT);
+        if (!b) {
+            return;
+        }
+        //        preCacheBundleFileToLocal(layerConfigContext, filePath, tempDirAbsolutePath,
+        // BUNDLE_EXT);
+    }
+
+    protected boolean zipBundleFileToLocal(
+            GirLayerConfigContext layerConfigContext,
+            String filePath,
+            String tempDirAbsolutePath,
+            String fileExt)
+            throws IOException {
+        boolean b =
+                preCacheBundleFileToLocal(
+                        layerConfigContext, filePath, tempDirAbsolutePath, fileExt);
+        if (b) { // 虽然走到这个方法的时候，肯定cacheEnableIs是false，但是不排除已经存在部分缓存了，这里先去缓存里面试探一下。
+            return true;
+        }
+        String pathToBundleFile = filePath.replaceFirst("^\\\\+", "") + fileExt;
+        // 检查并解压 .bundle 文件到临时目录
+        File tempBundleFile =
+                FileUtil.file(tempDirAbsolutePath + File.separator + pathToBundleFile);
+        if (!FileUtil.exist(tempBundleFile)) {
+            // ZIP文件内路径统一使用正斜杠
+            String normalizedPathToBundleFile = pathToBundleFile.replace('\\', '/');
+            try {
+                getICompressionHandler()
+                        .readFileFromZipToLocal(
+                                layerConfigContext.getObjectKey(),
+                                normalizedPathToBundleFile,
+                                tempBundleFile.getAbsolutePath());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                return false;
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    protected boolean preCacheBundleFileToLocal(
+            GirLayerConfigContext layerConfigContext,
+            String filePath,
+            String tempDirAbsolutePath,
+            String fileExt) {
+
+        String pathToBundleFile = null;
+        if (filePath.startsWith(File.separator)) {
+            String replaceFirst = StrUtil.replaceFirst(filePath, File.separator, "");
+            pathToBundleFile = replaceFirst + fileExt;
+        } else {
+            pathToBundleFile = filePath + fileExt;
+        }
+        // 检查并解压 .bundle 文件到临时目录
+
+        File tempBundleFile =
+                FileUtil.file(
+                        tempDirAbsolutePath
+                                + File.separator
+                                + (layerConfigContext.getTilePathPrefix() != null
+                                        ? layerConfigContext.getTilePathPrefix() + File.separator
+                                        : "")
+                                + pathToBundleFile);
+
+        if (FileUtil.exist(tempBundleFile)) {
+            return true;
+        }
+        try (LayerPerFileDao layerPerFileDao =
+                contextHelper.getLayerPerFileDao(layerConfigContext)) {
+            boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
+            if (b) {
+                String replace = pathToBundleFile.replace("\\", "/");
+                TileCentralDirectoryModel zipDirectoryByFileName =
+                        layerPerFileDao.findByFileName(replace);
+                if (zipDirectoryByFileName == null) {
+                    return false;
+                }
+                getICompressionHandler()
+                        .readAndDecompressEntryToLocal(
+                                zipDirectoryByFileName,
+                                layerConfigContext.getObjectKey(),
+                                tempBundleFile.getAbsolutePath());
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+
+            log.error("getTileDataByPreZipCache error:", e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
+        if (centralDirectoryModel.isDirectoryIs()) {
+            return null;
+        }
+        TileCentralDirectoryModel tileCentralDirectoryEntry = new TileCentralDirectoryModel();
+        BeanUtil.copyProperties(centralDirectoryModel, tileCentralDirectoryEntry);
+        String name = centralDirectoryModel.getName();
+
+        if (name.toLowerCase().contains("conf")) {
+            tileCentralDirectoryEntry.setFileName(name);
+        } else {
+            String subBundlePath = TilePathParser.getSubBundlePath(name);
+            if (subBundlePath == null) {
+                return null;
+            }
+            tileCentralDirectoryEntry.setFileName(subBundlePath);
+        }
+        tileCentralDirectoryEntry.setStorageType("COMPACT");
+        return tileCentralDirectoryEntry;
+    }
+
+    @Override
+    public void preCacheTiles(
+            GirLayerConfigContext layerConfigContext,
+            TileCache tileCache,
+            ProgressConsumer progressConsumer) {
+        this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
+
+        LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
+        // 参数校验
+        if (layerConfigContext == null) {
+            throw new IllegalArgumentException("layerConfigDto 不能为空");
+        }
+
+        ICompressionHandler iCompressionHandler = getICompressionHandler();
+        String objectKey = layerConfigContext.getObjectKey();
+        try {
+            layerPerFileDao.findAll(
+                    tileCentralDirectoryEntry -> {
+                        //                Integer z = tileCentralDirectoryEntry.getZAsInt(), x =
+                        // tileCentralDirectoryEntry.getXAsInt(), y =
+                        // tileCentralDirectoryEntry.getYAsInt();
+                        //                TileRequest tileRequest = getTileRequest(layerConfigDto );
+                        //                String cacheKey =
+                        // tileCache.buildTileCacheKey(layerConfigDto.getLayerName(), z, y, x);
+                        //                getExecutor().submit(() -> {
+                        //                    try {
+                        //                        byte[] bytes =
+                        // iCompressionHandler.readAndDecompressEntry(tileCentralDirectoryEntry,
+                        // objectKey);
+                        //                        tileRequest.setBytes(bytes);
+                        //
+                        // tileRequest.setLastModified(System.currentTimeMillis());
+                        //                        tileRequest.setSize(bytes.length);
+                        //                        tileRequest.setExists(true);
+                        //                        tileRequest.mimeTypeByType(MediaType.IMAGE_PNG);
+                        //                        tileCache.putTile(cacheKey, tileRequest);
+                        //                    } catch (Exception e) {
+                        //                        log.error("preCacheTiles error:{}",
+                        // e.getMessage());
+                        //                    }
+                        //                });
+                    });
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    public RootPathInfo preCheckZipAndGetRoot(
+            GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler)
+            throws IOException {
+        AtomicReference<String> tileSetPath = new AtomicReference<>("");
+        iCompressionHandler.scanAllEntries(
+                layerConfigContext.getObjectKey(),
+                (centralDirectoryEntry, allCount, currentCount) -> {
+                    boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
+                    if (directoryIs) {
+                        return true;
+                    }
+                    String name = centralDirectoryEntry.getName();
+                    String confFileName = "conf.xml";
+                    if (name.toLowerCase().contains(confFileName)) {
+                        tileSetPath.set(name);
+                        return false;
+                    }
+                    return true;
+                });
+        String tileSetJsonPath = tileSetPath.get();
+
+        if (StrUtil.isEmpty(tileSetJsonPath)) {
+            throw new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
+        } else {
+            log.info("zip中找到conf.xml，判断为合法的arcgis紧凑型瓦片文件包：{}", tileSetJsonPath);
+        }
+        String name = FileUtil.getName(tileSetJsonPath);
+        String rootPath = tileSetJsonPath.replace("conf.xml", "").replace("Conf.xml", "");
+        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath);
+    }
+
+    /**
+     * 根据图层配置信息获取配置XML内容
+     *
+     * @param layerConfigContext 图层配置信息对象
+     * @return 配置文件的XML字符串内容
+     * @throws Exception 读取文件异常
+     */
+    @Override
+    public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigXmlByLocal(layerConfigContext);
+    }
+
+    @Override
+    public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
+        return ArcgisTileUtils.getConfigCdiByLocal(layerConfigContext);
+    }
+}

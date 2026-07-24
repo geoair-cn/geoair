@@ -3,7 +3,8 @@ package cn.geoair.comp.code.generator.multi.run;
 import cn.geoair.base.Gir;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.comp.code.generator.multi.config.GirGeneratorConfig;
-import cn.geoair.comp.code.generator.multi.db.CommonRuner;
+import cn.geoair.comp.code.generator.multi.db.CommonRunner;
+import cn.geoair.comp.code.generator.multi.db.ICommonRunner;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
@@ -24,12 +25,17 @@ public class GirGenerator {
 
     private GirGeneratorConfig globalConfig;
 
-    private CommonRuner commonRuner;
+    private ICommonRunner iCommonRunner;
 
     public GirGenerator(DataSource dataSource, GirGeneratorConfig globalConfig) {
-        this.commonRuner = new CommonRuner(dataSource);
+        this.iCommonRunner = new CommonRunner(dataSource);
         this.globalConfig = globalConfig;
+        VelocityUtils.initVelocity();
+    }
 
+    public GirGenerator(ICommonRunner iCommonRunner, GirGeneratorConfig globalConfig) {
+        this.iCommonRunner = iCommonRunner;
+        this.globalConfig = globalConfig;
         VelocityUtils.initVelocity();
     }
 
@@ -38,14 +44,14 @@ public class GirGenerator {
             throw new GirException("生成表名列表不能为空");
         }
         // 查询表信息
-        List<GenTable> tableList = commonRuner.selectDbTableListByNames(tables);
+        List<GenTable> tableList = iCommonRunner.selectDbTableListByNames(tables);
         for (GenTable table : tableList) {
             GenUtils.initTable(table, this.globalConfig);
             table.setPackageName(globalConfig.getSourceRootPackage());
             table.setGenPath(globalConfig.getSourceRootPath());
             // 查询列信息
             List<GenTableColumn> genTableColumns =
-                    commonRuner.getTableColumnsByTableName(table.getTableName());
+                    iCommonRunner.getTableColumnsByTableName(table.getTableName());
             if (genTableColumns.isEmpty()) {
                 throw new GirException("表[" + table.getTableName() + "]无列信息，无法生成代码");
             }

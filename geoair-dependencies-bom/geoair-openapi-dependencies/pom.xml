@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-openapi-dependencies</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-openapi-dependencies</name>
   <description>geoair swagger 相关的基础依赖声明</description>
@@ -28,7 +28,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -45,7 +45,7 @@
     <knife4j-openapi3.version>4.4.0</knife4j-openapi3.version>
     <springfox.version>3.0.0</springfox.version>
     <springdoc.version>1.7.0</springdoc.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <spring-boot.version>2.7.18</spring-boot.version>
     <java.version>8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

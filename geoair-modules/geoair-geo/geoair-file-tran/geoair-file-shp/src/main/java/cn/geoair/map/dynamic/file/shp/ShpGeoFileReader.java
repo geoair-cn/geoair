@@ -4,13 +4,17 @@ import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -45,6 +49,14 @@ public class ShpGeoFileReader implements GeoFileReader {
         initShpReader();
     }
 
+    @Override
+    public long getFeatureCount() {
+        if (this.featureCollection == null) {
+            return 0;
+        }
+        return this.featureCollection.size();
+    }
+
     /** 初始化 Shapefile 读取器 */
     private void initShpReader() {
         try {
@@ -57,7 +69,7 @@ public class ShpGeoFileReader implements GeoFileReader {
 
             dataStore = DataStoreFinder.getDataStore(params);
             if (dataStore == null) {
-                throw new RuntimeException("无法读取 Shapefile，检查文件是否损坏或缺失配套文件(shx/dbf)");
+                throw new GeoFileReadException("无法读取 Shapefile，检查文件是否损坏或缺失配套文件(shx/dbf)");
             }
 
             String typeName = dataStore.getTypeNames()[0];
@@ -65,28 +77,22 @@ public class ShpGeoFileReader implements GeoFileReader {
             featureCollection = featureSource.getFeatures();
             featureType = featureCollection.getSchema();
             featureIterator = featureCollection.features();
-
         } catch (Exception e) {
             close();
-            throw new RuntimeException("初始化 Shapefile 读取器失败", e);
+            throw new GeoFileReadException("初始化 Shapefile 读取器失败", e);
         }
     }
 
-    /** 读取表头 = SimpleFeatureType */
     @Override
     public SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer) {
         try {
             return featureType;
         } catch (Exception e) {
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-                return null;
-            }
-            throw new RuntimeException("读取 shp 表头失败", e);
+            notifyException(exceptionConsumer, e);
+            throw new GeoFileReadException("读取 shp 表头失败", e);
         }
     }
 
-    /** 读取单行（和 GeoJSON 逻辑完全一致） */
     @Override
     public GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
         try {
@@ -111,17 +117,12 @@ public class ShpGeoFileReader implements GeoFileReader {
                 }
             }
             return GirAdvOneRow.ofByMap(attributes);
-
         } catch (Exception e) {
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-                return null;
-            }
-            throw new RuntimeException("读取 shp 单行数据失败", e);
+            notifyException(exceptionConsumer, e);
+            throw new GeoFileReadException("读取 shp 单行数据失败", e);
         }
     }
 
-    /** 行迭代器（完全复用原逻辑） */
     @Override
     public Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer) {
         resetIterator();
@@ -131,29 +132,28 @@ public class ShpGeoFileReader implements GeoFileReader {
 
             @Override
             public boolean hasNext() {
-                if (closed) return false;
+                if (closed) {
+                    return false;
+                }
                 try {
                     return featureIterator != null && featureIterator.hasNext();
                 } catch (Exception e) {
-                    if (exceptionConsumer != null) exceptionConsumer.accept(e);
-                    return false;
+                    notifyException(exceptionConsumer, e);
+                    closeIterator();
+                    throw new GeoFileReadException("检查 shp 是否有下一条数据失败", e);
                 }
             }
 
             @Override
             public GirAdvOneRow next() {
-                if (closed) throw new NoSuchElementException("迭代器已关闭");
-                try {
-                    GirAdvOneRow row = readOneRow(exceptionConsumer);
-                    if (row == null) {
-                        closeIterator();
-                        throw new NoSuchElementException("无更多数据");
-                    }
-                    return row;
-                } catch (Exception e) {
-                    closeIterator();
-                    throw new RuntimeException("读取 shp 数据失败", e);
+                if (closed) {
+                    throw new NoSuchElementException("迭代器已关闭");
                 }
+                if (!hasNext()) {
+                    closeIterator();
+                    throw new NoSuchElementException("无更多数据");
+                }
+                return readOneRow(exceptionConsumer);
             }
 
             @Override
@@ -177,12 +177,13 @@ public class ShpGeoFileReader implements GeoFileReader {
         };
     }
 
-    /** 分页读取（逻辑不变） */
     @Override
     public GirPager<GirAdvOneRow> readRowPage(GirPageParam param, ExceptionConsumer consumer) {
         GirPager<GirAdvOneRow> pager = new GirPager<>();
         try {
-            if (param == null) throw new IllegalArgumentException("分页参数不能为空");
+            if (param == null) {
+                throw new IllegalArgumentException("分页参数不能为空");
+            }
             int pageNum = param.getPageNum();
             int pageSize = param.getPageSize();
             int start = (pageNum - 1) * pageSize;
@@ -198,22 +199,26 @@ public class ShpGeoFileReader implements GeoFileReader {
                     featureIterator.next();
                     continue;
                 }
-                if (i >= end) break;
+                if (i >= end) {
+                    break;
+                }
 
-                GirAdvOneRow row = readOneRow(consumer);
-                if (row != null) list.add(row);
+                list.add(readOneRow(consumer));
             }
 
             pager.put(list, featureCollection.size(), param);
         } catch (Exception e) {
-            if (consumer != null) consumer.accept(e);
+            notifyException(consumer, e);
+            throw new GeoFileReadException("读取 shp 分页数据失败", e);
         }
         return pager;
     }
 
     /** 重置迭代器 */
     private void resetIterator() {
-        if (featureIterator != null) featureIterator.close();
+        if (featureIterator != null) {
+            featureIterator.close();
+        }
         initShpReader();
         currentRow.set(0);
     }
@@ -221,9 +226,19 @@ public class ShpGeoFileReader implements GeoFileReader {
     /** 关闭资源 */
     @Override
     public void close() {
-        if (featureIterator != null) featureIterator.close();
-        if (dataStore != null) dataStore.dispose();
+        if (featureIterator != null) {
+            featureIterator.close();
+        }
+        if (dataStore != null) {
+            dataStore.dispose();
+        }
         featureCollection = null;
         featureType = null;
+    }
+
+    private void notifyException(ExceptionConsumer exceptionConsumer, Exception e) {
+        if (exceptionConsumer != null) {
+            exceptionConsumer.accept(e);
+        }
     }
 }

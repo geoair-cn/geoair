@@ -1,5 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.service;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
@@ -21,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author: 武汉刘德华
  * @create: 2021-01-19 17:27
  */
-@Slf4j
 @Service
 public class DsApiConfigService {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Autowired GirDsApiGroupDao girDsApiGroupDao;
 
     @Autowired GirDsApiConfigDao girDsApiConfigDao;

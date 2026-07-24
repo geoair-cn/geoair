@@ -125,6 +125,12 @@ public interface DialectTableNameProcessor {
     /** 构建分页SQL */
     String tbBuildPageSql(String noPageSql, int pageSize, long offset);
 
+    /** 构建分页SQL */
+    String tbBuildPageSql(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero);
+
+    /** 获取分页的startRow */
+    long getPageOffset(int pageNum, int pageSize, boolean pageNumStartZero);
+
     /**
      * 不进行具体的值填充，只进行 ? 占位符填充
      *

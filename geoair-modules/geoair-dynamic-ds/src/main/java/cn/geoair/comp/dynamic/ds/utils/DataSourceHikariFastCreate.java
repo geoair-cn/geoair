@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * HikariCP 数据源快速创建工具类 对标 Druid 版本的 DataSourceDruidFastCreate
+ * HikariCP 数据源快速创建工具类
  *
  * <p>注意：HikariCP 官方推荐 minimumIdle = maximumPoolSize 以获得最佳性能
  */
@@ -68,6 +68,9 @@ public class DataSourceHikariFastCreate {
     private Long catalog;
 
     private Long schema;
+    private Boolean readOnly; // 是否只读数据源
+
+    private Consumer<HikariConfig> configurator = t -> {};
 
     // ==================== 静态工厂方法 ====================
 
@@ -159,13 +162,14 @@ public class DataSourceHikariFastCreate {
         if (jdbcUrl == null || jdbcUrl.trim().isEmpty()) {
             throw new IllegalArgumentException("jdbcUrl must not be null or empty");
         }
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("username must not be null or empty");
+        if (!jdbcUrl.contains("sqlite")) {
+            if (username == null || username.trim().isEmpty()) {
+                throw new IllegalArgumentException("username must not be null or empty");
+            }
+            if (password == null) {
+                throw new IllegalArgumentException("password must not be null");
+            }
         }
-        if (password == null) {
-            throw new IllegalArgumentException("password must not be null");
-        }
-
         config.setJdbcUrl(jdbcUrl);
         config.setUsername(username);
         config.setPassword(password);
@@ -211,10 +215,14 @@ public class DataSourceHikariFastCreate {
         if (allowPoolSuspension != null) {
             config.setAllowPoolSuspension(allowPoolSuspension);
         }
-
+        if (readOnly != null) {
+            config.setReadOnly(readOnly);
+        }
         // 额外优化：注册 JMX 监控 Bean（便于通过 JConsole 等工具监控）
         config.setRegisterMbeans(true);
-
+        if (configurator != null) {
+            configurator.accept(config);
+        }
         return new HikariDataSource(config);
     }
 }

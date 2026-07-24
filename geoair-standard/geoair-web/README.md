@@ -32,7 +32,7 @@ geoair-web 是一个轻量级的 Web 工具库，为 Java Web 应用提供了一
 - `GirHttpSession`：基于 HttpSession 的会话实现
 - `GirTokenSession`：基于 Token 的会话实现
 - `GirSpringSession`：基于 Spring Session 的会话实现
-- `GtcWebUserSession`：用户会话管理
+- `GirWebUserSession`：用户会话管理
 
 ### 4. 页面参数处理
 
@@ -57,7 +57,7 @@ geoair-web 是一个轻量级的 Web 工具库，为 Java Web 应用提供了一
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-web</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
 </dependency>
 ```
 
@@ -137,7 +137,7 @@ geoair-web/
 │   │   ├── GirSessionConfig.java
 │   │   ├── GirSpringSession.java
 │   │   ├── GirTokenSession.java
-│   │   ├── GtcWebUserSession.java
+│   │   ├── GirWebUserSession.java
 │   │   └── gtcWebUserSessionProvider.java
 │   └── util/                      # 工具类
 │       ├── GirHttpServletHelper.java
@@ -153,7 +153,7 @@ Apache License 2.0
 ## 开发团队
 
 - **开发者**：zhangfengji
-- **邮箱**：1159856928@qq.com
+- **邮箱**：zhangjun7570@qq.com
 - **组织**：geoair
 - **官网**：https://xmt.geoair.cn/
 
@@ -163,7 +163,7 @@ Apache License 2.0
 
 ## 版本信息
 
-当前版本：J8.1.4
+当前版本：J8.1.5
 
 ## 贡献指南
 
@@ -171,4 +171,4 @@ Apache License 2.0
 
 ## 更新日志
 
-- J8.1.4：初始版本，提供基础 Web 工具功能
+- J8.1.5：初始版本，提供基础 Web 工具功能

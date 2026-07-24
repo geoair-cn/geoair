@@ -66,7 +66,8 @@ public class GirDsRdAutoConfiguration {
                         : "轮询策略");
 
         GirReadWriteDataSource dataSource =
-                GirReadWriteDataSourceBuilder.builder(properties, dataSourceProperties, initHelper)
+                GirSpringReadWriteDataSourceBuilder.builder(
+                                properties, dataSourceProperties, initHelper)
                         .build();
 
         RdLog.minLogLevel = properties.minLogLevel;

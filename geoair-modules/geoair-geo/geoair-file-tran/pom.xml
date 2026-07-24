@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-file-tran</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
 
   <packaging>pom</packaging>
   <name>geoair-file-tran</name>
@@ -28,7 +28,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -36,6 +36,7 @@
 
   <modules>
     <module>geoair-file-core</module>
+    <module>geoair-file-csv</module>
     <module>geoair-file-geojson</module>
     <module>geoair-file-postgis</module>
     <module>geoair-file-shp</module>
@@ -49,7 +50,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -59,6 +60,11 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-file-core</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-csv</artifactId>
         <version>${geoair.version}</version>
       </dependency>
       <dependency>
@@ -77,8 +83,38 @@
   <build>
     <plugins>
 
-
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <!--      未开发完成，不发布到公网仓库-->
+      <id>central</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>false</extensions>
+            <executions>
+              <execution>
+                <id>injected-central-publishing</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+      </properties>
+    </profile>
+
+  </profiles>
 
 </project>

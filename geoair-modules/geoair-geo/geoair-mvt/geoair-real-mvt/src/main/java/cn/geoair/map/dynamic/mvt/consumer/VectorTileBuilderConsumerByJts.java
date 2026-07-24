@@ -1,20 +1,20 @@
 package cn.geoair.map.dynamic.mvt.consumer;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.tools.PipelineBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import no.ecc.vectortile.VectorTileEncoder;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 /** 基于Consumer模式的VectorTile PBF构建器 */
-@Slf4j
 public class VectorTileBuilderConsumerByJts extends VectorTileBuilderConsumer {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // 瓦片范围
     private final Envelope envelope;
 

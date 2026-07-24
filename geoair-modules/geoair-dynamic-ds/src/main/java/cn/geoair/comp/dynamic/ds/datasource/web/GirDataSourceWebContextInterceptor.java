@@ -1,10 +1,11 @@
 package cn.geoair.comp.dynamic.ds.datasource.web;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.datasource.GirDynamicStackDataSource;
 import java.util.Stack;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
@@ -12,8 +13,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * @date ：Created in 2025/6/19 10:44
  * @description： 动态数据源切换相关配置，这里可以接入相关业务库查询获取到数据库信息 注意： 如果涉及到异步线程，还需要手动注入数据源配置
  */
-@Slf4j
 public class GirDataSourceWebContextInterceptor implements HandlerInterceptor {
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     @Override
     public void afterCompletion(

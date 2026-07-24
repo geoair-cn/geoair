@@ -18,6 +18,8 @@ public interface GeoFileReader extends Closeable {
     // 链接信息
     void setLinkInfo(LinkInfo linkInfo);
 
+    long getFeatureCount();
+
     // 读取表头
     SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
 

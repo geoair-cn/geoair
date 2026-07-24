@@ -2,6 +2,8 @@ package cn.geoair.comp.db.service.core.controller;
 
 import cn.geoair.base.api.annotation.GaApi;
 import cn.geoair.base.api.annotation.GaApiAction;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
@@ -14,6 +16,9 @@ import cn.geoair.comp.db.service.core.basic.util.*;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -28,7 +33,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,11 +45,10 @@ import org.springframework.web.multipart.MultipartFile;
  * @create: 2021-01-19 17:27
  */
 @RestController
-@Slf4j
 @RequestMapping("/ds_api/apiConfig")
 @GaApi(tags = "GirDs api配置")
 public class GirDsApiConfigController {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     @Resource DsApiUserInfoHelper dsApiUserInfoHelper;
 
     @Autowired DsApiConfigService dsApiConfigService;
@@ -305,13 +308,11 @@ public class GirDsApiConfigController {
         DruidPooledConnection connection = null;
         try {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dsDataSourceApo);
+            IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
+            List<GirAdvOneRow> girAdvOneRows =
+                    iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
         } finally {
@@ -331,13 +332,11 @@ public class GirDsApiConfigController {
         DruidPooledConnection connection = null;
         try {
             DsDataSourceApo dsDataSourceApo = dsDataSourceService.detail(datasourceId);
-            connection = PoolManager.getPooledConnection(dsDataSourceApo);
+            IAdvExecutor iAdvExecutor = PoolManager.getIAdvExecutor(dsDataSourceApo);
             Map<String, Object> map = JSON.parseObject(params, Map.class);
-            SqlMeta sqlMeta = SqlEngineUtil.getEngine().parse(sql, map);
-            Object data =
-                    JdbcUtil.executeSql(
-                            connection, sqlMeta.getSql(), sqlMeta.getJdbcParamValues(), false);
-            return ResponseDto.successWithData(data);
+            List<GirAdvOneRow> girAdvOneRows =
+                    iAdvExecutor.bSelectList(sql, SqlParamMap.of().ofMap(map));
+            return ResponseDto.successWithData(girAdvOneRows);
         } catch (Exception e) {
             return ResponseDto.fail(e.getMessage());
         } finally {

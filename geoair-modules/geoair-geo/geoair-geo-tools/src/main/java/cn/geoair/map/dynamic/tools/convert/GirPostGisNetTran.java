@@ -40,4 +40,18 @@ public class GirPostGisNetTran {
         jtsGeom.setSRID(geometry.getSrid());
         return jtsGeom;
     }
+
+    public static Object toPGGeometry(Geometry jtsGeometry) throws Exception {
+        String wkt =
+                GirGeoTools.defaultInstance()
+                        .getFormatOpt()
+                        .jtsGeometryToWktString(jtsGeometry, true);
+        net.postgis.jdbc.PGgeometry pgGeometry = new net.postgis.jdbc.PGgeometry();
+        pgGeometry.setValue(wkt);
+        pgGeometry.setType("geometry");
+        if (jtsGeometry.getSRID() != 0 && pgGeometry.getGeometry() != null) {
+            pgGeometry.getGeometry().setSrid(jtsGeometry.getSRID());
+        }
+        return pgGeometry;
+    }
 }

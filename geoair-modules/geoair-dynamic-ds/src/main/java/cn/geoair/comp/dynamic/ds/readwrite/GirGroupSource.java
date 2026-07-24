@@ -4,6 +4,7 @@ import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.readwrite.proxy.ReadWritePxyConnection;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.db.ds.simple.AbstractDataSource;
 import java.io.IOException;
@@ -167,7 +168,7 @@ public class GirGroupSource extends AbstractDataSource {
         /** 构建 GirGroupSource */
         public GirGroupSource build() {
             if (groupName == null || groupName.trim().isEmpty()) {
-                throw new IllegalStateException("groupName 不能为空");
+                groupName = IdUtil.fastSimpleUUID();
             }
             if (dataSources.isEmpty()) {
                 throw new IllegalStateException("dataSources 不能为空");

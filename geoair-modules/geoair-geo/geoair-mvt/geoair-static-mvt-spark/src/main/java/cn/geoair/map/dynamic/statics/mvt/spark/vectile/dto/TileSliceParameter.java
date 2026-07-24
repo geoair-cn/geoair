@@ -34,10 +34,10 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 输入信息配置=====================
     /** 输入连接信息 */
-    public PgConnectInfo inputConnectInfo;
+    public PgConnectInfoSimple inputConnectSimple;
 
     /** 输出连接信息 */
-    public PgConnectInfo outPutConnectInfo;
+    public PgConnectInfoWithTable outPutConnectWithTable;
 
     /** 几何字段名称 */
     private String geomFieldName;
@@ -147,7 +147,7 @@ public class TileSliceParameter implements Serializable {
      *
      * @return
      */
-    private boolean statisticsIs = Boolean.TRUE;
+    private boolean statisticsIs = Boolean.FALSE;
 
     /** 统计的json存放的根路径 */
     private String staticTableName = "static_table_json_def";
@@ -209,5 +209,39 @@ public class TileSliceParameter implements Serializable {
         // 对处理后的JSON字符串进行Base32编码
         String encode = Base32.encode(jsonObject.toString());
         return encode;
+    }
+
+    @Deprecated
+    public TileSliceParameter setInputConnectInfo(PgConnectInfo pgConnectInfo) {
+        this.inputConnectSimple = pgConnectInfo.toPgConnectInfoSimple();
+        return this;
+    }
+
+    @Deprecated
+    public TileSliceParameter setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
+        this.outPutConnectWithTable = pgConnectInfo.toPgConnectInfoWithTable();
+        return this;
+    }
+
+    @Deprecated
+    public TileSliceParameter setInputConnectInfo(PgConnectInfoSimple inputConnectInfo) {
+        this.inputConnectSimple = inputConnectInfo;
+        return this;
+    }
+
+    @Deprecated
+    public TileSliceParameter setOutPutConnectInfo(PgConnectInfoWithTable outPutConnectInfo) {
+        this.outPutConnectWithTable = outPutConnectInfo;
+        return this;
+    }
+
+    @Deprecated
+    public PgConnectInfo getInputConnectInfo() {
+        return PgConnectInfo.fromPgConnectInfoSimple(inputConnectSimple);
+    }
+
+    @Deprecated
+    public PgConnectInfo getOutPutConnectInfo() {
+        return PgConnectInfo.fromPgConnectInfoWithTable(outPutConnectWithTable);
     }
 }

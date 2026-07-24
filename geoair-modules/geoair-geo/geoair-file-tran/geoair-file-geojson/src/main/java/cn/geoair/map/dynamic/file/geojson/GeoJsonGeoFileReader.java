@@ -4,11 +4,17 @@ import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
+import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.geotools.data.geojson.GeoJSONReader;
 import org.geotools.feature.FeatureCollection;
@@ -40,30 +46,33 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         initGeoJsonReader();
     }
 
+    @Override
+    public long getFeatureCount() {
+        if (this.featureCollection == null) {
+            return 0;
+        }
+        return this.featureCollection.size();
+    }
+
     /** 初始化 GeoJSON 读取器 */
     private void initGeoJsonReader() {
         try (FileInputStream fis = new FileInputStream(linkInfo.getGeoJsonFilePath())) {
             GeoJSONReader geoJsonReader = new GeoJSONReader(fis);
             this.featureCollection = geoJsonReader.getFeatures();
-            this.featureType = featureCollection.getSchema(); // 获取完整的 SimpleFeatureType
+            this.featureType = featureCollection.getSchema();
             this.featureIterator = featureCollection.features();
         } catch (Exception e) {
-            throw new RuntimeException("初始化 GeoJSON 读取器失败", e);
+            throw new GeoFileReadException("初始化 GeoJSON 读取器失败", e);
         }
     }
 
-    /** 改造 返回 SimpleFeatureType（替代原 List<Pair>） */
     @Override
     public SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer) {
         try {
             return this.featureType;
         } catch (Exception e) {
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-                return null;
-            } else {
-                throw new RuntimeException("读取 GeoJSON 表头（SimpleFeatureType）失败", e);
-            }
+            notifyException(exceptionConsumer, e);
+            throw new GeoFileReadException("读取 GeoJSON 表头失败", e);
         }
     }
 
@@ -88,41 +97,30 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
                 }
             }
             return GirAdvOneRow.ofByMap(attributes);
-
         } catch (Exception e) {
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-                return null;
-            } else {
-                throw new RuntimeException("读取 GeoJSON 单行数据失败", e);
-            }
+            notifyException(exceptionConsumer, e);
+            throw new GeoFileReadException("读取 GeoJSON 单行数据失败", e);
         }
     }
 
     @Override
     public Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer) {
-        // 重置迭代器，确保每次获取迭代器都是从第一条数据开始
         resetIterator();
 
         return new Iterator<GirAdvOneRow>() {
-            // 标记迭代器是否已关闭，防止重复关闭
             private boolean closed = false;
 
             @Override
             public boolean hasNext() {
-                // 已关闭则直接返回false
                 if (closed) {
                     return false;
                 }
                 try {
                     return featureIterator != null && featureIterator.hasNext();
                 } catch (Exception e) {
-                    if (exceptionConsumer != null) {
-                        exceptionConsumer.accept(e);
-                    } else {
-                        throw new RuntimeException("检查GeoJSON是否有下一条数据失败", e);
-                    }
-                    return false;
+                    notifyException(exceptionConsumer, e);
+                    closeIterator();
+                    throw new GeoFileReadException("检查 GeoJSON 是否有下一条数据失败", e);
                 }
             }
 
@@ -131,45 +129,24 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
                 if (closed) {
                     throw new NoSuchElementException("迭代器已关闭，无法获取下一条数据");
                 }
-                try {
-                    // 复用已有的readOneRow逻辑，保证数据处理逻辑一致
-                    GirAdvOneRow oneRow = readOneRow(exceptionConsumer);
-                    // 如果没有下一条数据了，自动关闭迭代器
-                    if (oneRow == null) {
-                        closeIterator();
-                        throw new NoSuchElementException("已无更多GeoJSON数据");
-                    }
-                    return oneRow;
-                } catch (NoSuchElementException e) {
-                    // 正常的无数据异常直接抛出
-                    throw e;
-                } catch (Exception e) {
-                    if (exceptionConsumer != null) {
-                        exceptionConsumer.accept(e);
-                        // 异常时关闭迭代器
-                        closeIterator();
-                        return null;
-                    } else {
-                        closeIterator();
-                        throw new RuntimeException("读取GeoJSON下一条数据失败", e);
-                    }
+                if (!hasNext()) {
+                    closeIterator();
+                    throw new NoSuchElementException("已无更多 GeoJSON 数据");
                 }
+                return readOneRow(exceptionConsumer);
             }
 
-            // 重写remove方法，GeoJSON只读，不支持删除
             @Override
             public void remove() {
-                throw new UnsupportedOperationException("GeoJSON文件为只读模式，不支持删除操作");
+                throw new UnsupportedOperationException("GeoJSON 文件为只读模式，不支持删除操作");
             }
 
-            // 迭代器结束时关闭资源
             @Override
             protected void finalize() throws Throwable {
                 closeIterator();
                 super.finalize();
             }
 
-            // 关闭迭代器的私有方法
             private void closeIterator() {
                 if (!closed && featureIterator != null) {
                     featureIterator.close();
@@ -180,7 +157,6 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         };
     }
 
-    /** 读取分页数据（逻辑不变） */
     @Override
     public GirPager<GirAdvOneRow> readRowPage(
             GirPageParam girPageParam, ExceptionConsumer exceptionConsumer) {
@@ -210,19 +186,13 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
                     break;
                 }
 
-                GirAdvOneRow oneRow = readOneRow(exceptionConsumer);
-                if (oneRow != null) {
-                    rowList.add(oneRow);
-                }
+                rowList.add(readOneRow(exceptionConsumer));
             }
 
             pager.put(rowList, featureCollection.size(), girPageParam);
         } catch (Exception e) {
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-            } else {
-                throw new RuntimeException("读取 GeoJSON 分页数据失败", e);
-            }
+            notifyException(exceptionConsumer, e);
+            throw new GeoFileReadException("读取 GeoJSON 分页数据失败", e);
         }
         return pager;
     }
@@ -244,5 +214,11 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         }
         this.featureCollection = null;
         this.featureType = null;
+    }
+
+    private void notifyException(ExceptionConsumer exceptionConsumer, Exception e) {
+        if (exceptionConsumer != null) {
+            exceptionConsumer.accept(e);
+        }
     }
 }

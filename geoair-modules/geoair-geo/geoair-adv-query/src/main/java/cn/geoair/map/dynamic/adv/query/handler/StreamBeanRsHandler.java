@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.handler;
 
-import cn.hutool.db.handler.HandleHelper;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMapper;
 import cn.hutool.db.handler.RsHandler;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -16,6 +16,8 @@ public class StreamBeanRsHandler<T> implements RsHandler<Integer> {
     Consumer<T> rowConsumer;
 
     private final Class<T> elementBeanType;
+
+    private final AdvBeanMapper beanMapper = new AdvBeanMapper();
 
     public StreamBeanRsHandler(Consumer<T> rowConsumer, Class<T> elementBeanType) {
         this.rowConsumer = rowConsumer;
@@ -33,7 +35,7 @@ public class StreamBeanRsHandler<T> implements RsHandler<Integer> {
     }
 
     void doAccept(ResultSetMetaData meta, int columnCount, ResultSet rs) throws SQLException {
-        T t = HandleHelper.handleRow(columnCount, meta, rs, this.elementBeanType);
+        T t = beanMapper.mapRow(rs, this.elementBeanType);
         rowConsumer.accept(t);
     }
 }

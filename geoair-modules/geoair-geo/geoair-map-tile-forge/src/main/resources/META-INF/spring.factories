@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.geoair.map.tile.forge.core.spring.GirForgeTileAutoConfiguration,\
+cn.geoair.map.tile.forge.core.spring.GirForgeS3AutoConfiguration,\
+cn.geoair.map.tile.forge.core.spring.GirForgeServletAutoConfiguration

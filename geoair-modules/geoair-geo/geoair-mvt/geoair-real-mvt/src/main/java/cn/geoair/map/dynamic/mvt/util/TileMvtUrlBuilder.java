@@ -26,6 +26,16 @@ public class TileMvtUrlBuilder {
     }
 
     /**
+     * 构建MVT的基础访问地址
+     *
+     * @return
+     */
+    public static String buildRealMvtUrl(String layerName) {
+        String replaceFirst = StrUtil.replaceFirst(REALMVT_PREFIX, "{layerName}", layerName);
+        return replaceFirst;
+    }
+
+    /**
      * 构建MVT的基础调试地址
      *
      * @param tileRequestParams

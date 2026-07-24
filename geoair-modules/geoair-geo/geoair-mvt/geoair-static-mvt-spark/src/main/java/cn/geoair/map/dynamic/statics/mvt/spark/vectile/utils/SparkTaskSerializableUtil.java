@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
@@ -8,7 +10,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
@@ -17,7 +19,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
 import java.util.*;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -26,9 +27,8 @@ import org.apache.spark.sql.RowFactory;
 import scala.Tuple2;
 
 /** 生成可序列化的spark的任务 */
-@Slf4j
 public class SparkTaskSerializableUtil implements Serializable {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // 序列化ID（必须）
     private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(Integer pageNum) throws Exception {
 
-            PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
+            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
             IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
             long startTime = System.currentTimeMillis();
@@ -116,7 +116,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(String partitionCondition) throws Exception {
 
-            PgConnectInfo pgConnectInfo = parameter.getInputConnectInfo();
+            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
             IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
 
             // 解析分区范围

@@ -260,7 +260,7 @@ export default {
             // this.isSelect = response.data.isSelect;
             let humpIs = response.data.taskJson[0].humpIs;
             if (humpIs) {
-              this.url = `http://${this.address}/${this.path}` + "?page=0&limit=5";
+              this.url = `http://${this.address}/${this.path}` + "?page=0&limit=25";
             } else {
               this.url = `http://${this.address}/${this.path}`;
             }

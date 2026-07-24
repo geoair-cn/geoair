@@ -13,6 +13,8 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.handler.StreamBeanRsHandler;
 import cn.geoair.map.dynamic.adv.query.handler.StreamRsHandler;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanHandler;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanListHandler;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
@@ -20,7 +22,10 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.Entity;
-import cn.hutool.db.handler.*;
+import cn.hutool.db.handler.EntityHandler;
+import cn.hutool.db.handler.EntityListHandler;
+import cn.hutool.db.handler.NumberHandler;
+import cn.hutool.db.handler.ValueListHandler;
 import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -225,7 +230,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            Object queryResult = SqlExecutor.query(connection, cleanSql, BeanHandler.create(clazz));
+            Object queryResult =
+                    SqlExecutor.query(connection, cleanSql, new AdvBeanHandler<>(clazz));
             stopWatch.stop();
             long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig())
@@ -254,7 +260,8 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
             cleanSql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            List<E> query = SqlExecutor.query(connection, cleanSql, BeanListHandler.create(clazz));
+            List<E> query =
+                    SqlExecutor.query(connection, cleanSql, new AdvBeanListHandler<>(clazz));
             stopWatch.stop();
             long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig())
@@ -595,7 +602,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     SqlExecutor.query(
                             connection,
                             sqlStatement,
-                            BeanHandler.create(clazz),
+                            new AdvBeanHandler<>(clazz),
                             sqlParamList.toArray());
             stopWatch.stop();
             long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();
@@ -631,7 +638,7 @@ public abstract class AbstractExecAdvBaseSelectOpt implements IAdvBaseSelectOpt 
                     SqlExecutor.query(
                             connection,
                             sqlStatement,
-                            BeanListHandler.create(clazz),
+                            new AdvBeanListHandler<>(clazz),
                             sqlParamList.toArray());
             stopWatch.stop();
             long lastTaskTimeMillis = stopWatch.getLastTaskTimeMillis();

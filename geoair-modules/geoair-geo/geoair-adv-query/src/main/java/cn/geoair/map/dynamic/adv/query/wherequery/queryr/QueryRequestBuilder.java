@@ -200,6 +200,20 @@ public class QueryRequestBuilder<T> {
     }
 
     /**
+     * 添加查询字段
+     *
+     * @param columnNames 字段名数组
+     * @return Builder实例
+     */
+    public QueryRequestBuilder<T> field(String... columnNames) {
+        if (this.columnNames == null) {
+            this.columnNames = new ArrayList<>();
+        }
+        this.columnNames.addAll(ListUtil.toList(columnNames));
+        return this;
+    }
+
+    /**
      * 设置查询字段（带别名）
      *
      * @param column 字段Lambda表达式

@@ -12,13 +12,13 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.hutool.core.bean.BeanDesc;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.PropDesc;
-import cn.hutool.core.bean.copier.BeanCopier;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -39,6 +39,8 @@ import javax.persistence.Transient;
  * @description： 查询的相关通用处理逻辑
  */
 public class GirAdvSqlUtils {
+
+    private static final AdvBeanColumnMapper ADV_BEAN_COLUMN_MAPPER = new AdvBeanColumnMapper();
     /** 解析带参数的SQL语句，生成可执行的SQL和参数列表 */
     public static SqlMeta parseSqlWithParam(
             String dynamicSql,
@@ -73,66 +75,33 @@ public class GirAdvSqlUtils {
             boolean isToUnderlineCase,
             boolean ignoreNullValue,
             List<String> ignoreFieldNames) {
-        Map<String, Object> rowData = new HashMap<>();
-        Class<?> clazz = entity.getClass();
+        return getRowData(entity, isToUnderlineCase, ignoreNullValue, true, ignoreFieldNames);
+    }
 
-        if (GutilObject.isEmpty(ignoreFieldNames)) {
-            ignoreFieldNames = new ArrayList<>();
-            List<String> ignoreFieldByAnnotation = getIgnoreFieldByAnnotation(clazz);
-            ignoreFieldNames.addAll(ignoreFieldByAnnotation);
+    public static <T> Map<String, Object> getRowData(
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            boolean ignoreEmptyString,
+            List<String> ignoreFieldNames) {
+        if (entity == null) {
+            return new HashMap<>();
         }
-        List<String> finalIgnoreFieldNames = ignoreFieldNames;
-        BeanCopier.create(
-                        entity,
-                        rowData,
-                        CopyOptions.create()
-                                .setIgnoreNullValue(ignoreNullValue)
-                                .setTransientSupport(true)
-                                .setFieldNameEditor(
-                                        fieldName -> {
-                                            if (finalIgnoreFieldNames.contains(fieldName)) {
-                                                return null;
-                                            }
-                                            String columnNameByAnnotation =
-                                                    GirAdvSqlUtils.getColumnNameByAnnotation(
-                                                            clazz, fieldName);
-                                            if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
-                                                return columnNameByAnnotation;
-                                            }
-                                            if (isToUnderlineCase) {
-                                                return StrUtil.toUnderlineCase(fieldName);
-                                            }
-                                            return fieldName;
-                                        }))
-                .copy();
-
-        return rowData;
+        return ADV_BEAN_COLUMN_MAPPER.toColumnValueMap(
+                entity, isToUnderlineCase, ignoreNullValue, ignoreEmptyString, ignoreFieldNames);
     }
 
     public static List<String> getIdByAnnotation(Class<?> clazz) {
-        List<String> ids = new ArrayList<>();
-        BeanDesc beanDesc = BeanUtil.getBeanDesc(clazz);
-        if (GutilObject.isNotEmpty(beanDesc)) {
-            Map<String, PropDesc> propMap = beanDesc.getPropMap(false);
-            if (GutilObject.isNotEmpty(propMap)) {
-                for (Map.Entry<String, PropDesc> propDescEntry : propMap.entrySet()) {
-                    PropDesc value = propDescEntry.getValue();
-                    Field field = value.getField();
-                    String idByJavax = getIdByJavax(field);
-                    if (idByJavax != null) {
-                        ids.add(idByJavax);
-                        continue;
-                    }
-                    String idByGaModel = getIdByGaModel(field);
-                    if (idByGaModel != null) {
-                        ids.add(idByGaModel);
-                        continue;
-                    }
-                }
-                return ids;
-            }
-        }
-        return ids;
+        return AdvBeanMappingMeta.of(clazz).getIdPropertyNames();
+    }
+
+    public static List<String> getIdColumnNames(Class<?> clazz, boolean toUnderlineCase) {
+        return AdvBeanMappingMeta.of(clazz).getIdColumnNames(toUnderlineCase);
+    }
+
+    public static String resolveColumnName(
+            Class<?> clazz, String fieldOrColumnName, boolean toUnderlineCase) {
+        return AdvBeanMappingMeta.of(clazz).resolveColumnName(fieldOrColumnName, toUnderlineCase);
     }
 
     public static List<String> getIgnoreFieldByAnnotation(Class<?> clazz) {

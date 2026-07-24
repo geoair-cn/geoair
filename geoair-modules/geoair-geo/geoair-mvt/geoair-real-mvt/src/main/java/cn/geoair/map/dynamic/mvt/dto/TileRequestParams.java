@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.mvt.dto;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
@@ -10,11 +12,10 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import java.util.List;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Data
 public class TileRequestParams {
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     @GaModelField(text = "数据库资源ID")
     private String dsId;
@@ -42,7 +43,7 @@ public class TileRequestParams {
     private int minZoom;
 
     @GaModelField(text = "true就是4490网格，false就是3857网格")
-    private boolean isGeo = false;
+    private boolean geoIs = false;
 
     @GaModelField(text = "坐标系转换，与isGeo相匹配，保证数据与网格的坐标系一致")
     private String transform;

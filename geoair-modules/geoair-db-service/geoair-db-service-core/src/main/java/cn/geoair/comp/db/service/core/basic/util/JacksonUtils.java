@@ -17,7 +17,7 @@ public class JacksonUtils {
     public static ObjectMapper getObjectMapper() {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
-            GirJtsJacksonUtils.registerModule(objectMapper);
+            GirJtsJacksonUtils.registerModule(objectMapper, true);
             // 全局配置：保留 null 值（一次性配置，无需每次设置）
             objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true);
             objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.ALWAYS);

@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-framework-bom</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-framework-bom</name>
   <description>用于工程模块的依赖定义</description>
@@ -28,7 +28,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -57,8 +57,8 @@
   </scm>
 
   <properties>
-    <!--        <geoair.version>J8.1.4</geoair.version>-->
-    <!--        <geoair.comp.version>J8.1.4</geoair.comp.version>-->
+    <!--        <geoair.version>J8.1.5</geoair.version>-->
+    <!--        <geoair.comp.version>J8.1.5</geoair.comp.version>-->
 
     <skipTests>true</skipTests>
   </properties>

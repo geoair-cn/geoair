@@ -1,5 +1,7 @@
 package cn.geoair.comp.db.service.core.basic.service;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
@@ -10,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Service;
  * @create: 2021-01-20 15:36
  */
 @Service
-@Slf4j
 public class DsApiService {
+    public static GiLogger log = GirLoggerFactory.getLogger();
 
     public Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfigApo config) {
         Map<String, Object> map = new HashMap<>();

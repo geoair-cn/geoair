@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
+import cn.geoair.base.data.page.GiPageParam;
+import cn.geoair.base.data.page.GiPager;
 import cn.hutool.core.collection.ListUtil;
 import java.io.Serializable;
 import java.util.List;
@@ -10,7 +12,7 @@ import lombok.Getter;
  * @date ：Created in 2025/10/10 10:52 @description： 分页对象的返回结果
  */
 @Getter
-public class PageApo<T> implements Serializable {
+public class PageApo<T> implements Serializable, GiPager<T> {
 
     /** 每页条数 */
     private int pageSize = 0; // 状态码
@@ -86,5 +88,37 @@ public class PageApo<T> implements Serializable {
      */
     public List<T> geRecordsList() {
         return ListUtil.toList(records);
+    }
+
+    @Override
+    public long total() {
+        return total;
+    }
+
+    @Override
+    public GiPageParam pageParam() {
+        return GiPageParam.of().putParam(pageNum, pageSize, startRow, pageNumStartZero);
+    }
+
+    @Override
+    public GiPager<T> put(Iterable<T> list, long total, GiPageParam pageParam) {
+        this.total = total;
+        this.records = list;
+        int pagedNum = pageParam.pageNum();
+        int pagedSize = pageParam.pageSize();
+        long startedRow = pageParam.startRow();
+        this.pageNumStartZero = pageParam.isPageNumStartZero();
+        this.pageNum = pagedNum;
+        this.pageSize = pagedSize;
+        this.startRow = startedRow;
+        return this;
+    }
+
+    @Override
+    public GiPager<T> put(
+            Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero) {
+        put(list, total, pageParam);
+        this.pageNumStartZero = pageNumStartZero;
+        return this;
     }
 }

@@ -23,7 +23,7 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     default boolean gtcExistsWithPK(PK pk) {
         Class<T> modelClass = getModelClass();
 
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(modelClass, true);
         String idKey = idByAnnotation.get(0);
         Number number =
                 GirSpringAdvExecutor.getInstance()
@@ -43,7 +43,7 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     @Override
     default T gtcSearchByPK(PK pk) {
         Class<T> modelClass = getModelClass();
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(modelClass, true);
         String idKey = idByAnnotation.get(0);
         T t =
                 GirSpringAdvExecutor.getInstance()
@@ -65,7 +65,7 @@ public interface AdvRetrieveOrmOpt<T extends GiEntityQueryable<PK>, PK extends S
     default List<T> gtcSearchByPK(Set<PK> pks) {
         Class<T> modelClass = getModelClass();
 
-        List<String> idByAnnotation = GirAdvSqlUtils.getIdByAnnotation(modelClass);
+        List<String> idByAnnotation = GirAdvSqlUtils.getIdColumnNames(modelClass, true);
         String idKey = idByAnnotation.get(0);
         List<T> ts =
                 GirSpringAdvExecutor.getInstance()

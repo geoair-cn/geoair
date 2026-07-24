@@ -1,0 +1,4 @@
+ cn.geoair.web.mime.getter.ApplicationMimeGetter
+ cn.geoair.web.mime.getter.TextMimeGetter
+ cn.geoair.web.mime.getter.ImageMimeGetter
+ cn.geoair.web.mime.getter.XMLMimeGetter

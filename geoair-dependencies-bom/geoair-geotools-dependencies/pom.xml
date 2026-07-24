@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geotools-dependencies</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-geotools-dependencies</name>
   <description>geotools 的依赖声明</description>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -42,7 +42,7 @@
   <properties>
     <java.version>8</java.version>
     <geotools.version>28.6.1</geotools.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -194,7 +194,7 @@
 
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt-s3-geotiff </artifactId>
+        <artifactId>gt-s3-geotiff</artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>

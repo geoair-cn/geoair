@@ -92,7 +92,11 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void fatal(String format, Object... arguments) {
-        log(GemLogLevel.FATAL, null, format, arguments);
+        if (!isFatalEnabled()) {
+            return;
+        }
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.FATAL, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
@@ -119,7 +123,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void error(String format, Object... arguments) {
-        log(GemLogLevel.ERROR, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.ERROR, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
@@ -141,7 +146,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void warn(String format, Object... arguments) {
-        log(GemLogLevel.WARN, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.WARN, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
@@ -163,7 +169,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void info(String format, Object... arguments) {
-        log(GemLogLevel.INFO, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.INFO, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
@@ -185,7 +192,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void debug(String format, Object... arguments) {
-        log(GemLogLevel.DEBUG, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.DEBUG, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override
@@ -206,7 +214,8 @@ public class GirConsoleLog implements GiLogger {
 
     @Override
     public void trace(String format, Object... arguments) {
-        log(GemLogLevel.TRACE, null, format, arguments);
+        FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        log(GemLogLevel.TRACE, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
     }
 
     @Override

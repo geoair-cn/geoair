@@ -2,9 +2,13 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import java.util.Objects;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
 
+@Data
+@Accessors(chain = true)
 public class TileZxyApo {
 
     private int z; // 层级
@@ -13,34 +17,67 @@ public class TileZxyApo {
 
     private int y; // 行号
 
+    public static TileZxyApo of() {
+        return new TileZxyApo();
+    }
+
+    public TileZxyApo() {}
+
     public TileZxyApo(int z, int x, int y) {
         this.z = z;
         this.x = x;
         this.y = y;
     }
 
-    public int getZ() {
-        return z;
+    public TileZxyApo(String z, String x, String y) {
+        try {
+            this.z = Integer.parseInt(z);
+            this.x = Integer.parseInt(x);
+            this.y = Integer.parseInt(y);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Invalid tile coordinates: z=" + z + ", x=" + x + ", y=" + y, e);
+        }
     }
 
-    public void setZ(int z) {
-        this.z = z;
+    /** Long类型构造函数（支持从Long类型转换） */
+    public TileZxyApo(Long z, Long x, Long y) {
+        if (z == null || x == null || y == null) {
+            throw new IllegalArgumentException("Tile coordinates cannot be null");
+        }
+        this.z = z.intValue();
+        this.x = x.intValue();
+        this.y = y.intValue();
     }
 
-    public int getX() {
-        return x;
+    /** 从单个字符串解析（格式：z/x/y） */
+    public TileZxyApo(String zxyString) {
+        if (zxyString == null || zxyString.isEmpty()) {
+            throw new IllegalArgumentException("ZXY string cannot be null or empty");
+        }
+        String[] parts = zxyString.split("/");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException(
+                    "Invalid ZXY format, expected 'z/x/y', got: " + zxyString);
+        }
+        try {
+            this.z = Integer.parseInt(parts[0]);
+            this.x = Integer.parseInt(parts[1]);
+            this.y = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Invalid numeric format in ZXY string: " + zxyString, e);
+        }
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+    /** 从数组构造（格式：[z, x, y]） */
+    public TileZxyApo(int[] zxyArray) {
+        if (zxyArray == null || zxyArray.length < 3) {
+            throw new IllegalArgumentException("ZXY array must have at least 3 elements");
+        }
+        this.z = zxyArray[0];
+        this.x = zxyArray[1];
+        this.y = zxyArray[2];
     }
 
     @Override

@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-apidoc</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-knife4j-spring-boot-demo</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-knife4j-spring-boot-demo</name>
 
@@ -28,7 +28,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -41,7 +41,10 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties></properties>
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+    <maven.install.skip>true</maven.install.skip>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -112,5 +115,34 @@
     </plugins>
 
   </build>
+  <profiles>
+    <profile>
+      <!--      未开发完成，不发布到公网仓库-->
+      <id>central</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>false</extensions>
+            <executions>
+              <execution>
+                <id>injected-central-publishing</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+      </properties>
+    </profile>
 
+  </profiles>
 </project>

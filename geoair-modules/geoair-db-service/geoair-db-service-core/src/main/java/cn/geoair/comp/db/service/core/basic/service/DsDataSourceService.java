@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.event.DsDataSourceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ import cn.geoair.comp.db.service.core.basic.util.UUIDUtil;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.dao.GirDsDataSourceDao;
 
-import lombok.extern.slf4j.Slf4j;
+ 
 
 /**
  * 数据源服务类
@@ -44,9 +46,9 @@ import lombok.extern.slf4j.Slf4j;
  * @create: 2021-01-20 10:43
  */
 @Service
-@Slf4j
+ 
 public class DsDataSourceService {
-
+    public static GiLogger log = GirLoggerFactory.getLogger();
     // /** Spring缓存管理器 */
     // @Autowired
     // CacheManager cacheManager;
@@ -118,7 +120,7 @@ public class DsDataSourceService {
         DsDataSourceEvent.triggerUpdateBeforeEvent(byId, dsDataSourceApo);
         girDsDataSourceDao.updateSelectiveById(dsDataSourceApo);
         DsDataSourceEvent.triggerUpdateAfterEvent(byId, dsDataSourceApo, true);
-        PoolManager.removeJdbcConnectionPool(dsDataSourceApo.getId());
+        PoolManager.removeExecutor(dsDataSourceApo.getId());
     }
 
     /**
@@ -150,7 +152,7 @@ public class DsDataSourceService {
             DsDataSourceApo byId = girDsDataSourceDao.getById(id);
             DsDataSourceEvent.triggerDeleteBeforeEvent(byId);
             girDsDataSourceDao.deleteByPK(id);
-            PoolManager.removeJdbcConnectionPool(id);
+            PoolManager.removeExecutor(id);
             DsDataSourceEvent.triggerDeleteAfterEvent(byId, true);
             // cacheManager.getCache("datasource").evictIfPresent(id);
 

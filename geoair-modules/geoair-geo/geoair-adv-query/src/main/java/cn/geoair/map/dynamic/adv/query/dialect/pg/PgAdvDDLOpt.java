@@ -686,8 +686,9 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS SELECT * FROM source
-        return StrUtil.format(
-                "CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}", dstTableName, srcTableName);
+        //        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
+        //                dstTableName, srcTableName);
+        return StrUtil.format("INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
     }
 
     @Override

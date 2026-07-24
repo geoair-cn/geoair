@@ -149,6 +149,7 @@ public class BeanToQueryFilterConverter {
                             bean,
                             options.isToUnderlineCase(),
                             options.isIgnoreNull(),
+                            options.isIgnoreEmptyString(),
                             ListUtil.empty());
         }
 

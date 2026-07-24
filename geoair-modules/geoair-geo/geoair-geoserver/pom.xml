@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.4</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geoserver</artifactId>
-  <version>J8.1.4</version>
+  <version>J8.1.5</version>
   <packaging>jar</packaging>
   <name>geoair-geoserver</name>
   <description>geoair-geoserver的springBootStart集成模块</description>
@@ -26,7 +26,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>1159856928@qq.com</email>
+      <email>zhangjun7570@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -40,11 +40,12 @@
 
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.4</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <geotools.version>28.6.1</geotools.version>
     <geoserver.version>2.22.6</geoserver.version>
+    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <dependencies>
@@ -373,5 +374,36 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <!--      未开发完成，不发布到公网仓库-->
+      <id>central</id>
+      <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>false</extensions>
+            <executions>
+              <execution>
+                <id>injected-central-publishing</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
 
 </project>

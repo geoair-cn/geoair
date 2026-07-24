@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-modules</artifactId>
+    <version>J8.1.5</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-message-jts-jackson</artifactId>
+  <version>J8.1.5</version>
+  <packaging>jar</packaging>
+  <name>geoair-message-jts-jackson</name>
+
+  <description>jackson 中处理 jts 库的对象转换</description>
+
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zhangjun7570@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
+
+  <properties>
+    <skipTests>true</skipTests>
+    <ojdbc.version>21.5.0.0</ojdbc.version>
+    <sdoutl.version>23.26</sdoutl.version>
+  </properties>
+
+  <dependencies>
+    <!--    <dependency>-->
+    <!--      <groupId>com.graphhopper.external</groupId>-->
+    <!--      <artifactId>jackson-datatype-jts</artifactId>-->
+    <!--      <version>2.14</version>-->
+    <!--      <exclusions>-->
+    <!--        <exclusion>-->
+    <!--          <artifactId>jackson-databind</artifactId>-->
+    <!--          <groupId>com.fasterxml.jackson.core</groupId>-->
+    <!--        </exclusion>-->
+    <!--      </exclusions>-->
+    <!--    </dependency>-->
+
+    <dependency>
+      <groupId>org.locationtech.spatial4j</groupId>
+      <artifactId>spatial4j</artifactId>
+      <version>0.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version.databind}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-base</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgis</groupId>
+      <artifactId>postgis-jdbc</artifactId>
+      <version>${org.postgis.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle.database.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>${ojdbc.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle.database.spatial</groupId>
+      <artifactId>sdoutl</artifactId>
+      <version>${sdoutl.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.database.spatial</groupId>
+      <artifactId>sdoapi</artifactId>
+      <version>${sdoutl.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-geo-tools</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <version>${spring-boot.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins></plugins>
+  </build>
+</project>

@@ -1,12 +1,14 @@
 package cn.geoair.map.dynamic.tools.page;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/19 13:45 @description： 分页配置
  */
 @Data
+@Accessors(chain = true)
 public class PageConfig {
 
     /** 符合条件的总记录数 */
@@ -19,7 +21,7 @@ public class PageConfig {
     private Long pageSize = 0L;
 
     /** 第一页是否从0开始 */
-    private boolean pageNumStartByZero;
+    private boolean pageNumStartByZero = false;
 
     /** 是否保存最终的结果 默认不保存，因为在流里面进行消费了。 */
     private boolean saveResultListIs = false;
