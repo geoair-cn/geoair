@@ -16,6 +16,7 @@ import cn.geoair.map.tile.forge.fuser.precache.TileCoordinate;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.*;
@@ -43,7 +44,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
     private final AtomicLong checkedCount;
     private final AtomicLong repairedCount;
     private final AtomicLong failCount;
-    private final ImageMime format;
+    private final GirImageMime format;
     boolean googleGridIs;
 
     public TileFuserCheckAndRepairTask(String layerName,
@@ -54,7 +55,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                                        AtomicLong checkedCount,
                                        AtomicLong repairedCount,
                                        AtomicLong failCount,
-                                       ImageMime format) {
+                                       GirImageMime format) {
         this.layerName = layerName;
         this.zoom = zoom;
         this.geometry4326 = geometry4326;

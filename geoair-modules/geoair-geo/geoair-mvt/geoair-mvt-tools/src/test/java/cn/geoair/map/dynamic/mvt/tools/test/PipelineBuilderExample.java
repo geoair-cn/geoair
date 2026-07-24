@@ -6,9 +6,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 
-/**
- * PipelineBuilder 示例
- */
+/** PipelineBuilder 示例 */
 public class PipelineBuilderExample {
 
     public static void main(String[] args) throws Exception {
@@ -16,11 +14,13 @@ public class PipelineBuilderExample {
         PipelineBuilder builder = PipelineBuilder.newBuilder(extent, 4326);
 
         GeometryFactory factory = new GeometryFactory();
-        Geometry line = factory.createLineString(new Coordinate[] {
-            new Coordinate(116.40, 39.90),
-            new Coordinate(116.45, 39.93),
-            new Coordinate(116.50, 39.97)
-        });
+        Geometry line =
+                factory.createLineString(
+                        new Coordinate[] {
+                            new Coordinate(116.40, 39.90),
+                            new Coordinate(116.45, 39.93),
+                            new Coordinate(116.50, 39.97)
+                        });
 
         Geometry transformed = builder.transform(line);
         Geometry simplified = builder.simplify(transformed);

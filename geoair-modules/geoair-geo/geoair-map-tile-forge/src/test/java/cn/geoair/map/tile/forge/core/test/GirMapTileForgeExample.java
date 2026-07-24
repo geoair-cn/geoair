@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
+import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ public class GirMapTileForgeExample {
 
     public static void main(String[] args) throws Exception {
         GirLayerConfigContext context = new GirLayerConfigContext();
-        context.setLayerName("base_layer")
+        context.setDataId("base_layer")
             .setDataId("XYZ")
             .setMapTileType(GirMapTileType.XYZ)
             .setStorageType(GirStorageType.LOCAL_ZIP)
@@ -28,6 +29,21 @@ public class GirMapTileForgeExample {
             @Override
             public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
                 return Optional.of(context);
+            }
+
+            @Override
+            public Optional<GirLayerConfigContext> getGirLayerConfigContext(GirMapTileType mapTileType, String layerName, String dataId, String fileName) {
+                return Optional.empty();
+            }
+
+            @Override
+            public LayerPerFileDao getLayerPerFileDao(GirLayerConfigContext layerConfigContext) {
+                return null;
+            }
+
+            @Override
+            public Long getLayerPerCacheBatchSize(GirLayerConfigContext layerConfigContext) {
+                return 0l;
             }
         };
 

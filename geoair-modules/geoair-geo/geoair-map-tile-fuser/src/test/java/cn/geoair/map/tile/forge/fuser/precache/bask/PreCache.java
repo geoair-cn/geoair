@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
+import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -58,7 +59,7 @@ public class PreCache {
         executePreCache(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, false);
     }
 
@@ -66,19 +67,19 @@ public class PreCache {
         executePreCheck(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, true);
     }
 
 
-    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format, boolean isPreCheck) {
+    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format, boolean isPreCheck) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
         }
 
         if (format == null) {
-            format = ImageMime.png;
+            format = GirImageMime.png;
         }
         Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
 
