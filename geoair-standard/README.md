@@ -148,7 +148,7 @@ user.save();  // 直接调用保存
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.5</version>
     <type>pom</type>
 </dependency>
 
@@ -156,12 +156,12 @@ user.save();  // 直接调用保存
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.5</version>
 </dependency>
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-core</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.5</version>
 </dependency>
 ```
 

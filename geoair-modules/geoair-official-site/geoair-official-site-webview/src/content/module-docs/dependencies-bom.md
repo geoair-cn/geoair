@@ -33,7 +33,7 @@
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-base-parent</artifactId>
-      <version>J8-dev-SNAPSHOT</version>
+      <version>J8.1.5</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-geotools-dependencies</artifactId>
-      <version>J8-dev-SNAPSHOT</version>
+      <version>J8.1.5</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>

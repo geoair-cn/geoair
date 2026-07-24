@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-geo</artifactId>
-        <version>J8-dev-SNAPSHOT</version>
+        <version>J8.1.5</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-map-tile-fuser</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.5</version>
     <name>geoair-map-tile-fuser</name>
 
     <packaging>jar</packaging>
@@ -44,7 +44,7 @@
 
     <properties>
         <java.version>8</java.version>
-        <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+        <geoair.version>J8.1.5</geoair.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <guava.version>32.0.0-jre</guava.version>

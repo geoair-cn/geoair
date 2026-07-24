@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-mvt</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.5</version>
   <packaging>pom</packaging>
   <name>geoair-mvt</name>
   <description>mvt相关模块的功能组合</description>
@@ -45,7 +45,7 @@
 
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J8.1.5</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>

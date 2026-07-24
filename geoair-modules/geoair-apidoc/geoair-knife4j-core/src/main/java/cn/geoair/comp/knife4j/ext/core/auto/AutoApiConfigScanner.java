@@ -8,7 +8,6 @@ import cn.geoair.comp.knife4j.ext.core.model.ApiModelInfo;
 import cn.geoair.comp.knife4j.ext.core.model.DocketInfo;
 import java.util.*;
 import java.util.stream.Collectors;
- 
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Administrator
  * @version $Id: $Id
  */
- 
 public class AutoApiConfigScanner extends GirOpenApiConfig {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private ApplicationContext applicationContext;
@@ -74,7 +72,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         return rootPackages;
     }
 
-    /**  找到@SpringBootApplication标注的启动类，提取扫描根包 */
+    /** 找到@SpringBootApplication标注的启动类，提取扫描根包 */
     private String getSpringBootRootPackage() {
         Map<String, Object> bootBeans =
                 applicationContext.getBeansWithAnnotation(SpringBootApplication.class);
@@ -266,7 +264,7 @@ public class AutoApiConfigScanner extends GirOpenApiConfig {
         String title = environment.getProperty("geoair.apidoc.title", "API 在线文档");
         String description = environment.getProperty("geoair.apidoc.description", "API文档 V1.0");
         String author = environment.getProperty("geoair.apidoc.author", "geoair");
-        String version = environment.getProperty("geoair.apidoc.version", "J8-dev-SNAPSHOT");
+        String version = environment.getProperty("geoair.apidoc.version", "J8.1.5");
 
         return new ApiModelInfo(title, description, author, version);
     }
