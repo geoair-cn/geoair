@@ -14,7 +14,6 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.orm.spi.GirEntityResolve;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
 import cn.geoair.orm.spi.entity.GirEntityTable;
-import cn.geoair.orm.spi.jpa.GirJpaGirEntityResolve;
 
 /**
  * 实体类工具类 - 处理实体和数据库表以及字段关键的一个类
@@ -31,10 +30,29 @@ public class GirEntityHelper {
 	 */
 	private static final Map<Class<?>, GirEntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, GirEntityTable>();
 
+	private static final String DEFAULT_RESOLVE_CLASS_NAME =
+			"cn.geoair.orm.spi.jpa.GirJpaGirEntityResolve";
+
 	/**
 	 * 实体类解析器
 	 */
-	private static GirEntityResolve resolve = new GirJpaGirEntityResolve();
+	private static volatile GirEntityResolve resolve;
+
+	private static GirEntityResolve getResolve() {
+		if (resolve == null) {
+			synchronized (GirEntityHelper.class) {
+				if (resolve == null) {
+					try {
+						Class<?> resolveClass = Class.forName(DEFAULT_RESOLVE_CLASS_NAME);
+						resolve = (GirEntityResolve) resolveClass.newInstance();
+					} catch (Exception e) {
+						throw new RuntimeException("默认实体解析器加载失败: " + DEFAULT_RESOLVE_CLASS_NAME, e);
+					}
+				}
+			}
+		}
+		return resolve;
+	}
 
 	/**
 	 * 获取表对象l
@@ -89,9 +107,10 @@ public class GirEntityHelper {
 	 * @return
 	 */
 	public static GirEntityTable updateEntityTable(Class<?> entityClass) {
-		GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+		GirEntityResolve entityResolve = getResolve();
+		GirEntityTable girEntityTable = entityResolve.resolveEntity(entityClass);
 		if (girEntityTable == null) {
-			throw new RuntimeException("无法通过该解析器" + resolve.getClass().getName() + "获取实体对象!");
+			throw new RuntimeException("无法通过该解析器" + entityResolve.getClass().getName() + "获取实体对象!");
 		}
 		else {
 			entityTableMap.put(entityClass, girEntityTable);
@@ -182,7 +201,7 @@ public class GirEntityHelper {
 			return;
 		}
 		// 创建并缓存EntityTable
-		GirEntityTable girEntityTable = resolve.resolveEntity(entityClass);
+		GirEntityTable girEntityTable = getResolve().resolveEntity(entityClass);
 		entityTableMap.put(entityClass, girEntityTable);
 	}
 

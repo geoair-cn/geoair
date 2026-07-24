@@ -48,13 +48,6 @@
     </dependency>
 
     <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-web</artifactId>
-      <version>${geoair.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
       <version>${spring.version}</version>

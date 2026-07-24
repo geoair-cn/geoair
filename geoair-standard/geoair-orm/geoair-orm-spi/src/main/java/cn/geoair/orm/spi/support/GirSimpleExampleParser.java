@@ -126,7 +126,10 @@ public class GirSimpleExampleParser {
         // JSONObject.parseObject(JSONObject.toJSONString(updateEntity)).getInnerMap();
         StringBuilder sql = new StringBuilder();
         // 获取全部列
-        Set<GirEntityColumn> columnSet = GirEntityHelper.getColumns(girExample.getEntityClass());
+        Set<GirEntityColumn> columnSet =
+                girExample.table != null
+                        ? girExample.table.getEntityClassColumns()
+                        : GirEntityHelper.getColumns(girExample.getEntityClass());
         // 当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
         StringBuilder updatesql = new StringBuilder();
         for (GirEntityColumn column : columnSet) {

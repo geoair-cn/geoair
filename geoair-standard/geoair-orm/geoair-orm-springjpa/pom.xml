@@ -44,6 +44,12 @@
 
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-orm-spi</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-core</artifactId>
       <version>${geoair.version}</version>
     </dependency>
