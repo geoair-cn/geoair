@@ -11,7 +11,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseUpdateOpt;
-
 import java.util.function.Supplier;
 
 /**
@@ -24,8 +23,10 @@ import java.util.function.Supplier;
  */
 public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(dataSourceGetter,configAdvQueryGetter);
+    public PgAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+        super(dataSourceGetter, configAdvQueryGetter);
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */

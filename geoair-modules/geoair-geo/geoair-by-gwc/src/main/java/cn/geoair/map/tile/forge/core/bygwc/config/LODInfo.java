@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 import lombok.Setter;
@@ -22,21 +21,15 @@ import lombok.Setter;
  * @version 1.0
  */
 @Setter
-public class LODInfo  implements   java.io.Serializable {
+public class LODInfo implements java.io.Serializable {
 
-    /**
-     * 级别ID，表示瓦片的缩放级别
-     */
+    /** 级别ID，表示瓦片的缩放级别 */
     private int levelID;
 
-    /**
-     * 比例尺，表示该级别的地图比例尺
-     */
+    /** 比例尺，表示该级别的地图比例尺 */
     private double scale;
 
-    /**
-     * 分辨率，表示该级别下每个像素代表的实际距离
-     */
+    /** 分辨率，表示该级别下每个像素代表的实际距离 */
     private double resolution;
 
     /**

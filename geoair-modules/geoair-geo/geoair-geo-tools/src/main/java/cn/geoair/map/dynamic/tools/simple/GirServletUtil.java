@@ -2,13 +2,11 @@ package cn.geoair.map.dynamic.tools.simple;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
@@ -24,9 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GirServletUtil extends ServletUtil {
 
-    /**
-     * 设置严格的无缓存响应头（适用于动态内容、API 等）
-     */
+    /** 设置严格的无缓存响应头（适用于动态内容、API 等） */
     public static void setNoCacheHeaders() {
         HttpServletResponse response = GirHttpServletHelper.getResponse();
         // HTTP 1.1
@@ -71,10 +67,7 @@ public class GirServletUtil extends ServletUtil {
      */
     public static Integer getOriginPort(HttpServletRequest request) {
         // 可能的代理端口头信息，按优先级排序
-        String[] portHeaders = {
-                "x-forwarded-port",
-                "X-Real-PORT"
-        };
+        String[] portHeaders = {"x-forwarded-port", "X-Real-PORT"};
 
         // 遍历所有可能的端口头，获取第一个有效的端口
         for (String header : portHeaders) {
@@ -89,7 +82,6 @@ public class GirServletUtil extends ServletUtil {
         }
         return null;
     }
-
 
     /**
      * 获取自己这台服务器的地址，通过httpRequest
@@ -144,7 +136,8 @@ public class GirServletUtil extends ServletUtil {
         }
     }
 
-    public static void toResponse(HttpServletResponse response, InputStream inputStream, String contentType) {
+    public static void toResponse(
+            HttpServletResponse response, InputStream inputStream, String contentType) {
         ServletOutputStream outputStream = null;
         response.setContentType(contentType);
         try {
@@ -157,8 +150,8 @@ public class GirServletUtil extends ServletUtil {
         }
     }
 
-
-    public static void toResponse(HttpServletResponse response, byte[] re, String contentType, int code) {
+    public static void toResponse(
+            HttpServletResponse response, byte[] re, String contentType, int code) {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
         response.setContentType(contentType);
@@ -190,5 +183,4 @@ public class GirServletUtil extends ServletUtil {
 
         return headers;
     }
-
 }

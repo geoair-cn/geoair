@@ -7,10 +7,8 @@ import cn.geoair.map.dynamic.adv.IAdvExecutorAdapter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.Optional;
 import javax.sql.DataSource;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -58,16 +56,15 @@ public class AdvAutoConfiguration {
         }
         IAdvExecutor advExecutorByDataSource =
                 AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
-        GirSpringAdvExecutor girSpringAdvExecutor = new GirSpringAdvExecutor(advExecutorByDataSource);
+        GirSpringAdvExecutor girSpringAdvExecutor =
+                new GirSpringAdvExecutor(advExecutorByDataSource);
         Gir.log.info(
                 "自动装配SpringIAdvExecutor，springAdvExecutor的数据库类型：{}",
                 advExecutorByDataSource.getClass().getSimpleName());
         return girSpringAdvExecutor;
     }
 
-    /**
-     * 自动装配执行器适配器（依赖上面的IAdvExecutor Bean）   参数注入IAdvExecutor，确保依赖顺序
-     */
+    /** 自动装配执行器适配器（依赖上面的IAdvExecutor Bean） 参数注入IAdvExecutor，确保依赖顺序 */
     @Bean
     @ConditionalOnMissingBean(IAdvExecutorAdapter.class)
     @ConditionalOnBean(IAdvExecutor.class)

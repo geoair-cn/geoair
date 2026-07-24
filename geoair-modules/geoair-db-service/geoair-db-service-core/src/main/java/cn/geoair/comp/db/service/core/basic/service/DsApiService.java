@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
- 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,9 @@ import org.springframework.stereotype.Service;
  * @create: 2021-01-20 15:36
  */
 @Service
- 
 public class DsApiService {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public Map<String, Object> getSqlParam(HttpServletRequest request, ApiConfigApo config) {
         Map<String, Object> map = new HashMap<>();
 

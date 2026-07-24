@@ -1,11 +1,9 @@
 package cn.geoair.spi.test;
 
-import cn.geoair.spi.json.GirFastJson;
 import cn.geoair.base.json.GirJSON;
+import cn.geoair.spi.json.GirFastJson;
 
-/**
- * GirFastJson 入口示例
- */
+/** GirFastJson 入口示例 */
 public class GirFastJsonExample {
 
     public static void main(String[] args) {

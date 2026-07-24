@@ -36,7 +36,8 @@ public class JtsGeometryAdvTypeHandler extends AdvBaseTypeHandler<Geometry> {
     @Override
     protected Object convertNonNullForWrite(
             Geometry value, Class<?> javaType, AdvTypeHandlerContext context) {
-        String wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
+        String wkt =
+                GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
         if (wkt == null) {
             return null;
         }
@@ -66,7 +67,8 @@ public class JtsGeometryAdvTypeHandler extends AdvBaseTypeHandler<Geometry> {
         }
         if (value instanceof String) {
             String text = (String) value;
-            Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt().wktToJtsGeometry(text, true);
+            Geometry geometry =
+                    GirGeoTools.defaultInstance().getFormatOpt().wktToJtsGeometry(text, true);
             if (geometry != null) {
                 return geometry;
             }

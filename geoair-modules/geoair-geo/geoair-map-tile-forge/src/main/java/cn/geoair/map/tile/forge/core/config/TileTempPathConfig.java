@@ -6,17 +6,11 @@ import cn.geoair.base.Gir;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.extra.spring.SpringUtil;
+import java.io.File;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-import java.io.File;
-
-/**
- * 瓦片服务临时路径配置类
- * 用于管理瓦片操作过程中的本地临时文件存储路径
- */
+/** 瓦片服务临时路径配置类 用于管理瓦片操作过程中的本地临时文件存储路径 */
 @Data
 @ConfigurationProperties(prefix = "geoair.file.temp")
 public class TileTempPathConfig {
@@ -39,11 +33,7 @@ public class TileTempPathConfig {
         return instance;
     }
 
-    /**
-     * 临时文件存储根路径
-     * 默认值: I:\arcgisTest\temp
-     * 可通过 application.yml 配置 tile.temp.path 修改
-     */
+    /** 临时文件存储根路径 默认值: I:\arcgisTest\temp 可通过 application.yml 配置 tile.temp.path 修改 */
     private String tempPath = FileUtil.getTmpDirPath();
 
     /**
@@ -64,7 +54,6 @@ public class TileTempPathConfig {
         return tempPath;
     }
 
-
     /**
      * 构建本地临时目录路径
      *
@@ -75,7 +64,13 @@ public class TileTempPathConfig {
         String layerName = layerConfigContext.getLayerName();
         GirStorageType girStorageType = layerConfigContext.getStorageType();
         String separator = getTempPath().endsWith(File.separator) ? "" : File.separator;
-        File tempDir = FileUtil.file(tempPath + separator + layerName + File.separator + girStorageType.getValue());
+        File tempDir =
+                FileUtil.file(
+                        tempPath
+                                + separator
+                                + layerName
+                                + File.separator
+                                + girStorageType.getValue());
         String tempDirAbsolutePath = tempDir.getAbsolutePath();
 
         if (!tempDir.exists()) {

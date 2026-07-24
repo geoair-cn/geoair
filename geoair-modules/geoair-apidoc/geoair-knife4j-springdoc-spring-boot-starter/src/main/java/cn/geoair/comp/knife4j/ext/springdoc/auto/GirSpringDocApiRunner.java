@@ -166,7 +166,8 @@ public class GirSpringDocApiRunner
                         () ->
                                 GroupedOpenApi.builder()
                                         .group(finalGroupName)
-                                        .packagesToScan(docketInfo.getBasePackages().toArray(new String[0]))
+                                        .packagesToScan(
+                                                docketInfo.getBasePackages().toArray(new String[0]))
                                         .build());
 
         builder.setLazyInit(false);

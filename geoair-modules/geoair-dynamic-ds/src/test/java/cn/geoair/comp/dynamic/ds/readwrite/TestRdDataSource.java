@@ -1,20 +1,19 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import cn.geoair.base.log.GemLogLevel;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.hutool.core.thread.ThreadUtil;
-import org.junit.jupiter.api.*;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * 读写分离数据源测试用例 - JDK 8 版本
@@ -46,10 +45,13 @@ public class TestRdDataSource {
         read.setPassword("tcsd2019");
         read.setQueryTimeout(12000);
 
-        dataSource = GirReadWriteDataSourceBuilder.build(
-                master.toDataSource(),
-                GirGroupSource.builder().dataSources(read.toDataSource()).groupName("104").build()
-        );
+        dataSource =
+                GirReadWriteDataSourceBuilder.build(
+                        master.toDataSource(),
+                        GirGroupSource.builder()
+                                .dataSources(read.toDataSource())
+                                .groupName("104")
+                                .build());
 
         jdbcTemplate = new JdbcTemplate(dataSource);
         RdLog.minLogLevel = GemLogLevel.TRACE;
@@ -74,34 +76,39 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 初始化数据库 - DDL
-     */
+    /** 初始化数据库 - DDL */
     private void initDatabase() {
         try {
             // 创建主表
-            String createUserTable = "CREATE TABLE IF NOT EXISTS " + TEST_TABLE + " (" +
-                                     "id SERIAL PRIMARY KEY, " +
-                                     "username VARCHAR(50) NOT NULL UNIQUE, " +
-                                     "email VARCHAR(100) NOT NULL, " +
-                                     "age INTEGER, " +
-                                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-                                     "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                                     ")";
+            String createUserTable =
+                    "CREATE TABLE IF NOT EXISTS "
+                            + TEST_TABLE
+                            + " ("
+                            + "id SERIAL PRIMARY KEY, "
+                            + "username VARCHAR(50) NOT NULL UNIQUE, "
+                            + "email VARCHAR(100) NOT NULL, "
+                            + "age INTEGER, "
+                            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                            + "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                            + ")";
             jdbcTemplate.execute(createUserTable);
 
             // 创建批处理日志表
-            String createBatchLogTable = "CREATE TABLE IF NOT EXISTS " + TEST_TABLE_BATCH + " (" +
-                                         "id SERIAL PRIMARY KEY, " +
-                                         "batch_id VARCHAR(50) NOT NULL, " +
-                                         "operation VARCHAR(20) NOT NULL, " +
-                                         "record_count INTEGER, " +
-                                         "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                                         ")";
+            String createBatchLogTable =
+                    "CREATE TABLE IF NOT EXISTS "
+                            + TEST_TABLE_BATCH
+                            + " ("
+                            + "id SERIAL PRIMARY KEY, "
+                            + "batch_id VARCHAR(50) NOT NULL, "
+                            + "operation VARCHAR(20) NOT NULL, "
+                            + "record_count INTEGER, "
+                            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+                            + ")";
             jdbcTemplate.execute(createBatchLogTable);
 
             // 创建索引
-            String createIndex = "CREATE INDEX IF NOT EXISTS idx_username ON " + TEST_TABLE + " (username)";
+            String createIndex =
+                    "CREATE INDEX IF NOT EXISTS idx_username ON " + TEST_TABLE + " (username)";
             jdbcTemplate.execute(createIndex);
 
             // 创建注释
@@ -115,9 +122,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 清理数据库
-     */
+    /** 清理数据库 */
     private void dropTables() {
         try {
             jdbcTemplate.execute("DROP TABLE IF EXISTS " + TEST_TABLE + " CASCADE");
@@ -130,22 +135,26 @@ public class TestRdDataSource {
 
     // ==================== 测试用例 ====================
 
-    /**
-     * 测试1: DDL - 创建表和索引
-     */
+    /** 测试1: DDL - 创建表和索引 */
     @Test
     @DisplayName("测试DDL - 创建表结构")
     void testDDL() {
         // 验证表是否存在
-        String checkTableSql = "SELECT COUNT(*) FROM information_schema.tables " +
-                               "WHERE table_name = '" + TEST_TABLE + "'";
+        String checkTableSql =
+                "SELECT COUNT(*) FROM information_schema.tables "
+                        + "WHERE table_name = '"
+                        + TEST_TABLE
+                        + "'";
 
         Integer count = jdbcTemplate.queryForObject(checkTableSql, Integer.class);
         assertEquals(1, count, "表应该存在");
 
         // 验证索引是否存在
-        String checkIndexSql = "SELECT COUNT(*) FROM pg_indexes " +
-                               "WHERE tablename = '" + TEST_TABLE + "' AND indexname = 'idx_username'";
+        String checkIndexSql =
+                "SELECT COUNT(*) FROM pg_indexes "
+                        + "WHERE tablename = '"
+                        + TEST_TABLE
+                        + "' AND indexname = 'idx_username'";
 
         Integer indexCount = jdbcTemplate.queryForObject(checkIndexSql, Integer.class);
         assertEquals(1, indexCount, "索引应该存在");
@@ -153,9 +162,7 @@ public class TestRdDataSource {
         System.out.println("✅ DDL测试通过");
     }
 
-    /**
-     * 测试2: INSERT - 插入单条数据
-     */
+    /** 测试2: INSERT - 插入单条数据 */
     @Test
     @DisplayName("测试INSERT - 插入单条数据")
     void testInsert() throws SQLException {
@@ -184,9 +191,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试3: INSERT - 批量插入数据
-     */
+    /** 测试3: INSERT - 批量插入数据 */
     @Test
     @DisplayName("测试INSERT - 批量插入数据")
     void testBatchInsert() throws SQLException {
@@ -221,9 +226,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试4: UPDATE - 更新数据
-     */
+    /** 测试4: UPDATE - 更新数据 */
     @Test
     @DisplayName("测试UPDATE - 更新数据")
     void testUpdate() throws SQLException {
@@ -243,7 +246,8 @@ public class TestRdDataSource {
             assertEquals(1, affected, "应该影响1行");
 
             // 验证更新结果
-            String querySql = "SELECT age, email FROM " + TEST_TABLE + " WHERE username = 'update_user'";
+            String querySql =
+                    "SELECT age, email FROM " + TEST_TABLE + " WHERE username = 'update_user'";
             Map<String, Object> result = jdbcTemplate.queryForMap(querySql);
             assertEquals(35, result.get("age"));
             assertEquals("updated@example.com", result.get("email"));
@@ -255,9 +259,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试5: DELETE - 删除数据
-     */
+    /** 测试5: DELETE - 删除数据 */
     @Test
     @DisplayName("测试DELETE - 删除数据")
     void testDelete() throws SQLException {
@@ -275,7 +277,8 @@ public class TestRdDataSource {
             assertEquals(1, affected, "应该影响1行");
 
             // 验证删除结果
-            String countSql = "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'delete_user'";
+            String countSql =
+                    "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'delete_user'";
             Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
             assertEquals(0, count, "记录应该被删除");
 
@@ -286,9 +289,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试6: SELECT - 查询数据（读路由）
-     */
+    /** 测试6: SELECT - 查询数据（读路由） */
     @Test
     @DisplayName("测试SELECT - 查询数据")
     void testSelect() throws SQLException {
@@ -315,13 +316,14 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试7: 批处理 - 混合操作
-     */
+    /** 测试7: 批处理 - 混合操作 */
     @Test
     @DisplayName("测试批处理 - 混合操作")
     void testMixedBatch() throws SQLException {
-        String insertSql = "INSERT INTO " + TEST_TABLE_BATCH + " (batch_id, operation, record_count) VALUES (?, ?, ?)";
+        String insertSql =
+                "INSERT INTO "
+                        + TEST_TABLE_BATCH
+                        + " (batch_id, operation, record_count) VALUES (?, ?, ?)";
 
         Connection conn = dataSource.getConnection();
         PreparedStatement ps = conn.prepareStatement(insertSql);
@@ -349,9 +351,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试8: 事务 - 事务提交和回滚
-     */
+    /** 测试8: 事务 - 事务提交和回滚 */
     @Test
     @DisplayName("测试事务 - 提交")
     void testTransaction() throws SQLException {
@@ -400,9 +400,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试9: 事务 - 回滚
-     */
+    /** 测试9: 事务 - 回滚 */
     @Test
     @DisplayName("测试事务 - 回滚")
     void testTransactionRollback() throws SQLException {
@@ -429,7 +427,8 @@ public class TestRdDataSource {
             conn.rollback();
 
             // 验证数据未插入
-            String countSql = "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'rollback_user'";
+            String countSql =
+                    "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'rollback_user'";
             Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
             assertEquals(0, count, "数据应该被回滚");
 
@@ -439,9 +438,7 @@ public class TestRdDataSource {
         }
     }
 
-    /**
-     * 测试10: 并发 - 多线程读写测试
-     */
+    /** 测试10: 并发 - 多线程读写测试 */
     @Test
     @DisplayName("测试并发 - 多线程读写")
     void testConcurrentReadWrite() throws InterruptedException {
@@ -454,35 +451,39 @@ public class TestRdDataSource {
 
         for (int i = 0; i < threadCount; i++) {
             final int threadId = i;
-            executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        for (int j = 0; j < operationsPerThread; j++) {
-                            // 50%读，50%写
-                            if (j % 2 == 0) {
-                                // 读操作
-                                String sql = "SELECT COUNT(*) FROM " + TEST_TABLE;
-                                jdbcTemplate.queryForObject(sql, Integer.class);
-                            } else {
-                                // 写操作
-                                String sql = "INSERT INTO " + TEST_TABLE + " (username, email, age) VALUES (?, ?, ?)";
-                                jdbcTemplate.update(sql,
-                                        "concurrent_" + threadId + "_" + j,
-                                        "concurrent" + threadId + "@example.com",
-                                        20 + j % 50
-                                );
+            executor.submit(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                for (int j = 0; j < operationsPerThread; j++) {
+                                    // 50%读，50%写
+                                    if (j % 2 == 0) {
+                                        // 读操作
+                                        String sql = "SELECT COUNT(*) FROM " + TEST_TABLE;
+                                        jdbcTemplate.queryForObject(sql, Integer.class);
+                                    } else {
+                                        // 写操作
+                                        String sql =
+                                                "INSERT INTO "
+                                                        + TEST_TABLE
+                                                        + " (username, email, age) VALUES (?, ?, ?)";
+                                        jdbcTemplate.update(
+                                                sql,
+                                                "concurrent_" + threadId + "_" + j,
+                                                "concurrent" + threadId + "@example.com",
+                                                20 + j % 50);
+                                    }
+                                    successCount.incrementAndGet();
+                                }
+                            } catch (Exception e) {
+                                failCount.incrementAndGet();
+                                System.err.println("线程 " + threadId + " 执行失败: " + e.getMessage());
+                            } finally {
+                                latch.countDown();
                             }
-                            successCount.incrementAndGet();
                         }
-                    } catch (Exception e) {
-                        failCount.incrementAndGet();
-                        System.err.println("线程 " + threadId + " 执行失败: " + e.getMessage());
-                    } finally {
-                        latch.countDown();
-                    }
-                }
-            });
+                    });
         }
 
         latch.await();
@@ -492,9 +493,7 @@ public class TestRdDataSource {
         System.out.println("✅ 并发测试通过，成功: " + successCount.get() + "，失败: " + failCount.get());
     }
 
-    /**
-     * 测试11: 预编译SQL缓存测试
-     */
+    /** 测试11: 预编译SQL缓存测试 */
     @Test
     @DisplayName("测试预编译SQL缓存")
     void testPreparedStatementCache() throws SQLException {
@@ -528,9 +527,7 @@ public class TestRdDataSource {
         System.out.println("✅ 预编译SQL缓存测试通过");
     }
 
-    /**
-     * 测试12: 大数据量批量插入
-     */
+    /** 测试12: 大数据量批量插入 */
     @Test
     @DisplayName("测试大数据量批量插入")
     void testLargeBatchInsert() throws SQLException {
@@ -562,16 +559,16 @@ public class TestRdDataSource {
         long endTime = System.currentTimeMillis();
         ThreadUtil.sleep(20);
         // 验证
-        String countSql = "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username LIKE 'large_batch_%'";
+        String countSql =
+                "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username LIKE 'large_batch_%'";
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
         assertEquals(batchSize, count);
 
-        System.out.println("✅ 大数据量批量插入测试通过，插入 " + batchSize + " 条，耗时: " + (endTime - startTime) + "ms");
+        System.out.println(
+                "✅ 大数据量批量插入测试通过，插入 " + batchSize + " 条，耗时: " + (endTime - startTime) + "ms");
     }
 
-    /**
-     * 测试13: 复杂查询 - JOIN和聚合
-     */
+    /** 测试13: 复杂查询 - JOIN和聚合 */
     @Test
     @DisplayName("测试复杂查询 - JOIN和聚合")
     void testComplexQuery() throws SQLException {
@@ -581,12 +578,15 @@ public class TestRdDataSource {
         }
 
         // 执行复杂查询
-        String sql = "SELECT " +
-                     "COUNT(*) as total, " +
-                     "AVG(age) as avg_age, " +
-                     "MAX(age) as max_age, " +
-                     "MIN(age) as min_age " +
-                     "FROM " + TEST_TABLE + " WHERE username LIKE 'complex_%'";
+        String sql =
+                "SELECT "
+                        + "COUNT(*) as total, "
+                        + "AVG(age) as avg_age, "
+                        + "MAX(age) as max_age, "
+                        + "MIN(age) as min_age "
+                        + "FROM "
+                        + TEST_TABLE
+                        + " WHERE username LIKE 'complex_%'";
 
         Map<String, Object> result = jdbcTemplate.queryForMap(sql);
         assertEquals(20L, result.get("total"));
@@ -597,9 +597,7 @@ public class TestRdDataSource {
         System.out.println("✅ 复杂查询测试通过");
     }
 
-    /**
-     * 测试14: 批量更新
-     */
+    /** 测试14: 批量更新 */
     @Test
     @DisplayName("测试批量更新")
     void testBatchUpdate() throws SQLException {
@@ -622,16 +620,15 @@ public class TestRdDataSource {
         }
 
         // 验证更新结果
-        String querySql = "SELECT AVG(age) FROM " + TEST_TABLE + " WHERE username LIKE 'batch_update_%'";
+        String querySql =
+                "SELECT AVG(age) FROM " + TEST_TABLE + " WHERE username LIKE 'batch_update_%'";
         Double avgAge = jdbcTemplate.queryForObject(querySql, Double.class);
         assertEquals(21.0, avgAge, 0.1);
 
         System.out.println("✅ 批量更新测试通过");
     }
 
-    /**
-     * 测试15: 边界值测试
-     */
+    /** 测试15: 边界值测试 */
     @Test
     @DisplayName("测试边界值")
     void testBoundaryValues() throws SQLException {
@@ -656,7 +653,8 @@ public class TestRdDataSource {
         }
 
         // 验证
-        String countSql = "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'null_age_user'";
+        String countSql =
+                "SELECT COUNT(*) FROM " + TEST_TABLE + " WHERE username = 'null_age_user'";
         Integer count = jdbcTemplate.queryForObject(countSql, Integer.class);
         assertEquals(1, count);
 

@@ -15,15 +15,18 @@ public class AdvPreparedStatementBinder {
 
     private final AdvTypeHandlerRegistry typeHandlerRegistry = AdvTypeHandlerRegistry.getInstance();
 
-    public void bind(PreparedStatement preparedStatement, int index, Object value) throws SQLException {
-        Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                value,
-                value == null ? Object.class : value.getClass(),
-                AdvTypeHandlerContext.simple(null));
+    public void bind(PreparedStatement preparedStatement, int index, Object value)
+            throws SQLException {
+        Object jdbcValue =
+                typeHandlerRegistry.convertForWrite(
+                        value,
+                        value == null ? Object.class : value.getClass(),
+                        AdvTypeHandlerContext.simple(null));
         preparedStatement.setObject(index, jdbcValue);
     }
 
-    public void bindAll(PreparedStatement preparedStatement, List<Object> values) throws SQLException {
+    public void bindAll(PreparedStatement preparedStatement, List<Object> values)
+            throws SQLException {
         for (int i = 0; i < values.size(); i++) {
             bind(preparedStatement, i + 1, values.get(i));
         }

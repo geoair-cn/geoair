@@ -17,9 +17,7 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
  * @author 张逢吉
  * @date 2024/12/05
  */
-
 public class GirAdvTools {
-
 
     /**
      * 获取几何对象转数组操作接口

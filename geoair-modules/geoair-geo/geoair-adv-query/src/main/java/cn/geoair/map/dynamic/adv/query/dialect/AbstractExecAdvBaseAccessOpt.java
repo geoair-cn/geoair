@@ -6,22 +6,21 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
-import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
-import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,17 +29,17 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-/**
- * 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑
- */
+/** 数据库插入操作抽象父类 封装所有数据库通用的插入逻辑 */
 public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt {
 
     protected IDataSourceGetter dataSourceGetter;
     protected DialectTableNameProcessor dialectTableNameProcessor;
-    protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseAccessOpt.class);
+    protected static final GiLogger log =
+            GirLoggerFactory.getLogger(AbstractExecAdvBaseAccessOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
-    private final AdvPreparedStatementBinder preparedStatementBinder = new AdvPreparedStatementBinder();
+    private final AdvPreparedStatementBinder preparedStatementBinder =
+            new AdvPreparedStatementBinder();
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
@@ -70,7 +69,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (StrUtil.isEmpty(dynamicSql)) {
             throw new IllegalArgumentException("插入SQL语句不能为空");
         }
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParamMap, dialectTableNameProcessor);
+        SqlMeta sqlMeta =
+                GirAdvSqlUtils.parseSqlWithParam(
+                        dynamicSql, sqlParamMap, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
         return bInsertBySql(execSql, SqlParamList.ofList(jdbcParams));
@@ -88,10 +89,19 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, sqlStatement, sqlParamList.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "bInsertBySql", sqlStatement, sqlParamList.toList(), cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bInsertBySql",
+                            sqlStatement,
+                            sqlParamList.toList(),
+                            cost,
+                            result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), "bInsertBySql", sqlStatement, sqlParamList, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(
+                            this.getClass(), "bInsertBySql", sqlStatement, sqlParamList, e);
             throw new RuntimeException("插入失败", e);
         } finally {
             closeConnection(connection);
@@ -118,7 +128,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 
         List<String> dbKeyList = new ArrayList<>();
         for (String field : rowData.keySet()) {
@@ -137,9 +149,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(false);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(false);
         return bInsertOne(entity, strategy);
     }
 
@@ -164,12 +175,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
-                entity,
-                toUnderlineCase,
-                ignoreNullValue,
-                strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+        Map<String, Object> rowData =
+                GirAdvSqlUtils.getRowData(
+                        entity,
+                        toUnderlineCase,
+                        ignoreNullValue,
+                        strategy.isIgnoreEmptyString(),
+                        ignoreFieldNames);
 
         return bInsertOne(tableName, rowData);
     }
@@ -190,9 +202,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(true);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(true);
         return bInsertOne(entity, strategy);
     }
 
@@ -218,12 +229,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     // ========== 4. 批量插入 ==========
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
+    public Integer bInsertBatch(
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return bInsertBatch(tableName, headers, rowsData, DEFAULT_BATCH_SIZE);
     }
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData, int batchSize) {
+    public Integer bInsertBatch(
+            String tableName,
+            List<String> headers,
+            List<Map<String, Object>> rowsData,
+            int batchSize) {
         validateTableNameAndData(tableName, headers, rowsData);
         if (batchSize <= 0) {
             batchSize = DEFAULT_BATCH_SIZE;
@@ -231,7 +247,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, batchSize);
         int totalSuccess = 0;
@@ -247,9 +265,10 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
 
-            List<String> fieldNames = headers.stream()
-                    .map(dialectTableNameProcessor::tbQuoteFieldName)
-                    .collect(Collectors.toList());
+            List<String> fieldNames =
+                    headers.stream()
+                            .map(dialectTableNameProcessor::tbQuoteFieldName)
+                            .collect(Collectors.toList());
             String fields = String.join(",", fieldNames);
             String placeholders = buildPlaceholders(fieldNames.size());
             String execSql = buildInsertSql(quoteTableName, fields, placeholders);
@@ -274,10 +293,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             stopWatch.stop();
 
             long cost = stopWatch.getTotalTimeMillis();
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
-                    this.getClass(), "bInsertBatch",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
-                    cost, totalSuccess);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bInsertBatch",
+                            StrUtil.format(
+                                    "表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                            cost,
+                            totalSuccess);
             return totalSuccess;
 
         } catch (SQLException e) {
@@ -290,9 +313,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
                 }
             }
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
-                    this.getClass(), "bInsertBatch",
-                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize), e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(
+                            this.getClass(),
+                            "bInsertBatch",
+                            StrUtil.format(
+                                    "表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, batchSize),
+                            e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
 
         } finally {
@@ -321,9 +348,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(false);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(false);
         return bInsertBatch(entities, strategy);
     }
 
@@ -348,12 +374,13 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
-                entity,
-                toUnderlineCase,
-                ignoreNullValue,
-                strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+            Map<String, Object> rowData =
+                    GirAdvSqlUtils.getRowData(
+                            entity,
+                            toUnderlineCase,
+                            ignoreNullValue,
+                            strategy.isIgnoreEmptyString(),
+                            ignoreFieldNames);
             rowsData.add(rowData);
         }
 
@@ -362,7 +389,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
@@ -372,15 +400,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertBatch(String tableName, Collection<T> entities) {
-        AccessStrategy strategy = new AccessStrategy()
-                .setTableName(tableName)
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(false);
+        AccessStrategy strategy =
+                new AccessStrategy()
+                        .setTableName(tableName)
+                        .setToUnderlineCase(true)
+                        .setIgnoreNullValue(false);
         return bInsertBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, AccessStrategy strategy) {
         if (strategy == null) {
             return bInsertBatch(tableName, entities);
         }
@@ -389,7 +419,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
@@ -406,17 +437,21 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
-        Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, conflictKeys);
+    public Integer bInsertIgnore(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+        Pair<String, List<Object>> insertIgnoreSql =
+                getInsertIgnoreSql(tableName, rowData, conflictKeys);
         return executeUpdate(insertIgnoreSql.getKey(), insertIgnoreSql.getValue(), "bInsertIgnore");
     }
 
-
-    public Pair<String, List<Object>> getInsertIgnoreSql(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Pair<String, List<Object>> getInsertIgnoreSql(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         validateTableNameAndData(tableName, rowData);
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
-        String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
+        String quoteTableName =
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
 
         List<String> dbKeyList = new ArrayList<>();
         for (String field : rowData.keySet()) {
@@ -424,7 +459,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
         String fields = String.join(",", dbKeyList);
         String placeholders = buildPlaceholders(rowData.keySet().size());
-        conflictKeys = conflictKeys.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
+        conflictKeys =
+                conflictKeys
+                        .stream()
+                        .map(dialectTableNameProcessor::tbQuoteFieldName)
+                        .collect(Collectors.toList());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
         execSql = dialectTableNameProcessor.tbRemoveSqlSpaces(execSql);
         List<Object> params = new ArrayList<>(rowData.values());
@@ -436,9 +475,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(false);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(false);
         return bInsertIgnore(entity, strategy);
     }
 
@@ -465,18 +503,20 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         boolean ignoreNullValue = strategy.isIgnoreNullValue();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
-                entity,
-                toUnderlineCase,
-                ignoreNullValue,
-                strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+        Map<String, Object> rowData =
+                GirAdvSqlUtils.getRowData(
+                        entity,
+                        toUnderlineCase,
+                        ignoreNullValue,
+                        strategy.isIgnoreEmptyString(),
+                        ignoreFieldNames);
 
         List<String> finalConflictKeys = conflictKeys;
         if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
             finalConflictKeys = new ArrayList<>();
             for (String key : conflictKeys) {
-                finalConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
+                finalConflictKeys.add(
+                        GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
             }
         }
 
@@ -499,9 +539,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (entity == null) {
             throw new IllegalArgumentException("插入的实体对象不能为空");
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(true);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(true);
         return bInsertIgnore(entity, strategy);
     }
 
@@ -527,7 +566,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     // ========== 7. 批量插入或忽略 ==========
 
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
+    public Integer bInsertIgnoreBatch(
+            String tableName,
+            Set<String> headers,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys) {
         validateTableNameAndData(tableName, ListUtil.toList(headers), rowsData);
 
         List<List<Map<String, Object>>> batches = CollUtil.split(rowsData, DEFAULT_BATCH_SIZE);
@@ -547,9 +590,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         if (CollUtil.isEmpty(entities)) {
             return 0;
         }
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(false);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(false);
         return bInsertIgnoreBatch(entities, strategy);
     }
 
@@ -580,24 +622,28 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         List<Pair<String, List<Object>>> sqlStatements = new ArrayList<>();
 
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
-                entity,
-                toUnderlineCase,
-                ignoreNullValue,
-                strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+            Map<String, Object> rowData =
+                    GirAdvSqlUtils.getRowData(
+                            entity,
+                            toUnderlineCase,
+                            ignoreNullValue,
+                            strategy.isIgnoreEmptyString(),
+                            ignoreFieldNames);
             List<String> finalConflictKeys = conflictKeys;
             if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
                 finalConflictKeys = new ArrayList<>();
                 for (String key : conflictKeys) {
-                    finalConflictKeys.add(GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
+                    finalConflictKeys.add(
+                            GirAdvSqlUtils.resolveColumnName(entity.getClass(), key, true));
                 }
             }
-            Pair<String, List<Object>> insertIgnoreSql = getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
+            Pair<String, List<Object>> insertIgnoreSql =
+                    getInsertIgnoreSql(tableName, rowData, finalConflictKeys);
             sqlStatements.add(insertIgnoreSql);
         }
 
-        List<List<Pair<String, List<Object>>>> batchGroupParams = CollUtil.split(sqlStatements, strategy.getBatchSize());
+        List<List<Pair<String, List<Object>>>> batchGroupParams =
+                CollUtil.split(sqlStatements, strategy.getBatchSize());
         StopWatch stopWatch = new StopWatch();
         int batchNum = 1;
         Connection connection = null;
@@ -619,21 +665,36 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 }
 
                 stopWatch.start();
-                int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
+                int execute =
+                        SqlExecutor.execute(
+                                connection,
+                                StrUtil.join("; \n", currentBatchSqls),
+                                currentBatchParamList.toArray());
                 stopWatch.stop();
 
                 totalSuccess += execute;
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
-                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                AdvLogSql.of(dataSourceGetter, getConfig())
+                        .debug(
+                                "批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
+                                batchNum,
+                                currentBatchSqls.size(),
+                                stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
 
             connection.commit();
             long cost = stopWatch.getTotalTimeMillis();
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
-                    this.getClass(), "bInsertIgnoreBatch",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
-                    cost, totalSuccess);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(
+                            this.getClass(),
+                            "bInsertIgnoreBatch",
+                            StrUtil.format(
+                                    "表名：{}，总条数：{}，批次大小：{}",
+                                    tableName,
+                                    totalSuccess,
+                                    strategy.getBatchSize()),
+                            cost,
+                            totalSuccess);
 
         } catch (SQLException e) {
             // 异常回滚
@@ -643,9 +704,16 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             } catch (SQLException ex) {
                 AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
             }
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
-                    this.getClass(), "bInsertIgnoreBatch",
-                    StrUtil.format("表名：{}，总成功条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()), e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(
+                            this.getClass(),
+                            "bInsertIgnoreBatch",
+                            StrUtil.format(
+                                    "表名：{}，总成功条数：{}，批次大小：{}",
+                                    tableName,
+                                    totalSuccess,
+                                    strategy.getBatchSize()),
+                            e);
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
 
         } finally {
@@ -664,7 +732,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
@@ -674,14 +743,14 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
     @Override
     public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities) {
-        AccessStrategy strategy = new AccessStrategy()
-                .setToUnderlineCase(true)
-                .setIgnoreNullValue(true);
+        AccessStrategy strategy =
+                new AccessStrategy().setToUnderlineCase(true).setIgnoreNullValue(true);
         return bInsertIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, AccessStrategy strategy) {
         if (strategy == null) {
             return bInsertSelectiveIgnoreBatch(entities);
         }
@@ -690,7 +759,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         AccessStrategy strategy = new AccessStrategy();
         if (strategyConsumer != null) {
             strategyConsumer.accept(strategy);
@@ -709,10 +779,12 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             Integer result = SqlExecutor.execute(connection, sql, params.toArray());
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), methodName, sql, params, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(this.getClass(), methodName, sql, params, cost, result);
             return result;
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), methodName, sql, params, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), methodName, sql, params, e);
             throw new RuntimeException("插入操作失败，SQL：" + sql, e);
         } finally {
             closeConnection(connection);
@@ -737,7 +809,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    protected void validateTableNameAndData(String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
+    protected void validateTableNameAndData(
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         validateTableName(tableName);
         if (CollUtil.isEmpty(headers)) {
             throw new IllegalArgumentException("插入的字段头不能为空");
@@ -758,6 +831,4 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             dataSourceGetter.connectionClose(connection);
         }
     }
-
-
 }

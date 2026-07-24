@@ -13,48 +13,32 @@ public class GirPercentConsumer implements GiPercentConsumer {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
-
     public enum PercentType {
         INT,
         DOUBLE
     }
 
-    /**
-     * 上次更新的进度（int类型）
-     */
+    /** 上次更新的进度（int类型） */
     private int[] intLastPercent = {0};
 
-    /**
-     * 上次更新的进度（double类型）
-     */
+    /** 上次更新的进度（double类型） */
     private double[] doubleLastPercent = {0.0};
 
-    /**
-     * int类型步长
-     */
+    /** int类型步长 */
     private int intStep;
 
-    /**
-     * double类型步长
-     */
+    /** double类型步长 */
     private double doubleStep;
 
-    /**
-     * 进度类型
-     */
+    /** 进度类型 */
     private PercentType percentType;
 
-    /**
-     * 进度更新回调
-     */
+    /** 进度更新回调 */
     private GiPercentUpdateConsumer percentUpdateConsumer;
-
 
     private boolean started = false;
 
-    /**
-     * 记录的总数
-     */
+    /** 记录的总数 */
     private Number totalCount = null;
 
     /**
@@ -71,7 +55,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
     /**
      * 构造函数 - 使用int类型进度（自定义步长）
      *
-     * @param step                  步长
+     * @param step 步长
      * @param percentUpdateConsumer 进度更新回调
      */
     public GirPercentConsumer(int step, GiPercentUpdateConsumer percentUpdateConsumer) {
@@ -84,7 +68,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
      * 构造函数 - 使用double类型进度（默认步长10.0）
      *
      * @param percentUpdateConsumer 进度更新回调
-     * @param isDouble              true表示使用double类型
+     * @param isDouble true表示使用double类型
      */
     public GirPercentConsumer(GiPercentUpdateConsumer percentUpdateConsumer, boolean isDouble) {
         this.percentType = isDouble ? PercentType.DOUBLE : PercentType.INT;
@@ -99,7 +83,7 @@ public class GirPercentConsumer implements GiPercentConsumer {
     /**
      * 构造函数 - 使用double类型进度（自定义步长）
      *
-     * @param step                  double类型步长
+     * @param step double类型步长
      * @param percentUpdateConsumer 进度更新回调
      */
     public GirPercentConsumer(double step, GiPercentUpdateConsumer percentUpdateConsumer) {
@@ -111,11 +95,12 @@ public class GirPercentConsumer implements GiPercentConsumer {
     /**
      * 构造函数 - 使用double类型进度（自定义步长）
      *
-     * @param step                  int类型步长（会自动转为double）
+     * @param step int类型步长（会自动转为double）
      * @param percentUpdateConsumer 进度更新回调
-     * @param useDouble             是否使用double类型
+     * @param useDouble 是否使用double类型
      */
-    public GirPercentConsumer(int step, GiPercentUpdateConsumer percentUpdateConsumer, boolean useDouble) {
+    public GirPercentConsumer(
+            int step, GiPercentUpdateConsumer percentUpdateConsumer, boolean useDouble) {
         if (useDouble) {
             this.percentType = PercentType.DOUBLE;
             this.doubleStep = step;
@@ -198,11 +183,10 @@ public class GirPercentConsumer implements GiPercentConsumer {
         doStart(allCount);
     }
 
-    /**
-     * 处理int类型进度
-     */
+    /** 处理int类型进度 */
     private void handleIntProgress(Long allCount, Long currentCount) {
-        int updatePercent = GutilPercent.getUpdatePercentInt(currentCount, allCount, intStep, intLastPercent);
+        int updatePercent =
+                GutilPercent.getUpdatePercentInt(currentCount, allCount, intStep, intLastPercent);
         if (updatePercent != -1) {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);
@@ -211,11 +195,11 @@ public class GirPercentConsumer implements GiPercentConsumer {
         }
     }
 
-    /**
-     * 处理double类型进度
-     */
+    /** 处理double类型进度 */
     private void handleDoubleProgress(Long allCount, Long currentCount) {
-        double updatePercent = GutilPercent.getUpdatePercentDouble(currentCount, allCount, doubleStep, doubleLastPercent);
+        double updatePercent =
+                GutilPercent.getUpdatePercentDouble(
+                        currentCount, allCount, doubleStep, doubleLastPercent);
         if (updatePercent != -1.0) {
             if (percentUpdateConsumer != null) {
                 percentUpdateConsumer.update(updatePercent);
@@ -224,16 +208,12 @@ public class GirPercentConsumer implements GiPercentConsumer {
         }
     }
 
-    /**
-     * 获取当前进度类型
-     */
+    /** 获取当前进度类型 */
     public PercentType getPercentType() {
         return percentType;
     }
 
-    /**
-     * 重置进度状态
-     */
+    /** 重置进度状态 */
     public void reset() {
         intLastPercent[0] = 0;
         doubleLastPercent[0] = 0.0;
@@ -252,37 +232,27 @@ public class GirPercentConsumer implements GiPercentConsumer {
         start(allCount);
     }
 
-    /**
-     * 获取当前int类型进度值（如果当前是int类型）
-     */
+    /** 获取当前int类型进度值（如果当前是int类型） */
     public int getCurrentIntPercent() {
         return percentType == PercentType.INT ? intLastPercent[0] : -1;
     }
 
-    /**
-     * 获取当前double类型进度值（如果当前是double类型）
-     */
+    /** 获取当前double类型进度值（如果当前是double类型） */
     public double getCurrentDoublePercent() {
         return percentType == PercentType.DOUBLE ? doubleLastPercent[0] : -1.0;
     }
 
-    /**
-     * 是否已启动
-     */
+    /** 是否已启动 */
     public boolean isStarted() {
         return started;
     }
 
-    /**
-     * 获取当前总数
-     */
+    /** 获取当前总数 */
     public Number getTotalCount() {
         return totalCount;
     }
 
-    /**
-     * 判断是否完成（进度达到100%）
-     */
+    /** 判断是否完成（进度达到100%） */
     public boolean isComplete() {
         if (percentType == PercentType.INT) {
             return intLastPercent[0] >= 100;

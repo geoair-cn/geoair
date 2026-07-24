@@ -29,7 +29,10 @@ final class CsvSchemaSupport {
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName("csv_feature");
         if (linkInfo.getSrid() > 0) {
-            builder.setCRS(cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid()));
+            builder.setCRS(
+                    cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance()
+                            .getSridOpt()
+                            .getCRS(linkInfo.getSrid()));
         }
         for (String header : headers) {
             builder.add(header, String.class);
@@ -60,7 +63,8 @@ final class CsvSchemaSupport {
             if (normalized.equals(normalize(header))) {
                 return i;
             }
-            String resolved = AdvBeanMappingMeta.of(HeaderHolder.class).resolveColumnName(header, false);
+            String resolved =
+                    AdvBeanMappingMeta.of(HeaderHolder.class).resolveColumnName(header, false);
             if (normalized.equals(normalize(resolved))) {
                 return i;
             }

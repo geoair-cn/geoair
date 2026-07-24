@@ -117,7 +117,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                     Geometry geom = (Geometry) value;
                     int srid = geom.getSRID();
                     Geometry convert =
-                            GirGeoTools.defaultInstance().getSridOpt()
+                            GirGeoTools.defaultInstance()
+                                    .getSridOpt()
                                     .convert(geom, srid, writeConfig.getOutPutSrid());
                     if (convert == null) {
                         Gir.log.info("转换失败");
@@ -179,9 +180,15 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put(PostgisNGDataStoreFactory.DBTYPE.key, "postgis");
-            params.put(PostgisNGDataStoreFactory.HOST.key, extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.HOST.key,
+                    extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.PORT.key,
+                    extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.DATABASE.key,
+                    extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());

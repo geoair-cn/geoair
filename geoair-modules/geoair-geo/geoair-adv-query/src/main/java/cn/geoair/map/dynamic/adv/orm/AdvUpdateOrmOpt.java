@@ -3,13 +3,11 @@ package cn.geoair.map.dynamic.adv.orm;
 import cn.geoair.base.gpa.dao.GiUpdateDao;
 import cn.geoair.base.gpa.entity.GiEntityAlterable;
 import cn.geoair.map.dynamic.adv.spring.GirSpringAdvExecutor;
-
 import java.io.Serializable;
 import java.util.List;
 
 public interface AdvUpdateOrmOpt<T extends GiEntityAlterable<PK>, PK extends Serializable>
-        extends
-        GiUpdateDao<T, PK> {
+        extends GiUpdateDao<T, PK> {
 
     /**
      * 根据主键更新记录(更新所有字段)
@@ -54,7 +52,8 @@ public interface AdvUpdateOrmOpt<T extends GiEntityAlterable<PK>, PK extends Ser
      */
     @Override
     default int gtcUpdateByPKSelective(List<T> records) {
-        GirSpringAdvExecutor.getInstance().bUpdateBatchByPKSelective(records, u -> u.setBatchSize(200));
+        GirSpringAdvExecutor.getInstance()
+                .bUpdateBatchByPKSelective(records, u -> u.setBatchSize(200));
         return records.size();
     }
 }

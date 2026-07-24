@@ -15,7 +15,6 @@
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
 import cn.hutool.core.util.ArrayUtil;
-
 import java.util.Arrays;
 
 /** Represents the extent of the data for a particular level */

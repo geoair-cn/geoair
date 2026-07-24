@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 import lombok.Setter;
@@ -23,7 +22,7 @@ import lombok.Setter;
  * @author Gabriel Roldan
  */
 @Setter
-public class CacheStorageInfo  implements   java.io.Serializable {
+public class CacheStorageInfo implements java.io.Serializable {
 
     /** 展开格式代码 */
     public static final String EXPLODED_FORMAT_CODE = "esriMapCacheStorageModeExploded";

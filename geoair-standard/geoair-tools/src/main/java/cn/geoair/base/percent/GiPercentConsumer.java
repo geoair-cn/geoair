@@ -1,8 +1,6 @@
 package cn.geoair.base.percent;
 
-/**
- * 进度条的消费者
- */
+/** 进度条的消费者 */
 @FunctionalInterface
 public interface GiPercentConsumer {
 

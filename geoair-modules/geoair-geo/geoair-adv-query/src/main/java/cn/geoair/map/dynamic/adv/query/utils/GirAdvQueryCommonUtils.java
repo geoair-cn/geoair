@@ -4,7 +4,6 @@ import cn.geoair.map.dynamic.adv.query.apo.PageApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.CollectionUtil;
-
 import java.util.List;
 
 /**
@@ -16,13 +15,13 @@ public class GirAdvQueryCommonUtils {
     /**
      * 根据结果集创建分页对象
      *
-     * @param total            总数
-     * @param pageNum          页号
-     * @param pageSize         页数
+     * @param total 总数
+     * @param pageNum 页号
+     * @param pageSize 页数
      * @param pageNumStartZero 页号是不是从0开始
-     * @param lastPageNum      最后一页
-     * @param startRow         开始行数
-     * @param records          记录集
+     * @param lastPageNum 最后一页
+     * @param startRow 开始行数
+     * @param records 记录集
      * @return 分页对象
      */
     public static PageApo<GirAdvOneRow> createPageApo(
@@ -44,10 +43,7 @@ public class GirAdvQueryCommonUtils {
         return pageApo;
     }
 
-
-    /**
-     * 处理空间字段值（转换WKT/GeoJSON等）
-     */
+    /** 处理空间字段值（转换WKT/GeoJSON等） */
     public static void transGeometryField(
             List<GirAdvOneRow> records,
             AdvEnumsGeomOpt advEnumsGeomOpt,

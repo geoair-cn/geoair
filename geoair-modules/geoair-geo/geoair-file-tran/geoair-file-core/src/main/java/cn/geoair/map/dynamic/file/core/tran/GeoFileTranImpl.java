@@ -7,10 +7,10 @@ import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileTimeoutException;
+import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranProgress;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
-import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import java.io.Closeable;
 import java.io.IOException;
@@ -18,9 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-/**
- * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制
- */
+/** 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制 */
 public class GeoFileTranImpl implements GeoFileTran {
 
     private static GiLogger log = GirLoggerFactory.getLogger(GeoFileTranImpl.class);
@@ -71,7 +69,8 @@ public class GeoFileTranImpl implements GeoFileTran {
             }
 
             if (this.context.getPreProcessor() != null) {
-                boolean continueFlag = this.context.getPreProcessor().process(reader, writer, this.context);
+                boolean continueFlag =
+                        this.context.getPreProcessor().process(reader, writer, this.context);
                 if (!continueFlag) {
                     status = TranStatus.ABORTED;
                     result.setErrorMsg("转换被终止");
@@ -164,9 +163,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         return result;
     }
 
-    /**
-     * 超时检查
-     */
+    /** 超时检查 */
     private void checkTimeout() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - startTime > context.getTimeout()) {
@@ -174,9 +171,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 更新进度并回调监听器
-     */
+    /** 更新进度并回调监听器 */
     private void updateProgress() {
         if (progressListener == null) {
             return;
@@ -200,9 +195,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 统一异常处理
-     */
+    /** 统一异常处理 */
     private void handleException(TranResult result, Exception e) {
         if (e == null) {
             return;
@@ -221,9 +214,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 静默关闭资源
-     */
+    /** 静默关闭资源 */
     private void closeQuietly(Closeable closeable, TranResult result) {
         if (closeable == null) {
             return;
@@ -264,7 +255,9 @@ public class GeoFileTranImpl implements GeoFileTran {
                     totalCount.get(),
                     successCount.get(),
                     failCount.get(),
-                    totalCount.get() == 0 ? 0.0 : (double) successCount.get() / totalCount.get() * 100);
+                    totalCount.get() == 0
+                            ? 0.0
+                            : (double) successCount.get() / totalCount.get() * 100);
         }
     }
 

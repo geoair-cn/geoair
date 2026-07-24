@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 import lombok.Data;
@@ -30,81 +29,51 @@ import lombok.Data;
  * @author Gabriel Roldan
  */
 @Data
-public class SpatialReference   implements   java.io.Serializable{
+public class SpatialReference implements java.io.Serializable {
 
-    /**
-     * 空间参考系统的 Well-Known Text (WKT) 表示形式
-     */
+    /** 空间参考系统的 Well-Known Text (WKT) 表示形式 */
     private String WKT;
 
-    /**
-     * X 坐标的原点值
-     */
+    /** X 坐标的原点值 */
     private double XOrigin;
 
-    /**
-     * Y 坐标的原点值
-     */
+    /** Y 坐标的原点值 */
     private double YOrigin;
 
-    /**
-     * XY 坐标的比例因子
-     */
+    /** XY 坐标的比例因子 */
     private double XYScale;
 
-    /**
-     * Z 坐标的原点值
-     */
+    /** Z 坐标的原点值 */
     private double ZOrigin;
 
-    /**
-     * Z 坐标的比例因子
-     */
+    /** Z 坐标的比例因子 */
     private double ZScale;
 
-    /**
-     * M 值的原点
-     */
+    /** M 值的原点 */
     private double MOrigin;
 
-    /**
-     * M 值的比例因子
-     */
+    /** M 值的比例因子 */
     private double MScale;
 
-    /**
-     * XY 坐标的容差值
-     */
+    /** XY 坐标的容差值 */
     private double XYTolerance;
 
-    /**
-     * Z 坐标的容差值
-     */
+    /** Z 坐标的容差值 */
     private double ZTolerance;
 
-    /**
-     * M 值的容差
-     */
+    /** M 值的容差 */
     private double MTolerance;
 
-    /**
-     * 是否启用高精度坐标
-     */
+    /** 是否启用高精度坐标 */
     private boolean HighPrecision;
 
-    /**
-     * 坐标系的 WKID 标识符
-     */
+    /** 坐标系的 WKID 标识符 */
     private int WKID;
 
-    /**
-     * 最新的 WKID 标识符（ArcGIS 10.1+版本新增）
-     */
+    /** 最新的 WKID 标识符（ArcGIS 10.1+版本新增） */
     private int LatestWKID;
 
-    /**
-     * 左侧经度值（似乎仅在 ArcGIS 9.2 格式中存在）
-     */
+    /** 左侧经度值（似乎仅在 ArcGIS 9.2 格式中存在） */
     private double LeftLongitude;
 
     /**

@@ -3,14 +3,12 @@ package cn.geoair.comp.dynamic.ds.tx;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
 
-import java.util.function.Supplier;
-
 public class GirDsJdbcTxBuilder {
     private final GirDsTransactionTemplate template;
     private Propagation propagation = Propagation.REQUIRED;
     private IsolationLevel isolation = IsolationLevel.REPEATABLE_READ;
     private boolean readOnly = false;
-    private Class<? extends Throwable>[] rollFor = new Class[]{RuntimeException.class};
+    private Class<? extends Throwable>[] rollFor = new Class[] {RuntimeException.class};
     private Class<? extends Throwable>[] noRollFor = new Class[0];
 
     public GirDsJdbcTxBuilder(GirDsTransactionTemplate template) {

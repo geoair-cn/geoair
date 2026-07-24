@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 import lombok.Setter;
@@ -56,21 +55,15 @@ import lombok.Setter;
  * @see CacheStorageInfo 缓存存储信息
  */
 @Setter
-public class CacheInfo   implements   java.io.Serializable{
+public class CacheInfo implements java.io.Serializable {
 
-    /**
-     * 瓦片缓存信息
-     */
+    /** 瓦片缓存信息 */
     private TileCacheInfo tileCacheInfo;
 
-    /**
-     * 瓦片图像信息
-     */
+    /** 瓦片图像信息 */
     private TileImageInfo tileImageInfo;
 
-    /**
-     * 缓存存储信息
-     */
+    /** 缓存存储信息 */
     private CacheStorageInfo cacheStorageInfo;
 
     /**

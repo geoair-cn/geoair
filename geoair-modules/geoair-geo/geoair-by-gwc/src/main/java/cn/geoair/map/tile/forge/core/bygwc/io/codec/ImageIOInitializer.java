@@ -1,16 +1,14 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
 import com.sun.media.imageioimpl.plugins.gif.GIFImageWriterSpi;
-
-import javax.imageio.ImageIO;
-import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageReaderWriterSpi;
-import javax.imageio.spi.ImageWriterSpi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderWriterSpi;
+import javax.imageio.spi.ImageWriterSpi;
 
 /**
  * This class is used for handling the registration of the various {@link ImageReaderWriterSpi}

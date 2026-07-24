@@ -1,6 +1,5 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
-import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
@@ -20,11 +19,9 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -34,27 +31,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
- 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
- 
 @Component
 public class GirDsAPIServlet extends HttpServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    @Autowired
-    DsApiConfigService dsApiConfigService;
+    @Autowired DsApiConfigService dsApiConfigService;
 
-    @Autowired
-    GirDsServiceProperties girDsServiceProperties;
+    @Autowired GirDsServiceProperties girDsServiceProperties;
 
-    @Autowired
-    DsApiService dsApiService;
+    @Autowired DsApiService dsApiService;
 
-    @Autowired
-    GirDsSQLExecutor girDsSqlExecutor;
+    @Autowired GirDsSQLExecutor girDsSqlExecutor;
 
     ApiConfigApo config;
 
@@ -78,14 +68,20 @@ public class GirDsAPIServlet extends HttpServlet {
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
+            GirServletUtil.toResponse(
+                    response,
+                    json.getBytes(Charset.defaultCharset()),
+                    "application/json; charset=utf-8");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             ResponseDto responseDto = ResponseDto.fail(e.toString());
             // 全局数据转换
             Object res = globalTransform(responseDto);
             String json = JacksonUtils.toJSONString(res);
-            GirServletUtil.toResponse(response, json.getBytes(Charset.defaultCharset()), "application/json; charset=utf-8");
+            GirServletUtil.toResponse(
+                    response,
+                    json.getBytes(Charset.defaultCharset()),
+                    "application/json; charset=utf-8");
             log.error(e.toString(), e);
         }
     }
@@ -154,8 +150,7 @@ public class GirDsAPIServlet extends HttpServlet {
             JSONObject jo = getHttpJsonBody(request);
             params =
                     JSONObject.parseObject(
-                            jo.toJSONString(), new TypeReference<Map<String, Object>>() {
-                            });
+                            jo.toJSONString(), new TypeReference<Map<String, Object>>() {});
         }
         // 如果是application/x-www-form-urlencoded请求，先判断接口规定的content-type是不是确实是application/x-www-form-urlencoded
         else if (contentType.equalsIgnoreCase(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
@@ -165,9 +160,9 @@ public class GirDsAPIServlet extends HttpServlet {
             } else {
                 throw new RuntimeException(
                         "This API only supports content-type: "
-                        + apiConfigApo.getContentType()
-                        + ", but you use: "
-                        + contentType);
+                                + apiConfigApo.getContentType()
+                                + ", but you use: "
+                                + contentType);
             }
         } else {
             throw new RuntimeException("Content-type not supported: " + contentType);

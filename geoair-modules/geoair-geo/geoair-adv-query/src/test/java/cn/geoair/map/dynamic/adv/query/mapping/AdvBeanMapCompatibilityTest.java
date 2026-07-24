@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
-import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -35,12 +34,8 @@ public class AdvBeanMapCompatibilityTest {
         input.put("skipMe", "ignored");
         input.put("nullValue", null);
 
-        Map<String, Object> rowData = mapper.toColumnValueMap(
-                input,
-                true,
-                true,
-                true,
-                Arrays.asList("skipMe"));
+        Map<String, Object> rowData =
+                mapper.toColumnValueMap(input, true, true, true, Arrays.asList("skipMe"));
 
         Assert.assertEquals("Alice", rowData.get("user_name"));
         Assert.assertEquals(18, rowData.get("age"));
@@ -52,9 +47,9 @@ public class AdvBeanMapCompatibilityTest {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldMapResultSetRowToMap() throws SQLException {
-        ResultSet rs = buildSingleRowResultSet(
-                new String[] {"user_name", "age"},
-                new Object[] {"Alice", 18});
+        ResultSet rs =
+                buildSingleRowResultSet(
+                        new String[] {"user_name", "age"}, new Object[] {"Alice", 18});
 
         AdvBeanMapper mapper = new AdvBeanMapper();
         Assert.assertTrue(rs.next());
@@ -68,12 +63,13 @@ public class AdvBeanMapCompatibilityTest {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldMapResultSetListToMapList() throws SQLException {
-        ResultSet rs = buildMultiRowResultSet(
-                new String[] {"user_name", "age"},
-                new Object[][] {
-                        {"Alice", 18},
-                        {"Bob", 20}
-                });
+        ResultSet rs =
+                buildMultiRowResultSet(
+                        new String[] {"user_name", "age"},
+                        new Object[][] {
+                            {"Alice", 18},
+                            {"Bob", 20}
+                        });
 
         AdvBeanMapper mapper = new AdvBeanMapper();
         List<Map> mapped = mapper.mapList(rs, Map.class);
@@ -91,57 +87,62 @@ public class AdvBeanMapCompatibilityTest {
 
     private ResultSet buildMultiRowResultSet(String[] columns, Object[][] rows) {
         ResultSetMetaData metaData = buildMetaData(columns);
-        InvocationHandler handler = new InvocationHandler() {
-            private int cursor = -1;
+        InvocationHandler handler =
+                new InvocationHandler() {
+                    private int cursor = -1;
 
-            @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                String methodName = method.getName();
-                if ("next".equals(methodName)) {
-                    cursor++;
-                    return cursor < rows.length;
-                }
-                if ("getMetaData".equals(methodName)) {
-                    return metaData;
-                }
-                if ("getObject".equals(methodName)) {
-                    if (args[0] instanceof Integer) {
-                        return rows[cursor][((Integer) args[0]) - 1];
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args)
+                            throws Throwable {
+                        String methodName = method.getName();
+                        if ("next".equals(methodName)) {
+                            cursor++;
+                            return cursor < rows.length;
+                        }
+                        if ("getMetaData".equals(methodName)) {
+                            return metaData;
+                        }
+                        if ("getObject".equals(methodName)) {
+                            if (args[0] instanceof Integer) {
+                                return rows[cursor][((Integer) args[0]) - 1];
+                            }
+                            String columnLabel = String.valueOf(args[0]);
+                            int idx = findColumnIndex(columns, columnLabel);
+                            return idx >= 0 ? rows[cursor][idx] : null;
+                        }
+                        if ("close".equals(methodName)) {
+                            return null;
+                        }
+                        if ("wasNull".equals(methodName)) {
+                            return false;
+                        }
+                        return defaultValue(method.getReturnType());
                     }
-                    String columnLabel = String.valueOf(args[0]);
-                    int idx = findColumnIndex(columns, columnLabel);
-                    return idx >= 0 ? rows[cursor][idx] : null;
-                }
-                if ("close".equals(methodName)) {
-                    return null;
-                }
-                if ("wasNull".equals(methodName)) {
-                    return false;
-                }
-                return defaultValue(method.getReturnType());
-            }
-        };
-        return (ResultSet) Proxy.newProxyInstance(
-                ResultSet.class.getClassLoader(),
-                new Class<?>[] {ResultSet.class},
-                handler);
+                };
+        return (ResultSet)
+                Proxy.newProxyInstance(
+                        ResultSet.class.getClassLoader(),
+                        new Class<?>[] {ResultSet.class},
+                        handler);
     }
 
     private ResultSetMetaData buildMetaData(String[] columns) {
-        InvocationHandler handler = (proxy, method, args) -> {
-            String methodName = method.getName();
-            if ("getColumnCount".equals(methodName)) {
-                return columns.length;
-            }
-            if ("getColumnLabel".equals(methodName) || "getColumnName".equals(methodName)) {
-                return columns[((Integer) args[0]) - 1];
-            }
-            return defaultValue(method.getReturnType());
-        };
-        return (ResultSetMetaData) Proxy.newProxyInstance(
-                ResultSetMetaData.class.getClassLoader(),
-                new Class<?>[] {ResultSetMetaData.class},
-                handler);
+        InvocationHandler handler =
+                (proxy, method, args) -> {
+                    String methodName = method.getName();
+                    if ("getColumnCount".equals(methodName)) {
+                        return columns.length;
+                    }
+                    if ("getColumnLabel".equals(methodName) || "getColumnName".equals(methodName)) {
+                        return columns[((Integer) args[0]) - 1];
+                    }
+                    return defaultValue(method.getReturnType());
+                };
+        return (ResultSetMetaData)
+                Proxy.newProxyInstance(
+                        ResultSetMetaData.class.getClassLoader(),
+                        new Class<?>[] {ResultSetMetaData.class},
+                        handler);
     }
 
     private int findColumnIndex(String[] columns, String columnLabel) {

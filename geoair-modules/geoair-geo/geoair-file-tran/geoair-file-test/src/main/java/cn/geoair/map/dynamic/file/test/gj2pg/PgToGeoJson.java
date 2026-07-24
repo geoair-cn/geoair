@@ -15,7 +15,6 @@ import cn.geoair.map.dynamic.file.geojson.GeoJsonGeoFileWriter;
 import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.*;
 import cn.hutool.core.util.StrUtil;
-
 import java.io.IOException;
 
 public class PgToGeoJson {

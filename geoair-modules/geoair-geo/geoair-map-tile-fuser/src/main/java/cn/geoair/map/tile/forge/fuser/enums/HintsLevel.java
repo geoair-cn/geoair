@@ -1,8 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.enums;
 
-
 import cn.geoair.base.data.GiVisualValuable;
-
 import java.awt.*;
 
 /**
@@ -10,7 +8,7 @@ import java.awt.*;
  * @date ：Created in 2026/6/12 17:15
  * @description： 枚举存储与三种配置（速度、质量、默认）之一相关的提示
  */
-public enum HintsLevel  implements GiVisualValuable<String> {
+public enum HintsLevel implements GiVisualValuable<String> {
     QUALITY(0, "quality"),
     DEFAULT(1, "default"),
     SPEED(2, "speed");
@@ -22,7 +20,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
     HintsLevel(int numHint, String mode) {
         this.mode = mode;
         switch (numHint) {
-            // QUALITY HINTS
+                // QUALITY HINTS
             case 0:
                 hints =
                         new RenderingHints(
@@ -46,8 +44,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
                                 RenderingHints.VALUE_INTERPOLATION_BICUBIC));
                 hints.add(
                         new RenderingHints(
-                                RenderingHints.KEY_RENDERING,
-                                RenderingHints.VALUE_RENDER_QUALITY));
+                                RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
                 hints.add(
                         new RenderingHints(
                                 RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -57,7 +54,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
                                 RenderingHints.KEY_STROKE_CONTROL,
                                 RenderingHints.VALUE_STROKE_NORMALIZE));
                 break;
-            // DEFAULT HINTS
+                // DEFAULT HINTS
             case 1:
                 hints =
                         new RenderingHints(
@@ -81,8 +78,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
                                 RenderingHints.VALUE_INTERPOLATION_BILINEAR));
                 hints.add(
                         new RenderingHints(
-                                RenderingHints.KEY_RENDERING,
-                                RenderingHints.VALUE_RENDER_DEFAULT));
+                                RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
                 hints.add(
                         new RenderingHints(
                                 RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -92,7 +88,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
                                 RenderingHints.KEY_STROKE_CONTROL,
                                 RenderingHints.VALUE_STROKE_DEFAULT));
                 break;
-            // SPEED HINTS
+                // SPEED HINTS
             case 2:
                 hints =
                         new RenderingHints(
@@ -116,8 +112,7 @@ public enum HintsLevel  implements GiVisualValuable<String> {
                                 RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR));
                 hints.add(
                         new RenderingHints(
-                                RenderingHints.KEY_RENDERING,
-                                RenderingHints.VALUE_RENDER_SPEED));
+                                RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED));
                 hints.add(
                         new RenderingHints(
                                 RenderingHints.KEY_TEXT_ANTIALIASING,

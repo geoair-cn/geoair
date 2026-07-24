@@ -27,8 +27,7 @@ public class GirPageParam implements GiPageParam {
     @GaModelField(text = "是否查询总条数")
     private boolean countTotal = true;
 
-    public GirPageParam() {
-    }
+    public GirPageParam() {}
 
     public int getPageSize() {
         return pageSize;
@@ -75,13 +74,14 @@ public class GirPageParam implements GiPageParam {
     /**
      * 设置分页参数，并指定页码起始值
      *
-     * @param pageSize         分页大小
-     * @param pageNum          页码
-     * @param startRow         起始行
+     * @param pageSize 分页大小
+     * @param pageNum 页码
+     * @param startRow 起始行
      * @param pageNumStartZero 页码是否从0开始
      * @return 当前对象
      */
-    public GirPageParam putParam(Integer pageSize, Integer pageNum, Long startRow, boolean pageNumStartZero) {
+    public GirPageParam putParam(
+            Integer pageSize, Integer pageNum, Long startRow, boolean pageNumStartZero) {
         // 先设置页码起始方式
         this.pageNumStartZero = pageNumStartZero;
 
@@ -126,7 +126,11 @@ public class GirPageParam implements GiPageParam {
     }
 
     public GirPageParam putParam(GiPageParam pageParam) {
-        return putParam(pageParam.pageSize(), pageParam.pageNum(), pageParam.startRow(), pageParam.isPageNumStartZero())
+        return putParam(
+                        pageParam.pageSize(),
+                        pageParam.pageNum(),
+                        pageParam.startRow(),
+                        pageParam.isPageNumStartZero())
                 .putSort(pageParam.sort())
                 .putCountTotal(pageParam.countTotal());
     }

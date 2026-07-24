@@ -1,10 +1,9 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.web.mime.GirImageMime;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * 原始网格预缓存任务
@@ -15,39 +14,45 @@ public class TileOriginalPreCacheTask implements Runnable {
 
     private final TileTaskExecutor executor;
 
-    public TileOriginalPreCacheTask(String layerName, String originalCacheName,
-                                    int zoom, Geometry geometry4326,
-                                    CountDownLatch latch, AtomicLong totalCount,
-                                    AtomicLong successCount, AtomicLong failCount,
-                                    GirImageMime format) {
-        TileTaskConfig config = TileTaskConfig.forOriginalPreCache(layerName, originalCacheName, zoom, geometry4326, format)
-                .setLatch(latch)
-                .setTotalCount(totalCount)
-                .setSuccessCount(successCount)
-                .setFailCount(failCount);
+    public TileOriginalPreCacheTask(
+            String layerName,
+            String originalCacheName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong successCount,
+            AtomicLong failCount,
+            GirImageMime format) {
+        TileTaskConfig config =
+                TileTaskConfig.forOriginalPreCache(
+                                layerName, originalCacheName, zoom, geometry4326, format)
+                        .setLatch(latch)
+                        .setTotalCount(totalCount)
+                        .setSuccessCount(successCount)
+                        .setFailCount(failCount);
         this.executor = TileTaskExecutor.forOriginalPreCache(config);
     }
 
-    /**
-     * 便捷创建方法
-     */
-    public static TileOriginalPreCacheTask of(String layerName, String originalCacheName,
-                                               int zoom, Geometry geometry4326, GirImageMime format) {
-        return new TileOriginalPreCacheTask(layerName, originalCacheName, zoom, geometry4326,
-                null, null, null, null, format);
+    /** 便捷创建方法 */
+    public static TileOriginalPreCacheTask of(
+            String layerName,
+            String originalCacheName,
+            int zoom,
+            Geometry geometry4326,
+            GirImageMime format) {
+        return new TileOriginalPreCacheTask(
+                layerName, originalCacheName, zoom, geometry4326, null, null, null, null, format);
     }
 
-    /**
-     * 便捷创建方法（使用默认缓存名）
-     */
-    public static TileOriginalPreCacheTask of(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
-        return new TileOriginalPreCacheTask(layerName, null, zoom, geometry4326,
-                null, null, null, null, format);
+    /** 便捷创建方法（使用默认缓存名） */
+    public static TileOriginalPreCacheTask of(
+            String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
+        return new TileOriginalPreCacheTask(
+                layerName, null, zoom, geometry4326, null, null, null, null, format);
     }
 
-    /**
-     * 链式构建
-     */
+    /** 链式构建 */
     public static Builder builder() {
         return new Builder();
     }
@@ -114,8 +119,16 @@ public class TileOriginalPreCacheTask implements Runnable {
         }
 
         public TileOriginalPreCacheTask build() {
-            return new TileOriginalPreCacheTask(layerName, originalCacheName, zoom, geometry4326,
-                    latch, totalCount, successCount, failCount, format);
+            return new TileOriginalPreCacheTask(
+                    layerName,
+                    originalCacheName,
+                    zoom,
+                    geometry4326,
+                    latch,
+                    totalCount,
+                    successCount,
+                    failCount,
+                    format);
         }
     }
 }

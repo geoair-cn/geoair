@@ -14,10 +14,10 @@ public class TileLevelMetadata {
     /** 缩放级别（0~maxZoom） */
     private final int zoom;
 
-    /** 每行的瓦片数量（水平方向/X轴）  */
+    /** 每行的瓦片数量（水平方向/X轴） */
     private final int numTilesWide;
 
-    /** 每列的瓦片数量（垂直方向/Y轴）  */
+    /** 每列的瓦片数量（垂直方向/Y轴） */
     private final int numTilesHigh;
 
     /** 每个瓦片的地理尺寸（米），计算公式：globalWidthMeters / numTilesWide */
@@ -50,7 +50,20 @@ public class TileLevelMetadata {
     /** 网格集名称（如 EPSG:4326 或 EPSG:3857） */
     private final String gridSetName;
 
-    public TileLevelMetadata(int zoom, int numTilesWide, int numTilesHigh, double tileSizeM, double groundResolution, double resolution, double scale, long totalTiles, int tilePixelSize, double dpi, double mmPerPixel, Envelope extent, String gridSetName) {
+    public TileLevelMetadata(
+            int zoom,
+            int numTilesWide,
+            int numTilesHigh,
+            double tileSizeM,
+            double groundResolution,
+            double resolution,
+            double scale,
+            long totalTiles,
+            int tilePixelSize,
+            double dpi,
+            double mmPerPixel,
+            Envelope extent,
+            String gridSetName) {
         this.zoom = zoom;
         this.numTilesWide = numTilesWide;
         this.numTilesHigh = numTilesHigh;
@@ -66,15 +79,11 @@ public class TileLevelMetadata {
         this.gridSetName = gridSetName;
     }
 
-    /**
-     * 获取格式化的比例尺字符串
-     */
+    /** 获取格式化的比例尺字符串 */
     public String getScaleString() {
         if (scale >= 1000000) {
             return String.format("1:%.1f万", scale / 10000);
         }
         return String.format("1:%.0f", scale);
     }
-
-
 }

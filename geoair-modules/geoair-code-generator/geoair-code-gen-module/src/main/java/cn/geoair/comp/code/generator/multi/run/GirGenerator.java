@@ -11,13 +11,11 @@ import cn.geoair.comp.code.generator.multi.utils.GenPathUtils;
 import cn.geoair.comp.code.generator.multi.utils.GenUtils;
 import cn.geoair.comp.code.generator.multi.utils.VelocityUtils;
 import cn.hutool.core.map.MapUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import javax.sql.DataSource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -68,7 +66,7 @@ public class GirGenerator {
     }
 
     public void genCode(String table) {
-        genCode(new String[]{table});
+        genCode(new String[] {table});
     }
 
     private void generatorCode(GenTable table, GirGeneratorConfig globalConfig) {
@@ -84,7 +82,7 @@ public class GirGenerator {
             try {
                 // 只处理枚举模板
                 if (template.contains("rx-enum.java.vm")
-                    || template.contains("rx-apienum.java.vm")) {
+                        || template.contains("rx-apienum.java.vm")) {
                     generateEnumCode(table, template, this.globalConfig.getMutiIs());
                 } else {
                     // 渲染模板
@@ -102,9 +100,7 @@ public class GirGenerator {
         }
     }
 
-    /**
-     * 生成枚举代码
-     */
+    /** 生成枚举代码 */
     private void generateEnumCode(GenTable table, String template, Boolean mutiIs) {
         Template tpl = null;
         try {
@@ -140,9 +136,7 @@ public class GirGenerator {
         }
     }
 
-    /**
-     * 设置主键列信息（修复空指针）
-     */
+    /** 设置主键列信息（修复空指针） */
     private void setPkColumn(GenTable table) {
         List<GenTableColumn> columns = table.getColumns();
         if (columns.isEmpty()) {

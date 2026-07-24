@@ -2,17 +2,12 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
-
 import javax.sql.DataSource;
 
-/**
- * 动态数据源管理器接口 定义动态数据源的添加、获取、移除、清空等操作
- */
+/** 动态数据源管理器接口 定义动态数据源的添加、获取、移除、清空等操作 */
 public interface DynamicDataSourceManager {
 
-    /**
-     * 清空数据源缓存并释放数据库连接
-     */
+    /** 清空数据源缓存并释放数据库连接 */
     void cleanCache();
 
     /**
@@ -24,8 +19,7 @@ public interface DynamicDataSourceManager {
     boolean containsDataSource(String dataSourceId);
 
     /**
-     * 获取指定ID的数据源
-     * 由于实现上是与getOrCreateDataSource一致，但是命名上感觉像是getDataSourceById，所以这个API废弃
+     * 获取指定ID的数据源 由于实现上是与getOrCreateDataSource一致，但是命名上感觉像是getDataSourceById，所以这个API废弃
      *
      * @param dataSourceId 数据源ID
      * @return DruidDataSource对象
@@ -53,10 +47,9 @@ public interface DynamicDataSourceManager {
     AdvDataSourceWrapper getOrCreateDataSource(String dataSourceId);
 
     /**
-     * 添加数据源到管理器
-     * 命名不规范，故废弃，移步registerDataSource
+     * 添加数据源到管理器 命名不规范，故废弃，移步registerDataSource
      *
-     * @param dataSource   数据源对象
+     * @param dataSource 数据源对象
      * @param dataSourceId 数据源ID
      */
     @Deprecated
@@ -65,7 +58,7 @@ public interface DynamicDataSourceManager {
     /**
      * 注册数据源到管理器
      *
-     * @param dataSource   数据源对象
+     * @param dataSource 数据源对象
      * @param dataSourceId 数据源ID
      */
     void registerDataSource(String dataSourceId, DataSource dataSource);

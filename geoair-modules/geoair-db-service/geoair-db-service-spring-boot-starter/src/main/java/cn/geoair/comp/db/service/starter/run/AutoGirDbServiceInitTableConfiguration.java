@@ -40,23 +40,23 @@ public class AutoGirDbServiceInitTableConfiguration {
                 buildCreateDsapiDatasourceSql(iAdvExecutor),
                 buildOwnerSql(iAdvExecutor, "dsapi_datasource"),
                 new String[][] {
-                        {"id", "名称"},
-                        {"name", "名称"},
-                        {"note", "备注信息"},
-                        {"type", "类型"},
-                        {"url", "jdbcUrl"},
-                        {"username", "用户名"},
-                        {"password", "密码"},
-                        {"driver", "驱动名称"},
-                        {"table_sql", "创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称"},
-                        {"create_user_id", "创建人"},
-                        {"create_time", "创建时间"},
-                        {"update_time", "更新时间"},
-                        {"del_is", "是否删除标识"},
-                        {"time_create", "创建时间"},
-                        {"time_update", "更新时间"},
-                        {"name_create", "创建人名称"},
-                        {"name_update", "更新人名称"}
+                    {"id", "名称"},
+                    {"name", "名称"},
+                    {"note", "备注信息"},
+                    {"type", "类型"},
+                    {"url", "jdbcUrl"},
+                    {"username", "用户名"},
+                    {"password", "密码"},
+                    {"driver", "驱动名称"},
+                    {"table_sql", "创建或编辑API的时候，选择数据源，会执行此sql来获取该数据源下的所有表名称"},
+                    {"create_user_id", "创建人"},
+                    {"create_time", "创建时间"},
+                    {"update_time", "更新时间"},
+                    {"del_is", "是否删除标识"},
+                    {"time_create", "创建时间"},
+                    {"time_update", "更新时间"},
+                    {"name_create", "创建人名称"},
+                    {"name_update", "更新人名称"}
                 },
                 "数据源信息");
     }
@@ -68,15 +68,15 @@ public class AutoGirDbServiceInitTableConfiguration {
                 buildCreateDsapiGroupSql(iAdvExecutor),
                 buildOwnerSql(iAdvExecutor, "dsapi_group"),
                 new String[][] {
-                        {"id", "主键"},
-                        {"name", "分组名称"},
-                        {"create_user_id", "创建人Id"},
-                        {"create_time", "创建时间"},
-                        {"update_time", "更新时间"},
-                        {"time_create", "创建时间"},
-                        {"time_update", "更新时间"},
-                        {"name_create", "创建人名称"},
-                        {"name_update", "更新人名称"}
+                    {"id", "主键"},
+                    {"name", "分组名称"},
+                    {"create_user_id", "创建人Id"},
+                    {"create_time", "创建时间"},
+                    {"update_time", "更新时间"},
+                    {"time_create", "创建时间"},
+                    {"time_update", "更新时间"},
+                    {"name_create", "创建人名称"},
+                    {"name_update", "更新人名称"}
                 },
                 "api分组信息");
     }
@@ -88,35 +88,36 @@ public class AutoGirDbServiceInitTableConfiguration {
                 buildCreateDsapiConfigSql(iAdvExecutor),
                 buildOwnerSql(iAdvExecutor, "dsapi_config"),
                 new String[][] {
-                        {"id", "主键"},
-                        {"name", "名称"},
-                        {"note", "备注"},
-                        {"path", "接口定义的路径"},
-                        {"params", "参数信息"},
-                        {"json_param", "入参信息"},
-                        {"status", "状态，停用与否"},
-                        {"access", "api类型"},
-                        {"group_id", "分组Id"},
-                        {"content_type", "请求头"},
-                        {"task", "该任务信息"},
-                        {"create_user_id", "创建人Id"},
-                        {"create_time", "创建时间"},
-                        {"update_time", "更新时间"},
-                        {"del_is", "是否删除标识"},
-                        {"time_create", "创建时间"},
-                        {"time_update", "更新时间"},
-                        {"name_create", "创建人名称"},
-                        {"name_update", "更新人名称"}
+                    {"id", "主键"},
+                    {"name", "名称"},
+                    {"note", "备注"},
+                    {"path", "接口定义的路径"},
+                    {"params", "参数信息"},
+                    {"json_param", "入参信息"},
+                    {"status", "状态，停用与否"},
+                    {"access", "api类型"},
+                    {"group_id", "分组Id"},
+                    {"content_type", "请求头"},
+                    {"task", "该任务信息"},
+                    {"create_user_id", "创建人Id"},
+                    {"create_time", "创建时间"},
+                    {"update_time", "更新时间"},
+                    {"del_is", "是否删除标识"},
+                    {"time_create", "创建时间"},
+                    {"time_update", "更新时间"},
+                    {"name_create", "创建人名称"},
+                    {"name_update", "更新人名称"}
                 },
                 "api配置信息");
     }
 
-    private void executeCreateAndComments(IAdvExecutor iAdvExecutor,
-                                          String tableName,
-                                          String createSql,
-                                          String ownerSql,
-                                          String[][] columnComments,
-                                          String tableComment) {
+    private void executeCreateAndComments(
+            IAdvExecutor iAdvExecutor,
+            String tableName,
+            String createSql,
+            String ownerSql,
+            String[][] columnComments,
+            String tableComment) {
         iAdvExecutor.dExecuteDDL(createSql, tableName, "create");
         if (StrUtil.isNotEmpty(ownerSql)) {
             iAdvExecutor.dExecuteDDL(ownerSql, tableName, "owner");
@@ -127,12 +128,14 @@ public class AutoGirDbServiceInitTableConfiguration {
                     tableName,
                     "comment column");
         }
-        iAdvExecutor.dExecuteDDL(buildCommentOnTableSql(tableName, tableComment), tableName, "comment table");
+        iAdvExecutor.dExecuteDDL(
+                buildCommentOnTableSql(tableName, tableComment), tableName, "comment table");
     }
 
     private String buildCreateDsapiDatasourceSql(IAdvExecutor iAdvExecutor) {
         if (isDmExecutor(iAdvExecutor)) {
-            return String.join("\n",
+            return String.join(
+                    "\n",
                     "CREATE TABLE \"dsapi_datasource\" (",
                     "    \"id\" VARCHAR2(255) NOT NULL,",
                     "    \"name\" VARCHAR2(255),",
@@ -154,7 +157,8 @@ public class AutoGirDbServiceInitTableConfiguration {
                     "    CONSTRAINT \"ds_datasource_pkey\" PRIMARY KEY (\"id\")",
                     ")");
         }
-        return String.join("\n",
+        return String.join(
+                "\n",
                 "CREATE TABLE \"dsapi_datasource\" (",
                 "    \"id\" text COLLATE \"pg_catalog\".\"default\" NOT NULL,",
                 "    \"name\" text COLLATE \"pg_catalog\".\"default\",",
@@ -179,7 +183,8 @@ public class AutoGirDbServiceInitTableConfiguration {
 
     private String buildCreateDsapiGroupSql(IAdvExecutor iAdvExecutor) {
         if (isDmExecutor(iAdvExecutor)) {
-            return String.join("\n",
+            return String.join(
+                    "\n",
                     "CREATE TABLE \"dsapi_group\" (",
                     "    \"id\" VARCHAR2(255) NOT NULL,",
                     "    \"name\" VARCHAR2(255) NOT NULL,",
@@ -193,7 +198,8 @@ public class AutoGirDbServiceInitTableConfiguration {
                     "    CONSTRAINT \"ds_api_group_pkey\" PRIMARY KEY (\"id\")",
                     ")");
         }
-        return String.join("\n",
+        return String.join(
+                "\n",
                 "CREATE TABLE \"dsapi_group\" (",
                 "    \"id\" text COLLATE \"pg_catalog\".\"default\" NOT NULL,",
                 "    \"name\" text COLLATE \"pg_catalog\".\"default\" NOT NULL,",
@@ -210,7 +216,8 @@ public class AutoGirDbServiceInitTableConfiguration {
 
     private String buildCreateDsapiConfigSql(IAdvExecutor iAdvExecutor) {
         if (isDmExecutor(iAdvExecutor)) {
-            return String.join("\n",
+            return String.join(
+                    "\n",
                     "CREATE TABLE \"dsapi_config\" (",
                     "    \"id\" VARCHAR2(255) NOT NULL,",
                     "    \"name\" VARCHAR2(255),",
@@ -234,7 +241,8 @@ public class AutoGirDbServiceInitTableConfiguration {
                     "    CONSTRAINT \"ds_api_config_pkey\" PRIMARY KEY (\"id\")",
                     ")");
         }
-        return String.join("\n",
+        return String.join(
+                "\n",
                 "CREATE TABLE \"dsapi_config\" (",
                 "    \"id\" text COLLATE \"pg_catalog\".\"default\" NOT NULL,",
                 "    \"name\" text COLLATE \"pg_catalog\".\"default\",",
@@ -267,12 +275,21 @@ public class AutoGirDbServiceInitTableConfiguration {
     }
 
     private String buildCommentOnColumnSql(String tableName, String columnName, String comment) {
-        return "COMMENT ON COLUMN " + quoteIdentifier(tableName) + "." + quoteIdentifier(columnName)
-                + " IS '" + escapeSql(comment) + "'";
+        return "COMMENT ON COLUMN "
+                + quoteIdentifier(tableName)
+                + "."
+                + quoteIdentifier(columnName)
+                + " IS '"
+                + escapeSql(comment)
+                + "'";
     }
 
     private String buildCommentOnTableSql(String tableName, String comment) {
-        return "COMMENT ON TABLE " + quoteIdentifier(tableName) + " IS '" + escapeSql(comment) + "'";
+        return "COMMENT ON TABLE "
+                + quoteIdentifier(tableName)
+                + " IS '"
+                + escapeSql(comment)
+                + "'";
     }
 
     private String quoteIdentifier(String name) {

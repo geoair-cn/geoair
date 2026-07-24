@@ -34,7 +34,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     protected ToolsConfig advToolsConfig;
 
-
     public GirGeoTools(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
@@ -72,7 +71,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     public static GirGeoTools me() {
         return defaultInstance();
     }
-
 
     @Override
     public GirGeom2ArrayOpt getGeom2ArrayOpt() {

@@ -2,11 +2,10 @@ package cn.geoair.map.dynamic.tools.simple.response;
 
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.GirImageMime;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张俊
@@ -21,16 +20,12 @@ public class TileResponseByByte extends TileResponse {
         return new TileResponseByByte();
     }
 
-
-    /**
-     * 瓦片输入字节
-     */
+    /** 瓦片输入字节 */
     private byte[] bytes;
 
     public InputStream toInputStream() {
         return new ByteArrayInputStream(bytes);
     }
-
 
     public byte[] toByteArrays() {
         return bytes;
@@ -40,16 +35,12 @@ public class TileResponseByByte extends TileResponse {
         return success && exists && bytes != null && bytes.length > 0;
     }
 
-    /**
-     * 获取内容长度（兼容HTTP Content-Length）
-     */
+    /** 获取内容长度（兼容HTTP Content-Length） */
     public Long getContentLength() {
         return bytes != null ? (long) bytes.length : size;
     }
 
-    /**
-     * 设置瓦片字节并自动更新size
-     */
+    /** 设置瓦片字节并自动更新size */
     public TileResponse setBytesAndUpdateSize(byte[] bytes) {
         this.bytes = bytes;
         this.size = bytes != null ? (long) bytes.length : 0;
@@ -57,9 +48,7 @@ public class TileResponseByByte extends TileResponse {
         return this;
     }
 
-    /**
-     * 创建成功的响应
-     */
+    /** 创建成功的响应 */
     public static TileResponse success(byte[] bytes, GiMimeType mimeType) {
         TileResponseByByte response = new TileResponseByByte();
         response.setSuccess(true);

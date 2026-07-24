@@ -1,26 +1,21 @@
 package cn.geoair.comp.dynamic.ds.datasource.web;
 
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.datasource.GirDynamicStackDataSource;
- 
-import org.springframework.web.servlet.HandlerInterceptor;
-
 import java.util.Stack;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * @author ：张俊
  * @date ：Created in 2025/6/19 10:44
- * @description： 动态数据源切换相关配置，这里可以接入相关业务库查询获取到数据库信息 注意：
- *     如果涉及到异步线程，还需要手动注入数据源配置
+ * @description： 动态数据源切换相关配置，这里可以接入相关业务库查询获取到数据库信息 注意： 如果涉及到异步线程，还需要手动注入数据源配置
  */
- 
 public class GirDataSourceWebContextInterceptor implements HandlerInterceptor {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     @Override
     public void afterCompletion(
             HttpServletRequest request,

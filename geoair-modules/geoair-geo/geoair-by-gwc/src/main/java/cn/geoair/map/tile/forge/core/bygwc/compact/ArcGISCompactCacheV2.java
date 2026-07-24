@@ -14,10 +14,6 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.compact;
 
-
-
-
-
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -28,8 +24,7 @@ import java.nio.ByteOrder;
  * <p>紧凑型缓存由 bundle 文件(*.bundle)组成，这些文件包含索引和实际的图像数据。每个.bundle文件以64字节的头部开始。
  * 头部之后是一个128x128矩阵(16384个瓦片)的8字节字。每个字的前5个字节是指向同一.bundle文件内瓦片图像数据的偏移量。
  * 接下来的3个字节是图像数据的大小。图像数据的大小在偏移量减4的位置以4字节字重复存储。未使用的索引条目使用
- * 04|00|00|00|00|00|00|00。如果大小为零，则表示没有可用的图像数据，索引条目为空。如果地图缓存超过128行或列，
- * 则会被分割成多个.bundle文件。
+ * 04|00|00|00|00|00|00|00。如果大小为零，则表示没有可用的图像数据，索引条目为空。如果地图缓存超过128行或列， 则会被分割成多个.bundle文件。
  *
  * @author Bjoern Saxe
  */

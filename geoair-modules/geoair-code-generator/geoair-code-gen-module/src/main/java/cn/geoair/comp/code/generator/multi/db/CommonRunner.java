@@ -12,7 +12,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +118,8 @@ public class CommonRunner implements ICommonRunner {
             return "";
         }
         String normalized = StrUtil.subAfter(tableName, ".", true);
-        return StrUtil.isEmpty(normalized) ? tableName.trim().toLowerCase() : normalized.trim().toLowerCase();
+        return StrUtil.isEmpty(normalized)
+                ? tableName.trim().toLowerCase()
+                : normalized.trim().toLowerCase();
     }
 }

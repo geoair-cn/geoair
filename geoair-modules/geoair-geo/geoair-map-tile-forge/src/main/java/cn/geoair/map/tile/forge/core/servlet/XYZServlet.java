@@ -1,35 +1,28 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
-import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.TileRequest;
-
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.hutool.core.util.StrUtil;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 
-/**
- * url构建逻辑参考 TileUrlBuilder
- */
-
-
+/** url构建逻辑参考 TileUrlBuilder */
 public class XYZServlet extends D3TilesServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -37,12 +30,18 @@ public class XYZServlet extends D3TilesServlet {
         super(mapTileService);
     }
 
-    Pattern pattern = Pattern.compile("/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
+    Pattern pattern =
+            Pattern.compile(
+                    "/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 
     //    /rest/xyz
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         String requestURI = request.getRequestURI();
-        Matcher matcher = pattern.matcher(requestURI);   ///xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
+        Matcher matcher =
+                pattern.matcher(
+                        requestURI); ///
+                                     // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
         String fileId = null;
         String type = null;
         String fileName = null;
@@ -52,10 +51,10 @@ public class XYZServlet extends D3TilesServlet {
         String y = null;
         String format = null;
         if (matcher.find()) {
-            type = matcher.group(1);          // 提取类型
-            fileId = matcher.group(2);          // 提取FileId（aaa）
-            fileName = matcher.group(3);      // 提取文件名称
-            serviceName = matcher.group(4);      // 提取服务名称
+            type = matcher.group(1); // 提取类型
+            fileId = matcher.group(2); // 提取FileId（aaa）
+            fileName = matcher.group(3); // 提取文件名称
+            serviceName = matcher.group(4); // 提取服务名称
             z = matcher.group(5); // 提取Z
             x = matcher.group(6); // 提取X
             y = matcher.group(7); // 提取Y
@@ -67,8 +66,7 @@ public class XYZServlet extends D3TilesServlet {
         }
         GirLayerConfigContext layerConfigContext = null;
         try {
-            layerConfigContext
-                    = getGirLayerConfigContext(type, fileId, fileName, serviceName);
+            layerConfigContext = getGirLayerConfigContext(type, fileId, fileName, serviceName);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             GirTileResponseUtil.buildFromException(e, response);
@@ -106,18 +104,24 @@ public class XYZServlet extends D3TilesServlet {
             }
             TileRequest tileRequest = null;
             try {
-                tileRequest = mapTileService.getLayerTile(layerConfigContext, zInt + "", wmtsY + "", xInt + "");
+                tileRequest =
+                        mapTileService.getLayerTile(
+                                layerConfigContext, zInt + "", wmtsY + "", xInt + "");
                 TileResponse tileResponse = tileRequest.toTileResponse();
                 if (!tileResponse.isSuccess()) {
                     String format1 = StrUtil.format("无法找到瓦片 z:{}, x:{}, y:{}", z, x, y);
                     tileResponse.setErrorMessage(format1);
                 }
-                tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                tileResponse
+                        .setCoordinate(new TileZxyApo(zInt, xInt, wmtsY))
+                        .setGridEpsgStr(gridSet);
                 GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 TileResponse tileResponse = TileResponse.error(e.getMessage());
-                tileResponse.setCoordinate(new TileZxyApo(zInt, xInt, wmtsY)).setGridEpsgStr(gridSet);
+                tileResponse
+                        .setCoordinate(new TileZxyApo(zInt, xInt, wmtsY))
+                        .setGridEpsgStr(gridSet);
                 GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
                 return;
             }
@@ -125,21 +129,21 @@ public class XYZServlet extends D3TilesServlet {
             log.error(e.getMessage(), e);
             GirTileResponseUtil.buildFromException(e, response);
         }
-
     }
 
-
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         doGet(req, resp);
     }
 
-    public GirLayerConfigContext getGirLayerConfigContext(String type, String fileId, String fileName, String serviceName) {
+    public GirLayerConfigContext getGirLayerConfigContext(
+            String type, String fileId, String fileName, String serviceName) {
         GirMapTileType mapTileType = getGirMapTileType(type);
-        GirLayerConfigContext config = GirLayerConfigContextHelper.getInstance().getGirLayerConfigContext(
-                        mapTileType, serviceName, fileId, fileName
-                )
-                .orElseThrow(() -> new RuntimeException("图层[" + fileId + "]配置不存在"));
+        GirLayerConfigContext config =
+                GirLayerConfigContextHelper.getInstance()
+                        .getGirLayerConfigContext(mapTileType, serviceName, fileId, fileName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + fileId + "]配置不存在"));
         return config;
     }
 
@@ -156,5 +160,4 @@ public class XYZServlet extends D3TilesServlet {
         }
         return mapTileType;
     }
-
 }

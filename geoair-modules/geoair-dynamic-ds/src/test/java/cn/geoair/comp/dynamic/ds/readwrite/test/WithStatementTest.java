@@ -1,12 +1,10 @@
 package cn.geoair.comp.dynamic.ds.readwrite.test;
 
-
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 
 /**
- * WITH 语句（CTE）测试用例
- * 测试 PostgreSQL 等各种 WITH 语法
+ * WITH 语句（CTE）测试用例 测试 PostgreSQL 等各种 WITH 语法
  *
  * @author 张俊
  * @date 2026/5/29
@@ -14,7 +12,6 @@ import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
 public class WithStatementTest {
 
     public static void main(String[] args) {
-
 
         System.out.println("========== WITH 语句测试用例 ==========\n");
 
@@ -33,9 +30,7 @@ public class WithStatementTest {
         System.out.println("\n========== 测试完成 ==========");
     }
 
-    /**
-     * 测试读操作类型的 WITH 语句
-     */
+    /** 测试读操作类型的 WITH 语句 */
     private static void testReadOperations() {
         System.out.println("【读操作测试 - 应该识别为 READ】");
 
@@ -74,17 +69,12 @@ public class WithStatementTest {
         for (String sql : readSQLs) {
             SQLType type = SQLParserUtil.getSQLType(sql);
             boolean isRead = SQLParserUtil.isReadOperation(sql);
-            System.out.printf("%-80s -> %s (%s)\n",
-                truncate(sql, 78),
-                type,
-                isRead ? "✓" : "✗");
+            System.out.printf("%-80s -> %s (%s)\n", truncate(sql, 78), type, isRead ? "✓" : "✗");
         }
         System.out.println();
     }
 
-    /**
-     * 测试写操作类型的 WITH 语句
-     */
+    /** 测试写操作类型的 WITH 语句 */
     private static void testWriteOperations() {
         System.out.println("【写操作测试 - 应该识别为 WRITE】");
 
@@ -123,50 +113,53 @@ public class WithStatementTest {
         for (String sql : writeSQLs) {
             SQLType type = SQLParserUtil.getSQLType(sql);
             boolean isWrite = SQLParserUtil.isWriteOperation(sql);
-            System.out.printf("%-80s -> %s (%s)\n",
-                truncate(sql, 78),
-                type,
-                isWrite ? "✓" : "✗");
+            System.out.printf("%-80s -> %s (%s)\n", truncate(sql, 78), type, isWrite ? "✓" : "✗");
         }
         System.out.println();
     }
 
-    /**
-     * 测试复杂场景
-     */
+    /** 测试复杂场景 */
     private static void testComplexScenarios() {
         System.out.println("【复杂场景测试】");
 
         // 混合场景数组
         Object[][] scenarios = {
             // 场景名称, SQL, 期望类型
-            {"递归 CTE 生成数字序列",
-             "WITH RECURSIVE numbers(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM numbers WHERE n < 100) SELECT * FROM numbers",
-             SQLType.READ},
-
-            {"递归 CTE 获取所有下级",
-             "WITH RECURSIVE subordinates AS (SELECT id, name, manager_id FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.name, e.manager_id FROM employees e JOIN subordinates s ON e.manager_id = s.id) SELECT * FROM subordinates",
-             SQLType.READ},
-
-            {"多个 CTE 相互引用",
-             "WITH cte1 AS (SELECT id, name FROM users), cte2 AS (SELECT user_id, amount FROM orders), cte3 AS (SELECT cte1.name, SUM(cte2.amount) as total FROM cte1 JOIN cte2 ON cte1.id = cte2.user_id GROUP BY cte1.name) SELECT * FROM cte3 ORDER BY total DESC",
-             SQLType.READ},
-
-            {"CTE + 窗口函数",
-             "WITH ranked AS (SELECT id, name, points, ROW_NUMBER() OVER (ORDER BY points DESC) as rank FROM users) SELECT * FROM ranked WHERE rank <= 10",
-             SQLType.READ},
-
-            {"CTE + 数据迁移",
-             "WITH archive AS (DELETE FROM logs WHERE created_at < '2024-01-01' RETURNING *) INSERT INTO logs_archive SELECT * FROM archive",
-             SQLType.WRITE},
-
-            {"CTE + 批量更新",
-             "WITH to_update AS (SELECT id, status FROM users WHERE status = 'pending' LIMIT 100) UPDATE users SET status = 'processed' WHERE id IN (SELECT id FROM to_update)",
-             SQLType.WRITE},
-
-            {"CTE + 软删除",
-             "WITH to_delete AS (SELECT id FROM products WHERE stock = 0) UPDATE products SET deleted_at = NOW() WHERE id IN (SELECT id FROM to_delete)",
-             SQLType.WRITE}
+            {
+                "递归 CTE 生成数字序列",
+                "WITH RECURSIVE numbers(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM numbers WHERE n < 100) SELECT * FROM numbers",
+                SQLType.READ
+            },
+            {
+                "递归 CTE 获取所有下级",
+                "WITH RECURSIVE subordinates AS (SELECT id, name, manager_id FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.name, e.manager_id FROM employees e JOIN subordinates s ON e.manager_id = s.id) SELECT * FROM subordinates",
+                SQLType.READ
+            },
+            {
+                "多个 CTE 相互引用",
+                "WITH cte1 AS (SELECT id, name FROM users), cte2 AS (SELECT user_id, amount FROM orders), cte3 AS (SELECT cte1.name, SUM(cte2.amount) as total FROM cte1 JOIN cte2 ON cte1.id = cte2.user_id GROUP BY cte1.name) SELECT * FROM cte3 ORDER BY total DESC",
+                SQLType.READ
+            },
+            {
+                "CTE + 窗口函数",
+                "WITH ranked AS (SELECT id, name, points, ROW_NUMBER() OVER (ORDER BY points DESC) as rank FROM users) SELECT * FROM ranked WHERE rank <= 10",
+                SQLType.READ
+            },
+            {
+                "CTE + 数据迁移",
+                "WITH archive AS (DELETE FROM logs WHERE created_at < '2024-01-01' RETURNING *) INSERT INTO logs_archive SELECT * FROM archive",
+                SQLType.WRITE
+            },
+            {
+                "CTE + 批量更新",
+                "WITH to_update AS (SELECT id, status FROM users WHERE status = 'pending' LIMIT 100) UPDATE users SET status = 'processed' WHERE id IN (SELECT id FROM to_update)",
+                SQLType.WRITE
+            },
+            {
+                "CTE + 软删除",
+                "WITH to_delete AS (SELECT id FROM products WHERE stock = 0) UPDATE products SET deleted_at = NOW() WHERE id IN (SELECT id FROM to_delete)",
+                SQLType.WRITE
+            }
         };
 
         for (Object[] scenario : scenarios) {
@@ -176,18 +169,16 @@ public class WithStatementTest {
             SQLType actual = SQLParserUtil.getSQLType(sql);
 
             boolean passed = actual == expected;
-            System.out.printf("%-35s -> 期望: %s, 实际: %s %s\n",
-                name, expected, actual, passed ? "✓" : "✗");
-            if (!passed  ) {
+            System.out.printf(
+                    "%-35s -> 期望: %s, 实际: %s %s\n", name, expected, actual, passed ? "✓" : "✗");
+            if (!passed) {
                 System.out.println("  SQL: " + truncate(sql, 70));
             }
         }
         System.out.println();
     }
 
-    /**
-     * 测试边界情况
-     */
+    /** 测试边界情况 */
     private static void testEdgeCases() {
         System.out.println("【边界情况测试】");
 
@@ -227,9 +218,7 @@ public class WithStatementTest {
         System.out.println();
     }
 
-    /**
-     * 截断过长的字符串用于显示
-     */
+    /** 截断过长的字符串用于显示 */
     private static String truncate(String str, int maxLength) {
         if (str == null) {
             return "null";

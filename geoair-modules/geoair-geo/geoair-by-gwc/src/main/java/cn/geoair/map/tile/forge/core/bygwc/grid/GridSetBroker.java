@@ -1,10 +1,12 @@
-///**
+/// **
 // * This program is free software: you can redistribute it and/or modify it under the terms of the
-// * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+// * GNU Lesser General Public License as published by the Free Software Foundation, either version
+// 3
 // * of the License, or (at your option) any later version.
 // *
 // * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+// the
 // * GNU General Public License for more details.
 // *
 // * <p>You should have received a copy of the GNU Lesser General Public License along with this
@@ -12,20 +14,20 @@
 // *
 // * @author Arne Kepp, OpenGeo, Copyright 2009
 // */
-//package cn.geoair.map.tile.forge.core.bygwc.grid;
+// package cn.geoair.map.tile.forge.core.bygwc.grid;
 //
 //
 //
-//import cn.geoair.base.log.GiLogger;
-//import cn.geoair.base.log.GirLoggerFactory;
-//import cn.geoair.map.tile.forge.core.bygwc.core.DefaultGridsets;
+// import cn.geoair.base.log.GiLogger;
+// import cn.geoair.base.log.GirLoggerFactory;
+// import cn.geoair.map.tile.forge.core.bygwc.core.DefaultGridsets;
 //
-//import javax.annotation.Nullable;
-//import java.util.*;
-//import java.util.stream.Collectors;
+// import javax.annotation.Nullable;
+// import java.util.*;
+// import java.util.stream.Collectors;
 //
 //
-//public class GridSetBroker
+// public class GridSetBroker
 //        {
 //    private static GiLogger logger = GirLoggerFactory.getLogger(GridSetBroker.class);
 //
@@ -106,7 +108,8 @@
 //    /**
 //     * Blindly removes a gridset from this gridset broker.
 //     *
-//     * <p>This method doesn't check whether there's any layer referencing the gridset nor removes it
+//     * <p>This method doesn't check whether there's any layer referencing the gridset nor removes
+// it
 //     * from the {@link XMLConfiguration}.
 //     */
 //    public synchronized GridSet remove(final String gridSetName) {
@@ -139,7 +142,8 @@
 //                        defaults = it.next();
 //                        if (it.hasNext()) {
 //                            log.warn(
-//                                    "GridSetBroker has more than one DefaultGridSets configuration");
+//                                    "GridSetBroker has more than one DefaultGridSets
+// configuration");
 //                        }
 //                    } catch (NoSuchElementException ex) {
 //                        throw new IllegalStateException(
@@ -162,7 +166,8 @@
 //        if (gridSet.isPresent()) {
 //            return gridSet.get();
 //        }
-//        // probably won't ever hit this, but if 4326 isn't in the configuration at this point, just
+//        // probably won't ever hit this, but if 4326 isn't in the configuration at this point,
+// just
 //        // return the internal
 //        // defaults.
 //        return internalDefault4326GridSet;
@@ -179,7 +184,8 @@
 //        if (gridSet.isPresent()) {
 //            return gridSet.get();
 //        }
-//        // probably won't ever hit this, but if 3857 isn't in the configuration at this point, just
+//        // probably won't ever hit this, but if 3857 isn't in the configuration at this point,
+// just
 //        // return the internal
 //        // defaults.
 //        return internalDefault3857GridSet;
@@ -189,7 +195,8 @@
 //    public <GSC extends GridSetConfiguration> List<? extends GSC> getConfigurations(
 //            Class<GSC> type) {
 //        return (List<? extends GSC>)
-//                getConfigurations().stream().filter(type::isInstance).collect(Collectors.toList());
+//
+// getConfigurations().stream().filter(type::isInstance).collect(Collectors.toList());
 //    }
 //
 //    private Collection<GridSetConfiguration> getConfigurations() {
@@ -207,7 +214,8 @@
 //                                        GridSetConfiguration.class, applicationContext);
 //                    } else {
 //                        log.warn(
-//                                "GridSetBroker.initialize() called without having set application context");
+//                                "GridSetBroker.initialize() called without having set application
+// context");
 //                        configurations =
 //                                GeoWebCacheExtensions.configurations(GridSetConfiguration.class);
 //                    }
@@ -221,7 +229,8 @@
 //    }
 //
 //    @Override
-//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+// {
 //        this.applicationContext = applicationContext;
 //    }
-//}
+// }

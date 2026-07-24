@@ -12,7 +12,8 @@ public class AdvTypeHandlerContext {
     private final String columnName;
     private final Class<?> propertyType;
 
-    private AdvTypeHandlerContext(Class<?> entityClass, String propertyName, String columnName, Class<?> propertyType) {
+    private AdvTypeHandlerContext(
+            Class<?> entityClass, String propertyName, String columnName, Class<?> propertyType) {
         this.entityClass = entityClass;
         this.propertyName = propertyName;
         this.columnName = columnName;

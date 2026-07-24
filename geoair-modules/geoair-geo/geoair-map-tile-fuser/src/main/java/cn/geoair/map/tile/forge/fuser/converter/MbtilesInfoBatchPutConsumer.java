@@ -8,13 +8,12 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.Getter;
-
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import lombok.Getter;
 
 /**
  * @author ：张俊
@@ -25,8 +24,7 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
 
     private static GiLogger log = GirLoggerFactory.getLogger(MbtilesInfoBatchPutConsumer.class);
 
-    @Getter
-    private final ConvertStats stats = new ConvertStats();
+    @Getter private final ConvertStats stats = new ConvertStats();
 
     private final boolean needReverseY;
     private final boolean overwrite;
@@ -39,8 +37,13 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
     private String tileCountToLog;
     private volatile boolean closed = false;
 
-    public MbtilesInfoBatchPutConsumer(boolean needReverseY, boolean overwrite,
-                                       int batchSize, DruidDataSource dataSource, Integer zoom, long tileCount) {
+    public MbtilesInfoBatchPutConsumer(
+            boolean needReverseY,
+            boolean overwrite,
+            int batchSize,
+            DruidDataSource dataSource,
+            Integer zoom,
+            long tileCount) {
         this.needReverseY = needReverseY;
         this.overwrite = overwrite;
         this.batchSize = batchSize;
@@ -60,8 +63,11 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
             return;
         }
         if (closed) {
-            log.warn("消费者已关闭，拒绝新任务: z={}, x={}, y={}",
-                    tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow());
+            log.warn(
+                    "消费者已关闭，拒绝新任务: z={}, x={}, y={}",
+                    tile.getZoomLevel(),
+                    tile.getTileColumn(),
+                    tile.getTileRow());
             return;
         }
 
@@ -76,8 +82,11 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
                 synchronized (stats) {
                     stats.failed++;
                 }
-                log.debug("瓦片数据为空，跳过: z={}, x={}, y={}",
-                        tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow());
+                log.debug(
+                        "瓦片数据为空，跳过: z={}, x={}, y={}",
+                        tile.getZoomLevel(),
+                        tile.getTileColumn(),
+                        tile.getTileRow());
                 return;
             }
 
@@ -106,14 +115,16 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
             synchronized (stats) {
                 stats.failed++;
             }
-            log.error("处理瓦片失败: z={}, x={}, y={}",
-                    tile.getZoomLevel(), tile.getTileColumn(), tile.getTileRow(), e);
+            log.error(
+                    "处理瓦片失败: z={}, x={}, y={}",
+                    tile.getZoomLevel(),
+                    tile.getTileColumn(),
+                    tile.getTileRow(),
+                    e);
         }
     }
 
-    /**
-     * 执行批量提交（必须在锁内调用）
-     */
+    /** 执行批量提交（必须在锁内调用） */
     private void doBatchSubmit() {
         if (batchArgs.isEmpty()) {
             return;
@@ -133,11 +144,22 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
                 stats.failed += results[2];
             }
             if (GutilObject.isEmpty(tileCountToLog)) {
-                log.info("批量提交成功:当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
-                        batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+                log.info(
+                        "批量提交成功:当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
+                        batchToSubmit.size(),
+                        zoom,
+                        results[0],
+                        results[1],
+                        results[2]);
             } else {
-                log.info("批量提交成功:总数量={}, 当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
-                        tileCountToLog, batchToSubmit.size(), zoom, results[0], results[1], results[2]);
+                log.info(
+                        "批量提交成功:总数量={}, 当前提交数量={}, zoom={}, 成功={}, 跳过={}, 失败={}",
+                        tileCountToLog,
+                        batchToSubmit.size(),
+                        zoom,
+                        results[0],
+                        results[1],
+                        results[2]);
             }
 
         } catch (Exception e) {
@@ -149,9 +171,7 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
         }
     }
 
-    /**
-     * 关闭消费者，提交剩余数据
-     */
+    /** 关闭消费者，提交剩余数据 */
     @Override
     public void close() {
         if (closed) {
@@ -170,14 +190,18 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
         }
 
         long costTime = System.currentTimeMillis() - layerStartTime;
-        log.info("层级 z={} 完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s, 总大小={}",
-                zoom, stats.total, stats.success, stats.skipped, stats.failed,
-                costTime / 1000, DataSizeUtil.format(stats.totalSize));
+        log.info(
+                "层级 z={} 完成: 总数={}, 成功={}, 跳过={}, 失败={}, 耗时={}s, 总大小={}",
+                zoom,
+                stats.total,
+                stats.success,
+                stats.skipped,
+                stats.failed,
+                costTime / 1000,
+                DataSizeUtil.format(stats.totalSize));
     }
 
-    /**
-     * 获取当前批次大小（用于监控）
-     */
+    /** 获取当前批次大小（用于监控） */
     public int getCurrentBatchSize() {
         lock.lock();
         try {

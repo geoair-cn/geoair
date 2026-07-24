@@ -2,9 +2,7 @@ package cn.geoair.web.test;
 
 import cn.geoair.web.data.result.GirWebResult;
 
-/**
- * GirWebResult 示例
- */
+/** GirWebResult 示例 */
 public class GirWebResultExample {
 
     public static void main(String[] args) {

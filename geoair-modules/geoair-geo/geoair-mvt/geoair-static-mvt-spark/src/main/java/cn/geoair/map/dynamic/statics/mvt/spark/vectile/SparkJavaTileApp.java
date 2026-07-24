@@ -18,8 +18,7 @@ public class SparkJavaTileApp {
 
         SparkSession spark = SparkSession.builder().appName("spark-tile-vec-tile").getOrCreate();
 
-        SparkVectorTileGenerator sparkVectorTileGenerator =
-                new SparkVectorTileGenerator(spark);
+        SparkVectorTileGenerator sparkVectorTileGenerator = new SparkVectorTileGenerator(spark);
 
         sparkVectorTileGenerator.doGenerate(tileSliceParameter);
     }

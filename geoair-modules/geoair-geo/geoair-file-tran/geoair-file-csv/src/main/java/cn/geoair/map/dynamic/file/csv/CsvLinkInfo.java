@@ -52,7 +52,8 @@ public class CsvLinkInfo extends LinkInfo {
         }
         if (geometryMode == CsvGeometryMode.LON_LAT) {
             if (isBlank(longitudeColumnName) || isBlank(latitudeColumnName)) {
-                throw new IllegalArgumentException("经纬度模式下必须配置 longitudeColumnName 和 latitudeColumnName");
+                throw new IllegalArgumentException(
+                        "经纬度模式下必须配置 longitudeColumnName 和 latitudeColumnName");
             }
         }
         if (geometryMode == CsvGeometryMode.WKT && isBlank(wktColumnName)) {

@@ -14,9 +14,6 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
-
-
 import java.util.*;
 
 /** A GridSubSet is a GridSet + a coverage area */
@@ -139,31 +136,31 @@ public class GridSubset {
         }
     }
 
-//    public long[][] expandToMetaFactors(final long[][] coverages, final int[] metaFactors) {
-//        long[][] ret = ServletUtils.arrayDeepCopy(coverages);
-//
-//        for (long[] cov : ret) {
-//            final int z = (int) cov[4];
-//            final Grid grid = this.gridSet.getGrid(z);
-//            final long numTilesWide = grid.getNumTilesWide();
-//            final long numTilesHigh = grid.getNumTilesHigh();
-//
-//            cov[0] = cov[0] - (cov[0] % metaFactors[0]);
-//            cov[1] = cov[1] - (cov[1] % metaFactors[1]);
-//
-//            cov[2] = cov[2] - (cov[2] % metaFactors[0]) + (metaFactors[0] - 1);
-//            if (cov[2] > numTilesWide) {
-//                cov[2] = numTilesWide;
-//            }
-//
-//            cov[3] = cov[3] - (cov[3] % metaFactors[1]) + (metaFactors[1] - 1);
-//            if (cov[3] > numTilesHigh) {
-//                cov[3] = numTilesHigh;
-//            }
-//        }
-//
-//        return ret;
-//    }
+    //    public long[][] expandToMetaFactors(final long[][] coverages, final int[] metaFactors) {
+    //        long[][] ret = ServletUtils.arrayDeepCopy(coverages);
+    //
+    //        for (long[] cov : ret) {
+    //            final int z = (int) cov[4];
+    //            final Grid grid = this.gridSet.getGrid(z);
+    //            final long numTilesWide = grid.getNumTilesWide();
+    //            final long numTilesHigh = grid.getNumTilesHigh();
+    //
+    //            cov[0] = cov[0] - (cov[0] % metaFactors[0]);
+    //            cov[1] = cov[1] - (cov[1] % metaFactors[1]);
+    //
+    //            cov[2] = cov[2] - (cov[2] % metaFactors[0]) + (metaFactors[0] - 1);
+    //            if (cov[2] > numTilesWide) {
+    //                cov[2] = numTilesWide;
+    //            }
+    //
+    //            cov[3] = cov[3] - (cov[3] % metaFactors[1]) + (metaFactors[1] - 1);
+    //            if (cov[3] > numTilesHigh) {
+    //                cov[3] = numTilesHigh;
+    //            }
+    //        }
+    //
+    //        return ret;
+    //    }
 
     public long[] getCoverage(int level) {
         GridCoverage gridCoverage = gridCoverageLevels.get(Integer.valueOf(level));
@@ -451,6 +448,4 @@ public class GridSubset {
         }
         return shouldCache;
     }
-
-
 }

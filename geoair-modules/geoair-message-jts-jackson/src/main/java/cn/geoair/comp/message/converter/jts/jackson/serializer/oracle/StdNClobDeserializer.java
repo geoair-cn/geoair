@@ -3,10 +3,9 @@ package cn.geoair.comp.message.converter.jts.jackson.serializer.oracle;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-
 import java.io.IOException;
-import java.sql.NClob;
 import java.sql.Connection;
+import java.sql.NClob;
 import java.sql.SQLException;
 
 public class StdNClobDeserializer extends JsonDeserializer<NClob> {

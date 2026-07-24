@@ -12,19 +12,15 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.util.StrUtil;
-
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SQL安全执行工具类 功能：拦截危险SQL操作（新增/删除/修改/清空表/删除库等），仅允许查询操作
- */
+/** SQL安全执行工具类 功能：拦截危险SQL操作（新增/删除/修改/清空表/删除库等），仅允许查询操作 */
 public class SafeSqlExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(SafeSqlExecutor.class);
@@ -46,23 +42,17 @@ public class SafeSqlExecutor {
                     "^\\s*DROP\\s+(DATABASE|SCHEMA|TABLE|VIEW|INDEX)\\s+",
                     Pattern.CASE_INSENSITIVE);
 
-
-
-    /**
-     * 检测是否为危险SQL
-     */
+    /** 检测是否为危险SQL */
     private static boolean isDangerousSql(String sql) {
         // 去除注释（简单处理）
         String cleanSql = removeComments(sql);
         // 检测危险模式
         return DANGEROUS_SQL_PATTERN.matcher(cleanSql).find()
-               || TRUNCATE_PATTERN.matcher(cleanSql).find()
-               || DROP_PATTERN.matcher(cleanSql).find();
+                || TRUNCATE_PATTERN.matcher(cleanSql).find()
+                || DROP_PATTERN.matcher(cleanSql).find();
     }
 
-    /**
-     * 移除SQL中的注释（简单处理）
-     */
+    /** 移除SQL中的注释（简单处理） */
     private static String removeComments(String sql) {
         // 移除/* */注释
         String noBlockComments = sql.replaceAll("/\\*.*?\\*/", " ");
@@ -70,7 +60,11 @@ public class SafeSqlExecutor {
         return noBlockComments.replaceAll("--.*?$", " ");
     }
 
-    public static List<Object> getObjects(SQLTaskDto task, Map<String, Object> sqlParam, IAdvExecutor iAdvExecutor, boolean humpIs) {
+    public static List<Object> getObjects(
+            SQLTaskDto task,
+            Map<String, Object> sqlParam,
+            IAdvExecutor iAdvExecutor,
+            boolean humpIs) {
         List<Object> dataList = new ArrayList<>();
         List<ApiSqlDto> sqlList = task.getSqlList();
         GiPageParam giPageParam = null;
@@ -101,14 +95,20 @@ public class SafeSqlExecutor {
             }
             if (task.pageIs()) {
                 int pageSize = giPageParam.pageSize();
-                Number number = iAdvExecutor.bSelectRecordRowCount(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
+                Number number =
+                        iAdvExecutor.bSelectRecordRowCount(
+                                sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
                 Long count = number.longValue();
-                String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
+                String pageSql =
+                        iAdvExecutor.tbBuildPageSql(
+                                sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
                 List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
-                iAdvExecutor.bSelectListStream(pageSql, girAdvOneRow -> {
-                    GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
-                    girAdvOneRows.add(row);
-                });
+                iAdvExecutor.bSelectListStream(
+                        pageSql,
+                        girAdvOneRow -> {
+                            GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
+                            girAdvOneRows.add(row);
+                        });
 
                 GiPager<GirAdvOneRow> pager = new GirPager<>();
                 giPageParam.setPageNumStartZero(true);
@@ -116,15 +116,17 @@ public class SafeSqlExecutor {
                 dataList.add(pager);
             } else {
                 List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
-                iAdvExecutor.bSelectListStream(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), new Consumer<GirAdvOneRow>() {
-                    @Override
-                    public void accept(GirAdvOneRow girAdvOneRow) {
-                        GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
-                        girAdvOneRows.add(row);
-                    }
-                });
+                iAdvExecutor.bSelectListStream(
+                        sqlMeta.getSql(),
+                        SqlParamList.of(sqlMeta.getJdbcParamValues()),
+                        new Consumer<GirAdvOneRow>() {
+                            @Override
+                            public void accept(GirAdvOneRow girAdvOneRow) {
+                                GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
+                                girAdvOneRows.add(row);
+                            }
+                        });
                 dataList.add(girAdvOneRows);
-
             }
         }
 
@@ -137,8 +139,7 @@ public class SafeSqlExecutor {
         for (Map.Entry<String, Object> entry : entries) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            TypeHandler typeHandlerByJavaType =
-                    TypeHandlerRegistry.getTypeHandlerByJavaType(value);
+            TypeHandler typeHandlerByJavaType = TypeHandlerRegistry.getTypeHandlerByJavaType(value);
             value = typeHandlerByJavaType.getResult(value);
             if (value instanceof Date) {
                 value = formatDate((Date) value);
@@ -149,19 +150,13 @@ public class SafeSqlExecutor {
         return row;
     }
 
-
-
-    /**
-     * 日期格式化
-     */
+    /** 日期格式化 */
     private static String formatDate(Date date) {
         // 可根据需要修改日期格式
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
 
-    /**
-     * 关闭结果集
-     */
+    /** 关闭结果集 */
     private static void closeResultSet(ResultSet rs) {
         if (rs != null) {
             try {
@@ -172,9 +167,7 @@ public class SafeSqlExecutor {
         }
     }
 
-    /**
-     * 关闭语句
-     */
+    /** 关闭语句 */
     private static void closeStatement(Statement stmt) {
         if (stmt != null) {
             try {
@@ -185,9 +178,7 @@ public class SafeSqlExecutor {
         }
     }
 
-    /**
-     * 批量执行安全检查（用于批量操作场景）
-     */
+    /** 批量执行安全检查（用于批量操作场景） */
     public static void checkBatchSqlSafety(List<String> sqlList) throws SecurityException {
         for (String sql : sqlList) {
             if (isDangerousSql(sql)) {

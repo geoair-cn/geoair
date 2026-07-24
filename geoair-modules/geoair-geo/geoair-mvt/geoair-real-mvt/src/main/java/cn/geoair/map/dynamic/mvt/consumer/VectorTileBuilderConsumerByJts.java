@@ -8,13 +8,11 @@ import cn.geoair.map.dynamic.mvt.tools.PipelineBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
- 
 import no.ecc.vectortile.VectorTileEncoder;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 /** 基于Consumer模式的VectorTile PBF构建器 */
- 
 public class VectorTileBuilderConsumerByJts extends VectorTileBuilderConsumer {
     public static GiLogger log = GirLoggerFactory.getLogger();
     // 瓦片范围

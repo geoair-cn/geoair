@@ -20,7 +20,9 @@ import java.util.function.Supplier;
  */
 public class DmAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
-    public DmAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public DmAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
     }
 

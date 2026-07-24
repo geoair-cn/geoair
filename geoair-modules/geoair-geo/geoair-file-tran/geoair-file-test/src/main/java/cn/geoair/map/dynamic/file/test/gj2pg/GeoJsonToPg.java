@@ -14,7 +14,6 @@ import cn.geoair.map.dynamic.file.postgis.PostgisGeoFileWriter;
 import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
 import cn.hutool.core.util.StrUtil;
-
 import java.io.IOException;
 
 public class GeoJsonToPg {

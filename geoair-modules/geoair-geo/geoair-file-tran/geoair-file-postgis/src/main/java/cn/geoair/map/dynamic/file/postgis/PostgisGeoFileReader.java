@@ -72,9 +72,15 @@ public class PostgisGeoFileReader implements GeoFileReader {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put(PostgisNGDataStoreFactory.DBTYPE.key, "postgis");
-            params.put(PostgisNGDataStoreFactory.HOST.key, extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.HOST.key,
+                    extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.PORT.key,
+                    extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.DATABASE.key,
+                    extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
@@ -153,7 +159,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
             if (linkInfo.getSrid() > 0 && featureType != null) {
                 SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
-                CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
+                CoordinateReferenceSystem crs =
+                        GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
                 typeBuilder.setCRS(crs);
                 this.featureType = typeBuilder.buildFeatureType();
             }

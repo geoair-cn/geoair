@@ -1,28 +1,23 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-/**
- * TAR.GZ解压适配器
- */
+/** TAR.GZ解压适配器 */
 public class TarGzHandler implements DecompressionHandler {
 
     private static final int BUFFER_SIZE = 8192;
 
-
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
-             GzipCompressorInputStream gzis = new GzipCompressorInputStream(bais);
-             TarArchiveInputStream tis = new TarArchiveInputStream(gzis);
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                GzipCompressorInputStream gzis = new GzipCompressorInputStream(bais);
+                TarArchiveInputStream tis = new TarArchiveInputStream(gzis);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             TarArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {

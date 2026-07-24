@@ -63,7 +63,9 @@ public class ShpGeoFileReader implements GeoFileReader {
             File shpFile = new File(linkInfo.getShpFilePath());
             Map<String, Object> params = new HashMap<>();
             params.put(ShapefileDataStoreFactory.URLP.key, shpFile.toURI().toURL());
-            params.put(ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
+            params.put(
+                    ShapefileDataStoreFactory.DBFCHARSET.key,
+                    Charset.forName(linkInfo.getCharset()));
 
             dataStore = DataStoreFinder.getDataStore(params);
             if (dataStore == null) {

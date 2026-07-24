@@ -4,11 +4,10 @@ import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.collection.map.GirFastStrObjMap;
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.GirImageMime;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.InputStream;
 import java.io.Serializable;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张俊
@@ -21,91 +20,54 @@ public class TileResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * http状态码
-     */
+    /** http状态码 */
     Integer httpCode;
 
-    /**
-     * 最后修改时间戳
-     */
+    /** 最后修改时间戳 */
     protected long lastModified;
 
-    /**
-     * 瓦片文件大小
-     */
+    /** 瓦片文件大小 */
     protected Long size;
 
-    /**
-     * 媒体类型，默认为PNG格式
-     */
+    /** 媒体类型，默认为PNG格式 */
     protected GiMimeType mimeType = GirImageMime.png;
 
-    /**
-     * 瓦片是否存在标识
-     */
+    /** 瓦片是否存在标识 */
     protected boolean exists;
 
-
-    /**
-     * 瓦片请求是否成功
-     */
+    /** 瓦片请求是否成功 */
     protected boolean success = true;
 
-    /**
-     * 错误码（当success为false时使用）
-     */
+    /** 错误码（当success为false时使用） */
     protected String errorCode;
 
-    /**
-     * 错误信息（当success为false时使用）
-     */
+    /** 错误信息（当success为false时使用） */
     protected String errorMessage;
 
-    /**
-     * 瓦片坐标信息
-     */
+    /** 瓦片坐标信息 */
     protected TileZxyApo coordinate;
 
-    /**
-     * 请求网格坐标系
-     */
+    /** 请求网格坐标系 */
     protected String gridEpsgStr;
 
-    /**
-     * 瓦片数据来源
-     */
+    /** 瓦片数据来源 */
     protected String dataSource;
 
-    /**
-     * 响应生成耗时（毫秒）
-     */
+    /** 响应生成耗时（毫秒） */
     protected long elapsedTime;
 
-    /**
-     * 缓存控制头（Expires、Cache-Control等）
-     */
+    /** 缓存控制头（Expires、Cache-Control等） */
     protected GirFastStrObjMap<String> cacheHeaders;
 
-
-    /**
-     * 瓦片格式版本
-     */
+    /** 瓦片格式版本 */
     protected String version = "1.0";
 
-    /**
-     * 瓦片ETag
-     */
+    /** 瓦片ETag */
     protected String eTag;
-    /**
-     * 扩展数据（用于传递额外信息）
-     */
+    /** 扩展数据（用于传递额外信息） */
     protected GirFastStrObjMap<String> extrasHeaders;
 
-
-    /**
-     * 创建失败的响应
-     */
+    /** 创建失败的响应 */
     public static TileResponse error(String errorMessage) {
         TileResponse response = new TileResponse();
         response.setSuccess(false);
@@ -114,9 +76,7 @@ public class TileResponse implements Serializable {
         return response;
     }
 
-    /**
-     * 创建空瓦片响应（瓦片不存在）
-     */
+    /** 创建空瓦片响应（瓦片不存在） */
     public static TileResponse notFound() {
         TileResponse response = new TileResponse();
         response.setSuccess(false);
@@ -126,21 +86,16 @@ public class TileResponse implements Serializable {
         return response;
     }
 
-
     public boolean isValid() {
         return success && exists;
     }
 
-    /**
-     * 获取内容长度（兼容HTTP Content-Length）
-     */
+    /** 获取内容长度（兼容HTTP Content-Length） */
     public Long getContentLength() {
         return size;
     }
 
-    /**
-     * 获取缓存ETag（如果未设置则自动生成）
-     */
+    /** 获取缓存ETag（如果未设置则自动生成） */
     public String getETag() {
         if (eTag == null && size != null) {
             // 简单实现：使用大小+修改时间生成ETag
@@ -153,14 +108,11 @@ public class TileResponse implements Serializable {
         return null;
     }
 
-
     public byte[] toByteArrays() {
         return new byte[0];
     }
 
-    /**
-     * 设置瓦片字节并自动更新size
-     */
+    /** 设置瓦片字节并自动更新size */
     public TileResponse setBytesAndUpdateSize(byte[] bytes) {
         // 由子类实现
         return this;

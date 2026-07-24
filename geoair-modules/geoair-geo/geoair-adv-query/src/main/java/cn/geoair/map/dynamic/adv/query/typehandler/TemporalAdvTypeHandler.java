@@ -91,7 +91,8 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         }
         if (value instanceof LocalTime) {
             LocalTime localTime = (LocalTime) value;
-            return Date.from(localTime.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
+            return Date.from(
+                    localTime.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
         }
         if (value instanceof OffsetDateTime) {
             return Date.from(((OffsetDateTime) value).toInstant());

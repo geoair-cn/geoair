@@ -1,55 +1,37 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
 import ar.com.hjg.pngj.FilterType;
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import it.geosolutions.imageio.plugins.png.PNGWriter;
-import org.geotools.image.ImageWorker;
-
-
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.geotools.image.ImageWorker;
 
 /**
  * Subclass of the {@link ImageEncoderImpl} class optimized for the PNG format. It uses a new
  * PNGEncoder which provides better performances.
  */
 public class PNGImageEncoder extends ImageEncoderImpl {
-    /**
-     * Filter type associated string
-     */
+    /** Filter type associated string */
     private static final String FILTER_TYPE = "filterType";
-    /**
-     * Logger used
-     */
+    /** Logger used */
     private static final GiLogger LOGGER = GirLogger.getLoger(PNGImageEncoder.class);
-    /**
-     * Supported mime types
-     */
+    /** Supported mime types */
     private static List<String> supportedMimeTypes;
-    /**
-     * Boolean used for disabling the png encoding
-     */
+    /** Boolean used for disabling the png encoding */
     private boolean disablePNG;
-    /**
-     * Boolean indicating if the aggressive output stream is supported
-     */
+    /** Boolean indicating if the aggressive output stream is supported */
     private final boolean isAggressiveSupported;
-    /**
-     * Default quality value
-     */
+    /** Default quality value */
     private static final float DEFAULT_QUALITY = 1;
-    /**
-     * Quality value
-     */
+    /** Quality value */
     private final float quality;
 
     static {
@@ -165,9 +147,7 @@ public class PNGImageEncoder extends ImageEncoderImpl {
         }
     }
 
-    /**
-     * Boolean indicating if the new PNG encoder is disabled
-     */
+    /** Boolean indicating if the new PNG encoder is disabled */
     public boolean isDisablePNG() {
         return disablePNG;
     }

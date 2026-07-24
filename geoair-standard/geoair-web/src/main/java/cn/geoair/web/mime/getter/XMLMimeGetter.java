@@ -1,10 +1,9 @@
-
 package cn.geoair.web.mime.getter;
+
+import static cn.geoair.web.mime.GirXMLMime.*;
 
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.IMimeTypeGetter;
-
-import static cn.geoair.web.mime.GirXMLMime.*;
 
 public class XMLMimeGetter implements IMimeTypeGetter {
 

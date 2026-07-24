@@ -1,9 +1,6 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
-
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
-
 import java.awt.image.RenderedImage;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +12,7 @@ import java.util.Map;
  */
 public interface ImageEncoder {
 
-    /**
-     * Encodes the selected image
-     */
+    /** Encodes the selected image */
     public void encode(
             RenderedImage image,
             Object destination,
@@ -26,13 +21,9 @@ public interface ImageEncoder {
             Map<String, ?> option)
             throws Exception;
 
-    /**
-     * Returns the list of the supported mimetypes
-     */
+    /** Returns the list of the supported mimetypes */
     public List<String> getSupportedMimeTypes();
 
-    /**
-     * Indicates if Aggressive outputStream is supported
-     */
+    /** Indicates if Aggressive outputStream is supported */
     public boolean isAggressiveOutputStreamSupported();
 }

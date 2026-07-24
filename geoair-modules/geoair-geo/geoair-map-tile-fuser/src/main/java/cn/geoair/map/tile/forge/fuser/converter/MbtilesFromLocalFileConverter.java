@@ -7,37 +7,27 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.Data;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张俊
  * @date ：Created in 2026/6/24 17:05
  * @description： 本地的散列文件瓦片转换成Mbtile工具类
- * <p>
- * 功能：
- * 1. 从本地目录扫描瓦片文件
- * 2. 支持自定义路径解析器（从文件路径中提取 z/x/y）
- * 3. 批量导入到 MBTiles
- * 4. 支持 Y 轴翻转、覆盖、删除源文件等
- * </p>
+ *     <p>功能： 1. 从本地目录扫描瓦片文件 2. 支持自定义路径解析器（从文件路径中提取 z/x/y） 3. 批量导入到 MBTiles 4. 支持 Y 轴翻转、覆盖、删除源文件等
  */
 public class MbtilesFromLocalFileConverter {
 
     private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromLocalFileConverter.class);
 
-
-    /**
-     * 自定义正则表达式解析器构建器
-     */
+    /** 自定义正则表达式解析器构建器 */
     public static TilePathParser parserByRegex(String regex, int zGroup, int xGroup, int yGroup) {
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
         return (file, relativePath, config) -> {
@@ -60,30 +50,24 @@ public class MbtilesFromLocalFileConverter {
 
     // ==================== 转换配置 ====================
 
-    /**
-     * 转换配置
-     */
+    /** 转换配置 */
     @Data
     @Accessors(chain = true)
     public static class ConvertConfig {
-        private String sourceRoot;              // 源文件根路径
-        private String mbtilesPath;             // MBTiles 文件完整路径
-        private String layerName;               // MBTiles 中的图层名称
-        private boolean needReverseY = false;   // 是否需要 Y 轴翻转（Google坐标系 ↔ TMS坐标系）
-        private int batchSize = 5000;           // 批量插入大小
-        private int maxPoolSize = 20;           // 连接池大小
-        private int minIdle = 2;                // 最小空闲连接数
-        private boolean overwrite = false;      // 如果瓦片已存在是否覆盖
-        private List<Integer> zoomLevels;       // 指定要转换的层级，为空则自动扫描
+        private String sourceRoot; // 源文件根路径
+        private String mbtilesPath; // MBTiles 文件完整路径
+        private String layerName; // MBTiles 中的图层名称
+        private boolean needReverseY = false; // 是否需要 Y 轴翻转（Google坐标系 ↔ TMS坐标系）
+        private int batchSize = 5000; // 批量插入大小
+        private int maxPoolSize = 20; // 连接池大小
+        private int minIdle = 2; // 最小空闲连接数
+        private boolean overwrite = false; // 如果瓦片已存在是否覆盖
+        private List<Integer> zoomLevels; // 指定要转换的层级，为空则自动扫描
         private boolean deleteSourceAfterConvert = false; // 转换后是否删除源文件
         private TilePathParser pathParser = TilePathParser.DEFAULT_ZYX_PARSER; // 路径解析器
-
-
     }
 
-    /**
-     * 转换结果
-     */
+    /** 转换结果 */
     @Data
     public static class ConvertResult {
         private String sourceRoot;
@@ -92,7 +76,7 @@ public class MbtilesFromLocalFileConverter {
         private long totalTiles;
         private long successTiles;
         private long failedTiles;
-        private long skippedTiles;      // 因解析失败而跳过的瓦片数
+        private long skippedTiles; // 因解析失败而跳过的瓦片数
         private long totalSize;
         private long costTime;
         private List<Integer> processedZoomLevels = new ArrayList<>();
@@ -100,18 +84,24 @@ public class MbtilesFromLocalFileConverter {
 
         @Override
         public String toString() {
-            return String.format("ConvertResult{source='%s', target='%s', layer='%s', " +
-                                 "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, " +
-                                 "totalSize=%s, costTime=%dms, deletedSource=%s}",
-                    sourceRoot, mbtilesPath, layerName,
-                    totalTiles, successTiles, skippedTiles, failedTiles,
-                    DataSizeUtil.format(totalSize), costTime, deletedSource);
+            return String.format(
+                    "ConvertResult{source='%s', target='%s', layer='%s', "
+                            + "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, "
+                            + "totalSize=%s, costTime=%dms, deletedSource=%s}",
+                    sourceRoot,
+                    mbtilesPath,
+                    layerName,
+                    totalTiles,
+                    successTiles,
+                    skippedTiles,
+                    failedTiles,
+                    DataSizeUtil.format(totalSize),
+                    costTime,
+                    deletedSource);
         }
     }
 
-    /**
-     * 瓦片信息
-     */
+    /** 瓦片信息 */
     public static class TileInfo {
         int z;
         int x;
@@ -135,20 +125,20 @@ public class MbtilesFromLocalFileConverter {
         }
     }
 
-
-    /**
-     * 瓦片信息消费者 - 负责将解析出的瓦片批量入库
-     */
+    /** 瓦片信息消费者 - 负责将解析出的瓦片批量入库 */
     public static class TileInfoConsumer implements Consumer<TileInfo> {
         private final MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer;
-        @Getter
-        private final ConvertStats stats = new ConvertStats();
+        @Getter private final ConvertStats stats = new ConvertStats();
 
-        public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize,
-                                DruidDataSource dataSource, Integer zoom) {
-            this.mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(
-                    needReverseY, overwrite, batchSize, dataSource, zoom, 0
-            );
+        public TileInfoConsumer(
+                boolean needReverseY,
+                boolean overwrite,
+                int batchSize,
+                DruidDataSource dataSource,
+                Integer zoom) {
+            this.mbtilesInfoBatchPutConsumer =
+                    new MbtilesInfoBatchPutConsumer(
+                            needReverseY, overwrite, batchSize, dataSource, zoom, 0);
         }
 
         @Override
@@ -163,8 +153,7 @@ public class MbtilesFromLocalFileConverter {
                                 .setX(tile.x)
                                 .setY(tile.y)
                                 .setZoomLevel(tile.z)
-                                .setTileData(data)
-                );
+                                .setTileData(data));
                 stats.success++;
             } catch (Exception e) {
                 stats.failed++;
@@ -181,49 +170,45 @@ public class MbtilesFromLocalFileConverter {
             // 所以我们用 batchStats 的 skipped 覆盖
             this.stats.skipped = batchStats.skipped;
         }
-
     }
 
     // ==================== 核心转换方法 ====================
 
-    /**
-     * 执行转换（便捷方法）
-     */
-    public static ConvertResult convert(String sourceRoot, String mbtilesPath,
-                                        String layerName, boolean needReverseY) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName)
-                .setNeedReverseY(needReverseY);
+    /** 执行转换（便捷方法） */
+    public static ConvertResult convert(
+            String sourceRoot, String mbtilesPath, String layerName, boolean needReverseY) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName)
+                        .setNeedReverseY(needReverseY);
         return convert(config);
     }
 
-    /**
-     * 执行转换（带配置回调）
-     */
-    public static ConvertResult convert(String sourceRoot, String mbtilesPath,
-                                        String layerName, Consumer<ConvertConfig> consumer) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName);
+    /** 执行转换（带配置回调） */
+    public static ConvertResult convert(
+            String sourceRoot,
+            String mbtilesPath,
+            String layerName,
+            Consumer<ConvertConfig> consumer) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName);
         consumer.accept(config);
         return convert(config);
     }
 
-    /**
-     * 执行转换（配置回调）
-     */
+    /** 执行转换（配置回调） */
     public static ConvertResult convert(Consumer<ConvertConfig> consumer) {
         ConvertConfig config = new ConvertConfig();
         consumer.accept(config);
         return convert(config);
     }
 
-    /**
-     * 执行转换（完整配置）
-     */
+    /** 执行转换（完整配置） */
     public static ConvertResult convert(ConvertConfig config) {
         long startTime = System.currentTimeMillis();
 
@@ -241,12 +226,12 @@ public class MbtilesFromLocalFileConverter {
         MbtilesUtils.ensureDirectoryExists(config.getMbtilesPath());
 
         // 创建数据源
-        DruidDataSource dataSource = MbtilesUtils.createDataSource(
-                config.getMbtilesPath(),
-                false,
-                config.getMaxPoolSize(),
-                config.getMinIdle()
-        );
+        DruidDataSource dataSource =
+                MbtilesUtils.createDataSource(
+                        config.getMbtilesPath(),
+                        false,
+                        config.getMaxPoolSize(),
+                        config.getMinIdle());
         GutilShutdownHook.getInstance().registerTask(dataSource::close);
 
         try {
@@ -306,11 +291,9 @@ public class MbtilesFromLocalFileConverter {
 
     // ==================== 瓦片转换核心逻辑 ====================
 
-    /**
-     * 转换瓦片
-     */
-    private static ConvertStats convertTiles(ConvertConfig config, DruidDataSource dataSource,
-                                             List<Integer> zoomLevels) {
+    /** 转换瓦片 */
+    private static ConvertStats convertTiles(
+            ConvertConfig config, DruidDataSource dataSource, List<Integer> zoomLevels) {
         ConvertStats totalStats = new ConvertStats();
         try {
             for (int z : zoomLevels) {
@@ -318,8 +301,8 @@ public class MbtilesFromLocalFileConverter {
 
                 // 构建层级目录路径
 
-
-                String zDirPath = concatPath(normalizePath(config.getSourceRoot()), normalizePath(z + ""));
+                String zDirPath =
+                        concatPath(normalizePath(config.getSourceRoot()), normalizePath(z + ""));
 
                 File zDir = new File(zDirPath);
 
@@ -329,14 +312,13 @@ public class MbtilesFromLocalFileConverter {
                 }
 
                 // 创建消费者
-                TileInfoConsumer consumer = new TileInfoConsumer(
-                        config.isNeedReverseY(),
-                        config.isOverwrite(),
-                        config.getBatchSize(),
-                        dataSource,
-                        z
-
-                );
+                TileInfoConsumer consumer =
+                        new TileInfoConsumer(
+                                config.isNeedReverseY(),
+                                config.isOverwrite(),
+                                config.getBatchSize(),
+                                dataSource,
+                                z);
 
                 // 递归遍历层级目录下的所有文件
                 scanDirectory(zDir, z, "", consumer, config);
@@ -347,18 +329,22 @@ public class MbtilesFromLocalFileConverter {
                 // 汇总统计
                 totalStats.add(consumer.getStats());
 
-                log.info("层级 z={} 处理完成: 总数={}, 成功={}, 跳过={}, 失败={}",
+                log.info(
+                        "层级 z={} 处理完成: 总数={}, 成功={}, 跳过={}, 失败={}",
                         z,
                         consumer.getStats().total,
                         consumer.getStats().success,
                         consumer.getStats().skipped,
-                        consumer.getStats().failed
-                );
+                        consumer.getStats().failed);
             }
 
-            log.info("所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}, 总大小={}",
-                    totalStats.total, totalStats.success, totalStats.skipped,
-                    totalStats.failed, DataSizeUtil.format(totalStats.totalSize));
+            log.info(
+                    "所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}, 总大小={}",
+                    totalStats.total,
+                    totalStats.success,
+                    totalStats.skipped,
+                    totalStats.failed,
+                    DataSizeUtil.format(totalStats.totalSize));
 
         } catch (Exception e) {
             log.error("转换过程异常", e);
@@ -367,11 +353,9 @@ public class MbtilesFromLocalFileConverter {
         return totalStats;
     }
 
-    /**
-     * 递归扫描目录，使用 TilePathParser 解析每个文件
-     */
-    private static void scanDirectory(File dir, int z, String relativePath,
-                                      TileInfoConsumer consumer, ConvertConfig config) {
+    /** 递归扫描目录，使用 TilePathParser 解析每个文件 */
+    private static void scanDirectory(
+            File dir, int z, String relativePath, TileInfoConsumer consumer, ConvertConfig config) {
         File[] files = dir.listFiles();
         if (files == null) {
             return;
@@ -390,11 +374,9 @@ public class MbtilesFromLocalFileConverter {
         }
     }
 
-    /**
-     * 解析并添加瓦片（使用自定义解析器）
-     */
-    private static void parseAndAddTile(File file, String relativePath,
-                                        TileInfoConsumer consumer, ConvertConfig config) {
+    /** 解析并添加瓦片（使用自定义解析器） */
+    private static void parseAndAddTile(
+            File file, String relativePath, TileInfoConsumer consumer, ConvertConfig config) {
         try {
             TilePathParser parser = config.getPathParser();
             if (parser == null) {
@@ -412,20 +394,17 @@ public class MbtilesFromLocalFileConverter {
         }
     }
 
-
-    /**
-     * 标准化路径
-     * - 统一使用系统文件分隔符
-     * - 处理多余的斜杠
-     */
+    /** 标准化路径 - 统一使用系统文件分隔符 - 处理多余的斜杠 */
     private static String normalizePath(String path) {
         if (path == null || path.isEmpty()) {
             return path;
         }
 
         // 统一使用系统文件分隔符
-        String normalized = path.replace('\\', File.separatorChar)
-                .replace('/', File.separatorChar).replace("\\", File.separator);
+        String normalized =
+                path.replace('\\', File.separatorChar)
+                        .replace('/', File.separatorChar)
+                        .replace("\\", File.separator);
 
         // 处理多个连续分隔符
         String doubleSeparator = File.separator + File.separator;
@@ -436,10 +415,7 @@ public class MbtilesFromLocalFileConverter {
         return normalized;
     }
 
-    /**
-     * 拼接路径
-     * 自动处理头尾分隔符，确保中间只有一个分隔符
-     */
+    /** 拼接路径 自动处理头尾分隔符，确保中间只有一个分隔符 */
     private static String concatPath(String parent, String child) {
         if (parent == null || parent.isEmpty()) {
             return child;
@@ -464,9 +440,7 @@ public class MbtilesFromLocalFileConverter {
     }
     // ==================== 辅助方法 ====================
 
-    /**
-     * 验证配置
-     */
+    /** 验证配置 */
     private static boolean validateConfig(ConvertConfig config) {
         if (config.getSourceRoot() == null || config.getSourceRoot().isEmpty()) {
             log.error("源根路径不能为空");
@@ -496,9 +470,7 @@ public class MbtilesFromLocalFileConverter {
         return true;
     }
 
-    /**
-     * 初始化图层元数据
-     */
+    /** 初始化图层元数据 */
     private static boolean initLayerMetadata(DruidDataSource dataSource, ConvertConfig config) {
         String layerName = config.getLayerName();
 
@@ -507,17 +479,19 @@ public class MbtilesFromLocalFileConverter {
             return true;
         }
 
-        return MbtilesUtils.initMetadata(dataSource,
-                "name", layerName,
-                "format", detectImageFormat(config),
-                "version", "1.0",
-                "type", "overlay"
-        );
+        return MbtilesUtils.initMetadata(
+                dataSource,
+                "name",
+                layerName,
+                "format",
+                detectImageFormat(config),
+                "version",
+                "1.0",
+                "type",
+                "overlay");
     }
 
-    /**
-     * 检测图片格式（从文件扩展名推断）
-     */
+    /** 检测图片格式（从文件扩展名推断） */
     private static String detectImageFormat(ConvertConfig config) {
         // 尝试扫描一个文件来判断格式
         File sourceDir = new File(config.getSourceRoot());
@@ -553,9 +527,7 @@ public class MbtilesFromLocalFileConverter {
         return null;
     }
 
-    /**
-     * 扫描所有层级（从源根目录下的一级子目录中识别数字）
-     */
+    /** 扫描所有层级（从源根目录下的一级子目录中识别数字） */
     private static List<Integer> scanZoomLevels(ConvertConfig config) {
         List<Integer> zoomLevels = new ArrayList<>();
         File sourceDir = new File(config.getSourceRoot());
@@ -577,9 +549,7 @@ public class MbtilesFromLocalFileConverter {
         return zoomLevels;
     }
 
-    /**
-     * 删除源文件
-     */
+    /** 删除源文件 */
     private static boolean deleteSourceFiles(ConvertConfig config) {
         try {
             File sourceDir = new File(config.getSourceRoot());
@@ -595,26 +565,27 @@ public class MbtilesFromLocalFileConverter {
         }
     }
 
-    /**
-     * 异步删除目录
-     */
+    /** 异步删除目录 */
     private static void asyncDeleteDirectory(Path path) {
-        Thread deleteThread = new Thread(() -> {
-            try {
-                Files.walk(path)
-                        .sorted((a, b) -> -a.compareTo(b))
-                        .forEach(p -> {
+        Thread deleteThread =
+                new Thread(
+                        () -> {
                             try {
-                                Files.deleteIfExists(p);
+                                Files.walk(path)
+                                        .sorted((a, b) -> -a.compareTo(b))
+                                        .forEach(
+                                                p -> {
+                                                    try {
+                                                        Files.deleteIfExists(p);
+                                                    } catch (IOException e) {
+                                                        log.error("删除文件/目录失败: {}", p, e);
+                                                    }
+                                                });
+                                log.info("异步删除临时目录成功: {}", path);
                             } catch (IOException e) {
-                                log.error("删除文件/目录失败: {}", p, e);
+                                log.error("异步删除临时目录失败: {}", path, e);
                             }
                         });
-                log.info("异步删除临时目录成功: {}", path);
-            } catch (IOException e) {
-                log.error("异步删除临时目录失败: {}", path, e);
-            }
-        });
         deleteThread.setDaemon(true);
         deleteThread.setName("tile-convert-delete-" + System.currentTimeMillis());
         deleteThread.start();
@@ -622,55 +593,51 @@ public class MbtilesFromLocalFileConverter {
 
     // ==================== 便捷方法 ====================
 
-    /**
-     * 转换指定层级
-     */
-    public static ConvertResult convertWithZoomLevels(String sourceRoot, String mbtilesPath,
-                                                      String layerName, List<Integer> zoomLevels) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName)
-                .setZoomLevels(zoomLevels);
+    /** 转换指定层级 */
+    public static ConvertResult convertWithZoomLevels(
+            String sourceRoot, String mbtilesPath, String layerName, List<Integer> zoomLevels) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName)
+                        .setZoomLevels(zoomLevels);
         return convert(config);
     }
 
-    /**
-     * 转换并追加到已有 MBTiles（不覆盖）
-     */
-    public static ConvertResult convertAppend(String sourceRoot, String mbtilesPath,
-                                              String layerName) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName)
-                .setOverwrite(false);
+    /** 转换并追加到已有 MBTiles（不覆盖） */
+    public static ConvertResult convertAppend(
+            String sourceRoot, String mbtilesPath, String layerName) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName)
+                        .setOverwrite(false);
         return convert(config);
     }
 
-    /**
-     * 转换并覆盖已有瓦片
-     */
-    public static ConvertResult convertOverwrite(String sourceRoot, String mbtilesPath,
-                                                 String layerName) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName)
-                .setOverwrite(true);
+    /** 转换并覆盖已有瓦片 */
+    public static ConvertResult convertOverwrite(
+            String sourceRoot, String mbtilesPath, String layerName) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName)
+                        .setOverwrite(true);
         return convert(config);
     }
 
-    /**
-     * 转换并删除源文件
-     */
-    public static ConvertResult convertAndDelete(String sourceRoot, String mbtilesPath,
-                                                 String layerName) {
-        ConvertConfig config = new ConvertConfig()
-                .setSourceRoot(sourceRoot)
-                .setMbtilesPath(mbtilesPath)
-                .setLayerName(layerName)
-                .setDeleteSourceAfterConvert(true);
+    /** 转换并删除源文件 */
+    public static ConvertResult convertAndDelete(
+            String sourceRoot, String mbtilesPath, String layerName) {
+        ConvertConfig config =
+                new ConvertConfig()
+                        .setSourceRoot(sourceRoot)
+                        .setMbtilesPath(mbtilesPath)
+                        .setLayerName(layerName)
+                        .setDeleteSourceAfterConvert(true);
         return convert(config);
     }
 
@@ -678,88 +645,95 @@ public class MbtilesFromLocalFileConverter {
 
     public static void main(String[] args) {
         // ==================== 1. 基本用法（默认解析器） ====================
-        ConvertResult result1 = MbtilesFromLocalFileConverter.convert(
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles",
-                "1_13",
-                true  // needReverseY
-        );
+        ConvertResult result1 =
+                MbtilesFromLocalFileConverter.convert(
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles",
+                        "1_13",
+                        true // needReverseY
+                        );
         System.out.println("结果1: " + result1);
-
 
         // ==================== 4. 使用正则表达式解析器 ====================
         // 路径格式: z/x/y.png
-        ConvertResult result4 = MbtilesFromLocalFileConverter.convert(
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_regex.mbtiles",
-                "1_13_regex",
-                config -> {
-                    config.setNeedReverseY(true);
-                    config.setPathParser(MbtilesFromLocalFileConverter.parserByRegex(
-                            "(\\d+)[/\\\\](\\d+)[/\\\\](\\d+)\\.png",  // 正则
-                            1,  // z 组
-                            2,  // x 组
-                            3   // y 组
-                    ));
-                }
-        );
+        ConvertResult result4 =
+                MbtilesFromLocalFileConverter.convert(
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_regex.mbtiles",
+                        "1_13_regex",
+                        config -> {
+                            config.setNeedReverseY(true);
+                            config.setPathParser(
+                                    MbtilesFromLocalFileConverter.parserByRegex(
+                                            "(\\d+)[/\\\\](\\d+)[/\\\\](\\d+)\\.png", // 正则
+                                            1, // z 组
+                                            2, // x 组
+                                            3 // y 组
+                                            ));
+                        });
         System.out.println("结果4: " + result4);
 
         // ==================== 5. 完全自定义解析器 ====================
-        ConvertResult result5 = MbtilesFromLocalFileConverter.convert(
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_custom.mbtiles",
-                "1_13_custom",
-                config -> {
-                    config.setNeedReverseY(true);
-                    config.setPathParser((file, relativePath, cfg) -> {
-                        // 自定义解析逻辑
-                        // 例如：从路径中提取 z, x, y
-                        String[] parts = relativePath.split("[/\\\\]");
-                        if (parts.length < 3) {
-                            return null;
-                        }
+        ConvertResult result5 =
+                MbtilesFromLocalFileConverter.convert(
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_custom.mbtiles",
+                        "1_13_custom",
+                        config -> {
+                            config.setNeedReverseY(true);
+                            config.setPathParser(
+                                    (file, relativePath, cfg) -> {
+                                        // 自定义解析逻辑
+                                        // 例如：从路径中提取 z, x, y
+                                        String[] parts = relativePath.split("[/\\\\]");
+                                        if (parts.length < 3) {
+                                            return null;
+                                        }
 
-                        TileInfo tile = new TileInfo();
-                        tile.path = file.toPath();
+                                        TileInfo tile = new TileInfo();
+                                        tile.path = file.toPath();
 
-                        try {
-                            // 假设格式: z/y/x.png
-                            tile.z = Integer.parseInt(parts[0]);
-                            tile.y = Integer.parseInt(parts[parts.length - 2]);
-                            String fileName = parts[parts.length - 1];
-                            int dotIndex = fileName.lastIndexOf('.');
-                            tile.x = Integer.parseInt(dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName);
-                            return tile;
-                        } catch (NumberFormatException e) {
-                            return null;
-                        }
-                    });
-                }
-        );
+                                        try {
+                                            // 假设格式: z/y/x.png
+                                            tile.z = Integer.parseInt(parts[0]);
+                                            tile.y = Integer.parseInt(parts[parts.length - 2]);
+                                            String fileName = parts[parts.length - 1];
+                                            int dotIndex = fileName.lastIndexOf('.');
+                                            tile.x =
+                                                    Integer.parseInt(
+                                                            dotIndex > 0
+                                                                    ? fileName.substring(
+                                                                            0, dotIndex)
+                                                                    : fileName);
+                                            return tile;
+                                        } catch (NumberFormatException e) {
+                                            return null;
+                                        }
+                                    });
+                        });
         System.out.println("结果5: " + result5);
 
         // ==================== 6. 指定层级 + 覆盖 ====================
         List<Integer> zoomLevels = java.util.Arrays.asList(0, 1, 2, 3, 4, 5);
-        ConvertResult result6 = MbtilesFromLocalFileConverter.convert(
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles",
-                "1_13_partial",
-                config -> {
-                    config.setNeedReverseY(true);
-                    config.setZoomLevels(zoomLevels);
-                    config.setOverwrite(true);
-                    config.setBatchSize(3000);
-                }
-        );
+        ConvertResult result6 =
+                MbtilesFromLocalFileConverter.convert(
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_partial.mbtiles",
+                        "1_13_partial",
+                        config -> {
+                            config.setNeedReverseY(true);
+                            config.setZoomLevels(zoomLevels);
+                            config.setOverwrite(true);
+                            config.setBatchSize(3000);
+                        });
         System.out.println("结果6: " + result6);
 
         // ==================== 7. 转换并删除源文件 ====================
-        ConvertResult result7 = MbtilesFromLocalFileConverter.convertAndDelete(
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
-                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_final.mbtiles",
-                "1_13_final"
-        );
+        ConvertResult result7 =
+                MbtilesFromLocalFileConverter.convertAndDelete(
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",
+                        "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13_final.mbtiles",
+                        "1_13_final");
         System.out.println("结果7: " + result7);
     }
 }

@@ -1,6 +1,4 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
-
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
@@ -10,10 +8,13 @@ import com.sun.media.imageioimpl.plugins.clib.CLibImageWriter;
 import it.geosolutions.imageio.stream.output.ImageOutputStreamAdapter;
 import it.geosolutions.jaiext.colorindexer.ColorIndexer;
 import it.geosolutions.jaiext.colorindexer.Quantizer;
-import org.geotools.image.ImageWorker;
-import org.geotools.image.ImageWorker.PNGImageWriteParam;
-
-
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
@@ -22,13 +23,8 @@ import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
-import java.awt.image.IndexColorModel;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.geotools.image.ImageWorker;
+import org.geotools.image.ImageWorker.PNGImageWriteParam;
 
 /**
  * Class implementing the ImageEncoder interface, the user should only create a new bean for

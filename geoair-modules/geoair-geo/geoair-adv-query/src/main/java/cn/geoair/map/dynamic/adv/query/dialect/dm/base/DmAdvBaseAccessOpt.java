@@ -20,7 +20,8 @@ public class DmAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
     }
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String[] fieldArray = fields.split(",");
         StringBuilder sourceSelectBuilder = new StringBuilder("SELECT ");
         for (int i = 0; i < fieldArray.length; i++) {
@@ -36,14 +37,22 @@ public class DmAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
         if (effectiveConflictKeys == null || effectiveConflictKeys.isEmpty()) {
             effectiveConflictKeys = java.util.Collections.singletonList(fieldArray[0].trim());
         }
-        String conflictCondition = effectiveConflictKeys.stream()
-                .map(field -> {
-                    String trimmedField = field.trim();
-                    return StrUtil.format("target.{} = source.{}", trimmedField, trimmedField);
-                })
-                .collect(java.util.stream.Collectors.joining(" AND "));
+        String conflictCondition =
+                effectiveConflictKeys
+                        .stream()
+                        .map(
+                                field -> {
+                                    String trimmedField = field.trim();
+                                    return StrUtil.format(
+                                            "target.{} = source.{}", trimmedField, trimmedField);
+                                })
+                        .collect(java.util.stream.Collectors.joining(" AND "));
         return StrUtil.format(
                 "INSERT INTO {} ({}) SELECT * FROM ({}) source WHERE NOT EXISTS (SELECT 1 FROM {} target WHERE {})",
-                tableName, fields, sourceSelectBuilder, tableName, conflictCondition);
+                tableName,
+                fields,
+                sourceSelectBuilder,
+                tableName,
+                conflictCondition);
     }
 }

@@ -49,11 +49,12 @@ public class DmAdvGeoOpt extends OracleAdvGeoOpt {
 
         String qualifiedName = getQualifiedName(tableNameOrSqlView);
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
-        String sql = StrUtil.format(
-                "SELECT {}.SDO_SRID AS \"srid\" FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
-                quotedGeomFieldName,
-                qualifiedName,
-                quotedGeomFieldName);
+        String sql =
+                StrUtil.format(
+                        "SELECT {}.SDO_SRID AS \"srid\" FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
+                        quotedGeomFieldName,
+                        qualifiedName,
+                        quotedGeomFieldName);
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null ? row.getInt("srid", 0) : 0;
     }
@@ -80,11 +81,12 @@ public class DmAdvGeoOpt extends OracleAdvGeoOpt {
         String columnName = dialectTableNameProcessor.tbUnquoteTableName(geomFieldName);
 
         try {
-            String allMetaSql = StrUtil.format(
-                    "SELECT SRID AS \"srid\" FROM ALL_SDO_GEOM_METADATA WHERE OWNER = UPPER('{}') AND TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
-                    owner,
-                    tableName,
-                    columnName);
+            String allMetaSql =
+                    StrUtil.format(
+                            "SELECT SRID AS \"srid\" FROM ALL_SDO_GEOM_METADATA WHERE OWNER = UPPER('{}') AND TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
+                            owner,
+                            tableName,
+                            columnName);
             GirAdvOneRow row = getAdvBaseOpt().bSelectOne(allMetaSql);
             if (row != null) {
                 return row.getInt("srid", 0);
@@ -93,10 +95,11 @@ public class DmAdvGeoOpt extends OracleAdvGeoOpt {
         }
 
         try {
-            String userMetaSql = StrUtil.format(
-                    "SELECT SRID AS \"srid\" FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
-                    tableName,
-                    columnName);
+            String userMetaSql =
+                    StrUtil.format(
+                            "SELECT SRID AS \"srid\" FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
+                            tableName,
+                            columnName);
             GirAdvOneRow row = getAdvBaseOpt().bSelectOne(userMetaSql);
             if (row != null) {
                 return row.getInt("srid", 0);
@@ -108,7 +111,8 @@ public class DmAdvGeoOpt extends OracleAdvGeoOpt {
 
     private String getQualifiedName(String tableNameOrSqlView) {
         if (isTableOrViewName(tableNameOrSqlView)) {
-            return dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView);
+            return dialectTableNameProcessor.tbGetTableNameWithSchema(
+                    dataSourceGetter, tableNameOrSqlView);
         }
         return StrUtil.format(
                 "({}) {}",
@@ -117,14 +121,16 @@ public class DmAdvGeoOpt extends OracleAdvGeoOpt {
     }
 
     private boolean isTableOrViewName(String tableNameOrSqlView) {
-        if (StrUtil.isEmpty(tableNameOrSqlView) || dialectTableNameProcessor.tbTableIsSqlView(tableNameOrSqlView)) {
+        if (StrUtil.isEmpty(tableNameOrSqlView)
+                || dialectTableNameProcessor.tbTableIsSqlView(tableNameOrSqlView)) {
             return false;
         }
         String name = dialectTableNameProcessor.tbGetTableNameNotSchema(tableNameOrSqlView);
         String schema = dialectTableNameProcessor.tbExtractSchemaName(tableNameOrSqlView);
-        List<SchemaTableApo> objects = StrUtil.isNotEmpty(schema)
-                ? getAdvDDLOpt().dGetTableAndViewBySchema(schema)
-                : getAdvDDLOpt().dGetTableAndViewBySchema();
+        List<SchemaTableApo> objects =
+                StrUtil.isNotEmpty(schema)
+                        ? getAdvDDLOpt().dGetTableAndViewBySchema(schema)
+                        : getAdvDDLOpt().dGetTableAndViewBySchema();
         if (CollectionUtil.isEmpty(objects)) {
             return false;
         }

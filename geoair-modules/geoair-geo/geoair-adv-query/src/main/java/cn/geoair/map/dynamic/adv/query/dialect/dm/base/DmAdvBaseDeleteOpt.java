@@ -26,7 +26,8 @@ public class DmAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
     }
 
     @Override
-    protected String buildDeleteBatchByConditionSql(String tableName, String whereClause, int batchSize) {
+    protected String buildDeleteBatchByConditionSql(
+            String tableName, String whereClause, int batchSize) {
         return StrUtil.format("DELETE FROM {} WHERE {} AND ROWNUM <= ?", tableName, whereClause);
     }
 }

@@ -5,9 +5,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
 
-/**
- * PgGeometryTypeHandler 示例
- */
+/** PgGeometryTypeHandler 示例 */
 public class PgGeometryTypeHandlerExample {
 
     public static void main(String[] args) throws Exception {

@@ -6,9 +6,7 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.exec.VectorTileExecutorV2;
 
-/**
- * geoair-real-mvt 实时入口示例
- */
+/** geoair-real-mvt 实时入口示例 */
 public class GirRealMvtEntryExample {
 
     public static void main(String[] args) {
@@ -23,7 +21,8 @@ public class GirRealMvtEntryExample {
         requestParams.setKeepFieldAll(true);
 
         ParamCheckResult result = helper.checkTileRequestParams(requestParams, "road_layer");
-        VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, "road_layer");
+        VectorTileExecutorV2 executor =
+                VectorTileExecutorV2.getInstance(requestParams, "road_layer");
         TileGlobalConfig config = executor.getTileGlobalConfig();
 
         System.out.println("param check = " + result.isPass());

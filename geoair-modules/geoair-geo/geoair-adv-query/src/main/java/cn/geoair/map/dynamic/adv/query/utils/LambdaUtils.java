@@ -4,20 +4,18 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
-
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 /**
  * Lambda表达式工具类
- * <p>用于从Lambda表达式中提取属性名称</p>
- * <p>使用示例：</p>
+ *
+ * <p>用于从Lambda表达式中提取属性名称
+ *
+ * <p>使用示例：
+ *
  * <pre>
  * String columnName = LambdaUtils.getColumnName(User::getName);
  * // 返回 "name"
@@ -32,8 +30,8 @@ public class LambdaUtils {
      * 获取Lambda表达式对应的字段名（默认不转换）
      *
      * @param function Lambda表达式
-     * @param <T>      实体类型
-     * @param <R>      属性类型
+     * @param <T> 实体类型
+     * @param <R> 属性类型
      * @return 字段名
      */
     public static <T, R> String getColumnName(SFunction<T, R> function) {
@@ -43,10 +41,10 @@ public class LambdaUtils {
     /**
      * 获取Lambda表达式对应的字段名
      *
-     * @param function          Lambda表达式
+     * @param function Lambda表达式
      * @param isToUnderlineCase 是否转换为下划线命名（驼峰转下划线）
-     * @param <T>               实体类型
-     * @param <R>               属性类型
+     * @param <T> 实体类型
+     * @param <R> 属性类型
      * @return 字段名
      */
     public static <T, R> String getColumnName(SFunction<T, R> function, boolean isToUnderlineCase) {
@@ -74,7 +72,8 @@ public class LambdaUtils {
             String implClassPath = serializedLambda.getImplClass();
             String className = implClassPath.replace('/', '.');
             Class<?> entityClass = ClassUtil.loadClass(className);
-            String columnNameByAnnotation = GirAdvSqlUtils.getColumnNameByAnnotation(entityClass, fieldName);
+            String columnNameByAnnotation =
+                    GirAdvSqlUtils.getColumnNameByAnnotation(entityClass, fieldName);
             if (GutilObject.isNotEmpty(columnNameByAnnotation)) {
                 return columnNameByAnnotation;
             }
@@ -85,15 +84,12 @@ public class LambdaUtils {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get column name from lambda: " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to get column name from lambda: " + e.getMessage(), e);
         }
-
-
     }
 
-
     private static final Map<Class<?>, SerializedLambda> LAMBDA_CACHE = new ConcurrentHashMap<>();
-
 
     /**
      * 获取SerializedLambda对象（带缓存）
@@ -114,7 +110,8 @@ public class LambdaUtils {
             writeReplaceMethod.setAccessible(true);
 
             // 调用writeReplace获取SerializedLambda
-            SerializedLambda serializedLambda = (SerializedLambda) writeReplaceMethod.invoke(function);
+            SerializedLambda serializedLambda =
+                    (SerializedLambda) writeReplaceMethod.invoke(function);
 
             // 放入缓存
             LAMBDA_CACHE.put(function.getClass(), serializedLambda);
@@ -122,9 +119,9 @@ public class LambdaUtils {
             return serializedLambda;
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(
-                    "Function must be a lambda expression that is serializable. " +
-                            "Make sure the lambda is properly typed.", e
-            );
+                    "Function must be a lambda expression that is serializable. "
+                            + "Make sure the lambda is properly typed.",
+                    e);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get SerializedLambda: " + e.getMessage(), e);
         }
@@ -142,8 +139,9 @@ public class LambdaUtils {
         }
 
         // 如果前两个字符都是大写，则不做处理（避免缩写词被错误转换）
-        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
-                Character.isUpperCase(name.charAt(0))) {
+        if (name.length() > 1
+                && Character.isUpperCase(name.charAt(1))
+                && Character.isUpperCase(name.charAt(0))) {
             return name;
         }
 
@@ -151,6 +149,4 @@ public class LambdaUtils {
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }
-
-
 }

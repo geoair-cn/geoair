@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.core.mime;
 
 import cn.geoair.web.mime.GirXMLMime;
@@ -12,10 +11,13 @@ public class XMLMime extends MimeType {
     public static final XMLMime gml = new XMLMime(GirXMLMime.gml, false);
     public static final XMLMime gml3 = new XMLMime(GirXMLMime.gml3, false);
 
-    private XMLMime(
-            GirXMLMime xmlMime,
-            boolean noop) {
-        super(xmlMime.getMimeType(), xmlMime.getFileExtension(), xmlMime.getInternalName(), xmlMime.getFormat(), false);
+    private XMLMime(GirXMLMime xmlMime, boolean noop) {
+        super(
+                xmlMime.getMimeType(),
+                xmlMime.getFileExtension(),
+                xmlMime.getInternalName(),
+                xmlMime.getFormat(),
+                false);
     }
 
     protected static XMLMime checkForFormat(String formatStr) throws MimeException {

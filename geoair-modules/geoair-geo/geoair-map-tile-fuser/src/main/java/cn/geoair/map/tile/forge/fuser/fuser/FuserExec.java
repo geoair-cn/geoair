@@ -17,5 +17,4 @@ public interface FuserExec {
     ImageMime getSrcFormat();
 
     RangeApo getSrcRange();
-
 }

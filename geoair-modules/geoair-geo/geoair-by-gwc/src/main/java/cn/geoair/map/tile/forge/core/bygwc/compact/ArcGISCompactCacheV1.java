@@ -1,6 +1,4 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.compact;
-
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -11,20 +9,15 @@ import java.nio.ByteBuffer;
  * <p>紧凑型缓存由包索引文件(*.bundlx)和包文件(*.bundle)组成，其中包含实际的图像数据。
  * 每个.bundlx文件包含16字节的头部和16字节的尾部。在头部和尾部之间是一个128x128矩阵（16384个瓦片），
  * 每个矩阵元素为5字节的偏移量。每个偏移量指向相应.bundle文件中的一个4字节字段，该字段包含瓦片图像数据的大小。
- * 实际图像数据从offset+4位置开始。如果大小为零，则表示没有可用的图像数据，该索引条目未被使用。
- * 如果地图缓存超过128行或128列，则会被分割成多个.bundlx和.bundle文件。
+ * 实际图像数据从offset+4位置开始。如果大小为零，则表示没有可用的图像数据，该索引条目未被使用。 如果地图缓存超过128行或128列，则会被分割成多个.bundlx和.bundle文件。
  *
  * @author Bjoern Saxe
  */
 public class ArcGISCompactCacheV1 extends ArcGISCompactCache {
-    /**
-     * 紧凑型缓存头部长度
-     */
+    /** 紧凑型缓存头部长度 */
     private static final int COMPACT_CACHE_HEADER_LENGTH = 16;
 
-    /**
-     * 索引缓存，用于缓存已读取的bundlx文件索引信息
-     */
+    /** 索引缓存，用于缓存已读取的bundlx文件索引信息 */
     private BundlxCache indexCache;
 
     /**

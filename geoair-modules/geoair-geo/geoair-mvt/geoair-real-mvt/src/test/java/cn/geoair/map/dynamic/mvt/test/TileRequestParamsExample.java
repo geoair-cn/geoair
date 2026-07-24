@@ -2,9 +2,7 @@ package cn.geoair.map.dynamic.mvt.test;
 
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 
-/**
- * TileRequestParams 示例
- */
+/** TileRequestParams 示例 */
 public class TileRequestParamsExample {
 
     public static void main(String[] args) {

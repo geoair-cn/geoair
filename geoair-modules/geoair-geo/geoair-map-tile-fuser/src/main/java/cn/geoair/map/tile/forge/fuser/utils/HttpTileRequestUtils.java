@@ -10,56 +10,39 @@ import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import javax.imageio.ImageIO;
 
 /**
  * Web 请求工具类
- * <p>
- * 提供 HTTP 请求相关的工具方法，包括：
- * - 代理配置
- * - 瓦片请求
- * - 请求重试
- * - 请求头构建
- * </p>
+ *
+ * <p>提供 HTTP 请求相关的工具方法，包括： - 代理配置 - 瓦片请求 - 请求重试 - 请求头构建
  *
  * @author 张俊
  * @date Created in 2026/6/16 09:20
  */
-
 public class HttpTileRequestUtils {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // ==================== 默认配置常量 ====================
 
-    /**
-     * 默认 User-Agent
-     */
+    /** 默认 User-Agent */
     public static final String DEFAULT_USER_AGENT =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-    /**
-     * 默认 Accept 头
-     */
+    /** 默认 Accept 头 */
     public static final String DEFAULT_ACCEPT =
             "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8";
 
-    /**
-     * 默认 Accept-Language 头
-     */
-    public static final String DEFAULT_ACCEPT_LANGUAGE =
-            "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7";
+    /** 默认 Accept-Language 头 */
+    public static final String DEFAULT_ACCEPT_LANGUAGE = "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7";
 
-    /**
-     * 默认 Accept-Encoding 头
-     */
-    public static final String DEFAULT_ACCEPT_ENCODING =
-            "gzip, deflate, br";
+    /** 默认 Accept-Encoding 头 */
+    public static final String DEFAULT_ACCEPT_ENCODING = "gzip, deflate, br";
 
     // ==================== 代理相关方法 ====================
 
@@ -80,7 +63,8 @@ public class HttpTileRequestUtils {
                 && config.getWebPxyPort() != null
                 && config.getWebPxyPort() > 0) {
 
-            return new Proxy(Proxy.Type.HTTP,
+            return new Proxy(
+                    Proxy.Type.HTTP,
                     new InetSocketAddress(config.getWebPxyHost(), config.getWebPxyPort()));
         }
         return null;
@@ -115,7 +99,9 @@ public class HttpTileRequestUtils {
         headers.put("Accept-Encoding", DEFAULT_ACCEPT_ENCODING);
         headers.put("Cache-Control", "no-cache");
         headers.put("Pragma", "no-cache");
-        headers.put("Sec-Ch-Ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"");
+        headers.put(
+                "Sec-Ch-Ua",
+                "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"");
         headers.put("Sec-Ch-Ua-Mobile", "?0");
         headers.put("Sec-Ch-Ua-Platform", "\"Windows\"");
         headers.put("Sec-Fetch-Dest", "image");
@@ -143,18 +129,20 @@ public class HttpTileRequestUtils {
     /**
      * 创建 HTTP GET 请求
      *
-     * @param url     请求 URL
-     * @param proxy   代理（可为 null）
+     * @param url 请求 URL
+     * @param proxy 代理（可为 null）
      * @param timeout 超时时间（毫秒）
      * @param headers 请求头
      * @return HttpRequest 对象
      */
-    public static HttpRequest createGetRequest(String url, Proxy proxy, int timeout, Map<String, String> headers) {
-        HttpRequest request = HttpUtil.createGet(url)
-                .setFollowRedirects(true)
-                .timeout(timeout)
-                .setConnectionTimeout(timeout)
-                .setReadTimeout(timeout);
+    public static HttpRequest createGetRequest(
+            String url, Proxy proxy, int timeout, Map<String, String> headers) {
+        HttpRequest request =
+                HttpUtil.createGet(url)
+                        .setFollowRedirects(true)
+                        .timeout(timeout)
+                        .setConnectionTimeout(timeout)
+                        .setReadTimeout(timeout);
 
         // 设置请求头
         if (headers != null && !headers.isEmpty()) {
@@ -169,57 +157,66 @@ public class HttpTileRequestUtils {
         return request;
     }
 
-
     // ==================== 瓦片请求方法 ====================
 
     /**
      * 请求瓦片数据（带重试）
      *
-     * @param url           请求 URL
-     * @param proxy         代理（可为 null）
-     * @param timeout       超时时间（毫秒）
-     * @param maxRetries    最大重试次数
-     * @param retryDelay    重试延迟（毫秒）
+     * @param url 请求 URL
+     * @param proxy 代理（可为 null）
+     * @param timeout 超时时间（毫秒）
+     * @param maxRetries 最大重试次数
+     * @param retryDelay 重试延迟（毫秒）
      * @param maxRetryDelay 最大重试延迟（毫秒）
-     * @param srcFormat     源图片格式
-     * @param logContext    日志上下文（用于记录 z, x, y 等信息）
+     * @param srcFormat 源图片格式
+     * @param logContext 日志上下文（用于记录 z, x, y 等信息）
      * @return 瓦片 Resource，失败返回 null
      */
-    public static Resource requestTileWithRetry(String url,
-                                                Proxy proxy,
-                                                int timeout,
-                                                int maxRetries,
-                                                long retryDelay,
-                                                long maxRetryDelay,
-                                                GiMimeType srcFormat,
-                                                String logContext) {
-        return requestTileWithRetry(url, proxy, timeout, maxRetries, retryDelay, maxRetryDelay,
-                srcFormat, logContext, null);
+    public static Resource requestTileWithRetry(
+            String url,
+            Proxy proxy,
+            int timeout,
+            int maxRetries,
+            long retryDelay,
+            long maxRetryDelay,
+            GiMimeType srcFormat,
+            String logContext) {
+        return requestTileWithRetry(
+                url,
+                proxy,
+                timeout,
+                maxRetries,
+                retryDelay,
+                maxRetryDelay,
+                srcFormat,
+                logContext,
+                null);
     }
 
     /**
      * 请求瓦片数据（带重试和自定义请求头）
      *
-     * @param url           请求 URL
-     * @param proxy         代理（可为 null）
-     * @param timeout       超时时间（毫秒）
-     * @param maxRetries    最大重试次数
-     * @param retryDelay    重试延迟（毫秒）
+     * @param url 请求 URL
+     * @param proxy 代理（可为 null）
+     * @param timeout 超时时间（毫秒）
+     * @param maxRetries 最大重试次数
+     * @param retryDelay 重试延迟（毫秒）
      * @param maxRetryDelay 最大重试延迟（毫秒）
-     * @param srcFormat     源图片格式
-     * @param logContext    日志上下文（用于记录 z, x, y 等信息）
-     * @param headers       自定义请求头
+     * @param srcFormat 源图片格式
+     * @param logContext 日志上下文（用于记录 z, x, y 等信息）
+     * @param headers 自定义请求头
      * @return 瓦片 Resource，失败返回 null
      */
-    public static Resource requestTileWithRetry(String url,
-                                                Proxy proxy,
-                                                int timeout,
-                                                int maxRetries,
-                                                long retryDelay,
-                                                long maxRetryDelay,
-                                                GiMimeType srcFormat,
-                                                String logContext,
-                                                Map<String, String> headers) {
+    public static Resource requestTileWithRetry(
+            String url,
+            Proxy proxy,
+            int timeout,
+            int maxRetries,
+            long retryDelay,
+            long maxRetryDelay,
+            GiMimeType srcFormat,
+            String logContext,
+            Map<String, String> headers) {
 
         // 默认重试配置
         int actualMaxRetries = maxRetries > 0 ? maxRetries : 3;
@@ -229,8 +226,12 @@ public class HttpTileRequestUtils {
         for (int attempt = 1; attempt <= actualMaxRetries; attempt++) {
             HttpResponse response = null;
             try {
-                HttpRequest request = createGetRequest(url, proxy, timeout,
-                        headers != null ? buildHeaders(headers) : buildDefaultHeaders());
+                HttpRequest request =
+                        createGetRequest(
+                                url,
+                                proxy,
+                                timeout,
+                                headers != null ? buildHeaders(headers) : buildDefaultHeaders());
 
                 long startTime = System.currentTimeMillis();
                 response = request.execute();
@@ -239,31 +240,43 @@ public class HttpTileRequestUtils {
                     BufferedImage image = ImageIO.read(response.bodyStream());
                     if (image != null) {
                         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                            String internalName = srcFormat != null ?
-                                    srcFormat.getInternalName() : "png";
+                            String internalName =
+                                    srcFormat != null ? srcFormat.getInternalName() : "png";
                             ImageIO.write(image, internalName, baos);
 
                             long elapsed = System.currentTimeMillis() - startTime;
                             byte[] byteArray = baos.toByteArray();
                             if (attempt > 1) {
-                                log.info("瓦片请求重试成功: {} - {} 尝试: {} 耗时: {}ms",
-                                        url, logContext, attempt, elapsed);
+                                log.info(
+                                        "瓦片请求重试成功: {} - {} 尝试: {} 耗时: {}ms",
+                                        url,
+                                        logContext,
+                                        attempt,
+                                        elapsed);
                             } else {
-                                log.info("瓦片请求成功: {} - {} 耗时: {}ms ,bodySize:{}",
-                                        url, logContext, elapsed, DataSizeUtil.format(byteArray.length));
+                                log.info(
+                                        "瓦片请求成功: {} - {} 耗时: {}ms ,bodySize:{}",
+                                        url,
+                                        logContext,
+                                        elapsed,
+                                        DataSizeUtil.format(byteArray.length));
                             }
                             return new ByteArrayResource(byteArray);
                         }
                     } else {
                         // 响应无法解析为图片
-                        log.warn("响应无法解析为图片: {} - {} 尝试: {}",
-                                url, logContext, attempt);
+                        log.warn("响应无法解析为图片: {} - {} 尝试: {}", url, logContext, attempt);
                         return null;
                     }
                 } else {
                     int statusCode = response.getStatus();
-                    log.warn("瓦片请求失败: {} - {} 状态码: {} 尝试: {}/{}",
-                            url, logContext, statusCode, attempt, actualMaxRetries);
+                    log.warn(
+                            "瓦片请求失败: {} - {} 状态码: {} 尝试: {}/{}",
+                            url,
+                            logContext,
+                            statusCode,
+                            attempt,
+                            actualMaxRetries);
 
                     // 4xx 错误（除了429）不重试
                     if (statusCode >= 400 && statusCode < 500 && statusCode != 429) {
@@ -273,13 +286,13 @@ public class HttpTileRequestUtils {
 
                     // 最后一次尝试失败
                     if (attempt == actualMaxRetries) {
-                        log.error("所有重试失败: {} - {} 状态码: {}",
-                                url, logContext, statusCode);
+                        log.error("所有重试失败: {} - {} 状态码: {}", url, logContext, statusCode);
                         return null;
                     }
 
                     // 等待后重试
-                    long delay = calculateRetryDelay(attempt, actualRetryDelay, actualMaxRetryDelay);
+                    long delay =
+                            calculateRetryDelay(attempt, actualRetryDelay, actualMaxRetryDelay);
                     log.info("等待 {}ms 后进行第 {} 次重试", delay, attempt + 1);
                     Thread.sleep(delay);
                 }
@@ -288,8 +301,8 @@ public class HttpTileRequestUtils {
                 log.warn("重试被中断: {} - {}", url, logContext);
                 return null;
             } catch (Exception e) {
-                log.error("瓦片请求异常: {} - {} 尝试: {}/{}",
-                        url, logContext, attempt, actualMaxRetries, e);
+                log.error(
+                        "瓦片请求异常: {} - {} 尝试: {}/{}", url, logContext, attempt, actualMaxRetries, e);
 
                 if (attempt == actualMaxRetries) {
                     log.error("所有重试失败: {} - {}", url, logContext, e);
@@ -297,7 +310,8 @@ public class HttpTileRequestUtils {
                 }
 
                 try {
-                    long delay = calculateRetryDelay(attempt, actualRetryDelay, actualMaxRetryDelay);
+                    long delay =
+                            calculateRetryDelay(attempt, actualRetryDelay, actualMaxRetryDelay);
                     log.debug("异常后等待 {}ms 进行第 {} 次重试", delay, attempt + 1);
                     Thread.sleep(delay);
                 } catch (InterruptedException ie) {
@@ -318,28 +332,34 @@ public class HttpTileRequestUtils {
     /**
      * 简单瓦片请求（不重试）
      *
-     * @param url        请求 URL
-     * @param proxy      代理（可为 null）
-     * @param timeout    超时时间（毫秒）
-     * @param srcFormat  源图片格式
+     * @param url 请求 URL
+     * @param proxy 代理（可为 null）
+     * @param timeout 超时时间（毫秒）
+     * @param srcFormat 源图片格式
      * @param logContext 日志上下文
      * @return 瓦片 Resource，失败返回 null
      */
-    public static Resource requestTile(String url, Proxy proxy, int timeout,
-                                       GiMimeType srcFormat, String logContext) {
+    public static Resource requestTile(
+            String url, Proxy proxy, int timeout, GiMimeType srcFormat, String logContext) {
         return requestTile(url, proxy, timeout, srcFormat, logContext, null);
     }
 
-    /**
-     * 简单瓦片请求（不重试，带自定义请求头）
-     */
-    public static Resource requestTile(String url, Proxy proxy, int timeout,
-                                       GiMimeType srcFormat, String logContext,
-                                       Map<String, String> headers) {
+    /** 简单瓦片请求（不重试，带自定义请求头） */
+    public static Resource requestTile(
+            String url,
+            Proxy proxy,
+            int timeout,
+            GiMimeType srcFormat,
+            String logContext,
+            Map<String, String> headers) {
         HttpResponse response = null;
         try {
-            HttpRequest request = createGetRequest(url, proxy, timeout,
-                    headers != null ? buildHeaders(headers) : buildDefaultHeaders());
+            HttpRequest request =
+                    createGetRequest(
+                            url,
+                            proxy,
+                            timeout,
+                            headers != null ? buildHeaders(headers) : buildDefaultHeaders());
 
             long startTime = System.currentTimeMillis();
             response = request.execute();
@@ -348,12 +368,15 @@ public class HttpTileRequestUtils {
                 BufferedImage image = ImageIO.read(response.bodyStream());
                 if (image != null) {
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                        String internalName = srcFormat != null ?
-                                srcFormat.getInternalName() : "png";
+                        String internalName =
+                                srcFormat != null ? srcFormat.getInternalName() : "png";
                         ImageIO.write(image, internalName, baos);
 
-                        log.debug("瓦片请求成功: {} - {} 耗时: {}ms",
-                                url, logContext, System.currentTimeMillis() - startTime);
+                        log.debug(
+                                "瓦片请求成功: {} - {} 耗时: {}ms",
+                                url,
+                                logContext,
+                                System.currentTimeMillis() - startTime);
                         return new ByteArrayResource(baos.toByteArray());
                     }
                 } else {
@@ -361,8 +384,7 @@ public class HttpTileRequestUtils {
                     return null;
                 }
             } else {
-                log.debug("瓦片请求失败: {} - {} 状态码: {}",
-                        url, logContext, response.getStatus());
+                log.debug("瓦片请求失败: {} - {} 状态码: {}", url, logContext, response.getStatus());
                 return null;
             }
         } catch (Exception e) {
@@ -380,9 +402,9 @@ public class HttpTileRequestUtils {
     /**
      * 计算重试延迟时间（指数退避 + 随机抖动）
      *
-     * @param attempt   当前尝试次数（从1开始）
+     * @param attempt 当前尝试次数（从1开始）
      * @param baseDelay 基础延迟（毫秒）
-     * @param maxDelay  最大延迟（毫秒）
+     * @param maxDelay 最大延迟（毫秒）
      * @return 延迟时间（毫秒）
      */
     private static long calculateRetryDelay(int attempt, long baseDelay, long maxDelay) {
@@ -394,6 +416,4 @@ public class HttpTileRequestUtils {
         double jitter = 0.9 + Math.random() * 0.2;
         return (long) (delay * jitter);
     }
-
-
 }

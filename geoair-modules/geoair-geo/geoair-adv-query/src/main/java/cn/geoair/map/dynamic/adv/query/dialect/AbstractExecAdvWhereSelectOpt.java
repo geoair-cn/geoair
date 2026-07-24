@@ -9,15 +9,15 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvSqlComposer.SqlBuildResult;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
+import java.util.List;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
  * 动态查询抽象实现类
- * <p>基于 IAdvBaseSelectOpt 实现，复用基础查询能力</p>
+ *
+ * <p>基于 IAdvBaseSelectOpt 实现，复用基础查询能力
  *
  * @author 张俊
  * @date Created in 2026/4/16 12:03
@@ -37,14 +37,10 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
         this.dataSourceGetter = dataSourceGetter;
     }
 
-    /**
-     * 获取数据库方言处理器
-     */
+    /** 获取数据库方言处理器 */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
-    /**
-     * 获取基础查询实现
-     */
+    /** 获取基础查询实现 */
     protected abstract IAdvBaseSelectOpt getBaseSelectOpt();
 
     protected abstract IAdvSimplePageOpt getSimplePageOpt();
@@ -56,22 +52,21 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
         return getBaseSelectOpt().getConfig();
     }
 
-    /**
-     * 获取SQL构建器
-     */
+    /** 获取SQL构建器 */
     protected GirAdvSqlComposer getSqlBuilder() {
         return new GirAdvSqlComposer(getDialectTableNameProcessor(), dataSourceGetter);
     }
 
-
     @Override
     public GirAdvOneRow wSelectOne(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
-        return getGeoOpt().eSelectOne(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
+        return getGeoOpt()
+                .eSelectOne(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
     }
 
     @Override
-    public <T> GirAdvOneRow wSelectOne(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> GirAdvOneRow wSelectOne(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectOne(builder.build());
@@ -87,11 +82,13 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     @Override
     public List<GirAdvOneRow> wSelectList(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResult(query);
-        return getGeoOpt().eSelectList(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
+        return getGeoOpt()
+                .eSelectList(result.getSql(), result.getParams(), query.getAdvEnumsGeomOpt());
     }
 
     @Override
-    public <T> List<GirAdvOneRow> wSelectList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<GirAdvOneRow> wSelectList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectList(builder.build());
@@ -108,15 +105,23 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     public PageApo<GirAdvOneRow> wSelectPage(GirAdvQueryRequest query) {
         SqlBuildResult result = getSqlBuildResultToPage(query);
         return getSimplePageOpt()
-                .pPage(result.getSql(), result.getParams(),
-                        query.getPageNum() == null ? query.getPageNumStartZero() ? 0 : 1 : query.getPageNum(),
+                .pPage(
+                        result.getSql(),
+                        result.getParams(),
+                        query.getPageNum() == null
+                                ? query.getPageNumStartZero() ? 0 : 1
+                                : query.getPageNum(),
                         query.getPageSize() == null ? 25 : query.getPageSize(),
                         query.getPageNumStartZero(),
-                        query.getAdvEnumsGeomOpt(), query.getHasFieldsInfo(), query.getOrders(), query.getAdvEnumsKeyTran());
+                        query.getAdvEnumsGeomOpt(),
+                        query.getHasFieldsInfo(),
+                        query.getOrders(),
+                        query.getAdvEnumsKeyTran());
     }
 
     @Override
-    public <T> PageApo<GirAdvOneRow> wSelectPage(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> PageApo<GirAdvOneRow> wSelectPage(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectPage(builder.build());
@@ -136,14 +141,18 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T> void wSelectStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+    public <T> void wSelectStream(
+            Class<T> entityClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<GirAdvOneRow> rowConsumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         wSelectStream(builder.build(), rowConsumer);
     }
 
     @Override
-    public <T> void wSelectStream(Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+    public <T> void wSelectStream(
+            Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(null);
         consumer.accept(builder);
         wSelectStream(builder.build(), rowConsumer);
@@ -156,7 +165,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T> Number wSelectCount(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> Number wSelectCount(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectCount(builder.build());
@@ -177,14 +187,16 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T> List<List<Object>> wSelectListToValueList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<List<Object>> wSelectListToValueList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectListToValueList(builder.build());
     }
 
     @Override
-    public <T> List<List<Object>> wSelectListToValueList(Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<List<Object>> wSelectListToValueList(
+            Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(null);
         consumer.accept(builder);
         return wSelectListToValueList(builder.build());
@@ -197,7 +209,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T> Number wSelectNumber(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> Number wSelectNumber(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectNumber(builder.build());
@@ -217,7 +230,8 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T, R> R wSelectObjOne(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T, R> R wSelectObjOne(
+            Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectObjOne(builder.build(), resultClass);
@@ -237,40 +251,50 @@ public abstract class AbstractExecAdvWhereSelectOpt implements IAdvWhereSelectOp
     }
 
     @Override
-    public <T, R> List<R> wSelectObjList(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T, R> List<R> wSelectObjList(
+            Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectObjList(builder.build(), resultClass);
     }
 
     @Override
-    public <T> List<T> wSelectObjList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<T> wSelectObjList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         return wSelectObjList(builder.build(), entityClass);
     }
 
     @Override
-    public <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void wSelectObjStream(
+            GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
         SqlBuildResult result = getSqlBuildResult(query);
         //  暂时不支持空间操作
-        getBaseSelectOpt().bSelectObjListStream(result.getSql(), result.getParams(), clazz, rowConsumer);
+        getBaseSelectOpt()
+                .bSelectObjListStream(result.getSql(), result.getParams(), clazz, rowConsumer);
     }
 
     @Override
-    public <T, R> void wSelectObjStream(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer) {
+    public <T, R> void wSelectObjStream(
+            Class<T> entityClass,
+            Class<R> resultClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<R> rowConsumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         wSelectObjStream(builder.build(), resultClass, rowConsumer);
     }
 
     @Override
-    public <T> void wSelectObjStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<T> rowConsumer) {
+    public <T> void wSelectObjStream(
+            Class<T> entityClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<T> rowConsumer) {
         QueryRequestBuilder<T> builder = GirAdvQueryRequest.builder(entityClass);
         consumer.accept(builder);
         wSelectObjStream(builder.build(), entityClass, rowConsumer);
     }
-
 
     private SqlBuildResult getSqlBuildResult(GirAdvQueryRequest query) {
         GirAdvSqlComposer sqlBuilder = getSqlBuilder();

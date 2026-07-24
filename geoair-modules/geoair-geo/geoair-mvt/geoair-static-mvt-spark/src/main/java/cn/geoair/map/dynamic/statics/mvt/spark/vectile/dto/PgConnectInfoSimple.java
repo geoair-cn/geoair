@@ -3,13 +3,12 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataSourceGetterFunction;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DefaultDataSourceGetterFunction;
 import cn.hutool.core.util.StrUtil;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import javax.sql.DataSource;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * @author ：张逢吉
@@ -31,10 +30,10 @@ public class PgConnectInfoSimple implements Serializable {
 
     protected String schemaName; // 模式名
 
-    protected DataSourceGetterFunction dataSourceGetterFunction = new DefaultDataSourceGetterFunction();
+    protected DataSourceGetterFunction dataSourceGetterFunction =
+            new DefaultDataSourceGetterFunction();
 
-    public PgConnectInfoSimple() {
-    }
+    public PgConnectInfoSimple() {}
 
     public DataSource toDataSource() {
         return dataSourceGetterFunction.apply(this);

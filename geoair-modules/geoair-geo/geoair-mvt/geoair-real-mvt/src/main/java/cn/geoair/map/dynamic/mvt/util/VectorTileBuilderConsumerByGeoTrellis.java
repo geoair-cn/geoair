@@ -5,7 +5,7 @@
 //
 // import geotrellis.vector.Extent;
 // import geotrellis.vectortile.*;
-//  
+//
 // import org.locationtech.jts.geom.*;
 // import scala.Option;
 // import scala.Tuple2;

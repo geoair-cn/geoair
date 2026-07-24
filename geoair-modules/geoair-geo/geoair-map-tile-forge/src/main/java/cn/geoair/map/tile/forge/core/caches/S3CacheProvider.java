@@ -1,6 +1,5 @@
 package cn.geoair.map.tile.forge.core.caches;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
@@ -8,10 +7,7 @@ import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.hutool.core.util.StrUtil;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
- 
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,10 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-/**
- * 基于S3对象存储的缓存实现
- */
- 
+/** 基于S3对象存储的缓存实现 */
 public class S3CacheProvider implements CacheProvider {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final AmazonS3 s3Client;
@@ -51,7 +44,7 @@ public class S3CacheProvider implements CacheProvider {
     /**
      * 构造函数（指定存储桶和前缀）
      *
-     * @param bucketName  存储桶名称
+     * @param bucketName 存储桶名称
      * @param cachePrefix 缓存前缀
      */
     public S3CacheProvider(String bucketName, String cachePrefix) {
@@ -63,32 +56,25 @@ public class S3CacheProvider implements CacheProvider {
         initBucket();
     }
 
-    /**
-     * 初始化存储桶（不存在则创建）
-     */
+    /** 初始化存储桶（不存在则创建） */
     private void initBucket() {
         if (!s3Client.doesBucketExistV2(bucketName)) {
             s3Client.createBucket(bucketName);
         }
     }
 
-    /**
-     * 将缓存键转换为S3对象键
-     */
+    /** 将缓存键转换为S3对象键 */
     private String getObjectKey(Object key) {
         // 安全转换键名，避免特殊字符
-        String keyStr = key.toString()
-                .replaceAll("[^a-zA-Z0-9-_./]", "_")
-                .replaceAll("//+", "/"); // 合并连续斜杠
-        while (keyStr.endsWith("/")) {  // 移除最后的文件符号，以防被解析成文件夹
+        String keyStr =
+                key.toString().replaceAll("[^a-zA-Z0-9-_./]", "_").replaceAll("//+", "/"); // 合并连续斜杠
+        while (keyStr.endsWith("/")) { // 移除最后的文件符号，以防被解析成文件夹
             keyStr = StrUtil.replaceLast(keyStr, "/", "");
         }
         return cachePrefix + keyStr;
     }
 
-    /**
-     * 获取对象的完整访问URL
-     */
+    /** 获取对象的完整访问URL */
     private String getObjectUrl(String objectKey) {
         return domain + "/" + objectKey;
     }
@@ -123,8 +109,9 @@ public class S3CacheProvider implements CacheProvider {
             }
             // 上传到S3
             ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-            PutObjectRequest putRequest = new PutObjectRequest(bucketName, objectKey, inputStream, metadata)
-                    .withCannedAcl(CannedAccessControlList.Private);
+            PutObjectRequest putRequest =
+                    new PutObjectRequest(bucketName, objectKey, inputStream, metadata)
+                            .withCannedAcl(CannedAccessControlList.Private);
 
             // 如果需要公共访问，可以设置为PublicRead
             // putRequest.withCannedAcl(CannedAccessControlList.PublicRead);
@@ -203,7 +190,7 @@ public class S3CacheProvider implements CacheProvider {
             }
             s3Object.close(); // 关闭流
 
-//            return deserializeValue(outputStream.toByteArray());
+            //            return deserializeValue(outputStream.toByteArray());
             return outputStream.toByteArray();
         } catch (Exception e) {
             // 读取失败或异常时返回null
@@ -306,9 +293,7 @@ public class S3CacheProvider implements CacheProvider {
         evictByPreFix("");
     }
 
-    /**
-     * 序列化对象（支持多种类型）
-     */
+    /** 序列化对象（支持多种类型） */
     private byte[] serializeValue(Object value) throws IOException {
         if (value == null) {
             return new byte[0];
@@ -331,9 +316,7 @@ public class S3CacheProvider implements CacheProvider {
         return value.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    /**
-     * 反序列化对象
-     */
+    /** 反序列化对象 */
     private Object deserializeValue(byte[] data) throws IOException {
         if (data.length == 0) {
             return null;
@@ -348,9 +331,7 @@ public class S3CacheProvider implements CacheProvider {
         }
     }
 
-    /**
-     * 检查对象是否过期
-     */
+    /** 检查对象是否过期 */
     private boolean isExpired(ObjectMetadata metadata) {
         String expiresAtStr = metadata.getUserMetadata().get(EXPIRATION_METADATA_KEY);
         if (expiresAtStr == null) {
@@ -365,9 +346,7 @@ public class S3CacheProvider implements CacheProvider {
         }
     }
 
-    /**
-     * 获取缓存对象的URL（如果需要对外访问）
-     */
+    /** 获取缓存对象的URL（如果需要对外访问） */
     public String getObjectUrl(Object key) {
         String objectKey = getObjectKey(key);
         if (s3Client.doesObjectExist(bucketName, objectKey)) {
@@ -376,9 +355,7 @@ public class S3CacheProvider implements CacheProvider {
         return null;
     }
 
-    /**
-     * 关闭资源（建议在应用销毁时调用）
-     */
+    /** 关闭资源（建议在应用销毁时调用） */
     public void destroy() {
         // 如果需要关闭客户端连接，可以在这里处理
         // s3Client.shutdown();

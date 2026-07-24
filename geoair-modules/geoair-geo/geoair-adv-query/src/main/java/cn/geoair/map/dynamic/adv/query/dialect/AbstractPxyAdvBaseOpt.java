@@ -12,7 +12,6 @@ import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,29 +29,23 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     protected IDataSourceGetter dataSourceGetter;
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractPxyAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public AbstractPxyAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         this.dataSourceGetter = dataSourceGetter;
         this.configAdvQueryGetter = configAdvQueryGetter;
     }
 
-    /**
-     * 插入操作代理对象
-     */
+    /** 插入操作代理对象 */
     protected IAdvBaseAccessOpt advBaseAccessPxyOpt;
 
-    /**
-     * 查询操作代理对象
-     */
+    /** 查询操作代理对象 */
     protected IAdvBaseSelectOpt advBaseSelectPxyOpt;
 
-    /**
-     * 更新操作代理对象
-     */
+    /** 更新操作代理对象 */
     protected IAdvBaseUpdateOpt advBaseUpdatePxyOpt;
 
-    /**
-     * 删除操作代理对象
-     */
+    /** 删除操作代理对象 */
     protected IAdvBaseDeleteOpt advBaseDeletePxyOpt;
 
     public abstract IAdvBaseAccessOpt getAdvBaseAccessPxyOpt();
@@ -62,7 +55,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     public abstract IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt();
 
     public abstract IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt();
-
 
     @Override
     public AdvQueryGlobalConfig getConfig() {
@@ -126,12 +118,17 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
+    public Integer bInsertBatch(
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, headers, rowsData);
     }
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData, int batchSize) {
+    public Integer bInsertBatch(
+            String tableName,
+            List<String> headers,
+            List<Map<String, Object>> rowsData,
+            int batchSize) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
@@ -146,7 +143,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(entities, strategyConsumer);
     }
 
@@ -156,12 +154,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, AccessStrategy strategy) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseAccessPxyOpt().bInsertBatch(tableName, entities, strategyConsumer);
     }
 
@@ -171,7 +171,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bInsertIgnore(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseAccessPxyOpt().bInsertIgnore(tableName, rowData, conflictKeys);
     }
 
@@ -206,8 +207,13 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
-        return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
+    public Integer bInsertIgnoreBatch(
+            String tableName,
+            Set<String> headers,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys) {
+        return getAdvBaseAccessPxyOpt()
+                .bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
 
     @Override
@@ -221,7 +227,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseAccessPxyOpt().bInsertIgnoreBatch(entities, strategyConsumer);
     }
 
@@ -231,16 +238,17 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, AccessStrategy strategy) {
         return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseAccessPxyOpt().bInsertSelectiveIgnoreBatch(entities, strategyConsumer);
     }
-// ==================== 删除操作实现（代理调用） ====================
-
+    // ==================== 删除操作实现（代理调用） ====================
 
     @Override
     public Integer bDeleteBySql(String sqlStatement) {
@@ -303,7 +311,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> void bDeleteBatchByPK(Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
+    public <T> void bDeleteBatchByPK(
+            Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
         getAdvBaseDeletePxyOpt().bDeleteBatchByPK(entities, strategyConsumer);
     }
 
@@ -318,12 +327,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseDeletePxyOpt().bDeleteByWhere(strategy, whereFilter);
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseDeletePxyOpt().bDeleteByWhere(strategy, consumer);
     }
 
@@ -333,12 +344,15 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(Consumer<DeleteStrategy> strategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            Consumer<DeleteStrategy> strategyConsumer,
+            Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseDeletePxyOpt().bDeleteByWhere(strategyConsumer, consumer);
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseDeletePxyOpt().bDeleteByWhere(tableName, consumer);
     }
 
@@ -445,7 +459,6 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
         getAdvBaseSelectPxyOpt().bSelectObjListStream(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
-
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseSelectPxyOpt().bSelectOne(sqlStatement, sqlParamList);
@@ -457,12 +470,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseSelectPxyOpt().bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+    public List<List<Object>> bSelectListToValueList(
+            String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseSelectPxyOpt().bSelectListToValueList(sqlStatement, sqlParamList);
     }
 
@@ -482,16 +497,22 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
         return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, sqlParamList, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(
+            String sqlStatement,
+            SqlParamList sqlParamList,
+            Class<E> clazz,
+            Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt()
+                .bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
     }
 
-    //=============================================================================
+    // =============================================================================
 
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
@@ -504,7 +525,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseSelectPxyOpt().bSelectListStream(sqlStatement, girSqlParam, rowConsumer);
     }
 
@@ -529,18 +551,19 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
         return getAdvBaseSelectPxyOpt().bSelectObjList(sqlStatement, girSqlParam, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
-        getAdvBaseSelectPxyOpt().bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
+    public <E> void bSelectObjListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+        getAdvBaseSelectPxyOpt()
+                .bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
     }
 
-
     // ==================== 更新操作实现（代理调用） ====================
-
 
     @Override
     public Integer bUpdateBySql(String sqlStatement) {
@@ -563,7 +586,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpdateByPK(String tableName, String idKey, Object id, Map<String, Object> rowData) {
+    public Integer bUpdateByPK(
+            String tableName, String idKey, Object id, Map<String, Object> rowData) {
         return getAdvBaseUpdatePxyOpt().bUpdateByPK(tableName, idKey, id, rowData);
     }
 
@@ -598,12 +622,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData) {
+    public void bUpdateBatchByPK(
+            String tableName, String idKey, List<Map<String, Object>> rowsData) {
         getAdvBaseUpdatePxyOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
-    public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
+    public void bUpdateBatchByPK(
+            String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
         getAdvBaseUpdatePxyOpt().bUpdateBatchByPK(tableName, idKey, rowsData, batchSize);
     }
 
@@ -618,12 +644,14 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> void bUpdateBatchByPK(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpdateBatchByPK(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseUpdatePxyOpt().bUpdateBatchByPK(entities, strategyConsumer);
     }
 
     @Override
-    public <T> void bUpdateBatchByPKSelective(String tableName, String idKey, Collection<T> entities) {
+    public <T> void bUpdateBatchByPKSelective(
+            String tableName, String idKey, Collection<T> entities) {
         getAdvBaseUpdatePxyOpt().bUpdateBatchByPKSelective(tableName, idKey, entities);
     }
 
@@ -633,22 +661,26 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> void bUpdateBatchByPKSelective(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpdateBatchByPKSelective(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseUpdatePxyOpt().bUpdateBatchByPKSelective(entities, strategyConsumer);
     }
 
     @Override
-    public Integer bUpdateByMap(String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
+    public Integer bUpdateByMap(
+            String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
         return getAdvBaseUpdatePxyOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, UpdateStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            T entity, UpdateStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(entity, strategy, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, UpdateStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            T entity, UpdateStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(entity, strategy, consumer);
     }
 
@@ -658,27 +690,34 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, Consumer<UpdateStrategy> strategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            T entity,
+            Consumer<UpdateStrategy> strategyConsumer,
+            Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(entity, strategyConsumer, consumer);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(tableName, entity, consumer);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateByWhere(tableName, rowData, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseUpdatePxyOpt().bUpdateSelectiveByWhere(tableName, rowData, whereFilter);
     }
 
     @Override
-    public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bUpsert(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseUpdatePxyOpt().bUpsert(tableName, rowData, conflictKeys);
     }
 
@@ -713,7 +752,11 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
+    public Integer bUpsertBatch(
+            String tableName,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys,
+            int batchSize) {
         return getAdvBaseUpdatePxyOpt().bUpsertBatch(tableName, rowsData, conflictKeys, batchSize);
     }
 
@@ -728,7 +771,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> void bUpsertBatch(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpsertBatch(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseUpdatePxyOpt().bUpsertBatch(entities, strategyConsumer);
     }
 
@@ -743,7 +787,8 @@ public abstract class AbstractPxyAdvBaseOpt implements IAdvBaseOpt {
     }
 
     @Override
-    public <T> void bUpsertBatchSelective(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpsertBatchSelective(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseUpdatePxyOpt().bUpsertBatchSelective(entities, strategyConsumer);
     }
 }

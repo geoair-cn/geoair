@@ -27,8 +27,7 @@ public class SparkJavaTileLocalApp {
                                 "cn.geoair.map.dynamic.statics.mvt.spark.listener.SparkSQLListener") // 自定义监听器
                         .getOrCreate();
 
-        SparkVectorTileGenerator sparkVectorTileGenerator =
-                new SparkVectorTileGenerator(spark);
+        SparkVectorTileGenerator sparkVectorTileGenerator = new SparkVectorTileGenerator(spark);
 
         sparkVectorTileGenerator.doGenerate(tileSliceParameter);
 

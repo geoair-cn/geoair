@@ -6,19 +6,13 @@ import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
-import cn.geoair.map.tile.forge.fuser.enums.HintsLevel;
 import cn.geoair.map.tile.forge.core.bygwc.io.GirImageDecoderContainer;
 import cn.geoair.map.tile.forge.core.bygwc.io.GirImageEncoderContainer;
 import cn.geoair.map.tile.forge.core.bygwc.io.ImageCodecInitializer;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
+import cn.geoair.map.tile.forge.fuser.enums.HintsLevel;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 import cn.hutool.core.date.StopWatch;
-import lombok.Getter;
-import org.apache.commons.io.IOUtils;
-import org.geotools.image.util.ImageUtilities;
-
-
-import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -29,21 +23,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+import javax.media.jai.PlanarImage;
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+import org.geotools.image.util.ImageUtilities;
 
-/**
- * 瓦片融合器
- * 将多个瓦片拼接成一张完整的大图
- */
-
+/** 瓦片融合器 将多个瓦片拼接成一张完整的大图 */
 public class GirFuserExec implements FuserExec {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     final GridSubset gridSubset;
-    @Getter
-    final ImageMime outputFormat;
+    @Getter final ImageMime outputFormat;
 
     final LayerTileGetter layerTileGetter;
-    @Getter
-    ImageMime srcFormat;
+    @Getter ImageMime srcFormat;
 
     int reqHeight;
 
@@ -68,14 +60,10 @@ public class GirFuserExec implements FuserExec {
     // 用于满足请求的瓦片空间范围
     BoundingBox srcBounds;
 
-    /**
-     * 画布尺寸
-     */
+    /** 画布尺寸 */
     int[] canvasSize = new int[2];
 
-    /**
-     * 全局日志开关（控制info和debug级别日志）
-     */
+    /** 全局日志开关（控制info和debug级别日志） */
     private static boolean globalLogEnabled = false;
 
     /**
@@ -90,88 +78,68 @@ public class GirFuserExec implements FuserExec {
         }
     }
 
-    /**
-     * 获取全局日志开关状态
-     */
+    /** 获取全局日志开关状态 */
     public static boolean isGlobalLogEnabled() {
         return globalLogEnabled;
     }
 
-    /**
-     * 条件info日志输出
-     */
+    /** 条件info日志输出 */
     private void infoLog(String message) {
         if (globalLogEnabled) {
             log.info(message);
         }
     }
 
-    /**
-     * 条件info日志输出（带参数）
-     */
+    /** 条件info日志输出（带参数） */
     private void infoLog(String format, Object... arguments) {
         if (globalLogEnabled) {
             log.info(format, arguments);
         }
     }
 
-    /**
-     * 条件debug日志输出
-     */
+    /** 条件debug日志输出 */
     private void debugLog(String message) {
         if (globalLogEnabled && log.isDebugEnabled()) {
             log.debug(message);
         }
     }
 
-    /**
-     * 条件debug日志输出（带参数）
-     */
+    /** 条件debug日志输出（带参数） */
     private void debugLog(String format, Object... arguments) {
         if (globalLogEnabled && log.isDebugEnabled()) {
             log.debug(format, arguments);
         }
     }
 
-    /**
-     * 条件warn日志输出
-     */
+    /** 条件warn日志输出 */
     private void warnLog(String message) {
         if (globalLogEnabled) {
             log.warn(message);
         }
     }
 
-    /**
-     * 条件warn日志输出（带参数）
-     */
+    /** 条件warn日志输出（带参数） */
     private void warnLog(String format, Object... arguments) {
         if (globalLogEnabled) {
             log.warn(format, arguments);
         }
     }
 
-    /**
-     * 条件error日志输出
-     */
+    /** 条件error日志输出 */
     private void errorLog(String message) {
         if (globalLogEnabled) {
             log.error(message);
         }
     }
 
-    /**
-     * 条件error日志输出（带参数）
-     */
+    /** 条件error日志输出（带参数） */
     private void errorLog(String format, Object... arguments) {
         if (globalLogEnabled) {
             log.error(format, arguments);
         }
     }
 
-    /**
-     * 条件error日志输出（带异常）
-     */
+    /** 条件error日志输出（带异常） */
     private void errorLog(String message, Throwable t) {
         if (globalLogEnabled) {
             log.error(message, t);
@@ -192,44 +160,38 @@ public class GirFuserExec implements FuserExec {
         int right;
     }
 
-    /**
-     * 缩放前的像素偏移值
-     */
+    /** 缩放前的像素偏移值 */
     PixelOffsets canvOfs = new PixelOffsets();
 
     SpatialOffsets boundOfs = new SpatialOffsets();
 
-    /**
-     * 马赛克图像
-     */
+    /** 马赛克图像 */
     BufferedImage canvas;
 
-    /**
-     * 用于将瓦片绘制到马赛克中的图形对象
-     */
+    /** 用于将瓦片绘制到马赛克中的图形对象 */
     Graphics2D gfx;
 
-    /**
-     * 所有可用的解码器映射
-     */
+    /** 所有可用的解码器映射 */
     private GirImageDecoderContainer decoderMap;
 
-    /**
-     * 所有可用的编码器映射
-     */
+    /** 所有可用的编码器映射 */
     private GirImageEncoderContainer encoderMap;
 
     /**
      * 构造函数 - 使用默认输出格式(PNG)
      *
      * @param layerTileGetter 瓦片获取器
-     * @param gridSubset      网格子集
-     * @param bounds          请求范围
-     * @param width           请求宽度
-     * @param height          请求高度
+     * @param gridSubset 网格子集
+     * @param bounds 请求范围
+     * @param width 请求宽度
+     * @param height 请求高度
      */
     public GirFuserExec(
-            LayerTileGetter layerTileGetter, GridSubset gridSubset, BoundingBox bounds, int width, int height) {
+            LayerTileGetter layerTileGetter,
+            GridSubset gridSubset,
+            BoundingBox bounds,
+            int width,
+            int height) {
         infoLog("初始化瓦片融合器 - 使用指定GridSubset, 范围: {}, 尺寸: {}x{}", bounds, width, height);
         init();
         this.outputFormat = ImageMime.png;
@@ -246,13 +208,17 @@ public class GirFuserExec implements FuserExec {
      * 构造函数 - 从LayerTileGetter中获取GridSubset，使用默认输出格式(PNG)
      *
      * @param layerTileGetter 瓦片获取器
-     * @param bounds          请求范围
-     * @param width           请求宽度
-     * @param height          请求高度
+     * @param bounds 请求范围
+     * @param width 请求宽度
+     * @param height 请求高度
      */
     public GirFuserExec(
             LayerTileGetter layerTileGetter, BoundingBox bounds, int width, int height) {
-        infoLog("初始化瓦片融合器 - 从LayerTileGetter获取GridSubset, 范围: {}, 尺寸: {}x{}", bounds, width, height);
+        infoLog(
+                "初始化瓦片融合器 - 从LayerTileGetter获取GridSubset, 范围: {}, 尺寸: {}x{}",
+                bounds,
+                width,
+                height);
         init();
         this.outputFormat = ImageMime.png;
         this.layerTileGetter = layerTileGetter;
@@ -261,23 +227,33 @@ public class GirFuserExec implements FuserExec {
         this.reqWidth = width;
         this.reqHeight = height;
         this.srcFormat = layerTileGetter.getSrcFormat();
-        infoLog("瓦片融合器初始化完成 - 源格式: {}, 输出格式: png, GridSubset分辨率数: {}",
-                srcFormat.getMimeType(), gridSubset.getResolutions().length);
+        infoLog(
+                "瓦片融合器初始化完成 - 源格式: {}, 输出格式: png, GridSubset分辨率数: {}",
+                srcFormat.getMimeType(),
+                gridSubset.getResolutions().length);
     }
 
     /**
      * 构造函数 - 从LayerTileGetter中获取GridSubset，指定输出格式
      *
      * @param layerTileGetter 瓦片获取器
-     * @param outputFormat    输出格式
-     * @param bounds          请求范围
-     * @param width           请求宽度
-     * @param height          请求高度
+     * @param outputFormat 输出格式
+     * @param bounds 请求范围
+     * @param width 请求宽度
+     * @param height 请求高度
      */
     public GirFuserExec(
-            LayerTileGetter layerTileGetter, ImageMime outputFormat, BoundingBox bounds, int width, int height) {
-        infoLog("初始化瓦片融合器 - 从LayerTileGetter获取GridSubset, 输出格式: {}, 范围: {}, 尺寸: {}x{}",
-                outputFormat.getMimeType(), bounds, width, height);
+            LayerTileGetter layerTileGetter,
+            ImageMime outputFormat,
+            BoundingBox bounds,
+            int width,
+            int height) {
+        infoLog(
+                "初始化瓦片融合器 - 从LayerTileGetter获取GridSubset, 输出格式: {}, 范围: {}, 尺寸: {}x{}",
+                outputFormat.getMimeType(),
+                bounds,
+                width,
+                height);
         if (layerTileGetter == null) {
             errorLog("LayerTileGetter不能为null");
             throw new IllegalArgumentException("LayerTileGetter不能为null");
@@ -302,15 +278,16 @@ public class GirFuserExec implements FuserExec {
         this.reqWidth = width;
         this.reqHeight = height;
         this.srcFormat = layerTileGetter.getSrcFormat();
-        infoLog("瓦片融合器初始化完成 - 源格式: {}, 输出格式: {}, GridSubset瓦片尺寸: {}x{}, 分辨率数: {}",
-                srcFormat.getMimeType(), outputFormat.getMimeType(),
-                gridSubset.getTileWidth(), gridSubset.getTileHeight(),
+        infoLog(
+                "瓦片融合器初始化完成 - 源格式: {}, 输出格式: {}, GridSubset瓦片尺寸: {}x{}, 分辨率数: {}",
+                srcFormat.getMimeType(),
+                outputFormat.getMimeType(),
+                gridSubset.getTileWidth(),
+                gridSubset.getTileHeight(),
                 gridSubset.getResolutions().length);
     }
 
-    /**
-     * 确定源分辨率
-     */
+    /** 确定源分辨率 */
     protected void determineSourceResolution() {
         infoLog("开始确定源分辨率");
         xResolution = reqBounds.getWidth() / reqWidth;
@@ -348,13 +325,14 @@ public class GirFuserExec implements FuserExec {
             infoLog("未找到足够精细的分辨率，使用最精细等级 - 索引: {}, 分辨率: {}", srcIdx, srcResolution);
         }
 
-        infoLog("源分辨率确定完成 - 等级索引: {}, 分辨率: {} 米/像素 (目标基准: {} 米/像素)",
-                srcIdx, srcResolution, tmpResolution);
+        infoLog(
+                "源分辨率确定完成 - 等级索引: {}, 分辨率: {} 米/像素 (目标基准: {} 米/像素)",
+                srcIdx,
+                srcResolution,
+                tmpResolution);
     }
 
-    /**
-     * 确定画布布局
-     */
+    /** 确定画布布局 */
     protected void determineCanvasLayout() {
         infoLog("开始确定画布布局");
         // 找出覆盖所需范围所需的图块的空间范围
@@ -371,8 +349,12 @@ public class GirFuserExec implements FuserExec {
         boundOfs.right = reqBounds.getMaxX() - srcBounds.getMaxX();
         boundOfs.top = reqBounds.getMaxY() - srcBounds.getMaxY();
 
-        infoLog("地理偏移量(米): left={}, right={}, top={}, bottom={}",
-                boundOfs.left, boundOfs.right, boundOfs.top, boundOfs.bottom);
+        infoLog(
+                "地理偏移量(米): left={}, right={}, top={}, bottom={}",
+                boundOfs.left,
+                boundOfs.right,
+                boundOfs.top,
+                boundOfs.bottom);
 
         canvasSize[0] = (int) Math.round(reqBounds.getWidth() / this.srcResolution);
         canvasSize[1] = (int) Math.round(reqBounds.getHeight() / this.srcResolution);
@@ -384,8 +366,12 @@ public class GirFuserExec implements FuserExec {
         naiveOfs.bottom = (int) Math.round(boundOfs.bottom / this.srcResolution);
         naiveOfs.right = (int) Math.round(boundOfs.right / this.srcResolution);
         naiveOfs.top = (int) Math.round(boundOfs.top / this.srcResolution);
-        debugLog("初步像素偏移量(像素): left={}, bottom={}, right={}, top={}",
-                naiveOfs.left, naiveOfs.bottom, naiveOfs.right, naiveOfs.top);
+        debugLog(
+                "初步像素偏移量(像素): left={}, bottom={}, right={}, top={}",
+                naiveOfs.left,
+                naiveOfs.bottom,
+                naiveOfs.right,
+                naiveOfs.top);
 
         // 找到相对侧的偏移量
         int tileWidth = this.gridSubset.getTileWidth();
@@ -409,21 +395,36 @@ public class GirFuserExec implements FuserExec {
         assert Math.abs(canvOfs.right - naiveOfs.right) <= 1;
         assert Math.abs(canvOfs.top - naiveOfs.top) <= 1;
 
-        infoLog("画布布局确定完成 - 画布尺寸: {}x{}, 最终像素偏移: left={}, bottom={}, right={}, top={}",
-                canvasSize[0], canvasSize[1], canvOfs.left, canvOfs.bottom, canvOfs.right, canvOfs.top);
+        infoLog(
+                "画布布局确定完成 - 画布尺寸: {}x{}, 最终像素偏移: left={}, bottom={}, right={}, top={}",
+                canvasSize[0],
+                canvasSize[1],
+                canvOfs.left,
+                canvOfs.bottom,
+                canvOfs.right,
+                canvOfs.top);
 
         if (globalLogEnabled && log.isDebugEnabled()) {
             log.debug("瓦片覆盖矩形: " + Arrays.toString(srcRectangle));
             log.debug("瓦片覆盖边界: " + srcBounds + " (请求边界: " + reqBounds + ")");
-            log.debug("边界偏移量: [{}, {}, {}, {}]", boundOfs.left, boundOfs.bottom, boundOfs.right, boundOfs.top);
-            log.debug("画布尺寸: {}x{} (请求尺寸: {}x{})", canvasSize[0], canvasSize[1], reqWidth, reqHeight);
-            log.debug("画布偏移量: [{}, {}, {}, {}]", canvOfs.left, canvOfs.bottom, canvOfs.right, canvOfs.top);
+            log.debug(
+                    "边界偏移量: [{}, {}, {}, {}]",
+                    boundOfs.left,
+                    boundOfs.bottom,
+                    boundOfs.right,
+                    boundOfs.top);
+            log.debug(
+                    "画布尺寸: {}x{} (请求尺寸: {}x{})", canvasSize[0], canvasSize[1], reqWidth, reqHeight);
+            log.debug(
+                    "画布偏移量: [{}, {}, {}, {}]",
+                    canvOfs.left,
+                    canvOfs.bottom,
+                    canvOfs.right,
+                    canvOfs.top);
         }
     }
 
-    /**
-     * 创建画布
-     */
+    /** 创建画布 */
     protected void createCanvas() {
         infoLog("开始创建画布");
 
@@ -457,15 +458,14 @@ public class GirFuserExec implements FuserExec {
         infoLog("画布创建完成");
     }
 
-    /**
-     * 渲染画布 - 将所有瓦片绘制到画布上
-     */
+    /** 渲染画布 - 将所有瓦片绘制到画布上 */
     protected void renderCanvas() throws Exception {
         infoLog("开始渲染画布");
 
         // 遍历所有相关瓦片并将其写入画布，从底部开始，向右和向上移动
         long starty = srcRectangle[1];
-        long totalTiles = (srcRectangle[2] - srcRectangle[0] + 1) * (srcRectangle[3] - srcRectangle[1] + 1);
+        long totalTiles =
+                (srcRectangle[2] - srcRectangle[0] + 1) * (srcRectangle[3] - srcRectangle[1] + 1);
         long processedTiles = 0;
         infoLog("需要处理的瓦片总数: {}", totalTiles);
         StopWatch stopWatch = new StopWatch();
@@ -473,17 +473,21 @@ public class GirFuserExec implements FuserExec {
         Map<String, Resource> resourceMap = new ConcurrentHashMap<>();
         IntStream.rangeClosed((int) starty, (int) srcRectangle[3])
                 .parallel()
-                .forEach(gridy -> {
-                    IntStream.rangeClosed((int) srcRectangle[0], (int) srcRectangle[2])
-                            .parallel()
-                            .forEach(gridx -> {
-                                String key = srcIdx + "_" + gridx + "_" + gridy;
-                                Resource blob = layerTileGetter.getTileResource(srcIdx, gridx, gridy);    // tms 原点，找原始
-                                if (blob != null) {
-                                    resourceMap.put(key, blob);
-                                }
-                            });
-                });
+                .forEach(
+                        gridy -> {
+                            IntStream.rangeClosed((int) srcRectangle[0], (int) srcRectangle[2])
+                                    .parallel()
+                                    .forEach(
+                                            gridx -> {
+                                                String key = srcIdx + "_" + gridx + "_" + gridy;
+                                                Resource blob =
+                                                        layerTileGetter.getTileResource(
+                                                                srcIdx, gridx, gridy); // tms 原点，找原始
+                                                if (blob != null) {
+                                                    resourceMap.put(key, blob);
+                                                }
+                                            });
+                        });
         stopWatch.stop();
         stopWatch.start("渲染瓦片renderCanvas");
         // gridy 是瓦片行索引
@@ -517,11 +521,17 @@ public class GirFuserExec implements FuserExec {
                 long[] gridLoc = {gridx, gridy, srcIdx};
                 processedTiles++;
 
-                debugLog("处理瓦片 [{}, {}], 等级索引={}, 进度: {}/{}",
-                        gridx, gridy, srcIdx, processedTiles, totalTiles);
+                debugLog(
+                        "处理瓦片 [{}, {}], 等级索引={}, 进度: {}/{}",
+                        gridx,
+                        gridy,
+                        srcIdx,
+                        processedTiles,
+                        totalTiles);
 
                 // 获取瓦片资源
-//                Resource blob = layerTileGetter.getTileResource(srcIdx, (int) gridx, (int) gridy);
+                //                Resource blob = layerTileGetter.getTileResource(srcIdx, (int)
+                // gridx, (int) gridy);
                 String key = srcIdx + "_" + gridx + "_" + gridy;
                 Resource blob = resourceMap.get(key);
                 if (blob == null) {
@@ -531,16 +541,23 @@ public class GirFuserExec implements FuserExec {
                 resourceMap.remove(key);
                 debugLog("成功获取瓦片资源 - gridx={}, gridy={}", gridx, gridy);
                 String formatName = srcFormat.getMimeType();
-                BufferedImage tileImg = decoderMap.decode(
-                        formatName, blob,
-                        decoderMap.isAggressiveInputStreamSupported(formatName),
-                        null);
+                BufferedImage tileImg =
+                        decoderMap.decode(
+                                formatName,
+                                blob,
+                                decoderMap.isAggressiveInputStreamSupported(formatName),
+                                null);
 
                 if (tileImg == null) {
-                    errorLog("瓦片解码失败 - formatName={}, gridx={}, gridy={}", formatName, gridx, gridy);
+                    errorLog(
+                            "瓦片解码失败 - formatName={}, gridx={}, gridy={}", formatName, gridx, gridy);
                     continue;
                 }
-                debugLog("瓦片解码成功 - 尺寸: {}x{}, 格式: {}", tileImg.getWidth(), tileImg.getHeight(), formatName);
+                debugLog(
+                        "瓦片解码成功 - 尺寸: {}x{}, 格式: {}",
+                        tileImg.getWidth(),
+                        tileImg.getHeight(),
+                        formatName);
 
                 int tilex = 0;
                 int canvasx = (int) (gridx - startx) * gridSubset.getTileWidth();
@@ -571,29 +588,47 @@ public class GirFuserExec implements FuserExec {
                 }
 
                 // 裁剪瓦片到需要的部分
-                if (tileWidth != gridSubset.getTileWidth() || tileHeight != gridSubset.getTileHeight()) {
-                    debugLog("裁剪瓦片 - getSubimage({}, {}, {}, {})", tilex, tiley, tileWidth, tileHeight);
+                if (tileWidth != gridSubset.getTileWidth()
+                        || tileHeight != gridSubset.getTileHeight()) {
+                    debugLog(
+                            "裁剪瓦片 - getSubimage({}, {}, {}, {})",
+                            tilex,
+                            tiley,
+                            tileWidth,
+                            tileHeight);
                     tileImg = tileImg.getSubimage(tilex, tiley, tileWidth, tileHeight);
                 }
 
                 // 将瓦片渲染到大画布上
-                debugLog("绘制瓦片 - 画布位置: ({}, {}), 瓦片位置: [{}, {}, {}]",
-                        canvasx, canvasy, gridx, gridy, srcIdx);
+                debugLog(
+                        "绘制瓦片 - 画布位置: ({}, {}), 瓦片位置: [{}, {}, {}]",
+                        canvasx,
+                        canvasy,
+                        gridx,
+                        gridy,
+                        srcIdx);
                 gfx.drawImage(tileImg, canvasx, canvasy, null);
             }
         }
         stopWatch.stop();
         gfx.dispose();
-        infoLog("画布渲染完成 - 共处理瓦片: {}/{},总耗时: {}", processedTiles, totalTiles, stopWatch.prettyPrint(TimeUnit.SECONDS));
+        infoLog(
+                "画布渲染完成 - 共处理瓦片: {}/{},总耗时: {}",
+                processedTiles,
+                totalTiles,
+                stopWatch.prettyPrint(TimeUnit.SECONDS));
         ;
     }
 
-    /**
-     * 缩放栅格图像到请求的尺寸
-     */
+    /** 缩放栅格图像到请求的尺寸 */
     protected void scaleRaster() {
         if (canvasSize[0] != reqWidth || canvasSize[1] != reqHeight) {
-            infoLog("开始缩放栅格 - 从 {}x{} 缩放到 {}x{}", canvasSize[0], canvasSize[1], reqWidth, reqHeight);
+            infoLog(
+                    "开始缩放栅格 - 从 {}x{} 缩放到 {}x{}",
+                    canvasSize[0],
+                    canvasSize[1],
+                    reqWidth,
+                    reqHeight);
 
             BufferedImage preTransform = canvas;
             canvas = new BufferedImage(reqWidth, reqHeight, preTransform.getType());
@@ -653,7 +688,8 @@ public class GirFuserExec implements FuserExec {
             } catch (Exception e) {
                 errorLog("编码图像时发生异常: {}", e.getMessage(), e);
                 if (finalImage != null) {
-                    ImageUtilities.disposePlanarImageChain(PlanarImage.wrapRenderedImage(finalImage));
+                    ImageUtilities.disposePlanarImageChain(
+                            PlanarImage.wrapRenderedImage(finalImage));
                     debugLog("已释放图像资源");
                 }
                 throw e;
@@ -663,7 +699,10 @@ public class GirFuserExec implements FuserExec {
             }
 
             long endTime = System.currentTimeMillis();
-            infoLog("瓦片融合处理完成 - 耗时: {} ms, 输出大小: {} bytes", (endTime - startTime), imageBytes.length);
+            infoLog(
+                    "瓦片融合处理完成 - 耗时: {} ms, 输出大小: {} bytes",
+                    (endTime - startTime),
+                    imageBytes.length);
             return imageBytes;
 
         } catch (Exception e) {
@@ -678,12 +717,15 @@ public class GirFuserExec implements FuserExec {
             determineSourceResolution();
             determineCanvasLayout();
         }
-        return new RangeApo(srcRectangle[0], srcRectangle[2], srcRectangle[1], srcRectangle[3], (int) srcRectangle[4]);
+        return new RangeApo(
+                srcRectangle[0],
+                srcRectangle[2],
+                srcRectangle[1],
+                srcRectangle[3],
+                (int) srcRectangle[4]);
     }
 
-    /**
-     * 初始化解码器和编码器
-     */
+    /** 初始化解码器和编码器 */
     public void init() {
         infoLog("初始化解码器和编码器");
         decoderMap = new GirImageDecoderContainer(ImageCodecInitializer.getAllDecodersList());

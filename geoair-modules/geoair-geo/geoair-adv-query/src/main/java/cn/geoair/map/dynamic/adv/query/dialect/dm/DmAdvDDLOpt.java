@@ -10,7 +10,6 @@ import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +38,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
 
         String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaName = getOwnerName(tableName);
-        String sql = StrUtil.format(
-                "SELECT COUNT(*) AS \"cnt\" FROM ALL_TABLES WHERE TABLE_NAME = UPPER('{}'){}",
-                nameNotSchema,
-                buildOwnerClause(schemaName));
+        String sql =
+                StrUtil.format(
+                        "SELECT COUNT(*) AS \"cnt\" FROM ALL_TABLES WHERE TABLE_NAME = UPPER('{}'){}",
+                        nameNotSchema,
+                        buildOwnerClause(schemaName));
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }
@@ -55,26 +55,27 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
 
         String owner = getOwnerName(tableName);
         String tableNameUpper = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String sql = StrUtil.format(
-                "SELECT "
-                        + "  col.COLUMN_NAME AS \"column_name\", "
-                        + "  col.DATA_TYPE AS \"udt_name\", "
-                        + "  col.DATA_TYPE AS \"data_type\", "
-                        + "  col.DATA_LENGTH AS \"character_maximum_length\", "
-                        + "  col.DATA_PRECISION AS \"numeric_precision\", "
-                        + "  col.DATA_SCALE AS \"numeric_precision_radix\", "
-                        + "  col.NULLABLE AS \"is_nullable\", "
-                        + "  col.DATA_DEFAULT AS \"column_default\", "
-                        + "  comm.COMMENTS AS \"column_comment\" "
-                        + "FROM ALL_TAB_COLUMNS col "
-                        + "LEFT JOIN ALL_COL_COMMENTS comm "
-                        + "  ON col.OWNER = comm.OWNER "
-                        + "  AND col.TABLE_NAME = comm.TABLE_NAME "
-                        + "  AND col.COLUMN_NAME = comm.COLUMN_NAME "
-                        + "WHERE col.TABLE_NAME = UPPER('{}'){} "
-                        + "ORDER BY col.COLUMN_ID",
-                tableNameUpper,
-                buildOwnerClause(owner, "col.OWNER"));
+        String sql =
+                StrUtil.format(
+                        "SELECT "
+                                + "  col.COLUMN_NAME AS \"column_name\", "
+                                + "  col.DATA_TYPE AS \"udt_name\", "
+                                + "  col.DATA_TYPE AS \"data_type\", "
+                                + "  col.DATA_LENGTH AS \"character_maximum_length\", "
+                                + "  col.DATA_PRECISION AS \"numeric_precision\", "
+                                + "  col.DATA_SCALE AS \"numeric_precision_radix\", "
+                                + "  col.NULLABLE AS \"is_nullable\", "
+                                + "  col.DATA_DEFAULT AS \"column_default\", "
+                                + "  comm.COMMENTS AS \"column_comment\" "
+                                + "FROM ALL_TAB_COLUMNS col "
+                                + "LEFT JOIN ALL_COL_COMMENTS comm "
+                                + "  ON col.OWNER = comm.OWNER "
+                                + "  AND col.TABLE_NAME = comm.TABLE_NAME "
+                                + "  AND col.COLUMN_NAME = comm.COLUMN_NAME "
+                                + "WHERE col.TABLE_NAME = UPPER('{}'){} "
+                                + "ORDER BY col.COLUMN_ID",
+                        tableNameUpper,
+                        buildOwnerClause(owner, "col.OWNER"));
 
         List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sql, FieldBySchemaApo.class);
         List<String> primaryKeys = dGetPrimaryKeys(tableName);
@@ -97,18 +98,19 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
         String owner = getOwnerName(tableName);
         String tableNameUpper = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String ownerClause = buildOwnerClause(owner);
-        String sql = StrUtil.format(
-                "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_CONS_COLUMNS "
-                        + "WHERE TABLE_NAME = UPPER('{}'){} "
-                        + "  AND CONSTRAINT_NAME = ( "
-                        + "      SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS "
-                        + "      WHERE TABLE_NAME = UPPER('{}'){} "
-                        + "        AND CONSTRAINT_TYPE = 'P' "
-                        + "  ) ORDER BY POSITION",
-                tableNameUpper,
-                ownerClause,
-                tableNameUpper,
-                ownerClause);
+        String sql =
+                StrUtil.format(
+                        "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_CONS_COLUMNS "
+                                + "WHERE TABLE_NAME = UPPER('{}'){} "
+                                + "  AND CONSTRAINT_NAME = ( "
+                                + "      SELECT CONSTRAINT_NAME FROM ALL_CONSTRAINTS "
+                                + "      WHERE TABLE_NAME = UPPER('{}'){} "
+                                + "        AND CONSTRAINT_TYPE = 'P' "
+                                + "  ) ORDER BY POSITION",
+                        tableNameUpper,
+                        ownerClause,
+                        tableNameUpper,
+                        ownerClause);
 
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> pks = new ArrayList<>();
@@ -124,14 +126,15 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
 
         String owner = getOwnerName(tableName);
         String tableNameUpper = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String sql = StrUtil.format(
-                "SELECT "
-                        + "INDEX_NAME AS \"indexname\", "
-                        + "TABLE_NAME AS \"tablename\", "
-                        + "UNIQUENESS AS \"indexdef\" "
-                        + "FROM ALL_INDEXES WHERE TABLE_NAME = UPPER('{}'){}",
-                tableNameUpper,
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT "
+                                + "INDEX_NAME AS \"indexname\", "
+                                + "TABLE_NAME AS \"tablename\", "
+                                + "UNIQUENESS AS \"indexdef\" "
+                                + "FROM ALL_INDEXES WHERE TABLE_NAME = UPPER('{}'){}",
+                        tableNameUpper,
+                        buildOwnerClause(owner));
         return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
 
@@ -144,7 +147,10 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
 
     @Override
     public String dGetCurrentDataBase() {
-        GirAdvOneRow row = getAdvBaseOpt().bSelectOne("SELECT SYS_CONTEXT('USERENV', 'DB_NAME') AS \"database_name\" FROM DUAL");
+        GirAdvOneRow row =
+                getAdvBaseOpt()
+                        .bSelectOne(
+                                "SELECT SYS_CONTEXT('USERENV', 'DB_NAME') AS \"database_name\" FROM DUAL");
         if (row != null) {
             String dbName = row.getStr("database_name");
             if (StrUtil.isNotEmpty(dbName)) {
@@ -156,7 +162,10 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
 
     @Override
     public List<String> dGetAllSchemas() {
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList("SELECT USERNAME AS \"schema_name\" FROM ALL_USERS ORDER BY USERNAME");
+        List<GirAdvOneRow> rows =
+                getAdvBaseOpt()
+                        .bSelectList(
+                                "SELECT USERNAME AS \"schema_name\" FROM ALL_USERS ORDER BY USERNAME");
         List<String> schemas = new ArrayList<>();
         rows.forEach(row -> schemas.add(row.getStr("schema_name")));
         return schemas;
@@ -166,10 +175,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
     public String dGetTableComment(String tableName) {
         String tableNameUpper = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String owner = getOwnerName(tableName);
-        String sql = StrUtil.format(
-                "SELECT COMMENTS AS \"comments\" FROM ALL_TAB_COMMENTS WHERE TABLE_NAME = UPPER('{}'){}",
-                tableNameUpper,
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT COMMENTS AS \"comments\" FROM ALL_TAB_COMMENTS WHERE TABLE_NAME = UPPER('{}'){}",
+                        tableNameUpper,
+                        buildOwnerClause(owner));
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row == null ? "" : row.getStr("comments");
     }
@@ -177,9 +187,10 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
     @Override
     public List<String> dGetTablesBySchema(String schemaName) {
         String owner = normalizeOwner(schemaName);
-        String sql = StrUtil.format(
-                "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TABLES{} ORDER BY TABLE_NAME",
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TABLES{} ORDER BY TABLE_NAME",
+                        buildOwnerClause(owner));
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> tables = new ArrayList<>();
         rows.forEach(row -> tables.add(row.getStr("table_name")));
@@ -194,10 +205,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
     @Override
     public List<SchemaTableApo> dGetTableAndViewBySchema(String schemaName) {
         String owner = normalizeOwner(schemaName);
-        String sql = StrUtil.format(
-                "SELECT OBJECT_NAME AS \"object_name\", OBJECT_TYPE AS \"object_type\", OWNER AS \"owner\" "
-                        + "FROM ALL_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW'){} ORDER BY OBJECT_NAME",
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT OBJECT_NAME AS \"object_name\", OBJECT_TYPE AS \"object_type\", OWNER AS \"owner\" "
+                                + "FROM ALL_OBJECTS WHERE OBJECT_TYPE IN ('TABLE', 'VIEW'){} ORDER BY OBJECT_NAME",
+                        buildOwnerClause(owner));
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<SchemaTableApo> result = new ArrayList<>();
         for (GirAdvOneRow row : rows) {
@@ -230,10 +242,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
         }
         String notSchemaTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String owner = getOwnerName(tableName);
-        String sql = StrUtil.format(
-                "SELECT SUM(BYTES) AS \"table_size\" FROM ALL_SEGMENTS WHERE SEGMENT_NAME = UPPER('{}') AND SEGMENT_TYPE = 'TABLE'{}",
-                notSchemaTableName,
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT SUM(BYTES) AS \"table_size\" FROM ALL_SEGMENTS WHERE SEGMENT_NAME = UPPER('{}') AND SEGMENT_TYPE = 'TABLE'{}",
+                        notSchemaTableName,
+                        buildOwnerClause(owner));
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null ? row.getLong("table_size") : null;
     }
@@ -245,10 +258,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
         }
         String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(functionName);
         String owner = getOwnerName(functionName);
-        String sql = StrUtil.format(
-                "SELECT COUNT(*) AS \"cnt\" FROM ALL_OBJECTS WHERE OBJECT_NAME = UPPER('{}') AND OBJECT_TYPE = 'FUNCTION'{}",
-                nameNotSchema,
-                buildOwnerClause(owner));
+        String sql =
+                StrUtil.format(
+                        "SELECT COUNT(*) AS \"cnt\" FROM ALL_OBJECTS WHERE OBJECT_NAME = UPPER('{}') AND OBJECT_TYPE = 'FUNCTION'{}",
+                        nameNotSchema,
+                        buildOwnerClause(owner));
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
         return row != null && row.getInt("cnt") > 0;
     }

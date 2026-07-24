@@ -9,8 +9,7 @@ import lombok.Getter;
  * @description：
  */
 @Getter
-public enum OriginType  implements GiVisualValuable<String> {
-
+public enum OriginType implements GiVisualValuable<String> {
     TMS("tms"),
     Google("wmts");
 
@@ -20,9 +19,7 @@ public enum OriginType  implements GiVisualValuable<String> {
         this.mode = mode;
     }
 
-    /**
-     * 根据mode值获取枚举
-     */
+    /** 根据mode值获取枚举 */
     public static OriginType fromMode(String mode) {
         for (OriginType type : OriginType.values()) {
             if (type.mode.equals(mode)) {
@@ -32,16 +29,12 @@ public enum OriginType  implements GiVisualValuable<String> {
         return Google;
     }
 
-    /**
-     * 判断是否为网络类型
-     */
+    /** 判断是否为网络类型 */
     public boolean isGoogle() {
         return this == Google;
     }
 
-    /**
-     * 判断是否为本地类型
-     */
+    /** 判断是否为本地类型 */
     public boolean isTMS() {
         return this == TMS;
     }

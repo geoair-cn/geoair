@@ -75,6 +75,4 @@ public class RangeApo {
     public Envelope getEnvelope() {
         return envelope;
     }
-
-
 }
