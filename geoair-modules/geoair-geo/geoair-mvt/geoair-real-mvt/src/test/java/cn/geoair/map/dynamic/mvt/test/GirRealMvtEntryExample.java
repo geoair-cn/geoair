@@ -25,7 +25,6 @@ public class GirRealMvtEntryExample {
                 VectorTileExecutorV2.getInstance(requestParams, "road_layer");
         TileGlobalConfig config = executor.getTileGlobalConfig();
 
-        System.out.println("param check = " + result.isPass());
         System.out.println("config layerName = " + config.getLayerName());
         System.out.println("config version = " + config.getVersion());
     }

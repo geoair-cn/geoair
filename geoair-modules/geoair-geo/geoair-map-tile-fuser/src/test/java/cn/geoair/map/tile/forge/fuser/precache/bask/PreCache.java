@@ -3,10 +3,10 @@ package cn.geoair.map.tile.forge.fuser.precache.bask;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
+import cn.geoair.web.mime.GirImageMime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,7 +56,11 @@ public class PreCache {
     }
 
     public void executePreCache(
-            PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+            PxyLayerInfo config,
+            String wkt4326String,
+            int minZoom,
+            int maxZoom,
+            GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, false);
     }
 
@@ -66,7 +70,11 @@ public class PreCache {
     }
 
     public void executePreCheck(
-            PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, ImageMime format) {
+            PxyLayerInfo config,
+            String wkt4326String,
+            int minZoom,
+            int maxZoom,
+            GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, true);
     }
 
@@ -75,7 +83,7 @@ public class PreCache {
             String wkt4326String,
             int minZoom,
             int maxZoom,
-            ImageMime format,
+            GirImageMime format,
             boolean isPreCheck) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
@@ -83,7 +91,7 @@ public class PreCache {
         }
 
         if (format == null) {
-            format = ImageMime.png;
+            format = GirImageMime.png;
         }
         Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
 

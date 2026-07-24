@@ -16,11 +16,10 @@ import cn.geoair.map.tile.forge.fuser.precache.TileCoordinate;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.LargeBlankCheck;
 import cn.geoair.map.tile.forge.fuser.utils.TileBlankDetector;
+import cn.geoair.web.mime.GirImageMime;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-
-import cn.geoair.web.mime.GirImageMime;
 import org.locationtech.jts.geom.Geometry;
 
 /**

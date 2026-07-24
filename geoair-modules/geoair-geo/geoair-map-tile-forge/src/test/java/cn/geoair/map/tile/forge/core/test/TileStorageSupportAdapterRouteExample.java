@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
+import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import java.util.Optional;
 
 /** TileStorageSupportAdapter 路由示例 */
@@ -17,6 +18,27 @@ public class TileStorageSupportAdapterRouteExample {
                     @Override
                     public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
                         return Optional.empty();
+                    }
+
+                    @Override
+                    public Optional<GirLayerConfigContext> getGirLayerConfigContext(
+                            GirMapTileType mapTileType,
+                            String layerName,
+                            String dataId,
+                            String fileName) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public LayerPerFileDao getLayerPerFileDao(
+                            GirLayerConfigContext layerConfigContext) {
+                        return null;
+                    }
+
+                    @Override
+                    public Long getLayerPerCacheBatchSize(
+                            GirLayerConfigContext layerConfigContext) {
+                        return 0L;
                     }
                 };
 
