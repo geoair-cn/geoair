@@ -3,16 +3,16 @@ package cn.geoair.base.test;
 import cn.geoair.base.data.result.support.GirResult;
 
 /**
- * GirResult 最小示例
+ * GirResult 示例
  */
 public class GirResultExample {
 
     public static void main(String[] args) {
         GirResult<String> result = new GirResult<>();
-        result.forSuccess().andAlertMsg("操作成功").andValue("data");
+        result.andCode(200).andAlertMsg("ok").andValue("hello-base");
 
-        System.out.println("code = " + result.getCode());
-        System.out.println("alertMsg = " + result.getAlertMsg());
-        System.out.println("data = " + result.getData());
+        System.out.println("code = " + result.code());
+        System.out.println("msg = " + result.alertMsg());
+        System.out.println("value = " + result.value());
     }
 }

@@ -1,191 +1,115 @@
 ## 模块定位
 
-`geoair-mvt` 负责矢量瓦片相关能力，但内部并不是一个单体模块，而是按用途拆成了三层：
+`geoair-mvt` 是 GeoAir 中与矢量瓦片相关的模块总览页。
 
-- `geoair-mvt-tools`：矢量瓦片工具层
+它不是单一实现，而是一组分层能力的组合：
+
+- `geoair-mvt-tools`：工具层
 - `geoair-real-mvt`：实时矢量瓦片服务层
-- `geoair-static-mvt-spark`：离线批量生成层
+- `geoair-static-mvt-spark`：基于 Java + Spark 的静态切片层
 
-如果只看功能边界，这个模块更像一套“从几何数据到 PBF 瓦片”的处理链，而不是单个工具类。
+其中一个非常重要的特性是：**这套模块同时支持 4490 网格与 3857 网格**。
 
-## 模块结构
+这意味着：
 
-### geoair-mvt-tools
+- 在更偏互联网地图体系时，可以直接走 3857
+- 在更偏国内测绘 / 天地图 / 地理坐标网格体系时，也可以走 4490
+- 实时服务和离线切片都能围绕这两套网格组织瓦片范围与输出逻辑
 
-这一层偏算法与转换工具，负责：
+这三层合在一起，覆盖了从“瓦片范围计算”到“实时服务输出”再到“离线批量切片”的整条链路。
 
-- 几何到屏幕坐标的转换
-- 要素密度控制
-- 瓦片范围与执行参数计算
-- PBF 相关工具能力
+## 三层职责划分
 
-关键类：
+### 1. geoair-mvt-tools
 
-- `PipelineBuilder`
+负责：
+
+- 当前瓦片范围计算
+- 坐标到屏幕坐标转换
+- 几何简化
+- 瓦片执行参数组织
+
+典型类：
+
 - `AdvMvtTileUtils`
+- `PipelineBuilder`
 - `AdvMvtDensityUtils`
 
-对应测试示例：
+对应测试：
 
 - `AdvMvtTileUtilsExample`
 - `PipelineBuilderExample`
 
-### geoair-real-mvt
+### 2. geoair-real-mvt
 
-这一层偏在线实时服务，负责：
+负责：
 
-- 接收瓦片请求参数
-- 计算当前请求的瓦片范围
+- 接收实时瓦片请求
+- 组织 `TileRequestParams`
+- 构建 `VectorTileExecutorV2`
 - 查询数据库中的 Geometry
-- 进行裁剪、简化、密度控制
-- 输出实时 PBF
+- 实时返回 PBF 矢量瓦片
 
-关键类：
+对应独立页面：
 
-- `GirRealMvtHelper`
-- `VectorTileExecutorV2`
-- `TileRequestParams`
-- `TileGlobalConfig`
-- `TileExecutorConfig`
+- `real-mvt`
 
-对应测试示例：
+### 3. geoair-static-mvt-spark
 
+负责：
+
+- 用 Java + Spark 组织离线切片任务
+- 通过 `TileSliceParameter` 描述切片任务
+- 读取空间数据、映射瓦片、聚合、生成 PBF 并写出
+- 作为一种在 Java 体系内替代 `tippecanoe` 的切片方案
+
+对应独立页面：
+
+- `static-mvt-spark`
+
+## 适合怎样阅读
+
+如果目标是快速理解整个模块，建议按下面顺序：
+
+1. 先看 `geoair-mvt-tools`
+2. 再看 `geoair-real-mvt`
+3. 最后看 `geoair-static-mvt-spark`
+
+这样更容易把：
+
+- 工具层
+- 在线实时层
+- 离线切片层
+
+三者的关系看清楚。
+
+## GitHub 源码入口
+
+- 模块目录：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt`
+- `geoair-mvt-tools`：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-mvt-tools`
+- `geoair-real-mvt`：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-real-mvt`
+- `geoair-static-mvt-spark`：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark`
+
+## 对应测试入口
+
+- `AdvMvtTileUtilsExample`
+- `PipelineBuilderExample`
 - `GirRealMvtEntryExample`
 - `TileRequestParamsExample`
 - `TileExecutorConfigExample`
 - `TileGlobalConfigExample`
-
-### geoair-static-mvt-spark
-
-这一层偏离线批处理，负责：
-
-- 从数据库批量读取空间数据
-- 计算每个要素对应的瓦片范围
-- 生成 PBF 并写入目标存储
-- 统计瓦片数据
-
-关键类：
-
-- `SparkVectorTileGenerator`
-- `SparkVectorTileGeneratorAll`
-- `VectorTileCommonUtils`
-- `SparkTaskSerializableUtil`
-- `TileSliceParameter`
-
-对应测试示例：
-
 - `TileSliceParameterExample`
 
-## 核心入口
+## 阅读建议
 
-### 实时服务入口
+如果重点是：
 
-```java
-GirRealMvtHelper helper = GirRealMvtHelper.getInstance();
-```
+- **在线服务**：优先进入 `real-mvt`
+- **离线切片**：优先进入 `static-mvt-spark`
+- **工具链路**：优先进入 `geoair-mvt-tools`
 
-### 实时执行器入口
-
-```java
-VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, layerName);
-```
-
-### 工具层入口
-
-```java
-Envelope tileEnvelope = AdvMvtTileUtils.getTileRect(level, x, y, sourceGrid);
-TileExecParams params = AdvMvtTileUtils.getTileExecParamsNotHasSql(level, x, y, sourceGrid, sourceDataSrid);
-```
-
-### 离线生成入口
-
-```java
-SparkVectorTileGenerator generator = new SparkVectorTileGenerator(sparkSession);
-generator.doGenerate(parameter);
-```
-
-## 实时服务链路
-
-实时矢量瓦片的核心过程可以概括成：
-
-1. 前端传入 `layerName / z / x / y / paramTile`
-2. `TileRequestParams` 解析参数
-3. `VectorTileExecutorV2` 根据层级、范围、SRID 和输出字段组装 SQL
-4. 使用 `ST_Intersects` 把数据库中的 Geometry 裁到当前瓦片范围
-5. 通过 `VectorTileBuilderConsumer` 组织为 MVT 要素
-6. 输出 PBF 字节流
-
-## 核心 API 示例
-
-### 示例1：根据瓦片坐标计算瓦片范围
-
-```java
-Envelope tileEnvelope = AdvMvtTileUtils.getTileRect(10, 845, 388, 4326);
-TileExecParams params = AdvMvtTileUtils.getTileExecParamsNotHasSql(10, 845, 388, 4326, 4326);
-```
-
-对应测试：`AdvMvtTileUtilsExample`
-
-### 示例2：获取实时 MVT 辅助入口
-
-```java
-GirRealMvtHelper helper = GirRealMvtHelper.getInstance();
-TileRequestParams requestParams = helper.getTileRequestParams("road_layer");
-ParamCheckResult result = helper.checkTileRequestParams(requestParams, "road_layer");
-```
-
-对应测试：`GirRealMvtEntryExample`
-
-### 示例3：构建实时瓦片执行器
-
-```java
-VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, "road_layer");
-TileGlobalConfig config = executor.getTileGlobalConfig();
-```
-
-对应测试：`GirRealMvtEntryExample`、`TileGlobalConfigExample`
-
-### 示例4：执行器配置对象
-
-```java
-TileExecutorConfig config = new TileExecutorConfig()
-    .setLowLevelOptStrategy(TileExecutorConfig.LowLevelOptStrategy.PAGING)
-    .setDensityOptStrategy(TileExecutorConfig.DensityOptStrategy.DENSITY_MERGING);
-```
-
-对应测试：`TileExecutorConfigExample`
-
-### 示例5：离线 Spark 生成参数
-
-```java
-TileSliceParameter parameter = new TileSliceParameter()
-    .setLayerName("road_layer")
-    .setMinZoom(6)
-    .setMaxZoom(14);
-```
-
-对应测试：`TileSliceParameterExample`
-
-## 核心源码入口
-
-- GitHub 源码目录：
-  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt`
-- `geoair-mvt-tools`：
-  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-mvt-tools/src/main/java/cn/geoair/map/dynamic/mvt/tools`
-- `geoair-real-mvt`：
-  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-real-mvt/src/main/java/cn/geoair/map/dynamic/mvt`
-- `geoair-static-mvt-spark`：
-  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/main/java/cn/geoair/map/dynamic/statics/mvt/spark`
-
-## 测试建议
-
-建议优先从以下顺序阅读：
-
-1. `AdvMvtTileUtilsExample`
-2. `GirRealMvtEntryExample`
-3. `TileRequestParamsExample`
-4. `TileExecutorConfigExample`
-5. `TileGlobalConfigExample`
-6. `TileSliceParameterExample`
-
-这样可以从工具层一路读到实时服务层，再进入离线切片层。
+这页只负责总览，不再承担所有实现细节。

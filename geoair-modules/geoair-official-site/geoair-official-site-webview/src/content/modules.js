@@ -94,9 +94,24 @@ const standardModules = [
         description: '展示 GirBeanHelper 默认入口与兜底逻辑。'
       },
       {
+        title: 'GirPropertyHelperExample',
+        path: 'geoair-standard/geoair-base/src/test/java/cn/geoair/base/test/GirPropertyHelperExample.java',
+        description: '展示 GirPropertyHelper 如何通过 method hand 获取属性实现。'
+      },
+      {
+        title: 'GirEnvironmentHelperExample',
+        path: 'geoair-standard/geoair-base/src/test/java/cn/geoair/base/test/GirEnvironmentHelperExample.java',
+        description: '展示 GirEnvironmentHelper 如何通过 method hand 获取环境实现。'
+      },
+      {
         title: 'GirCacheHelper',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-base/src/main/java/cn/geoair/base/cache',
         description: '缓存辅助类相关目录。'
+      },
+      {
+        title: 'GirPropertyHelper / GirEnvironmentHelper',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-base/src/main/java/cn/geoair/base/env',
+        description: '环境与属性读取相关目录。'
       },
       {
         title: 'GiResult / GirResultExample',
@@ -120,6 +135,11 @@ const standardModules = [
         description: 'Spring 容器适配目录。'
       },
       {
+        title: 'SpringEnvironment4GirExample',
+        path: 'geoair-standard/geoair-core/src/test/java/cn/geoair/spi/test/SpringEnvironment4GirExample.java',
+        description: '展示环境变量与属性访问的最小用法。'
+      },
+      {
         title: 'Cache4Gir',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-core/src/main/java/cn/geoair/spi/cache',
         description: '缓存 SPI 实现目录。'
@@ -128,6 +148,21 @@ const standardModules = [
         title: 'GirJacksonJsonExample',
         path: 'geoair-standard/geoair-core/src/test/java/cn/geoair/spi/test/GirJacksonJsonExample.java',
         description: '展示 GirJacksonJson 的最小 JSON 序列化入口。'
+      },
+      {
+        title: 'GirFastJsonExample',
+        path: 'geoair-standard/geoair-core/src/test/java/cn/geoair/spi/test/GirFastJsonExample.java',
+        description: '展示 GirFastJson 的最小 JSON 入口与路径读取。'
+      },
+      {
+        title: 'Log4GirExample',
+        path: 'geoair-standard/geoair-core/src/test/java/cn/geoair/spi/test/Log4GirExample.java',
+        description: '展示 Log4Gir 选择实现后的统一日志入口。'
+      },
+      {
+        title: 'GirFastJson / GirGsonJson / GirHutoolJson',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-core/src/main/java/cn/geoair/spi/json',
+        description: '其他 JSON 实现目录。'
       }
     ],
     related: ['base', 'web']
@@ -146,7 +181,7 @@ const standardModules = [
         description: 'Web 门面入口与核心目录。'
       },
       {
-        title: 'GirCookieSession / GirTokenSession',
+        title: 'GirCookieSession / GirHttpSession / GirTokenSession',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web/session',
         description: '会话管理相关目录。'
       },
@@ -154,6 +189,16 @@ const standardModules = [
         title: 'GirWebResult',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web/data/result',
         description: 'Web 结果模型目录。'
+      },
+      {
+        title: 'GirWebResultExample',
+        path: 'geoair-standard/geoair-web/src/test/java/cn/geoair/web/test/GirWebResultExample.java',
+        description: '展示 GirWebResult 的最小使用方式。'
+      },
+      {
+        title: 'GirWebPageParamProvider',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-web/src/main/java/cn/geoair/web/data/page',
+        description: '分页参数提供器目录。'
       }
     ],
     related: ['base', 'core']
@@ -316,9 +361,10 @@ const geoModules = [
     route: '/modules/geo/mvt',
     title: 'geoair-mvt',
     group: 'geo',
-    summary: '矢量瓦片相关模块集合，覆盖实时 MVT、离线 Spark 生成和工具层处理。',
+    summary: '矢量瓦片模块总览页，负责串起工具层、实时矢量瓦片和 Spark 静态切片三个部分。',
     tags: ['MVT', '矢量瓦片', 'Spark'],
     related: ['geo-tools', 'map-tile-forge', 'map-tile-fuser'],
+    children: ['real-mvt', 'static-mvt-spark'],
     sourceExamples: [
       {
         title: 'AdvMvtTileUtilsExample',
@@ -331,36 +377,78 @@ const geoModules = [
         description: '展示 PipelineBuilder 的坐标转换与几何简化流程。'
       },
       {
-        title: 'GirRealMvtEntryExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
-        description: '展示 geoair-real-mvt 中的 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 入口。'
-      },
-      {
-        title: 'TileRequestParamsExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
-        description: '展示 TileRequestParams 的参数组织与 Base32 编解码。'
-      },
-      {
-        title: 'TileExecutorConfigExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileExecutorConfigExample.java',
-        description: '展示 TileExecutorConfig 的低级别优化策略和密度优化策略配置。'
-      },
-      {
-        title: 'TileGlobalConfigExample',
-        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileGlobalConfigExample.java',
-        description: '展示 TileGlobalConfig 如何组合 TileRequestParams、TileExecParams 和 TileExecutorConfig。'
-      },
-      {
-        title: 'TileSliceParameterExample',
-        path: 'geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/test/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/test/TileSliceParameterExample.java',
-        description: '展示 TileSliceParameter 的离线切片参数组织与 Base32 编解码。'
-      },
-      {
         title: 'geoair-mvt GitHub 目录',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt',
         description: '直接跳到 geoair-mvt 模块目录。'
       }
     ]
+  },
+  {
+    slug: 'real-mvt',
+    route: '/modules/geo/mvt/real-mvt',
+    title: 'geoair-real-mvt',
+    group: 'geo',
+    summary: '实时矢量瓦片服务层，负责请求参数组织、执行器构建、数据库查询与实时 PBF 输出，并支持 4490 / 3857 双网格。',
+    tags: ['实时矢量瓦片', 'MVT', 'PBF'],
+    sourceExamples: [
+      {
+        title: 'GirRealMvtEntryExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
+        description: '展示 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 的入口。'
+      },
+      {
+        title: 'TileRequestParamsExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileRequestParamsExample.java',
+        description: '展示实时瓦片请求参数的组织与 Base32 编解码。'
+      },
+      {
+        title: 'TileExecutorConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileExecutorConfigExample.java',
+        description: '展示执行器配置对象的常见参数。'
+      },
+      {
+        title: 'TileGlobalConfigExample',
+        path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/TileGlobalConfigExample.java',
+        description: '展示 TileGlobalConfig 如何组合请求参数、执行参数与执行器配置。'
+      },
+      {
+        title: 'geoair-real-mvt GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-real-mvt',
+        description: '直接跳到 geoair-real-mvt 模块目录。'
+      }
+    ],
+    related: ['mvt', 'static-mvt-spark', 'geo-tools']
+  },
+  {
+    slug: 'static-mvt-spark',
+    route: '/modules/geo/mvt/static-mvt-spark',
+    title: 'geoair-static-mvt-spark',
+    group: 'geo',
+    summary: '基于 Java + Spark 的静态矢量瓦片切片层，负责离线切片任务参数组织、任务启动和 PBF 生成。',
+    tags: ['Spark 静态切片', 'MVT', 'Tippecanoe 替代'],
+    sourceExamples: [
+      {
+        title: 'TileSliceParameterExample',
+        path: 'geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/test/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/test/TileSliceParameterExample.java',
+        description: '展示离线切片参数对象的组织与 Base32 编解码。'
+      },
+      {
+        title: 'SparkJavaTileLocalApp',
+        path: 'https://github.com/geoair-cn/geoair/blob/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/main/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/SparkJavaTileLocalApp.java',
+        description: '本地 Spark 模式启动静态切片的入口。'
+      },
+      {
+        title: 'SparkVectorTileGenerator',
+        path: 'https://github.com/geoair-cn/geoair/blob/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark/src/main/java/cn/geoair/map/dynamic/statics/mvt/spark/vectile/impl/SparkVectorTileGenerator.java',
+        description: '静态矢量瓦片主执行器。'
+      },
+      {
+        title: 'geoair-static-mvt-spark GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-mvt/geoair-static-mvt-spark',
+        description: '直接跳到 geoair-static-mvt-spark 模块目录。'
+      }
+    ],
+    related: ['mvt', 'real-mvt', 'geo-tools']
   },
   {
     slug: 'map-tile-forge',
@@ -546,15 +634,15 @@ const businessModules = [
     route: '/modules/geo',
     title: 'geoair-geo',
     group: 'business',
-    summary: 'GeoAir 最核心的 GIS 能力集合，覆盖坐标转换、空间查询、文件互转、瓦片、GeoServer 与缓存直读。',
+    summary: 'GIS 相关模块集合，覆盖坐标、查询、文件转换、矢量瓦片、瓦片读取与瓦片融合。',
     tags: ['GIS 核心', 'GeoTools', '空间处理'],
-    capabilities: [
-      '提供统一的空间处理与空间服务能力。',
-      '下含多个可独立接入的 GIS 子模块。',
-      '是构建地图平台、空间分析和空间服务的核心基础。'
+    sourceExamples: [
+      {
+        title: 'geoair-geo GitHub 目录',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo',
+        description: '直接跳到 geoair-geo 模块目录。'
+      }
     ],
-    quickStart: `<dependency>\n  <groupId>cn.geoair.devkit</groupId>\n  <artifactId>geoair-geo-tools</artifactId>\n  <version>J17-dev-SNAPSHOT</version>\n</dependency>`,
-    example: '如果你的项目要处理坐标、Geometry、空间查询或瓦片服务，geoair-geo 是最先需要了解的模块组。',
     related: geoModules.map(item => item.slug),
     children: geoModules.map(item => item.slug)
   },

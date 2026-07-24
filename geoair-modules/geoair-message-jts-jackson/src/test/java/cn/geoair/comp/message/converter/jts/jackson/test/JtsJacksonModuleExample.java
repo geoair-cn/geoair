@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.locationtech.jts.geom.Envelope;
 
 /**
- * JTS + Jackson module 注册示例
+ * JtsExtModule 示例
  */
 public class JtsJacksonModuleExample {
 

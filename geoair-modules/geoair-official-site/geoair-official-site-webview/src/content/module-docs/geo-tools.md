@@ -134,4 +134,4 @@ String quadKey = GirGeoTools.defaultInstance()
 3. 然后看测量与 SRID
 4. 最后看瓦片与 QuadKey
 
-如果你需要直接对照 Java 示例，优先查看 `src/test/java/cn/geoair/map/dynamic/tools/test` 下的示例类。
+如果需要直接对照 Java 示例，可优先查看 `src/test/java/cn/geoair/map/dynamic/tools/test` 下的示例类。

@@ -6,7 +6,7 @@
 - 怎么定义主页信息
 - 怎么把这套配置接到 Spring 容器里
 
-如果你需要给项目中的不同控制器包做文档分组，或者希望统一定义文档标题、描述、作者和版本，这个模块就是入口。
+适用场景包括：
 
 ## 核心类
 
@@ -19,7 +19,7 @@
 
 ### GirOpenApiConfig
 
-这是抽象配置基类。通常你的项目会：
+这是抽象配置基类。通常项目会：
 
 - 继承它
 - 覆盖 `getDocketInfos()`
@@ -43,9 +43,9 @@
 - 作者
 - 版本
 
-## 你的项目示例
+## 项目示例
 
-你给的配置示例可以直接放到这里作为项目里的典型写法：
+下面这段配置可以作为项目中的典型写法：
 
 ```java
 @Configuration
@@ -54,13 +54,13 @@ public class Swagger2Configuration extends GtcOpenApiConfig {
     @Override
     public List<DocketInfo> getDocketInfos() {
         return ListUtil.of(
-                new DocketInfo("user", "com.gtc.gishubteam.jwyt"),
+                new DocketInfo("user", "com.gtc.gishubteam.my-service"),
                 new DocketInfo("admin", "com.gtc.gishubteam.admin.auth.controller"));
     }
 
     @Override
     public ApiModelInfo getApiModelInfo() {
-        return new ApiModelInfo("jwyt在线文档", "jwyt在线文档", "jwyt", "1.0");
+        return new ApiModelInfo("my-service在线文档", "my-service在线文档", "my-service", "1.0");
     }
 }
 ```
