@@ -91,7 +91,7 @@
 
 ```java
 @RestController
-@RequestMapping("jwyt/tile/fuser")
+@RequestMapping("my-service/tile/fuser")
 public class TileServiceTranController extends TileServiceTran {
 
     @GetMapping("/{layerName}/{dataId}/{verify}/{sourceSrid}/{z}/{x}/{y}")

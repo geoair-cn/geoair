@@ -54,13 +54,13 @@ public class Swagger2Configuration extends GtcOpenApiConfig {
     @Override
     public List<DocketInfo> getDocketInfos() {
         return ListUtil.of(
-                new DocketInfo("user", "com.gtc.gishubteam.jwyt"),
+                new DocketInfo("user", "com.gtc.gishubteam.my-service"),
                 new DocketInfo("admin", "com.gtc.gishubteam.admin.auth.controller"));
     }
 
     @Override
     public ApiModelInfo getApiModelInfo() {
-        return new ApiModelInfo("jwyt在线文档", "jwyt在线文档", "jwyt", "1.0");
+        return new ApiModelInfo("my-service在线文档", "my-service在线文档", "my-service", "1.0");
     }
 }
 ```

@@ -2,22 +2,20 @@ package cn.geoair.comp.message.converter.jts.mybatis.test;
 
 import cn.geoair.comp.message.converter.jts.mybatis.typehander.PgGeometryTypeHandler;
 import org.apache.ibatis.type.JdbcType;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.WKTReader;
 
 /**
- * Geometry TypeHandler 示例
+ * PgGeometryTypeHandler 示例
  */
 public class PgGeometryTypeHandlerExample {
 
-    public static void main(String[] args) {
-        GeometryFactory factory = new GeometryFactory();
-        Geometry point = factory.createPoint(new Coordinate(116.40, 39.90));
+    public static void main(String[] args) throws Exception {
         PgGeometryTypeHandler handler = new PgGeometryTypeHandler();
+        Geometry geometry = new WKTReader().read("POINT (116.40 39.90)");
 
         System.out.println("handler = " + handler.getClass().getSimpleName());
-        System.out.println("mapped geometry = " + point);
+        System.out.println("geometry = " + geometry);
         System.out.println("jdbcType = " + JdbcType.OTHER);
     }
 }

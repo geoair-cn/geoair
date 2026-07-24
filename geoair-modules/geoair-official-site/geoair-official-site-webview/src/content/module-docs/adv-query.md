@@ -103,7 +103,79 @@
 
 统一聚合成一个基础操作总接口。
 
-所以当你看到实现类同时具备查、增、改、删能力时，本质上就是通过 `IAdvBaseOpt` 把这四组基础接口拼起来了。
+所以当实现类同时具备查、增、改、删能力时，本质上就是通过 `IAdvBaseOpt` 把这四组基础接口拼起来了。
+
+## Spring 集成方式
+
+`adv-query` 并不只是工具层或手动构造执行器，在 Spring 环境中也提供了一整套自动装配链。
+
+### 启用入口
+
+核心注解：
+
+- `EnableGirAdvDynamic`
+
+通过启用这个注解，可以触发：
+
+- `AdvAutoConfiguration`
+
+### 自动装配逻辑
+
+`AdvAutoConfiguration` 的作用是：
+
+1. 检查 Spring 环境中是否已经有 `DataSource`
+2. 读取当前数据源
+3. 根据数据源类型创建默认 `IAdvExecutor`
+4. 再把它包装成 `GirSpringAdvExecutor`
+5. 最终让 Spring 容器里可以直接获取：
+   - `IAdvExecutor`
+   - `GirSpringAdvExecutor`
+
+也就是说，在 Spring 环境中：
+
+- 不一定每次都要手动 `AdvExecutorFactory.getAdvExecutorByDataSource(...)`
+- 默认情况下可以依赖自动装配
+
+### Spring 环境下的快速使用方式
+
+如果项目里已经启用了自动装配，那么业务代码里可以直接使用：
+
+```java
+GirSpringAdvExecutor.getInstance().bSelectList(...)
+```
+
+或者直接获取：
+
+```java
+IAdvExecutor executor = GirSpringAdvExecutor.getExecutorInstance();
+```
+
+这样就能在 Spring 环境下任意位置直接访问当前数据源对应的高级查询能力。
+
+### Spring 配置示例
+
+下面这段写法就是一个典型的 Spring 自动装配入口：
+
+```java
+@Configuration
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+public class AdvAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean(IAdvExecutor.class)
+    public IAdvExecutor springAdvExecutor(ObjectProvider<DataSource> dataSourceProvider) {
+        DataSource dataSource = dataSourceProvider.getIfAvailable();
+        IAdvExecutor advExecutorByDataSource =
+                AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, "master_by_spring");
+        return new GirSpringAdvExecutor(advExecutorByDataSource);
+    }
+}
+```
+
+它的核心意义是：
+
+- 让 `adv-query` 能自然接进 Spring Boot 的默认数据源体系
+- 让上层业务代码不需要反复自己 new 执行器
 
 ## typehandler 使用与注册逻辑
 
@@ -193,6 +265,7 @@ preparedStatement.setObject(index, jdbcValue);
 - 自定义 SQL + 统一分页封装
 - 需要把查询能力抽成通用层的 GIS 服务
 - 需要在 JDBC 写入 / 查询过程中自动处理 Geometry 参数与结果
+- 需要在 Spring 环境中直接把当前数据源自动挂成 `IAdvExecutor`
 
 ## 真实示例位置
 
@@ -308,6 +381,8 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query`
 - 示例目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test`
+- Spring 集成目录：
+  - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/spring`
 - typehandler 目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/query/typehandler`
 - 参数绑定目录：
@@ -321,8 +396,10 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
 2. `LambdaFilterExample`
 3. `GirAdvQueryRequestExample`
 4. `GirAdvQueryRequest1Example`
-5. `AdvTypeHandlerRegistry`
-6. `AdvPreparedStatementBinder`
-7. `JtsGeometryAdvTypeHandler`
+5. `AdvAutoConfiguration`
+6. `GirSpringAdvExecutor`
+7. `AdvTypeHandlerRegistry`
+8. `AdvPreparedStatementBinder`
+9. `JtsGeometryAdvTypeHandler`
 
-先看查询请求怎么组织，再看类型参数如何进入 JDBC，会更容易把这套 API 吃透。
+先看查询请求怎么组织，再看 Spring 集成与自动装配，最后再看类型参数如何进入 JDBC，会更容易把整套 API 吃透。
