@@ -96,11 +96,11 @@
         <version>${geoair.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geoserver</artifactId>
-        <version>${geoair.version}</version>
-      </dependency>
+<!--      <dependency>-->
+<!--        <groupId>cn.geoair.devkit</groupId>-->
+<!--        <artifactId>geoair-geoserver</artifactId>-->
+<!--        <version>${geoair.version}</version>-->
+<!--      </dependency>-->
 
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
