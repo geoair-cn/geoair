@@ -6,9 +6,7 @@ import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 import com.alibaba.fastjson2.JSONObject;
 
-/**
- * TileGlobalConfig 示例
- */
+/** TileGlobalConfig 示例 */
 public class TileGlobalConfigExample {
 
     public static void main(String[] args) {
@@ -22,13 +20,14 @@ public class TileGlobalConfigExample {
         TileExecutorConfig executorConfig = new TileExecutorConfig();
         executorConfig.setIgnoreMinZoom(true);
 
-        TileGlobalConfig config = new TileGlobalConfig()
-            .setLayerName("road_layer")
-            .setVersion(2)
-            .setTileRequestParams(requestParams)
-            .setTileExecParams(tileExecParams)
-            .setTileExecConfig(executorConfig)
-            .setCustomVariable(new JSONObject());
+        TileGlobalConfig config =
+                new TileGlobalConfig()
+                        .setLayerName("road_layer")
+                        .setVersion(2)
+                        .setTileRequestParams(requestParams)
+                        .setTileExecParams(tileExecParams)
+                        .setTileExecConfig(executorConfig)
+                        .setCustomVariable(new JSONObject());
 
         System.out.println("layerName = " + config.getLayerName());
         System.out.println("version = " + config.getVersion());
