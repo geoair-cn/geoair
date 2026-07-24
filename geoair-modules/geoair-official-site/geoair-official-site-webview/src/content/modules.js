@@ -99,6 +99,11 @@ const standardModules = [
         description: '展示 GirPropertyHelper 如何通过 method hand 获取属性实现。'
       },
       {
+        title: 'GirEnvironmentHelperExample',
+        path: 'geoair-standard/geoair-base/src/test/java/cn/geoair/base/test/GirEnvironmentHelperExample.java',
+        description: '展示 GirEnvironmentHelper 如何通过 method hand 获取环境实现。'
+      },
+      {
         title: 'GirCacheHelper',
         path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-standard/geoair-base/src/main/java/cn/geoair/base/cache',
         description: '缓存辅助类相关目录。'
