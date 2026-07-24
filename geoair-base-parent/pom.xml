@@ -42,7 +42,6 @@
 
   <properties>
 
-
     <geoair.version>J8.1.5</geoair.version>
     <slf4j.version>1.7.36</slf4j.version>
   </properties>
@@ -97,7 +96,6 @@
   </dependencyManagement>
 
   <build>
-
 
   </build>
 

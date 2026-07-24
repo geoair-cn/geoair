@@ -83,7 +83,6 @@
   <build>
     <plugins>
 
-
     </plugins>
   </build>
 
@@ -91,10 +90,6 @@
     <profile>
       <!--      未开发完成，不发布到公网仓库-->
       <id>central</id>
-      <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.install.skip>true</maven.install.skip>
-      </properties>
       <build>
         <plugins>
           <plugin>
@@ -114,9 +109,12 @@
           </plugin>
         </plugins>
       </build>
+      <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+      </properties>
     </profile>
 
   </profiles>
-
 
 </project>

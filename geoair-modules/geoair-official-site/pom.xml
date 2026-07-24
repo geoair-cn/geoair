@@ -49,6 +49,6 @@
   </properties>
 
   <build>
-    <plugins />
+    <plugins></plugins>
   </build>
 </project>

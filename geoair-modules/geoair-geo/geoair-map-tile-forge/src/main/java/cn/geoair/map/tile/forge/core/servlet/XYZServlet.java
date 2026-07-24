@@ -38,10 +38,8 @@ public class XYZServlet extends D3TilesServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String requestURI = request.getRequestURI();
-        Matcher matcher =
-                pattern.matcher(
-                        requestURI); ///
-                                     // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
+        Matcher matcher = pattern.matcher(requestURI); // /
+        // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
         String fileId = null;
         String type = null;
         String fileName = null;
