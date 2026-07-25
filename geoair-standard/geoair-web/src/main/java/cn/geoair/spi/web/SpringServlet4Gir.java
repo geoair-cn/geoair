@@ -3,6 +3,7 @@ package cn.geoair.spi.web;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
+import cn.geoair.web.util.GiWebContextProvider;
 import cn.geoair.web.util.GirHttpServletHelper;
 import java.lang.ref.WeakReference;
 import javax.servlet.ServletContext;
@@ -14,8 +15,27 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class SpringServlet4Gir {
 
+    private static final GiWebContextProvider CONTEXT_PROVIDER =
+            new GiWebContextProvider() {
+                @Override
+                public HttpServletRequest getRequest() {
+                    return currentRequest();
+                }
+
+                @Override
+                public HttpServletResponse getResponse() {
+                    return currentResponse();
+                }
+
+                @Override
+                public ServletContext getServletContext() {
+                    return currentServletContext();
+                }
+            };
+
     static {
         GkMethodHand.implFromClass(SpringServlet4Gir.class);
+        GirHttpServletHelper.setContextProvider(CONTEXT_PROVIDER);
     }
 
     @GaMethodHandImpl(
@@ -24,13 +44,7 @@ public class SpringServlet4Gir {
         type = ImplType.expectfirst
     )
     public static HttpServletRequest getRequest() {
-        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
-        if (ra != null) {
-            ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            return sra.getRequest();
-        } else {
-            return null;
-        }
+        return currentRequest();
     }
 
     @GaMethodHandImpl(
@@ -39,13 +53,7 @@ public class SpringServlet4Gir {
         type = ImplType.expectfirst
     )
     public static HttpServletResponse getResponse() {
-        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
-        if (ra != null) {
-            ServletRequestAttributes sra = (ServletRequestAttributes) ra;
-            return sra.getResponse();
-        } else {
-            return null;
-        }
+        return currentResponse();
     }
 
     private static WeakReference<ServletContext> servletContextWarp =
@@ -57,9 +65,37 @@ public class SpringServlet4Gir {
         type = ImplType.expectfirst
     )
     public static ServletContext getServletContext() {
+        return currentServletContext();
+    }
+
+    private static HttpServletRequest currentRequest() {
+        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+        if (ra != null) {
+            ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+            return sra.getRequest();
+        } else {
+            return null;
+        }
+    }
+
+    private static HttpServletResponse currentResponse() {
+        RequestAttributes ra = RequestContextHolder.getRequestAttributes();
+        if (ra != null) {
+            ServletRequestAttributes sra = (ServletRequestAttributes) ra;
+            return sra.getResponse();
+        } else {
+            return null;
+        }
+    }
+
+    private static ServletContext currentServletContext() {
 
         if (servletContextWarp.get() == null) {
-            ServletContext sc = GirHttpServletHelper.getRequest().getServletContext();
+            HttpServletRequest request = currentRequest();
+            if (request == null) {
+                return null;
+            }
+            ServletContext sc = request.getServletContext();
             servletContextWarp = new WeakReference<ServletContext>(sc);
         }
         return servletContextWarp.get();

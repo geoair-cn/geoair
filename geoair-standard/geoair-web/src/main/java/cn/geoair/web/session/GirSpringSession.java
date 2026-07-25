@@ -17,7 +17,7 @@ public class GirSpringSession extends GirHttpSession {
     }
 
     public HttpSession getHttpSession(boolean autoCreate) {
-        return GirHttpServletHelper.getRequest().getSession(autoCreate);
+        return GirHttpServletHelper.getSession(autoCreate);
     }
 
     @Override
