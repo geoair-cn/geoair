@@ -70,7 +70,7 @@ final class GirSdkTransport {
         String newUrl = urlStr;
 
         Long timeStamp = Long.valueOf(System.currentTimeMillis());
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             newUrl = appendUrl(newUrl, "_", timeStamp.toString(), false, charsetName);
         }
         else {
@@ -111,6 +111,9 @@ final class GirSdkTransport {
 
     static String appendUrl(String url, Map<String, Object> data, boolean encodeValue, Charset charsetName)
             throws Exception {
+        if (data == null || data.isEmpty()) {
+            return url;
+        }
         if (url.contains("?")) {
             return url + "&" + mapToUrl(data, encodeValue, charsetName);
         }

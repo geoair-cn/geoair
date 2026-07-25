@@ -25,6 +25,7 @@ public class Cache4Gir {
 
     static {
         GkMethodHand.implFromClass(Cache4Gir.class);
+        GirCacheHelper.setCacheProvider(Cache4Gir::getCache);
         if (GutilClass.isPresent(
                 "org.springframework.cache.CacheManager", SpringCache.class.getClassLoader())) {
             Cache4Gir.setCacheType(CacheType.SPRING);
@@ -61,15 +62,8 @@ public class Cache4Gir {
         private org.springframework.cache.Cache springCache;
 
         private SpringCache(String name) {
-            org.springframework.cache.CacheManager cacheManager = getSpringCacheManager();
+            org.springframework.cache.CacheManager cacheManager = SpringCacheManagerProvider.getCacheManager();
             this.springCache = cacheManager.getCache(name);
-        }
-
-        private org.springframework.cache.CacheManager getSpringCacheManager() {
-            // 这里应该获取Spring的CacheManager实例
-            // 可以通过ApplicationContext或者其他方式获取
-            // 示例：return applicationContext.getBean(CacheManager.class);
-            throw new UnsupportedOperationException("请实现获取Spring CacheManager的逻辑");
         }
 
         public static GiCache createCache(String name) {

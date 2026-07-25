@@ -25,10 +25,11 @@ final class GirSdkProfileResolver {
 
     static ProfileEnum resolveRequestProfile(String reqProfile) {
         ProfileEnum pe = getCurrentProfile();
-        if (GirSdkUtil.hasText(reqProfile)) {
-            pe = ProfileEnum.valueOf(reqProfile.toUpperCase());
-            if (pe == null) {
-                throw new GirSdkException("Sdk请求发送了错误的profile参数:" + reqProfile);
+        if (GirSdkSupport.hasText(reqProfile)) {
+            try {
+                pe = ProfileEnum.valueOf(reqProfile.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new GirSdkException("Sdk请求发送了错误的profile参数:" + reqProfile, e);
             }
         }
         return pe;

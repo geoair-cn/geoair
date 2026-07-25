@@ -4,9 +4,6 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.*;
-import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.text.GuStrFormatter;
-import cn.geoair.base.util.GutilClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,23 +16,13 @@ public class Log4Gir {
         CONSOLE
     }
 
-
     private static LogType logType;
 
     static {
         GkMethodHand.implFromClass(GirLogger.class);
         GkMethodHand.implFromClass(GirLoggerFactory.class);
-        if (GutilClass.isPresent(
-                "cn.hutool.log.LogFactory", HutoolLog.class.getClassLoader())) {
-            Log4Gir.setLogType(LogType.HUTOOL);
-        } else if (GutilClass.isPresent("org.slf4j.LoggerFactory", Slf4jLog.class.getClassLoader())) {
-            Log4Gir.setLogType(LogType.SLF4J);
-        } else if (GutilClass.isPresent(
-                "org.apache.commons.logging.LogFactory", ApacheCommonsLog.class.getClassLoader())) {
-            Log4Gir.setLogType(LogType.APPACHECOMMONS);
-        } else {
-            Log4Gir.setLogType(LogType.CONSOLE);
-        }
+        GirLoggerFactory.setLoggerProvider(Log4Gir::getLogger);
+        Log4Gir.setLogType(LogProviderResolver.resolve());
     }
 
     public static void setLogType(LogType logType2) {
@@ -45,18 +32,15 @@ public class Log4Gir {
     @GaMethodHandImpl(
             implClass = GirLogger.class,
             implMethod = "getLoger",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     public static GiLogger getLoger(String name) {
         return getLogger(name);
     }
 
-
     @GaMethodHandImpl(
             implClass = GirLoggerFactory.class,
             implMethod = "getLogger",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     public static GiLogger getLogger(String name) {
         switch (logType) {
             case SLF4J:
@@ -84,7 +68,6 @@ public class Log4Gir {
 
         @Override
         public boolean isFatalEnabled() {
-            // SLF4J没有Fatal级别，复用Error级别
             return logger.isErrorEnabled();
         }
 
@@ -115,11 +98,22 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
-            logger.error(format, arguments);
+            if (!isFatalEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.error(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.error(tp.getMessage());
+            }
         }
 
         @Override
         public void fatal(Throwable t) {
+            if (!isFatalEnabled()) {
+                return;
+            }
             logger.error("", t);
         }
 
@@ -128,16 +122,28 @@ public class Log4Gir {
             if (!isFatalEnabled()) {
                 return;
             }
-            logger.error(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(tp.getMessage(), t);
         }
 
         @Override
         public void error(String format, Object... arguments) {
-            logger.error(format, arguments); // 最后一个参数如果是Throwable ,slf4j会自动识别并处理
+            if (!isErrorEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.error(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.error(tp.getMessage());
+            }
         }
 
         @Override
         public void error(Throwable t) {
+            if (!isErrorEnabled()) {
+                return;
+            }
             logger.error("", t);
         }
 
@@ -146,16 +152,28 @@ public class Log4Gir {
             if (!isErrorEnabled()) {
                 return;
             }
-            logger.error(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(tp.getMessage(), t);
         }
 
         @Override
         public void warn(String format, Object... arguments) {
-            logger.warn(format, arguments);
+            if (!isWarnEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.warn(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.warn(tp.getMessage());
+            }
         }
 
         @Override
         public void warn(Throwable t) {
+            if (!isWarnEnabled()) {
+                return;
+            }
             logger.warn("", t);
         }
 
@@ -164,7 +182,8 @@ public class Log4Gir {
             if (!isWarnEnabled()) {
                 return;
             }
-            logger.warn(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.warn(tp.getMessage(), t);
         }
 
         @Override
@@ -172,11 +191,19 @@ public class Log4Gir {
             if (!isInfoEnabled()) {
                 return;
             }
-            logger.info(GuStrFormatter.format(format, arguments));
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.info(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.info(tp.getMessage());
+            }
         }
 
         @Override
         public void info(Throwable t) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             logger.info("", t);
         }
 
@@ -185,16 +212,28 @@ public class Log4Gir {
             if (!isInfoEnabled()) {
                 return;
             }
-            logger.info(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.info(tp.getMessage(), t);
         }
 
         @Override
         public void debug(String format, Object... arguments) {
-            logger.debug(format, arguments);
+            if (!isDebugEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.debug(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.debug(tp.getMessage());
+            }
         }
 
         @Override
         public void debug(Throwable t) {
+            if (!isDebugEnabled()) {
+                return;
+            }
             logger.debug("", t);
         }
 
@@ -203,16 +242,28 @@ public class Log4Gir {
             if (!isDebugEnabled()) {
                 return;
             }
-            logger.debug(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.debug(tp.getMessage(), t);
         }
 
         @Override
         public void trace(String format, Object... arguments) {
-            logger.trace(format, arguments);
+            if (!isTraceEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.trace(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.trace(tp.getMessage());
+            }
         }
 
         @Override
         public void trace(Throwable t) {
+            if (!isTraceEnabled()) {
+                return;
+            }
             logger.trace("", t);
         }
 
@@ -221,19 +272,17 @@ public class Log4Gir {
             if (!isTraceEnabled()) {
                 return;
             }
-            logger.trace(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.trace(tp.getMessage(), t);
         }
     }
 
     private static class ApacheCommonsLog implements GiLogger {
 
-        private String tarName;
-
-        private org.apache.commons.logging.Log logger;
+        private final org.apache.commons.logging.Log logger;
 
         private ApacheCommonsLog(String name) {
-            this.tarName = name;
-            this.logger = org.apache.commons.logging.LogFactory.getLog(this.tarName);
+            this.logger = org.apache.commons.logging.LogFactory.getLog(name);
         }
 
         public static GiLogger createLog(String name) {
@@ -276,12 +325,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.fatal(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            if (tp.getThrowable() != null) {
+                logger.fatal(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.fatal(tp.getMessage());
+            }
         }
 
         @Override
         public void fatal(Throwable t) {
-            logger.fatal("", t);
+            if (!isFatalEnabled()) {
+                return;
+            }
+            logger.fatal(t);
         }
 
         @Override
@@ -289,7 +345,8 @@ public class Log4Gir {
             if (!isFatalEnabled()) {
                 return;
             }
-            logger.fatal(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.fatal(tp.getMessage(), t);
         }
 
         @Override
@@ -298,12 +355,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.error(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            if (tp.getThrowable() != null) {
+                logger.error(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.error(tp.getMessage());
+            }
         }
 
         @Override
         public void error(Throwable t) {
-            logger.error("", t);
+            if (!isErrorEnabled()) {
+                return;
+            }
+            logger.error(t);
         }
 
         @Override
@@ -311,7 +375,8 @@ public class Log4Gir {
             if (!isErrorEnabled()) {
                 return;
             }
-            logger.error(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(tp.getMessage(), t);
         }
 
         @Override
@@ -320,13 +385,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.warn(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
-
+            if (tp.getThrowable() != null) {
+                logger.warn(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.warn(tp.getMessage());
+            }
         }
 
         @Override
         public void warn(Throwable t) {
-            logger.warn("", t);
+            if (!isWarnEnabled()) {
+                return;
+            }
+            logger.warn(t);
         }
 
         @Override
@@ -334,7 +405,8 @@ public class Log4Gir {
             if (!isWarnEnabled()) {
                 return;
             }
-            logger.warn(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.warn(tp.getMessage(), t);
         }
 
         @Override
@@ -343,13 +415,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.info(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
-
+            if (tp.getThrowable() != null) {
+                logger.info(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.info(tp.getMessage());
+            }
         }
 
         @Override
         public void info(Throwable t) {
-            logger.info("", t);
+            if (!isInfoEnabled()) {
+                return;
+            }
+            logger.info(t);
         }
 
         @Override
@@ -357,7 +435,8 @@ public class Log4Gir {
             if (!isInfoEnabled()) {
                 return;
             }
-            logger.info(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.info(tp.getMessage(), t);
         }
 
         @Override
@@ -366,12 +445,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.debug(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            if (tp.getThrowable() != null) {
+                logger.debug(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.debug(tp.getMessage());
+            }
         }
 
         @Override
         public void debug(Throwable t) {
-            logger.debug("", t);
+            if (!isDebugEnabled()) {
+                return;
+            }
+            logger.debug(t);
         }
 
         @Override
@@ -379,7 +465,8 @@ public class Log4Gir {
             if (!isDebugEnabled()) {
                 return;
             }
-            logger.debug(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.debug(tp.getMessage(), t);
         }
 
         @Override
@@ -388,12 +475,19 @@ public class Log4Gir {
                 return;
             }
             FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-            logger.trace(GuStrFormatter.format(tp.getMessage(), tp.getArgArray()), tp.getThrowable());
+            if (tp.getThrowable() != null) {
+                logger.trace(tp.getMessage(), tp.getThrowable());
+            } else {
+                logger.trace(tp.getMessage());
+            }
         }
 
         @Override
         public void trace(Throwable t) {
-            logger.trace("", t);
+            if (!isTraceEnabled()) {
+                return;
+            }
+            logger.trace(t);
         }
 
         @Override
@@ -401,19 +495,17 @@ public class Log4Gir {
             if (!isTraceEnabled()) {
                 return;
             }
-            logger.trace(GuStrFormatter.format(format, arguments), t);
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.trace(tp.getMessage(), t);
         }
     }
 
     private static class HutoolLog implements GiLogger {
 
-        private String tarName;
-
-        private cn.hutool.log.Log logger;
+        private final cn.hutool.log.Log logger;
 
         private HutoolLog(String name) {
-            this.tarName = name;
-            this.logger = cn.hutool.log.LogFactory.get(tarName);
+            this.logger = cn.hutool.log.LogFactory.get(name);
         }
 
         public static GiLogger createLog(String name) {
@@ -452,112 +544,182 @@ public class Log4Gir {
 
         @Override
         public void fatal(String format, Object... arguments) {
-            if (isFatalEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isFatalEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.error(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.error(tp.getMessage());
             }
         }
 
         @Override
         public void fatal(Throwable t) {
+            if (!isFatalEnabled()) {
+                return;
+            }
             logger.error(t);
         }
 
         @Override
         public void fatal(Throwable t, String format, Object... arguments) {
-            logger.error(t, format, arguments);
+            if (!isFatalEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(t, tp.getMessage());
         }
 
         @Override
         public void error(String format, Object... arguments) {
-            if (isErrorEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.error(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isErrorEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.error(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.error(tp.getMessage());
             }
         }
 
         @Override
         public void error(Throwable t) {
+            if (!isErrorEnabled()) {
+                return;
+            }
             logger.error(t);
         }
 
         @Override
         public void error(Throwable t, String format, Object... arguments) {
-            logger.error(t, format, arguments);
+            if (!isErrorEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.error(t, tp.getMessage());
         }
 
         @Override
         public void warn(String format, Object... arguments) {
-            if (isWarnEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.warn(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isWarnEnabled()) {
+                return;
             }
-
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.warn(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.warn(tp.getMessage());
+            }
         }
 
         @Override
         public void warn(Throwable t) {
+            if (!isWarnEnabled()) {
+                return;
+            }
             logger.warn(t);
         }
 
         @Override
         public void warn(Throwable t, String format, Object... arguments) {
-            logger.warn(t, format, arguments);
+            if (!isWarnEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.warn(t, tp.getMessage());
         }
 
         @Override
         public void info(String format, Object... arguments) {
-            if (isInfoEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.info(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isInfoEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.info(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.info(tp.getMessage());
             }
         }
 
         @Override
         public void info(Throwable t) {
+            if (!isInfoEnabled()) {
+                return;
+            }
             logger.info(t);
         }
 
         @Override
         public void info(Throwable t, String format, Object... arguments) {
-            logger.info(t, format, arguments);
+            if (!isInfoEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.info(t, tp.getMessage());
         }
 
         @Override
         public void debug(String format, Object... arguments) {
-            if (isDebugEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.debug(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isDebugEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.debug(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.debug(tp.getMessage());
             }
         }
 
         @Override
         public void debug(Throwable t) {
+            if (!isDebugEnabled()) {
+                return;
+            }
             logger.debug(t);
         }
 
         @Override
         public void debug(Throwable t, String format, Object... arguments) {
-            logger.debug(t, format, arguments);
+            if (!isDebugEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.debug(t, tp.getMessage());
         }
 
         @Override
         public void trace(String format, Object... arguments) {
-            if (isTraceEnabled()) {
-                FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
-                logger.trace(tp.getThrowable(), tp.getMessage(), tp.getArgArray());
+            if (!isTraceEnabled()) {
+                return;
             }
-
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            if (tp.getThrowable() != null) {
+                logger.trace(tp.getThrowable(), tp.getMessage());
+            } else {
+                logger.trace(tp.getMessage());
+            }
         }
 
         @Override
         public void trace(Throwable t) {
+            if (!isTraceEnabled()) {
+                return;
+            }
             logger.trace(t);
         }
 
         @Override
         public void trace(Throwable t, String format, Object... arguments) {
-            logger.trace(t, format, arguments);
+            if (!isTraceEnabled()) {
+                return;
+            }
+            FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+            logger.trace(t, tp.getMessage());
         }
     }
 }

@@ -55,7 +55,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
             type = ImplType.expectfirst
     )
     private static GiBeanFactory getProvider() {
-        return beanProvider;
+        return SpringBeanProviderResolver.getProvider();
     }
 
     private static ApplicationContext springContext;
@@ -67,15 +67,23 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
      */
     private static ConfigurableListableBeanFactory beanFactory;
 
+    static GiBeanFactory getCurrentProvider() {
+        return beanProvider;
+    }
+
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         beanProvider = this;
+        GirBeanHelper.setProvider(this);
+        SpringBeanProviderResolver.setProvider(this);
         SpringContextBean4Gir.beanFactory = beanFactory;
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         beanProvider = this;
+        GirBeanHelper.setProvider(this);
+        SpringBeanProviderResolver.setProvider(this);
         springContext = applicationContext;
     }
 
@@ -291,5 +299,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @Override
     public void afterPropertiesSet() throws Exception {
         beanProvider = this;
+        GirBeanHelper.setProvider(this);
+        SpringBeanProviderResolver.setProvider(this);
     }
 }

@@ -5,7 +5,6 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.util.GutilClass;
 
 public class Json4Gir {
 
@@ -21,23 +20,8 @@ public class Json4Gir {
     private static JsonUtilSupport jsonUtil;
 
     static {
-        if (GutilClass.isPresent(
-                "com.fasterxml.jackson.databind.ObjectMapper",
-                GirJacksonJson.class.getClassLoader())) {
-            Json4Gir.setJsonUtilType(JsonUtilSupport.JACKSON);
-        } else if (GutilClass.isPresent(
-                "com.alibaba.fastjson2.JSON", GirFastJson.class.getClassLoader())) {
-            Json4Gir.setJsonUtilType(JsonUtilSupport.FASTJSON);
-        } else if (GutilClass.isPresent(
-                "com.alibaba.fastjson.JSON", GirFastJson.class.getClassLoader())) {
-            Json4Gir.setJsonUtilType(JsonUtilSupport.FASTJSON);
-        } else if (GutilClass.isPresent(
-                "cn.hutool.json.JSON", GirHutoolJson.class.getClassLoader())) {
-            Json4Gir.setJsonUtilType(JsonUtilSupport.HUTOOLS);
-        } else if (GutilClass.isPresent(
-                "com.google.gson.Gson", GirGsonJson.class.getClassLoader())) {
-            Json4Gir.setJsonUtilType(JsonUtilSupport.GSON);
-        } else {
+        Json4Gir.setJsonUtilType(JsonProviderResolver.resolve());
+        if (jsonUtil == null) {
             logger.warn("未找到合适的json转换工具");
         }
     }
