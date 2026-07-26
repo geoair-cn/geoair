@@ -1,4 +1,10 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
  cn.geoair.spi.bean.SpringContextBean4Gir,\
- cn.geoair.spi.env.SpringEnvironment4Gir
+ cn.geoair.spi.env.SpringEnvironment4Gir,\
+ cn.geoair.spi.util.SpringBeanCopyProvider4Gir,\
+ cn.geoair.spi.util.SpringAopProvider4Gir,\
+ cn.geoair.spi.util.GenericTypeUtil4Gir,\
+ cn.geoair.spi.convert.util.GirConverterProviderBridge,\
+ cn.geoair.spi.util.GspIdGenerator4Gir,\
+ cn.geoair.spi.cache.Cache4Gir

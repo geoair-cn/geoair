@@ -9,12 +9,22 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirConvertHelper {
 
+    private static volatile GiConverterProvider converterProvider;
+
+    public static void setProvider(GiConverterProvider converterProvider) {
+        GirConvertHelper.converterProvider = converterProvider;
+    }
+
     static {
         GkMethodHand.implFromClass(GirConvertHelper.class);
     }
 
     @GaMethodHandDefine()
     public static GiConverterProvider getProvider() {
+        GiConverterProvider provider = converterProvider;
+        if (provider != null) {
+            return provider;
+        }
         return (GiConverterProvider) GkMethodHand.invokeSelf();
     }
 

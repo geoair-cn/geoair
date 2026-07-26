@@ -20,6 +20,7 @@ public class Json4Gir {
     private static JsonUtilSupport jsonUtil;
 
     static {
+        GirJSON.setProvider(Json4Gir::toJson);
         Json4Gir.setJsonUtilType(JsonProviderResolver.resolve());
         if (jsonUtil == null) {
             logger.warn("未找到合适的json转换工具");

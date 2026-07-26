@@ -11,6 +11,7 @@ public class GenericTypeUtil4Gir {
 
     static {
         GkMethodHand.implFromClass(GutilGenericType.class);
+        GutilGenericType.setGenericTypeProvider(GenericTypeUtil4Gir::resolveTypeArguments);
     }
 
     @GaMethodHandImpl(

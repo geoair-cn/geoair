@@ -8,20 +8,20 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 
-public class GirConvertHelper {
+public class GirConverterProviderBridge {
 
     static {
-        GkMethodHand.implFromClass(GirConvertHelper.class);
+        GkMethodHand.implFromClass(GirConverterProviderBridge.class);
+        cn.geoair.base.convert.util.GirConvertHelper.setProvider(getProvider());
     }
 
-    // @SuppressWarnings("unchecked")
     @GaMethodHandDefine()
     public static GiConverterProvider getProvider() {
         return (GiConverterProvider) GkMethodHand.invokeSelf();
     }
 
     @GaMethodHandImpl(
-        implClass = GirConvertHelper.class,
+        implClass = GirConverterProviderBridge.class,
         implMethod = "getProvider",
         type = ImplType.comity
     )
@@ -33,7 +33,7 @@ public class GirConvertHelper {
 
         Class<S> sc = (Class<S>) source.getClass();
 
-        GiConverter<S, T> converter = GirConvertHelper.getProvider().getConverter(sc, targetClass);
+        GiConverter<S, T> converter = GirConverterProviderBridge.getProvider().getConverter(sc, targetClass);
         return converter.convert(source);
     }
 }

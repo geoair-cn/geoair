@@ -6,6 +6,22 @@ import java.lang.reflect.Proxy;
 
 public class GutilAop {
 
+    private static volatile AopProvider aopProvider;
+
+    public interface AopProvider {
+        boolean isAopProxy(Object object);
+
+        boolean isJdkDynamicProxy(Object object);
+
+        boolean isCglibProxy(Object object);
+
+        Class<?> getTargetClass(Object candidate);
+    }
+
+    public static void setAopProvider(AopProvider aopProvider) {
+        GutilAop.aopProvider = aopProvider;
+    }
+
     /**
      * 检查给定对象是否为JDK动态代理或CGLIB代理。
      *
@@ -21,6 +37,10 @@ public class GutilAop {
         expectMethodName = "isAopProxy"
     )
     public static boolean isAopProxy(Object object) {
+        AopProvider provider = aopProvider;
+        if (provider != null) {
+            return provider.isAopProxy(object);
+        }
         return (boolean) GkMethodHand.invokeSelf(object);
     }
 
@@ -38,6 +58,10 @@ public class GutilAop {
         expectMethodName = "isJdkDynamicProxy"
     )
     public static boolean isJdkDynamicProxy(Object object) {
+        AopProvider provider = aopProvider;
+        if (provider != null) {
+            return provider.isJdkDynamicProxy(object);
+        }
         return (boolean) GkMethodHand.invokeSelf(object);
     }
 
@@ -54,6 +78,10 @@ public class GutilAop {
         expectMethodName = "isCglibProxy"
     )
     public static boolean isCglibProxy(Object object) {
+        AopProvider provider = aopProvider;
+        if (provider != null) {
+            return provider.isCglibProxy(object);
+        }
         return (boolean) GkMethodHand.invokeSelf(object);
     }
 
@@ -70,6 +98,10 @@ public class GutilAop {
         expectMethodName = "getTargetClass"
     )
     public static Class<?> getTargetClass(Object candidate) {
+        AopProvider provider = aopProvider;
+        if (provider != null) {
+            return provider.getTargetClass(candidate);
+        }
         return (Class<?>) GkMethodHand.invokeSelf(candidate);
     }
 }
