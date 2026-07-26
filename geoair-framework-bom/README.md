@@ -73,7 +73,7 @@ Apache License 2.0
 ## 开发团队
 
 - **开发者**：张逢吉
-- **邮箱**：zhangjun7570@qq.com
+- **邮箱**：zfj20250104@qq.com
 - **组织**：geoair
 - **官网**：https://xmt.geoair.cn/
 
