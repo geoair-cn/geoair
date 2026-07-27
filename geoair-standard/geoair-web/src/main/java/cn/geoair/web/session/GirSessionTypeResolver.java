@@ -1,6 +1,7 @@
 package cn.geoair.web.session;
 
-import javax.servlet.http.HttpSession;
+
+import jakarta.servlet.http.HttpSession;
 
 final class GirSessionTypeResolver {
 

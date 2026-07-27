@@ -1,7 +1,9 @@
 package cn.geoair.web.session;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.lang.reflect.Constructor;
-import javax.servlet.http.HttpSession;
+
 
 final class GirHttpSessionFactory {
 

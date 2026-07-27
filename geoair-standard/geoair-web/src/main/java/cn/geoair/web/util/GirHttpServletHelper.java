@@ -5,6 +5,7 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 public class GirHttpServletHelper {
 

@@ -2,10 +2,11 @@ package cn.geoair.sdk;
 
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
+
 
 import cn.geoair.base.cache.support.GirMemoryCache;
 import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
+import jakarta.servlet.http.HttpServletRequest;
 
 final class GirSdkRequestValidator {
 
