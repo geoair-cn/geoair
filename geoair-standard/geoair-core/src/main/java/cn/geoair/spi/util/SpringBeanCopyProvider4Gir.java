@@ -19,7 +19,7 @@ public class SpringBeanCopyProvider4Gir implements GutilBean.BeanCopyProvider {
         if (editable == null) {
             BeanUtils.copyProperties(source, target, ignoreProperties);
         } else {
-            BeanUtils.copyProperties(source, target, editable, ignoreProperties);
+            BeanUtils.copyProperties(source, target, editable);
         }
     }
 }
