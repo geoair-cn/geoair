@@ -44,7 +44,7 @@ geoair-standard/
 │       ├── json/            Json4Gir + 5 种 JSON 实现
 │       ├── log/             Log4Gir + 3 种日志适配
 │       ├── util/            ID 生成 / 泛型工具
-│       └── web/             SpringServlet4Gir（Servlet 适配）
+│       └── web/             SpringWebContextBridge（Servlet 适配）
 │
 ├── geoair-web/          ← Web 公共组件（38 Java 文件）
 │   └── cn/geoair/web/

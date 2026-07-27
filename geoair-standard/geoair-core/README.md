@@ -2,82 +2,94 @@
 
 ## 模块介绍
 
-GeoAir Core 是 GeoAir 框架的核心功能模块，提供了各种 SPI（Service Provider Interface）实现，为框架的其他模块提供基础支持。
+GeoAir Core 是 GeoAir 框架的 **Spring / runtime 侧桥接实现模块**，主要职责不是定义公共 API，而是把 `geoair-base` / `geoair-tools` 暴露出来的 facade/helper 在 Spring 运行时环境下接到具体实现上。
+
+换句话说：
+- `geoair-base` / `geoair-tools`：定义 facade、接口、工具入口
+- `geoair-core`：提供 bridge / provider / SPI runtime 实现
 
 ## 目录结构
 
 ```
-goair-core/
+geoair-core/
 ├── src/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── cn/geoair/
-│   │   │       ├── core/ # 核心代码
-│   │   │       └── spi/  # SPI 实现
-│   │   │           ├── bean/       # Bean 管理 SPI
-│   │   │           ├── cache/      # 缓存 SPI
-│   │   │           ├── convert/    # 转换 SPI
-│   │   │           ├── env/        # 环境 SPI
-│   │   │           ├── json/       # JSON 处理 SPI
-│   │   │           ├── log/        # 日志 SPI
-│   │   │           ├── util/       # 工具类 SPI
-│   │   │           └── web/        # Web 相关 SPI
+│   │   │       ├── core/ # 示例/测试性核心代码
+│   │   │       └── spi/  # runtime bridge / provider 实现
+│   │   │           ├── bean/       # Spring Bean 容器桥接
+│   │   │           ├── cache/      # Spring / JSR cache 桥接
+│   │   │           ├── convert/    # convert provider bridge
+│   │   │           ├── env/        # Spring environment / property 桥接
+│   │   │           ├── json/       # JSON backend provider / bridge
+│   │   │           ├── log/        # 日志 backend provider / bridge
+│   │   │           ├── util/       # Spring AOP / 泛型 / ID 等 bridge
+│   │   │           └── web/        # Spring Web context bridge
 │   │   └── resources/
 │   │       └── META-INF/
-│   │           └── spring.factories # Spring 自动配置
-│   └── test/ # 测试代码
-├── target/ # 构建输出
+│   │           └── spring.factories # Spring 自动装配入口
+│   └── test/
+├── target/
 ├── README.md
-└── pom.xml # Maven 配置
+└── pom.xml
 ```
 
 ## 模块说明
 
-### 1. SPI 实现
+### 1. bridge / provider 实现
 
 #### 1.1 bean 包
 
-- **SpringContextBean4Gir**：Spring 上下文 Bean 管理实现，提供了基于 Spring 上下文的 Bean 管理功能。
+- **SpringContextBean4Gir**：Spring Bean 容器桥接，实现 `GiBeanFactory` 的运行时 provider。
+- **SpringBeanProviderResolver**：provider 解析器，帮助 `GirBeanHelper` 走 direct fast path。
 
 #### 1.2 cache 包
 
-- **Cache4Gir**：缓存实现，支持多种缓存类型，包括 JSR 缓存和 Spring 缓存。
+- **Cache4Gir**：缓存 bridge，负责在 Spring Cache / JSR Cache / fallback 之间分发。
+- **SpringCacheManagerProvider**：Spring `CacheManager` 获取 provider。
 
 #### 1.3 convert 包
 
-- **GirConvertHelper**：转换助手，提供了类型转换功能。
+- **GirConverterProviderBridge**：convert runtime bridge，把 `GiConverterProvider` 接回 base facade `GirConvertHelper`。
 
 #### 1.4 env 包
 
-- **SpringEnvironment4Gir**：Spring 环境实现，提供了基于 Spring 环境的配置管理功能。
+- **SpringEnvironment4Gir**：Spring environment / property bridge，同时实现 `GiEnvironmenter` 与 `GiPropertier`。
+- **SpringEnvironmentProviderResolver**：provider 解析器，帮助 `GirEnvironmentHelper` / `GirPropertyHelper` 走 direct fast path。
 
 #### 1.5 json 包
 
-- **GirFastJson**：FastJson 实现，提供了基于 FastJson 的 JSON 处理功能。
-- **GirGsonJson**：Gson 实现，提供了基于 Gson 的 JSON 处理功能。
-- **GirHutoolJson**：Hutool JSON 实现，提供了基于 Hutool 的 JSON 处理功能。
-- **GirJacksonJson**：Jackson 实现，提供了基于 Jackson 的 JSON 处理功能。
-- **Json4Gir**：JSON 处理接口，定义了 JSON 处理的标准接口。
+- **GirFastJson**：FastJson backend 适配实现。
+- **GirFastJson2**：FastJson2 backend 适配实现。
+- **GirGsonJson**：Gson backend 适配实现。
+- **GirHutoolJson**：Hutool JSON backend 适配实现。
+- **GirJacksonJson**：Jackson backend 适配实现。
+- **JacksonObjectMapperProvider**：Jackson `ObjectMapper` provider。
+- **JsonProviderResolver**：JSON backend 探测 resolver。
+- **Json4Gir**：`GirJSON` 的 runtime provider bridge / backend dispatcher。
 
 #### 1.6 log 包
 
-- **Log4Gir**：日志实现，支持多种日志类型，包括 Apache Commons Log、Hutool Log 和 Slf4j Log。
+- **LogProviderResolver**：日志 backend 探测 resolver。
+- **Log4Gir**：`GirLoggerFactory` / `GirLogger` 的 runtime provider bridge / backend dispatcher。
 
 #### 1.7 util 包
 
-- **GenericTypeUtil4Gir**：泛型类型工具，提供了泛型类型的处理功能。
-- **GspIdGenerator4Gir**：ID 生成器，提供了 ID 生成功能。
+- **SpringGenericTypeBridge**：Spring 泛型桥接工具，提供基于 Spring `GenericTypeResolver` 的泛型类型解析能力。
+- **GspIdGenerator4Gir**：ID bridge，把 `GirIdGenerator` 接到具体实现上。
+- **SpringBeanCopyProvider4Gir**：Spring Bean 拷贝 provider，接入 `GutilBean.copyProperties(...)` fast path。
+- **SpringAopProvider4Gir**：Spring AOP provider，接入 `GutilAop` fast path。
 
 #### 1.8 web 包
 
-- **SpringServlet4Gir**：Spring Servlet 实现，提供了基于 Spring Servlet 的 Web 功能。
+- **SpringWebContextBridge**：Spring Web 上下文桥接实现，提供基于 Spring 请求上下文的 Web 能力接入。
 
 ## 快速开始
 
 ### 1. 引入依赖
 
 在 Maven 项目中，添加以下依赖：
-#  geoair-core    开发基础库的适配实现
 
 ```xml
 <dependency>
@@ -86,66 +98,63 @@ goair-core/
     <version>J8-dev-SNAPSHOT</version>
 </dependency>
 ```
-该工程作为基础开发库的解耦实现，给 geoair-base库提供了基础能力
 
-### 2. 使用
+该模块主要作为 `geoair-base` / `geoair-tools` facade 的 Spring/runtime 适配实现。
 
-#### 2.1 使用 JSON 处理
-## 目录说明：
+### 2. 运行方式理解
+
+#### 2.1 JSON 处理
+
+通常不直接 new `Json4Gir`，而是通过 facade：
 
 ```java
-// 使用 Jackson 处理 JSON
-Json4Gir json4Gir = new GirJacksonJson();
-String json = json4Gir.toJson(obj);
-Object obj = json4Gir.fromJson(json, Object.class);
+GirJSON json = GirJSON.toJson(obj);
+String text = json.toJSONString();
 ```
-* core  工具目录
-* spi  SPI方式实现 geoair-base的能力
 
-#### 2.2 使用缓存
+其中：
+- facade：`GirJSON`
+- runtime bridge：`Json4Gir`
+- 具体 backend：`GirJacksonJson` / `GirFastJson` / `GirGsonJson` / ...
+
+#### 2.2 缓存处理
+
+通常通过 facade：
 
 ```java
-// 使用缓存
-Cache4Gir cache = new Cache4Gir();
+GiCache cache = GirCacheHelper.getCache("demo");
 cache.put("key", "value");
-Object value = cache.get("key");
+Object value = cache.getObject("key");
 ```
 
-#### 2.3 使用日志
-## 其他：
+#### 2.3 日志处理
+
+通常通过 facade：
 
 ```java
-// 使用日志
-Log4Gir log = new Log4Gir();
+GiLogger log = GirLoggerFactory.getLogger("demo");
 log.info("This is an info message");
 log.error("This is an error message");
 ```
 
 ## 功能特性
 
-- 提供了多种 SPI 实现
-- 支持多种 JSON 处理库
-- 支持多种缓存类型
-- 支持多种日志类型
-- 提供了基于 Spring 的集成
-- 提供了泛型类型处理功能
-- 提供了 ID 生成功能
+- 为 facade/helper 提供 Spring/runtime 侧 bridge
+- 支持多种 JSON backend
+- 支持多种日志 backend
+- 支持 Spring Cache / JSR Cache 适配
+- 支持 Spring Bean / Environment / Property 适配
+- 支持 Spring Web context 适配
+- 支持泛型解析 / ID / AOP / Bean copy 等运行时能力接入
 
 ## 依赖关系
 
 - **geoair-core** 依赖于 **geoair-base**
+- 运行时主要为 `geoair-base` / `geoair-tools` 中的 facade 提供实现
 
 ## 版本历史
 
 - J8-dev-SNAPSHOT：当前开发版本
-
-## 贡献指南
-
-1. Fork 本项目
-2. 创建 feature 分支
-3. 提交代码
-4. 推送到远程分支
-5. 创建 Pull Request
 
 ## 许可证
 
@@ -157,5 +166,3 @@ log.error("This is an error message");
 - 邮箱：zfj20250104@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
-
-* 对于其他通用工具，可在此处添加

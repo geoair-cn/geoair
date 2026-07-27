@@ -13,7 +13,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-public class SpringServlet4Gir {
+public class SpringWebContextBridge {
 
     private static final GiWebContextProvider CONTEXT_PROVIDER =
             new GiWebContextProvider() {
@@ -34,7 +34,7 @@ public class SpringServlet4Gir {
             };
 
     static {
-        GkMethodHand.implFromClass(SpringServlet4Gir.class);
+        GkMethodHand.implFromClass(SpringWebContextBridge.class);
         GirHttpServletHelper.setContextProvider(CONTEXT_PROVIDER);
     }
 

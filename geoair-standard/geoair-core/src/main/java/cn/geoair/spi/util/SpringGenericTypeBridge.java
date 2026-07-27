@@ -7,11 +7,11 @@ import cn.geoair.base.util.GutilGenericType;
 import java.lang.reflect.Type;
 import org.springframework.core.GenericTypeResolver;
 
-public class GenericTypeUtil4Gir {
+public class SpringGenericTypeBridge {
 
     static {
-        GkMethodHand.implFromClass(GutilGenericType.class);
-        GutilGenericType.setGenericTypeProvider(GenericTypeUtil4Gir::resolveTypeArguments);
+        GkMethodHand.implFromClass(SpringGenericTypeBridge.class);
+        GutilGenericType.setGenericTypeProvider(SpringGenericTypeBridge::resolveTypeArguments);
     }
 
     @GaMethodHandImpl(

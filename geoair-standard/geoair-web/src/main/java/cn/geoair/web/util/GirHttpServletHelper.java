@@ -23,7 +23,7 @@ public class GirHttpServletHelper {
     // MethodHand.implFromClass( girHttpServletHelper.class);
     // }
 
-    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringServlet4Gir")
+    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringWebContextBridge")
     public static HttpServletRequest getRequest() {
         GiWebContextProvider provider = getContextProvider();
         if (provider != null) {
@@ -32,7 +32,7 @@ public class GirHttpServletHelper {
         return (HttpServletRequest) GkMethodHand.invokeSelf();
     }
 
-    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringServlet4Gir")
+    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringWebContextBridge")
     public static HttpServletResponse getResponse() {
         GiWebContextProvider provider = getContextProvider();
         if (provider != null) {
@@ -41,7 +41,7 @@ public class GirHttpServletHelper {
         return (HttpServletResponse) GkMethodHand.invokeSelf();
     }
 
-    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringServlet4Gir")
+    @GaMethodHandDefine(expectClassName = "cn.geoair.spi.web.SpringWebContextBridge")
     public static ServletContext getServletContext() {
         GiWebContextProvider provider = getContextProvider();
         if (provider != null) {
