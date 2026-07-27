@@ -47,72 +47,64 @@ public class BaseModelSuggest {
         return idCreate;
     }
 
-    public BaseModelSuggest setIdCreate(String idCreate) {
+    public void setIdCreate(String idCreate) {
         this.idCreate = idCreate;
-        return this;
     }
 
     public String getNameCreate() {
         return nameCreate;
     }
 
-    public BaseModelSuggest setNameCreate(String nameCreate) {
+    public void setNameCreate(String nameCreate) {
         this.nameCreate = nameCreate;
-        return this;
     }
 
     public Date getTimeCreate() {
         return timeCreate;
     }
 
-    public BaseModelSuggest setTimeCreate(Date timeCreate) {
+    public void setTimeCreate(Date timeCreate) {
         this.timeCreate = timeCreate;
-        return this;
     }
 
     public String getNameUpdate() {
         return nameUpdate;
     }
 
-    public BaseModelSuggest setNameUpdate(String nameUpdate) {
+    public void setNameUpdate(String nameUpdate) {
         this.nameUpdate = nameUpdate;
-        return this;
     }
 
     public String getIdUpdate() {
         return idUpdate;
     }
 
-    public BaseModelSuggest setIdUpdate(String idUpdate) {
+    public void setIdUpdate(String idUpdate) {
         this.idUpdate = idUpdate;
-        return this;
     }
 
     public Date getTimeUpdate() {
         return timeUpdate;
     }
 
-    public BaseModelSuggest setTimeUpdate(Date timeUpdate) {
+    public void setTimeUpdate(Date timeUpdate) {
         this.timeUpdate = timeUpdate;
-        return this;
     }
 
     public String getRemark() {
         return remark;
     }
 
-    public BaseModelSuggest setRemark(String remark) {
+    public void setRemark(String remark) {
         this.remark = remark;
-        return this;
     }
 
     public String getDelIs() {
         return delIs;
     }
 
-    public BaseModelSuggest setDelIs(String delIs) {
+    public void setDelIs(String delIs) {
         this.delIs = delIs;
-        return this;
     }
 
     public void setNotDel() {
