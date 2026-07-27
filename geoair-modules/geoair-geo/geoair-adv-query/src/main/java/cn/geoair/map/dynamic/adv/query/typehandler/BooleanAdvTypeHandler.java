@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.typehandler;
 
+import cn.hutool.core.util.BooleanUtil;
+
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/7/22
@@ -25,6 +27,6 @@ public class BooleanAdvTypeHandler extends AdvBaseTypeHandler<Boolean> {
         if ("0".equals(text) || "N".equalsIgnoreCase(text) || "NO".equalsIgnoreCase(text)) {
             return false;
         }
-        return Boolean.valueOf(text);
+        return BooleanUtil.toBoolean(text);
     }
 }
