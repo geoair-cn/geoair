@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.typehandler;
 
+import cn.hutool.core.convert.Convert;
+
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/7/22
@@ -15,6 +17,11 @@ public class ObjectAdvTypeHandler extends AdvBaseTypeHandler<Object> {
     @Override
     protected Object convertNonNullForRead(
             Object value, Class<?> javaType, AdvTypeHandlerContext context) {
-        return value;
+        try {
+            return Convert.convert(javaType, value);
+        } catch (Exception e) {
+            return value;
+        }
+
     }
 }
