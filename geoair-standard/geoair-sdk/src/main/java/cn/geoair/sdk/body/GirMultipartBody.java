@@ -2,8 +2,8 @@ package cn.geoair.sdk.body;
 
 import cn.geoair.base.gpa.id.GirIdGenerator;
 import cn.geoair.base.util.GutilCollection;
+import cn.geoair.sdk.GirSdkException;
 import cn.geoair.sdk.file.GirMultipartOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -63,16 +63,16 @@ public class GirMultipartBody implements GiRequestBody {
      * @param out out流
      */
     public void write(OutputStream out) {
-        final GirMultipartOutputStream stream = new GirMultipartOutputStream(out, this.charset);
+        final GirMultipartOutputStream stream =
+                new GirMultipartOutputStream(out, this.charset, this.boundary);
         if (!GutilCollection.isEmpty(this.form)) {
-            this.form.forEach(
-                    (formFieldName, value) -> {
-                        try {
-                            stream.write(formFieldName, value);
-                        } catch (IOException e) {
-                            // todo 异常处理
-                        }
-                    });
+            for (Map.Entry<String, Object> entry : this.form.entrySet()) {
+                try {
+                    stream.write(entry.getKey(), entry.getValue());
+                } catch (Exception e) {
+                    throw new GirSdkException("SDK multipart请求体写出失败", e);
+                }
+            }
         }
         stream.finish();
     }

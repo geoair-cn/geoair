@@ -12,7 +12,17 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
  */
 public class GirLoggerFactory {
 
+    private static volatile LoggerProvider loggerProvider;
+
     private GirLoggerFactory() {
+    }
+
+    public interface LoggerProvider {
+        GiLogger getLogger(String name);
+    }
+
+    public static void setLoggerProvider(LoggerProvider loggerProvider) {
+        GirLoggerFactory.loggerProvider = loggerProvider;
     }
 
     static {
@@ -25,6 +35,10 @@ public class GirLoggerFactory {
 
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.log.Log4Gir")
     public static GiLogger getLogger(String name) {
+        LoggerProvider provider = loggerProvider;
+        if (provider != null) {
+            return provider.getLogger(name);
+        }
         return (GiLogger) GkMethodHand.invokeSelf(name);
     }
 

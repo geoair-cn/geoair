@@ -70,46 +70,27 @@ public class GirSessionConfig implements Serializable {
     }
 
     public String getRequestSessionCode(boolean autoCreate) {
-        String code = null;
-        if (sessionClass == GirSpringSession.class || sessionClass == HttpSession.class) {
-            HttpSession hs = GirHttpServletHelper.getRequest().getSession(false);
-            if (hs != null) {
-                code = hs.getId();
-            } else if (autoCreate) {
-                code = GirHttpServletHelper.getRequest().getSession().getId();
-            }
-        } else if (sessionClass == GirCookieSession.class) {
-            Cookie cookie = GutilCookie.getCookie(cookieKey);
-            if (cookie != null) {
-                code = cookie.getValue();
-            } else if (autoCreate) {
-                code = UUID.randomUUID().toString();
-                GutilCookie.addCookie(cookieKey, code, cookieTimeout);
-            }
-        } else if (sessionClass == GirTokenSession.class) {
-            if (!useCache) {
-                Object oldToken =
-                        GirHttpServletHelper.getRequest().getAttribute(" geoair-tokenKey-random");
-                if (oldToken != null) {
-                    return (String) oldToken;
-                }
-            }
-            String token = null;
-            if (tokenInHeader) {
-                token = GirHttpServletHelper.getRequest().getHeader(tokenKey);
-            } else {
-                token = GirHttpServletHelper.getRequest().getParameter(tokenKey);
-            }
-            if (GutilStr.hasText(token)) {
-                code = token;
-            } else if (autoCreate) {
-                code = UUID.randomUUID().toString();
-                if (!useCache) {
-                    GirHttpServletHelper.getRequest().setAttribute(" geoair-tokenKey-random", code);
-                }
-            }
-        }
-        return code;
+        return GirSessionCodeResolver.resolve(this, autoCreate);
+    }
+
+    public boolean isNativeHttpSessionClass() {
+        return GirSessionTypeResolver.isNativeHttpSessionClass(this);
+    }
+
+    public boolean isServletSessionClass() {
+        return GirSessionTypeResolver.isServletSessionClass(this);
+    }
+
+    public boolean isCookieSessionClass() {
+        return GirSessionTypeResolver.isCookieSessionClass(this);
+    }
+
+    public boolean isTokenSessionClass() {
+        return GirSessionTypeResolver.isTokenSessionClass(this);
+    }
+
+    public boolean isManagedSessionClass() {
+        return GirSessionTypeResolver.isManagedSessionClass(this);
     }
 
     public String getCookieKey() {

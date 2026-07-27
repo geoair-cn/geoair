@@ -26,7 +26,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -45,13 +45,6 @@
       <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-base</artifactId>
       <version>${geoair.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-web</artifactId>
-      <version>${geoair.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>

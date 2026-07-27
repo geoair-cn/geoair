@@ -44,7 +44,7 @@ geoair-standard/
 │       ├── json/            Json4Gir + 5 种 JSON 实现
 │       ├── log/             Log4Gir + 3 种日志适配
 │       ├── util/            ID 生成 / 泛型工具
-│       └── web/             SpringServlet4Gir（Servlet 适配）
+│       └── web/             SpringWebContextBridge（Servlet 适配）
 │
 ├── geoair-web/          ← Web 公共组件（38 Java 文件）
 │   └── cn/geoair/web/
@@ -169,7 +169,7 @@ user.save();  // 直接调用保存
 ## 👥 开发者
 
 - **作者**: 张逢吉
-- **邮箱**: zhangjun7570@qq.com
+- **邮箱**: zfj20250104@qq.com
 - **组织**: GeoAir
 - **官网**: https://xmt.geoair.cn/
 

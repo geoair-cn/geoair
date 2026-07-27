@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
  * @date ：Created in 2022/7/1 14:05 @description： EntityManager提供者
  */
 @Component
-public class EntityManagerProvider {
+public class EntityManagerProvider extends cn.geoair.orm.spi.jpa.EntityManagerProvider {
 
     private static WeakReference<EntityManagerProvider> weakReference = null;
 
     @PersistenceContext EntityManager entityManager;
 
+    @Override
     public EntityManager getEntityManager() {
         return entityManager;
     }

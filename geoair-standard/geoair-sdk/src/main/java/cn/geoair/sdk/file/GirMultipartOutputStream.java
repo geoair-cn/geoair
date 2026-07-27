@@ -2,6 +2,7 @@ package cn.geoair.sdk.file;
 
 import cn.geoair.base.gpa.id.GirIdGenerator;
 import cn.geoair.base.text.GuStrFormatter;
+import cn.geoair.sdk.GirSdkException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,7 +34,7 @@ public class GirMultipartOutputStream extends OutputStream {
     private final Charset charset;
 
     // 文件边界符
-    private final String boundary = "-------------------- girSDk_" + GirIdGenerator.simpleUUID();
+    private final String boundary;
 
     private boolean isFinish;
 
@@ -44,8 +45,13 @@ public class GirMultipartOutputStream extends OutputStream {
      * @param charset 编码
      */
     public GirMultipartOutputStream(OutputStream out, Charset charset) {
+        this(out, charset, "-------------------- girSDk_" + GirIdGenerator.simpleUUID());
+    }
+
+    public GirMultipartOutputStream(OutputStream out, Charset charset, String boundary) {
         this.out = out;
         this.charset = charset;
+        this.boundary = boundary;
     }
 
     /**
@@ -54,8 +60,7 @@ public class GirMultipartOutputStream extends OutputStream {
      * @param out HTTP写出流
      */
     public GirMultipartOutputStream(OutputStream out) {
-        this.out = out;
-        this.charset = StandardCharsets.UTF_8;
+        this(out, StandardCharsets.UTF_8);
     }
 
     /**
@@ -94,7 +99,7 @@ public class GirMultipartOutputStream extends OutputStream {
             appendFieldResource(formFieldName, value);
         }
 
-        write(CRLF);
+        writeContent(CRLF);
         return this;
     }
 
@@ -110,7 +115,7 @@ public class GirMultipartOutputStream extends OutputStream {
      */
     public void finish() {
         if (false == isFinish) {
-            write(GuStrFormatter.format("--{}--\r\n", boundary));
+            writeContent(GuStrFormatter.format("--{}--\r\n", boundary));
             this.isFinish = true;
         }
     }
@@ -135,16 +140,16 @@ public class GirMultipartOutputStream extends OutputStream {
         // Content-Disposition
         if (null == fileName) {
             // Content-Disposition: form-data; name="参数名"[换行]
-            write(GuStrFormatter.format(CONTENT_DISPOSITION_TEMPLATE, formFieldName));
+            writeContent(GuStrFormatter.format(CONTENT_DISPOSITION_TEMPLATE, formFieldName));
         } else {
             // Content-Disposition: form-data; name="参数名"; filename="文件名"[换行]
-            write(
+            writeContent(
                     GuStrFormatter.format(
                             CONTENT_DISPOSITION_FILE_TEMPLATE, formFieldName, fileName));
         }
 
         // 内容
-        write("\r\n");
+        writeContent("\r\n");
         resource.writeTo(this);
     }
 
@@ -158,10 +163,10 @@ public class GirMultipartOutputStream extends OutputStream {
     private void appendFieldResource(String formFieldName, Object resource) throws IOException {
 
         // Content-Disposition: form-data; name="参数名"[换行]
-        write(GuStrFormatter.format(CONTENT_DISPOSITION_TEMPLATE, formFieldName));
+        writeContent(GuStrFormatter.format(CONTENT_DISPOSITION_TEMPLATE, formFieldName));
         // 内容
-        write("\r\n");
-        write(resource.toString());
+        writeContent("\r\n");
+        writeContent(resource.toString());
     }
 
     /**
@@ -171,9 +176,9 @@ public class GirMultipartOutputStream extends OutputStream {
      *     --分隔符(boundary)[换行]
      * </pre>
      */
-    private void beginPart() {
+    private void beginPart() throws IOException {
         // --分隔符(boundary)[换行]
-        write("--", boundary, CRLF);
+        writeContent("--", boundary, CRLF);
     }
 
     /**
@@ -181,11 +186,12 @@ public class GirMultipartOutputStream extends OutputStream {
      *
      * @param objs 写出的对象（转换为字符串）
      */
-    private void write(Object... objs) {
+    private void writeContent(Object... objs) {
         try {
             write(this, this.charset, false, objs);
         } catch (IOException e) {
             close();
+            throw new GirSdkException("SDK multipart请求体写出失败", e);
         }
     }
 

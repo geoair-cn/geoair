@@ -4,10 +4,21 @@ import cn.geoair.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class GutilGenericType {
+
+    private static volatile GenericTypeProvider genericTypeProvider;
+
+    public interface GenericTypeProvider {
+        Type[] resolveTypeArguments(Class<?> clazz, Class<?> genericIfc);
+    }
+
+    public static void setGenericTypeProvider(GenericTypeProvider genericTypeProvider) {
+        GutilGenericType.genericTypeProvider = genericTypeProvider;
+    }
 
     static {
         GkMethodHand.implFromClass(GutilGenericType.class);
@@ -16,29 +27,33 @@ public class GutilGenericType {
     /**
      * 获取类的泛型
      *
-     * @param clazz 目标class
+     * @param clazz    目标class
      * @param forClass 设置泛型的类或接口
      * @return 泛型数组 找不到为null
      */
     @GaMethodHandDefine(
-        expectClassName = "cn.geoair.spi.util.GenericTypeUtil4Gir",
-        expectMethodName = "resolveTypeArguments"
+            expectClassName = "cn.geoair.spi.util.SpringGenericTypeBridge",
+            expectMethodName = "resolveTypeArguments"
     )
     public static Type[] resolveTypeArguments(final Class<?> clazz, final Class<?> genericIfc) {
+        GenericTypeProvider provider = genericTypeProvider;
+        if (provider != null) {
+            return provider.resolveTypeArguments(clazz, genericIfc);
+        }
         return (Type[]) GkMethodHand.invokeSelf(clazz, genericIfc);
     }
 
     /**
      * 获取类的泛型
      *
-     * @param clazz 目标class
+     * @param clazz    目标class
      * @param forClass 设置泛型的类或接口
      * @return 泛型数组 找不到为null
      */
     @GaMethodHandImpl(
-        implClass = GutilGenericType.class,
-        implMethod = "resolveTypeArguments",
-        type = ImplType.comity
+            implClass = GutilGenericType.class,
+            implMethod = "resolveTypeArguments",
+            type = ImplType.comity
     )
     private static Type[] _resolveTypeArguments(Class<?> clazz, Class<?> forClass) {
         if (forClass.isInterface()) {

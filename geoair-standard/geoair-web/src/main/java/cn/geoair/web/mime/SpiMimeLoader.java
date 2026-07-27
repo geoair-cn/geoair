@@ -14,7 +14,9 @@ import java.util.ServiceLoader;
  * @author 张俊
  * @date 2026/7/8
  */
-public class SpiMimeLoader {
+public class
+
+SpiMimeLoader {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     private static List<IMimeTypeGetter> iMimeGetters;

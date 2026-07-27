@@ -8,17 +8,12 @@ import cn.geoair.base.env.support.GirSystemEnvironmentOperater;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
-import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +35,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
             type = ImplType.expectfirst
     )
     private static GiPropertier getPropertier() {
-        return me;
+        return SpringEnvironmentProviderResolver.getProvider();
     }
 
     @GaMethodHandImpl(
@@ -49,7 +44,7 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
             type = ImplType.expectfirst
     )
     private static GiEnvironmenter getEnvironmenter() {
-        return me;
+        return SpringEnvironmentProviderResolver.getProvider();
     }
 
     protected static SpringEnvironment4Gir me;
@@ -155,11 +150,17 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     @Override
     public void afterPropertiesSet() throws Exception {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
         SpringEnvironment4Gir.applicationContext = applicationContext;
 
     }
@@ -167,5 +168,9 @@ public class SpringEnvironment4Gir implements GiPropertier, GiEnvironmenter, App
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
+        SpringEnvironment4Gir.beanFactory = beanFactory;
     }
 }

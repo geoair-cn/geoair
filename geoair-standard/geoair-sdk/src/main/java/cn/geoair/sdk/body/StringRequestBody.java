@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import cn.geoair.sdk.GirSdkException;
+
 /**
  * @author ：张俊
  * @date ：Created in 2023/2/28 16:26 @description： TODO
@@ -31,9 +33,9 @@ public class StringRequestBody implements GiRequestBody {
     @Override
     public void write(OutputStream out) {
         try {
-            out.write(bodyString.getBytes(charsetName));
+            out.write((bodyString == null ? "" : bodyString).getBytes(charsetName));
         } catch (IOException e) {
-            // todo 异常处理
+            throw new GirSdkException("SDK请求体写出失败", e);
         }
     }
 

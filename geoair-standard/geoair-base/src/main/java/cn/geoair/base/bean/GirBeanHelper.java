@@ -7,7 +7,13 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirBeanHelper {
 
+    private static volatile GiBeanFactory beanProvider;
+
     private GirBeanHelper() {}
+
+    public static void setProvider(GiBeanFactory beanProvider) {
+        GirBeanHelper.beanProvider = beanProvider;
+    }
 
     static {
         GkMethodHand.implFromClass(GirBeanHelper.class);
@@ -15,6 +21,10 @@ public class GirBeanHelper {
 
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.bean.SpringContextBean4Gir")
     public static GiBeanFactory getProvider() {
+        GiBeanFactory provider = beanProvider;
+        if (provider != null) {
+            return provider;
+        }
         return (GiBeanFactory) GkMethodHand.invokeSelf();
     }
 
