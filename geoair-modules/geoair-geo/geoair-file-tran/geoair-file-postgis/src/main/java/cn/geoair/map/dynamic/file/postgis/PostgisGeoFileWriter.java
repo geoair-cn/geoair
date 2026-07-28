@@ -79,18 +79,22 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             typeBuilder.setCRS(crs);
             typeBuilder.setName(linkInfo.getTableName());
             this.featureType = typeBuilder.buildFeatureType();
+            SimpleFeatureType schema = null;
+            try {
+                  schema = postgisDataStore.getSchema(linkInfo.getTableName());
+            } catch (IOException e) {
 
-            if (postgisDataStore.getSchema(linkInfo.getTableName()) != null) {
+            }
+
+            if (schema!= null) {
                 if (!writeConfig.isOverwrite()) {
                     throw new GeoFileWriteException("目标表已存在且未开启覆盖：" + linkInfo.getTableName());
                 }
                 postgisDataStore.removeSchema(linkInfo.getTableName());
                 LOGGER.info("已删除原有表：" + linkInfo.getTableName());
             }
-
             postgisDataStore.createSchema(this.featureType);
             LOGGER.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
-
             this.featureStore =
                     (FeatureStore<SimpleFeatureType, SimpleFeature>)
                             postgisDataStore.getFeatureSource(linkInfo.getTableName());
