@@ -395,7 +395,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
         GiResult result = GiResult.failureMsg(errorMessage).andCode(httpCode);
         String json = GirJSON.toJson(result).toJSONString();
-        GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json,charset=utf-8", httpCode);
+        GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json;charset=utf-8", httpCode);
     }
 
 
