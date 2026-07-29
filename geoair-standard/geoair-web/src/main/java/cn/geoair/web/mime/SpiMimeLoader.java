@@ -2,6 +2,8 @@ package cn.geoair.web.mime;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.sp.GirSpHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -17,7 +19,9 @@ public class SpiMimeLoader {
 
     private static List<IMimeTypeGetter> iMimeGetters;
 
-    /** 获取所有IMimeTypeGetter */
+    /**
+     * 获取所有IMimeTypeGetter
+     */
     public static List<IMimeTypeGetter> getMimeTypeGetters() {
         if (iMimeGetters == null) {
             loadMimes();
@@ -25,11 +29,13 @@ public class SpiMimeLoader {
         return iMimeGetters;
     }
 
-    /** 加载IMimeTypeGetter */
+    /**
+     * 加载IMimeTypeGetter
+     */
     public static void loadMimes() {
         iMimeGetters = new ArrayList<>();
 
-        List<IMimeTypeGetter> spiIMimeTypeGetters = loadFromSpi();
+        List<IMimeTypeGetter> spiIMimeTypeGetters = GirSpHelper.loadAll(IMimeTypeGetter.class);
         for (IMimeTypeGetter handler : spiIMimeTypeGetters) {
             iMimeGetters.add(handler);
             log.trace("通过Java SPI加载IMimeTypeGetter: {}", handler.getClass().getSimpleName());
@@ -38,7 +44,9 @@ public class SpiMimeLoader {
         log.trace("IMimeTypeGetter加载完成，共加载 {} 个IMimeTypeGetter", iMimeGetters.size());
     }
 
-    /** 从Java SPI加载IMimeTypeGetter */
+    /**
+     * 从Java SPI加载IMimeTypeGetter
+     */
     private static List<IMimeTypeGetter> loadFromSpi() {
         List<IMimeTypeGetter> result = new ArrayList<>();
         try {
@@ -56,6 +64,11 @@ public class SpiMimeLoader {
     public static void main(String[] args) {
         List<IMimeTypeGetter> proxyIMimeTypeGetters = loadFromSpi();
         for (IMimeTypeGetter handler : proxyIMimeTypeGetters) {
+            System.out.println(handler.getClass().getSimpleName());
+        }
+        System.out.println("=========");
+        List<IMimeTypeGetter> iMimeTypeGetters = GirSpHelper.loadAll(IMimeTypeGetter.class);
+        for (IMimeTypeGetter handler : iMimeTypeGetters) {
             System.out.println(handler.getClass().getSimpleName());
         }
     }
