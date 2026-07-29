@@ -70,6 +70,8 @@ public class AdvTypeHandlerRegistry {
         return defaultHandler;
     }
 
-
+    public static void main(String[] args) {
+        AdvTypeHandlerRegistry.getInstance().getHandlers().forEach(System.out::println);
+    }
 
 }
