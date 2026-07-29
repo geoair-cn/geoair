@@ -34,6 +34,13 @@ public class AdvTypeHandlerRegistry {
 
     public void register(AdvTypeHandler<?> handler) {
         if (handler != null) {
+            handlers.add(0, handler);
+        }
+    }
+
+
+    public void registerLast(AdvTypeHandler<?> handler) {
+        if (handler != null) {
             handlers.add(handler);
         }
     }
