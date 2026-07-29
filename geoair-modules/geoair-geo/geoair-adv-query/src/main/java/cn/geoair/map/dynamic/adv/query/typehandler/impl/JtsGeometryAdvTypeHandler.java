@@ -1,5 +1,7 @@
-package cn.geoair.map.dynamic.adv.query.typehandler;
+package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
 import cn.geoair.map.dynamic.tools.convert.GirOracleSpatialTran;
@@ -17,6 +19,8 @@ import org.postgresql.util.PGobject;
  * @description： JTS空间类型处理器
  */
 public class JtsGeometryAdvTypeHandler extends AdvBaseTypeHandler<Geometry> {
+
+
 
     @Override
     public boolean supports(Class<?> javaType, Object value) {
