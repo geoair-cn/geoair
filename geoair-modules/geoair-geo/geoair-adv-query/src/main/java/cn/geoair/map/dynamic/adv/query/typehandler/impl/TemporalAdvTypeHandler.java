@@ -20,19 +20,20 @@ import java.util.Date;
  */
 public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
 
+
     @Override
     public boolean supports(Class<?> javaType, Object value) {
         if (javaType == null) {
             return false;
         }
         return javaType == Date.class
-                || javaType == java.sql.Date.class
-                || javaType == Time.class
-                || javaType == Timestamp.class
-                || javaType == LocalDate.class
-                || javaType == LocalTime.class
-                || javaType == LocalDateTime.class
-                || javaType == OffsetDateTime.class;
+               || javaType == java.sql.Date.class
+               || javaType == Time.class
+               || javaType == Timestamp.class
+               || javaType == LocalDate.class
+               || javaType == LocalTime.class
+               || javaType == LocalDateTime.class
+               || javaType == OffsetDateTime.class;
     }
 
     @Override

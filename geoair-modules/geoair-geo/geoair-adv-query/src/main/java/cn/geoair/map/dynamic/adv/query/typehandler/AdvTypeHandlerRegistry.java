@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.typehandler;
 
+import cn.geoair.base.sp.GirSpHelper;
 import cn.geoair.map.dynamic.adv.query.typehandler.impl.*;
+import cn.hutool.core.collection.ListUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,16 +22,14 @@ public class AdvTypeHandlerRegistry {
 
 
     private AdvTypeHandlerRegistry() {
+        List<AdvTypeHandler> advTypeHandlers = GirSpHelper.loadAll(AdvTypeHandler.class);
+        for (AdvTypeHandler handler : advTypeHandlers) {
+            register(handler);
+        }
+    }
 
-
-        register(new JtsGeometryAdvTypeHandler());
-        register(new StringAdvTypeHandler());
-        register(new CharacterAdvTypeHandler());
-        register(new BooleanAdvTypeHandler());
-        register(new NumberAdvTypeHandler());
-        register(new TemporalAdvTypeHandler());
-        register(new ByteArrayAdvTypeHandler());
-        register(new EnumAdvTypeHandler());
+    public List<AdvTypeHandler<?>> getHandlers() {
+        return ListUtil.unmodifiable(handlers);
     }
 
     public static AdvTypeHandlerRegistry getInstance() {
@@ -69,4 +69,6 @@ public class AdvTypeHandlerRegistry {
         }
         return defaultHandler;
     }
+
+
 }
