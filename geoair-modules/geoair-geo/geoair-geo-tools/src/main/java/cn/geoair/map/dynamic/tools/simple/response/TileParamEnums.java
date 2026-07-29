@@ -12,7 +12,7 @@ public enum TileParamEnums implements GiVisualValuable<String> {
     /**
      * ZXY 类型：xyz 或 zyx
      */
-    ZXY_TYPE("zxyType", "xyz"),
+    ZXY_TYPE("zxyType", "zxy"),
 
     /**
      * 坐标系：EPSG:3857, EPSG:4326, EPSG:4490
