@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.typehandler;
 
+import cn.geoair.map.dynamic.adv.query.typehandler.impl.*;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -17,6 +19,8 @@ public class AdvTypeHandlerRegistry {
     private final AdvTypeHandler<Object> defaultHandler = new ObjectAdvTypeHandler();
 
     private AdvTypeHandlerRegistry() {
+
+
         register(new JtsGeometryAdvTypeHandler());
         register(new StringAdvTypeHandler());
         register(new CharacterAdvTypeHandler());
