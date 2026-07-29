@@ -200,7 +200,7 @@ public class TileServiceTran {
 
 
             TileResponse tileResponse = TileResponseByByte.of()
-                    .setBytes(imageBytes)
+                    .setBytesAndUpdateSize(imageBytes)
                     .setLastModified(System.currentTimeMillis())
                     .setSuccess(true)
                     .setMimeType(fromFormat)
