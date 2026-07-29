@@ -7,6 +7,7 @@ import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
@@ -27,6 +28,56 @@ public class GirImageUtil extends ImgUtil {
     private static GiLogger log = GirLoggerFactory.getLogger();
 
     // ========== 基础方法 ==========
+
+    public static BufferedImage createEmptyPng(int size) {
+        return createEmptyImage(size, null, true);
+    }
+
+    public static BufferedImage createEmptyJpeg(int size) {
+        return createEmptyImage(size, null, false);
+    }
+
+
+    public static BufferedImage createEmptyImage(int size, Color backgroundColor, boolean transparent) {
+        BufferedImage image;
+
+        if (transparent) {
+            // 透明背景
+            image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = image.createGraphics();
+            try {
+                // 清除所有像素，使其透明
+                g2d.setComposite(AlphaComposite.Clear);
+                g2d.fillRect(0, 0, size, size);
+                g2d.setComposite(AlphaComposite.SrcOver);
+
+                // 如果指定了背景颜色，绘制带透明度的背景
+                if (backgroundColor != null) {
+                    g2d.setColor(backgroundColor);
+                    g2d.fillRect(0, 0, size, size);
+                }
+            } finally {
+                g2d.dispose();
+            }
+        } else {
+            // 不透明背景
+            image = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = image.createGraphics();
+            try {
+                if (backgroundColor != null) {
+                    g2d.setColor(backgroundColor);
+                } else {
+                    g2d.setColor(Color.WHITE); // 默认白色
+                }
+                g2d.fillRect(0, 0, size, size);
+            } finally {
+                g2d.dispose();
+            }
+        }
+
+        return image;
+    }
+
 
     public static byte[] imageToBytes(BufferedImage image, String formatName) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
