@@ -11,12 +11,7 @@ import cn.geoair.base.sp.support.GirJdkSpLoader;
 @GkSP(loader = GirJdkSpLoader.class)
 public interface AdvTypeHandler<T> {
 
-    /**
-     * 判断当前的TypeHandler是否需要注册进来
-     *
-     * @return
-     */
-    boolean canRegister();
+
 
     boolean supports(Class<?> javaType, Object value);
 

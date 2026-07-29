@@ -10,6 +10,8 @@ import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
  */
 public class BooleanAdvTypeHandler extends AdvBaseTypeHandler<Boolean> {
 
+
+
     @Override
     public boolean supports(Class<?> javaType, Object value) {
         return javaType == Boolean.class || javaType == boolean.class;
