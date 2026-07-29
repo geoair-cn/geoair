@@ -1,4 +1,7 @@
-package cn.geoair.map.dynamic.adv.query.typehandler;
+package cn.geoair.map.dynamic.adv.query.typehandler.impl;
+
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -17,19 +20,20 @@ import java.util.Date;
  */
 public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
 
+
     @Override
     public boolean supports(Class<?> javaType, Object value) {
         if (javaType == null) {
             return false;
         }
         return javaType == Date.class
-                || javaType == java.sql.Date.class
-                || javaType == Time.class
-                || javaType == Timestamp.class
-                || javaType == LocalDate.class
-                || javaType == LocalTime.class
-                || javaType == LocalDateTime.class
-                || javaType == OffsetDateTime.class;
+               || javaType == java.sql.Date.class
+               || javaType == Time.class
+               || javaType == Timestamp.class
+               || javaType == LocalDate.class
+               || javaType == LocalTime.class
+               || javaType == LocalDateTime.class
+               || javaType == OffsetDateTime.class;
     }
 
     @Override

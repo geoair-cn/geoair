@@ -1,5 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.typehandler;
 
+import cn.geoair.base.sp.GirSpHelper;
+import cn.geoair.map.dynamic.adv.query.typehandler.impl.*;
+import cn.hutool.core.collection.ListUtil;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -18,14 +22,14 @@ public class AdvTypeHandlerRegistry {
 
 
     private AdvTypeHandlerRegistry() {
-        register(new JtsGeometryAdvTypeHandler());
-        register(new StringAdvTypeHandler());
-        register(new CharacterAdvTypeHandler());
-        register(new BooleanAdvTypeHandler());
-        register(new NumberAdvTypeHandler());
-        register(new TemporalAdvTypeHandler());
-        register(new ByteArrayAdvTypeHandler());
-        register(new EnumAdvTypeHandler());
+        List<AdvTypeHandler> advTypeHandlers = GirSpHelper.loadAll(AdvTypeHandler.class);
+        for (AdvTypeHandler handler : advTypeHandlers) {
+            register(handler);
+        }
+    }
+
+    public List<AdvTypeHandler<?>> getHandlers() {
+        return ListUtil.unmodifiable(handlers);
     }
 
     public static AdvTypeHandlerRegistry getInstance() {
@@ -33,6 +37,13 @@ public class AdvTypeHandlerRegistry {
     }
 
     public void register(AdvTypeHandler<?> handler) {
+        if (handler != null) {
+            handlers.add(0, handler);
+        }
+    }
+
+
+    public void registerLast(AdvTypeHandler<?> handler) {
         if (handler != null) {
             handlers.add(handler);
         }
@@ -58,4 +69,9 @@ public class AdvTypeHandlerRegistry {
         }
         return defaultHandler;
     }
+
+    public static void main(String[] args) {
+        AdvTypeHandlerRegistry.getInstance().getHandlers().forEach(System.out::println);
+    }
+
 }
