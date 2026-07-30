@@ -37,87 +37,11 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 2025/11/17
  */
 
-public class LocalZipMvtTilesStorageSupport extends AbstractZipDirectoryGetter implements ZipDirectoryGetter, ITileStorageSupport {
+public class LocalZipMvtTilesStorageSupport extends LocalZip3DTileStorageSupport {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     public LocalZipMvtTilesStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
-    }
-
-    /**
-     * 压缩处理器实例，用于处理ZIP文件的解压缩操作
-     */
-    protected ICompressionHandler compressionHandler = null;
-
-    /**
-     * 获取压缩处理器实例
-     * 使用懒加载单例模式，确保只有一个压缩处理器实例存在
-     *
-     * @return ICompressionHandler 压缩处理器实例
-     */
-    public ICompressionHandler getICompressionHandler() {
-        if (compressionHandler == null) {
-            compressionHandler = new LocalCompressionHandler();
-        }
-        return compressionHandler;
-    }
-
-
-    @Override
-    public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-        StringBuilder inLocalPathBuilder = new StringBuilder();
-        String format = layerConfigContext.getFormat();
-        if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
-            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
-                    .append(z);
-        } else {
-            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
-                    .append(z).append(File.separator)
-                    .append(y).append(File.separator)
-                    .append(x).append(".").append(format);
-        }
-        String inLocalPath = inLocalPathBuilder.toString().trim();
-        File localTileFile = new File(inLocalPath);
-        boolean localStatu = localTileFile.exists();
-        if (!localStatu) {
-            localStatu = byPreCache(layerConfigContext, z, y, x, inLocalPath);
-        }
-        if (localStatu) {
-            tileRequest.setBytes(FileUtil.readBytes(localTileFile));
-            tileRequest.setLastModified(localTileFile.lastModified());
-            tileRequest.setSize(localTileFile.length());
-            tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
-        }
-        return tileRequest;
-    }
-
-    protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String y, String x, String inLocalPath) {
-        try {
-            TileCentralDirectoryModel tileCentralDirectoryEntry = null;
-            if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
-                tileCentralDirectoryEntry = getZipDirectoryBFileName(layerConfigContext, z);
-            } else {
-                tileCentralDirectoryEntry = getZipDirectoryByXyz(layerConfigContext, x, y, z);
-            }
-            if (tileCentralDirectoryEntry == null) {
-                return false;
-            }
-            getICompressionHandler().readAndDecompressEntryToLocal(tileCentralDirectoryEntry, layerConfigContext.getObjectKey(), inLocalPath);
-            return true;
-        } catch (Exception e) {
-            log.error("getTileDataByPreZipCache error:", e);
-            return false;
-        }
-
-    }
-
-
-    @Override
-    public void preCacheTiles(GirLayerConfigContext layerConfigContext, TileCache tileCache, ProgressConsumer progressConsumer) {
-        this.preCacheCentralDir(layerConfigContext, ListUtil.of(progressConsumer));
     }
 
 
@@ -135,7 +59,6 @@ public class LocalZipMvtTilesStorageSupport extends AbstractZipDirectoryGetter i
             tileCentralDirectoryEntry.setY(xyzTileInfo.getY() + "");
             tileCentralDirectoryEntry.setX(xyzTileInfo.getX() + "");
             tileCentralDirectoryEntry.setZ(xyzTileInfo.getZ() + "");
-            tileCentralDirectoryEntry.setFileName(xyzTileInfo.getZ() + "/" + xyzTileInfo.getX() + "/" + xyzTileInfo.getY());
             return tileCentralDirectoryEntry;
         }
     }
@@ -160,7 +83,7 @@ public class LocalZipMvtTilesStorageSupport extends AbstractZipDirectoryGetter i
 
         if (StrUtil.isEmpty(tileSetJsonPath)) {
             throw new RuntimeException("MvtTiles中缺失style.json关键元素");
-        }else{
+        } else {
             log.info("zip中找到style.json，判断为合法的MvtTiles文件：{}", tileSetJsonPath);
         }
         String rootPath = tileSetJsonPath.replace("style.json", "");
