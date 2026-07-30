@@ -37,31 +37,36 @@ public class D3TilesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        Matcher matcher = getPattern().matcher(requestURI);
-        String fileId = null;
-        String fileName = null;
-        String contentAfterPrefix = null;
-        String serviceName = null;
-        if (matcher.find()) {
-            fileId = matcher.group(1);          // 提取FileId
-            fileName = matcher.group(2);      // 提取文件名称
-            serviceName = matcher.group(3);      // 提取服务名称
-            contentAfterPrefix = matcher.group(4); // 提取prefixName后的内容
 
-            if (contentAfterPrefix != null && !contentAfterPrefix.isEmpty()) {
-                contentAfterPrefix = contentAfterPrefix.substring(1);
-            }
+
+        // 解析请求
+        TileParseResult parseResult = parseRequest(requestURI);
+        if (parseResult == null || !parseResult.isValid()) {
+            log.warn("无法解析请求URI: {}", requestURI);
+            GirTileResponseUtil.buildFromException(
+                    new IllegalArgumentException("Invalid request URI: " + requestURI),
+                    response
+            );
+            return;
         }
         GirLayerConfigContext layerConfigContext = null;
         try {
-            layerConfigContext
-                    = getGirLayerConfigContext(fileId, fileName, serviceName);
+            layerConfigContext = getGirLayerConfigContext(
+                    parseResult.getFileId(),
+                    parseResult.getFileName(),
+                    parseResult.getServiceName()
+            );
         } catch (Exception e) {
             GirTileResponseUtil.buildFromException(e, response);
             return;
         }
         try {
-            TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, contentAfterPrefix, "", "");
+            TileRequest layerTile = mapTileService.getLayerTile(
+                    layerConfigContext,
+                    parseResult.getContentAfterPrefix(),
+                    "",
+                    ""
+            );
             TileResponse tileResponse = layerTile.toTileResponse();
             GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
         } catch (Exception e) {
@@ -84,4 +89,32 @@ public class D3TilesServlet extends HttpServlet {
         return config;
     }
 
+    /**
+     * 解析请求URI
+     *
+     * @param requestURI 请求URI
+     * @return TileParseResult 对象
+     */
+    private TileParseResult parseRequest(String requestURI) {
+        Matcher matcher = getPattern().matcher(requestURI);
+
+        if (!matcher.find()) {
+            return null;
+        }
+
+        String contentAfterPrefix = matcher.group(4);
+        // 如果contentAfterPrefix不为空且不以'/'开头，则去掉第一个'/'
+        if (contentAfterPrefix != null && !contentAfterPrefix.isEmpty()) {
+            contentAfterPrefix = contentAfterPrefix.substring(1);
+        }
+
+        return TileParseResult.of()
+                .setRequestURI(requestURI)
+                .setFileId(matcher.group(1))        // FileId
+                .setFileName(matcher.group(2))      // 文件名称
+                .setServiceName(matcher.group(3))   // 服务名称
+                .setContentAfterPrefix(contentAfterPrefix)
+                .setFullPath(matcher.group(4));     // 完整路径（带前缀的）
+    }
 }
+
