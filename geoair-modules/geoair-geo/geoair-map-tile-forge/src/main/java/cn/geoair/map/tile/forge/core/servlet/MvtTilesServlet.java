@@ -11,6 +11,7 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import jakarta.servlet.http.HttpServletResponse;
+import cn.geoair.web.GirWeb;
 
 import java.util.regex.Pattern;
 
@@ -42,7 +43,7 @@ public class MvtTilesServlet extends D3TerrainServlet {
         if (requestURI.contains("style.json")) {
             byte[] bytes = tileRequest.getBytes();
             String jsonContent = new String(bytes);
-            String replace = requestURI.replace("/style.json", "");
+            String replace = GirWeb.getRequest().getRequestURL().toString().replace("/style.json", "");
             jsonContent = jsonContent.replace("{BASE_URL}", replace);
             tileRequest.setBytes(jsonContent.getBytes());
         }
