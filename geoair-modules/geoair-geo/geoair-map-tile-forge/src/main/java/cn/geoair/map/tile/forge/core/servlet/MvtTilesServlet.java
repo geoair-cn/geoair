@@ -13,10 +13,11 @@ import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.web.GirWeb;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MvtTilesServlet extends D3TerrainServlet {
+public class MvtTilesServlet extends D3TilesServlet {
 
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -25,7 +26,7 @@ public class MvtTilesServlet extends D3TerrainServlet {
     }
 
     public Pattern getPattern() {
-        return Pattern.compile("/mvtTilesService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
+        return Pattern.compile("/mvtTilesService/([^/]+)/([^/]+)/([^/]+)(/.*)?");
     }
 
 
