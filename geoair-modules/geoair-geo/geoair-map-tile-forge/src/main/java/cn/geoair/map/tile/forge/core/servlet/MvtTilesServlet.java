@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -44,7 +45,8 @@ public class MvtTilesServlet extends D3TilesServlet {
         if (requestURI.contains("style.json")) {
             byte[] bytes = tileRequest.getBytes();
             String jsonContent = new String(bytes);
-            String replace = GirWeb.getRequest().getRequestURL().toString().replace("/style.json", "");
+            String requestURL = GirServletUtil.getServerPathByRequest() + GirWeb.getRequest().getRequestURI();
+            String replace = requestURL.replace("/style.json", "");
             jsonContent = jsonContent.replace("{BASE_URL}", replace);
             tileRequest.setBytes(jsonContent.getBytes());
         }
