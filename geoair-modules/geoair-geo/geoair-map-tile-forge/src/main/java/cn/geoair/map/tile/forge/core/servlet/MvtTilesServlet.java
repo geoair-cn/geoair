@@ -45,7 +45,7 @@ public class MvtTilesServlet extends D3TilesServlet {
         if (requestURI.contains("style.json")) {
             byte[] bytes = tileRequest.getBytes();
             String jsonContent = new String(bytes);
-            String requestURL = GirServletUtil.getServerPathByRequest() + GirWeb.getRequest().getRequestURI();
+            String requestURL = GirServletUtil.getHttpPathByRequest() + GirWeb.getRequest().getRequestURI();
             String replace = requestURL.replace("/style.json", "");
             jsonContent = jsonContent.replace("{BASE_URL}", replace);
             tileRequest.setBytes(jsonContent.getBytes());

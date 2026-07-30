@@ -44,23 +44,33 @@ public class GirServletUtil extends ServletUtil {
      * @return
      */
     public static String getServerPathByRequest() {
-        HttpServletRequest request = GirHttpServletHelper.getRequest();
-        Map<String, String> headerMap = GirServletUtil.getHeaderMap(request);
-        String host = headerMap.get("host");
         String property = Gir.property.getProperty("server.servlet.context-path");
         if (GutilObject.isNotEmpty(property)) {
             property = StrUtil.replaceFirst(property, "/", "");
+            property = "/" + property;
         } else {
             property = "";
         }
+        return getHttpPathByRequest() + property;
+    }
+
+    /**
+     * 获取自己这台服务器的地址   类似与 http://wuhan.zzzz.com.cn:9196
+     *
+     * @return
+     */
+    public static String getHttpPathByRequest() {
+        HttpServletRequest request = GirHttpServletHelper.getRequest();
+        Map<String, String> headerMap = GirServletUtil.getHeaderMap(request);
+        String host = headerMap.get("host");
+
         if (!host.contains(":")) {
             Integer originPort = getOriginPort(request);
             if (originPort != null) {
                 host = host + ":" + originPort;
             }
         }
-
-        return "http://" + host + "/" + property;
+        return "http://" + host;
     }
 
     /**
