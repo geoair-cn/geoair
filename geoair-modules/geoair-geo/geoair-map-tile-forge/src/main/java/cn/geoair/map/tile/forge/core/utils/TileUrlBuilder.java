@@ -51,10 +51,17 @@ public class TileUrlBuilder {
     }
 
     /**
-     * 构建3Dtile瓦片服务URL
+     * 构建三维地形瓦片服务URL
      */
     public static String buildD3TerrainUrl(String dataId, String layerName, String fileName) {
         return "3dTerrainService/" + StrUtil.format("{}/{}/{}/layer.json", dataId, fileName, layerName);
+    }
+
+    /**
+     * 构建mvt服务URL
+     */
+    public static String buildMvtTileUrl(String dataId, String layerName, String fileName) {
+        return "mvtTilesService/" + StrUtil.format("{}/{}/{}/style.json", dataId, fileName, layerName);
     }
 
 
