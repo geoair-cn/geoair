@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.servlet.D3TerrainServlet;
 import cn.geoair.map.tile.forge.core.servlet.D3TilesServlet;
+import cn.geoair.map.tile.forge.core.servlet.MvtTilesServlet;
 import cn.geoair.map.tile.forge.core.servlet.XYZServlet;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -61,5 +62,11 @@ public class GirForgeServletAutoConfiguration {
     @Primary
     public XYZServlet xyzServlet(ObjectProvider<GirMapTileService> provider) {
         return createServlet(provider, "XYZServlet", XYZServlet::new);
+    }
+
+    @Bean
+    @Primary
+    public MvtTilesServlet mvtTilesServlet(ObjectProvider<GirMapTileService> provider) {
+        return createServlet(provider, "MvtTilesServlet", MvtTilesServlet::new);
     }
 }
