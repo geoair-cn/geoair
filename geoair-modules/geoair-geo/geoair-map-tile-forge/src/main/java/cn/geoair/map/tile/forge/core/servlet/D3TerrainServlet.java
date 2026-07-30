@@ -4,7 +4,6 @@ package cn.geoair.map.tile.forge.core.servlet;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
-import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -12,7 +11,6 @@ import cn.geoair.map.tile.forge.core.TileRequest;
 
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -63,8 +61,7 @@ public class D3TerrainServlet extends D3TilesServlet {
                     parseResult.getY(),
                     parseResult.getX()
             );
-            TileResponse tileResponse = layerTile.toTileResponse();
-            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+            toHttpResponse(layerTile, response, parseResult);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             GirTileResponseUtil.buildFromException(e, response);
@@ -79,13 +76,16 @@ public class D3TerrainServlet extends D3TilesServlet {
         return config;
     }
 
+
+
+
     /**
      * 解析请求URI
      *
      * @param requestURI 请求URI
      * @return TileParseResult 对象，解析失败返回null
      */
-    private TileParseResult parseRequest(String requestURI) {
+    public TileParseResult parseRequest(String requestURI) {
         Matcher matcher = getPattern().matcher(requestURI);
         if (!matcher.find()) {
             return null;

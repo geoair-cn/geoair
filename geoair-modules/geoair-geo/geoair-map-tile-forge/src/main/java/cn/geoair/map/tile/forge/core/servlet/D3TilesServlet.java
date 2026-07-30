@@ -67,8 +67,7 @@ public class D3TilesServlet extends HttpServlet {
                     "",
                     ""
             );
-            TileResponse tileResponse = layerTile.toTileResponse();
-            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+            toHttpResponse(layerTile, response,parseResult );
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             GirTileResponseUtil.buildFromException(e, response);
@@ -95,7 +94,7 @@ public class D3TilesServlet extends HttpServlet {
      * @param requestURI 请求URI
      * @return TileParseResult 对象
      */
-    private TileParseResult parseRequest(String requestURI) {
+    public TileParseResult parseRequest(String requestURI) {
         Matcher matcher = getPattern().matcher(requestURI);
 
         if (!matcher.find()) {
@@ -115,6 +114,12 @@ public class D3TilesServlet extends HttpServlet {
                 .setServiceName(matcher.group(3))   // 服务名称
                 .setContentAfterPrefix(contentAfterPrefix)
                 .setFullPath(matcher.group(4));     // 完整路径（带前缀的）
+    }
+
+
+    public void toHttpResponse(TileRequest tileRequest, HttpServletResponse response, TileParseResult tileParseResult) {
+        TileResponse tileResponse = tileRequest.toTileResponse();
+        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
     }
 }
 
