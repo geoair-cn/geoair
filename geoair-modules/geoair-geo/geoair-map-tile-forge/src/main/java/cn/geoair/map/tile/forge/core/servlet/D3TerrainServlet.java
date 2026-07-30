@@ -5,6 +5,8 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.TileRequest;
 
@@ -26,11 +28,15 @@ public class D3TerrainServlet extends D3TilesServlet {
         super(mapTileService);
     }
 
-    Pattern pattern = Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
+    public Pattern getPattern() {
+        return Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
+    }
+
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        Matcher matcher = pattern.matcher(requestURI);
+        Matcher matcher = getPattern().matcher(requestURI);
         String fileId = null;
         String fileName = null;
         String serviceName = null;
@@ -76,11 +82,15 @@ public class D3TerrainServlet extends D3TilesServlet {
         }
     }
 
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+    public GirLayerConfigContext getGirLayerConfigContext(String fileId, String fileName, String layerName) {
+        GirLayerConfigContext config = GirLayerConfigContextHelper.getInstance().getGirLayerConfigContext(
+                        GirMapTileType.TERRAIN_3D, layerName, fileId, fileName
+                )
+                .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+        return config;
     }
+
+
 
 
 }

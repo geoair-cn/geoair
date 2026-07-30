@@ -30,11 +30,14 @@ public class D3TilesServlet extends HttpServlet {
         this.mapTileService = mapTileService;
     }
 
-    Pattern pattern = Pattern.compile("/3dTilesService/([^/]+)/([^/]+)/([^/]+)(/.*)?");
+
+    public Pattern getPattern() {
+        return Pattern.compile("/3dTilesService/([^/]+)/([^/]+)/([^/]+)(/.*)?");
+    }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        Matcher matcher = pattern.matcher(requestURI);
+        Matcher matcher = getPattern().matcher(requestURI);
         String fileId = null;
         String fileName = null;
         String contentAfterPrefix = null;

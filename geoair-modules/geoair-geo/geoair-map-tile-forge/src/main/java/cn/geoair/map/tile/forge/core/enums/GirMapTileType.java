@@ -14,6 +14,7 @@ public enum GirMapTileType implements GiVisualValuable<String> {
     LOOSE("loose"),// 松散型瓦片格式
     TILE_3D("3d_tiles"),
     S3M("s3m"),
+    MVT_TILES("mvt_tiles"), // 包含style.json的一个zip包
     TERRAIN_3D("3d_terrain"),
     ;
     private final String value;
