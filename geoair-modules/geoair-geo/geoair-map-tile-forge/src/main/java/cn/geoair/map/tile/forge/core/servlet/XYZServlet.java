@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -44,6 +45,7 @@ public class XYZServlet extends D3TilesServlet {
     //    /rest/xyz
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI();
+        requestURI= URLUtil.decode(requestURI);
         Matcher matcher = pattern.matcher(requestURI);   ///xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
         String fileId = null;
         String type = null;

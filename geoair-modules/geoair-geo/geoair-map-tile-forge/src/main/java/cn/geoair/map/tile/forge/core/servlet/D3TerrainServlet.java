@@ -11,9 +11,9 @@ import cn.geoair.map.tile.forge.core.TileRequest;
 
 
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import cn.hutool.core.util.URLUtil;
 
 
 import java.io.IOException;
@@ -36,6 +36,7 @@ public class D3TerrainServlet extends D3TilesServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
+        requestURI= URLUtil.decode(requestURI);
         // 解析请求URI
         TileParseResult parseResult = parseRequest(requestURI);
         if (parseResult == null) {

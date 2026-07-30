@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.hutool.core.util.URLUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -38,7 +39,7 @@ public class D3TilesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-
+        requestURI= URLUtil.decode(requestURI);
 
         // 解析请求
         TileParseResult parseResult = parseRequest(requestURI);
