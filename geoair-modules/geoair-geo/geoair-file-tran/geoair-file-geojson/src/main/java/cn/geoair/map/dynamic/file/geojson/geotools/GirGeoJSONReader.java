@@ -120,7 +120,7 @@ public class GirGeoJSONReader implements AutoCloseable {
     /**
      * Default IdStrategy is Provided
      */
-    private org.geotools.data.geojson.GeoJSONReader.IdStrategy idStrategy = org.geotools.data.geojson.GeoJSONReader.IdStrategy.PROVIDED;
+    private GirGeoJSONReader.IdStrategy idStrategy = GirGeoJSONReader.IdStrategy.PROVIDED;
 
     /**
      * Builds a GeoJSON parser from a GeoJSON source, located at the specified URL.
@@ -144,7 +144,7 @@ public class GirGeoJSONReader implements AutoCloseable {
      *                   uses a provided ID without a prefix.
      * @throws IOException
      */
-    public GirGeoJSONReader(URL url, org.geotools.data.geojson.GeoJSONReader.IdStrategy idStrategy) throws IOException {
+    public GirGeoJSONReader(URL url, GirGeoJSONReader.IdStrategy idStrategy) throws IOException {
         this(url);
         this.idStrategy = idStrategy;
     }
@@ -168,7 +168,7 @@ public class GirGeoJSONReader implements AutoCloseable {
      *
      * @return the idStrategy
      */
-    public org.geotools.data.geojson.GeoJSONReader.IdStrategy getIdStrategy() {
+    public GirGeoJSONReader.IdStrategy getIdStrategy() {
         return idStrategy;
     }
 
@@ -177,7 +177,7 @@ public class GirGeoJSONReader implements AutoCloseable {
      *
      * @param idStrategy the idStrategy to set
      */
-    public void setIdStrategy(org.geotools.data.geojson.GeoJSONReader.IdStrategy idStrategy) {
+    public void setIdStrategy(GirGeoJSONReader.IdStrategy idStrategy) {
         this.idStrategy = idStrategy;
     }
 
@@ -282,7 +282,7 @@ public class GirGeoJSONReader implements AutoCloseable {
      * @throws IOException        IO Exception reading json
      */
     public static SimpleFeature parseFeature(
-            String json, org.geotools.data.geojson.GeoJSONReader.IdStrategy idStrategy, String idPrefix, String idFieldName)
+            String json, GirGeoJSONReader.IdStrategy idStrategy, String idPrefix, String idFieldName)
             throws JsonParseException, IOException {
         try (JsonParser lParser = factory.createParser(new ByteArrayInputStream(json.getBytes()))) {
             ObjectMapper mapper = ObjectMapperFactory.getDefaultMapper();
@@ -305,8 +305,8 @@ public class GirGeoJSONReader implements AutoCloseable {
      * Parses and returns a feature collection from a GeoJSON
      */
     public static SimpleFeatureCollection parseFeatureCollection(String jsonString) {
-        try (org.geotools.data.geojson.GeoJSONReader reader =
-                     new org.geotools.data.geojson.GeoJSONReader(new ByteArrayInputStream(jsonString.getBytes()))) {
+        try (GirGeoJSONReader reader =
+                     new GirGeoJSONReader(new ByteArrayInputStream(jsonString.getBytes()))) {
             SimpleFeatureCollection features = (SimpleFeatureCollection) reader.getFeatures();
             return features;
         } catch (IOException e) {
@@ -505,82 +505,86 @@ public class GirGeoJSONReader implements AutoCloseable {
                     builder.set(n.getKey(), n.getValue().booleanValue());
                 } else if (binding == Object.class) {
                     builder.set(n.getKey(), n.getValue());
-                }
-                else if (binding == List.class) {
+                } else if (binding == List.class) {
                     JsonNode value = n.getValue();
-                    List<Object> list = new ArrayList<>();
-
-                    // 处理null值
-                    if (value == null || value.isNull()) {
-                        builder.set(n.getKey(), null);
-                        continue;
-                    }
-
-                    ArrayNode array = null;
-                    // 安全地获取数组节点
-                    if (value.isArray()) {
-                        // 已经是数组，直接使用
-                        array = (ArrayNode) value;
-                    } else if (value.isTextual()) {
-                        // 字符串转为单元素数组
-                        array = mapper.createArrayNode();
-                        array.add(value.textValue());
-                    } else if (value.isNumber()) {
-                        // 数字转为单元素数组
-                        array = mapper.createArrayNode();
-                        array.add(value.asDouble());
-                    } else if (value.isBoolean()) {
-                        // 布尔转为单元素数组
-                        array = mapper.createArrayNode();
-                        array.add(value.asBoolean());
-                    } else if (value.isObject()) {
-                        // 对象转为单元素数组
-                        array = mapper.createArrayNode();
-                        array.add(value);
-                    } else {
-                        // 其他未知类型，转为字符串
-                        LOGGER.warning("Unexpected value type for List field: " + value.getNodeType() + ", converting to String");
-                        array = mapper.createArrayNode();
-                        array.add(value.asText());
-                    }
-
-                    // 遍历数组构建List
-                    for (int i = 0; i < array.size(); i++) {
-                        JsonNode item = array.get(i);
-                        Object vc;
-                        if (item == null || item.isNull()) {
-                            vc = null;
-                        } else {
-                            switch (item.getNodeType()) {
-                                case BOOLEAN:
-                                    vc = item.asBoolean();
-                                    break;
-                                case NUMBER:
-                                    vc = item.asDouble();
-                                    break;
-                                case STRING:
-                                    vc = item.asText();
-                                    break;
-                                case OBJECT:
-                                    vc = item;
-                                    break;
-                                case ARRAY:
-                                    vc = item;
-                                    break;
-                                case NULL:
-                                    vc = null;
-                                    break;
-                                default:
-                                    // 未知类型转为字符串
-                                    vc = item.asText();
-                                    LOGGER.warning("Unknown node type in array: " + item.getNodeType() + ", converting to String");
-                                    break;
-                            }
-                        }
-                        list.add(vc);
-                    }
-                    builder.set(n.getKey(), list);
+                    String text = value.asText("");
+                    builder.set(n.getKey(), text);
                 }
+//                else if (binding == List.class) {
+//                    JsonNode value = n.getValue();
+//                    List<Object> list = new ArrayList<>();
+//
+//                    // 处理null值
+//                    if (value == null || value.isNull()) {
+//                        builder.set(n.getKey(), null);
+//                        continue;
+//                    }
+//
+//                    ArrayNode array = null;
+//                    // 安全地获取数组节点
+//                    if (value.isArray()) {
+//                        // 已经是数组，直接使用
+//                        array = (ArrayNode) value;
+//                    } else if (value.isTextual()) {
+//                        // 字符串转为单元素数组
+//                        array = mapper.createArrayNode();
+//                        array.add(value.textValue());
+//                    } else if (value.isNumber()) {
+//                        // 数字转为单元素数组
+//                        array = mapper.createArrayNode();
+//                        array.add(value.asDouble());
+//                    } else if (value.isBoolean()) {
+//                        // 布尔转为单元素数组
+//                        array = mapper.createArrayNode();
+//                        array.add(value.asBoolean());
+//                    } else if (value.isObject()) {
+//                        // 对象转为单元素数组
+//                        array = mapper.createArrayNode();
+//                        array.add(value);
+//                    } else {
+//                        // 其他未知类型，转为字符串
+//                        LOGGER.warning("Unexpected value type for List field: " + value.getNodeType() + ", converting to String");
+//                        array = mapper.createArrayNode();
+//                        array.add(value.asText());
+//                    }
+//
+//                    // 遍历数组构建List
+//                    for (int i = 0; i < array.size(); i++) {
+//                        JsonNode item = array.get(i);
+//                        Object vc;
+//                        if (item == null || item.isNull()) {
+//                            vc = null;
+//                        } else {
+//                            switch (item.getNodeType()) {
+//                                case BOOLEAN:
+//                                    vc = item.asBoolean();
+//                                    break;
+//                                case NUMBER:
+//                                    vc = item.asDouble();
+//                                    break;
+//                                case STRING:
+//                                    vc = item.asText();
+//                                    break;
+//                                case OBJECT:
+//                                    vc = item;
+//                                    break;
+//                                case ARRAY:
+//                                    vc = item;
+//                                    break;
+//                                case NULL:
+//                                    vc = null;
+//                                    break;
+//                                default:
+//                                    // 未知类型转为字符串
+//                                    vc = item.asText();
+//                                    LOGGER.warning("Unknown node type in array: " + item.getNodeType() + ", converting to String");
+//                                    break;
+//                            }
+//                        }
+//                        list.add(vc);
+//                    }
+//                    builder.set(n.getKey(), list);
+//                }
 //                else if (binding == List.class) {
 //                    JsonNode value = n.getValue();
 //                    ArrayNode array = null;
@@ -773,9 +777,14 @@ public class GirGeoJSONReader implements AutoCloseable {
                     // a complex object, we don't know what it is going to be
                     typeBuilder.add(n.getKey(), Object.class);
                 }
-            } else if (value instanceof ArrayNode) {
-                typeBuilder.add(n.getKey(), List.class);
-            } else if (value instanceof TextNode && guessingDates) {
+            }else if (value instanceof ArrayNode) {    // 强制array当做字符串处理
+                typeBuilder.defaultValue("");
+                typeBuilder.add(n.getKey(), String.class);
+            }
+//            else if (value instanceof ArrayNode) {
+//                typeBuilder.add(n.getKey(), List.class);
+//            }
+            else if (value instanceof TextNode && guessingDates) {
                 // it could be a date too
                 Date date = dateParser.parse(value.asText());
                 if (date != null) {

@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.geoair.map.dynamic.file.geojson.geotools.GirGeoJSONReader;
+import cn.hutool.core.io.IoUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geotools.feature.FeatureCollection;
@@ -89,16 +90,26 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
      * 初始化 GeoJSON 读取器
      */
     private void initGeoJsonReader() {
-        try (FileInputStream fis = new FileInputStream(linkInfo.getGeoJsonFilePath())) {
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(linkInfo.getGeoJsonFilePath());
             GirGeoJSONReader geoJsonReader = new GirGeoJSONReader(fis);
             try {
                 this.featureCollection = geoJsonReader.getFeatures();
+                IoUtil.close(fis);
+                this.featureType = featureCollection.getSchema();
+                this.featureIterator = featureCollection.features();
             } catch (Exception e) {
-                log.info("获取全量featureCollection发生异常 {}", e.getMessage());
+                log.error("获取全量featureCollection发生异常 {}", e.getMessage());
+
+            }
+            if (featureType == null) {
+                fis = new FileInputStream(linkInfo.getGeoJsonFilePath());
+                this.featureType = (SimpleFeatureType) geoJsonReader.getSchema();
+                geoJsonReader = new GirGeoJSONReader(fis);
+                this.featureIterator = geoJsonReader.getIterator();
             }
 
-            this.featureType = (SimpleFeatureType) geoJsonReader.getSchema();
-            this.featureIterator = geoJsonReader.getIterator();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new GeoFileReadException("初始化 GeoJSON 读取器失败", e);
@@ -129,24 +140,28 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
             } finally {
                 currentRow.incrementAndGet();
             }
-
-            Map<String, Object> attributes = new HashMap<>();
-            for (Property property : feature.getProperties()) {
-                String propName = property.getName().getLocalPart();
-                Object propValue = property.getValue();
-                if (propValue instanceof Geometry) {
-                    Geometry geometry = (Geometry) propValue;
-                    geometry.setSRID(linkInfo.getSrid());
-                    attributes.put(propName, geometry);
-                } else {
-                    attributes.put(propName, propValue);
-                }
-            }
+            Map<String, Object> attributes = tranFeature(feature);
             return GirAdvOneRow.ofByMap(attributes);
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileReadException("读取 GeoJSON 单行数据失败", e);
         }
+    }
+
+    private Map<String, Object> tranFeature(SimpleFeature feature) {
+        Map<String, Object> attributes = new HashMap<>();
+        for (Property property : feature.getProperties()) {
+            String propName = property.getName().getLocalPart();
+            Object propValue = property.getValue();
+            if (propValue instanceof Geometry) {
+                Geometry geometry = (Geometry) propValue;
+                geometry.setSRID(linkInfo.getSrid());
+                attributes.put(propName, geometry);
+            } else {
+                attributes.put(propName, propValue);
+            }
+        }
+        return attributes;
     }
 
     @Override

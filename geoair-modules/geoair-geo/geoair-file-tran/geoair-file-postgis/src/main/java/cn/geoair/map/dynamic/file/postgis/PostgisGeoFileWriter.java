@@ -1,6 +1,10 @@
 package cn.geoair.map.dynamic.file.postgis;
 
 import cn.geoair.base.Gir;
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
+import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
@@ -12,10 +16,14 @@ import cn.geoair.map.dynamic.tools.GirGeoTools;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import cn.geoair.map.dynamic.tools.simple.collection.map.GirFastStrObjMap;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.StopWatch;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
@@ -29,11 +37,15 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import javax.sql.DataSource;
+
 public class PostgisGeoFileWriter implements GeoFileWriter {
 
-    private static final Logger LOGGER = Logger.getLogger(PostgisGeoFileWriter.class.getName());
+    private static final GiLogger logger = GirLoggerFactory.getLogger();
 
     private PostgisWriterLinkInfo linkInfo;
+
+    DataSource dataSource = null;
 
     private WriteConfig writeConfig = new WriteConfig();
 
@@ -47,17 +59,19 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
 
     private DefaultFeatureCollection featureCollection;
 
-    private int batchSize = 1000;
+    private int batchSize;
 
     private int batchCount = 0;
 
     @Override
     public void setLinkInfo(LinkInfo linkInfo) {
+
         if (!(linkInfo instanceof PostgisWriterLinkInfo)) {
             throw new IllegalArgumentException("链接信息必须是 PostgisLinkInfo 类型");
         }
         this.linkInfo = (PostgisWriterLinkInfo) linkInfo;
         this.linkInfo.checkLinkInfo();
+        batchSize = this.linkInfo.getBatchSize();
         initPostgisDataStore();
     }
 
@@ -81,20 +95,20 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             this.featureType = typeBuilder.buildFeatureType();
             SimpleFeatureType schema = null;
             try {
-                  schema = postgisDataStore.getSchema(linkInfo.getTableName());
+                schema = postgisDataStore.getSchema(linkInfo.getTableName());
             } catch (IOException e) {
 
             }
 
-            if (schema!= null) {
+            if (schema != null) {
                 if (!writeConfig.isOverwrite()) {
                     throw new GeoFileWriteException("目标表已存在且未开启覆盖：" + linkInfo.getTableName());
                 }
                 postgisDataStore.removeSchema(linkInfo.getTableName());
-                LOGGER.info("已删除原有表：" + linkInfo.getTableName());
+                logger.info("已删除原有表：" + linkInfo.getTableName());
             }
             postgisDataStore.createSchema(this.featureType);
-            LOGGER.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
+            logger.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
             this.featureStore =
                     (FeatureStore<SimpleFeatureType, SimpleFeature>)
                             postgisDataStore.getFeatureSource(linkInfo.getTableName());
@@ -116,6 +130,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             }
 
             featureBuilder.reset();
+            GirAdvQuery.getIAdvExecutor(dataSource).bInsertIgnore(girAdvOneRow,
+                    s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid")).setTableName(linkInfo.getTableName()));
             for (Map.Entry<String, Object> entry : girAdvOneRow.entrySet()) {
                 String fieldName = entry.getKey();
                 Object value = entry.getValue();
@@ -148,14 +164,19 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         return this;
     }
 
+
     private void writeBatchFeatures(ExceptionConsumer exceptionConsumer) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Transaction transaction = new DefaultTransaction("batch-write");
+        stopWatch.stop();
         try {
+            stopWatch.start();
             featureStore.setTransaction(transaction);
             featureStore.addFeatures(featureCollection);
             transaction.commit();
-            LOGGER.info("批量写入 " + featureCollection.size() + " 条要素成功");
-
+            stopWatch.stop();
+            logger.info("批量写入 {} 条要素成功，耗时：{}秒", batchCount, stopWatch.getTotalTimeSeconds());
             featureCollection.clear();
             batchCount = 0;
         } catch (Exception e) {
@@ -181,6 +202,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         }
     }
 
+
     private void initPostgisDataStore() {
         try {
             Map<String, Object> params = new HashMap<>();
@@ -189,6 +211,14 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
+            DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();
+            fastCreate.setUrl(linkInfo.getJdbcUrl());
+            fastCreate.setUsername(linkInfo.getUsername());
+            fastCreate.setPassword(linkInfo.getPassword());
+            fastCreate.setInitialSize(1);
+            fastCreate.setMinIdle(1);
+            dataSource = fastCreate.toDataSource();
+            params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
 
@@ -223,9 +253,9 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             if (postgisDataStore != null) {
                 postgisDataStore.dispose();
             }
-            LOGGER.info("PostGIS 写入器资源已释放，剩余批次条数 " + batchCount);
+            logger.info("PostGIS 写入器资源已释放，剩余批次条数 " + batchCount);
         } catch (Exception e) {
-            LOGGER.severe("关闭 PostGIS 写入器失败：" + e.getMessage());
+            logger.error("关闭 PostGIS 写入器失败：" + e.getMessage());
             throw new GeoFileWriteException("关闭 PostGIS 写入器失败", e);
         }
     }

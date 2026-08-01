@@ -2,6 +2,9 @@ package cn.geoair.map.dynamic.file.test.gj2pg;
 
 import static cn.geoair.base.Gir.log;
 
+import cn.geoair.base.percent.GiPercentUpdateConsumer;
+import cn.geoair.base.percent.GirPercentConsumer;
+import cn.geoair.base.util.GutilPercent;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTran;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTranImpl;
@@ -13,6 +16,7 @@ import cn.geoair.map.dynamic.file.geojson.GeoJsonLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisGeoFileWriter;
 import cn.geoair.map.dynamic.file.postgis.PostgisLinkInfo;
 import cn.geoair.map.dynamic.file.postgis.PostgisWriterLinkInfo;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.io.IOException;
@@ -28,7 +32,7 @@ public class GeoJsonToPg {
         geoJsonReader.setLinkInfo(geoJsonLinkInfo);
         PostgisLinkInfo postgisWriterLinkInfo =
                 new PostgisWriterLinkInfo()
-                        .setTableName("poi")
+                        .setBatchSize(5000).setTableName("t" + IdUtil.fastSimpleUUID())
                         .setJdbcUrl("jdbc:postgresql://192.168.0.110:5432/kashi_dth")
                         .setUsername("postgres")
                         .setPassword("tcsd2019")
@@ -40,7 +44,7 @@ public class GeoJsonToPg {
         postgisWriter.setWriteConfig(writeConfig);
         TranContext context =
                 new TranContext()
-                        .setBatchLogThreshold(500)
+                        .setBatchLogThreshold(2000)
                         .setSkipErrorRecord(true)
                         .setTimeout(60 * 60 * 1000)
                         // 预处理：校验表是否存在
@@ -60,7 +64,18 @@ public class GeoJsonToPg {
                         // 自定义扩展参数
                         .putExtParam("tranId", "TRAN_20260209_001")
                         .putExtParam("operator", "admin");
+        GirPercentConsumer percentConsumerInt = GutilPercent.getPercentConsumerInt(new GiPercentUpdateConsumer() {
+            @Override
+            public void start(Number allCount) {
+                log.info("总数：{}", allCount);
+            }
 
+            @Override
+            public void update(Number updatePercent) {
+                String progressBar = GutilPercent.getProgressBar(updatePercent.intValue());
+                log.info("{}: {}%", progressBar, updatePercent);
+            }
+        }, 1);
         // 3. 构建转换处理器
         GeoFileTran tran =
                 new GeoFileTranImpl()
@@ -72,12 +87,7 @@ public class GeoJsonToPg {
                         // 进度监听器（实时回调）
                         .setProgressListener(
                                 progress -> {
-                                    log.info(
-                                            StrUtil.format(
-                                                    "进度更新：已处理 {} 条，成功率 {}%，状态{}s",
-                                                    progress.getBatchTotalCount(),
-                                                    progress.getSuccessRate(),
-                                                    progress.getStatus()));
+                                    percentConsumerInt.accept(progress.getTotalFeatureCount(), progress.getBatchTotalCount());
                                 });
 
         // 4. 执行转换
@@ -86,7 +96,7 @@ public class GeoJsonToPg {
         // 5. 处理结果
         if (result.getStatus() == TranStatus.SUCCESS) {
             log.info(
-                    "转换成功！总条数：{}，成功率：{:.2f}%，耗时：{}ms",
+                    "转换成功！总条数：{}，成功率：{}%，耗时：{}ms",
                     result.getTotalCount(), result.getSuccessRate(), result.getElapsedTime());
         } else {
             log.error("转换失败！错误信息：{}，异常列表：{}", result.getErrorMsg(), result.getExceptions());

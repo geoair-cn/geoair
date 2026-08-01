@@ -4,7 +4,10 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
+
 import java.io.Closeable;
+import java.util.List;
+
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -24,4 +27,10 @@ public interface GeoFileWriter extends Closeable {
 
     // 写入一行
     GeoFileWriter writeOneRow(GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer);
+
+    // 批量插入
+    default GeoFileWriter writeRows(List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
+        rows.forEach(row -> writeOneRow(row, exceptionConsumer));
+        return this;
+    }
 }
