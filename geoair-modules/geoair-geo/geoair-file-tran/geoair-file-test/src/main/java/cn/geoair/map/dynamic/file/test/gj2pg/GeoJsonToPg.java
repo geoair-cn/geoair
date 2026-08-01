@@ -22,14 +22,13 @@ public class GeoJsonToPg {
     public static void main(String[] args) throws IOException {
         GeoJsonLinkInfo geoJsonLinkInfo =
                 new GeoJsonLinkInfo()
-                        .setGeoJsonFilePath("C:\\Users\\Administrator\\Documents\\aaaa.geojson")
+                        .setGeoJsonFilePath("E:\\gis测试数据\\测试数据\\geojson\\poi.geojson")
                         .setCharset("UTF-8");
         GeoJsonGeoFileReader geoJsonReader = new GeoJsonGeoFileReader();
         geoJsonReader.setLinkInfo(geoJsonLinkInfo);
-
         PostgisLinkInfo postgisWriterLinkInfo =
                 new PostgisWriterLinkInfo()
-                        .setTableName("geo_tran_demo")
+                        .setTableName("poi")
                         .setJdbcUrl("jdbc:postgresql://192.168.0.110:5432/kashi_dth")
                         .setUsername("postgres")
                         .setPassword("tcsd2019")
