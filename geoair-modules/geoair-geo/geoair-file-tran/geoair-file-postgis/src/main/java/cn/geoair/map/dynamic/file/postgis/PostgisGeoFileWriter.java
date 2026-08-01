@@ -188,7 +188,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             fastCreate.setInitialSize(1);
             fastCreate.setMinIdle(1);
             dataSource = fastCreate.toDataSource();
-            params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
+//            params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
 
 
