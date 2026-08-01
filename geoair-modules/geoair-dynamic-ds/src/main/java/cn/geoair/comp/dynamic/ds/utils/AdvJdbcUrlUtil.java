@@ -1,7 +1,9 @@
 package cn.geoair.comp.dynamic.ds.utils;
 
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import lombok.Getter;
 
 /**
@@ -11,27 +13,116 @@ import lombok.Getter;
  */
 public class AdvJdbcUrlUtil {
 
+    /**
+     * 为 JDBC URL 追加 schema 参数
+     *
+     * @param jdbcUrl 原始 JDBC URL
+     * @param schema  要设置的 schema 名称
+     * @return 包含 schema 参数的 JDBC URL
+     */
+    public static String appendSchema(String jdbcUrl, String schema) {
+        if (jdbcUrl == null || jdbcUrl.isEmpty()) {
+            throw new IllegalArgumentException("jdbcUrl cannot be null or empty");
+        }
+        if (schema == null || schema.isEmpty()) {
+            return jdbcUrl;
+        }
+
+        // URL 编码 schema 名称（防止特殊字符）
+        String encodedSchema = URLEncoder.encode(schema);
+
+        // 检查是否已经包含 schema 参数
+        String existingSchema = extractSchema(jdbcUrl);
+        if (existingSchema != null) {
+            // 如果已存在，替换
+            return replaceSchemaParameter(jdbcUrl, encodedSchema);
+        }
+
+        String separator = jdbcUrl.contains("?") ? "&" : "?";
+        String paramName = detectSchemaParamName(jdbcUrl);
+
+        return jdbcUrl + separator + paramName + "=" + encodedSchema;
+    }
+
+    /**
+     * 检测应该使用的 schema 参数名
+     */
+    private static String detectSchemaParamName(String jdbcUrl) {
+        String lowerUrl = jdbcUrl.toLowerCase();
+
+        if (lowerUrl.startsWith("jdbc:postgresql:")) {
+            return "currentSchema";
+        }
+        if (lowerUrl.startsWith("jdbc:oracle:")) {
+            return "defaultSchema";
+        }
+        if (lowerUrl.startsWith("jdbc:sqlserver:")) {
+            return "schemaName";
+        }
+        if (lowerUrl.startsWith("jdbc:h2:")) {
+            return "schema";
+        }
+        // 默认
+        return "currentSchema";
+    }
+
+    /**
+     * 从 JDBC URL 中提取已有的 schema 参数
+     */
+    private static String extractSchema(String jdbcUrl) {
+        String[] paramNames = {"currentSchema", "schema", "schemaName", "defaultSchema"};
+        for (String paramName : paramNames) {
+            String pattern = paramName + "=([^&]*)";
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+            java.util.regex.Matcher m = p.matcher(jdbcUrl);
+            if (m.find()) {
+                return m.group(1);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 替换已有的 schema 参数
+     */
+    private static String replaceSchemaParameter(String jdbcUrl, String newSchema) {
+        String[] paramNames = {"currentSchema", "schema", "schemaName", "defaultSchema"};
+        for (String paramName : paramNames) {
+            String pattern = paramName + "=[^&]*";
+            if (jdbcUrl.matches(".*" + pattern + ".*")) {
+                return jdbcUrl.replaceAll(pattern, paramName + "=" + newSchema);
+            }
+        }
+        return jdbcUrl;
+    }
+
+
     public static AdvJdbcUrlUtil splitter(String jdbcUrl) {
         return new AdvJdbcUrlUtil(jdbcUrl);
     }
 
     // 基础组件
-    @Getter public String driverName; // 驱动名（如postgresql、mysql、derby）
+    @Getter
+    public String driverName; // 驱动名（如postgresql、mysql、derby）
 
-    @Getter public String host; // 主机地址
+    @Getter
+    public String host; // 主机地址
 
-    @Getter public String port; // 端口号
+    @Getter
+    public String port; // 端口号
 
-    @Getter public String database; // 数据库名/实例名
+    @Getter
+    public String database; // 数据库名/实例名
 
     // 参数Map（key=参数名，value=参数值，保留原始顺序）
-    @Getter public Map<String, String> params;
+    @Getter
+    public Map<String, String> params;
 
     /**
      * 解析JDBC URL
      *
      * @param jdbcUrl JDBC连接URL，例如：
-     *     jdbc:postgresql://10.11.14.182:5432/bdh?currentSchema=onemap_tile_builder&characterEncoding=utf8&reWriteBatchedInserts=true
+     *                jdbc:postgresql://10.11.14.182:5432/bdh?currentSchema=onemap_tile_builder&characterEncoding=utf8&reWriteBatchedInserts=true
      */
     public AdvJdbcUrlUtil(String jdbcUrl) {
         // 初始化参数Map
@@ -113,7 +204,7 @@ public class AdvJdbcUrlUtil {
     /**
      * 解析参数字符串为Map
      *
-     * @param paramStr 参数字符串（如currentSchema=onemap_tile_builder&characterEncoding=utf8）
+     * @param paramStr  参数字符串（如currentSchema=onemap_tile_builder&characterEncoding=utf8）
      * @param separator 参数分隔符（&或;）
      */
     private void parseParams(String paramStr, String separator) {
@@ -170,5 +261,9 @@ public class AdvJdbcUrlUtil {
     }
 
     // 测试方法
-    public static void main(String[] args) {}
+    public static void main(String[] args) {
+
+        System.out.println(appendSchema("jdbc:postgresql://localhost:5432/mydb", "public"));
+        System.out.println(appendSchema("jdbc:postgresql://localhost:5432/mydb?currentSchema=old", "public"));
+    }
 }
