@@ -3,6 +3,8 @@ package cn.geoair.map.dynamic.adv.query.mapping;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.hutool.core.util.StrUtil;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +80,7 @@ public class AdvBeanColumnMapper {
             if (ignoreEmptyString && value instanceof String && ((String) value).trim().isEmpty()) {
                 continue;
             }
-            String columnName = toUnderlineCase ? cn.hutool.core.util.StrUtil.toUnderlineCase(propertyName) : propertyName;
+            String columnName = toUnderlineCase ? StrUtil.toUnderlineCase(propertyName) : propertyName;
             Class<?> valueType = value == null ? Object.class : value.getClass();
             Object jdbcValue = typeHandlerRegistry.convertForWrite(
                     value,

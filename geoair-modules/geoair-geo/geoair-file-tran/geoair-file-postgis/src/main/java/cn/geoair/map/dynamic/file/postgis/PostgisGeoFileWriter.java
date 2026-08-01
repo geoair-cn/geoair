@@ -5,6 +5,8 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
@@ -35,6 +37,9 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.sql.DataSource;
@@ -50,22 +55,14 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     private WriteConfig writeConfig = new WriteConfig();
 
     private DataStore postgisDataStore;
-
+    private IAdvExecutor iAdvExecutor;
     private SimpleFeatureType featureType;
-
-    private SimpleFeatureBuilder featureBuilder;
-
-    private FeatureStore<SimpleFeatureType, SimpleFeature> featureStore;
-
-    private DefaultFeatureCollection featureCollection;
 
     private int batchSize;
 
-    private int batchCount = 0;
 
     @Override
     public void setLinkInfo(LinkInfo linkInfo) {
-
         if (!(linkInfo instanceof PostgisWriterLinkInfo)) {
             throw new IllegalArgumentException("链接信息必须是 PostgisLinkInfo 类型");
         }
@@ -87,6 +84,10 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             this.featureType = featureType;
             CoordinateReferenceSystem crs =
                     GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+            GeometryDescriptor geometryDescriptor = featureType.getGeometryDescriptor();
+            GeometryType type = geometryDescriptor.getType();
+            Class<?> binding = type.getBinding();
+            AdvEnumsTypeGeom enumsTypeGeom = AdvEnumsTypeGeom.findByGeoToolsClassValue(binding);
             org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                     new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
             typeBuilder.init(featureType);
@@ -99,7 +100,6 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             } catch (IOException e) {
 
             }
-
             if (schema != null) {
                 if (!writeConfig.isOverwrite()) {
                     throw new GeoFileWriteException("目标表已存在且未开启覆盖：" + linkInfo.getTableName());
@@ -108,12 +108,11 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                 logger.info("已删除原有表：" + linkInfo.getTableName());
             }
             postgisDataStore.createSchema(this.featureType);
+
+            iAdvExecutor.eDropGeomColumn(linkInfo.getTableName(), "geometry");
+            iAdvExecutor.eAddGeomColumn(linkInfo.getTableName(), "geometry",enumsTypeGeom, writeConfig.getOutPutSrid());
+
             logger.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
-            this.featureStore =
-                    (FeatureStore<SimpleFeatureType, SimpleFeature>)
-                            postgisDataStore.getFeatureSource(linkInfo.getTableName());
-            this.featureBuilder = new SimpleFeatureBuilder(this.featureType);
-            this.featureCollection = new DefaultFeatureCollection(null, this.featureType);
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileWriteException("基于 SimpleFeatureType 自动建表失败", e);
@@ -125,38 +124,13 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     public GeoFileWriter writeOneRow(
             GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer) {
         try {
-            if (featureBuilder == null || girAdvOneRow == null || girAdvOneRow.isEmpty()) {
+            if (girAdvOneRow == null || girAdvOneRow.isEmpty()) {
                 return this;
             }
-
-            featureBuilder.reset();
+            tranRows(girAdvOneRow);
             GirAdvQuery.getIAdvExecutor(dataSource).bInsertIgnore(girAdvOneRow,
-                    s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid")).setTableName(linkInfo.getTableName()));
-            for (Map.Entry<String, Object> entry : girAdvOneRow.entrySet()) {
-                String fieldName = entry.getKey();
-                Object value = entry.getValue();
-                if (value instanceof Geometry) {
-                    Geometry geom = (Geometry) value;
-                    int srid = geom.getSRID();
-                    Geometry convert =
-                            GirGeoTools.defaultInstance().getSridOpt()
-                                    .convert(geom, srid, writeConfig.getOutPutSrid());
-                    if (convert == null) {
-                        Gir.log.info("转换失败");
-                    }
-                    featureBuilder.set(fieldName, convert);
-                } else {
-                    featureBuilder.set(fieldName, value);
-                }
-            }
-
-            SimpleFeature feature = featureBuilder.buildFeature(UUID.randomUUID().toString());
-            featureCollection.add(feature);
-            batchCount++;
-
-            if (batchCount >= batchSize) {
-                writeBatchFeatures(exceptionConsumer);
-            }
+                    s -> s.setConflictKeys(ListUtil.of("fid"))
+                            .setTableName(linkInfo.getTableName()));
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileWriteException("写入 PostGIS 单行数据失败", e);
@@ -165,41 +139,39 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     }
 
 
-    private void writeBatchFeatures(ExceptionConsumer exceptionConsumer) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        Transaction transaction = new DefaultTransaction("batch-write");
-        stopWatch.stop();
-        try {
-            stopWatch.start();
-            featureStore.setTransaction(transaction);
-            featureStore.addFeatures(featureCollection);
-            transaction.commit();
-            stopWatch.stop();
-            logger.info("批量写入 {} 条要素成功，耗时：{}秒", batchCount, stopWatch.getTotalTimeSeconds());
-            featureCollection.clear();
-            batchCount = 0;
-        } catch (Exception e) {
-            try {
-                transaction.rollback();
-            } catch (IOException ex) {
-                if (exceptionConsumer != null) {
-                    exceptionConsumer.accept(ex);
+    private void tranRows(GirAdvOneRow girAdvOneRow) {
+        for (Map.Entry<String, Object> entry : girAdvOneRow.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Geometry) {
+                Geometry geom = (Geometry) value;
+                int srid = geom.getSRID();
+                Geometry convert =
+                        GirGeoTools.defaultInstance().getSridOpt()
+                                .convert(geom, srid, writeConfig.getOutPutSrid());
+                if (convert == null) {
+                    Gir.log.info("转换失败");
                 }
-            }
-            if (exceptionConsumer != null) {
-                exceptionConsumer.accept(e);
-            }
-            throw new GeoFileWriteException("PostGIS 批量写入失败", e);
-        } finally {
-            try {
-                transaction.close();
-            } catch (IOException e) {
-                if (exceptionConsumer != null) {
-                    exceptionConsumer.accept(e);
-                }
+                girAdvOneRow.put(fieldName, convert);
+            } else {
+                girAdvOneRow.put(fieldName, value);
             }
         }
+    }
+
+    public GeoFileWriter writeRows(List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (GirAdvOneRow row : rows) {
+            tranRows(row);
+        }
+        GirAdvQuery.getIAdvExecutor(dataSource).bInsertIgnoreBatch(rows,
+                s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid"))
+                        .setTableName(linkInfo.getTableName()));
+        stopWatch.stop();
+        logger.info("批量写入 {} 条要素成功，耗时：{}秒", batchSize, stopWatch.getTotalTimeSeconds());
+
+        return this;
     }
 
 
@@ -223,6 +195,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
 
             this.postgisDataStore = DataStoreFinder.getDataStore(params);
+
+            iAdvExecutor   =GirAdvQuery.getIAdvExecutor(dataSource);
             if (postgisDataStore == null) {
                 throw new GeoFileWriteException("初始化 PostGIS DataStore 失败");
             }
@@ -247,13 +221,9 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     @Override
     public void close() {
         try {
-            if (batchCount > 0) {
-                writeBatchFeatures(null);
-            }
             if (postgisDataStore != null) {
                 postgisDataStore.dispose();
             }
-            logger.info("PostGIS 写入器资源已释放，剩余批次条数 " + batchCount);
         } catch (Exception e) {
             logger.error("关闭 PostGIS 写入器失败：" + e.getMessage());
             throw new GeoFileWriteException("关闭 PostGIS 写入器失败", e);
