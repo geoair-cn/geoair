@@ -49,7 +49,7 @@ public class ShpToPg {
         postgisWriter.setWriteConfig(writeConfig);
         TranContext context =
                 new TranContext()
-                        .setBatchLogThreshold(500)
+                        .setBatchSize(500)
                         .setSkipErrorRecord(true)
                         .setTimeout(60 * 60 * 1000)
                         // 预处理：校验表是否存在

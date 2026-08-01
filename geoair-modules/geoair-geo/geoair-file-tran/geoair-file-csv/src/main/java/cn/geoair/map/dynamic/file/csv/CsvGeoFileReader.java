@@ -81,7 +81,7 @@ public class CsvGeoFileReader implements GeoFileReader {
     }
 
     @Override
-    public GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
+    public GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
         try {
             String line = reader.readLine();
             if (line == null) {
@@ -142,7 +142,7 @@ public class CsvGeoFileReader implements GeoFileReader {
                     closeIterator();
                     throw new NoSuchElementException("无更多数据");
                 }
-                return readOneRow(exceptionConsumer);
+                return readNextRow(exceptionConsumer);
             }
 
             @Override

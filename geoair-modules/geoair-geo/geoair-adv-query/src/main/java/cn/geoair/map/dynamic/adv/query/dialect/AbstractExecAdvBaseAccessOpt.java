@@ -632,7 +632,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             long cost = stopWatch.getTotalTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
                     this.getClass(), "bInsertIgnoreBatch",
-                    StrUtil.format("表名：{}，总条数：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
+                    StrUtil.format("表名：{}，总成功批次：{}，批次大小：{}", tableName, totalSuccess, strategy.getBatchSize()),
                     cost, totalSuccess);
 
         } catch (SQLException e) {

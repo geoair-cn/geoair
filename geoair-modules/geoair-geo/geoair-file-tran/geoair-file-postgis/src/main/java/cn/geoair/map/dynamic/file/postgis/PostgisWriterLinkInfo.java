@@ -8,16 +8,20 @@ import cn.geoair.base.log.GirLoggerFactory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
- 
+
 
 /** PostGIS 链接信息类 包含数据库连接、排序字段、几何字段等核心配置 */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
- 
+
 public class PostgisWriterLinkInfo extends PostgisLinkInfo {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     private String tableName;
+
+    // 批量插入的批次大小
+    private int batchSize = 1000;
 
     /** 检查链接信息有效性 */
     @Override

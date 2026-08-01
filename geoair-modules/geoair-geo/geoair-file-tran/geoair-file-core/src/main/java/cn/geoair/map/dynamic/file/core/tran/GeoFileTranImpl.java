@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
+import cn.geoair.base.data.page.support.GirPageParam;
+import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -7,15 +9,24 @@ import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileTimeoutException;
+import cn.geoair.map.dynamic.file.core.exception.GeoFileWriteException;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranProgress;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
+
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.page.PageConditionDef;
+import cn.geoair.map.dynamic.tools.page.PageConfig;
+
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 
@@ -31,9 +42,11 @@ public class GeoFileTranImpl implements GeoFileTran {
 
     // 全局异常处理器
     private ExceptionConsumer exceptionConsumer;
-    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {};
+    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {
+    };
 
-    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {};
+    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {
+    };
 
     // 进度监听器
     private TranProgressListener progressListener;
@@ -64,7 +77,8 @@ public class GeoFileTranImpl implements GeoFileTran {
         this.status = TranStatus.RUNNING;
         this.startTime = System.currentTimeMillis();
         TranResult result = new TranResult().setStatus(TranStatus.RUNNING).setStartTime(startTime);
-        ExceptionConsumer internalExceptionConsumer = e -> {};
+        ExceptionConsumer internalExceptionConsumer = e -> {
+        };
 
         try {
             if (reader == null || writer == null) {
@@ -91,45 +105,56 @@ public class GeoFileTranImpl implements GeoFileTran {
             log.info("表头初始化完成，要素类型：{}", featureType.getName());
 
             featureCount = reader.getFeatureCount();
-            while (status == TranStatus.RUNNING) {
-                checkTimeout();
 
-                GirAdvOneRow oneRow;
-                try {
-                    oneRow = reader.readOneRow(internalExceptionConsumer);
-                } catch (Exception e) {
-                    totalCount.incrementAndGet();
-                    onRecordFailure(result, e, "读取记录失败");
-                    updateProgress();
-                    logBatchProgress();
-                    if (!this.context.isSkipErrorRecord()) {
-                        break;
-                    }
-                    continue;
-                }
 
-                if (oneRow == null) {
-                    break;
-                }
-
-                try {
-                    oneRowConsumer.accept(oneRow);
-                    writer.writeOneRow(oneRow, internalExceptionConsumer);
-                    successCount.incrementAndGet();
-                } catch (Exception e) {
-                    onRecordFailure(result, e, "写入记录失败");
-                    if (!this.context.isSkipErrorRecord()) {
+            GirAdvTools.getPageActuatorOpt(new PageConditionDef<GirAdvOneRow>() {
+                @Override
+                public Consumer<GirAdvOneRow> getEachRecordConsumer() {
+                    return t -> {
+                        checkTimeout();
+                        oneRowConsumer.accept(t);
                         totalCount.incrementAndGet();
                         updateProgress();
-                        logBatchProgress();
-                        break;
-                    }
+                    };
                 }
 
-                totalCount.incrementAndGet();
-                updateProgress();
-                logBatchProgress();
-            }
+                @Override
+                public Long getTotalRecordCount() {
+                    return featureCount;
+                }
+
+                @Override
+                public void setPageConfig(PageConfig pageConfig) {
+                    pageConfig.setPageNumStartByZero(false);
+                    pageConfig.setSaveResultListIs(false).setPageSize((long) context.getBatchSize());
+                }
+
+                @Override
+                public List<GirAdvOneRow> getPageRecords(Integer pageNo, Integer pageSize) {
+                    logBatchProgress();
+                    GirPageParam pageParam = new GirPageParam();
+                    pageParam.putParam(pageSize, pageNo, 0L, false);
+                    GirPager<GirAdvOneRow> pager = reader.readRowPage(pageParam, exceptionConsumer);
+                    List<GirAdvOneRow> list = (List<GirAdvOneRow>) pager.getList();
+                    try {
+                        writer.writeRows(list, internalExceptionConsumer);
+                        successCount.addAndGet(list.size());
+                        return list;
+                    } catch (Exception e) {
+                        onRecordFailure(result, e, "写入记录失败");
+                        if (!context.isSkipErrorRecord()) {
+                            totalCount.addAndGet(list.size());
+                            updateProgress();
+                            logBatchProgress();
+                            return Collections.emptyList();
+                        } else {
+                            throw new GeoFileWriteException("写入失败！");
+                        }
+                    }
+
+                }
+            }).execute();
+
 
             if (status == TranStatus.RUNNING) {
                 status = TranStatus.SUCCESS;
@@ -151,14 +176,12 @@ public class GeoFileTranImpl implements GeoFileTran {
                 closeQuietly(reader, result);
                 closeQuietly(writer, result);
             }
-
             finalizeResult(result);
             log.info("转换任务执行完成，状态：{}，总耗时：{}ms", status, result.getElapsedTime());
 
             if (this.context.getPostProcessor() != null) {
                 this.context.getPostProcessor().process(result, this.context);
             }
-
             updateProgress();
         }
 
@@ -256,10 +279,10 @@ public class GeoFileTranImpl implements GeoFileTran {
     }
 
     private void logBatchProgress() {
-        if (totalCount.get() == 0 || context.getBatchLogThreshold() <= 0) {
+        if (totalCount.get() == 0 || context.getBatchSize() <= 0) {
             return;
         }
-        if (totalCount.get() % context.getBatchLogThreshold() == 0) {
+        if (totalCount.get() % context.getBatchSize() == 0) {
             log.info(
                     "转换进度：已处理 {} 条，成功 {} 条，失败 {} 条，成功率 {}%",
                     totalCount.get(),

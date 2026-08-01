@@ -169,7 +169,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
     }
 
     @Override
-    public GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
+    public GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
         try {
             if (featureIterator == null || !featureIterator.hasNext()) {
                 return null;
@@ -222,7 +222,7 @@ public class PostgisGeoFileReader implements GeoFileReader {
                     closeIterator();
                     throw new NoSuchElementException("已无更多 PostGIS 数据");
                 }
-                return readOneRow(exceptionConsumer);
+                return readNextRow(exceptionConsumer);
             }
 
             @Override

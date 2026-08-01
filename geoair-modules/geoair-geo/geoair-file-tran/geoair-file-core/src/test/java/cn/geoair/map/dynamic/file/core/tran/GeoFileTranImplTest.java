@@ -41,7 +41,7 @@ class GeoFileTranImplTest {
             }
 
             @Override
-            public cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
+            public cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
                 throw new GeoFileReadException("boom");
             }
 
@@ -119,7 +119,7 @@ class GeoFileTranImplTest {
         }
 
         @Override
-        public cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
+        public cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
             if (counter.incrementAndGet() > 1000) {
                 return null;
             }

@@ -48,6 +48,8 @@ public class ImageMimeGetter implements IMimeTypeGetter {
             return jpegPng;
         } else if (tmpStr.equalsIgnoreCase("vnd.jpeg-png8")) {
             return jpegPng8;
+        } else if (tmpStr.equalsIgnoreCase("webp")) {
+            return webp;
         }
         return null;
     }
@@ -73,6 +75,8 @@ public class ImageMimeGetter implements IMimeTypeGetter {
             return jpegPng;
         } else if (fileExtension.equalsIgnoreCase("jpeg-png8")) {
             return jpegPng8;
+        } else if (fileExtension.equalsIgnoreCase("webp")) {
+            return webp;
         }
         return null;
     }
