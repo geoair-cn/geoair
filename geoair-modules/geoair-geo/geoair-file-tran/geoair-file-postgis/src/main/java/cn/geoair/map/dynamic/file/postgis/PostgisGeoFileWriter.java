@@ -165,11 +165,11 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         for (GirAdvOneRow row : rows) {
             tranRows(row);
         }
-        GirAdvQuery.getIAdvExecutor(dataSource).bInsertIgnoreBatch(rows,
+        iAdvExecutor.bInsertIgnoreBatch(rows,
                 s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid"))
                         .setTableName(linkInfo.getTableName()));
         stopWatch.stop();
-        logger.info("批量写入 {} 条要素成功，耗时：{}秒", batchSize, stopWatch.getTotalTimeSeconds());
+        logger.info("批量写入 {} 条要素成功，耗时：{}秒", rows.size(), stopWatch.getTotalTimeSeconds());
 
         return this;
     }
@@ -183,6 +183,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
+            params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
             DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();
             fastCreate.setUrl(linkInfo.getJdbcUrl());
             fastCreate.setUsername(linkInfo.getUsername());
@@ -192,7 +193,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             dataSource = fastCreate.toDataSource();
             params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
-            params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
+
 
             this.postgisDataStore = DataStoreFinder.getDataStore(params);
 

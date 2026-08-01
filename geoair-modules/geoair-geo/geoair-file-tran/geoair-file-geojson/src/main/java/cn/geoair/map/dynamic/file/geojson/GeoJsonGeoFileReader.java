@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.geoair.map.dynamic.file.geojson.geotools.GirGeoJSONReader;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geotools.feature.FeatureCollection;
@@ -37,7 +38,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
     private GeoJsonLinkInfo linkInfo;
 
     private FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection;
-
+    Object[] featureCollectionArray;
     private FeatureIterator<SimpleFeature> featureIterator;
 
     private SimpleFeatureType featureType;
@@ -97,6 +98,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
             try {
                 this.featureCollection = geoJsonReader.getFeatures();
                 IoUtil.close(fis);
+                featureCollectionArray = featureCollection.toArray();
                 this.featureType = featureCollection.getSchema();
                 this.featureIterator = featureCollection.features();
             } catch (Exception e) {
@@ -231,25 +233,16 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
             int pageSize = girPageParam.getPageSize();
             int startIndex = (pageNum - 1) * pageSize;
             int endIndex = startIndex + pageSize;
-
-            resetIterator();
-
             List<GirAdvOneRow> rowList = new ArrayList<>();
-            AtomicInteger index = new AtomicInteger(0);
-
-            while (featureIterator.hasNext()) {
-                int currentIndex = index.getAndIncrement();
-                if (currentIndex < startIndex) {
-                    featureIterator.next();
-                    continue;
+            Object[] any = ArrayUtil.sub(featureCollectionArray, startIndex, endIndex);
+            if (GutilObject.isNotEmpty(any)) {
+                for (Object o : any) {
+                    SimpleFeature simpleFeature = (SimpleFeature) o;
+                    Map<String, Object> attributes = tranFeature(simpleFeature);
+                    GirAdvOneRow girAdvOneRow = GirAdvOneRow.ofByMap(attributes);
+                    rowList.add(girAdvOneRow);
                 }
-                if (currentIndex >= endIndex) {
-                    break;
-                }
-
-                rowList.add(readOneRow(exceptionConsumer));
             }
-
             pager.put(rowList, getFeatureCount(), girPageParam);
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);

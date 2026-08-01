@@ -30,9 +30,11 @@ public class GeoJsonToPg {
                         .setCharset("UTF-8");
         GeoJsonGeoFileReader geoJsonReader = new GeoJsonGeoFileReader();
         geoJsonReader.setLinkInfo(geoJsonLinkInfo);
+        long featureCount = geoJsonReader.getFeatureCount();
+        System.out.println(featureCount);
         PostgisLinkInfo postgisWriterLinkInfo =
                 new PostgisWriterLinkInfo()
-                        .setBatchSize(5000).setTableName("t" + IdUtil.fastSimpleUUID())
+                        .setBatchSize(5000).setTableName("t" + IdUtil.getSnowflakeNextIdStr())
                         .setJdbcUrl("jdbc:postgresql://192.168.0.110:5432/kashi_dth")
                         .setUsername("postgres")
                         .setPassword("tcsd2019")
@@ -44,7 +46,7 @@ public class GeoJsonToPg {
         postgisWriter.setWriteConfig(writeConfig);
         TranContext context =
                 new TranContext()
-                        .setBatchLogThreshold(2000)
+                        .setBatchSize(5000)
                         .setSkipErrorRecord(true)
                         .setTimeout(60 * 60 * 1000)
                         // 预处理：校验表是否存在
@@ -96,8 +98,8 @@ public class GeoJsonToPg {
         // 5. 处理结果
         if (result.getStatus() == TranStatus.SUCCESS) {
             log.info(
-                    "转换成功！总条数：{}，成功率：{}%，耗时：{}ms",
-                    result.getTotalCount(), result.getSuccessRate(), result.getElapsedTime());
+                    "转换成功！总条数：{}，成功率：{}%，耗时：{}s",
+                    result.getTotalCount(), result.getSuccessRate(), result.getElapsedTime()/1000);
         } else {
             log.error("转换失败！错误信息：{}，异常列表：{}", result.getErrorMsg(), result.getExceptions());
         }

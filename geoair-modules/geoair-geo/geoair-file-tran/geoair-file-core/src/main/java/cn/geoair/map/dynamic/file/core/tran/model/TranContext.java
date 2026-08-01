@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 public class TranContext {
 
     // 基础配置
-    private int batchLogThreshold = 1000; // 批量日志阈值
+    private int batchSize = 3000; // 批量日志阈值
 
     private boolean skipErrorRecord = true; // 是否跳过错误记录
 
