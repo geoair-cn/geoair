@@ -32,6 +32,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.sql.DataSource;
@@ -101,8 +102,9 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             }
             postgisDataStore.createSchema(this.featureType);
 
-            iAdvExecutor.eDropGeomColumn(linkInfo.getTableName(), "geometry");
-            iAdvExecutor.eAddGeomColumn(linkInfo.getTableName(), "geometry",enumsTypeGeom, writeConfig.getOutPutSrid());
+            String localPart = geometryDescriptor.getName().getLocalPart();
+            iAdvExecutor.eDropGeomColumn(linkInfo.getTableName(), localPart);
+            iAdvExecutor.eAddGeomColumn(linkInfo.getTableName(), localPart, enumsTypeGeom, writeConfig.getOutPutSrid());
 
             logger.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
         } catch (Exception e) {
@@ -122,7 +124,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             tranRows(girAdvOneRow);
             iAdvExecutor.bInsertIgnore(girAdvOneRow,
                     s -> s.setConflictKeys(ListUtil.of("fid"))
-                            .setTableName(linkInfo.getTableName()));
+                            .setTableName(linkInfo.getTableName()).setToUnderlineCase(false));
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileWriteException("写入 PostGIS 单行数据失败", e);
@@ -158,7 +160,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             tranRows(row);
         }
         iAdvExecutor.bInsertIgnoreBatch(rows,
-                s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid"))
+                s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid")).setToUnderlineCase(false)
                         .setTableName(linkInfo.getTableName()));
         stopWatch.stop();
         logger.info("批量写入 {} 条要素成功，耗时：{}秒", rows.size(), stopWatch.getTotalTimeSeconds());
