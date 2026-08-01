@@ -19,36 +19,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
 
-import cn.geoair.map.dynamic.tools.simple.collection.map.GirFastStrObjMap;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.Transaction;
-import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
-import org.geotools.api.data.FeatureStore;
-import org.geotools.api.data.Transaction;
-import org.geotools.data.*;
-import org.geotools.data.postgis.PostgisNGDataStoreFactory;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.locationtech.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.GeometryType;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.type.GeometryDescriptor;
+import org.geotools.api.feature.type.GeometryType;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.data.postgis.PostgisNGDataStoreFactory;
+import org.locationtech.jts.geom.Geometry;
+
 
 import javax.sql.DataSource;
 
