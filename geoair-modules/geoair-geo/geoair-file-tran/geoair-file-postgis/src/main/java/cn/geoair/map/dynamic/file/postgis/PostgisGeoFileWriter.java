@@ -3,12 +3,13 @@ package cn.geoair.map.dynamic.file.postgis;
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.adv.utils.AdvJdbcUrlUtil;
+
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileWriteException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
@@ -176,7 +177,12 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
             DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();
-            fastCreate.setUrl(linkInfo.getJdbcUrl());
+            if(linkInfo.getSchema()!=null) {
+                String jdbcUrl = AdvJdbcUrlUtil.appendSchema(linkInfo.getJdbcUrl(), linkInfo.getSchema());
+                fastCreate.setUrl(jdbcUrl);
+            }else{
+                fastCreate.setUrl(linkInfo.getJdbcUrl());
+            }
             fastCreate.setUsername(linkInfo.getUsername());
             fastCreate.setPassword(linkInfo.getPassword());
             fastCreate.setInitialSize(1);
@@ -189,6 +195,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             this.postgisDataStore = DataStoreFinder.getDataStore(params);
 
             iAdvExecutor   =GirAdvQuery.getIAdvExecutor(dataSource);
+
             if (postgisDataStore == null) {
                 throw new GeoFileWriteException("初始化 PostGIS DataStore 失败");
             }
