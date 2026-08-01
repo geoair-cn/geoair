@@ -92,7 +92,7 @@ public class ShpGeoFileReader implements GeoFileReader {
     }
 
     @Override
-    public GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer) {
+    public GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
         try {
             if (featureIterator == null || !featureIterator.hasNext()) {
                 return null;
@@ -151,7 +151,7 @@ public class ShpGeoFileReader implements GeoFileReader {
                     closeIterator();
                     throw new NoSuchElementException("无更多数据");
                 }
-                return readOneRow(exceptionConsumer);
+                return readNextRow(exceptionConsumer);
             }
 
             @Override
@@ -201,7 +201,7 @@ public class ShpGeoFileReader implements GeoFileReader {
                     break;
                 }
 
-                list.add(readOneRow(consumer));
+                list.add(readNextRow(consumer));
             }
 
             pager.put(list, featureCollection.size(), param);
