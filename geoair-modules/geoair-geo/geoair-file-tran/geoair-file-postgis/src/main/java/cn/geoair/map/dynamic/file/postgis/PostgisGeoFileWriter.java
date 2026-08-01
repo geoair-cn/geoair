@@ -128,7 +128,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                 return this;
             }
             tranRows(girAdvOneRow);
-            GirAdvQuery.getIAdvExecutor(dataSource).bInsertIgnore(girAdvOneRow,
+            iAdvExecutor.bInsertIgnore(girAdvOneRow,
                     s -> s.setConflictKeys(ListUtil.of("fid"))
                             .setTableName(linkInfo.getTableName()));
         } catch (Exception e) {

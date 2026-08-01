@@ -91,6 +91,10 @@ public class GeoFileTranImpl implements GeoFileTran {
 
             featureCount = reader.getFeatureCount();
             while (status == TranStatus.RUNNING) {
+
+
+
+
                 checkTimeout();
 
                 GirAdvOneRow oneRow;
