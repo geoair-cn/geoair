@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.file.postgis;
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.dynamic.adv.GirAdvQuery;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -186,25 +188,22 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
             DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();
-            if(linkInfo.getSchema()!=null) {
-                String jdbcUrl = AdvJdbcUrlUtil.appendSchema(linkInfo.getJdbcUrl(), linkInfo.getSchema());
-                fastCreate.setUrl(jdbcUrl);
-            }else{
-                fastCreate.setUrl(linkInfo.getJdbcUrl());
-            }
+            fastCreate.setUrl(linkInfo.getJdbcUrl());
             fastCreate.setUsername(linkInfo.getUsername());
             fastCreate.setPassword(linkInfo.getPassword());
             fastCreate.setInitialSize(1);
             fastCreate.setMinIdle(1);
             dataSource = fastCreate.toDataSource();
-//            params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
+            params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
 
 
             this.postgisDataStore = DataStoreFinder.getDataStore(params);
 
-            iAdvExecutor   =GirAdvQuery.getIAdvExecutor(dataSource);
-
+            iAdvExecutor = GirAdvQuery.getIAdvExecutor(dataSource);
+            if (GutilObject.isNotEmpty(linkInfo.getSchema())) {
+                iAdvExecutor.setSchemaNameGetterFunction(() -> linkInfo.getSchema());
+            }
             if (postgisDataStore == null) {
                 throw new GeoFileWriteException("初始化 PostGIS DataStore 失败");
             }
