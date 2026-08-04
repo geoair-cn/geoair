@@ -47,7 +47,6 @@ public class TileResponseByInputStream extends TileResponse {
         }
 
 
-
         // 3. 都没有则返回null
         return null;
     }
@@ -131,9 +130,14 @@ public class TileResponseByInputStream extends TileResponse {
 
     /**
      * 获取内容长度（兼容HTTP Content-Length）
-     * 优先级：bytes > inputStream.available() > size
+     * 优先级：size>bytes > inputStream.available()
      */
     public Long getContentLength() {
+
+        if (size != null) {
+            return size;
+        }
+
         if (bytes != null && bytes.length > 0) {
             return (long) bytes.length;
         }
