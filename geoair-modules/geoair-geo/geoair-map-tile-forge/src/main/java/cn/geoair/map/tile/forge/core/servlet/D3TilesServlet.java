@@ -38,7 +38,7 @@ public class D3TilesServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        requestURI= URLUtil.decode(requestURI);
+//        requestURI= URLUtil.decode(requestURI);
 
         // 解析请求
         TileParseResult parseResult = parseRequest(requestURI);
