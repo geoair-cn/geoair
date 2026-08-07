@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.spring;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.DynamicDataSourceManager;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
@@ -10,6 +11,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.tools.GirService;
 
 import javax.sql.DataSource;
+import java.util.function.Supplier;
 
 /**
  * @author ：张逢吉
@@ -21,7 +23,12 @@ public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
     public IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
         DynamicDataSourceManager instance = AdvDynamicDataSourceStorage.getInstance();
         AdvDataSourceWrapper dataSource = instance.getOrCreateDataSource(dataSourceId);
-        return AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceId);
+        String dataSourceName = dataSourceId + "_" + schema;
+        IAdvExecutor advExecutorByDataSource = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceName);
+        if (GutilObject.isNotEmpty(schema)) {
+            advExecutorByDataSource.setSchemaNameGetterFunction(() -> schema);
+        }
+        return advExecutorByDataSource;
     }
 
     @Override
