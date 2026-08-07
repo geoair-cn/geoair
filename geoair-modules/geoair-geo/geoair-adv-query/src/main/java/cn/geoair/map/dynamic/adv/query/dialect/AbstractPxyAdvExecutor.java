@@ -14,6 +14,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.strategy.AccessStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
+import cn.geoair.map.dynamic.adv.query.supplier.GirDataBaseNameGetter;
+import cn.geoair.map.dynamic.adv.query.supplier.GirSchemaNameGetter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
@@ -86,6 +88,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             throw new IllegalArgumentException("DataSourceApo 不能为空");
         }
         this.getDataSourceGetter().initByDataSourceApo(dataSourceApo);
+        this.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
+        this.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
         this.initProxyObjects();
     }
 
@@ -100,6 +104,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             throw new IllegalArgumentException("DataSource 不能为空");
         }
         this.getDataSourceGetter().initByDataSource(dataSource, dataSourceName);
+        this.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
+        this.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
         this.initProxyObjects();
     }
 
