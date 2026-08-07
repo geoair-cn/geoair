@@ -484,7 +484,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         config.setEnableQueryLog(enableQueryLog);
         String schema = girAdvOneRow.getStr("schema");
-        Gir.log.info("从数据库获取到的schema为：【{}】", schema); 
+        Gir.log.info("从数据库获取到的schema为：【{}】", schema);
         return schema;
     }
 
