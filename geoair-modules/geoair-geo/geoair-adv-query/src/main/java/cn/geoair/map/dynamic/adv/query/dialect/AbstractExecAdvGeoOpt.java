@@ -27,12 +27,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
- 
 
 /**
  * 空间操作抽象基类 封装通用参数校验、结果处理等逻辑，子类只需实现数据库方言相关逻辑
  */
- 
+
 public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     public static GiLogger log = GirLoggerFactory.getLogger();
     protected final IDataSourceGetter dataSourceGetter;
@@ -436,8 +435,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     public List<GirAdvOneRow> eGetCentroid(
             String tableNameOrSqlView, String geomFieldName, String centerAlias) {
         if (StrUtil.isEmpty(tableNameOrSqlView)
-                || StrUtil.isEmpty(geomFieldName)
-                || StrUtil.isEmpty(centerAlias)) {
+            || StrUtil.isEmpty(geomFieldName)
+            || StrUtil.isEmpty(centerAlias)) {
             throw new IllegalArgumentException("表名、空间字段名和中心点字段别名不能为空");
         }
         String qualifiedTableName =
@@ -548,8 +547,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                         dialectTableNameProcessor.tbGetTempAliasTableName());
 
         Integer srid = eGetSrid(tableNameOrSqlView, geomFieldName);
+        Integer bboxSrid = srid;
 
-        String sql = getGetExtentSql(geomFieldName, qualifiedTableName, srid);
+
+        if (srid == 0) {
+            log.info("{}的{}字段获取到的srid为0，为了不影响获取边界，临时指定为 4326", tableNameOrSqlView, geomFieldName);
+            bboxSrid = 4326;
+        }
+        String sql = getGetExtentSql(geomFieldName, qualifiedTableName, bboxSrid);
         sql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
 
@@ -708,7 +713,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         validateTableName(tableName);
         AdvEnumsTypeGeom geomType = eGetGeoTypeByTable(tableName);
         return AdvEnumsTypeGeom.Point.equals(geomType)
-                || AdvEnumsTypeGeom.MultiPoint.equals(geomType);
+               || AdvEnumsTypeGeom.MultiPoint.equals(geomType);
     }
 
     @Override
@@ -716,7 +721,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         validateTableName(tableName);
         AdvEnumsTypeGeom geomType = eGetGeoTypeByTable(tableName);
         return AdvEnumsTypeGeom.Polygon.equals(geomType)
-                || AdvEnumsTypeGeom.MultiPolygon.equals(geomType);
+               || AdvEnumsTypeGeom.MultiPolygon.equals(geomType);
     }
 
     @Override
@@ -724,7 +729,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         validateTableName(tableName);
         AdvEnumsTypeGeom geomType = eGetGeoTypeByTable(tableName);
         return AdvEnumsTypeGeom.LineString.equals(geomType)
-                || AdvEnumsTypeGeom.MultiLineString.equals(geomType);
+               || AdvEnumsTypeGeom.MultiLineString.equals(geomType);
     }
 
     @Override
@@ -793,7 +798,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     protected DataFieldsApo fillGeomType(
             DataFieldsApo dataFieldsApo, Map<String, AdvEnumsTypeGeom> typeMaps) {
         if (CollectionUtil.isEmpty(typeMaps)
-                || CollectionUtil.isEmpty(dataFieldsApo.getDataFieldList())) {
+            || CollectionUtil.isEmpty(dataFieldsApo.getDataFieldList())) {
             return dataFieldsApo;
         }
         for (FieldBySchemaApo field : dataFieldsApo.getDataFieldList()) {
