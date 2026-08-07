@@ -9,6 +9,10 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
+import cn.geoair.comp.dynamic.ds.base.supplier.GirSysSupplierGetter;
+
+import cn.geoair.map.dynamic.adv.query.supplier.GirDataBaseNameGetter;
+import cn.geoair.map.dynamic.adv.query.supplier.GirSchemaNameGetter;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
@@ -44,8 +48,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         this.dataSourceGetter = dataSourceGetter;
         this.baseOpt = baseOpt;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
-        this.dataSourceGetter.setSchemaNameGetterFunction(this::dGetCurrentSchema);
-        this.dataSourceGetter.setDatabaseNameGetterFunction(this::dGetCurrentDataBase);
+        this.dataSourceGetter.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
+        this.dataSourceGetter.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
     }
 
     public IAdvBaseOpt getAdvBaseOpt() {
@@ -288,8 +292,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     public void dCreateIndex(
             String tableName, String indexName, List<String> columnNames, boolean isUnique) {
         if (StrUtil.isEmpty(tableName)
-                || StrUtil.isEmpty(indexName)
-                || ObjectUtil.isEmpty(columnNames)) {
+            || StrUtil.isEmpty(indexName)
+            || ObjectUtil.isEmpty(columnNames)) {
             throw new IllegalArgumentException("表名、索引名和列名列表不能为空");
         }
         if (!dIsTableExists(tableName)) {

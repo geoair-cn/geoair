@@ -31,5 +31,7 @@ public class GirSpringPGAdvExecutor extends AdvExecutorPG implements IAdvExecuto
         return SpringUtil.getBean(DataSource.class);
     }
 
-    public GirSpringPGAdvExecutor() {}
+    public GirSpringPGAdvExecutor() {
+
+    }
 }
