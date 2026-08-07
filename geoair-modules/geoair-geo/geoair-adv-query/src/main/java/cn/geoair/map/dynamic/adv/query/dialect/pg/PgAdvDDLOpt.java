@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -67,7 +68,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT COUNT(*) AS cnt FROM information_schema.tables "
-                                + "WHERE table_name = '{}' AND table_type = 'BASE TABLE'",
+                        + "WHERE table_name = '{}' AND table_type = 'BASE TABLE'",
                         nameNotSchema);
         if (StrUtil.isNotEmpty(schemaName)) {
             sql += StrUtil.format(" AND table_schema = '{}'", schemaName);
@@ -184,13 +185,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         // 处理长度/精度
         if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
-                && (newField.getUdtName().contains("char")
+            && (newField.getUdtName().contains("char")
                 || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
-                && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
-                && (newField.getUdtName().contains("numeric")
-                || newField.getUdtName().contains("decimal"))) {
+                   && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
+                   && (newField.getUdtName().contains("numeric")
+                       || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -233,11 +234,11 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT kcu.column_name "
-                                + "FROM information_schema.table_constraints tco "
-                                + "JOIN information_schema.key_column_usage kcu "
-                                + "ON tco.constraint_name = kcu.constraint_name "
-                                + "WHERE tco.table_name ='{}' AND tco.constraint_type = 'PRIMARY KEY' "
-                                + "ORDER BY kcu.ordinal_position",
+                        + "FROM information_schema.table_constraints tco "
+                        + "JOIN information_schema.key_column_usage kcu "
+                        + "ON tco.constraint_name = kcu.constraint_name "
+                        + "WHERE tco.table_name ='{}' AND tco.constraint_type = 'PRIMARY KEY' "
+                        + "ORDER BY kcu.ordinal_position",
                         tableName);
         if (StrUtil.isNotEmpty(dataSourceGetter.getSchemaName())) {
             sql += StrUtil.format(" AND tco.table_schema = '{}'", dataSourceGetter.getSchemaName());
@@ -255,7 +256,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT constraint_name FROM information_schema.table_constraints "
-                                + "WHERE table_name = '{}' AND constraint_type = '{}' AND constraint_name = '{}'",
+                        + "WHERE table_name = '{}' AND constraint_type = '{}' AND constraint_name = '{}'",
                         tableName,
                         constraintType,
                         constraintName);
@@ -318,8 +319,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                        + "UPDATE {} f1 SET {} = {} f1.rn "
-                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                + "UPDATE {} f1 SET {} = {} f1.rn "
+                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 pkColumnName,
@@ -368,8 +369,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                        + "UPDATE {} f1 SET {} = nr.rn "
-                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                + "UPDATE {} f1 SET {} = nr.rn "
+                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 pkColumnName);
@@ -395,8 +396,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                        + "UPDATE {} f1 SET {} = nr.rn "
-                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                + "UPDATE {} f1 SET {} = nr.rn "
+                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 pkColumnName);
@@ -474,14 +475,26 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public String dGetCurrentSchema() {
         String sql = "SELECT current_schema()  as schema  ";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false);
+        }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
+        config.setEnableQueryLog(enableQueryLog);
         return girAdvOneRow.getStr("schema");
     }
 
     @Override
     public String dGetCurrentDataBase() {
         String sql = "SELECT current_database() AS database_name ";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false);
+        }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
+        config.setEnableQueryLog(enableQueryLog);
         return girAdvOneRow.getStr("database_name");
     }
 
@@ -512,13 +525,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (StrUtil.isEmpty(actualSchema)) {
             sql =
                     "SELECT table_name FROM information_schema.tables "
-                            + "WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('information_schema', 'pg_catalog') "
-                            + "ORDER BY table_name";
+                    + "WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('information_schema', 'pg_catalog') "
+                    + "ORDER BY table_name";
         } else {
             sql =
                     StrUtil.format(
                             "SELECT table_name FROM information_schema.tables "
-                                    + "WHERE table_type = 'BASE TABLE' AND table_schema = '{}' ORDER BY table_name",
+                            + "WHERE table_type = 'BASE TABLE' AND table_schema = '{}' ORDER BY table_name",
                             actualSchema);
         }
 
@@ -542,17 +555,17 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (StrUtil.isEmpty(actualSchema)) {
             sql =
                     "SELECT "
-                            + fields
-                            + " FROM information_schema.tables "
-                            + "WHERE   table_schema NOT IN ('information_schema', 'pg_catalog') "
-                            + "ORDER BY table_name";
+                    + fields
+                    + " FROM information_schema.tables "
+                    + "WHERE   table_schema NOT IN ('information_schema', 'pg_catalog') "
+                    + "ORDER BY table_name";
         } else {
             sql =
                     StrUtil.format(
                             "SELECT "
-                                    + fields
-                                    + " FROM information_schema.tables "
-                                    + "WHERE   table_schema = '{}' ORDER BY table_name",
+                            + fields
+                            + " FROM information_schema.tables "
+                            + "WHERE   table_schema = '{}' ORDER BY table_name",
                             actualSchema);
         }
         List<SchemaTableApo> result = new ArrayList<>();
@@ -654,9 +667,9 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
             field.setCharacterMaximumLength(
                     String.valueOf(metaData.getColumnDisplaySize(columnIndex)));
         } else if (columnTypeName.contains("int")
-                || columnTypeName.contains("numeric")
-                || columnTypeName.contains("decimal")
-                || columnTypeName.contains("float")) {
+                   || columnTypeName.contains("numeric")
+                   || columnTypeName.contains("decimal")
+                   || columnTypeName.contains("float")) {
             field.setNumericPrecision(String.valueOf(metaData.getPrecision(columnIndex)));
             field.setNumericPrecisionRadix(String.valueOf(metaData.getScale(columnIndex)));
         }
@@ -675,7 +688,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT COUNT(*) AS cnt FROM information_schema.routines "
-                                + "WHERE routine_name = '{}' AND routine_type = 'FUNCTION'",
+                        + "WHERE routine_name = '{}' AND routine_type = 'FUNCTION'",
                         nameNotSchema);
         if (StrUtil.isNotEmpty(schemaName)) {
             sql += StrUtil.format(" AND specific_schema = '{}'", schemaName);
