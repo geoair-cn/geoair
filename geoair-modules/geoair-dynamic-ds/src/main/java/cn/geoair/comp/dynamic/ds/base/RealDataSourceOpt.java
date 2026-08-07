@@ -162,7 +162,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             }
         }
         this.dataSource = dataSource;
-        this.dataSourceId = dataSourceName;
+        this.dataSourceId = dataSourceName;  //这里不应该这样
         this.dataSourceApo = null;
         if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;
