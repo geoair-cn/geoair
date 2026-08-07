@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.dialect.pg;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
@@ -478,11 +479,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         AdvQueryGlobalConfig config = getConfig();
         boolean enableQueryLog = config.isEnableQueryLog();
         if (enableQueryLog) {
-            config.setEnableQueryLog(false);
+            config.setEnableQueryLog(false);  //  如果不关闭，就会死循环
         }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         config.setEnableQueryLog(enableQueryLog);
-        return girAdvOneRow.getStr("schema");
+        String schema = girAdvOneRow.getStr("schema");
+        Gir.log.info("从数据库获取到的schema为：【{}】", schema); 
+        return schema;
     }
 
     @Override
@@ -491,11 +494,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         AdvQueryGlobalConfig config = getConfig();
         boolean enableQueryLog = config.isEnableQueryLog();
         if (enableQueryLog) {
-            config.setEnableQueryLog(false);
+            config.setEnableQueryLog(false);   //  如果不关闭，就会死循环
         }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         config.setEnableQueryLog(enableQueryLog);
-        return girAdvOneRow.getStr("database_name");
+        String databaseName = girAdvOneRow.getStr("database_name");
+        Gir.log.info("从数据库获取到的databaseName为：【{}】", databaseName);
+        return databaseName;
     }
 
     // ========== Schema/模式差异化实现 ==========
