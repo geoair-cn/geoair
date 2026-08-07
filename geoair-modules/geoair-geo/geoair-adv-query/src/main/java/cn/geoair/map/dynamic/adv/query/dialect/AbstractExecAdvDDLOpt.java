@@ -48,8 +48,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         this.dataSourceGetter = dataSourceGetter;
         this.baseOpt = baseOpt;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
-        this.dataSourceGetter.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
-        this.dataSourceGetter.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
+//        this.dataSourceGetter.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
+//        this.dataSourceGetter.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
     }
 
     public IAdvBaseOpt getAdvBaseOpt() {
