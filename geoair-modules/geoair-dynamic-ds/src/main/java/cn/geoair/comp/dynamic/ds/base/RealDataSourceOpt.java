@@ -53,17 +53,28 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         if (schemaName != null) {
             return schemaName;
         }
+
+
+
         if (schemaNameGetterFunction != null && !(schemaNameGetterFunction instanceof GirSysSupplierGetter)) {
             String userGetter = schemaNameGetterFunction.get();   // 用户指定的getter 优先级最高
             schemaName = GutilObject.isEmpty(userGetter) ? "" : userGetter;
             return schemaName;
         }
+
+
+
         // 尝试从缓存中获取
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
             schemaName = schemaNameMap.get(dataSourceName);
             return schemaName;
         }
-    // 这应该是系统的getter
+
+        if (dataSource instanceof AdvSimpleDataSource) {
+            return "";
+        }
+
+        // 这应该是系统的getter
         if (schemaNameGetterFunction != null) {
             String name = schemaNameGetterFunction.get();
             if (name != null) {
@@ -94,6 +105,10 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             databaseName = dataBaseNameMap.get(dataSourceName);
             return databaseName;
         }
+        if (dataSource instanceof AdvSimpleDataSource) {
+            return "";
+        }
+
         if (databaseNameGetterFunction != null) {
             String name = databaseNameGetterFunction.get();
             if (name != null) {
@@ -162,7 +177,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             }
         }
         this.dataSource = dataSource;
-        this.dataSourceId = dataSourceName;
+        this.dataSourceId = dataSourceName;  //这里不应该这样
         this.dataSourceApo = null;
         if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;
