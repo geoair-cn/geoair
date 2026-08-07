@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.supplier.GirSysSupplierGetter;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
@@ -62,6 +63,13 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         if (schemaName != null) {
             return;
         }
+
+        if (schemaNameGetterFunction != null && !(schemaNameGetterFunction instanceof GirSysSupplierGetter)) {
+            schemaName = schemaNameGetterFunction.get();
+            return;
+        }
+
+
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
             schemaName = schemaNameMap.get(dataSourceName);
             return;
@@ -80,6 +88,10 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
         this.databaseNameGetterFunction = databaseNameGetterFunction;
         if (databaseName != null) {
+            return;
+        }
+        if (databaseNameGetterFunction != null && !(databaseNameGetterFunction instanceof GirSysSupplierGetter)) {
+            databaseName = databaseNameGetterFunction.get();
             return;
         }
         if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
@@ -108,7 +120,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {
         this.dataSourceApo = dataSourceApo;
         this.dataSourceId = dataSourceApo.getId();
-        this.dataSourceName = dataSourceApo.getId();
+        this.dataSourceName = dataSourceApo.getId()+"_"+dataSourceApo.getSchemaName();
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
