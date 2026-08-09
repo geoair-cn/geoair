@@ -3,6 +3,5 @@ cn.geoair.map.dynamic.adv.query.typehandler.impl.ByteArrayAdvTypeHandler
 cn.geoair.map.dynamic.adv.query.typehandler.impl.CharacterAdvTypeHandler
 cn.geoair.map.dynamic.adv.query.typehandler.impl.EnumAdvTypeHandler
 cn.geoair.map.dynamic.adv.query.typehandler.impl.NumberAdvTypeHandler
-cn.geoair.map.dynamic.adv.query.typehandler.impl.StringAdvTypeHandler
 cn.geoair.map.dynamic.adv.query.typehandler.impl.TemporalAdvTypeHandler
 cn.geoair.map.dynamic.adv.query.typehandler.impl.JtsGeometryAdvTypeHandler
