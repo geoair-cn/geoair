@@ -84,7 +84,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
-                        + "AND TABLE_SCHEMA = ? "
+                        + "AND TABLE_SCHEMA = #{schema} "
                         + "GROUP BY TABLE_NAME;";
 
         SqlParamMap paramMap = new SqlParamMap();
@@ -107,8 +107,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
-                        + "AND TABLE_SCHEMA = ? "
-                        + "AND TABLE_NAME LIKE CONCAT('%', ?, '%') "
+                        + "AND TABLE_SCHEMA = #{schema} "
+                        + "AND TABLE_NAME LIKE CONCAT('%', #{keyword}, '%') "
                         + "GROUP BY TABLE_NAME;";
 
         SqlParamMap paramMap = new SqlParamMap();

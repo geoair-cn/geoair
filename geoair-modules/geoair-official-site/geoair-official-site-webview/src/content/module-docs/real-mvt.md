@@ -31,7 +31,8 @@
 最重要的入口包括：
 
 - `GirRealMvtHelper`
-- `VectorTileExecutorV2`
+- `VectorTileExecutorV2` (已重构为 `TileExecutorFactory` + 多方言实现)
+- `PostgisVectorTileExecutor` / `OracleVectorTileExecutor` / `MysqlVectorTileExecutor`
 - `TileRequestParams`
 - `TileExecutorConfig`
 - `TileGlobalConfig`
@@ -44,7 +45,14 @@
 - 校验请求参数
 - 生成或解析 `TileRequestParams`
 
-### VectorTileExecutorV2
+### 瓦片执行器（多方言）
+
+`TileExecutorFactory` 根据数据源类型自动选择：
+
+- **PostGIS** → `PostgisVectorTileExecutor`
+- **Oracle** → `OracleVectorTileExecutor`
+- **MySQL** → `MysqlVectorTileExecutor`
+- **达梦** → 复用 `OracleVectorTileExecutor`
 
 负责：
 
@@ -94,7 +102,7 @@ TileRequestParams decoded = TileRequestParams.fromBase32(encoded);
 ### 示例3：构建执行器
 
 ```java
-VectorTileExecutorV2 executor = VectorTileExecutorV2.getInstance(requestParams, "road_layer");
+ITileExecutor executor = TileExecutorFactory.getInstance(requestParams, "road_layer");
 TileGlobalConfig config = executor.getTileGlobalConfig();
 ```
 
@@ -135,7 +143,7 @@ TileGlobalConfig globalConfig = new TileGlobalConfig()
 
 ## 对应测试入口
 
-- `GirRealMvtEntryExample`
+- `GirRealMvtEntryExample`（参考 `TileExecutorFactory` 用法）
 - `TileRequestParamsExample`
 - `TileExecutorConfigExample`
 - `TileGlobalConfigExample`

@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.mvt.exec;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -25,16 +26,68 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
- 
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
+import org.locationtech.jts.io.WKTReader;
 
-/** 矢量瓦片查询工具 V2版本，该版本把客户端传入的sql全部当做一个临时表进行处理 */
- 
-public class VectorTileExecutorV2 extends AbstractITileExecutor {
+/**
+ * 矢量瓦片查询抽象基类
+ * <p>
+ * 封装了瓦片查询的公共逻辑（SQL执行、分页、密度合并、几何变换），
+ * 子类只需实现各数据库方言的 SQL 生成方法。
+ */
+public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    List<String> keepFieldList = new ArrayList<>();
+
+    static final String geomBox = "geo_box";
+
+    /** 空间字段的别名 */
+    static final String GEOM_FIELD_ALIAS_IN_SQL = "geo_root";
+
+    static final String GEOM_FIELD_ALIAS_IN_TRAN = "geom";
+
+    public AbstractVectorTileExecutor(TileRequestParams requestParams, String layerName) {
+        super(requestParams, layerName);
+        initKeepFieldList();
+    }
+
+    public AbstractVectorTileExecutor(
+            TileRequestParams requestParams, String layerName, IAdvExecutor iAdvExecutor) {
+        super(requestParams, layerName, iAdvExecutor);
+        initKeepFieldList();
+    }
+
+    private void initKeepFieldList() {
+        List<String> keepFieldListTemp = new ArrayList<>();
+        String keepField = requestParams.getKeepFields();
+        if (ObjectUtil.isNotEmpty(keepField)) {
+            keepFieldListTemp = StrUtil.split(keepField, ",");
+        } else {
+            keepFieldListTemp =
+                    requestParams.getKeepFieldList() == null
+                            ? new ArrayList<>()
+                            : requestParams.getKeepFieldList();
+        }
+        for (String field : keepFieldListTemp) {
+            if (StrUtil.isEmpty(field)) {
+                continue;
+            }
+            String trimmed = field.replace("\"", "").trim();
+            int dotIndex = trimmed.lastIndexOf(".");
+            if (dotIndex != -1 && dotIndex < trimmed.length() - 1) {
+                trimmed = trimmed.substring(dotIndex + 1);
+            }
+            if (StrUtil.isNotEmpty(trimmed)) {
+                keepFieldList.add(trimmed);
+            }
+        }
+    }
+
     @Override
     public TileGlobalConfig getTileGlobalConfig() {
         TileGlobalConfig tileGlobalConfig = new TileGlobalConfig();
@@ -48,69 +101,34 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         return tileGlobalConfig;
     }
 
-    List<String> keepFieldList = new ArrayList<>();
-
-    static final String geomBox = "geo_box";
-
-    /** 空间字段的别名 */
-    static final String GEOM_FIELD_ALIAS_IN_SQL = "geo_root";
-
-    static final String GEOM_FIELD_ALIAS_IN_TRAN = "geom";
-
-    public static VectorTileExecutorV2 getInstance(
-            TileRequestParams requestParams, String layerName) {
-        return new VectorTileExecutorV2(requestParams, layerName);
-    }
-
-    public VectorTileExecutorV2(TileRequestParams requestParams, String layerName) {
-        super(requestParams, layerName);
-        String keepField = requestParams.getKeepFields();
-        List<String> keepFieldListTemp = new ArrayList<>();
-        if (ObjectUtil.isNotEmpty(keepField)) {
-            keepFieldListTemp = StrUtil.split(keepField, ",");
-            // 处理每个字段：移除双引号 + 提取.后面的字段名
-        } else {
-            keepFieldListTemp =
-                    requestParams.getKeepFieldList() == null
-                            ? new ArrayList<>()
-                            : requestParams.getKeepFieldList();
-        }
-        for (String field : keepFieldListTemp) {
-            if (StrUtil.isEmpty(field)) {
-                continue; // 跳过空字符串
-            }
-            // 1. 移除双引号（处理可能的前后引号）
-            String trimmed = field.replace("\"", "").trim();
-            // 2. 提取.后面的字段名（如果包含.的话）
-            int dotIndex = trimmed.lastIndexOf(".");
-            if (dotIndex != -1 && dotIndex < trimmed.length() - 1) {
-                trimmed = trimmed.substring(dotIndex + 1);
-            }
-            // 添加到结果列表（避免空值）
-            if (StrUtil.isNotEmpty(trimmed)) {
-                keepFieldList.add(trimmed);
-            }
-        }
-    }
+    /**
+     * 获取缓冲区边界框 SQL 表达式（数据库方言相关）
+     */
+    protected abstract String getBufferBboxSqlFunction(TileExecParams tileExecParams);
 
     /**
-     * 获取缓冲区SQL函数
-     *
-     * @return
+     * 获取几何字段的导出表达式（统一返回 Base64(WKB) 或 WKT）
      */
-    protected String getBufferBboxSqlFunction(TileExecParams tileExecParams) {
-        Envelope dataExtentBufferEnvelope = tileExecParams.getDataExtentBufferEnvelope();
-        double xmin = dataExtentBufferEnvelope.getMinX();
-        double ymin = dataExtentBufferEnvelope.getMinY();
-        double xmax = dataExtentBufferEnvelope.getMaxX();
-        double ymax = dataExtentBufferEnvelope.getMaxY();
-        return StrUtil.format(
-                "public.ST_MakeEnvelope({}, {}, {}, {}, {})",
-                xmin,
-                ymin,
-                xmax,
-                ymax,
-                sourceDataSrid);
+    protected abstract String getGeomExportExpr(String tableAlias, String geomFieldName);
+
+    /**
+     * 获取空间相交判断的 WHERE 条件表达式
+     */
+    protected abstract String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias);
+
+    /**
+     * 返回几何编码格式："wkb_base64" 或 "wkt"
+     */
+    protected abstract String getGeomEncodingFormat();
+
+    /**
+     * 对 SRID 为 0 时的特殊处理表达式（PostGIS 需 SetSRID，Oracle 不需）
+     */
+    protected String getGeomFieldWithSrid(String tableAlias, String geomFieldName, String srid) {
+        if (ObjectUtil.equals(srid, "0")) {
+            return tableAlias + "." + geomFieldName;
+        }
+        return tableAlias + "." + geomFieldName;
     }
 
     public String getExecSql(TileExecParams tileExecParams) {
@@ -133,7 +151,6 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
                             "( select * from  {})   as {} ", tbGetTableNameWithSchema, tableAlias);
         }
         // 校验必要参数
-        // 2. 校验必要参数（从Params读取）
         Envelope dataExtent = tileExecParams.getDataExtent();
         if (ObjectUtils.anyNull(
                 dataExtent,
@@ -146,15 +163,10 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         String polygonFunction = getBufferBboxSqlFunction(tileExecParams);
         String geomFieldName = requestParams.getGeomFieldName();
         String srid = requestParams.getSrid();
-        // 构建geom字段表达式（添加表别名前缀）
-        String geomField = null;
-        if (ObjectUtil.equals(srid, "0")) {
-            geomField = "public.ST_SetSRID(" + tableAlias + "." + geomFieldName + "," + srid + ")";
-        } else {
-            geomField = tableAlias + "." + geomFieldName;
-        }
+        // 构建geom字段表达式（添加表别名前缀，处理 SRID=0 的情况）
+        String geomField = getGeomFieldWithSrid(tableAlias, geomFieldName, srid);
+
         StringBuilder withSQL = new StringBuilder();
-        // 构建WITH查询块 - 定义查询区域
         withSQL.append("\n")
                 .append("WITH   ")
                 .append(withQueryAlias)
@@ -166,37 +178,30 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         StringBuilder rootSql = new StringBuilder();
         rootSql.append("SELECT ");
         if (ObjectUtil.isEmpty(keepFieldList) && !requestParams.isKeepFieldAll()) {
-            rootSql.append("encode(public.ST_AsBinary(public.ST_Force2D(")
-                    .append(geomField)
-                    .append(")), 'base64') as  ")
+            rootSql.append(getGeomExportExpr(tableAlias, geomFieldName))
+                    .append(" as  ")
                     .append(GEOM_FIELD_ALIAS_IN_SQL);
         } else if (requestParams.isKeepFieldAll()) {
             rootSql.append(tableAlias)
                     .append(".*")
-                    .append(", encode(")
-                    .append(StrUtil.format("public.ST_AsBinary({})", geomField))
-                    .append(", 'base64') as  ")
+                    .append(", ")
+                    .append(getGeomExportExpr(tableAlias, geomFieldName))
+                    .append(" as  ")
                     .append(GEOM_FIELD_ALIAS_IN_SQL);
         } else {
-            // 保留指定字段并添加表别名前缀，同时拼接geom字段
             List<String> aliasFields = new ArrayList<>();
             for (String field : keepFieldList) {
                 if (StrUtil.isNotBlank(field)) {
-                    // 给每个字段添加表别名前缀
                     aliasFields.add(tableAlias + "." + StrUtil.wrap(field, "\""));
                 }
             }
-
-            // 拼接所有带别名的字段
             rootSql.append(String.join(", ", aliasFields))
-                    // 拼接geom字段（处理交集逻辑）
-                    .append(", encode(")
-                    .append(StrUtil.format("public.ST_AsBinary({})", geomField))
-                    .append(", 'base64') as  ")
+                    .append(", ")
+                    .append(getGeomExportExpr(tableAlias, geomFieldName))
+                    .append(" as  ")
                     .append(GEOM_FIELD_ALIAS_IN_SQL);
         }
 
-        // 构建FROM和WHERE部分（主表添加别名T）
         rootSql.append(" FROM ")
                 .append(finalTbName)
                 .append(" ")
@@ -204,13 +209,8 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
                 .append(withQueryAlias)
                 .append(" ")
                 .append(withQueryAlias)
-                .append(" WHERE public.ST_Intersects(")
-                .append(geomField)
-                .append(",")
-                .append(withQueryAlias)
-                .append(".")
-                .append(geomBox)
-                .append(" )")
+                .append(" WHERE ")
+                .append(getIntersectsWhereExpr(geomField, withQueryAlias))
                 .append(" and ")
                 .append(geomField)
                 .append(" is not null  ");
@@ -245,7 +245,6 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
         try {
             if (lowLevelOptStrategy.equals(TileExecutorConfig.LowLevelOptStrategy.PAGING)
                     && zoom <= pagingStartLevel) {
-                // 策略1：分页查询
                 Long totalCount = iAdvExecutor.pCount(excuteSQL);
                 if (totalCount == 0) {
                     return;
@@ -286,14 +285,6 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
                 gridSrid);
     }
 
-    /**
-     * 处理 GirAdvOneRow 列表，完成转换、密度合并、写入 TileBuilder
-     *
-     * @param girAdvOneRows 待处理数据列表
-     * @param densityOptStrategy 密度优化策略
-     * @param vectorTileBuilder 瓦片构建器
-     * @param gridSrid 网格坐标系
-     */
     private void processGirAdvOneRowList(
             List<GirAdvOneRow> girAdvOneRows,
             boolean needTransform,
@@ -329,23 +320,29 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
     public void featuresTransform(GirAdvOneRow oneRow) {
         try {
             String geomEncodeStr = oneRow.getStr(GEOM_FIELD_ALIAS_IN_SQL);
-            byte[] decode = Base64.decode(geomEncodeStr);
-            WKBReader wkbReader = new WKBReader();
-            Geometry geometry = wkbReader.read(decode);
-            // 将geom转到extent坐标系下
+            String encodingFormat = getGeomEncodingFormat();
+            Geometry geometry;
+            if ("wkt".equals(encodingFormat)) {
+                // Oracle WKT 路径
+                WKTReader wktReader = new WKTReader();
+                geometry = wktReader.read(geomEncodeStr);
+            } else {
+                // 默认 WKB Base64 路径 (PostGIS, MySQL)
+                byte[] decode = Base64.decode(geomEncodeStr);
+                WKBReader wkbReader = new WKBReader();
+                geometry = wkbReader.read(decode);
+            }
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
                 geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
             }
-            // 内存裁剪数据
             Geometry finalGeometry = geometry;
             if (geometry != null) {
                 try {
-                    // intersection 返回的「空几何类型」由调用方的几何类型
                     Geometry gridExtentBufferBoxGeom =
                             this.tileExecParams.getGridExtentBufferBoxGeom();
                     finalGeometry = gridExtentBufferBoxGeom.intersection(geometry);
                 } catch (Exception e) {
-                    // 有的数据库里面的几何裁剪不了，这里就直接抛弃，因为在转换成屏幕坐标的时候，也会再裁剪一遍的
+                    // 裁剪失败时忽略，后续 PipelineBuilder 会再裁剪
                 }
             }
             if (finalGeometry != null && !finalGeometry.isEmpty()) {
@@ -354,17 +351,10 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
             oneRow.remove(GEOM_FIELD_ALIAS_IN_SQL);
         } catch (Exception e) {
             log.error("featuresTransform异常", e);
-            throw new RuntimeException("wkt转几何错误");
+            throw new RuntimeException("几何转换错误");
         }
     }
 
-    /**
-     * 并行分页查询
-     *
-     * @param excuteSQL 执行SQL
-     * @param totalCount 总条数
-     * @param orderFileIdName 排序字段
-     */
     public List<GirAdvOneRow> parallelPageQueryReturnList(
             String excuteSQL,
             Long totalCount,
@@ -387,7 +377,6 @@ public class VectorTileExecutorV2 extends AbstractITileExecutor {
                             public void setPageConfig(PageConfig pageConfig) {
                                 pageConfig.setMaxPageNo(maxPageNumber);
                                 pageConfig.setPageSize(maxPageSize);
-//                                pageConfig.setTotalCount(totalCount);
                                 pageConfig.setPageNumStartByZero(false);
                                 pageConfig.setParallelConsumeRecordIs(true);
                                 pageConfig.setParallelExecPageIs(true);

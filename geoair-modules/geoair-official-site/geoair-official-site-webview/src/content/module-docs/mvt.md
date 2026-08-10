@@ -46,7 +46,7 @@
 
 - 接收实时瓦片请求
 - 组织 `TileRequestParams`
-- 构建 `VectorTileExecutorV2`
+- 构建 `TileExecutorFactory` 返回的多方言执行器
 - 查询数据库中的 Geometry
 - 实时返回 PBF 矢量瓦片
 
