@@ -116,10 +116,7 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
      */
     protected abstract String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias);
 
-    /**
-     * 返回几何编码格式："wkb_base64" 或 "wkt"
-     */
-    protected abstract String getGeomEncodingFormat();
+
 
     /**
      * 对 SRID 为 0 时的特殊处理表达式（PostGIS 需 SetSRID，Oracle 不需）
@@ -319,23 +316,17 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
 
     public void featuresTransform(GirAdvOneRow oneRow) {
         try {
-            boolean geoIsWkt = "wkt".equals(getGeomEncodingFormat());
+
             String geomEncodeStr = oneRow.getStr(GEOM_FIELD_ALIAS_IN_SQL);
             if (StrUtil.isEmpty(geomEncodeStr)) {
                 oneRow.remove(GEOM_FIELD_ALIAS_IN_SQL);
                 return;
             }
             Geometry geometry;
-            if (geoIsWkt) {
-                // Oracle WKT 路径
-                WKTReader wktReader = new WKTReader();
-                geometry = wktReader.read(geomEncodeStr);
-            } else {
-                // 默认 WKB Base64 路径 (PostGIS, MySQL)
-                byte[] decode = Base64.decode(geomEncodeStr);
-                WKBReader wkbReader = new WKBReader();
-                geometry = wkbReader.read(decode);
-            }
+            // 默认 WKB Base64 路径 (PostGIS, MySQL)
+            byte[] decode = Base64.decode(geomEncodeStr);
+            WKBReader wkbReader = new WKBReader();
+            geometry = wkbReader.read(decode);
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
                 geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
             }
