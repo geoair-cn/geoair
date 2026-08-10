@@ -26,7 +26,6 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
         double ymin = dataExtentBufferEnvelope.getMinY();
         double xmax = dataExtentBufferEnvelope.getMaxX();
         double ymax = dataExtentBufferEnvelope.getMaxY();
-        // MySQL: 使用 ST_GeomFromText 构造矩形 Polygon
         return StrUtil.format(
                 "ST_GeomFromText('POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))', {})",
                 xmin, ymin, xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, sourceDataSrid);
@@ -34,15 +33,13 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
 
     @Override
     protected String getGeomExportExpr(String tableAlias, String geomFieldName) {
-        // MySQL: TO_BASE64(ST_AsBinary(geom)) 导出 WKB Base64
-        return StrUtil.format("TO_BASE64(ST_AsBinary(%s.%s))",
+        return StrUtil.format("TO_BASE64(ST_AsBinary({}.{}))",
                 tableAlias, geomFieldName);
     }
 
     @Override
     protected String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias) {
-        // MySQL: ST_Intersects(geom, bbox)
-        return StrUtil.format("ST_Intersects(%s, %s.%s)",
+        return StrUtil.format("ST_Intersects({}, {}.{})",
                 geomFieldExpr, withQueryAlias, geomBox);
     }
 
