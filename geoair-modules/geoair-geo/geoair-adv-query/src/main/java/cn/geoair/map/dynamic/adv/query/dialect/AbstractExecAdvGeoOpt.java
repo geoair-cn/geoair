@@ -109,6 +109,24 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
             String geomFieldName, String qualifiedTableName, int srid);
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        // 默认兜底实现：keyword 为空退化为获取全部，非空则在 Java 层面过滤
+        // 各数据库方言可重写以在 SQL 层面实现 LIKE，性能更优
+        List<String> allLayerNames = eGetAllGeoLayerName();
+        if (StrUtil.isEmpty(layerNameKeyword) || CollectionUtil.isEmpty(allLayerNames)) {
+            return allLayerNames;
+        }
+        List<String> matchedNames = new ArrayList<>();
+        String lowerKeyword = layerNameKeyword.toLowerCase();
+        for (String layerName : allLayerNames) {
+            if (layerName.toLowerCase().contains(lowerKeyword)) {
+                matchedNames.add(layerName);
+            }
+        }
+        return matchedNames;
+    }
+
+    @Override
     public DataFieldsApo dGetColumnsByTable(String tableName) {
         validateTableName(tableName);
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsByTable(tableName);

@@ -99,6 +99,31 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        if (StrUtil.isEmpty(layerNameKeyword)) {
+            return eGetAllGeoLayerName();
+        }
+        // MySQL 使用参数化查询，天然防止 SQL 注入
+        String sql =
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                        + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
+                        + "AND TABLE_SCHEMA = ? "
+                        + "AND TABLE_NAME LIKE CONCAT('%', ?, '%') "
+                        + "GROUP BY TABLE_NAME;";
+
+        SqlParamMap paramMap = new SqlParamMap();
+        paramMap.put("schema", dataSourceGetter.getSchemaName());
+        paramMap.put("keyword", layerNameKeyword);
+
+        List<GirAdvOneRow> result = baseOpt.bSelectList(sql, paramMap);
+        List<String> layerNames = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(result)) {
+            result.forEach(row -> layerNames.add(row.getStr("TABLE_NAME")));
+        }
+        return layerNames;
+    }
+
+    @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeByTable(
             String tableName, List<String> geomFieldNames) {
         validateTableName(tableName);

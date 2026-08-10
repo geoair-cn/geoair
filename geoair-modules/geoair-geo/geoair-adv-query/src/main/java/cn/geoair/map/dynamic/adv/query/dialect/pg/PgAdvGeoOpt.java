@@ -107,6 +107,32 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        if (StrUtil.isEmpty(layerNameKeyword)) {
+            return eGetAllGeoLayerName();
+        }
+        // 转义单引号防止 SQL 注入
+        String safeKeyword = layerNameKeyword.replace("'", "''");
+        String sqlTemp =
+                "SELECT table_name FROM information_schema.columns "
+                        + "WHERE udt_name = 'geometry' AND table_name LIKE '%{}%' {} "
+                        + "GROUP BY table_name;";
+        String schemaFilter =
+                StrUtil.isEmpty(dataSourceGetter.getSchemaName())
+                        ? ""
+                        : StrUtil.format(
+                        "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
+        String sql = StrUtil.format(sqlTemp, safeKeyword, schemaFilter);
+
+        List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
+        List<String> layerNames = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(result)) {
+            result.forEach(row -> layerNames.add(row.getStr("table_name")));
+        }
+        return layerNames;
+    }
+
+    @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeByTable(
             String tableName, List<String> geomFieldNames) {
         validateTableName(tableName);
