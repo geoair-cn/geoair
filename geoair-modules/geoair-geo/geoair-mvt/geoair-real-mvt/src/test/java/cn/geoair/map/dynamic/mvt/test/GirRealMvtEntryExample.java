@@ -4,7 +4,8 @@ import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
 import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
-import cn.geoair.map.dynamic.mvt.exec.VectorTileExecutorV2;
+import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
+import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 
 /** geoair-real-mvt 实时入口示例 */
 public class GirRealMvtEntryExample {
@@ -21,8 +22,8 @@ public class GirRealMvtEntryExample {
         requestParams.setKeepFieldAll(true);
 
         ParamCheckResult result = helper.checkTileRequestParams(requestParams, "road_layer");
-        VectorTileExecutorV2 executor =
-                VectorTileExecutorV2.getInstance(requestParams, "road_layer");
+        ITileExecutor executor =
+                TileExecutorFactory.getInstance(requestParams, "road_layer");
         TileGlobalConfig config = executor.getTileGlobalConfig();
 
         System.out.println("param check = " + result.isSuccess());

@@ -9,7 +9,8 @@ import lombok.Getter;
 /**
  * 创建人: 张逢吉 创建时间: 2025/9/30 09:28 描述: 将JDBC URL拆分为各个组件，支持解析参数为Map（适配PostgreSQL/MySQL等）
  * 支持URL格式：jdbc:postgresql://host:port/db?param1=value1&param2=value2 或
- * jdbc:derby://host:port/db;param1=value1;param2=value2
+ * jdbc:derby://host:port/db;param1=value1;param2=value2 或
+ * jdbc:oracle:thin:@//host:port/service?param=value
  */
 public class AdvJdbcUrlUtil {
 
@@ -106,6 +107,12 @@ public class AdvJdbcUrlUtil {
     public String driverName; // 驱动名（如postgresql、mysql、derby）
 
     @Getter
+    public String subProtocol; // 子协议前缀（如 oracle 的 thin、oci 等）
+
+    @Getter
+    public boolean oracleServiceNameFormat; // Oracle Service Name 格式（@//host:port/service）vs SID 格式（@host:port:sid）
+
+    @Getter
     public String host; // 主机地址
 
     @Getter
@@ -141,36 +148,68 @@ public class AdvJdbcUrlUtil {
         }
         this.driverName = jdbcUrl.substring(5, driverEndPos);
 
-        // 3. 拆分连接URI和参数部分（处理?和;两种分隔符）
+        // 3. 处理 Oracle 子协议前缀（如 thin、oci）
+        String afterDriver = jdbcUrl.substring(driverEndPos + 1);
+        this.subProtocol = null;
+        this.oracleServiceNameFormat = false;
+        if ("oracle".equalsIgnoreCase(driverName) && afterDriver.indexOf(':') > 0) {
+            // Oracle URL 格式: jdbc:oracle:thin:@//host:port/service 或 jdbc:oracle:thin:@host:port:sid
+            int subProtoEnd = afterDriver.indexOf(':');
+            this.subProtocol = afterDriver.substring(0, subProtoEnd);
+            // 截掉子协议，让后续逻辑处理 "@//host:port/db" 部分
+            afterDriver = afterDriver.substring(subProtoEnd + 1);
+        }
+
+        // 4. 拆分连接URI和参数部分（处理?和;两种分隔符）
         String connUri; // 连接核心部分（//host:port/db）
         int paramSeparatorPos = -1;
         // 优先处理?分隔（PostgreSQL/MySQL主流格式），再处理;分隔（Derby等）
-        if (jdbcUrl.contains("?")) {
-            paramSeparatorPos = jdbcUrl.indexOf('?');
-            connUri = jdbcUrl.substring(driverEndPos + 1, paramSeparatorPos);
+        if (afterDriver.contains("?")) {
+            paramSeparatorPos = afterDriver.indexOf('?');
+            connUri = afterDriver.substring(0, paramSeparatorPos);
             // 解析?后的参数
-            parseParams(jdbcUrl.substring(paramSeparatorPos + 1), "&");
-        } else if (jdbcUrl.contains(";")) {
-            paramSeparatorPos = jdbcUrl.indexOf(';');
-            connUri = jdbcUrl.substring(driverEndPos + 1, paramSeparatorPos);
+            parseParams(afterDriver.substring(paramSeparatorPos + 1), "&");
+        } else if (afterDriver.contains(";")) {
+            paramSeparatorPos = afterDriver.indexOf(';');
+            connUri = afterDriver.substring(0, paramSeparatorPos);
             // 解析;后的参数
-            parseParams(jdbcUrl.substring(paramSeparatorPos + 1), ";");
+            parseParams(afterDriver.substring(paramSeparatorPos + 1), ";");
         } else {
             // 无参数的情况
-            connUri = jdbcUrl.substring(driverEndPos + 1);
+            connUri = afterDriver;
         }
 
-        // 4. 解析连接URI（//host:port/db 或 本地路径/实例名）
+        // 5. 解析连接URI（//host:port/db 或 @//host:port/db 等Oracle格式）
         parseConnUri(connUri);
     }
 
     /**
      * 解析连接核心部分（//host:port/db 或 本地数据库路径）
      *
-     * @param connUri 连接核心部分，例如：//10.11.14.182:5432/bdh
+     * @param connUri 连接核心部分，例如：//10.11.14.182:5432/bdh 或 @//192.168.0.39:1522/XEPDB1
      */
     private void parseConnUri(String connUri) {
-        // 处理带//的网络连接格式（主流数据库）
+        // 处理 Oracle @ 前缀格式：@//host:port/service 或 @host:port:sid
+        if (connUri.startsWith("@//")) {
+            this.oracleServiceNameFormat = true;
+            connUri = connUri.substring(1); // 去掉 @，剩下 //host:port/service
+        } else if (connUri.startsWith("@")) {
+            this.oracleServiceNameFormat = false;
+            connUri = connUri.substring(1); // 去掉 @，剩下 host:port:sid
+        }
+
+        // 处理 Oracle SID 格式: host:port:sid（无 // 前缀，用 : 分隔且不含 /）
+        if (!connUri.startsWith("//") && connUri.contains(":") && !connUri.contains("/")) {
+            String[] parts = connUri.split(":");
+            if (parts.length >= 3) {
+                this.host = parts[0];
+                this.port = parts[1];
+                this.database = parts[2];
+                return;
+            }
+        }
+
+        // 处理带//的网络连接格式（主流数据库 + Oracle Service Name）
         if (connUri.startsWith("//")) {
             // 拆分主机+端口 和 数据库名（找第一个/）
             int dbStartPos = connUri.indexOf('/', 2);
@@ -239,16 +278,36 @@ public class AdvJdbcUrlUtil {
         StringBuilder sb = new StringBuilder();
         sb.append("jdbc:").append(driverName).append(":");
 
+        // Oracle 特殊处理：需要把子协议前缀拼回去
+        boolean isOracle = "oracle".equalsIgnoreCase(driverName);
+        if (isOracle && subProtocol != null) {
+            sb.append(subProtocol).append(":");
+        }
+
         // 处理带host/port的网络型数据库（PostgreSQL/MySQL/Derby网络版等）
         if (host != null) {
-            sb.append("//").append(host);
+            // Oracle 需要 @ 前缀
+            if (isOracle) {
+                sb.append("@");
+                if (oracleServiceNameFormat) {
+                    sb.append("//"); // Service Name 格式: @//host:port/service
+                }
+            } else {
+                sb.append("//");
+            }
+            sb.append(host);
             // 有端口则拼接端口
             if (port != null && !port.isEmpty()) {
                 sb.append(":").append(port);
             }
             // 拼接数据库名
             if (database != null && !database.isEmpty()) {
-                sb.append("/").append(database);
+                if (isOracle && !oracleServiceNameFormat) {
+                    // SID 格式用 : 分隔
+                    sb.append(":").append(database);
+                } else {
+                    sb.append("/").append(database);
+                }
             }
         } else {
             // 处理无host/port的嵌入式数据库（如Derby嵌入式、SQLite等）
@@ -265,5 +324,20 @@ public class AdvJdbcUrlUtil {
 
         System.out.println(appendSchema("jdbc:postgresql://localhost:5432/mydb", "public"));
         System.out.println(appendSchema("jdbc:postgresql://localhost:5432/mydb?currentSchema=old", "public"));
+
+        // Oracle URL 解析测试
+        testUrl("jdbc:oracle:thin:@//192.168.0.39:1522/XEPDB1");
+        testUrl("jdbc:oracle:thin:@192.168.0.39:1522:XEPDB1");
+        testUrl("jdbc:oracle:thin:@//192.168.0.39:1522/XEPDB1?param=value");
+    }
+
+    private static void testUrl(String jdbcUrl) {
+        System.out.println("=== " + jdbcUrl);
+        AdvJdbcUrlUtil u = splitter(jdbcUrl);
+        System.out.println("  driverName=" + u.driverName + " subProtocol=" + u.subProtocol +
+                " oracleSvcFormat=" + u.oracleServiceNameFormat);
+        System.out.println("  host=" + u.host + " port=" + u.port + " db=" + u.database);
+        System.out.println("  params=" + u.params);
+        System.out.println("  withoutParams=" + u.getJdbcUrlWithoutParams());
     }
 }
