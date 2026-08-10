@@ -106,6 +106,29 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        if (StrUtil.isEmpty(layerNameKeyword)) {
+            return eGetAllGeoLayerName();
+        }
+        String schemaName = dataSourceGetter.getSchemaName();
+        // 转义单引号防止 SQL 注入
+        String safeKeyword = layerNameKeyword.replace("'", "''");
+        String sql = StrUtil.format(
+                "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS " +
+                        "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
+                        "AND TABLE_NAME LIKE '%{}%' " +
+                        "GROUP BY TABLE_NAME",
+                schemaName, safeKeyword);
+
+        List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
+        List<String> layerNames = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(result)) {
+            result.forEach(row -> layerNames.add(row.getStr("table_name")));
+        }
+        return layerNames;
+    }
+
+    @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeByTable(String tableName, List<String> geomFieldNames) {
         validateTableName(tableName);
         if (CollectionUtil.isEmpty(geomFieldNames)) {

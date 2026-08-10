@@ -1183,6 +1183,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        return getGeoOpt().eGetGeoLayerNameByKeyword(layerNameKeyword);
+    }
+
+    @Override
     public boolean eIsGeomByTable(String tableName) {
         return getGeoOpt().eIsGeomByTable(tableName);
     }
