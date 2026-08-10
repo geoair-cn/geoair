@@ -27,7 +27,7 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
         double xmax = dataExtentBufferEnvelope.getMaxX();
         double ymax = dataExtentBufferEnvelope.getMaxY();
         return StrUtil.format(
-                "ST_GeomFromText('POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))', {})",
+                "ST_GeomFromText('POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))', {},'axis-order=long-lat')",
                 xmin, ymin, xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, sourceDataSrid);
     }
 
