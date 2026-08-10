@@ -550,7 +550,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName, String geomFieldName, String geometry, int srid) {
         // MySQL: ST_Intersects + ST_GeomFromText
         return StrUtil.format(
-                "SELECT * FROM {} WHERE ST_Intersects({}, ST_GeomFromText('{}', {}));",
+                "SELECT * FROM {} WHERE ST_Intersects({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
                 geomFieldName,
                 geometry,
@@ -562,7 +562,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName, String geomFieldName, String bboxWkt, int srid) {
         // MySQL: ST_Within
         return StrUtil.format(
-                "SELECT * FROM {} WHERE ST_Within({}, ST_GeomFromText('{}', {}));",
+                "SELECT * FROM {} WHERE ST_Within({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
                 geomFieldName,
                 bboxWkt,
@@ -578,7 +578,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName) {
         // MySQL: ST_Distance (注意：MySQL 8.0+支持ST_Distance，5.7需用ST_Distance_Sphere)
         return StrUtil.format(
-                "SELECT *, ST_Distance({}, ST_GeomFromText('{}', {})) AS {} FROM {};",
+                "SELECT *, ST_Distance({}, ST_GeomFromText('{}', {},'axis-order=long-lat')) AS {} FROM {};",
                 geomFieldName,
                 geometry,
                 srid,
