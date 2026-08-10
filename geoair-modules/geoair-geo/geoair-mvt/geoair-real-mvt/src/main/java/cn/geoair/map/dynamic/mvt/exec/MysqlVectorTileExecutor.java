@@ -43,10 +43,7 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
                 geomFieldExpr, withQueryAlias, geomBox);
     }
 
-    @Override
-    protected String getGeomEncodingFormat() {
-        return "wkb_base64";
-    }
+
 
     @Override
     protected String getGeomFieldWithSrid(String tableAlias, String geomFieldName, String srid) {
