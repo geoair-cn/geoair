@@ -205,8 +205,7 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
 
         rootSql.append(" FROM ")
                 .append(finalTbName)
-                .append(" ")
-                .append(",  ")
+                .append(" CROSS JOIN ")
                 .append(withQueryAlias)
                 .append(" ")
                 .append(withQueryAlias)
