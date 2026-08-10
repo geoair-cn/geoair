@@ -616,27 +616,18 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
-        // MySQL: ST_Extent返回MIN/MAX坐标，需拆分
+        // MySQL: ST_Extent 本身返回聚合边界框。分开用 ST_Extent 计算 minx/miny/maxx/maxy 的函数是 PG 写法。
+        // MySQL 的正确写法：先聚合到子查询，再取维度的最小/最大值
         return StrUtil.format(
                 "SELECT "
-                        + "ST_XMin(ST_Extent({})) AS minx, "
-                        + "ST_YMin(ST_Extent({})) AS miny, "
-                        + "ST_XMax(ST_Extent({})) AS maxx, "
-                        + "ST_YMax(ST_Extent({})) AS maxy, "
-                        + "ST_XMin(ST_Transform(ST_Extent({}), 4326)) AS minx_gs, "
-                        + "ST_YMin(ST_Transform(ST_Extent({}), 4326)) AS miny_gs, "
-                        + "ST_XMax(ST_Transform(ST_Extent({}), 4326)) AS maxx_gs, "
-                        + "ST_YMax(ST_Transform(ST_Extent({}), 4326)) AS maxy_gs "
-                        + "FROM {};",
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                qualifiedTableName);
+                        + "ST_XMin(extent) AS minx, ST_YMin(extent) AS miny, "
+                        + "ST_XMax(extent) AS maxx, ST_YMax(extent) AS maxy, "
+                        + "ST_XMin(ST_Transform(extent, 4326)) AS minx_gs, "
+                        + "ST_YMin(ST_Transform(extent, 4326)) AS miny_gs, "
+                        + "ST_XMax(ST_Transform(extent, 4326)) AS maxx_gs, "
+                        + "ST_YMax(ST_Transform(extent, 4326)) AS maxy_gs "
+                        + "FROM (SELECT ST_Extent({}) AS extent FROM {}) AS temp_extent",
+                geomFieldName, qualifiedTableName);
     }
 
     @Override
