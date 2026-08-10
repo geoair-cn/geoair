@@ -49,6 +49,14 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
     /** 空间字段的别名 */
     static final String GEOM_FIELD_ALIAS_IN_SQL = "geo_root";
 
+    /**
+     * 获取 WITH CTE 与主表的连接方式（子类覆盖以适配不同数据库）
+     * <p>PG/MySQL 用逗号即可，Oracle 需 CROSS JOIN
+     */
+    protected String getCteJoinSeparator() {
+        return ",  ";
+    }
+
     static final String GEOM_FIELD_ALIAS_IN_TRAN = "geom";
 
     public AbstractVectorTileExecutor(TileRequestParams requestParams, String layerName) {
@@ -205,7 +213,7 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
 
         rootSql.append(" FROM ")
                 .append(finalTbName)
-                .append(" CROSS JOIN ")
+                .append(getCteJoinSeparator())
                 .append(withQueryAlias)
                 .append(" ")
                 .append(withQueryAlias)

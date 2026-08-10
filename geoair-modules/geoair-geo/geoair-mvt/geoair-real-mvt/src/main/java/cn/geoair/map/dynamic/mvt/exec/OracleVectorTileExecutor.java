@@ -21,13 +21,18 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
     }
 
     @Override
+    protected String getCteJoinSeparator() {
+        // Oracle 不支持逗号连接 CTE，必须用 CROSS JOIN
+        return " CROSS JOIN ";
+    }
+
+    @Override
     protected String getBufferBboxSqlFunction(TileExecParams tileExecParams) {
         Envelope dataExtentBufferEnvelope = tileExecParams.getDataExtentBufferEnvelope();
         double xmin = dataExtentBufferEnvelope.getMinX();
         double ymin = dataExtentBufferEnvelope.getMinY();
         double xmax = dataExtentBufferEnvelope.getMaxX();
         double ymax = dataExtentBufferEnvelope.getMaxY();
-        // Oracle: SDO_GEOMETRY(2003, srid, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY(...))
         return StrUtil.format(
                 "SDO_GEOMETRY(2003, {}, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY({},{},{},{}))",
                 sourceDataSrid, xmin, ymin, xmax, ymax);
