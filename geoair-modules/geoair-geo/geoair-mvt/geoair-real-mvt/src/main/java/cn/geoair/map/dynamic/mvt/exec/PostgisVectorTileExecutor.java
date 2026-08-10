@@ -48,7 +48,7 @@ public class PostgisVectorTileExecutor extends AbstractVectorTileExecutor {
     @Override
     protected String getGeomFieldWithSrid(String tableAlias, String geomFieldName, String srid) {
         if (ObjectUtil.equals(srid, "0")) {
-            return "public.ST_SetSRID(" + tableAlias + "." + geomFieldName + "," + srid + ")";
+            return "public.ST_SetSRID(" + tableAlias + "." + geomFieldName + "," + sourceDataSrid + ")";
         }
         return tableAlias + "." + geomFieldName;
     }
