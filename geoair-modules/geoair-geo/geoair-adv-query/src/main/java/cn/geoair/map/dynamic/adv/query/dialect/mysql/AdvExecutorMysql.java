@@ -7,7 +7,6 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.*;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.*;
 
 import java.sql.Connection;
 import javax.sql.DataSource;
@@ -125,7 +124,7 @@ public class AdvExecutorMysql extends AbstractPxyAdvExecutor {
 
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
-        return PgDialectTableNameUtil.getInstance();
+        return MysqlDialectTableNameUtil.getInstance();
     }
 
 
