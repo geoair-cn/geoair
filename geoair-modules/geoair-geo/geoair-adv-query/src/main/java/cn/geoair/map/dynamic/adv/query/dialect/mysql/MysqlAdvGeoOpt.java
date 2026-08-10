@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
+import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
@@ -83,9 +84,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public List<String> eGetAllGeoLayerName() {
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
-                        + "AND TABLE_SCHEMA = #{schema} "
-                        + "GROUP BY TABLE_NAME;";
+                + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
+                + "AND TABLE_SCHEMA = #{schema} "
+                + "GROUP BY TABLE_NAME;";
 
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("schema", dataSourceGetter.getSchemaName());
@@ -105,10 +106,10 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         }
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
-                        + "AND TABLE_SCHEMA = #{schema} "
-                        + "AND TABLE_NAME LIKE CONCAT('%', #{keyword}, '%') "
-                        + "GROUP BY TABLE_NAME;";
+                + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
+                + "AND TABLE_SCHEMA = #{schema} "
+                + "AND TABLE_NAME LIKE CONCAT('%', #{keyword}, '%') "
+                + "GROUP BY TABLE_NAME;";
 
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("schema", dataSourceGetter.getSchemaName());
@@ -225,9 +226,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql =
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE TABLE_NAME = #{tableName} "
-                        + "AND TABLE_SCHEMA = #{schemaName} "
-                        + "AND DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon');";
+                + "WHERE TABLE_NAME = #{tableName} "
+                + "AND TABLE_SCHEMA = #{schemaName} "
+                + "AND DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon');";
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("tableName", dialectTableNameProcessor.tbGetTableNameNotSchema(tableName));
         paramMap.put("schemaName", schemaName);
@@ -614,20 +615,108 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 geomFieldName);
     }
 
+//    @Override
+//    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
+//        // MySQL: ST_Extent 本身返回聚合边界框。分开用 ST_Extent 计算 minx/miny/maxx/maxy 的函数是 PG 写法。
+//        // MySQL 的正确写法：先聚合到子查询，再取维度的最小/最大值
+//        return StrUtil.format(
+//                "SELECT "
+//                        + "ST_XMin(extent) AS minx, ST_YMin(extent) AS miny, "
+//                        + "ST_XMax(extent) AS maxx, ST_YMax(extent) AS maxy, "
+//                        + "ST_XMin(ST_Transform(extent, 4326)) AS minx_gs, "
+//                        + "ST_YMin(ST_Transform(extent, 4326)) AS miny_gs, "
+//                        + "ST_XMax(ST_Transform(extent, 4326)) AS maxx_gs, "
+//                        + "ST_YMax(ST_Transform(extent, 4326)) AS maxy_gs "
+//                        + "FROM (SELECT ST_Extent({}) AS extent FROM {}) AS temp_extent",
+//                geomFieldName, qualifiedTableName);
+//    }
+
+    /**
+     * 获取几何数据范围的SQL - 优化版
+     * 使用辅助函数简化代码，避免重复
+     */
     @Override
-    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
-        // MySQL: ST_Extent 本身返回聚合边界框。分开用 ST_Extent 计算 minx/miny/maxx/maxy 的函数是 PG 写法。
-        // MySQL 的正确写法：先聚合到子查询，再取维度的最小/最大值
-        return StrUtil.format(
-                "SELECT "
-                        + "ST_XMin(extent) AS minx, ST_YMin(extent) AS miny, "
-                        + "ST_XMax(extent) AS maxx, ST_YMax(extent) AS maxy, "
-                        + "ST_XMin(ST_Transform(extent, 4326)) AS minx_gs, "
-                        + "ST_YMin(ST_Transform(extent, 4326)) AS miny_gs, "
-                        + "ST_XMax(ST_Transform(extent, 4326)) AS maxx_gs, "
-                        + "ST_YMax(ST_Transform(extent, 4326)) AS maxy_gs "
-                        + "FROM (SELECT ST_Extent({}) AS extent FROM {}) AS temp_extent",
-                geomFieldName, qualifiedTableName);
+    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int bboxSrid) {
+        // 提取几何坐标的表达式（兼容所有类型）
+        String xExpr = String.format(
+                "CASE " +
+                "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(%s) " +
+                "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_PointN(%s, 1)) " +
+                "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
+                "    ELSE NULL " +
+                "END",
+                geomFieldName, geomFieldName,
+                geomFieldName, geomFieldName,
+                geomFieldName, geomFieldName
+        );
+
+        String yExpr = String.format(
+                "CASE " +
+                "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(%s) " +
+                "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_PointN(%s, 1)) " +
+                "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
+                "    ELSE NULL " +
+                "END",
+                geomFieldName, geomFieldName,
+                geomFieldName, geomFieldName,
+                geomFieldName, geomFieldName
+        );
+
+        // 基础查询
+        String baseSql = String.format(
+                "SELECT " +
+                "MIN(%s) AS minx, " +
+                "MIN(%s) AS miny, " +
+                "MAX(%s) AS maxx, " +
+                "MAX(%s) AS maxy " +
+                "FROM %s WHERE %s IS NOT NULL",
+                xExpr, yExpr, xExpr, yExpr,
+                qualifiedTableName, geomFieldName
+        );
+
+        // 如果需要4326坐标
+        if (bboxSrid != 4326) {
+            // 这里需要判断是否有SRID=0的数据，如果有，需要先设置SRID
+            // 简单处理：直接使用ST_SRID设置后再转换
+            String xExprTransform = String.format(
+                    "CASE " +
+                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(ST_Transform(ST_SRID(%s, 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_Transform(ST_SRID(ST_PointN(%s, 1), 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_Transform(ST_SRID(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1), 4326), 4326)) " +
+                    "    ELSE NULL " +
+                    "END",
+                    geomFieldName, geomFieldName,
+                    geomFieldName, geomFieldName,
+                    geomFieldName, geomFieldName
+            );
+
+            String yExprTransform = String.format(
+                    "CASE " +
+                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(ST_Transform(ST_SRID(%s, 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_Transform(ST_SRID(ST_PointN(%s, 1), 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_Transform(ST_SRID(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1), 4326), 4326)) " +
+                    "    ELSE NULL " +
+                    "END",
+                    geomFieldName, geomFieldName,
+                    geomFieldName, geomFieldName,
+                    geomFieldName, geomFieldName
+            );
+
+            String transformSql = String.format(
+                    "SELECT " +
+                    "MIN(%s) AS minx_gs, " +
+                    "MIN(%s) AS miny_gs, " +
+                    "MAX(%s) AS maxx_gs, " +
+                    "MAX(%s) AS maxy_gs " +
+                    "FROM %s WHERE %s IS NOT NULL",
+                    xExprTransform, yExprTransform, xExprTransform, yExprTransform,
+                    qualifiedTableName, geomFieldName
+            );
+
+            return String.format("SELECT t1.*, t2.* FROM (%s) t1 CROSS JOIN (%s) t2", baseSql, transformSql);
+        }
+
+        return baseSql;
     }
 
     @Override
@@ -728,4 +817,6 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         }
         return null;
     }
+
+
 }
