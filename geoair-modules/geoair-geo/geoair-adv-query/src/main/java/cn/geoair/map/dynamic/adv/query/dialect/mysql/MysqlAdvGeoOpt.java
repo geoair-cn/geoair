@@ -103,7 +103,6 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         if (StrUtil.isEmpty(layerNameKeyword)) {
             return eGetAllGeoLayerName();
         }
-        // MySQL 使用参数化查询，天然防止 SQL 注入
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
@@ -226,10 +225,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql =
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE TABLE_NAME = ? "
-                        + "AND TABLE_SCHEMA = ? "
+                        + "WHERE TABLE_NAME = #{tableName} "
+                        + "AND TABLE_SCHEMA = #{schemaName} "
                         + "AND DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon');";
-
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("tableName", dialectTableNameProcessor.tbGetTableNameNotSchema(tableName));
         paramMap.put("schemaName", schemaName);
