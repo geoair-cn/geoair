@@ -21,9 +21,9 @@ import java.util.List;
  * Oracle Spatial 矢量瓦片执行器
  * <p>
  * Oracle 使用完全自包含的 SQL：SDO_GEOMETRY 包围盒直接写在 SELECT 中，
- * 避免 WITH CTE 与 CROSS JOIN 的兼容性问题（Oracle 不兼容 WITH ... CROSS JOIN）。
+
  * <p>
- * 几何导出使用 WKT 格式，featuresTransform 中走 WKT 解码路径。
+
  */
 public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
 
