@@ -142,13 +142,14 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
         String finalTbName = null;
         if (isSqlView) {
             String tbRemoveSqlSpaces = iAdvExecutor.tbRemoveSqlSpaces(tbNameOrSql);
-            finalTbName = StrUtil.format("({})  as {} ", tbRemoveSqlSpaces, tableAlias);
+            // Oracle 子查询后面不能用 AS，oracleDialectTableNameUtil 里面处理了
+            finalTbName = iAdvExecutor.tbBuildAsTable(
+                    StrUtil.format("({})", tbRemoveSqlSpaces), tableAlias);
         } else {
             String tbGetTableNameWithSchema =
                     iAdvExecutor.tbGetTableNameWithSchema(tbNameOrSql, schema);
-            finalTbName =
-                    StrUtil.format(
-                            "( select * from  {})   as {} ", tbGetTableNameWithSchema, tableAlias);
+            finalTbName = iAdvExecutor.tbBuildAsTable(
+                    StrUtil.format("( select * from  {})", tbGetTableNameWithSchema), tableAlias);
         }
         // 校验必要参数
         Envelope dataExtent = tileExecParams.getDataExtent();
@@ -211,11 +212,11 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
                 .append(withQueryAlias)
                 .append(" WHERE ")
                 .append(getIntersectsWhereExpr(geomField, withQueryAlias))
-                .append(" and ")
+                .append(" AND ")
                 .append(geomField)
-                .append(" is not null  ");
+                .append(" IS NOT NULL  ");
 
-        excuteSQL = withSQL.toString() + "\n" + rootSql;
+            excuteSQL = withSQL.toString() + "\n" + rootSql;
         return excuteSQL;
     }
 
