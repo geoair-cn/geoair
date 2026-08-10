@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.dialect.oracle;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
@@ -295,15 +297,31 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
     public String dGetCurrentSchema() {
         // 双引号强制小写
         String sql = "SELECT USER AS \"schema_name\" FROM DUAL";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false);  //  如果不关闭，就会死循环
+        }
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
-        return row != null ? row.getStr("schema_name") : null;
+        config.setEnableQueryLog(enableQueryLog);
+        String schemaName = row.getStr("schema_name");
+        Gir.log.info("从数据库获取到的schema为：【{}】", schemaName);
+        return schemaName;
     }
 
     @Override
     public String dGetCurrentDataBase() {
         String sql = "SELECT SYS_CONTEXT('USERENV', 'DB_NAME') AS \"database_name\" FROM DUAL";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false);  //  如果不关闭，就会死循环
+        }
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
-        return row != null ? row.getStr("database_name") : null;
+        config.setEnableQueryLog(enableQueryLog);
+        String databaseName = row.getStr("database_name");
+        Gir.log.info("从数据库获取到的databaseName为：【{}】", databaseName);
+        return databaseName;
     }
 
     // ========== Schema 相关 ==========

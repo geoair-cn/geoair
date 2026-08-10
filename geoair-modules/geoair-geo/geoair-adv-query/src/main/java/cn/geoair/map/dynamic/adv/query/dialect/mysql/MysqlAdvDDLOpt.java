@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -454,8 +456,16 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public String dGetCurrentSchema() {
         String sql = "SELECT DATABASE() as ds ";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false);  //  如果不关闭，就会死循环
+        }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
-        return girAdvOneRow.getStr("ds");
+        config.setEnableQueryLog(enableQueryLog);
+        String schema = girAdvOneRow.getStr("ds");
+        Gir.log.info("从数据库获取到的schema为：【{}】", schema);
+        return schema;
     }
 
     @Override
