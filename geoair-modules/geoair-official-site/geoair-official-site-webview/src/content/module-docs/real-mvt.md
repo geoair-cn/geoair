@@ -31,7 +31,7 @@
 最重要的入口包括：
 
 - `GirRealMvtHelper`
-- `VectorTileExecutorV2` (已重构为 `TileExecutorFactory` + 多方言实现)
+- `TileExecutorFactory`（多方言：Postgis/Oracle/Mysql）
 - `PostgisVectorTileExecutor` / `OracleVectorTileExecutor` / `MysqlVectorTileExecutor`
 - `TileRequestParams`
 - `TileExecutorConfig`

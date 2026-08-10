@@ -27,8 +27,7 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
         double ymin = dataExtentBufferEnvelope.getMinY();
         double xmax = dataExtentBufferEnvelope.getMaxX();
         double ymax = dataExtentBufferEnvelope.getMaxY();
-        // Oracle: 使用 SDO_GEOMETRY 构造矩形 (GTYPE=2003, SDO_GTYPE格式: d00t)
-        // 2003 = 二维多边形
+        // Oracle: SDO_GEOMETRY(2003, srid, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY(...))
         return StrUtil.format(
                 "SDO_GEOMETRY(2003, {}, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY({},{},{},{}))",
                 sourceDataSrid, xmin, ymin, xmax, ymax);
@@ -36,15 +35,13 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
 
     @Override
     protected String getGeomExportExpr(String tableAlias, String geomFieldName) {
-        // Oracle: 使用 SDO_UTIL.TO_WKTGEOMETRY 导出 WKT 文本
-        return StrUtil.format("SDO_UTIL.TO_WKTGEOMETRY(%s.%s)",
+        return StrUtil.format("SDO_UTIL.TO_WKTGEOMETRY({}.{})",
                 tableAlias, geomFieldName);
     }
 
     @Override
     protected String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias) {
-        // Oracle: SDO_RELATE(geom, bbox, 'MASK=ANYINTERACT') = 'TRUE'
-        return StrUtil.format("SDO_RELATE(%s, %s.%s, 'MASK=ANYINTERACT') = 'TRUE'",
+        return StrUtil.format("SDO_RELATE({}, {}.{}, 'MASK=ANYINTERACT') = 'TRUE'",
                 geomFieldExpr, withQueryAlias, geomBox);
     }
 

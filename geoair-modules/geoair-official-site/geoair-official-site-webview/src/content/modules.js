@@ -394,7 +394,7 @@ const geoModules = [
       {
         title: 'GirRealMvtEntryExample',
         path: 'geoair-geo/geoair-mvt/geoair-real-mvt/src/test/java/cn/geoair/map/dynamic/mvt/test/GirRealMvtEntryExample.java',
-        description: '展示 GirRealMvtHelper、TileRequestParams 和 VectorTileExecutorV2 的入口。'
+        description: '展示 GirRealMvtHelper、TileRequestParams 和 TileExecutorFactory 的入口。'
       },
       {
         title: 'TileRequestParamsExample',

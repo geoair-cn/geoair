@@ -319,10 +319,14 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
 
     public void featuresTransform(GirAdvOneRow oneRow) {
         try {
+            boolean geoIsWkt = "wkt".equals(getGeomEncodingFormat());
             String geomEncodeStr = oneRow.getStr(GEOM_FIELD_ALIAS_IN_SQL);
-            String encodingFormat = getGeomEncodingFormat();
+            if (StrUtil.isEmpty(geomEncodeStr)) {
+                oneRow.remove(GEOM_FIELD_ALIAS_IN_SQL);
+                return;
+            }
             Geometry geometry;
-            if ("wkt".equals(encodingFormat)) {
+            if (geoIsWkt) {
                 // Oracle WKT 路径
                 WKTReader wktReader = new WKTReader();
                 geometry = wktReader.read(geomEncodeStr);

@@ -34,13 +34,13 @@ public class PostgisVectorTileExecutor extends AbstractVectorTileExecutor {
     @Override
     protected String getGeomExportExpr(String tableAlias, String geomFieldName) {
         return StrUtil.format(
-                "encode(public.ST_AsBinary(public.ST_Force2D(%s.%s)), 'base64')",
+                "encode(public.ST_AsBinary(public.ST_Force2D({}.{})), 'base64')",
                 tableAlias, geomFieldName);
     }
 
     @Override
     protected String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias) {
-        return StrUtil.format("public.ST_Intersects(%s, %s.%s)",
+        return StrUtil.format("public.ST_Intersects({}, {}.{})",
                 geomFieldExpr, withQueryAlias, geomBox);
     }
 
