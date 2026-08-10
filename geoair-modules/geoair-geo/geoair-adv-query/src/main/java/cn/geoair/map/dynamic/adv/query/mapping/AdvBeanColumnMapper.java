@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
@@ -42,14 +43,28 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName = property.resolveColumnName(toUnderlineCase);
-            Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                    value,
-                    property.getPropertyType(),
-                    AdvTypeHandlerContext.of(
-                            bean.getClass(),
-                            property.getPropertyName(),
-                            columnName,
-                            property.getPropertyType()));
+            @SuppressWarnings("rawtypes")
+            AdvTypeHandler fieldHandler = property.getAdvTypeHandler();
+            Object jdbcValue;
+            if (fieldHandler != null) {
+                jdbcValue = fieldHandler.convertForWrite(
+                        value,
+                        property.getPropertyType(),
+                        AdvTypeHandlerContext.of(
+                                bean.getClass(),
+                                property.getPropertyName(),
+                                columnName,
+                                property.getPropertyType()));
+            } else {
+                jdbcValue = typeHandlerRegistry.convertForWrite(
+                        value,
+                        property.getPropertyType(),
+                        AdvTypeHandlerContext.of(
+                                bean.getClass(),
+                                property.getPropertyName(),
+                                columnName,
+                                property.getPropertyType()));
+            }
             rowData.put(columnName, jdbcValue);
         }
         return rowData;

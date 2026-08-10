@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -33,7 +34,8 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
                || javaType == LocalDate.class
                || javaType == LocalTime.class
                || javaType == LocalDateTime.class
-               || javaType == OffsetDateTime.class;
+               || javaType == OffsetDateTime.class
+               || javaType == Instant.class;
     }
 
     @Override
@@ -58,7 +60,10 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         if (javaType == Timestamp.class) {
             return new Timestamp(date.getTime());
         }
-        Instant instant = Instant.ofEpochMilli(date.getTime());
+        Instant instant = date.toInstant();
+        if (javaType == Instant.class) {
+            return instant;
+        }
         ZoneId zoneId = ZoneId.systemDefault();
         if (javaType == LocalDate.class) {
             return instant.atZone(zoneId).toLocalDate();
@@ -70,7 +75,7 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
             return instant.atZone(zoneId).toLocalDateTime();
         }
         if (javaType == OffsetDateTime.class) {
-            return instant.atZone(zoneId).toOffsetDateTime();
+            return instant.atOffset(ZoneOffset.UTC);
         }
         return value;
     }
@@ -84,6 +89,9 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         }
         if (value instanceof Time) {
             return new Date(((Time) value).getTime());
+        }
+        if (value instanceof Instant) {
+            return Date.from((Instant) value);
         }
         if (value instanceof LocalDateTime) {
             LocalDateTime dateTime = (LocalDateTime) value;
