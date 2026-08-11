@@ -88,13 +88,20 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                                              String idKey,
                                              Set<String> updateFields,
                                              int batchSize) {
+        String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         // 构建 FORALL 批量更新语句
         String setClause = updateFields.stream()
-                .map(field -> StrUtil.format("{} = {}_new.{}", field, tableName, field))
+                .map(field -> {
+                    String quotedField = dialectTableNameProcessor.tbQuoteFieldName(field);
+                    return StrUtil.format("{} = {}_new.{}", quotedField, tableName, quotedField);
+                })
                 .collect(Collectors.joining(", "));
 
         String fieldList = updateFields.stream()
-                .map(field -> StrUtil.format("{}_new.{}", tableName, field))
+                .map(field -> {
+                    String quotedField = dialectTableNameProcessor.tbQuoteFieldName(field);
+                    return StrUtil.format("{}_new.{}", tableName, quotedField);
+                })
                 .collect(Collectors.joining(", "));
 
         return StrUtil.format(
@@ -105,6 +112,6 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                         "  FORALL i IN 1..? \n" +
                         "    UPDATE {} SET {} WHERE {} = l_data(i).{};\n" +
                         "END;",
-                tableName, tableName, tableName, tableName, setClause, idKey, idKey);
+                tableName, tableName, tableName, tableName, setClause, quotedIdKey, quotedIdKey);
     }
 }

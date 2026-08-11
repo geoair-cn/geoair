@@ -29,7 +29,7 @@ public class GenTableColumn {
     private String numericPrecision;
 
     /** 数值小数位 */
-    private String numericPrecisionRadix;
+    private String numericScale;
 
     /** JAVA类型 */
     private String javaType;

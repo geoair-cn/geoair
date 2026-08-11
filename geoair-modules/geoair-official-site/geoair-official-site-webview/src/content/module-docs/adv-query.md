@@ -249,9 +249,9 @@ Strategy 显式设置 > @Table / @Id / @Column 注解 > 驼峰转下划线默认
 ```java
 // 创建表
 List<FieldBySchemaApo> fields = Arrays.asList(
-    new FieldBySchemaApo().setColumnName("id").setColumnType("INTEGER"),
-    new FieldBySchemaApo().setColumnName("name").setColumnType("VARCHAR(100)"),
-    new FieldBySchemaApo().setColumnName("geom").setColumnType("GEOMETRY")
+    new FieldBySchemaApo().setColumnName("id").setUdtName("INTEGER"),
+    new FieldBySchemaApo().setColumnName("name").setUdtName("VARCHAR").setCharacterMaximumLength(100),
+    new FieldBySchemaApo().setColumnName("geom").setUdtName("GEOMETRY")
 );
 executor.dCreateTable("public.cities", fields, "id");
 
@@ -289,11 +289,11 @@ DataFieldsApo columnsBySql = executor.dGetColumnsBySQL("SELECT * FROM public.cit
 
 // 添加字段
 executor.dAddColumn("public.cities",
-    new FieldBySchemaApo().setColumnName("population").setColumnType("INTEGER"));
+    new FieldBySchemaApo().setColumnName("population").setUdtName("INTEGER"));
 
 // 修改字段
 executor.dAlterColumn("public.cities", "population",
-    new FieldBySchemaApo().setColumnName("pop").setColumnType("BIGINT"));
+    new FieldBySchemaApo().setColumnName("pop").setUdtName("BIGINT"));
 
 // 删除字段
 executor.dDropColumn("public.cities", "pop");
@@ -380,6 +380,217 @@ executor.dExecuteDDL("ALTER TABLE ${tableName} ADD COLUMN ${colName} ${colType}"
         .put("colName", "area")
         .put("colType", "DOUBLE PRECISION"),
     "cities", "添加字段");
+```
+
+## 类型元数据系统 —— dbmeta 包
+
+`dbmeta` 包提供了一套"数据库类型 → Java 类型"的统一映射体系，替代了早期仅支持 PostgreSQL 的硬编码类型判断。
+
+### 核心接口：TypeMetadata
+
+```java
+public interface TypeMetadata {
+    enum IgnorePolicy { NOT_SET, KEEP, IGNORE, CONDITIONAL, MUTUAL_DEPENDENT }
+    enum CATEGORY_GROUP { STRING, NUMBER, BOOLEAN, BYTES, DATETIME, COLLECTION, GEOMETRY, INTERVAL, OTHER, NONE }
+    enum CATEGORY {
+        CHAR, TEXT, BOOLEAN, BYTES, BLOB, INT, FLOAT,
+        DATE, TIME, DATETIME, TIMESTAMP, COLLECTION, GEOMETRY, INTERVAL, OTHER, NONE
+    }
+
+    CATEGORY getCategory();
+    CATEGORY_GROUP getCategoryGroup();
+    String getName();
+    boolean support();
+    Class<?> supportClass();
+    int ignoreLength();    // -1=未设置, 0=保留, 1=忽略, 2=有条件, 3=互依赖
+    int ignorePrecision();
+    int ignoreScale();
+    Config config();
+}
+```
+
+每个数据库类型枚举都实现 `TypeMetadata`，统一了类型判断、Java 映射和 DDL 生成逻辑。
+
+### 方言类型枚举
+
+| 枚举 | 对应数据库 | 代表类型 |
+|------|-----------|---------|
+| `PostgreSqlType` | PostgreSQL | `int4`, `varchar`, `geometry`, `geography`, `jsonb`... |
+| `MysqlType` | MySQL | `INT`, `VARCHAR`, `GEOMETRY`, `POINT`, `LINESTRING`... |
+| `OracleType` | Oracle | `NUMBER`, `VARCHAR2`, `SDO_GEOMETRY`, `TIMESTAMP`... |
+
+每种枚举的 `getByUdtName(String)` 方法通过大小写不敏感匹配，支持从 `information_schema.columns.udt_name` 或 JDBC 元数据返回值中查找对应类型。
+
+特别是几何类型，每个枚举支持多个名称变体：
+
+```java
+// PG: geometry 可能在非 public schema 下返回 "\"public\".\"geometry\""
+PostgreSqlType.GEOMETRY = new PostgreSqlType(..., "geometry", "\"public\".\"geometry\"");
+PostgreSqlType.GEOGRAPHY = new PostgreSqlType(..., "geography", "\"public\".\"geography\"");
+
+// Oracle: SDO_GEOMETRY 可能带或不带 schema 前缀
+OracleType.SDO_GEOMETRY = new OracleType(..., "sdo_geometry", "SDO_GEOMETRY",
+    "MDSYS.SDO_GEOMETRY", "mdsys.sdo_geometry");
+
+// MySQL: 每种空间子类型是独立的 UDT
+MysqlType.GEOMETRY = new MysqlType(..., "geometry", "GEOMETRY");
+MysqlType.POINT = new MysqlType(..., "point", "POINT");
+```
+
+### IgnorePolicy —— 替代 magic number
+
+`CATEGORY` 枚举的构造参数使用 `IgnorePolicy` 枚举，语义清晰：
+
+```java
+enum CATEGORY {
+    CHAR(STRING, KEEP, IGNORE, IGNORE),    // 保留长度，忽略精度和小数位
+    INT(NUMBER, KEEP, IGNORE, IGNORE),     // 同上
+    FLOAT(NUMBER, IGNORE, KEEP, KEEP),     // 忽略长度，保留精度和小数位
+    GEOMETRY(GEOMETRY, IGNORE, IGNORE, IGNORE), // 全忽略
+    ...
+}
+```
+
+### 分类体系 (CATEGORY / CATEGORY_GROUP)
+
+`CATEGORY` 是一级分组，决定了 DDL 生成时哪些属性需要输出（长度、精度、小数位）。`CATEGORY_GROUP` 是更大的分组，供业务层快速判断：
+
+```java
+TypeMetadata dbType = field.getDbType();
+if (dbType.getCategoryGroup() == CATEGORY_GROUP.GEOMETRY) { ... }
+if (dbType.getCategory() == CATEGORY.CHAR) { ... }
+```
+
+---
+
+## 字段元数据 —— FieldBySchemaApo
+
+`FieldBySchemaApo` 是数据库列元数据的载体，从 `information_schema.columns` 或 JDBC 元数据中反序列化后，自动填充方言相关的类型信息。
+
+### 核心字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `dialectName` | `DialectName` | Hutool 方言枚举，标识所属数据库 |
+| `columnName` | `String` | 列名 |
+| `originalColumnName` | `String` | 原始列名（如 `plot_geom as geom` 中的 `plot_geom`） |
+| `ordinalPosition` | `Integer` | 数据库列序位置 |
+| `udtName` | `String` | 数据库内部类型名（`int4` / `VARCHAR2` / `geometry`） |
+| `dataType` | `String` | 类型描述（`character varying` / `USER-DEFINED`） |
+| `characterMaximumLength` | `Integer` | 字符类型最大长度 |
+| `numericPrecision` | `Integer` | 数值精度 |
+| `numericScale` | `Integer` | 数值小数位数（非 radix） |
+| `geometryFieldIs` | `boolean` | 是否为空间字段 |
+| `geomType` | `AdvEnumsTypeGeom` | 空间字段子类型 |
+| `srid` | `Integer` | 空间参考系 ID |
+| `primaryKeyIs` | `boolean` | 是否为主键 |
+
+### 方言感知的类型分发
+
+```java
+FieldBySchemaApo field = ...;
+field.setDialectName(DialectName.POSTGRESQL);
+
+TypeMetadata dbType = field.getDbType();  // → PostgreSqlType.getByUdtName(udtName)
+String javaClass = field.getJavaClassName();  // → 如 "Integer", "String", "PGgeometry"
+
+// 几何字段识别走类型系统而非硬编码字符串
+boolean isGeom = field.isGeometryFieldIs(); // → dbType.getCategory() == CATEGORY.GEOMETRY
+```
+
+`getDbType()` 根据 `dialectName` 自动分发：
+- `MYSQL` → `MysqlType.getByUdtName(udtName)`
+- `ORACLE` / `DM` → `OracleType.getByUdtName(udtName)`
+- `POSTGRESQL` / 其它 → `PostgreSqlType.getByUdtName(udtName)`
+
+### 几何字段识别 —— 三层防御
+
+`determineGeometryFieldIs()` 在字段反序列化后自动调用：
+
+```
+1. getDbType() → CATEGORY.GEOMETRY  （类型系统，覆盖所有注册类型）
+2. PG JDBC 层去 "\"public\"." 前缀 （驱动 schema 降级修正）
+3. udtName 原始字符串模式匹配       （兜底：PgObject/geometry/geography/sdo_geometry）
+```
+
+### 字段填充流程
+
+`dGetColumnsByTable` 和 `getMetadataFromSql` 两个入口在创建 `FieldBySchemaApo` 时都会统一执行：
+
+```java
+field.setDialectName(getDialectName());     // 设置方言
+field.setOriginalColumnName(field.getColumnName());
+field.determineGeometryFieldIs();           // 计算几何标记
+```
+
+---
+
+## 字段集合 —— DataFieldsApo
+
+`DataFieldsApo` 封装了一组 `FieldBySchemaApo`，提供排序策略和便捷的查询方法。
+
+### 构造即排序
+
+```java
+// 构造函数自动执行默认排序（主键 → 普通字段 → 空间字段）
+DataFieldsApo fields = new DataFieldsApo(fieldList);
+
+// 空构造用于序列化场景
+DataFieldsApo empty = new DataFieldsApo();
+```
+
+### 两种排序策略
+
+| 方法 | 排序规则 | 使用场景 |
+|------|---------|---------|
+| `applyDefaultSort()` | 主键在前 → 空间字段在后 | 构造函数默认执行，DDL 建表字段顺序 |
+| `applyOrdinalSort()` | 按 `ordinalPosition` 升序 | 还原数据库表的自然列序 |
+| `inOrdinalOrder()` | 返回已排序的新实例（不可变） | 链式调用，不改变原实例 |
+
+### 查询方法命名对照
+
+所有方法名都反映了实际返回的数据：
+
+| 方法 | 返回内容 |
+|------|---------|
+| `filterFields(boolean includeGeom)` | 过滤后的字段列表（深拷贝） |
+| `findField(Predicate)` | 按条件查找第一个匹配字段 |
+| `mapFields(Function, boolean includeGeom)` | 遍历映射为自定义结果 |
+| `fieldNames()` / `fieldNames(boolean)` | 字段名列表 |
+| `columnNamesOf(List)` | **静态方法**，从指定列表提取列名 |
+| `primaryKeyFields()` | 主键字段列表 |
+| `primaryKeyFieldNames()` | 主键字段名列表 |
+| `firstGeomField()` | 第一个空间字段 |
+| `geomFields()` | 所有空间字段 |
+| `firstGeomFieldName()` | 第一个空间字段名 |
+| `geomFieldNames()` | 所有空间字段名 |
+| `unresolvedGeomTypeFieldNames()` | 几何类型未知的空间字段名 |
+
+### 典型用法
+
+```java
+DataFieldsApo fields = executor.dGetColumnsByTable("public.cities");
+
+// 字段名列表（默认排序：PK → 其他 → 几何）
+List<String> names = fields.fieldNames();
+
+// 排除几何字段
+List<String> nonGeomNames = fields.fieldNames(false);
+
+// 按数据库自然列序
+List<String> naturalOrder = fields.inOrdinalOrder().fieldNames();
+
+// 查找主键字段
+List<String> pkNames = fields.primaryKeyFieldNames();
+
+// 空间字段探测
+if (fields.firstGeomFieldName() != null) {
+    String geomCol = fields.firstGeomFieldName();
+    Integer srid = fields.firstGeomField().get().getSrid();
+}
+
+// 类型未知的空间字段（需要运行时探测）
+List<String> unknownGeom = fields.unresolvedGeomTypeFieldNames();
 ```
 
 ## 空间几何操作 —— IAdvGeoOpt

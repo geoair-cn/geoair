@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DialectName;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,11 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
     @Override
     protected DialectTableNameProcessor getDialectTableNameProcessor() {
         return DmDialectTableNameUtil.getInstance();
+    }
+
+    @Override
+    protected DialectName getDialectName() {
+        return DialectName.DM;
     }
 
     @Override
@@ -62,7 +68,7 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
                         + "  col.DATA_TYPE AS \"data_type\", "
                         + "  col.DATA_LENGTH AS \"character_maximum_length\", "
                         + "  col.DATA_PRECISION AS \"numeric_precision\", "
-                        + "  col.DATA_SCALE AS \"numeric_precision_radix\", "
+                        + "  col.DATA_SCALE AS \"numeric_scale\", "
                         + "  col.NULLABLE AS \"is_nullable\", "
                         + "  col.DATA_DEFAULT AS \"column_default\", "
                         + "  comm.COMMENTS AS \"column_comment\" "
@@ -79,12 +85,13 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
         List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sql, FieldBySchemaApo.class);
         List<String> primaryKeys = dGetPrimaryKeys(tableName);
         for (FieldBySchemaApo field : fields) {
+            field.setDialectName(getDialectName());
             field.setOriginalColumnName(field.getColumnName());
+            field.determineGeometryFieldIs();
             field.setPrimaryKeyIs(primaryKeys.contains(field.getColumnName()));
             field.setIsNullable("Y".equals(field.getIsNullable()) ? "YES" : "NO");
         }
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
     }
 

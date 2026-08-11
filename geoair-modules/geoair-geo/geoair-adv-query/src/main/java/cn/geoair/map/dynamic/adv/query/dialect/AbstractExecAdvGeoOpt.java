@@ -132,7 +132,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsByTable(tableName);
         try {
             Map<String, AdvEnumsTypeGeom> typeMaps =
-                    eGetGeoTypeByTable(tableName, dataFieldsApo.getGeomFieldNameList());
+                    eGetGeoTypeByTable(tableName, dataFieldsApo.geomFieldNames());
             return fillGeomType(dataFieldsApo, typeMaps);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -256,15 +256,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         DataFieldsApo dataFieldsApo = dGetColumnsByTable(tableName);
-        return dataFieldsApo.getGeomFieldNameList();
+        return dataFieldsApo.geomFieldNames();
     }
 
     @Override
     public List<String> eGetGeomColumnNameListBySql(String sqlView) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(sqlView);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        return dataFieldsApo.getFieldNameList();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
+        return dataFieldsApo.fieldNames();
     }
 
     @Override
@@ -282,9 +281,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        return dataFieldsApo.getFieldNameList();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
+        return dataFieldsApo.fieldNames();
     }
 
     @Override
@@ -296,7 +294,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListByTable(String tableName) {
         DataFieldsApo dataFieldsApo = dGetColumnsByTable(tableName);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override
@@ -308,7 +306,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlView) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(sqlView);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override
@@ -321,7 +319,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(
             String dynamicSql, GirSqlParam sqlParam) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override

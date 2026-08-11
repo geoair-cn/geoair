@@ -20,6 +20,7 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DialectName;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -65,6 +66,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 创建表名处理器（子类实现：绑定PG/MySQL版本）
      */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
+
+    /** 获取当前数据库方言类型 */
+    protected abstract DialectName getDialectName();
 
     // ========== 通用逻辑：表操作 ==========
     @Override
@@ -567,11 +571,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 String columnTypeName = getColumnTypeName(metaData, i);
                 if (tableFields != null) {
                     Optional<FieldBySchemaApo> fieldOpt =
-                            tableFields.getDataField(
-                                    fieldBySchemaApo ->
-                                            fieldBySchemaApo.getOriginalColumnName().equals(baseColumnName)
-                                                    ? fieldBySchemaApo
-                                                    : null);
+                            tableFields.findField(
+                                    field -> field.getOriginalColumnName().equals(baseColumnName));
                     if (fieldOpt.isPresent()) {
                         FieldBySchemaApo field = fieldOpt.get();
                         field.setColumnName(columnName);
@@ -580,15 +581,17 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                     }
                 }
                 FieldBySchemaApo field = new FieldBySchemaApo();
+                field.setDialectName(getDialectName());
                 field.setColumnName(columnName);
                 field.setOriginalColumnName(baseColumnName);
                 field.setUdtName(columnTypeName);
                 field.setIsNullable(
                         metaData.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NO" : "YES");
                 setFieldLengthInfo(metaData, i, field);
+                field.determineGeometryFieldIs();
                 dataFieldList.add(field);
             }
-            dataFieldVO.setDataFieldList(dataFieldList);
+            dataFieldVO = new DataFieldsApo(dataFieldList);
         } catch (SQLException e) {
             log.error("通过SQL查询字段信息失败，错误: {}", e.getMessage(), e);
             throw new RuntimeException("获取字段信息失败: " + e.getMessage(), e);

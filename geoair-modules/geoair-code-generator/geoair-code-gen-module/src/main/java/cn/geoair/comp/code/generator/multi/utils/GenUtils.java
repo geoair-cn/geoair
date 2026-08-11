@@ -84,7 +84,7 @@ public class GenUtils {
 
     /** 处理数字类型转换 */
     private static void handleNumberType(GenTableColumn column) {
-        String scale = column.getNumericPrecisionRadix();
+        String scale = column.getNumericScale();
         String precision = column.getNumericPrecision();
         if (StringUtils.isNotEmpty(scale) && !"0".equals(scale.trim())) {
             column.setJavaType(GenConstants.TYPE_BIGDECIMAL);
