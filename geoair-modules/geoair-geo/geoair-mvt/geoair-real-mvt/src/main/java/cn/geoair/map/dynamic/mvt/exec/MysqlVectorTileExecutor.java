@@ -33,7 +33,7 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
 
     @Override
     protected String getGeomExportExpr(String tableAlias, String geomFieldName) {
-        return StrUtil.format("TO_BASE64(ST_AsBinary({}.{}))",
+        return StrUtil.format("TO_BASE64(ST_AsBinary({}.{},'axis-order=long-lat'))",
                 tableAlias, geomFieldName);
     }
 
