@@ -1,9 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
-import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta;
-import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMapMapper;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.tools.simple.collection.map.OptNullGeomAndBasicTypeFromObjectGetter;
 import cn.hutool.core.collection.ListUtil;
@@ -25,10 +22,17 @@ import java.util.stream.Collectors;
 public class GirAdvOneRow extends LinkedHashMap<String, Object>
         implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable {
 
+    /** 关联的 TypeHandler 注册表，用于 {@link #toBeanObj(Class)} 做正确的类型转换 */
+    private transient AdvTypeHandlerRegistry typeHandlerRegistry;
+
     // ==================== 工厂方法 ====================
 
     public static GirAdvOneRow ofByMap(Map<String, Object> row) {
-        return new GirAdvOneRow(row);
+        GirAdvOneRow result = new GirAdvOneRow(row);
+        if (row instanceof GirAdvOneRow) {
+            result.typeHandlerRegistry = ((GirAdvOneRow) row).typeHandlerRegistry;
+        }
+        return result;
     }
 
     public static GirAdvOneRow ofByEntity(Entity row) {
@@ -50,86 +54,40 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         super(map);
     }
 
-    // ==================== Bean 转换（使用 TypeHandler 体系） ====================
-
-    /**
-     * 使用 TypeHandler 体系将当前行转换为指定类型的 Bean。
-     *
-     * <p>Geometry / 日期 / 枚举 等复杂类型会通过 {@link AdvTypeHandlerRegistry} 进行正确的类型转换，
-     * 而非简单的 BeanUtil 反射映射。推荐在持有 Registry 时使用此方法。</p>
-     *
-     * @param clazz   目标 Bean 类型
-     * @param registry TypeHandler 注册表（通过 {@code executor.getTypeHandlerRegistry()} 获取）
-     * @param <T>     Bean 类型
-     * @return 转换后的 Bean 实例
-     */
-    public <T> T toBeanObj(Class<T> clazz, AdvTypeHandlerRegistry registry) {
-        T bean = newInstance(clazz);
-        AdvBeanMappingMeta mappingMeta = AdvBeanMappingMeta.of(clazz);
-        for (Map.Entry<String, Object> entry : this.entrySet()) {
-            String key = entry.getKey();
-            Object rawValue = entry.getValue();
-            AdvBeanPropertyMeta propertyMeta = mappingMeta.resolvePropertyByColumnOrProperty(key);
-            if (propertyMeta == null || propertyMeta.isIgnored()) continue;
-
-            @SuppressWarnings("rawtypes")
-            AdvTypeHandler fieldHandler = propertyMeta.getAdvTypeHandler();
-            Object convertedValue;
-            if (fieldHandler != null) {
-                convertedValue = fieldHandler.convertForRead(
-                        rawValue, propertyMeta.getPropertyType(),
-                        AdvTypeHandlerContext.of(clazz, propertyMeta.getPropertyName(), key, propertyMeta.getPropertyType()));
-            } else {
-                convertedValue = registry.convertForRead(
-                        rawValue, propertyMeta.getPropertyType(),
-                        AdvTypeHandlerContext.of(clazz, propertyMeta.getPropertyName(), key, propertyMeta.getPropertyType()));
-            }
-            propertyMeta.writeValue(bean, convertedValue);
-        }
-        return bean;
+    /** 设置 TypeHandler 注册表（由 bSelectList / bSelectOne 等方法自动注入） */
+    public void setTypeHandlerRegistry(AdvTypeHandlerRegistry registry) {
+        this.typeHandlerRegistry = registry;
     }
 
-    /**
-     * 将行列表批量转换为 Bean 列表（使用 TypeHandler 体系）。
-     *
-     * @param rowList  行列表
-     * @param clazz    目标 Bean 类型
-     * @param registry TypeHandler 注册表
-     * @param <T>      Bean 类型
-     * @return Bean 列表
-     */
-    public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz, AdvTypeHandlerRegistry registry) {
-        if (rowList == null) return Collections.emptyList();
-        return rowList.stream()
-                .filter(Objects::nonNull)
-                .map(row -> row.toBeanObj(clazz, registry))
-                .collect(Collectors.toList());
+    /** fluent 风格的 Registry 注入 */
+    public GirAdvOneRow withRegistry(AdvTypeHandlerRegistry registry) {
+        this.typeHandlerRegistry = registry;
+        return this;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T newInstance(Class<T> clazz) {
-        try {
-            if (Map.class.isAssignableFrom(clazz)) {
-                return (T) new LinkedHashMap<String, Object>();
-            }
-            return clazz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("创建对象失败：" + clazz.getName(), e);
-        }
-    }
+    // ==================== Bean 转换 ====================
 
     /**
-     * 将当前行简单转换为 Bean（不使用 TypeHandler，适合无 Geometry/日期等复杂类型的 Bean）。
+     * 将当前行转换为 Bean（委托给 {@link AdvBeanMapMapper}）。
      *
-     * <p>如需正确的 Geometry 类型转换，请使用 {@link #toBeanObj(Class, AdvTypeHandlerRegistry)}。</p>
+     * <p>如果已注入 {@link AdvTypeHandlerRegistry}（通过 {@code bSelectList} 等方法自动注入），
+     * 则走 TypeHandler 转换链路；否则回退到 Hutool BeanUtil。</p>
      */
     public <T> T toBeanObj(Class<T> clazz) {
+        if (typeHandlerRegistry != null) {
+            return new AdvBeanMapMapper(typeHandlerRegistry).mapToBean(this, clazz);
+        }
         return cn.hutool.core.bean.BeanUtil.toBean(this, clazz);
     }
 
     /**
-     * 将行列表批量简单转换为 Bean 列表。
+     * 使用指定 Registry 转换为 Bean。
      */
+    public <T> T toBeanObj(Class<T> clazz, AdvTypeHandlerRegistry registry) {
+        return new AdvBeanMapMapper(registry).mapToBean(this, clazz);
+    }
+
+    /** 批量转换（自动检测各行已注入的 Registry） */
     public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz) {
         if (rowList == null) return Collections.emptyList();
         return rowList.stream()
@@ -138,25 +96,32 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
                 .collect(Collectors.toList());
     }
 
+    /** 批量转换（使用统一 Registry） */
+    public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz, AdvTypeHandlerRegistry registry) {
+        if (rowList == null) return Collections.emptyList();
+        AdvBeanMapMapper mapper = new AdvBeanMapMapper(registry);
+        return rowList.stream()
+                .filter(Objects::nonNull)
+                .map(row -> mapper.mapToBean(row, clazz))
+                .collect(Collectors.toList());
+    }
+
     /** 转换为大小写不敏感的 key */
     public GirAdvOneRow toCaseInsensitive() {
-        return new GirAdvOneRow(new CaseInsensitiveLinkedMap<>(this));
+        GirAdvOneRow result = new GirAdvOneRow(new CaseInsensitiveLinkedMap<>(this));
+        result.typeHandlerRegistry = this.typeHandlerRegistry;
+        return result;
     }
 
     /**
      * 转换为驼峰 key。
-     *
-     * <p>仅在外部套一层适配，不复制原始数据，key 的转换是惰性的。
-     * 如果只需要读取少量字段，建议直接使用 {@code getStr / getInt} 等方法，
-     * 它们本身已支持大小写不敏感匹配。</p>
      */
     public GirAdvOneRow toCamelCase() {
-        // 驼峰映射不可逆，需要实际转换所有 key
         Map<String, Object> camelMap = new LinkedHashMap<>(this.size());
-        this.forEach((key, value) -> {
-            camelMap.put(toCamelCaseKey(key), value);
-        });
-        return new GirAdvOneRow(camelMap);
+        this.forEach((key, value) -> camelMap.put(toCamelCaseKey(key), value));
+        GirAdvOneRow result = new GirAdvOneRow(camelMap);
+        result.typeHandlerRegistry = this.typeHandlerRegistry;
+        return result;
     }
 
     /** 转换 key 列表为驼峰 */
