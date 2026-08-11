@@ -13,11 +13,15 @@ import java.util.Map;
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/7/22
- * @description： bean到列值的映射器
+ * @description： bean到列值的映射器（写方向）
  */
 public class AdvBeanColumnMapper {
 
-    private final AdvTypeHandlerRegistry typeHandlerRegistry = AdvTypeHandlerRegistry.getInstance();
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
+    public AdvBeanColumnMapper(AdvTypeHandlerRegistry typeHandlerRegistry) {
+        this.typeHandlerRegistry = typeHandlerRegistry;
+    }
 
     public Map<String, Object> toColumnValueMap(
             Object bean,

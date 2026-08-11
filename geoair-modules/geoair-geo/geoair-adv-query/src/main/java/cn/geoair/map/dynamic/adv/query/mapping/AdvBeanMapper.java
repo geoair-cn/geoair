@@ -15,11 +15,15 @@ import java.util.Map;
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/7/22
- * @description： bean结果映射器
+ * @description： bean结果映射器（读方向）
  */
 public class AdvBeanMapper {
 
-    private final AdvTypeHandlerRegistry typeHandlerRegistry = AdvTypeHandlerRegistry.getInstance();
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
+    public AdvBeanMapper(AdvTypeHandlerRegistry typeHandlerRegistry) {
+        this.typeHandlerRegistry = typeHandlerRegistry;
+    }
 
     public <T> T mapRow(ResultSet rs, Class<T> beanType) throws SQLException {
         T bean = createBean(beanType);

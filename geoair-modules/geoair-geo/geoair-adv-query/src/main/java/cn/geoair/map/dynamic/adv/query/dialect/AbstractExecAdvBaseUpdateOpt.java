@@ -12,6 +12,8 @@ import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -40,8 +42,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    private final AdvBeanColumnMapper columnMapper;
+
+    public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
+        this.columnMapper = new AdvBeanColumnMapper(registry);
     }
 
     @Override
@@ -194,7 +199,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -267,7 +272,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -407,7 +412,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty(), this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -441,7 +446,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity,
-                    strategy.isToUnderlineCase(), strategy.isIgnoreNullValue(), strategy.getIgnoreFieldNames());
+                    strategy.isToUnderlineCase(), strategy.isIgnoreNullValue(), strategy.getIgnoreFieldNames(), this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData, strategy.getBatchSize());
@@ -468,7 +473,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
             // 忽略null值字段
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, true, ListUtil.empty());
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, true, true, ListUtil.empty(), this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -507,7 +512,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
             // 使用策略中的配置，但强制忽略null值
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -570,7 +575,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
 
         return bUpdateByWhere(tableName, rowData, whereFilter.toWhereFilter());
     }
@@ -730,7 +735,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
 
         if (toUnderlineCase) {
             List<String> underlineConflictKeys = new ArrayList<>();
@@ -935,7 +940,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
             allRows.add(rowData);
         }
         bUpsertBatch(tableName, allRows, finalConflictKeys, strategy.getBatchSize());

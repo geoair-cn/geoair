@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
 
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.function.Supplier;
  */
 public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
-    public OracleAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(configAdvQueryGetter);
+    public OracleAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+        super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
 

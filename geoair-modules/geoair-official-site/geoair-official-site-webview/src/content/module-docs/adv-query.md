@@ -181,44 +181,84 @@ public class AdvAutoConfiguration {
 
 `adv-query` 自己内部就有一套类型处理链，不是完全依赖外部 ORM。
 
+### 设计要点
+
+与旧版不同，当前版本的核心设计决策是：
+
+- **`AdvTypeHandlerRegistry` 不再是全局单例**：每个数据库方言执行器拥有独立的 Registry 实例
+- **Geometry handler 按方言拆分**：原来一个 `JtsGeometryAdvTypeHandler` 负责所有数据库，改为每个方言一个独立实现
+- **`AdvQueryGlobalConfig` 承载用户自定义 handler**：通过 `addTypeHandler()` 注册，优先级高于 SPI 默认处理器
+
 ### 入口对象
 
-最关键的三个类是：
+最关键的几个类是：
 
-- `AdvTypeHandlerRegistry`
-- `AdvPreparedStatementBinder`
-- `JtsGeometryAdvTypeHandler`
+- `AdvTypeHandlerRegistry` — 类型处理注册表（每个 Executor 一个实例）
+- `AdvPreparedStatementBinder` — 参数绑定器
+- `JtsGeometryAdvTypeHandler` — JTS Geometry 类型处理抽象基类
+- `PostGisGeometryAdvTypeHandler` — PostgreSQL/PostGIS 方言实现
+- `MysqlGeometryAdvTypeHandler` — MySQL 方言实现
+- `OracleGeometryAdvTypeHandler` — Oracle Spatial 方言实现
+- `WktGeometryAdvTypeHandler` — 达梦 / 通用 WKT 方言实现
 
-### 注册逻辑
+### Registry 创建流程
 
-`AdvTypeHandlerRegistry` 在构造时会默认注册一组处理器：
+`AdvTypeHandlerRegistry` 通过工厂方法 `create(DialectName, List<AdvTypeHandler<?>>)` 创建，加载顺序为：
 
-- `JtsGeometryAdvTypeHandler`
-- `StringAdvTypeHandler`
-- `CharacterAdvTypeHandler`
-- `BooleanAdvTypeHandler`
-- `NumberAdvTypeHandler`
-- `TemporalAdvTypeHandler`
-- `ByteArrayAdvTypeHandler`
-- `EnumAdvTypeHandler`
+1. **SPI 加载公共 handlers**（方言无关）：
+   - `BooleanAdvTypeHandler`
+   - `ByteArrayAdvTypeHandler`
+   - `CharacterAdvTypeHandler`
+   - `EnumAdvTypeHandler`
+   - `NumberAdvTypeHandler`
+   - `TemporalAdvTypeHandler`
 
-也就是说，这个模块本身已经预置了：
+2. **用户自定义 handlers**（来自 `AdvQueryGlobalConfig.typeHandlers`）：优先级高于 SPI
 
-- 空间类型处理
-- 字符串处理
-- 数值处理
-- 时间类型处理
-- 布尔类型处理
-- 枚举处理
-- 字节数组处理
+3. **方言专属 Geometry handler**（优先级最高）：
+   - PostgreSQL → `PostGisGeometryAdvTypeHandler`
+   - MySQL → `MysqlGeometryAdvTypeHandler`
+   - Oracle → `OracleGeometryAdvTypeHandler`
+   - 达梦 → `WktGeometryAdvTypeHandler`
 
-如果没有匹配到任何具体 handler，则会回退到：
+如果没有匹配到任何具体 handler，则回退到 `ObjectAdvTypeHandler`。
 
-- `ObjectAdvTypeHandler`
+### Registry 创建位置
+
+`AdvTypeHandlerRegistry` 的创建不在 `AbstractPxyAdvExecutor`（纯代理层），而在各方言的 `*AdvBaseOpt`（方言工厂）构造函数中：
+
+```java
+public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
+    public MysqlAdvBaseOpt(IDataSourceGetter dsGetter, Supplier<AdvQueryGlobalConfig> configGetter) {
+        super(dsGetter, configGetter);
+        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
+                DialectName.MYSQL,
+                configGetter.get().getTypeHandlers());
+    }
+    // ... Registry 通过构造注入传递给 PgAdvBaseAccessOpt / SelectOpt / UpdateOpt / DeleteOpt
+}
+```
+
+这样设计保证了：
+- `AbstractPxyAdvExecutor` 保持纯代理职责
+- 每个 Executor 的 Registry 天生知道自己的方言
+- Geometry handler 不再需要猜测 classpath 上有什么驱动
+
+### 配置用户自定义 TypeHandler
+
+在 `AdvQueryGlobalConfig` 中添加自定义处理器：
+
+```java
+AdvQueryGlobalConfig config = AdvQueryGlobalConfig.of()
+    .addTypeHandler(new MyCustomTypeHandler())
+    .turnOnLog();
+```
 
 ### 写入绑定逻辑
 
-`AdvPreparedStatementBinder` 会在绑定参数时调用：
+`AdvPreparedStatementBinder` 通过构造注入持有 `AdvTypeHandlerRegistry`，在绑定参数时调用：
 
 ```java
 Object jdbcValue = typeHandlerRegistry.convertForWrite(
@@ -228,33 +268,64 @@ Object jdbcValue = typeHandlerRegistry.convertForWrite(
 preparedStatement.setObject(index, jdbcValue);
 ```
 
-也就是说，参数在真正进入 JDBC 之前，会先通过注册表做一次“Java 类型 -> JDBC 可写值”的转换。
+参数在真正进入 JDBC 之前，会先通过注册表做一次”Java 类型 → JDBC 可写值”的转换。
 
-### 空间类型处理逻辑
+### 空间类型处理逻辑（按方言拆分）
 
-`JtsGeometryAdvTypeHandler` 负责 Geometry 类型，它的读写逻辑大致是：
+#### PostGisGeometryAdvTypeHandler（PostgreSQL）
 
-#### 读取时
-尝试把以下对象还原成 `Geometry`：
+**读取时**：
+- `PGobject` → 通过 `GirPostGisJdbcTran` 还原
+- PostGIS org 驱动对象 → 通过 `GirPostGisOrgTran` 还原
+- PostGIS net 驱动对象 → 通过 `GirPostGisNetTran` 还原
+- String（WKT / WKB / GeoJSON）→ 兜底解析
 
-- `Geometry`
-- `String`（WKT / WKB / GeoJSON）
-- `PGobject`
-- PostGIS 不同驱动返回对象
-- MySQL Geometry 二进制
-- Oracle Spatial SDO Geometry
+**写入时**：
+- 优先转为 PostGIS net 驱动 `PGgeometry` 对象
+- 其次转为 PostGIS org 驱动对象
+- 兜底回退为 WKT 字符串
 
-#### 写入时
-优先把 Geometry 转成：
+#### MysqlGeometryAdvTypeHandler（MySQL）
 
-- PostGIS Net 驱动对象
-- PostGIS Org 驱动对象
-- Oracle Spatial 兼容值
-- 如果都不适用，则回退成 WKT 字符串
+**读取时**：
+- MySQL 二进制几何格式 → 通过 `GirMysqlTran` 还原
+- String（WKT / WKB / GeoJSON）→ 兜底解析
 
-这意味着 `adv-query` 本身就已经把“空间对象参数如何进 JDBC”这件事抽象掉了。
+**写入时**：
+- 直接转为 WKT 字符串（MySQL JDBC 驱动原生支持）
 
-## 适用场景
+#### OracleGeometryAdvTypeHandler（Oracle）
+
+**读取时**：
+- Oracle `SDO_GEOMETRY` 对象 → 通过 `GirOracleSpatialTran` 还原
+- String（WKT / WKB / GeoJSON）→ 兜底解析
+
+**写入时**：
+- 转为 Oracle Spatial 兼容值
+- 兜底回退为 WKT 字符串
+
+#### WktGeometryAdvTypeHandler（达梦 / 通用）
+
+**读取时**：
+- String 格式（WKT / WKB / GeoJSON）→ 解析还原
+
+**写入时**：
+- 直接转为 WKT 字符串（JDBC 原生兼容）
+
+### 与 @GirAdvTypeHandler 注解的关系
+
+`@GirAdvTypeHandler` 是字段级注解，为特定实体字段指定自定义类型处理器。它与 Registry 是**并行互补**的关系：
+
+- 字段标注了 `@GirAdvTypeHandler` → 优先级最高，直接调用注解指定的 handler
+- 字段无注解 → 走 `AdvTypeHandlerRegistry` 全局匹配
+
+方案 D 的改动不影响注解机制，两者完全独立。
+
+### 与 SPI 的关系
+
+SPI 仍然用于加载 6 个**方言无关**的公共 handler。`JtsGeometryAdvTypeHandler` 已从 SPI 中移除，改由各方言 Executor 在 `*AdvBaseOpt` 中按需注册对应的 Geometry handler 实现。
+
+### 适用场景
 
 适合：
 
@@ -266,6 +337,7 @@ preparedStatement.setObject(index, jdbcValue);
 - 需要把查询能力抽成通用层的 GIS 服务
 - 需要在 JDBC 写入 / 查询过程中自动处理 Geometry 参数与结果
 - 需要在 Spring 环境中直接把当前数据源自动挂成 `IAdvExecutor`
+- 多数据源场景下区分 MySQL / PostgreSQL / Oracle / 达梦的空间类型转换
 
 ## 真实示例位置
 
@@ -383,7 +455,7 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/test/java/cn/geoair/map/dynamic/adv/query/wherequery/test`
 - Spring 集成目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/spring`
-- typehandler 目录：
+- typehandler 目录（抽象基类 + 方言实现）：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/query/typehandler`
 - 参数绑定目录：
   - `https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-geo/geoair-adv-query/src/main/java/cn/geoair/map/dynamic/adv/query/mapping`
@@ -400,6 +472,12 @@ GirAdvWhereLambdaFilter<User> wrapper = GirAdvWhereLambdaFilter.of(User.class)
 6. `GirSpringAdvExecutor`
 7. `AdvTypeHandlerRegistry`
 8. `AdvPreparedStatementBinder`
-9. `JtsGeometryAdvTypeHandler`
+9. `JtsGeometryAdvTypeHandler`（抽象基类）
+10. `PostGisGeometryAdvTypeHandler`（PG 方言实现）
+11. `MysqlGeometryAdvTypeHandler`（MySQL 方言实现）
+12. `OracleGeometryAdvTypeHandler`（Oracle 方言实现）
+13. `WktGeometryAdvTypeHandler`（达梦/通用实现）
+14. `AdvQueryGlobalConfig`（配置与自定义 handler 入口）
+15. `PgAdvBaseOpt` / `MysqlAdvBaseOpt`（方言 Registry 创建入口）
 
-先看查询请求怎么组织，再看 Spring 集成与自动装配，最后再看类型参数如何进入 JDBC，会更容易把整套 API 吃透。
+先看查询请求怎么组织，再看 Spring 集成与自动装配，然后看 typehandler 的抽象与方言分离设计，最后再看配置入口，会更容易把整套 API 吃透。

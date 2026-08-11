@@ -11,6 +11,8 @@ import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.base.MysqlAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.hutool.db.dialect.DialectName;
 
 import java.util.function.Supplier;
 
@@ -20,57 +22,48 @@ import java.util.function.Supplier;
  */
 public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
     public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(dataSourceGetter,configAdvQueryGetter);
+        super(dataSourceGetter, configAdvQueryGetter);
+        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
+                DialectName.MYSQL,
+                configAdvQueryGetter.get().getTypeHandlers());
     }
 
-    /**
-     * 获取插入操作代理对象（懒加载+数据源注入）
-     */
     @Override
     public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new MysqlAdvBaseAccessOpt(this::getConfig);
+            advBaseAccessPxyOpt = new MysqlAdvBaseAccessOpt(this::getConfig, typeHandlerRegistry);
             advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseAccessPxyOpt;
     }
 
-    /**
-     * 获取查询操作代理对象（懒加载+数据源注入）
-     */
     @Override
     public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new MysqlAdvBaseSelectOpt(this::getConfig);
+            advBaseSelectPxyOpt = new MysqlAdvBaseSelectOpt(this::getConfig, typeHandlerRegistry);
             advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseSelectPxyOpt;
     }
 
-    /**
-     * 获取更新操作代理对象（懒加载+数据源注入）
-     */
     @Override
     public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new MysqlAdvBaseUpdateOpt(this::getConfig);
+            advBaseUpdatePxyOpt = new MysqlAdvBaseUpdateOpt(this::getConfig, typeHandlerRegistry);
             advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseUpdatePxyOpt;
     }
 
-    /**
-     * 获取删除操作代理对象（懒加载+数据源注入）
-     */
     @Override
     public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new MysqlAdvBaseDeleteOpt(this::getConfig);
+            advBaseDeletePxyOpt = new MysqlAdvBaseDeleteOpt(this::getConfig, typeHandlerRegistry);
             advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseDeletePxyOpt;
     }
-
-
 }
