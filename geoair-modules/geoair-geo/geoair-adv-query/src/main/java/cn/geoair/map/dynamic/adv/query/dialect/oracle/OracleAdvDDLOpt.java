@@ -137,14 +137,14 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             if (sqlBuilder.length() > 0) sqlBuilder.append("; ");
             String dataType = newField.getUdtName();
 
-            if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength()) &&
+            if (newField.getCharacterMaximumLength() != null &&
                     (dataType.contains("CHAR") || dataType.contains("VARCHAR2"))) {
                 dataType = StrUtil.format("{}({})", dataType, newField.getCharacterMaximumLength());
-            } else if (StrUtil.isNotEmpty(newField.getNumericPrecision()) &&
+            } else if (newField.getNumericPrecision() != null &&
                     (dataType.contains("NUMBER") || dataType.contains("DECIMAL"))) {
-                if (StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())) {
+                if (newField.getNumericScale() != null) {
                     dataType = StrUtil.format("{}({}, {})", dataType,
-                            newField.getNumericPrecision(), newField.getNumericPrecisionRadix());
+                            newField.getNumericPrecision(), newField.getNumericScale());
                 } else {
                     dataType = StrUtil.format("{}({})", dataType, newField.getNumericPrecision());
                 }
@@ -465,10 +465,10 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (columnTypeName == null) return;
 
         if (columnTypeName.contains("CHAR") || columnTypeName.contains("VARCHAR2")) {
-            field.setCharacterMaximumLength(String.valueOf(metaData.getColumnDisplaySize(columnIndex)));
+            field.setCharacterMaximumLength(metaData.getColumnDisplaySize(columnIndex));
         } else if (columnTypeName.contains("NUMBER")) {
-            field.setNumericPrecision(String.valueOf(metaData.getPrecision(columnIndex)));
-            field.setNumericPrecisionRadix(String.valueOf(metaData.getScale(columnIndex)));
+            field.setNumericPrecision(metaData.getPrecision(columnIndex));
+            field.setNumericScale(metaData.getScale(columnIndex));
         }
     }
 

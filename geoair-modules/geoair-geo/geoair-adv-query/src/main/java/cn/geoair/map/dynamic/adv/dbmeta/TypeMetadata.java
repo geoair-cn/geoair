@@ -2,8 +2,34 @@ package cn.geoair.map.dynamic.adv.dbmeta;
 
 import cn.hutool.core.util.StrUtil;
 
-/** 数据库类型的枚举 */
+/** 数据库类型的统一元数据接口（合并了旧的DataType接口） */
 public interface TypeMetadata {
+
+    /** 忽略策略枚举 */
+    enum IgnorePolicy {
+        NOT_SET(-1),
+        KEEP(0),
+        IGNORE(1),
+        CONDITIONAL(2),
+        MUTUAL_DEPENDENT(3);
+
+        final int code;
+
+        IgnorePolicy(int code) {
+            this.code = code;
+        }
+
+        public int code() {
+            return code;
+        }
+
+        public static IgnorePolicy of(int code) {
+            for (IgnorePolicy p : values()) {
+                if (p.code == code) return p;
+            }
+            return NOT_SET;
+        }
+    }
 
     /** 字段类型的大分组 */
     enum CATEGORY_GROUP {
@@ -19,39 +45,32 @@ public interface TypeMetadata {
         NONE
     }
 
-    // 基于以下特性区分的二级分组
-    // 要用来区分 length/precision
-    // BLOB不需要长度 BYTES需要长度
-    // TIMESTAMP在有些数据库中支持SCALE需要在单独的alias中设置如TIMESTAMP(6)
+    /** 基于长度/精度/小数位特性的二级分组 */
     enum CATEGORY {
-        CHAR(CATEGORY_GROUP.STRING, 0, 1, 1),
-        TEXT(CATEGORY_GROUP.STRING, 1, 1, 1),
-        BOOLEAN(CATEGORY_GROUP.BOOLEAN, 1, 1, 1),
-        BYTES(CATEGORY_GROUP.BYTES, 0, 1, 1),
-        BLOB(CATEGORY_GROUP.BYTES, 1, 1, 1),
-        INT(CATEGORY_GROUP.NUMBER, 0, 1, 1),
-        FLOAT(CATEGORY_GROUP.NUMBER, 1, 0, 0),
-        DATE(CATEGORY_GROUP.DATETIME, 1, 1, 1),
-        TIME(CATEGORY_GROUP.DATETIME, 1, 1, 1),
-        DATETIME(CATEGORY_GROUP.DATETIME, 1, 1, 1),
-        TIMESTAMP(CATEGORY_GROUP.DATETIME, 1, 1, 1),
-        COLLECTION(CATEGORY_GROUP.COLLECTION, 1, 1, 1),
-        GEOMETRY(CATEGORY_GROUP.GEOMETRY, 1, 1, 1),
-        INTERVAL(CATEGORY_GROUP.INTERVAL, 1, 2, 3),
-        OTHER(CATEGORY_GROUP.OTHER, 1, 1, 1),
-        NONE(CATEGORY_GROUP.NONE, 1, 1, 1);
+        CHAR(CATEGORY_GROUP.STRING, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        TEXT(CATEGORY_GROUP.STRING, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        BOOLEAN(CATEGORY_GROUP.BOOLEAN, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        BYTES(CATEGORY_GROUP.BYTES, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        BLOB(CATEGORY_GROUP.BYTES, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        INT(CATEGORY_GROUP.NUMBER, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        FLOAT(CATEGORY_GROUP.NUMBER, IgnorePolicy.IGNORE, IgnorePolicy.KEEP, IgnorePolicy.KEEP),
+        DATE(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        TIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        DATETIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        TIMESTAMP(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        COLLECTION(CATEGORY_GROUP.COLLECTION, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        GEOMETRY(CATEGORY_GROUP.GEOMETRY, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        INTERVAL(CATEGORY_GROUP.INTERVAL, IgnorePolicy.IGNORE, IgnorePolicy.CONDITIONAL, IgnorePolicy.MUTUAL_DEPENDENT),
+        OTHER(CATEGORY_GROUP.OTHER, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
+        NONE(CATEGORY_GROUP.NONE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE);
 
         private final CATEGORY_GROUP group;
-
-        private final int ignoreLength;
-
-        private final int ignorePrecision;
-
-        private final int ignoreScale;
-
+        private final IgnorePolicy ignoreLength;
+        private final IgnorePolicy ignorePrecision;
+        private final IgnorePolicy ignoreScale;
         private Config config;
 
-        CATEGORY(CATEGORY_GROUP group, int ignoreLength, int ignorePrecision, int ignoreScale) {
+        CATEGORY(CATEGORY_GROUP group, IgnorePolicy ignoreLength, IgnorePolicy ignorePrecision, IgnorePolicy ignoreScale) {
             this.group = group;
             this.ignoreLength = ignoreLength;
             this.ignorePrecision = ignorePrecision;
@@ -65,121 +84,83 @@ public interface TypeMetadata {
         public Config config() {
             if (null == config) {
                 config = new Config();
-                config.setIgnoreLength(ignoreLength)
-                        .setIgnorePrecision(ignorePrecision)
-                        .setIgnoreScale(ignoreScale);
+                config.setIgnoreLength(ignoreLength.code())
+                        .setIgnorePrecision(ignorePrecision.code())
+                        .setIgnoreScale(ignoreScale.code());
             }
             return config;
         }
     }
 
-    default boolean equals(TypeMetadata metadata) {
-        if (null == metadata) {
+    /** 判断两个TypeMetadata是否代表同一类型 */
+    default boolean isSameType(TypeMetadata other) {
+        if (null == other) {
             return false;
         }
-        if (this.getOrigin() == metadata) {
+        if (this.getOrigin() == other) {
             return true;
         }
-        if (this == metadata) {
+        if (this == other) {
             return true;
         }
-        if (this == metadata.getOrigin()) {
+        if (this == other.getOrigin()) {
             return true;
         }
-        if (this.getOrigin() == metadata.getOrigin()) {
+        if (this.getOrigin() == other.getOrigin()) {
             return true;
         }
         return false;
     }
 
-    TypeMetadata ILLEGAL =
-            new TypeMetadata() {
+    /** 不识别的类型，原样输出 */
+    TypeMetadata NONE = new TypeMetadata() {
+        @Override
+        public CATEGORY getCategory() {
+            return CATEGORY.NONE;
+        }
 
-                @Override
-                public CATEGORY getCategory() {
-                    return CATEGORY.NONE;
-                }
+        @Override
+        public String getName() {
+            return "NONE";
+        }
 
-                @Override
-                public CATEGORY_GROUP getCategoryGroup() {
-                    return CATEGORY_GROUP.NONE;
-                }
+        @Override
+        public int ignoreLength() {
+            return -1;
+        }
 
-                @Override
-                public String getName() {
-                    return "ILLEGAL";
-                }
+        @Override
+        public int ignorePrecision() {
+            return -1;
+        }
 
-                @Override
-                public int ignoreLength() {
-                    return -1;
-                }
+        @Override
+        public int ignoreScale() {
+            return -1;
+        }
 
-                @Override
-                public int ignorePrecision() {
-                    return -1;
-                }
+        @Override
+        public boolean support() {
+            return true;
+        }
 
-                @Override
-                public int ignoreScale() {
-                    return -1;
-                }
+        @Override
+        public Class<?> supportClass() {
+            return Object.class;
+        }
 
-                @Override
-                public boolean support() {
-                    return false;
-                }
+        @Override
+        public Config config() {
+            return new Config();
+        }
 
-                @Override
-                public Config config() {
-                    return new Config();
-                }
-            };
+        @Override
+        public CATEGORY_GROUP getCategoryGroup() {
+            return CATEGORY_GROUP.NONE;
+        }
+    };
 
-    // 不识别的类型 原样输出
-    TypeMetadata NONE =
-            new TypeMetadata() {
-
-                @Override
-                public CATEGORY getCategory() {
-                    return CATEGORY.NONE;
-                }
-
-                @Override
-                public String getName() {
-                    return "NONE";
-                }
-
-                @Override
-                public int ignoreLength() {
-                    return -1;
-                }
-
-                @Override
-                public int ignorePrecision() {
-                    return -1;
-                }
-
-                @Override
-                public int ignoreScale() {
-                    return -1;
-                }
-
-                @Override
-                public boolean support() {
-                    return true;
-                }
-
-                @Override
-                public Config config() {
-                    return new Config();
-                }
-
-                @Override
-                public CATEGORY_GROUP getCategoryGroup() {
-                    return CATEGORY_GROUP.NONE;
-                }
-            };
+    // ========== 方法声明 ==========
 
     CATEGORY getCategory();
 
@@ -197,7 +178,11 @@ public interface TypeMetadata {
 
     int ignoreScale();
 
+    /** 是否支持该类型 */
     boolean support();
+
+    /** 该类型对应的Java类 */
+    Class<?> supportClass();
 
     default String formula() {
         return null;
@@ -209,56 +194,36 @@ public interface TypeMetadata {
 
     Config config();
 
+    // ========== Config 内部类 ==========
+
     class Config {
 
-        /** SQL 数据类型(用来比较数据类型是否相同) INTERVAL DAY TO HOUR 不提供则根据NAME 生成 */
+        /** SQL 数据类型，用于比较数据类型是否相同。不提供则根据NAME生成 */
         private String meta;
 
-        /** SQL生成公式如INTERVAL DAY(｛p｝) TO HOUR 不提供则根据NAME 生成 */
+        /** SQL生成公式，如 INTERVAL DAY({p}) TO HOUR。不提供则根据NAME生成 */
         private String formula;
 
         /**
-         * 是否忽略长度，创建和比较时忽略，但元数据中可能会有对应的列也有值 -1:未设置可以继承上级 0:不忽略 1:忽略 2:根据情况(是否提供)
-         * 3:用来处理precision和scale相互依赖的情况,只有同时有值才生效,其中一个没值就全忽略
+         * 是否忽略长度：-1未设置(继承上级)，0不忽略，1忽略，2视情况，3精度和小数位互依赖
          */
         private int ignoreLength = -1;
-
         private int ignorePrecision = -1;
-
         private int ignoreScale = -1;
 
-        /**
-         * 读取元数据时 字符类型长度对应的列<br>
-         * 正常情况下只有一列<br>
-         * 如果需要取多列以,分隔
-         */
+        /** 从元数据读取时，字符类型长度对应的列。多列以,分隔 */
         private String[] lengthRefers;
 
-        /**
-         * 读取元数据时 数字类型长度对应的列<br>
-         * 正常情况下只有一列<br>
-         * 如果需要取多列以,分隔
-         */
+        /** 从元数据读取时，数字类型长度对应的列 */
         private String[] precisionRefers;
 
-        /**
-         * 读取元数据时 小数位对应的列<br>
-         * 正常情况下只有一列<br>
-         * 如果需要取多列以,分隔
-         */
+        /** 从元数据读取时，小数位对应的列 */
         private String[] scaleRefers;
 
         public Config() {}
 
-        public Config(
-                String meta,
-                String formula,
-                String lengthRefer,
-                String precisionRefer,
-                String scaleRefer,
-                int ignoreLength,
-                int ignorePrecision,
-                int ignoreScale) {
+        public Config(String meta, String formula, String lengthRefer, String precisionRefer,
+                      String scaleRefer, int ignoreLength, int ignorePrecision, int ignoreScale) {
             setMeta(meta);
             setFormula(formula);
             setLengthRefer(lengthRefer);
@@ -269,13 +234,8 @@ public interface TypeMetadata {
             this.ignoreScale = ignoreScale;
         }
 
-        public Config(
-                String lengthRefer,
-                String precisionRefer,
-                String scaleRefer,
-                int ignoreLength,
-                int ignorePrecision,
-                int ignoreScale) {
+        public Config(String lengthRefer, String precisionRefer, String scaleRefer,
+                      int ignoreLength, int ignorePrecision, int ignoreScale) {
             setLengthRefer(lengthRefer);
             setScaleRefer(scaleRefer);
             setPrecisionRefer(precisionRefer);
@@ -296,167 +256,65 @@ public interface TypeMetadata {
             this.ignoreScale = ignoreScale;
         }
 
-        public int ignoreLength() {
-            return ignoreLength;
-        }
+        public int ignoreLength() { return ignoreLength; }
+        public Config setIgnoreLength(int ignoreLength) { this.ignoreLength = ignoreLength; return this; }
 
-        public Config setIgnoreLength(int ignoreLength) {
-            this.ignoreLength = ignoreLength;
-            return this;
-        }
+        public int ignorePrecision() { return ignorePrecision; }
+        public Config setIgnorePrecision(int ignorePrecision) { this.ignorePrecision = ignorePrecision; return this; }
 
-        public int ignorePrecision() {
-            return ignorePrecision;
-        }
+        public int ignoreScale() { return ignoreScale; }
+        public Config setIgnoreScale(int ignoreScale) { this.ignoreScale = ignoreScale; return this; }
 
-        public Config setIgnorePrecision(int ignorePrecision) {
-            this.ignorePrecision = ignorePrecision;
-            return this;
-        }
-
-        public int ignoreScale() {
-            return ignoreScale;
-        }
-
-        public Config setIgnoreScale(int ignoreScale) {
-            this.ignoreScale = ignoreScale;
-            return this;
-        }
-
-        public String[] getLengthRefers() {
-            return lengthRefers;
-        }
-
+        public String[] getLengthRefers() { return lengthRefers; }
         public String getLengthRefer() {
-            if (null != lengthRefers && lengthRefers.length > 0) {
-                return lengthRefers[0];
-            }
-            return null;
+            return (null != lengthRefers && lengthRefers.length > 0) ? lengthRefers[0] : null;
         }
-
-        public Config setLengthRefers(String[] lengthRefers) {
-            this.lengthRefers = lengthRefers;
-            return this;
-        }
-
+        public Config setLengthRefers(String[] lengthRefers) { this.lengthRefers = lengthRefers; return this; }
         public Config setLengthRefer(String lengthRefer) {
-            if (StrUtil.isNotEmpty(lengthRefer)) {
-                this.lengthRefers = lengthRefer.split(",");
-            } else {
-
-                this.lengthRefers = null;
-            }
+            this.lengthRefers = StrUtil.isNotEmpty(lengthRefer) ? lengthRefer.split(",") : null;
             return this;
         }
 
-        public String[] getPrecisionRefers() {
-            return precisionRefers;
-        }
-
+        public String[] getPrecisionRefers() { return precisionRefers; }
         public String getPrecisionRefer() {
-            if (null != precisionRefers && precisionRefers.length > 0) {
-                return precisionRefers[0];
-            }
-            return null;
+            return (null != precisionRefers && precisionRefers.length > 0) ? precisionRefers[0] : null;
         }
-
-        public Config setPrecisionRefers(String[] precisionRefers) {
-            this.precisionRefers = precisionRefers;
-            return this;
-        }
-
+        public Config setPrecisionRefers(String[] precisionRefers) { this.precisionRefers = precisionRefers; return this; }
         public Config setPrecisionRefer(String precisionRefer) {
-            if (StrUtil.isNotEmpty(precisionRefer)) {
-                this.precisionRefers = precisionRefer.split(",");
-            } else {
-                this.precisionRefers = null;
-            }
+            this.precisionRefers = StrUtil.isNotEmpty(precisionRefer) ? precisionRefer.split(",") : null;
             return this;
         }
 
-        public String[] getScaleRefers() {
-            return scaleRefers;
-        }
-
+        public String[] getScaleRefers() { return scaleRefers; }
         public String getScaleRefer() {
-            if (null != scaleRefers && scaleRefers.length > 0) {
-                return scaleRefers[0];
-            }
-            return null;
+            return (null != scaleRefers && scaleRefers.length > 0) ? scaleRefers[0] : null;
         }
-
-        public Config setScaleRefers(String[] scaleRefers) {
-            this.scaleRefers = scaleRefers;
-            return this;
-        }
-
+        public Config setScaleRefers(String[] scaleRefers) { this.scaleRefers = scaleRefers; return this; }
         public Config setScaleRefer(String scaleRefer) {
-            if (StrUtil.isNotEmpty(scaleRefer)) {
-                this.scaleRefers = scaleRefer.split(",");
-            } else {
-
-                this.scaleRefers = null;
-            }
+            this.scaleRefers = StrUtil.isNotEmpty(scaleRefer) ? scaleRefer.split(",") : null;
             return this;
         }
 
-        public String getFormula() {
-            return formula;
-        }
+        public String getFormula() { return formula; }
+        public void setFormula(String formula) { this.formula = formula; }
 
-        public void setFormula(String formula) {
-            this.formula = formula;
-        }
+        public String getMeta() { return meta; }
+        public void setMeta(String meta) { this.meta = meta; }
 
-        public String getMeta() {
-            return meta;
-        }
-
-        public void setMeta(String meta) {
-            this.meta = meta;
-        }
-
-        /**
-         * 合并copy的属性(非空并且!=-1的属性)
-         *
-         * @param copy 复本
-         * @return Config
-         */
+        /** 合并非空且!= -1的属性 */
         public Config merge(Config copy) {
             if (null != copy) {
-                String meta = copy.getMeta();
-                String formula = copy.getFormula();
-                int ignoreLength = copy.ignoreLength();
-                int ignorePrecision = copy.ignorePrecision;
-                int ignoreScale = copy.ignoreScale();
-                if (StrUtil.isNotEmpty(meta)) {
-                    this.meta = meta;
-                }
-                if (StrUtil.isNotEmpty(formula)) {
-                    this.formula = formula;
-                }
-                if (-1 != ignoreLength) {
-                    this.ignoreLength = ignoreLength;
-                }
-                if (-1 != ignorePrecision) {
-                    this.ignorePrecision = ignorePrecision;
-                }
-                if (-1 != ignoreScale) {
-                    this.ignoreScale = ignoreScale;
-                }
-                String[] lengthRefers = copy.getLengthRefers();
-                ;
-                String[] precisionRefers = copy.getPrecisionRefers();
-                String[] scaleRefers = copy.getScaleRefers();
-                if (null != lengthRefers && lengthRefers.length > 0) {
-                    this.lengthRefers = lengthRefers;
-                }
-                if (null != precisionRefers && precisionRefers.length > 0) {
-                    this.precisionRefers = precisionRefers;
-                }
-                if (null != scaleRefers && scaleRefers.length > 0) {
-                    this.scaleRefers = scaleRefers;
-                }
+                if (StrUtil.isNotEmpty(copy.getMeta())) this.meta = copy.getMeta();
+                if (StrUtil.isNotEmpty(copy.getFormula())) this.formula = copy.getFormula();
+                if (-1 != copy.ignoreLength()) this.ignoreLength = copy.ignoreLength();
+                if (-1 != copy.ignorePrecision()) this.ignorePrecision = copy.ignorePrecision();
+                if (-1 != copy.ignoreScale()) this.ignoreScale = copy.ignoreScale();
+                if (null != copy.getLengthRefers() && copy.getLengthRefers().length > 0)
+                    this.lengthRefers = copy.getLengthRefers();
+                if (null != copy.getPrecisionRefers() && copy.getPrecisionRefers().length > 0)
+                    this.precisionRefers = copy.getPrecisionRefers();
+                if (null != copy.getScaleRefers() && copy.getScaleRefers().length > 0)
+                    this.scaleRefers = copy.getScaleRefers();
             }
             return this;
         }

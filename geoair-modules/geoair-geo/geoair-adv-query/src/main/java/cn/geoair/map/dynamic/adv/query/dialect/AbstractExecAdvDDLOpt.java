@@ -586,6 +586,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 field.setIsNullable(
                         metaData.isNullable(i) == ResultSetMetaData.columnNoNulls ? "NO" : "YES");
                 setFieldLengthInfo(metaData, i, field);
+                field.determineGeometryFieldIs();
                 dataFieldList.add(field);
             }
             dataFieldVO.setDataFieldList(dataFieldList);

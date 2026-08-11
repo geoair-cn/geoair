@@ -59,8 +59,10 @@ public class CommonRunner implements ICommonRunner {
             }
             genTableColumn.setColumnComment(columnComment);
             genTableColumn.setColumnType(fieldBySchemaApo.getUdtName());
-            genTableColumn.setNumericPrecision(fieldBySchemaApo.getNumericPrecision());
-            genTableColumn.setNumericPrecisionRadix(fieldBySchemaApo.getNumericPrecisionRadix());
+            genTableColumn.setNumericPrecision(fieldBySchemaApo.getNumericPrecision() != null
+                    ? String.valueOf(fieldBySchemaApo.getNumericPrecision()) : null);
+            genTableColumn.setNumericScale(fieldBySchemaApo.getNumericScale() != null
+                    ? String.valueOf(fieldBySchemaApo.getNumericScale()) : null);
             genTableColumn.setIsPk(fieldBySchemaApo.isPrimaryKeyIs() ? "1" : "0");
             genTableColumn.setIsIncrement("0");
             genTableColumn.setIsRequired("NO".equals(fieldBySchemaApo.getIsNullable()) ? "1" : "0");

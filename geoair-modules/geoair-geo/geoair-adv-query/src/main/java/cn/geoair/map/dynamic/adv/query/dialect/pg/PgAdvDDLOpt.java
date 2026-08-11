@@ -186,19 +186,19 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         newField.getUdtName()));
 
         // 处理长度/精度
-        if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
+        if (newField.getCharacterMaximumLength() != null
             && (newField.getUdtName().contains("char")
                 || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
-        } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
-                   && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
+        } else if (newField.getNumericPrecision() != null
+                   && newField.getNumericScale() != null
                    && (newField.getUdtName().contains("numeric")
                        || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
                             newField.getNumericPrecision(),
-                            newField.getNumericPrecisionRadix()));
+                            newField.getNumericScale()));
         }
 
         // 处理非空
@@ -673,14 +673,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         // PG专属：字段长度处理
         if (columnTypeName.contains("char") || columnTypeName.contains("varchar")) {
-            field.setCharacterMaximumLength(
-                    String.valueOf(metaData.getColumnDisplaySize(columnIndex)));
+            field.setCharacterMaximumLength(metaData.getColumnDisplaySize(columnIndex));
         } else if (columnTypeName.contains("int")
                    || columnTypeName.contains("numeric")
                    || columnTypeName.contains("decimal")
                    || columnTypeName.contains("float")) {
-            field.setNumericPrecision(String.valueOf(metaData.getPrecision(columnIndex)));
-            field.setNumericPrecisionRadix(String.valueOf(metaData.getScale(columnIndex)));
+            field.setNumericPrecision(metaData.getPrecision(columnIndex));
+            field.setNumericScale(metaData.getScale(columnIndex));
         }
     }
 
