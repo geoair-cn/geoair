@@ -6,7 +6,9 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
@@ -40,12 +42,15 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     protected static final GiLogger log = GirLoggerFactory.getLogger(AbstractExecAdvBaseAccessOpt.class);
     protected static final int DEFAULT_BATCH_SIZE = 1000;
 
-    private final AdvPreparedStatementBinder preparedStatementBinder = new AdvPreparedStatementBinder();
+    private final AdvPreparedStatementBinder preparedStatementBinder;
+    private final AdvBeanColumnMapper columnMapper;
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public AbstractExecAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
+        this.preparedStatementBinder = new AdvPreparedStatementBinder(registry);
+        this.columnMapper = new AdvBeanColumnMapper(registry);
     }
 
     @Override
@@ -169,7 +174,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
 
         return bInsertOne(tableName, rowData);
     }
@@ -353,7 +358,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
             rowsData.add(rowData);
         }
 
@@ -470,7 +475,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
 
         List<String> finalConflictKeys = conflictKeys;
         if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
@@ -585,7 +590,7 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                 toUnderlineCase,
                 ignoreNullValue,
                 strategy.isIgnoreEmptyString(),
-                ignoreFieldNames);
+                ignoreFieldNames, this.columnMapper);
             List<String> finalConflictKeys = conflictKeys;
             if (toUnderlineCase && CollUtil.isNotEmpty(conflictKeys)) {
                 finalConflictKeys = new ArrayList<>();

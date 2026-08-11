@@ -11,6 +11,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -41,7 +42,6 @@ import java.util.stream.Collectors;
  */
 public class GirAdvSqlUtils {
 
-    private static final AdvBeanColumnMapper ADV_BEAN_COLUMN_MAPPER = new AdvBeanColumnMapper();
     /**
      * 解析带参数的SQL语句，生成可执行的SQL和参数列表
      */
@@ -68,12 +68,51 @@ public class GirAdvSqlUtils {
      * @param isToUnderlineCase
      * @param ignoreNullValue
      * @param ignoreFieldNames
+     * @param columnMapper     用于转换 bean 字段值到 JDBC 参数值的列映射器
      * @param <T>
      * @return
+     */
+    public static <T> Map<String, Object> getRowData(
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            List<String> ignoreFieldNames,
+            AdvBeanColumnMapper columnMapper) {
+        return getRowData(entity, isToUnderlineCase, ignoreNullValue, true, ignoreFieldNames, columnMapper);
+    }
+
+    public static <T> Map<String, Object> getRowData(
+            T entity,
+            boolean isToUnderlineCase,
+            boolean ignoreNullValue,
+            boolean ignoreEmptyString,
+            List<String> ignoreFieldNames,
+            AdvBeanColumnMapper columnMapper) {
+        if (entity == null) {
+            return new HashMap<>();
+        }
+        return columnMapper.toColumnValueMap(
+                entity,
+                isToUnderlineCase,
+                ignoreNullValue,
+                ignoreEmptyString,
+                ignoreFieldNames);
+    }
+
+    /**
+     * 向后兼容的重载：使用默认 Registry（SPI-only，不含方言 Geometry handler）。
+     * 仅用于非 Executor 上下文的工具类（如 BeanToQueryFilterConverter）。
+     * Executor 内部请使用带 AdvBeanColumnMapper 参数的版本。
      */
     public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         return getRowData(entity, isToUnderlineCase, ignoreNullValue, true, ignoreFieldNames);
     }
+
+    /**
+     * @deprecated 请使用带 AdvBeanColumnMapper 参数的重载版本
+     */
+    private static final AdvBeanColumnMapper DEFAULT_COLUMN_MAPPER =
+            new AdvBeanColumnMapper(AdvTypeHandlerRegistry.defaultInstance());
 
     public static <T> Map<String, Object> getRowData(
             T entity,
@@ -84,7 +123,7 @@ public class GirAdvSqlUtils {
         if (entity == null) {
             return new HashMap<>();
         }
-        return ADV_BEAN_COLUMN_MAPPER.toColumnValueMap(
+        return DEFAULT_COLUMN_MAPPER.toColumnValueMap(
                 entity,
                 isToUnderlineCase,
                 ignoreNullValue,

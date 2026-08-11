@@ -13,7 +13,11 @@ import java.util.List;
  */
 public class AdvPreparedStatementBinder {
 
-    private final AdvTypeHandlerRegistry typeHandlerRegistry = AdvTypeHandlerRegistry.getInstance();
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
+    public AdvPreparedStatementBinder(AdvTypeHandlerRegistry typeHandlerRegistry) {
+        this.typeHandlerRegistry = typeHandlerRegistry;
+    }
 
     public void bind(PreparedStatement preparedStatement, int index, Object value) throws SQLException {
         Object jdbcValue = typeHandlerRegistry.convertForWrite(

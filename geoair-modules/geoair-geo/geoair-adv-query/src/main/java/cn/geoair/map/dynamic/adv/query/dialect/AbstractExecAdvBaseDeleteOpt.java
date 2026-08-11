@@ -12,6 +12,8 @@ import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.strategy.DeleteStrategy;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -40,8 +42,11 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    private final AdvBeanColumnMapper columnMapper;
+
+    public AbstractExecAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
+        this.columnMapper = new AdvBeanColumnMapper(registry);
     }
 
     @Override
@@ -180,7 +185,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
-        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+        Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -313,7 +318,7 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
 
         Set<Object> ids = new HashSet<>();
         for (T entity : entities) {
-            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+            Map<String, Object> rowData = GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
             String finalIdKey = toUnderlineCase ? StrUtil.toUnderlineCase(idKey) : idKey;
             Object id = rowData.get(finalIdKey);
             if (id != null) {

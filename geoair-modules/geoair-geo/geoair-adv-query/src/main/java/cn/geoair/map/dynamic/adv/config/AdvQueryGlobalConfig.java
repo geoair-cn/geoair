@@ -1,7 +1,11 @@
 package cn.geoair.map.dynamic.adv.config;
 
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author ：张俊
@@ -44,6 +48,30 @@ public class AdvQueryGlobalConfig {
      */
     boolean enableErrorLog = true;
 
+    /**
+     * 用户自定义类型处理器列表，优先级高于 SPI 默认处理器。
+     * 每个 Executor 创建时会读取此列表，注册到自己的 AdvTypeHandlerRegistry 中。
+     */
+    private List<AdvTypeHandler<?>> typeHandlers = new ArrayList<>();
+
+    /**
+     * 添加一个自定义类型处理器
+     */
+    public AdvQueryGlobalConfig addTypeHandler(AdvTypeHandler<?> handler) {
+        if (this.typeHandlers == null) {
+            this.typeHandlers = new ArrayList<>();
+        }
+        this.typeHandlers.add(handler);
+        return this;
+    }
+
+    /**
+     * 设置自定义类型处理器列表
+     */
+    public AdvQueryGlobalConfig setTypeHandlers(List<AdvTypeHandler<?>> typeHandlers) {
+        this.typeHandlers = typeHandlers;
+        return this;
+    }
 
     /**
      * 打开日志

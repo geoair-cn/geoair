@@ -13,10 +13,11 @@ import java.util.List;
 public class AdvBeanListHandler<T> implements RsHandler<List<T>> {
 
     private final Class<T> beanType;
-    private final AdvBeanMapper beanMapper = new AdvBeanMapper();
+    private final AdvBeanMapper beanMapper;
 
-    public AdvBeanListHandler(Class<T> beanType) {
+    public AdvBeanListHandler(Class<T> beanType, AdvBeanMapper beanMapper) {
         this.beanType = beanType;
+        this.beanMapper = beanMapper;
     }
 
     @Override
