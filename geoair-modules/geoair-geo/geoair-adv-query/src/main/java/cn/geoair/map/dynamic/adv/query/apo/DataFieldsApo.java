@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
-import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,7 +9,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * 数据库表的字段集合封装。
@@ -48,8 +46,8 @@ public class DataFieldsApo implements Serializable {
     // ==================== 排序规则 ====================
 
     /**
-     * 将字段列表按"主键在前 → 其他字段 → 空间字段在后"排序。
-     * 一般情况下不需要手动调用，构造函数已自动执行。
+     * 按"主键在前 → 其他字段 → 空间字段在后"排序。
+     * 构造函数默认执行，一般无需手动调用。
      */
     public void applyDefaultSort() {
         if (ObjectUtil.isEmpty(dataFieldList)) return;
@@ -66,6 +64,37 @@ public class DataFieldsApo implements Serializable {
 
             return 0;
         });
+    }
+
+    /**
+     * 按数据库列的自然顺序（{@code ordinalPosition}）排序。
+     * 没有 {@code ordinalPosition} 值的字段排在最后。
+     */
+    public void applyOrdinalSort() {
+        if (ObjectUtil.isEmpty(dataFieldList)) return;
+        dataFieldList.sort(Comparator.comparing(
+                FieldBySchemaApo::getOrdinalPosition,
+                Comparator.nullsLast(Comparator.naturalOrder())));
+    }
+
+    /**
+     * 返回一个按数据库列自然顺序排序的新实例。
+     * 原实例不受影响，新实例中的字段是深拷贝。
+     *
+     * <pre>{@code
+     *   // 获取按表列序排列的字段名
+     *   List<String> orderedNames = fields.inOrdinalOrder().fieldNames();
+     * }</pre>
+     */
+    public DataFieldsApo inOrdinalOrder() {
+        DataFieldsApo copy = new DataFieldsApo();
+        copy.dataFieldList = dataFieldList.stream()
+                .map(DataFieldsApo::copy)
+                .sorted(Comparator.comparing(
+                        FieldBySchemaApo::getOrdinalPosition,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+        return copy;
     }
 
     // ==================== 查询方法 ====================
