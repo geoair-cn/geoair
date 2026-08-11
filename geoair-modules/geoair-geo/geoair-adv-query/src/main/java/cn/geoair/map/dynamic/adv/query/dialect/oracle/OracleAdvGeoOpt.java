@@ -13,7 +13,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
- 
+
 
 import java.sql.*;
 import java.util.*;
@@ -24,7 +24,7 @@ import java.util.*;
  *
  * @author zhangjun
  */
- 
+
 public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final IAdvBaseOpt baseOpt;
@@ -227,7 +227,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 String colType = metaData.getColumnTypeName(i);
-                if ("SDO_GEOMETRY".equalsIgnoreCase(colType)) {
+                if (colType.contains("SDO_GEOMETRY")) {  //还有可能是MDSYS.SDO_GEOMETRY
                     return metaData.getColumnName(i);
                 }
             }
