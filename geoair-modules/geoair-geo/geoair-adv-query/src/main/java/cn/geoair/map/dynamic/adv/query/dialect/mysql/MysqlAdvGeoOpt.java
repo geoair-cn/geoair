@@ -615,29 +615,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 geomFieldName);
     }
 
-//    @Override
-//    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
-//        // MySQL: ST_Extent 本身返回聚合边界框。分开用 ST_Extent 计算 minx/miny/maxx/maxy 的函数是 PG 写法。
-//        // MySQL 的正确写法：先聚合到子查询，再取维度的最小/最大值
-//        return StrUtil.format(
-//                "SELECT "
-//                        + "ST_XMin(extent) AS minx, ST_YMin(extent) AS miny, "
-//                        + "ST_XMax(extent) AS maxx, ST_YMax(extent) AS maxy, "
-//                        + "ST_XMin(ST_Transform(extent, 4326)) AS minx_gs, "
-//                        + "ST_YMin(ST_Transform(extent, 4326)) AS miny_gs, "
-//                        + "ST_XMax(ST_Transform(extent, 4326)) AS maxx_gs, "
-//                        + "ST_YMax(ST_Transform(extent, 4326)) AS maxy_gs "
-//                        + "FROM (SELECT ST_Extent({}) AS extent FROM {}) AS temp_extent",
-//                geomFieldName, qualifiedTableName);
-//    }
-
-    /**
-     * 获取几何数据范围的SQL - 优化版
-     * 使用辅助函数简化代码，避免重复
-     */
     @Override
     public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int bboxSrid) {
-        // 提取几何坐标的表达式（兼容所有类型）
+
+        String swappedGeom = String.format("ST_GeomFromWKB(ST_AsWKB(%s, 'axis-order=long-lat'))", geomFieldName);
+
+        // 提取几何坐标的表达式（兼容所有类型）- 使用交换后的几何
         String xExpr = String.format(
                 "CASE " +
                 "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(%s) " +
@@ -645,9 +628,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
                 "    ELSE NULL " +
                 "END",
-                geomFieldName, geomFieldName,
-                geomFieldName, geomFieldName,
-                geomFieldName, geomFieldName
+                geomFieldName, swappedGeom,
+                geomFieldName, swappedGeom,
+                geomFieldName, swappedGeom
         );
 
         String yExpr = String.format(
@@ -657,12 +640,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
                 "    ELSE NULL " +
                 "END",
-                geomFieldName, geomFieldName,
-                geomFieldName, geomFieldName,
-                geomFieldName, geomFieldName
+                geomFieldName, swappedGeom,
+                geomFieldName, swappedGeom,
+                geomFieldName, swappedGeom
         );
 
-        // 基础查询
+        // 基础查询（long-lat 轴顺序）
         String baseSql = String.format(
                 "SELECT " +
                 "MIN(%s) AS minx, " +
@@ -674,32 +657,36 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 qualifiedTableName, geomFieldName
         );
 
-        // 如果需要4326坐标
+        // 如果需要坐标转换（从其他坐标系转到 4326）
         if (bboxSrid != 4326) {
-            // 这里需要判断是否有SRID=0的数据，如果有，需要先设置SRID
-            // 简单处理：直接使用ST_SRID设置后再转换
+            // 先设置 SRID，再转换到 4326，最后交换轴顺序确保 X=经度
+            String swappedGeomTransform = String.format(
+                    "ST_GeomFromWKB(ST_AsWKB(ST_Transform(ST_SRID(%s, %d), 4326), 'axis-order=long-lat'))",
+                    geomFieldName, bboxSrid
+            );
+
             String xExprTransform = String.format(
                     "CASE " +
-                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(ST_Transform(ST_SRID(%s, 4326), 4326)) " +
-                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_Transform(ST_SRID(ST_PointN(%s, 1), 4326), 4326)) " +
-                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_Transform(ST_SRID(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1), 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(%s) " +
+                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_PointN(%s, 1)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
                     "    ELSE NULL " +
                     "END",
-                    geomFieldName, geomFieldName,
-                    geomFieldName, geomFieldName,
-                    geomFieldName, geomFieldName
+                    geomFieldName, swappedGeomTransform,
+                    geomFieldName, swappedGeomTransform,
+                    geomFieldName, swappedGeomTransform
             );
 
             String yExprTransform = String.format(
                     "CASE " +
-                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(ST_Transform(ST_SRID(%s, 4326), 4326)) " +
-                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_Transform(ST_SRID(ST_PointN(%s, 1), 4326), 4326)) " +
-                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_Transform(ST_SRID(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1), 4326), 4326)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(%s) " +
+                    "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_PointN(%s, 1)) " +
+                    "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) " +
                     "    ELSE NULL " +
                     "END",
-                    geomFieldName, geomFieldName,
-                    geomFieldName, geomFieldName,
-                    geomFieldName, geomFieldName
+                    geomFieldName, swappedGeomTransform,
+                    geomFieldName, swappedGeomTransform,
+                    geomFieldName, swappedGeomTransform
             );
 
             String transformSql = String.format(
