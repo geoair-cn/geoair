@@ -118,6 +118,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
         for (FieldBySchemaApo field : fields) {
             field.setDialectName(getDialectName());
             field.setOriginalColumnName(field.getColumnName());
+            field.determineGeometryFieldIs();
             field.setPrimaryKeyIs(primaryKeys.contains(field.getColumnName()));
             field.setIsNullable("Y".equals(field.getIsNullable()) ? "YES" : "NO");
         }

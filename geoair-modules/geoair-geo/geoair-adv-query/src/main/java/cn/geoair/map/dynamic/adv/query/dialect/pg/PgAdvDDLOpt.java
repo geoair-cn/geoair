@@ -158,6 +158,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         fields.forEach(f -> {
             f.setDialectName(getDialectName());
             f.setOriginalColumnName(f.getColumnName());
+            f.determineGeometryFieldIs();
         });
 
         DataFieldsApo dataFieldsApo = new DataFieldsApo();

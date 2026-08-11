@@ -51,7 +51,7 @@ public enum PostgreSqlType implements TypeMetadata {
     GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
             "geometry", "\"public\".\"geometry\""),
     GEOGRAPHY(DefaultJavaType.JAVA_GEOGRAPHY, CATEGORY.GEOMETRY,
-            "geography"),
+            "geography", "\"public\".\"geography\""),
 
     MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CATEGORY.FLOAT);
 
