@@ -89,8 +89,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public List<String> eGetAllGeoLayerName() {
         String sqlTemp =
                 "SELECT table_name FROM information_schema.columns "
-                        + "WHERE udt_name = 'geometry' {} "
-                        + "GROUP BY table_name;";
+                + "WHERE udt_name = 'geometry' {} "
+                + "GROUP BY table_name;";
         String schemaFilter =
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
@@ -115,8 +115,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String safeKeyword = layerNameKeyword.replace("'", "''");
         String sqlTemp =
                 "SELECT table_name FROM information_schema.columns "
-                        + "WHERE udt_name = 'geometry' AND table_name LIKE '%{}%' {} "
-                        + "GROUP BY table_name;";
+                + "WHERE udt_name = 'geometry' AND table_name LIKE '%{}%' {} "
+                + "GROUP BY table_name;";
         String schemaFilter =
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
@@ -236,7 +236,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sqlTemp =
                 "SELECT column_name FROM information_schema.columns "
-                        + "WHERE table_name = '{}' AND udt_name = 'geometry' {};";
+                + "WHERE table_name = '{}' AND udt_name = 'geometry' {};";
         String schemaFilter =
                 StrUtil.isEmpty(schemaName)
                         ? ""
@@ -278,8 +278,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     String colName = metaData.getColumnName(i);
                     String colType = metaData.getColumnTypeName(i);
                     if ("geometry".equals(colType)
-                            || "geography".equals(colType)
-                            || "\"public\".\"geometry\"".equals(colType)) {
+                        || "geography".equals(colType)
+                        || "\"public\".\"geometry\"".equals(colType)) {
                         return colName;
                     }
                 }
@@ -309,11 +309,12 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql =
                 StrUtil.format(
-                        "SELECT public.st_srid({}) AS srid FROM {} LIMIT 1;",
+                        "SELECT public.st_srid({}) AS srid FROM {}  WHERE   {}  is not null LIMIT 1;",
                         geomFieldName,
-                        qualifiedName);
+                        qualifiedName,
+                        geomFieldName);
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
-        return row != null ? row.getInt("srid") : 0;
+        return row != null ? row.getInt("srid",0) : 0;
     }
 
     @Override
@@ -619,15 +620,15 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
         return StrUtil.format(
                 "SELECT "
-                        + "public.ST_XMin ( extent ) AS minx,"
-                        + "public.ST_YMin ( extent ) AS miny,"
-                        + "public.ST_XMax ( extent ) AS maxx,"
-                        + "public.ST_YMax ( extent ) AS maxy,"
-                        + "public.ST_XMin ( public.st_transform ( extent, 4326 ) ) AS minx_gs,"
-                        + "public.ST_YMin ( public.st_transform ( extent, 4326 ) ) AS miny_gs,"
-                        + "public.ST_XMax ( public.st_transform ( extent, 4326 ) ) AS maxx_gs,"
-                        + "public.ST_YMax ( public.st_transform ( extent, 4326 ) ) AS maxy_gs "
-                        + "FROM ( SELECT public.st_setsrid ( public.ST_Extent ( {} ), {} ) AS extent FROM {} ) AS lpl666;",
+                + "public.ST_XMin ( extent ) AS minx,"
+                + "public.ST_YMin ( extent ) AS miny,"
+                + "public.ST_XMax ( extent ) AS maxx,"
+                + "public.ST_YMax ( extent ) AS maxy,"
+                + "public.ST_XMin ( public.st_transform ( extent, 4326 ) ) AS minx_gs,"
+                + "public.ST_YMin ( public.st_transform ( extent, 4326 ) ) AS miny_gs,"
+                + "public.ST_XMax ( public.st_transform ( extent, 4326 ) ) AS maxx_gs,"
+                + "public.ST_YMax ( public.st_transform ( extent, 4326 ) ) AS maxy_gs "
+                + "FROM ( SELECT public.st_setsrid ( public.ST_Extent ( {} ), {} ) AS extent FROM {} ) AS lpl666;",
                 geomFieldName,
                 srid,
                 qualifiedTableName);
@@ -714,8 +715,8 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     String colName = metaData.getColumnName(i);
                     String colType = metaData.getColumnTypeName(i);
                     if ("geometry".equals(colType)
-                            || "geography".equals(colType)
-                            || "\"public\".\"geometry\"".equals(colType)) {
+                        || "geography".equals(colType)
+                        || "\"public\".\"geometry\"".equals(colType)) {
                         return colName;
                     }
                 }
