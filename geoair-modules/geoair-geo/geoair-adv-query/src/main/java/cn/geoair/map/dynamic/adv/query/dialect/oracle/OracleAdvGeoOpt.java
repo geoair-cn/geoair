@@ -158,7 +158,9 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String tableNameS = "";
         if (b) {
-            tableNameS = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView);
+            tableNameS =  StrUtil.wrap(tableNameOrSqlView, "( ", " )");
+            String aliasTableName = dialectTableNameProcessor.tbGetTempAliasTableName();
+            tableNameS =   dialectTableNameProcessor.tbBuildAsTable(tableNameS,aliasTableName);
         } else {
             tableNameS = StrUtil.wrap(tableNameOrSqlView, "( ", " )");
         }
