@@ -167,8 +167,6 @@ public class DataFieldsApo implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    // ==================== 主键相关 ====================
-
     /** 获取所有主键字段（深拷贝） */
     public List<FieldBySchemaApo> primaryKeyFields() {
         return dataFieldList.stream()
@@ -225,6 +223,89 @@ public class DataFieldsApo implements Serializable {
                 .filter(f -> f.getGeomType() != null && f.getGeomType().getGeotoolsType() == null)
                 .map(FieldBySchemaApo::getColumnName)
                 .collect(Collectors.toList());
+    }
+
+    // ==================== @Deprecated 旧方法（兼容） ====================
+
+    /** @deprecated 请使用 {@link #filterFields(boolean)} */
+    @Deprecated
+    public List<FieldBySchemaApo> getDataFieldList(boolean includeGeom) {
+        return filterFields(includeGeom);
+    }
+
+    /** @deprecated 请使用 {@link #mapFields(Function, boolean)} */
+    @Deprecated
+    public <R> List<R> getFieldList(Function<FieldBySchemaApo, R> mapper, boolean includeGeom) {
+        return mapFields(mapper, includeGeom);
+    }
+
+    /** @deprecated 请使用 {@link #fieldNames()} */
+    @Deprecated
+    public List<String> getFieldNameList() {
+        return fieldNames(true);
+    }
+
+    /** @deprecated 请使用 {@link #fieldNames(boolean)} */
+    @Deprecated
+    public List<String> getFieldNameList(boolean includeGeom) {
+        return fieldNames(includeGeom);
+    }
+
+    /** @deprecated 请使用 {@link #columnNamesOf(List)} */
+    @Deprecated
+    public List<String> getFieldNameList(List<FieldBySchemaApo> dataFieldList) {
+        return columnNamesOf(dataFieldList);
+    }
+
+    /** @deprecated 请使用 {@link #findField(Predicate)} */
+    @Deprecated
+    public Optional<FieldBySchemaApo> getDataField(Function<FieldBySchemaApo, FieldBySchemaApo> mapper) {
+        return dataFieldList.stream()
+                .filter(f -> mapper.apply(f) != null)
+                .map(DataFieldsApo::copy)
+                .findFirst();
+    }
+
+    /** @deprecated 请使用 {@link #firstGeomField()} */
+    @Deprecated
+    public Optional<FieldBySchemaApo> getGeomField() {
+        return firstGeomField();
+    }
+
+    /** @deprecated 请使用 {@link #geomFields()} */
+    @Deprecated
+    public List<FieldBySchemaApo> getGeomFields() {
+        return geomFields();
+    }
+
+    /** @deprecated 请使用 {@link #firstGeomFieldName()} */
+    @Deprecated
+    public String getGeomFieldName() {
+        return firstGeomFieldName();
+    }
+
+    /** @deprecated 请使用 {@link #geomFieldNames()} */
+    @Deprecated
+    public List<String> getGeomFieldNameList() {
+        return geomFieldNames();
+    }
+
+    /** @deprecated 请使用 {@link #unresolvedGeomTypeFieldNames()} */
+    @Deprecated
+    public List<String> getGeomUnKnownTypeFieldNameList() {
+        return unresolvedGeomTypeFieldNames();
+    }
+
+    /** @deprecated 请使用 {@link #primaryKeyFields()} */
+    @Deprecated
+    public List<FieldBySchemaApo> getPrimaryKeys() {
+        return primaryKeyFields();
+    }
+
+    /** @deprecated 请使用 {@link #primaryKeyFieldNames()} */
+    @Deprecated
+    public List<String> getPrimaryKeyNameList() {
+        return primaryKeyFieldNames();
     }
 
     // ==================== 内部工具 ====================
