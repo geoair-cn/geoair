@@ -667,7 +667,14 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     protected String getColumnTypeName(ResultSetMetaData metaData, int columnIndex)
             throws SQLException {
         if (metaData instanceof PgResultSetMetaData) {
-            return ((PgResultSetMetaData) metaData).getColumnTypeName(columnIndex);
+            PgResultSetMetaData pgMeta = (PgResultSetMetaData) metaData;
+            String typeName = pgMeta.getColumnTypeName(columnIndex);
+            // PG JDBC 驱动在 currentSchema 不是 public 时，可能因找不到类型定义而降级返回
+            // "PgObject" 或 "\"public\".\"geometry\"" 等，这里统一去掉 schema 前缀保留纯类型名
+            if (typeName != null && typeName.startsWith("\"public\".")) {
+                return typeName.substring("\"public\".".length());
+            }
+            return typeName;
         }
         return metaData.getColumnTypeName(columnIndex);
     }

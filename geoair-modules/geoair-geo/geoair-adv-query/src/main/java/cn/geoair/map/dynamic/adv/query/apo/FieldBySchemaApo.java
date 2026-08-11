@@ -92,7 +92,13 @@ public class FieldBySchemaApo implements Serializable {
         if (dbType != null) {
             geometryFieldIs = dbType.getCategory() == TypeMetadata.CATEGORY.GEOMETRY;
         } else {
-            geometryFieldIs = false;
+            // 兜底：类型系统未匹配到（如 PG JDBC 驱动降级为 PgObject），
+            // 用原始 udtName 做模式匹配
+            String lower = udtName.toLowerCase();
+            geometryFieldIs = lower.contains("geometry")
+                    || lower.contains("geography")
+                    || lower.contains("pgobject")
+                    || lower.contains("sdo_geometry");
         }
         return geometryFieldIs;
     }
