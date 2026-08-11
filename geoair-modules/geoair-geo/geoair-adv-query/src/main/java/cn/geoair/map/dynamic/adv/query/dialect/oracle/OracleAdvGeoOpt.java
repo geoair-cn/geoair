@@ -93,8 +93,8 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String schemaName = dataSourceGetter.getSchemaName();
         String sql = StrUtil.format(
                 "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS " +
-                        "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
-                        "GROUP BY TABLE_NAME",
+                "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
+                "GROUP BY TABLE_NAME",
                 schemaName);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -115,9 +115,9 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String safeKeyword = layerNameKeyword.replace("'", "''");
         String sql = StrUtil.format(
                 "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS " +
-                        "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
-                        "AND TABLE_NAME LIKE '%{}%' " +
-                        "GROUP BY TABLE_NAME",
+                "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
+                "AND TABLE_NAME LIKE '%{}%' " +
+                "GROUP BY TABLE_NAME",
                 schemaName, safeKeyword);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -165,15 +165,15 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql = StrUtil.format(
                 "SELECT CASE " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 1 THEN 'POINT' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 2 THEN 'LINESTRING' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 3 THEN 'POLYGON' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 4 THEN 'COLLECTION' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 5 THEN 'MULTIPOINT' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 6 THEN 'MULTILINESTRING' " +
-                        "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 7 THEN 'MULTIPOLYGON' " +
-                        "  ELSE 'GEOMETRY' END AS \"geom_type\" " +
-                        "FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 1 THEN 'POINT' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 2 THEN 'LINESTRING' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 3 THEN 'POLYGON' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 4 THEN 'COLLECTION' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 5 THEN 'MULTIPOINT' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 6 THEN 'MULTILINESTRING' " +
+                "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 7 THEN 'MULTIPOLYGON' " +
+                "  ELSE 'GEOMETRY' END AS \"geom_type\" " +
+                "FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
                 geomFieldName, geomFieldName, geomFieldName, geomFieldName,
                 geomFieldName, geomFieldName, geomFieldName,
                 tableNameS, geomFieldName);
@@ -197,7 +197,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql = StrUtil.format(
                 "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_TAB_COLUMNS " +
-                        "WHERE TABLE_NAME = '{}' AND DATA_TYPE = 'SDO_GEOMETRY'",
+                "WHERE TABLE_NAME = '{}' AND DATA_TYPE = 'SDO_GEOMETRY'",
                 nameNotSchema);
 
         List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
@@ -249,11 +249,23 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         if (sridFromMeta != null && sridFromMeta > 0) {
             return sridFromMeta;
         }
+        String qualifiedName = null;
+        String aliasTableName = dialectTableNameProcessor.tbGetTempAliasTableName();
+        if (isTableOrViewName(tableNameOrSqlView)) {
+            qualifiedName = StrUtil.format(
+                    "({}) {}",
+                    dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView), aliasTableName);
+        } else {
+            qualifiedName = StrUtil.format(
+                    "({}) {}",
+                    dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView), aliasTableName
+            );
+        }
 
-        String qualifiedName = getQualifiedName(tableNameOrSqlView);
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql = StrUtil.format(
-                "SELECT {}.SDO_SRID AS \"srid\" FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
+                "SELECT {}.{}.SDO_SRID AS \"srid\" FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
+                aliasTableName,
                 quotedGeomFieldName,
                 qualifiedName,
                 quotedGeomFieldName);
@@ -312,18 +324,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return null;
     }
 
-    /**
-     * 获取限定名称（表名或视图子查询别名）
-     */
-    private String getQualifiedName(String tableNameOrSqlView) {
-        if (isTableOrViewName(tableNameOrSqlView)) {
-            return dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameOrSqlView);
-        }
-        return StrUtil.format(
-                "({}) {}",
-                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
-                dialectTableNameProcessor.tbGetTempAliasTableName());
-    }
+
 
     /**
      * 判断是否为实际存在的表名或视图名
@@ -382,9 +383,9 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String insertMetaSql = StrUtil.format(
                 "INSERT INTO USER_SDO_GEOM_METADATA (TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) " +
-                        "VALUES (UPPER('{}'), UPPER('{}'), " +
-                        "SDO_DIM_ARRAY(SDO_DIM_ELEMENT('X', -180, 180, 0.005), " +
-                        "SDO_DIM_ELEMENT('Y', -90, 90, 0.005)), {})",
+                "VALUES (UPPER('{}'), UPPER('{}'), " +
+                "SDO_DIM_ARRAY(SDO_DIM_ELEMENT('X', -180, 180, 0.005), " +
+                "SDO_DIM_ELEMENT('Y', -90, 90, 0.005)), {})",
                 qualifiedTableName, geomFieldName, srid);
 
         try {
@@ -510,15 +511,15 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
         return StrUtil.format(
                 "SELECT "
-                        + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(extent, 1) AS \"minx\","
-                        + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(extent, 2) AS \"miny\","
-                        + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(extent, 1) AS \"maxx\","
-                        + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(extent, 2) AS \"maxy\","
-                        + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 1) AS \"minx_gs\","
-                        + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 2) AS \"miny_gs\","
-                        + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 1) AS \"maxx_gs\","
-                        + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 2) AS \"maxy_gs\" "
-                        + "FROM ( SELECT SDO_AGGR_MBR({}) AS extent FROM {} )",
+                + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(extent, 1) AS \"minx\","
+                + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(extent, 2) AS \"miny\","
+                + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(extent, 1) AS \"maxx\","
+                + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(extent, 2) AS \"maxy\","
+                + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 1) AS \"minx_gs\","
+                + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 2) AS \"miny_gs\","
+                + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 1) AS \"maxx_gs\","
+                + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 2) AS \"maxy_gs\" "
+                + "FROM ( SELECT SDO_AGGR_MBR({}) AS extent FROM {} )",
                 geomFieldName,
                 qualifiedTableName);
     }
