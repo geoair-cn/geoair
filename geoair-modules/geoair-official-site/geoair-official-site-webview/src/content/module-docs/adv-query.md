@@ -105,6 +105,486 @@
 
 所以当实现类同时具备查、增、改、删能力时，本质上就是通过 `IAdvBaseOpt` 把这四组基础接口拼起来了。
 
+## 策略对象 —— 细粒度控制 CRUD 行为
+
+`AccessStrategy`、`UpdateStrategy`、`DeleteStrategy` 三个策略类用于在调用 opt 方法时精确控制字段映射、表名覆盖、冲突处理等行为，无需修改实体类注解。
+
+### 三种策略概览
+
+| 策略 | 典型场景 | 独有字段 |
+|------|---------|---------|
+| `AccessStrategy` | 插入 / 批量插入 / INSERT IGNORE | `conflictKeys`（冲突判定的列） |
+| `UpdateStrategy` | 按主键更新 / 按条件更新 / UPSERT | `conflictKeys`（UPSERT 冲突列） |
+| `DeleteStrategy` | 按主键删除 / 按条件删除 | — |
+
+**共用字段**（三个策略都有）：
+
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| `tableName` | null（走注解） | 覆盖实体类的 `@Table` 注解 |
+| `idKey` | null（走注解） | 覆盖实体类的 `@Id` 注解 |
+| `toUnderlineCase` | true | 驼峰 `userName` → 下划线 `user_name` |
+| `ignoreNullValue` | true | 是否跳过值为 null 的字段 |
+| `ignoreFieldNames` | 空列表 | 显式排除的字段名列表 |
+| `batchSize` | 1000 | 批量操作的批次大小 |
+
+### AccessStrategy — 插入策略
+
+**Lambda 风格**（推荐，IDE 自动补全）：
+
+```java
+// 选择性插入：自动跳过 null 值
+executor.bInsertSelectiveOne(user, strategy -> strategy
+    .tableName("t_user")
+    .ignoreField("createTime", "updateTime"));
+
+// 批量插入：覆盖表名 + 忽略字段
+executor.bInsertBatch(users, strategy -> strategy
+    .tableName("t_user")
+    .batchSize(500)
+    .ignoreField("role"));
+
+// INSERT IGNORE：指定冲突列（PostgreSQL 用 ON CONFLICT，MySQL 用 INSERT IGNORE）
+executor.bInsertIgnore(user, strategy -> strategy
+    .tableName("t_user")
+    .conflictKey("id"));
+
+// 批量 INSERT IGNORE
+executor.bInsertIgnoreBatch(users, strategy -> strategy
+    .tableName("t_user")
+    .conflictKey("email")
+    .batchSize(200));
+```
+
+**构造对象风格**：
+
+```java
+AccessStrategy strategy = new AccessStrategy()
+    .setTableName("t_user")
+    .setIgnoreNullValue(false)    // 插入 null 值
+    .setBatchSize(500)
+    .setIgnoreFieldNames(Arrays.asList("createTime"));
+executor.bInsertOne(user, strategy);
+```
+
+**内置快捷方法**（无需传策略）：
+
+```java
+// 普通插入（toUnderlineCase=true, ignoreNullValue=false）
+executor.bInsertOne(user);
+
+// 选择性插入（toUnderlineCase=true, ignoreNullValue=true）
+executor.bInsertSelectiveOne(user);
+```
+
+### UpdateStrategy — 更新策略
+
+```java
+// 按主键选择性更新（只更新非 null 字段）
+executor.bUpdateByPKSelective(user, strategy -> strategy
+    .tableName("t_user")
+    .idKey("userId")               // 覆盖主键字段名
+    .ignoreField("password"));     // 排除敏感字段
+
+// 按主键全量更新（包含 null 值）
+executor.bUpdateByPK(user, strategy -> strategy
+    .tableName("t_user")
+    .setIgnoreNullValue(false));
+
+// 批量按主键更新
+executor.bUpdateBatchByPK(users, strategy -> strategy
+    .batchSize(300));
+
+// UPSERT：存在则更新，不存在则插入
+executor.bUpsert(user, strategy -> strategy
+    .tableName("t_user")
+    .conflictKey("email")           // 以 email 为冲突判定
+    .ignoreField("createTime"));    // 冲突时不更新创建时间
+
+// 批量 UPSERT
+executor.bUpsertBatch(users, strategy -> strategy
+    .tableName("t_user")
+    .conflictKey("email", "phone"));
+
+// 按条件更新 + Lambda 条件
+executor.bUpdateByWhere(user,
+    strategy -> strategy.tableName("t_user").ignoreField("password"),
+    where -> where.eq(User::getStatus, 1));
+```
+
+### DeleteStrategy — 删除策略
+
+```java
+// 按主键删除（实体中 @Id 字段的值作为 WHERE 条件）
+executor.bDeleteByPK(user, strategy -> strategy
+    .tableName("t_user")
+    .idKey("userId"));
+
+// 批量按主键删除
+executor.bDeleteBatchByPK(users, strategy -> strategy
+    .tableName("t_user"));
+
+// 按条件删除 + Lambda 条件
+executor.bDeleteByWhere(
+    strategy -> strategy.tableName("t_user"),
+    where -> where.eq(User::getStatus, 0).lt(User::getCreateTime, someDate));
+```
+
+### 策略解析优先级
+
+策略对象中设置的值会覆盖实体类注解，未设置的值回退到默认行为：
+
+```
+Strategy 显式设置 > @Table / @Id / @Column 注解 > 驼峰转下划线默认行为
+```
+
+例如：`strategy.tableName("t_user")` 会覆盖实体类上的 `@Table(name = "user")`。
+
+## DDL 操作 —— IAdvDDLOpt
+
+`IAdvDDLOpt` 提供表结构管理能力，所有方法以 `d` 开头。支持建表、改表、索引、主键、Schema 管理等操作，内部已处理多数据库方言差异。
+
+### 表操作
+
+```java
+// 创建表
+List<FieldBySchemaApo> fields = Arrays.asList(
+    new FieldBySchemaApo().setColumnName("id").setColumnType("INTEGER"),
+    new FieldBySchemaApo().setColumnName("name").setColumnType("VARCHAR(100)"),
+    new FieldBySchemaApo().setColumnName("geom").setColumnType("GEOMETRY")
+);
+executor.dCreateTable("public.cities", fields, "id");
+
+// 判断表是否存在
+if (executor.dIsTableExists("public.cities")) {
+    executor.dDropTable("public.cities");
+}
+
+// 重命名表
+executor.dRenameTable("public.cities_old", "public.cities_new");
+
+// 清空表数据（比 DELETE 高效）
+executor.dTruncateTable("public.temp_data");
+
+// 查询当前 Schema 下的所有表
+List<String> tables = executor.dGetTablesBySchema("public");
+
+// 查询表与视图
+List<SchemaTableApo> tableAndViews = executor.dGetTableAndViewBySchema("public");
+
+// 获取表注释
+String comment = executor.dGetTableComment("public.cities");
+
+// 获取表大小
+String size = executor.dGetTableSizeFormat("public.cities");  // "10 MB"
+Long bytes = executor.dGetTableSize("public.cities");
+```
+
+### 字段操作
+
+```java
+// 查看表字段
+DataFieldsApo columns = executor.dGetColumnsByTable("public.cities");
+DataFieldsApo columnsBySql = executor.dGetColumnsBySQL("SELECT * FROM public.cities WHERE id > 100");
+
+// 添加字段
+executor.dAddColumn("public.cities",
+    new FieldBySchemaApo().setColumnName("population").setColumnType("INTEGER"));
+
+// 修改字段
+executor.dAlterColumn("public.cities", "population",
+    new FieldBySchemaApo().setColumnName("pop").setColumnType("BIGINT"));
+
+// 删除字段
+executor.dDropColumn("public.cities", "pop");
+```
+
+### 主键与索引
+
+```java
+// 添加整数自增主键（SERIAL / AUTO_INCREMENT）
+executor.dAddIntAutoPrimaryKey("public.cities", "id", null);
+
+// 添加长整数自增主键（BIGSERIAL，推荐）
+executor.dAddBigIntAutoPrimaryKey("public.cities", "id", null);
+
+// 添加字符串主键（如 file_20260811_0001）
+executor.dAddStringPrimaryKey("public.files", "file_no", 50, null, "file_");
+
+// 添加普通索引
+executor.dCreateIndex("public.cities", "idx_city_name",
+    Arrays.asList("name"), false);
+
+// 添加唯一索引
+executor.dCreateIndex("public.users", "uk_email",
+    Arrays.asList("email"), true);
+
+// 查询主键
+List<String> pks = executor.dGetPrimaryKeys("public.cities");
+
+// 查询索引
+List<IndexApo> indexes = executor.dGetIndexes("public.cities");
+
+// 判断索引是否存在
+boolean exists = executor.dIndexesExists("public.cities", "idx_city_name");
+
+// 删除索引
+executor.dDropIndex("public.cities", "idx_city_name");
+
+// 删除主键约束
+executor.dDropPrimaryKey("public.cities", "cities_pkey");
+```
+
+### Schema 管理
+
+```java
+// 创建 Schema
+executor.dCreateSchema("gis_data");
+
+// 获取当前 Schema / Database
+String schema = executor.dGetCurrentSchema();
+String dbName = executor.dGetCurrentDataBase();
+
+// 查询所有 Schema
+List<String> schemas = executor.dGetAllSchemas();
+
+// 删除 Schema（级联删除其下所有对象）
+executor.dDropSchema("gis_data", true);
+```
+
+### 表复制
+
+```java
+// 复制表结构 + 数据
+executor.dCopyTableByTableName("public.users_backup", "public.users", true);
+
+// 仅复制表结构
+executor.dCopyTableByTableName("public.users_empty", "public.users", false);
+
+// 通过 SQL 查询结果复制
+executor.dCopyTableBySql("public.active_users",
+    "SELECT * FROM users WHERE status = 'active'", true);
+```
+
+### 通用 DDL 执行
+
+```java
+// 直接执行 DDL（不解析占位符）
+executor.dExecuteDDL("ALTER TABLE cities ADD COLUMN area DOUBLE PRECISION",
+    "cities", "添加面积字段");
+
+// 带 MyBatis 风格占位符的 DDL
+executor.dExecuteDDL("ALTER TABLE ${tableName} ADD COLUMN ${colName} ${colType}",
+    SqlParamMap.create()
+        .put("tableName", "cities")
+        .put("colName", "area")
+        .put("colType", "DOUBLE PRECISION"),
+    "cities", "添加字段");
+```
+
+## 空间几何操作 —— IAdvGeoOpt
+
+`IAdvGeoOpt` 提供空间数据相关能力，所有方法以 `e` 开头。支持空间查询、空间字段管理、坐标系转换、空间索引、几何体校验与修复等。
+
+### 空间查询
+
+```java
+// 空间相交查询：找出与指定几何体相交的记录
+List<GirAdvOneRow> rows = executor.eQueryIntersects(
+    "public.cities", "geom", "POINT(116.4 39.9)", 4326);
+
+// BBOX 范围查询：找出在边界框内的记录
+List<GirAdvOneRow> rows = executor.eQueryWithinBBox(
+    "public.land_parcels", "geom",
+    new double[]{116.0, 39.5, 117.0, 40.5}, 4326);
+
+// 距离计算：计算每条记录到指定点的距离
+List<GirAdvOneRow> rows = executor.eCalculateDistance(
+    "public.stores", "geom", "POINT(116.4 39.9)", 4326, "distance_m");
+
+// 中心点查询：返回每条记录几何字段的中心点
+List<GirAdvOneRow> rows = executor.eGetCentroid(
+    "public.districts", "geom", "center_point");
+
+// BBOX 范围查询 + 空间字段处理策略
+List<GirAdvOneRow> rows = executor.eSelectList(
+    "SELECT id, name, ST_AsGeoJSON(geom) as geom_json FROM cities WHERE pop > 1000000",
+    AdvEnumsGeomOpt.toGeoJson, "geom_json");
+```
+
+### 空间字段探测
+
+```java
+// 判断表是否包含空间字段
+boolean isGeom = executor.eIsGeomByTable("public.cities");
+
+// 获取空间字段名称
+String geomCol = executor.eGetGeomColumnNameByTable("public.cities");        // 返回第一个
+List<String> geomCols = executor.eGetGeomColumnNameListByTable("public.cities"); // 返回全部
+
+// 获取空间字段元数据
+FieldBySchemaApo geomMeta = executor.eGetGeomColumnByTable("public.cities");
+List<FieldBySchemaApo> geomMetas = executor.eGetGeomColumnListByTable("public.cities");
+
+// 获取空间类型
+AdvEnumsTypeGeom type = executor.eGetGeoTypeByTable("public.cities");
+// → Point / LineString / Polygon / MultiPoint / ...
+
+// 判断空间类型
+boolean isPoint = executor.eIsPointTable("public.cities");
+boolean isLine = executor.eIsLineStringTable("public.roads");
+boolean isPolygon = executor.eIsPolygonTable("public.land_parcels");
+
+// 获取 SRID
+Integer srid = executor.eGetSrid("public.cities");            // 4326
+Integer srid2 = executor.eGetSrid("public.cities", "geom");   // 按字段名
+
+// 获取所有空间图层
+List<String> allLayers = executor.eGetAllGeoLayerName();
+List<String> matched = executor.eGetGeoLayerNameByKeyword("city");
+```
+
+### 空间字段 DDL
+
+```java
+// 添加空间字段
+executor.eAddGeomColumn("public.stores", "geom",
+    AdvEnumsTypeGeom.Point, 4326);
+
+// 删除空间字段
+executor.eDropGeomColumn("public.stores", "geom");
+executor.eDropGeomColumn("public.stores");  // 自动查找并删除
+
+// 坐标系转换（如从 4326 转 3857）
+executor.eTransformSrid("public.stores", "geom", 3857);
+executor.eTransformSrid("public.stores", 3857);  // 自动查找空间字段
+
+// 创建 / 删除空间索引（GIST）
+executor.eCreateSpatialIndex("public.stores", "geom", "idx_stores_geom");
+executor.eCreateSpatialIndex("public.stores", "idx_stores_geom");  // 自动查找空间字段
+executor.eDropSpatialIndex("public.stores", "idx_stores_geom");
+```
+
+### 几何体校验与修复
+
+```java
+// 验证几何体：返回无效几何体的 ID 列表
+List<Object> invalidIds = executor.eValidateGeometries("public.parcels", "geom");
+
+// 修复无效几何体
+int repaired = executor.eRepairGeometries("public.parcels", "geom");
+
+// 获取全表几何体的边界范围
+BBoxApo extent = executor.eGetExtent("public.cities", "geom");
+// → {minX: 116.0, minY: 39.5, maxX: 117.0, maxY: 40.5}
+```
+
+### 空间字段结果处理策略
+
+`AdvEnumsGeomOpt` 控制查询结果中空间字段如何处理：
+
+```java
+// 不做处理（保持 JDBC 原生返回值）
+AdvEnumsGeomOpt.none
+
+// 转为 GeoJSON 字符串
+AdvEnumsGeomOpt.toGeoJson
+
+// 转为 WKT 字符串
+AdvEnumsGeomOpt.toWKT
+
+// 转为 WKB 字节
+AdvEnumsGeomOpt.toWKB
+
+// 移除空间字段
+AdvEnumsGeomOpt.remove
+
+// 空间字段值替换为 null
+AdvEnumsGeomOpt.toNull
+
+// 空间字段值替换为空字符串
+AdvEnumsGeomOpt.toEmptyStr
+```
+
+## 分页查询 —— IAdvSimplePageOpt
+
+`IAdvSimplePageOpt` 提供分页封装能力，所有方法以 `p` 开头。自动处理不同数据库的分页语法差异（LIMIT/OFFSET vs ROWNUM vs FETCH），同时集成空间字段处理、排序和字段元数据返回。
+
+### 基础分页
+
+```java
+// 最简分页：仅传入 SQL、页码、每页条数
+PageApo<GirAdvOneRow> page = executor.pPage(
+    "SELECT * FROM public.cities ORDER BY id", 1, 20);
+
+// 访问分页结果
+List<GirAdvOneRow> rows = page.getRecords();   // 当前页数据
+long total = page.getTotal();                   // 总记录数
+int pageSize = page.getPageSize();              // 每页条数
+int currentPage = page.getCurrentPage();        // 当前页码
+
+// 页码从 0 开始（前端常见）
+PageApo<GirAdvOneRow> page = executor.pPage(
+    "SELECT * FROM public.cities ORDER BY id", 0, 20, true);
+
+// 带排序的分页
+PageApo<GirAdvOneRow> page = executor.pPage(
+    "SELECT * FROM public.cities",
+    1, 20,
+    Arrays.asList(new OrderApo("name", true), new OrderApo("id", false)));
+    // name ASC, id DESC
+```
+
+### GIS 综合分页
+
+```java
+// 分页 + 空间字段处理 + 字段元数据
+PageApo<GirAdvOneRow> page = executor.pPage(
+    "SELECT id, name, geom FROM public.cities WHERE pop > 1000000",
+    1, 20,
+    false,                          // pageNumStartZero
+    AdvEnumsGeomOpt.toGeoJson,      // geom 转为 GeoJSON
+    true,                           // 需要字段元数据
+    Arrays.asList(new OrderApo("name", true)));
+
+// 访问字段元数据（用于动态表格表头渲染）
+DataFieldsApo fields = page.getDataFields();
+
+// 只获取总数（不查数据）
+Long count = executor.pCount("SELECT * FROM cities WHERE region = 'east'");
+
+// 带 MyBatis 占位符参数的分页
+PageApo<GirAdvOneRow> page = executor.pPage(
+    "SELECT * FROM ${tableName} WHERE ${whereField} > #{minValue}",
+    SqlParamMap.create()
+        .put("tableName", "cities")
+        .put("whereField", "pop"),
+    1, 20,
+    false,
+    AdvEnumsGeomOpt.toGeoJson,
+    true,
+    null);
+```
+
+### 手动构建分页 SQL
+
+如果只需要分页 SQL 字符串而不执行查询：
+
+```java
+// 构建分页 SQL（按方言自动追加 LIMIT/OFFSET）
+String pageSql = executor.pBuildPageSql(
+    "SELECT * FROM cities ORDER BY id", 20, 1, false);
+// MySQL:    SELECT * FROM cities ORDER BY id LIMIT 20 OFFSET 0
+// PG:       SELECT * FROM cities ORDER BY id LIMIT 20 OFFSET 0
+// Oracle:   SELECT * FROM (SELECT t.*, ROWNUM rn FROM (...) t WHERE ROWNUM <= 20) WHERE rn > 0
+
+// 构建排序 SQL
+String orderedSql = executor.pBuildSqlWithOrder(
+    "SELECT * FROM cities",
+    Arrays.asList(new OrderApo("name", true), new OrderApo("id", false)));
+// → SELECT * FROM cities ORDER BY name ASC, id DESC
+```
+
 ## 创建 IAdvExecutor
 
 `IAdvExecutor` 的创建方式从上层到下分为三个层次：
