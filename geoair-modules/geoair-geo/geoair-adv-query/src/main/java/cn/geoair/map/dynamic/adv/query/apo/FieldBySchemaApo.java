@@ -90,7 +90,8 @@ public class FieldBySchemaApo implements Serializable {
     public boolean isGeometryFieldIs() {
         geometryFieldIs = udtName.equals("geometry")
                 || udtName.equals("geography")
-                || udtName.equals("SDO_GEOMETRY")
+                || udtName.equalsIgnoreCase("SDO_GEOMETRY")
+                || udtName.equalsIgnoreCase("MDSYS.SDO_GEOMETRY")
                 || udtName.equals("\"public\".\"geometry\"");
         return geometryFieldIs;
     }
