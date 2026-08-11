@@ -307,12 +307,13 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         // MySQL: ST_SRID获取空间参考系ID
         String sql =
                 StrUtil.format(
-                        "SELECT ST_SRID({}) AS srid FROM {} LIMIT 1;",
+                        "SELECT ST_SRID({}) AS srid FROM {} where {} is not null  LIMIT 1;",
                         geomFieldName,
-                        qualifiedName);
+                        qualifiedName,
+                        geomFieldName);
 
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
-        return row != null ? row.getInt("srid") : 0;
+        return row != null ? row.getInt("srid",0) : 0;
     }
 
     @Override
