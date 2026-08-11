@@ -591,8 +591,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 field.determineGeometryFieldIs();
                 dataFieldList.add(field);
             }
-            dataFieldVO.setDataFieldList(dataFieldList);
-            dataFieldVO.applyDefaultSort();
+            dataFieldVO = new DataFieldsApo(dataFieldList);
         } catch (SQLException e) {
             log.error("通过SQL查询字段信息失败，错误: {}", e.getMessage(), e);
             throw new RuntimeException("获取字段信息失败: " + e.getMessage(), e);

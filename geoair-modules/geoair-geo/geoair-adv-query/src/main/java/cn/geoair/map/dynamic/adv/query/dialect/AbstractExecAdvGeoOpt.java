@@ -262,9 +262,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListBySql(String sqlView) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(sqlView);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        dataFieldsApo.applyDefaultSort();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo.fieldNames();
     }
 
@@ -283,9 +281,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        dataFieldsApo.applyDefaultSort();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo.fieldNames();
     }
 

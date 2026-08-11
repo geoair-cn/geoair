@@ -128,9 +128,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
             f.determineGeometryFieldIs();
         });
 
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        dataFieldsApo.applyDefaultSort();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
     }
 

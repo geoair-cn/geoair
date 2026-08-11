@@ -123,9 +123,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             field.setIsNullable("Y".equals(field.getIsNullable()) ? "YES" : "NO");
         }
 
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        dataFieldsApo.applyDefaultSort();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
     }
 

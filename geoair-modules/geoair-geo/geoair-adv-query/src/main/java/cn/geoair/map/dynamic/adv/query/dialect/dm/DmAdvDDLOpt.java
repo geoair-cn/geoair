@@ -91,9 +91,7 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
             field.setPrimaryKeyIs(primaryKeys.contains(field.getColumnName()));
             field.setIsNullable("Y".equals(field.getIsNullable()) ? "YES" : "NO");
         }
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        dataFieldsApo.applyDefaultSort();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
     }
 
