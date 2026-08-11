@@ -13,19 +13,51 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @date ：Created in 2026/7/22
  * @description： 高级查询类型处理器注册表
  * <p>每个数据库方言执行器拥有独立的 Registry 实例，通过 {@link #create(DialectName, List)} 工厂方法创建。
- * Registry 自动加载 SPI 公共处理器 + 用户自定义处理器 + 方言专属 Geometry 处理器</p>
+ * Registry 自动加载 SPI 公共处理器 + 全局注册处理器 + 用户自定义处理器 + 方言专属 Geometry 处理器</p>
+ *
+ * <p><b>全局注册（兼容旧 API）</b></p>
+ * <pre>{@code
+ *   AdvTypeHandlerRegistry.getInstance().register(new MyHandler());
+ * }</pre>
+ * 全局注册的 handler 会被所有后续创建的 Executor Registry 继承，优先级高于 SPI 但低于 per-executor 自定义。
+ *
+ * <p><b>按 Executor 注册</b></p>
+ * <pre>{@code
+ *   AdvQueryGlobalConfig.of().addTypeHandler(new MyHandler());
+ * }</pre>
+ * 仅对当前 Executor 生效，优先级高于全局注册。
  */
 public class AdvTypeHandlerRegistry {
+
+    /** 全局共享 Registry，用于 SPI 之外的统一注入入口 */
+    private static final AdvTypeHandlerRegistry GLOBAL = new AdvTypeHandlerRegistry();
 
     private final List<AdvTypeHandler<?>> handlers = new CopyOnWriteArrayList<>();
 
     private final AdvTypeHandler<Object> defaultHandler = new ObjectAdvTypeHandler();
 
     /**
-     * 创建指定方言的 TypeHandlerRegistry
+     * 获取全局 Registry 实例，兼容旧 API。
+     * 通过 {@code getInstance().register(handler)} 注册的处理器会被所有
+     * 后续通过 {@link #create} 创建的 Executor Registry 继承。
+     */
+    public static AdvTypeHandlerRegistry getInstance() {
+        return GLOBAL;
+    }
+
+    /**
+     * 创建指定方言的执行器专属 TypeHandlerRegistry
+     *
+     * <p>加载优先级（从低到高）：</p>
+     * <ol>
+     *   <li>SPI 公共 handlers（Boolean, Number, Temporal, ByteArray, Character, Enum）</li>
+     *   <li>全局 handlers（通过 {@link #getInstance()}.register() 注册）</li>
+     *   <li>用户自定义 handlers（来自 AdvQueryGlobalConfig.typeHandlers）</li>
+     *   <li>方言专属 Geometry handler（优先级最高）</li>
+     * </ol>
      *
      * @param dialect        数据库方言
-     * @param customHandlers 用户自定义类型处理器（可为 null），优先级高于 SPI 默认处理器
+     * @param customHandlers 用户自定义类型处理器（可为 null），优先级高于全局和 SPI
      */
     public static AdvTypeHandlerRegistry create(
             DialectName dialect,
@@ -33,25 +65,27 @@ public class AdvTypeHandlerRegistry {
 
         AdvTypeHandlerRegistry registry = new AdvTypeHandlerRegistry();
 
-        // 1. 加载 SPI 公共 handlers（Boolean, Number, Temporal, ByteArray, Character, Enum）
-        //    使用 registerLast 追加到尾部，后续注册的 handler 优先级更高
+        // 1. 加载 SPI 公共 handlers（优先级最低）
         List<AdvTypeHandler> spiHandlers = GirSpHelper.loadAll(AdvTypeHandler.class);
         for (AdvTypeHandler handler : spiHandlers) {
             registry.registerLast(handler);
         }
 
-        // 2. 注册用户自定义 handlers（优先级高于 SPI）
+        // 2. 合并全局 handlers（通过 getInstance().register() 注册的）
+        for (AdvTypeHandler<?> handler : GLOBAL.handlers) {
+            registry.register(handler);
+        }
+
+        // 3. 注册用户自定义 handlers（来自 AdvQueryGlobalConfig，优先级高于全局）
         if (customHandlers != null) {
             for (AdvTypeHandler<?> handler : customHandlers) {
                 registry.register(handler);
             }
         }
 
-        // 3. 注册方言专属 Geometry handler（优先级最高）
+        // 4. 注册方言专属 Geometry handler（优先级最高）
         AdvTypeHandler<?> geometryHandler = createGeometryHandler(dialect);
-        if (geometryHandler != null) {
-            registry.register(geometryHandler);
-        }
+        registry.register(geometryHandler);
 
         return registry;
     }
