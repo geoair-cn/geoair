@@ -164,6 +164,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 StrUtil.isEmpty(newField.getColumnName())
                         ? oldColumnName
                         : newField.getColumnName();
+        String quotedFinalColumnName = dialectTableNameProcessor.tbQuoteFieldName(finalColumnName);
 
         // PG专属：重名字段
         if (!oldColumnName.equals(finalColumnName)) {
@@ -172,7 +173,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                             "ALTER TABLE {} RENAME COLUMN {} TO {};",
                             qualifiedTableName,
                             oldColumnName,
-                            finalColumnName));
+                            quotedFinalColumnName));
         }
 
         // PG专属：修改字段类型/约束
@@ -181,7 +182,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 StrUtil.format(
                         "ALTER TABLE {} ALTER COLUMN {} TYPE {}",
                         qualifiedTableName,
-                        finalColumnName,
+                        quotedFinalColumnName,
                         newField.getUdtName()));
 
         // 处理长度/精度
@@ -296,6 +297,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
 
+        String quotedPkColumnName = dialectTableNameProcessor.tbQuoteFieldName(pkColumnName);
+
         try {
             // ========== 分支1：字符串类型主键 ==========
             if (PrimaryKeyType.STRING.equals(pkType)) {
@@ -308,7 +311,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} VARCHAR({})  ",
                                 qualifiedTableName,
-                                pkColumnName,
+                                quotedPkColumnName,
                                 pkColumnLength);
                 dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
 
@@ -324,7 +327,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                                 + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
-                                pkColumnName,
+                                quotedPkColumnName,
                                 valuePrefix);
                 dExecuteDDL(updateSql, tableName, "填充字符串主键值[" + pkColumnName + "]");
 
@@ -341,7 +344,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} SERIAL PRIMARY KEY",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增整数自增主键列[" + pkColumnName + "]");
             }
 
@@ -352,7 +355,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增长整数自增主键列[" + pkColumnName + "]");
             }
 
@@ -363,7 +366,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} INT  ",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增普通整数列[" + pkColumnName + "]");
 
                 // 步骤2：填充唯一整数值（从1开始连续序号）
@@ -374,7 +377,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                                 + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(updateSql, tableName, "填充普通整数主键值[" + pkColumnName + "]");
 
                 // 步骤3：添加主键约束
@@ -390,7 +393,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} BIGINT  ",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增普通长整数列[" + pkColumnName + "]");
 
                 // 步骤2：填充唯一长整数值（从1开始连续序号）
@@ -401,7 +404,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                                 + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(updateSql, tableName, "填充普通长整数主键值[" + pkColumnName + "]");
 
                 // 步骤3：添加主键约束
@@ -419,11 +422,12 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     protected String buildAddPrimaryKeySql(
             String qualifiedTableName, String constraintName, String columns) {
+        String quotedColumns = dialectTableNameProcessor.tbQuoteFieldName(columns);
         return StrUtil.format(
                 "ALTER TABLE {} ADD CONSTRAINT {} PRIMARY KEY ({})",
                 qualifiedTableName,
                 constraintName,
-                columns);
+                quotedColumns);
     }
 
     @Override

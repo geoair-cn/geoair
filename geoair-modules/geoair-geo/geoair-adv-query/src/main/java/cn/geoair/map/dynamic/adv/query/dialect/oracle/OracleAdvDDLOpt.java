@@ -125,11 +125,12 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             String qualifiedTableName, String oldColumnName, FieldBySchemaApo newField) {
         StringBuilder sqlBuilder = new StringBuilder();
         String finalColumnName = StrUtil.isEmpty(newField.getColumnName()) ? oldColumnName : newField.getColumnName();
+        String quotedFinalColumnName = dialectTableNameProcessor.tbQuoteFieldName(finalColumnName);
 
         if (!oldColumnName.equals(finalColumnName)) {
             sqlBuilder.append(StrUtil.format(
                     "ALTER TABLE {} RENAME COLUMN {} TO {}",
-                    qualifiedTableName, oldColumnName, finalColumnName));
+                    qualifiedTableName, oldColumnName, quotedFinalColumnName));
         }
 
         if (StrUtil.isNotEmpty(newField.getUdtName())) {
@@ -150,17 +151,17 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             }
 
             sqlBuilder.append(StrUtil.format(
-                    "ALTER TABLE {} MODIFY {} {}", qualifiedTableName, finalColumnName, dataType));
+                    "ALTER TABLE {} MODIFY {} {}", qualifiedTableName, quotedFinalColumnName, dataType));
         }
 
         if (StrUtil.isNotEmpty(newField.getIsNullable())) {
             if (sqlBuilder.length() > 0) sqlBuilder.append("; ");
             if ("NO".equals(newField.getIsNullable())) {
                 sqlBuilder.append(StrUtil.format(
-                        "ALTER TABLE {} MODIFY {} NOT NULL", qualifiedTableName, finalColumnName));
+                        "ALTER TABLE {} MODIFY {} NOT NULL", qualifiedTableName, quotedFinalColumnName));
             } else {
                 sqlBuilder.append(StrUtil.format(
-                        "ALTER TABLE {} MODIFY {} NULL", qualifiedTableName, finalColumnName));
+                        "ALTER TABLE {} MODIFY {} NULL", qualifiedTableName, quotedFinalColumnName));
             }
         }
 
@@ -168,11 +169,11 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
             if (sqlBuilder.length() > 0) sqlBuilder.append("; ");
             if ("null".equalsIgnoreCase(newField.getColumnDefault())) {
                 sqlBuilder.append(StrUtil.format(
-                        "ALTER TABLE {} MODIFY {} DEFAULT NULL", qualifiedTableName, finalColumnName));
+                        "ALTER TABLE {} MODIFY {} DEFAULT NULL", qualifiedTableName, quotedFinalColumnName));
             } else {
                 sqlBuilder.append(StrUtil.format(
                         "ALTER TABLE {} MODIFY {} DEFAULT {}",
-                        qualifiedTableName, finalColumnName, newField.getColumnDefault()));
+                        qualifiedTableName, quotedFinalColumnName, newField.getColumnDefault()));
             }
         }
 
@@ -236,9 +237,10 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     @Override
     protected String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns) {
+        String quotedColumns = dialectTableNameProcessor.tbQuoteFieldName(columns);
         return StrUtil.format(
                 "ALTER TABLE {} ADD CONSTRAINT {} PRIMARY KEY ({})",
-                qualifiedTableName, constraintName, columns);
+                qualifiedTableName, constraintName, quotedColumns);
     }
 
     @Override
@@ -518,6 +520,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sequenceName = StrUtil.format("SEQ_{}", tableName.toUpperCase());
+        String quotedPkColumnName = dialectTableNameProcessor.tbQuoteFieldName(pkColumnName);
 
         try {
             if (PrimaryKeyType.STRING.equals(pkType)) {
@@ -526,7 +529,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 }
                 String addColumnSql = StrUtil.format(
                         "ALTER TABLE {} ADD {} VARCHAR2({})",
-                        qualifiedTableName, pkColumnName, pkColumnLength);
+                        qualifiedTableName, quotedPkColumnName, pkColumnLength);
                 dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
 
                 String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
@@ -537,7 +540,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
                 String addColumnSql = StrUtil.format(
                         "ALTER TABLE {} ADD {} {} NOT NULL",
-                        qualifiedTableName, pkColumnName, dataType);
+                        qualifiedTableName, quotedPkColumnName, dataType);
                 dExecuteDDL(addColumnSql, tableName, "新增主键列[" + pkColumnName + "]");
 
                 String createSequenceSql = StrUtil.format(
@@ -558,7 +561,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
                                 "    SELECT {}.NEXTVAL INTO :NEW.{} FROM DUAL; " +
                                 "  END IF; " +
                                 "END;",
-                        triggerName, qualifiedTableName, pkColumnName, sequenceName, pkColumnName);
+                        triggerName, qualifiedTableName, quotedPkColumnName, sequenceName, quotedPkColumnName);
                 dExecuteDDL(createTriggerSql, tableName, "创建触发器[" + triggerName + "]");
             }
             else if (PrimaryKeyType.INT_NORMAL.equals(pkType) || PrimaryKeyType.BIGINT_NORMAL.equals(pkType)) {
@@ -566,7 +569,7 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
                 String addColumnSql = StrUtil.format(
                         "ALTER TABLE {} ADD {} {} NOT NULL",
-                        qualifiedTableName, pkColumnName, dataType);
+                        qualifiedTableName, quotedPkColumnName, dataType);
                 dExecuteDDL(addColumnSql, tableName, "新增主键列[" + pkColumnName + "]");
 
                 String addPkSql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, pkColumnName);
