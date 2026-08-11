@@ -15,6 +15,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DialectName;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -35,6 +36,11 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public DialectTableNameProcessor getDialectTableNameProcessor() {
         return MysqlDialectTableNameUtil.getInstance();
+    }
+
+    @Override
+    protected DialectName getDialectName() {
+        return DialectName.MYSQL;
     }
 
     // ========== 表操作差异化实现 ==========
@@ -116,7 +122,10 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
 
         List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sql, FieldBySchemaApo.class);
-        fields.forEach(f -> f.setOriginalColumnName(f.getColumnName()));
+        fields.forEach(f -> {
+            f.setDialectName(getDialectName());
+            f.setOriginalColumnName(f.getColumnName());
+        });
 
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);

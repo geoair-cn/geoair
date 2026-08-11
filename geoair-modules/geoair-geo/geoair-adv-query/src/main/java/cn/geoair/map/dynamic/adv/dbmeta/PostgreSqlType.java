@@ -1,9 +1,13 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/** PostgreSQL UDT类型与Java类型映射枚举 */
+/**
+ * PostgreSQL UDT类型与Java类型映射枚举
+ */
 public enum PostgreSqlType implements TypeMetadata {
 
     // 字符串/文本类
@@ -42,10 +46,16 @@ public enum PostgreSqlType implements TypeMetadata {
     // 二进制/特殊类
     BYTEA("bytea", "BYTEA", DefaultJavaType.JAVA_BYTES, CATEGORY.BYTES),
     BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CATEGORY.BLOB),
-    GEOMETRY("geometry", "GEOMETRY", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
+
+    // 空间类
+    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "geometry", "\"public\".\"geometry\""),
+    GEOGRAPHY(DefaultJavaType.JAVA_GEOGRAPHY, CATEGORY.GEOMETRY,
+            "geography"),
+
     MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CATEGORY.FLOAT);
 
-    private final String udtName;
+    private final List<String> udtNames;
     private final String standardName;
     private final DefaultJavaType javaType;
     private final CATEGORY category;
@@ -54,52 +64,91 @@ public enum PostgreSqlType implements TypeMetadata {
 
     static {
         for (PostgreSqlType type : values()) {
-            UDT_NAME_MAP.put(type.udtName.toLowerCase(), type);
+            for (String name : type.udtNames) {
+                UDT_NAME_MAP.put(name.toLowerCase(), type);
+            }
         }
     }
 
+    /**
+     * 单一 udtName 的构造器
+     */
     PostgreSqlType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
-        this.udtName = udtName;
+        this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
         this.category = category;
     }
 
-    /** 根据PostgreSQL内部类型名获取枚举实例 */
+    /**
+     * 多个 udtName 变体的构造器
+     */
+    PostgreSqlType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
+        this.udtNames = Arrays.asList(udtNames);
+        this.standardName = this.name();
+        this.javaType = javaType;
+        this.category = category;
+    }
+
+    /**
+     * 根据 udtName 查找（匹配任一变体名）
+     */
     public static PostgreSqlType getByUdtName(String udtName) {
         if (udtName == null) return null;
         return UDT_NAME_MAP.get(udtName.toLowerCase());
     }
 
-    public DefaultJavaType getJavaType() { return javaType; }
+    public DefaultJavaType getJavaType() {
+        return javaType;
+    }
 
     @Override
-    public CATEGORY getCategory() { return category; }
+    public CATEGORY getCategory() {
+        return category;
+    }
 
     @Override
-    public CATEGORY_GROUP getCategoryGroup() { return category.group(); }
+    public CATEGORY_GROUP getCategoryGroup() {
+        return category.group();
+    }
 
     @Override
-    public String getName() { return standardName; }
+    public String getName() {
+        return standardName;
+    }
 
     @Override
-    public int ignoreLength() { return javaType.ignoreLength(); }
+    public int ignoreLength() {
+        return javaType.ignoreLength();
+    }
 
     @Override
-    public int ignorePrecision() { return javaType.ignorePrecision(); }
+    public int ignorePrecision() {
+        return javaType.ignorePrecision();
+    }
 
     @Override
-    public int ignoreScale() { return javaType.ignoreScale(); }
+    public int ignoreScale() {
+        return javaType.ignoreScale();
+    }
 
     @Override
-    public boolean support() { return javaType.support(); }
+    public boolean support() {
+        return javaType.support();
+    }
 
     @Override
-    public Class<?> supportClass() { return javaType.supportClass(); }
+    public Class<?> supportClass() {
+        return javaType.supportClass();
+    }
 
     @Override
-    public Config config() { return category.config(); }
+    public Config config() {
+        return category.config();
+    }
 
     @Override
-    public String toString() { return standardName; }
+    public String toString() {
+        return standardName;
+    }
 }

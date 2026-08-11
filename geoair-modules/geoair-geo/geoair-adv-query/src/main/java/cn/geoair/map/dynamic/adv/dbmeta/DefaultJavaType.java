@@ -57,6 +57,7 @@ public enum DefaultJavaType implements TypeMetadata {
     JAVA_BYTES("BYTEA", byte[].class, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, CATEGORY.BYTES),
     JAVA_BLOB("BLOB", byte[].class, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, CATEGORY.BLOB),
     JAVA_GEOMETRY("GEOMETRY", byte[].class, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, CATEGORY.GEOMETRY),
+    JAVA_GEOGRAPHY("GEOGRAPHY", byte[].class, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, CATEGORY.GEOMETRY),
 
     // ========== 特殊类型 ==========
     JAVA_MONEY("MONEY", BigDecimal.class, IgnorePolicy.IGNORE, IgnorePolicy.KEEP, IgnorePolicy.KEEP, CATEGORY.FLOAT);

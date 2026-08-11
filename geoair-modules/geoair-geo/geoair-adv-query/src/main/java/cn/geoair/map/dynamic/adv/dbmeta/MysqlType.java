@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** MySQL 数据类型与Java类型映射枚举 */
@@ -49,21 +51,32 @@ public enum MysqlType implements TypeMetadata {
     // JSON
     JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CATEGORY.TEXT),
 
-    // 几何类
-    GEOMETRY("geometry", "GEOMETRY", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    POINT("point", "POINT", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    LINESTRING("linestring", "LINESTRING", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    POLYGON("polygon", "POLYGON", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    MULTIPOINT("multipoint", "MULTIPOINT", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    MULTILINESTRING("multilinestring", "MULTILINESTRING", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    MULTIPOLYGON("multipolygon", "MULTIPOLYGON", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
+    // 空间类
+    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "geometry", "GEOMETRY"),
+    POINT(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "point", "POINT"),
+    LINESTRING(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "linestring", "LINESTRING"),
+    POLYGON(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "polygon", "POLYGON"),
+    MULTIPOINT(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "multipoint", "MULTIPOINT"),
+    MULTILINESTRING(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "multilinestring", "MULTILINESTRING"),
+    MULTIPOLYGON(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "multipolygon", "MULTIPOLYGON"),
+    GEOMETRYCOLLECTION(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "geometrycollection", "GEOMETRYCOLLECTION"),
 
     // 其他
     BIT("bit", "BIT", DefaultJavaType.JAVA_BYTE, CATEGORY.INT),
-    BOOLEAN("boolean", "BOOLEAN", DefaultJavaType.JAVA_BOOLEAN, CATEGORY.BOOLEAN),
-    TINYINT_BOOL("tinyint", "TINYINT", DefaultJavaType.JAVA_BOOLEAN, CATEGORY.BOOLEAN);
 
-    private final String udtName;
+    // 布尔（TINYINT(1) 在 MySQL 中经常表示布尔）
+    BOOLEAN(DefaultJavaType.JAVA_BOOLEAN, CATEGORY.BOOLEAN,
+            "boolean", "BOOL", "tinyint");
+
+    private final List<String> udtNames;
     private final String standardName;
     private final DefaultJavaType javaType;
     private final CATEGORY category;
@@ -72,13 +85,24 @@ public enum MysqlType implements TypeMetadata {
 
     static {
         for (MysqlType type : values()) {
-            UDT_NAME_MAP.put(type.udtName.toLowerCase(), type);
+            for (String name : type.udtNames) {
+                UDT_NAME_MAP.put(name.toLowerCase(), type);
+            }
         }
     }
 
+    /** 单一 udtName 的构造器 */
     MysqlType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
-        this.udtName = udtName;
+        this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
+        this.javaType = javaType;
+        this.category = category;
+    }
+
+    /** 多个 udtName 变体的构造器 */
+    MysqlType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
+        this.udtNames = Arrays.asList(udtNames);
+        this.standardName = this.name();
         this.javaType = javaType;
         this.category = category;
     }

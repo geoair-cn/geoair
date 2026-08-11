@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.adv.dbmeta.OracleType;
 import cn.geoair.map.dynamic.adv.dbmeta.PostgreSqlType;
 import cn.geoair.map.dynamic.adv.dbmeta.TypeMetadata;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
+import cn.hutool.db.dialect.DialectName;
 import java.io.Serializable;
 import lombok.Data;
 
@@ -20,6 +21,9 @@ import lombok.Data;
 public class FieldBySchemaApo implements Serializable {
 
     public FieldBySchemaApo() {}
+
+    /** 所属数据库方言 */
+    private DialectName dialectName;
 
     /** 是否为主键 */
     private boolean primaryKeyIs = false;
@@ -72,64 +76,59 @@ public class FieldBySchemaApo implements Serializable {
     /** 空间参考系ID */
     private Integer srid;
 
-    /** 检测并标记是否为几何字段（纯查询，无副作用） */
+    /** 检测是否为几何字段（纯查询，无副作用） */
     public boolean isGeometryFieldIs() {
         return geometryFieldIs;
     }
 
-    /** 根据 udtName 判断并设置是否为几何字段 */
+
+    /** 根据 udtName 和 dialectName，通过类型系统判断并设置是否为几何字段 */
     public boolean determineGeometryFieldIs() {
         if (udtName == null) {
             geometryFieldIs = false;
             return false;
         }
-        geometryFieldIs = "geometry".equals(udtName)
-                || "geography".equals(udtName)
-                || udtName.equalsIgnoreCase("SDO_GEOMETRY")
-                || udtName.equalsIgnoreCase("MDSYS.SDO_GEOMETRY")
-                || "\"public\".\"geometry\"".equals(udtName);
+        TypeMetadata dbType = getDbType();
+        if (dbType != null) {
+            geometryFieldIs = dbType.getCategory() == TypeMetadata.CATEGORY.GEOMETRY;
+        } else {
+            geometryFieldIs = false;
+        }
         return geometryFieldIs;
     }
 
-    /** 根据 dialect 获取数据库类型元数据 */
-    public TypeMetadata getDbType(String dialectName) {
+    /** 根据内置 dialectName 获取数据库类型元数据 */
+    public TypeMetadata getDbType() {
         if (udtName == null) return null;
         if (udtName.startsWith("_")) {
             Gir.log.info("该字段为数组类型{}:{}", originalColumnName, udtName);
-            String baseName = udtName.substring(1);
-            return PostgreSqlType.getByUdtName(baseName);
+            return PostgreSqlType.getByUdtName(udtName.substring(1));
         }
-        // 根据方言分发
-        if ("postgresql".equalsIgnoreCase(dialectName) || "pg".equalsIgnoreCase(dialectName)) {
+        if (dialectName == null) {
             return PostgreSqlType.getByUdtName(udtName);
-        } else if ("mysql".equalsIgnoreCase(dialectName)) {
-            return MysqlType.getByUdtName(udtName);
-        } else if ("oracle".equalsIgnoreCase(dialectName)) {
-            return OracleType.getByUdtName(udtName);
         }
-        // 兜底：尝试所有已知类型
-        TypeMetadata result = PostgreSqlType.getByUdtName(udtName);
-        if (result == null) result = MysqlType.getByUdtName(udtName);
-        if (result == null) result = OracleType.getByUdtName(udtName);
-        return result;
+        switch (dialectName) {
+            case MYSQL:
+                return MysqlType.getByUdtName(udtName);
+            case ORACLE:
+            case DM:
+                return OracleType.getByUdtName(udtName);
+            case POSTGRESQL:
+            default:
+                return PostgreSqlType.getByUdtName(udtName);
+        }
     }
 
     /** 获取对应的 Java 简单类名 */
     public String getJavaClassName() {
-        // 默认为 String：先尝试 PG，再尝试其他
-        TypeMetadata dbType = PostgreSqlType.getByUdtName(udtName);
-        if (dbType == null && udtName != null && udtName.startsWith("_")) {
-            dbType = PostgreSqlType.getByUdtName(udtName.substring(1));
-        }
-        if (dbType == null) dbType = MysqlType.getByUdtName(udtName);
-        if (dbType == null) dbType = OracleType.getByUdtName(udtName);
+        TypeMetadata dbType = getDbType();
         if (dbType == null) {
             return DefaultJavaType.JAVA_STRING.supportClass().getSimpleName();
         }
         return dbType.supportClass().getSimpleName();
     }
 
-    /** @deprecated 请使用 getDbType(dialectName) 代替 */
+    /** @deprecated 请使用 getDbType() 代替 */
     @Deprecated
     public PostgreSqlType getPostgreSqlType() {
         if (udtName == null) return null;

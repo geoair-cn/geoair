@@ -1,9 +1,13 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/** Oracle 数据类型与Java类型映射枚举 */
+/**
+ * Oracle 数据类型与Java类型映射枚举
+ */
 public enum OracleType implements TypeMetadata {
 
     // 字符串类
@@ -44,10 +48,11 @@ public enum OracleType implements TypeMetadata {
     // XML
     XMLTYPE("xmltype", "XMLTYPE", DefaultJavaType.JAVA_STRING, CATEGORY.TEXT),
 
-    // 空间类型
-    SDO_GEOMETRY("sdo_geometry", "SDO_GEOMETRY", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY);
+    // 空间类型（多个变体名都指向同一个逻辑类型）
+    SDO_GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+            "sdo_geometry", "SDO_GEOMETRY", "MDSYS.SDO_GEOMETRY", "mdsys.sdo_geometry");
 
-    private final String udtName;
+    private final List<String> udtNames;
     private final String standardName;
     private final DefaultJavaType javaType;
     private final CATEGORY category;
@@ -56,13 +61,28 @@ public enum OracleType implements TypeMetadata {
 
     static {
         for (OracleType type : values()) {
-            UDT_NAME_MAP.put(type.udtName.toLowerCase(), type);
+            for (String name : type.udtNames) {
+                UDT_NAME_MAP.put(name.toLowerCase(), type);
+            }
         }
     }
 
+    /**
+     * 单一 udtName 的构造器
+     */
     OracleType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
-        this.udtName = udtName;
+        this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
+        this.javaType = javaType;
+        this.category = category;
+    }
+
+    /**
+     * 多个 udtName 变体的构造器
+     */
+    OracleType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
+        this.udtNames = Arrays.asList(udtNames);
+        this.standardName = this.name();
         this.javaType = javaType;
         this.category = category;
     }
@@ -72,16 +92,57 @@ public enum OracleType implements TypeMetadata {
         return UDT_NAME_MAP.get(udtName.toLowerCase());
     }
 
-    public DefaultJavaType getJavaType() { return javaType; }
+    public DefaultJavaType getJavaType() {
+        return javaType;
+    }
 
-    @Override public CATEGORY getCategory() { return category; }
-    @Override public CATEGORY_GROUP getCategoryGroup() { return category.group(); }
-    @Override public String getName() { return standardName; }
-    @Override public int ignoreLength() { return javaType.ignoreLength(); }
-    @Override public int ignorePrecision() { return javaType.ignorePrecision(); }
-    @Override public int ignoreScale() { return javaType.ignoreScale(); }
-    @Override public boolean support() { return javaType.support(); }
-    @Override public Class<?> supportClass() { return javaType.supportClass(); }
-    @Override public Config config() { return category.config(); }
-    @Override public String toString() { return standardName; }
+    @Override
+    public CATEGORY getCategory() {
+        return category;
+    }
+
+    @Override
+    public CATEGORY_GROUP getCategoryGroup() {
+        return category.group();
+    }
+
+    @Override
+    public String getName() {
+        return standardName;
+    }
+
+    @Override
+    public int ignoreLength() {
+        return javaType.ignoreLength();
+    }
+
+    @Override
+    public int ignorePrecision() {
+        return javaType.ignorePrecision();
+    }
+
+    @Override
+    public int ignoreScale() {
+        return javaType.ignoreScale();
+    }
+
+    @Override
+    public boolean support() {
+        return javaType.support();
+    }
+
+    @Override
+    public Class<?> supportClass() {
+        return javaType.supportClass();
+    }
+
+    @Override
+    public Config config() {
+        return category.config();
+    }
+
+    @Override
+    public String toString() {
+        return standardName;
+    }
 }

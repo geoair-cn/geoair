@@ -20,6 +20,7 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DialectName;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -65,6 +66,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 创建表名处理器（子类实现：绑定PG/MySQL版本）
      */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
+
+    /** 获取当前数据库方言类型 */
+    protected abstract DialectName getDialectName();
 
     // ========== 通用逻辑：表操作 ==========
     @Override
@@ -580,6 +584,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                     }
                 }
                 FieldBySchemaApo field = new FieldBySchemaApo();
+                field.setDialectName(getDialectName());
                 field.setColumnName(columnName);
                 field.setOriginalColumnName(baseColumnName);
                 field.setUdtName(columnTypeName);
