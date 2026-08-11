@@ -51,7 +51,7 @@
 
 <script>
 import { siteMeta, topNav } from '@/content/site'
-import logoGeoAir from '@/assets/logo-geoair.svg'
+import logoGeoAir from '@/assets/logo.svg'
 
 export default {
   name: 'SiteShell',
