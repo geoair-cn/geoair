@@ -571,11 +571,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 String columnTypeName = getColumnTypeName(metaData, i);
                 if (tableFields != null) {
                     Optional<FieldBySchemaApo> fieldOpt =
-                            tableFields.getDataField(
-                                    fieldBySchemaApo ->
-                                            fieldBySchemaApo.getOriginalColumnName().equals(baseColumnName)
-                                                    ? fieldBySchemaApo
-                                                    : null);
+                            tableFields.findField(
+                                    field -> field.getOriginalColumnName().equals(baseColumnName));
                     if (fieldOpt.isPresent()) {
                         FieldBySchemaApo field = fieldOpt.get();
                         field.setColumnName(columnName);
@@ -595,6 +592,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 dataFieldList.add(field);
             }
             dataFieldVO.setDataFieldList(dataFieldList);
+            dataFieldVO.applyDefaultSort();
         } catch (SQLException e) {
             log.error("通过SQL查询字段信息失败，错误: {}", e.getMessage(), e);
             throw new RuntimeException("获取字段信息失败: " + e.getMessage(), e);

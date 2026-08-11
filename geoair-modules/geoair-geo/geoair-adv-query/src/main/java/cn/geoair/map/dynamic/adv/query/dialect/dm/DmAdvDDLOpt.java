@@ -93,6 +93,7 @@ public class DmAdvDDLOpt extends OracleAdvDDLOpt {
         }
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
+        dataFieldsApo.applyDefaultSort();
         return dataFieldsApo;
     }
 

@@ -90,8 +90,8 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
         }
 
 
-        List<String> fieldNames = dataFieldsApo.getFieldList(FieldBySchemaApo::getColumnName, true);
-        List<String> geomFieldNameList = dataFieldsApo.getGeomFieldNameList();
+        List<String> fieldNames = dataFieldsApo.mapFields(FieldBySchemaApo::getColumnName, true);
+        List<String> geomFieldNameList = dataFieldsApo.geomFieldNames();
         String quotedFields =
                 fieldNames.stream().map(this::quoteFieldName).collect(Collectors.joining(", "));
         String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();

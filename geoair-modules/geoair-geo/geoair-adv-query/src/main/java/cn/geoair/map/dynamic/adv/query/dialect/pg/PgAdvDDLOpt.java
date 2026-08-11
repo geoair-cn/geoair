@@ -163,6 +163,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         DataFieldsApo dataFieldsApo = new DataFieldsApo();
         dataFieldsApo.setDataFieldList(fields);
+        dataFieldsApo.applyDefaultSort();
         return dataFieldsApo;
     }
 

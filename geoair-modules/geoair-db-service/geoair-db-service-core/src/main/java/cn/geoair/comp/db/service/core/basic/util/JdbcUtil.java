@@ -40,7 +40,7 @@ public class JdbcUtil {
         List<JSONObject> list = new ArrayList<>();
         PreparedStatement pst = null;
         try {
-            dataFieldsApo.getFieldList(new Function<FieldBySchemaApo, JSONObject>() {
+            dataFieldsApo.mapFields(new Function<FieldBySchemaApo, JSONObject>() {
                 @Override
                 public JSONObject apply(FieldBySchemaApo fieldBySchemaApo) {
                     String javaClassName = fieldBySchemaApo.getJavaClassName();

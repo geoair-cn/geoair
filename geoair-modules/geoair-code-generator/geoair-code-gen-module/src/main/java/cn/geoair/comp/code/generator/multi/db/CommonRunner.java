@@ -40,7 +40,7 @@ public class CommonRunner implements ICommonRunner {
             return genTableColumnList;
         }
 
-        List<FieldBySchemaApo> dataFieldList = dataFieldsApo.getDataFieldList(true);
+        List<FieldBySchemaApo> dataFieldList = dataFieldsApo.filterFields(true);
         GenTable genTable = new GenTable();
         genTable.setTableName(tableName);
 
