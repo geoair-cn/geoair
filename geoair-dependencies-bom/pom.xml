@@ -83,7 +83,7 @@
         <druid.version>1.2.28</druid.version>
         <mapper-module.version>5.0.2</mapper-module.version>
 <!--        https://github.com/abel533/Mapper-->
-        <geotools.version>34.3</geotools.version>
+        <geotools.version>34.4</geotools.version>
         <geoserver.version>2.22.6</geoserver.version>
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <hutool.version>5.8.44</hutool.version>
