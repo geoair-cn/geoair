@@ -105,6 +105,192 @@
 
 所以当实现类同时具备查、增、改、删能力时，本质上就是通过 `IAdvBaseOpt` 把这四组基础接口拼起来了。
 
+## 创建 IAdvExecutor
+
+`IAdvExecutor` 的创建方式从上层到下分为三个层次：
+
+| 层次 | 入口 | 适用场景 |
+|------|------|---------|
+| 快捷入口 | `GirAdvQuery.getIAdvExecutor(...)` | 日常编码，快速获取执行器 |
+| 工厂层 | `AdvExecutorFactory.getAdvExecutorByDataSource(...)` | 需要显式控制方言路由 |
+| 底层构造 | `initByDataSource(...)` / `initByConnection(...)` | 需要完全手动控制初始化 |
+
+### 1. 快捷入口 —— GirAdvQuery
+
+`GirAdvQuery` 提供了几个静态方法，是日常编码中最常用的入口：
+
+```java
+// 通过数据源 ID + schema 获取（Spring 环境下，走适配器）
+IAdvExecutor executor = GirAdvQuery.getIAdvExecutor("master", "public");
+
+// 直接传入 DataSource（不依赖 Spring 上下文）
+IAdvExecutor executor = GirAdvQuery.getIAdvExecutor(dataSource);
+
+// 传入 DataSource 并指定名称
+IAdvExecutor executor = GirAdvQuery.getIAdvExecutor(dataSource, "myDs");
+
+// 已知方言，跳过 JDBC 探测（性能更高）
+IAdvExecutor executor = GirAdvQuery.getIAdvExecutor(DialectName.MYSQL, dataSource, "myDs");
+
+// 指定返回类型的泛型版本
+PgAdvExecutor executor = GirAdvQuery.getIAdvExecutor("master", "public", PgAdvExecutor.class);
+```
+
+`getIAdvExecutor(String dataSourceId, String schema)` 的工作流程：
+
+1. 通过 `GirService.getPxyBeanC(IAdvExecutorAdapter.class)` 获取适配器
+2. 适配器内部查找对应 `dataSourceId` 的数据源
+3. 自动检测数据库方言，创建对应的 Executor
+4. 设置 schema 后返回
+
+这种方式适合 **Spring 多数据源环境**，只需传数据源 ID 即可。
+
+`getIAdvExecutor(DataSource)` 的工作流程：
+
+1. 直接调用 `AdvExecutorFactory.getAdvExecutorByDataSource(dataSource)`
+2. 从 `DataSource` 获取 JDBC 连接
+3. 通过 `DatabaseMetaData.getDatabaseProductName()` 检测数据库类型
+4. 创建对应方言的 Executor（MySQL → `GirSpringMysqlAdvExecutor`，PG → `GirSpringPGAdvExecutor` 等）
+
+这种方式适合 **非 Spring 环境**或**手动管理 DataSource** 的场景。
+
+#### IAdvExecutorAdapter — 数据源查找的抽象层
+
+`GirAdvQuery.getIAdvExecutor(dataSourceId, schema)` 并不是直接访问数据库的，中间隔了一个适配器接口：
+
+```
+GirAdvQuery.getIAdvExecutor("master", "public")
+  └── IAdvExecutorAdapter.getIAdvExecutor(dataSourceId, schema)
+        └── CommonAdvExecutorAdapter（默认实现）
+              ├── AdvDynamicDataSourceStorage → 根据 ID 查找 DataSource
+              ├── AdvExecutorFactory → 检测方言创建 Executor
+              └── setSchemaNameGetterFunction → 设置 Schema
+```
+
+`IAdvExecutorAdapter` 的核心价值：
+
+- **隔离数据源查找与执行器创建**：调用方不需要知道 DataSource 从哪来
+- **可扩展**：如果默认的 `CommonAdvExecutorAdapter` 不满足需求（比如数据源来自不同的注册中心），可以实现自己的适配器
+- **通过 SPI 暴露**：`CommonAdvExecutorAdapter` 通过 `Gir` SPI 机制注册，`GirService.getPxyBeanC(IAdvExecutorAdapter.class)` 即可获取
+
+```java
+// 默认实现：从动态数据源存储中查找
+public class CommonAdvExecutorAdapter implements IAdvExecutorAdapter {
+    @Override
+    public IAdvExecutor getIAdvExecutor(String dataSourceId, String schema) {
+        // 1. 根据 ID 获取 DataSource
+        DynamicDataSourceManager instance = AdvDynamicDataSourceStorage.getInstance();
+        AdvDataSourceWrapper dataSource = instance.getOrCreateDataSource(dataSourceId);
+        // 2. 检测方言创建 Executor
+        IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, dataSourceId + "_" + schema);
+        // 3. 设置 Schema
+        if (isNotEmpty(schema)) {
+            executor.setSchemaNameGetterFunction(() -> schema);
+        }
+        return executor;
+    }
+}
+```
+
+### 2. 工厂层 —— AdvExecutorFactory
+
+`AdvExecutorFactory` 是方言路由的核心。它提供了两种创建方式：
+
+**方式 A：自动检测（通过 JDBC 连接探测）**
+
+```java
+// 自动从 Spring 容器获取 DataSource
+IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource();
+
+// 显式传入 DataSource
+IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
+
+// 传入 DataSource 并指定名称
+IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource, "myDs");
+```
+
+方言检测逻辑：通过 `DatabaseMetaData.getDatabaseProductName()` 获取数据库产品名称并匹配：
+
+```
+DatabaseMetaData.getDatabaseProductName()
+  ├── 包含 "MYSQL"              → DialectName.MYSQL      → GirSpringMysqlAdvExecutor
+  ├── 包含 "POSTGRESQL" / "PG"  → DialectName.POSTGRESQL → GirSpringPGAdvExecutor
+  ├── 包含 "ORACLE"             → DialectName.ORACLE     → GirSpringOracleAdvExecutor
+  ├── 包含 "DAMENG" / "DM"      → DialectName.DM         → GirSpringDmAdvExecutor
+  └── 其他                      → UnsupportedOperationException
+```
+
+**方式 B：直接指定方言（跳过 JDBC 探测，性能更高）**
+
+```java
+// 调用方已知数据库类型时，直接指定方言，避免额外的连接开销
+IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDialect(
+        DialectName.MYSQL, dataSource, "myDs");
+```
+
+当调用方已经明确知道数据库类型时（比如从配置文件读取、或通过其他途径获取），使用 `getAdvExecutorByDialect` 可以完全跳过 JDBC 连接探测，消除 `getDbTypeFromDataSource` 中获取连接再释放的开销。
+
+`AdvExecutorFactory` 的功能边界：
+
+- **负责**：数据库类型检测（或接收指定）、方言 Executor 创建
+- **不负责**：Spring Bean 注册（由 `AdvAutoConfiguration` 负责）、数据源生命周期管理、SQL 执行
+
+### 3. 底层构造 —— initBy* 方法
+
+`IAdvExecutor` 继承自 `IDataSourceGetter`，提供了四种底层初始化方式：
+
+```java
+// 通过数据源描述对象初始化
+void initByDataSourceApo(DataSourceApo dataSourceApo);
+
+// 通过数据源对象初始化
+void initByDataSource(DataSource dataSource);
+
+// 通过数据源对象初始化（指定名称）
+void initByDataSource(DataSource dataSource, String dataSourceName);
+
+// 通过数据库连接初始化
+void initByConnection(Connection connection);
+```
+
+这些方法定义在 `IDataSourceGetter` 接口中，由 `AbstractPxyAdvExecutor` 实现。调用后会：
+
+1. 初始化内部的数据源获取器
+2. 触发 `initProxyObjects()`，创建各功能模块（Access / Select / Update / Delete / DDL / Geo 等）
+3. 设置 Schema 和 Database 名称的获取函数
+
+**直接使用底层构造的场景**：
+
+```java
+// 场景1：已有 Connection，不想额外管理连接池
+IAdvExecutor executor = new AdvExecutorMysql(connection);
+
+// 场景2：手动构造，传入 DataSourceApo 配置
+DataSourceApo apo = new DataSourceApo();
+apo.setUrl("jdbc:mysql://localhost:3306/gis");
+apo.setUsername("root");
+apo.setPassword("xxx");
+IAdvExecutor executor = new AdvExecutorMysql(apo);
+
+// 场景3：直接传 DataSource
+IAdvExecutor executor = new AdvExecutorMysql(dataSource, "gis_db");
+```
+
+**注意**：底层构造需要自己指定方言实现类（如 `AdvExecutorMysql`），不会自动检测数据库类型。一般推荐使用 `AdvExecutorFactory` 或 `GirAdvQuery` 入口，它们会自动处理方言检测。
+
+### 创建方式选择建议
+
+```
+需要自动检测数据库类型？
+├── 是 → 用 AdvExecutorFactory 或 GirAdvQuery
+│   └── 在 Spring 环境？
+│       ├── 是 → GirAdvQuery.getIAdvExecutor("dsId", "schema")
+│       └── 否 → GirAdvQuery.getIAdvExecutor(dataSource)
+└── 否 → 直接 new 方言 Executor
+    └── 已有 Connection？ → new AdvExecutorMysql(connection)
+    └── 有 DataSource？   → new AdvExecutorMysql(dataSource, "name")
+```
+
 ## Spring 集成方式
 
 `adv-query` 并不只是工具层或手动构造执行器，在 Spring 环境中也提供了一整套自动装配链。
@@ -183,11 +369,21 @@ public class AdvAutoConfiguration {
 
 ### 设计要点
 
-与旧版不同，当前版本的核心设计决策是：
+当前版本的核心设计决策是：
 
-- **`AdvTypeHandlerRegistry` 不再是全局单例**：每个数据库方言执行器拥有独立的 Registry 实例
-- **Geometry handler 按方言拆分**：原来一个 `JtsGeometryAdvTypeHandler` 负责所有数据库，改为每个方言一个独立实现
-- **`AdvQueryGlobalConfig` 承载用户自定义 handler**：通过 `addTypeHandler()` 注册，优先级高于 SPI 默认处理器
+- **每个 Executor 拥有独立 Registry**：`create()` 工厂方法为每个方言执行器创建专属实例，Geometry handler 按方言自动匹配
+- **保留全局注册入口**：`AdvTypeHandlerRegistry.getInstance().register(xxx)` 仍然可用，全局注册的 handler 会被所有新创建的 Executor Registry 继承
+- **Geometry handler 按方言拆分**：原来一个 `JtsGeometryAdvTypeHandler` 负责所有数据库，改为每个方言一个独立实现，不再依赖 classpath 探测
+- **`AdvQueryGlobalConfig` 承载 per-executor 自定义 handler**：通过 `addTypeHandler()` 注册，优先级高于全局注册和 SPI
+
+### 三种注册方式
+
+| 方式 | API | 作用范围 | 优先级 |
+|------|-----|---------|--------|
+| SPI | 无需手动调用，框架自动加载 | 全局（所有 Executor） | 最低 |
+| 全局注册 | `AdvTypeHandlerRegistry.getInstance().register(handler)` | 全局（后续创建的 Executor） | 中 |
+| 按 Executor 注册 | `AdvQueryGlobalConfig.of().addTypeHandler(handler)` | 当前 Executor | 高于全局 |
+| 方言 Geometry | 框架自动 | 当前 Executor | 最高
 
 ### 入口对象
 
@@ -203,7 +399,7 @@ public class AdvAutoConfiguration {
 
 ### Registry 创建流程
 
-`AdvTypeHandlerRegistry` 通过工厂方法 `create(DialectName, List<AdvTypeHandler<?>>)` 创建，加载顺序为：
+`AdvTypeHandlerRegistry` 通过工厂方法 `create(DialectName, List<AdvTypeHandler<?>>)` 创建，加载顺序（优先级从低到高）为：
 
 1. **SPI 加载公共 handlers**（方言无关）：
    - `BooleanAdvTypeHandler`
@@ -213,9 +409,11 @@ public class AdvAutoConfiguration {
    - `NumberAdvTypeHandler`
    - `TemporalAdvTypeHandler`
 
-2. **用户自定义 handlers**（来自 `AdvQueryGlobalConfig.typeHandlers`）：优先级高于 SPI
+2. **全局 handlers**（通过 `AdvTypeHandlerRegistry.getInstance().register()` 注册）：优先级高于 SPI，被所有新创建的 Executor Registry 继承
 
-3. **方言专属 Geometry handler**（优先级最高）：
+3. **用户自定义 handlers**（来自 `AdvQueryGlobalConfig.typeHandlers`）：优先级高于全局注册，仅对当前 Executor 生效
+
+4. **方言专属 Geometry handler**（优先级最高）：
    - PostgreSQL → `PostGisGeometryAdvTypeHandler`
    - MySQL → `MysqlGeometryAdvTypeHandler`
    - Oracle → `OracleGeometryAdvTypeHandler`
@@ -248,13 +446,21 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
 ### 配置用户自定义 TypeHandler
 
-在 `AdvQueryGlobalConfig` 中添加自定义处理器：
+**方式一：全局注册（影响所有后续创建的 Executor）**
+
+```java
+AdvTypeHandlerRegistry.getInstance().register(new MyCustomTypeHandler());
+```
+
+**方式二：按 Executor 注册（仅影响当前 Executor）**
 
 ```java
 AdvQueryGlobalConfig config = AdvQueryGlobalConfig.of()
     .addTypeHandler(new MyCustomTypeHandler())
     .turnOnLog();
 ```
+
+全局注册的 handler 会被 `create()` 工厂方法继承到每个新创建的 Registry 中，但 `AdvQueryGlobalConfig.typeHandlers` 中的 handler 优先级更高。
 
 ### 写入绑定逻辑
 
