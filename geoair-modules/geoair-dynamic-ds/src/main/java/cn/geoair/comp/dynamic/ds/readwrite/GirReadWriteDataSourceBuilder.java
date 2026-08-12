@@ -92,12 +92,13 @@ public class GirReadWriteDataSourceBuilder {
     }
 
     /**
-     * 设置从库组（直接传入 GirGroupByIdDataSource）
+     * 设置从库组（直接传入 GirGroupSource）
      */
-    public GirReadWriteDataSourceBuilder slaves(GirGroupByIdDataSource dataSources) {
-        this.slaveGroupByIdDataSource = dataSources;
+    public GirReadWriteDataSourceBuilder slaves(GirGroupSource dataSources) {
+        this.slaveGroupSource = dataSources;
         return this;
     }
+
     // ==================== 从库配置方法（辅助方法，用于快速构建） ====================
 
     /**
@@ -213,7 +214,7 @@ public class GirReadWriteDataSourceBuilder {
         }
 
         // 校验从库（至少有一种方式配置了从库）
-        boolean hasSlave = slaveDataSource != null ||
+        boolean hasSlave = !slaveDataSource.isEmpty() ||
                 slaveGroupSource != null ||
                 slaveGroupByIdDataSource != null ||
                 !slaveDataSourceIds.isEmpty();

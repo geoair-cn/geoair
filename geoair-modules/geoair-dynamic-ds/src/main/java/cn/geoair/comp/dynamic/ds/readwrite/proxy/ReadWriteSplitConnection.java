@@ -52,7 +52,7 @@ public class ReadWriteSplitConnection implements Connection {
     /**
      * 根据SQL获取或创建连接
      */
-    protected Connection getConnection(String sql) {
+    protected Connection getConnection(String sql) throws SQLException {
         RdLog.getInstance().trace("getConnection 被调用，SQL: {}, 当前事务状态: transactionUsedMaster={}",
                 sql, transactionUsedMaster);
 
@@ -83,7 +83,7 @@ public class ReadWriteSplitConnection implements Connection {
     /**
      * 获取当前连接（不切换）
      */
-    private Connection getCurrentConnection() {
+    private Connection getCurrentConnection() throws SQLException {
         if (currentConnection == null) {
             RdLog.getInstance().trace("当前连接为空，默认使用主库连接");
             return getMasterConnection();
@@ -92,7 +92,7 @@ public class ReadWriteSplitConnection implements Connection {
         return currentConnection;
     }
 
-    private Connection getMasterConnection() {
+    private Connection getMasterConnection() throws SQLException {
         RdLog.getInstance().trace("准备获取主库连接，当前连接状态: currentConnection={}, autoCommit={}",
                 currentConnection, autoCommit);
 
@@ -121,11 +121,11 @@ public class ReadWriteSplitConnection implements Connection {
             return currentConnection;
         } catch (SQLException e) {
             RdLog.getInstance().error("获取主库连接失败", e);
-            throw new RuntimeException(e);
+            throw e;
         }
     }
 
-    private Connection getSlaveConnection() {
+    private Connection getSlaveConnection() throws SQLException {
         RdLog.getInstance().trace("准备获取从库连接，当前连接状态: currentConnection={}, autoCommit={}", currentConnection, autoCommit);
 
         try {
