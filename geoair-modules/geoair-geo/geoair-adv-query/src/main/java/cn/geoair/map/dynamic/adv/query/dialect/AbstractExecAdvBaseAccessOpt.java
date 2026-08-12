@@ -435,6 +435,17 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         conflictKeys = conflictKeys.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
         execSql = dialectTableNameProcessor.tbRemoveSqlSpaces(execSql);
+        if (needsConflictKeyParams()) {
+            for (String ck : conflictKeys) {
+                String unquoted = dialectTableNameProcessor.tbUnquoteTableName(ck);
+                for (String key : rowData.keySet()) {
+                    if (key.equalsIgnoreCase(unquoted)) {
+                        params.add(rowData.get(key));
+                        break;
+                    }
+                }
+            }
+        }
         return Pair.of(execSql, params);
     }
 
@@ -750,6 +761,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
      * （如 MySQL 几何列用 ST_GeomFromText(?, 4326, 'axis-order=long-lat')），
      * 未提供则使用默认 {@code ?}。
      */
+    /** Oracle 等用子查询做冲突检查的方言需覆写返回 true */
+    protected boolean needsConflictKeyParams() {
+        return false;
+    }
+
     protected String buildPlaceholders(List<Object> params) {
         List<String> parts = new ArrayList<>();
         List<Object> filtered = new ArrayList<>();
