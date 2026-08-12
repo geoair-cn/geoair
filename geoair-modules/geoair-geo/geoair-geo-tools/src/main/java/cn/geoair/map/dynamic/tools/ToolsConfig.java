@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.ByteOrderValues;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
@@ -25,7 +26,7 @@ public class ToolsConfig {
 
     // 线程安全（可全局单例）
     private GeometryFactory geometryFactory = new GeometryFactory();
-    private WKBWriter wkbWriter = new WKBWriter();
+    private WKBWriter wkbWriter = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN, true);
     private GeometryJSON geometryJSON = new GeometryJSON();
 
     // 非线程安全（只持有构造器，不持有实例）

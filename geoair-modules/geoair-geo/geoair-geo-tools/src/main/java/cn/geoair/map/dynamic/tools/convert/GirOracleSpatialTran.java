@@ -7,6 +7,7 @@ import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.io.ByteOrderValues;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
@@ -21,7 +22,8 @@ import java.sql.SQLException;
  * @author zhangjun
  */
 public class GirOracleSpatialTran {
-  static   GiLogger logger = GirLoggerFactory.getLogger();
+    static GiLogger logger = GirLoggerFactory.getLogger();
+
     /**
      * 判断值是否为 Oracle Spatial 几何数据
      *
@@ -85,21 +87,37 @@ public class GirOracleSpatialTran {
      * @return Oracle STRUCT 对象，转换失败返回 null
      */
     public static STRUCT jtsGeomToSdoGeometry(Geometry geometry, java.sql.Connection connection) {
+        return jtsGeomToSdoGeometry(geometry, connection, geometry != null ? geometry.getSRID() : 0);
+    }
+
+    /**
+     * 将 JTS Geometry 转换为 Oracle SDO_GEOMETRY STRUCT，含 SRID。
+     */
+    public static STRUCT jtsGeomToSdoGeometry(Geometry geometry, java.sql.Connection connection, int srid) {
         if (geometry == null || connection == null) {
             return null;
         }
 
         try {
-            // 将 JTS Geometry 转换为 WKB 字节数组
-            WKBWriter writer = new WKBWriter();
+            // 设置 SRID 到 Geometry 上
+            if (srid > 0) geometry.setSRID(srid);
+
+            // 使用 JTS 的 SRID-aware WKBWriter
+            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN, true);
             byte[] wkbBytes = writer.write(geometry);
 
-            // 使用 Oracle WKB 工具类转换为 STRUCT
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             return wkb.toSTRUCT(wkbBytes, connection);
         } catch (Exception e) {
-            logger.error(e);
-            return null;
+            // 回退：不用 SRID 的方式
+            try {
+                WKBWriter writer = new WKBWriter();
+                WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
+                return wkb.toSTRUCT(writer.write(geometry), connection);
+            } catch (Exception e2) {
+                logger.error(e2);
+                return null;
+            }
         }
     }
 
