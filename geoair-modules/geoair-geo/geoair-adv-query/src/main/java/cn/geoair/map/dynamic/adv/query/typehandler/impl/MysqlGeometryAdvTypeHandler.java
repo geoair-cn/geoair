@@ -23,7 +23,18 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
     @Override
     protected Object writeGeometry(Geometry value) {
-        // MySQL JDBC 驱动原生支持 WKT 字符串写入 GEOMETRY 列
+        // MySQL JDBC 驱动原生支持 WKT 字符串写入 GEOMETRY 列，配合 getSqlPlaceholder 使用
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
+    }
+
+    @Override
+    public String getSqlPlaceholder(Object value) {
+        if (value instanceof Geometry) {
+            Geometry geom = (Geometry) value;
+            int srid = geom.getSRID();
+            if (srid <= 0) srid = 4326;
+            return "ST_GeomFromText(?, " + srid + ", 'axis-order=long-lat')";
+        }
+        return null;
     }
 }

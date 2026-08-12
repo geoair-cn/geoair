@@ -130,10 +130,10 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             dbKeyList.add(dialectTableNameProcessor.tbQuoteFieldName(field));
         }
         String fields = String.join(",", dbKeyList);
-        String placeholders = buildPlaceholders(rowData.keySet().size());
+        List<Object> params = new ArrayList<>(rowData.values());
+        String placeholders = buildPlaceholders(params);
         String execSql = buildInsertSql(quoteTableName, fields, placeholders);
 
-        List<Object> params = new ArrayList<>(rowData.values());
         return executeUpdate(execSql, params, "bInsertOne");
     }
 
@@ -256,7 +256,8 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     .map(dialectTableNameProcessor::tbQuoteFieldName)
                     .collect(Collectors.toList());
             String fields = String.join(",", fieldNames);
-            String placeholders = buildPlaceholders(fieldNames.size());
+            String placeholders = buildPlaceholders(
+                    rowsData.isEmpty() ? Collections.emptyList() : new ArrayList<>(rowsData.get(0).values()));
             String execSql = buildInsertSql(quoteTableName, fields, placeholders);
             pstmt = connection.prepareStatement(execSql);
 
@@ -428,11 +429,11 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             dbKeyList.add(dialectTableNameProcessor.tbQuoteFieldName(field));
         }
         String fields = String.join(",", dbKeyList);
-        String placeholders = buildPlaceholders(rowData.keySet().size());
+        List<Object> params = new ArrayList<>(rowData.values());
+        String placeholders = buildPlaceholders(params);
         conflictKeys = conflictKeys.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
         String execSql = buildInsertIgnoreSql(quoteTableName, fields, placeholders, conflictKeys);
         execSql = dialectTableNameProcessor.tbRemoveSqlSpaces(execSql);
-        List<Object> params = new ArrayList<>(rowData.values());
         return Pair.of(execSql, params);
     }
 
@@ -724,8 +725,18 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
         }
     }
 
-    protected String buildPlaceholders(int count) {
-        return StrUtil.repeatAndJoin("?", count, ",");
+    /**
+     * 构建占位符列表：每个值先通过 TypeHandler 检查是否需要自定义占位符表达式
+     * （如 MySQL 几何列用 ST_GeomFromText(?, 4326, 'axis-order=long-lat')），
+     * 未提供则使用默认 {@code ?}。
+     */
+    protected String buildPlaceholders(List<Object> values) {
+        return values.stream()
+                .map(v -> {
+                    String ph = preparedStatementBinder.getSqlPlaceholder(v);
+                    return ph != null ? ph : "?";
+                })
+                .collect(Collectors.joining(", "));
     }
 
     protected String buildInsertSql(String tableName, String fields, String placeholders) {

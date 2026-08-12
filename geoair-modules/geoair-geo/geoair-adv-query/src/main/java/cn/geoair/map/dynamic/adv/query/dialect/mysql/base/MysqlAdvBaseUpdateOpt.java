@@ -35,9 +35,9 @@ public class MysqlAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
             String placeholders,
             String conflictFields,
             String updateClause) {
-        // MySQL：ON DUPLICATE KEY UPDATE语法（无需指定冲突字段，依赖主键/唯一索引）
+        // MySQL：ON DUPLICATE KEY UPDATE语法（无 SET，直接跟 列=值 列表）
         return StrUtil.format(
-                "INSERT INTO {} ({}) VALUES ({}){}UPDATE SET {}",
+                "INSERT INTO {} ({}) VALUES ({}){}UPDATE {}",
                 tableName,
                 fields,
                 placeholders,
