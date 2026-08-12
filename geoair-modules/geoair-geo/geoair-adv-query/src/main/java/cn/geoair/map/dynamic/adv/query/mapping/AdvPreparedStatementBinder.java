@@ -24,7 +24,11 @@ public class AdvPreparedStatementBinder {
                 value,
                 value == null ? Object.class : value.getClass(),
                 AdvTypeHandlerContext.simple(null));
-        preparedStatement.setObject(index, jdbcValue);
+        if (jdbcValue instanceof String) {
+            preparedStatement.setString(index, (String) jdbcValue);
+        } else {
+            preparedStatement.setObject(index, jdbcValue);
+        }
     }
 
     public void bindAll(PreparedStatement preparedStatement, List<Object> values) throws SQLException {
