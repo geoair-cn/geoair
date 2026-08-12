@@ -2,7 +2,9 @@ package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.hutool.core.convert.Converter;
 import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
@@ -13,6 +15,7 @@ import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -75,7 +78,17 @@ public class GirOracleSpatialTran {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             byte[] bytes = wkb.fromSTRUCT(struct);
             Object[] attributes = struct.getAttributes();
-            return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
+            Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
+            try {
+                Object attribute = attributes[1];
+                if (GutilObject.isNotEmpty(attribute)) {
+                    BigDecimal srid = (BigDecimal) attribute;
+                    geometry.setSRID(srid.intValue());
+                }
+            } catch (Exception e) {
+
+            }
+            return geometry;
         } catch (Exception e) {
             logger.error(e);
             return null;
@@ -104,7 +117,7 @@ public class GirOracleSpatialTran {
         }
         try {
             if (srid > 0) geometry.setSRID(srid);
-            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN );
+            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN);
             byte[] wkbBytes = writer.write(geometry);
 
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
