@@ -352,23 +352,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
             // 循环每一批执行
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
-                List<String> currentBatchSqls = new ArrayList<>();
-                List<Object> currentBatchParamList = new ArrayList<>();
-
-                for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
-                    currentBatchParamList.addAll(sqlStatement.getValue());
-                    currentBatchSqls.add(sqlStatement.getKey());
-                }
-
                 stopWatch.start();
-                // 多条sql用;分隔执行
-                String batchSql = StrUtil.join("; \n", currentBatchSqls);
-                int execute = SqlExecutor.execute(connection, batchSql, currentBatchParamList.toArray());
+                int execute = executeUpdateBatch(connection, currentBatchParam);
                 stopWatch.stop();
 
                 totalSuccess += execute;
                 AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
-                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                        batchNum, execute, stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
 
@@ -822,25 +812,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             connection.setAutoCommit(false);
 
             for (List<Map<String, Object>> currentBatchData : batchGroupParams) {
-                List<String> currentBatchSqls = new ArrayList<>();
-                List<Object> currentBatchParamList = new ArrayList<>();
-
-                for (Map<String, Object> rowData : currentBatchData) {
-                    Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
-                    // 表名去除空格处理
-                    String sql = dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey());
-                    currentBatchSqls.add(sql);
-                    currentBatchParamList.addAll(upsertSql.getValue());
-                }
-
                 stopWatch.start();
-
-                int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
+                int execute = executeUpsertBatch(connection, tableName, currentBatchData, conflictKeys);
                 stopWatch.stop();
 
                 totalSuccess += execute;
                 AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
-                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                        batchNum, execute, stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
 
@@ -1041,6 +1019,36 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (dataSourceGetter != null) {
             dataSourceGetter.connectionClose(connection);
         }
+    }
+
+    /**
+     * 执行一批 UPDATE 语句。PG/Oracle/DM 可拼接多语句执行。
+     * MySQL 需覆写为 PreparedStatement.addBatch。
+     */
+    protected int executeUpdateBatch(Connection connection, List<Pair<String, List<Object>>> statements) throws SQLException {
+        List<String> sqls = new ArrayList<>();
+        List<Object> allParams = new ArrayList<>();
+        for (Pair<String, List<Object>> stmt : statements) {
+            allParams.addAll(stmt.getValue());
+            sqls.add(stmt.getKey());
+        }
+        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+    }
+
+    /**
+     * 执行一批 Upsert 语句。PG/Oracle/DM 可拼接多语句执行。
+     * MySQL 需覆写为 PreparedStatement.addBatch。
+     */
+    protected int executeUpsertBatch(Connection connection, String tableName,
+                                     List<Map<String, Object>> batchData, List<String> conflictKeys) throws SQLException {
+        List<String> sqls = new ArrayList<>();
+        List<Object> allParams = new ArrayList<>();
+        for (Map<String, Object> rowData : batchData) {
+            Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
+            allParams.addAll(upsertSql.getValue());
+        }
+        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
     }
 
     protected String buildUpsertUpdateClause(Map<String, Object> rowData, List<String> conflictKeys) {
