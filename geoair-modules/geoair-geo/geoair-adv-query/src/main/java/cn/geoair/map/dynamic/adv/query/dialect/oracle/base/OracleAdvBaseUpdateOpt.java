@@ -58,6 +58,7 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
             if (i > 0) usingBuilder.append(", ");
             usingBuilder.append("? AS ").append(fieldArray[i].trim());
         }
+        usingBuilder.append(" FROM DUAL");
         String usingClause = usingBuilder.toString();
 
         // INSERT 引用 source 列，不复用 ? 占位符
