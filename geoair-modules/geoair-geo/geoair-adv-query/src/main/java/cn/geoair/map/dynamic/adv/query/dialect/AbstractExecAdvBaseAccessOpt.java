@@ -272,7 +272,10 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                         for (Map<String, Object> row : group.getValue()) {
                             int paramIndex = 1;
                             for (String header : headers) {
-                                preparedStatementBinder.bind(pstmt, paramIndex++, row.get(header));
+                                Object val = row.get(header);
+                                SqlPlaceholder ph = preparedStatementBinder.getSqlPlaceholder(val);
+                                if (ph != null && ph.getParam() == null) continue; // 值已嵌入 SQL，跳过
+                                preparedStatementBinder.bind(pstmt, paramIndex++, val);
                             }
                             pstmt.addBatch();
                         }
