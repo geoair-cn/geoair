@@ -184,13 +184,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
-            if (CollUtil.isNotEmpty(idKeys)) {
-                idKey = idKeys.get(0);
-            }
-        }
-        if (GutilObject.isEmpty(idKey)) {
-            throw new IllegalArgumentException("主键字段名不能为空");
+            idKey = resolveIdKey(entity.getClass(), strategy);
         }
 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
@@ -263,13 +257,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
-            if (CollUtil.isNotEmpty(idKeys)) {
-                idKey = idKeys.get(0);
-            }
-        }
-        if (GutilObject.isEmpty(idKey)) {
-            throw new IllegalArgumentException("主键字段名不能为空");
+            idKey = resolveIdKey(entity.getClass(), strategy);
         }
 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
@@ -419,6 +407,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             T first = entities.iterator().next();
             String tableName = GirAdvSqlUtils.getTableName(first.getClass());
             List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
+            if (CollUtil.isEmpty(idKeys)) throw new IllegalArgumentException("未指定主键字段，且未找到 @Id 注解");
             bUpdateBatchByPK(tableName, idKeys.get(0), entities);
             return;
         }
@@ -431,8 +420,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
             T first = entities.iterator().next();
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
-            idKey = idKeys.get(0);
+            idKey = resolveIdKey(first.getClass(), strategy);
         }
 
         List<Map<String, Object>> rowsData = new ArrayList<>();
@@ -916,11 +904,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         for (T entity : entities) {
             Map<String, Object> rowData = GirAdvSqlUtils.getRowData(
-                entity,
-                toUnderlineCase,
-                ignoreNullValue,
-                strategy.isIgnoreEmptyString(),
-                ignoreFieldNames, this.columnMapper);
+                    entity,
+                    toUnderlineCase,
+                    ignoreNullValue,
+                    strategy.isIgnoreEmptyString(),
+                    ignoreFieldNames, this.columnMapper);
             allRows.add(rowData);
         }
         bUpsertBatch(tableName, allRows, finalConflictKeys, strategy.getBatchSize());
@@ -1049,6 +1037,17 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             allParams.addAll(upsertSql.getValue());
         }
         return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+    }
+
+    /**
+     * 解析主键字段：注解 → conflictKeys → 异常。
+     */
+    private String resolveIdKey(Class<?> clazz, UpdateStrategy strategy) {
+        List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(clazz, true);
+        if (CollUtil.isNotEmpty(idKeys)) return idKeys.get(0);
+        List<String> conflictKeys = strategy.getConflictKeys();
+        if (CollUtil.isNotEmpty(conflictKeys)) return conflictKeys.get(0);
+        throw new IllegalArgumentException("未指定主键字段，且未找到 @Id 注解或 conflictKeys");
     }
 
     protected String buildUpsertUpdateClause(Map<String, Object> rowData, List<String> conflictKeys) {
