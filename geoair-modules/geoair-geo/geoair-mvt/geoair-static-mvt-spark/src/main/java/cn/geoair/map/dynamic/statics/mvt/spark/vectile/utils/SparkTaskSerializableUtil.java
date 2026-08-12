@@ -4,9 +4,9 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
@@ -20,7 +20,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.Serializable;
 import java.util.*;
- 
+
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -29,7 +29,7 @@ import org.apache.spark.sql.RowFactory;
 import scala.Tuple2;
 
 /** 生成可序列化的spark的任务 */
- 
+
 public class SparkTaskSerializableUtil implements Serializable {
     public static GiLogger log = GirLoggerFactory.getLogger();
     // 序列化ID（必须）
@@ -64,7 +64,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         public Iterator<GirAdvOneRow> call(Integer pageNum) throws Exception {
 
             PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+            IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
 
             long startTime = System.currentTimeMillis();
             // 构建排序SQL
@@ -120,7 +120,7 @@ public class SparkTaskSerializableUtil implements Serializable {
         public Iterator<GirAdvOneRow> call(String partitionCondition) throws Exception {
 
             PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+            IAdvExecutor iAdvExecutor =AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
 
             // 解析分区范围
             String[] coords = partitionCondition.split(",");
