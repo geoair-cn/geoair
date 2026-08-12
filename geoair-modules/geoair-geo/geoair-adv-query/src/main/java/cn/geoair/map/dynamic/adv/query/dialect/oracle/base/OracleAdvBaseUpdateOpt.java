@@ -52,32 +52,32 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                                             String placeholders,
                                             String conflictFields,
                                             String updateClause) {
-        // 拆分字段
         String[] fieldArray = fields.split(",");
-        String[] placeholderArray = placeholders.split(",");
 
-        // 构建 USING 子句（使用 DUAL 表）
+        // USING 子句
         StringBuilder usingBuilder = new StringBuilder("SELECT ");
         for (int i = 0; i < fieldArray.length; i++) {
-            if (i > 0) {
-                usingBuilder.append(", ");
-            }
+            if (i > 0) usingBuilder.append(", ");
             usingBuilder.append("? AS ").append(fieldArray[i].trim());
         }
         String usingClause = usingBuilder.toString();
 
-        // 构建 ON 条件
+        // INSERT 引用 source 列，不复用 ? 占位符
+        String insertValues = java.util.Arrays.stream(fieldArray)
+                .map(f -> "source." + f.trim())
+                .collect(Collectors.joining(", "));
+
+        // ON 条件
         String[] conflictFieldArray = conflictFields.split(",");
         String onCondition = java.util.Arrays.stream(conflictFieldArray)
-                .map(field -> StrUtil.format("target.{} = source.{}", field.trim(), field.trim()))
+                .map(f -> StrUtil.format("target.{} = source.{}", f.trim(), f.trim()))
                 .collect(Collectors.joining(" AND "));
 
-        // 构建完整的 MERGE 语句
         return StrUtil.format(
                 "MERGE INTO {} target USING ({}) source ON ({}) " +
                         "WHEN MATCHED THEN UPDATE SET {} " +
                         "WHEN NOT MATCHED THEN INSERT ({}) VALUES ({})",
-                tableName, usingClause, onCondition, updateClause, fields, placeholders);
+                tableName, usingClause, onCondition, updateClause, fields, insertValues);
     }
 
     /**

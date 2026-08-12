@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
@@ -19,7 +21,7 @@ import java.sql.SQLException;
  * @author zhangjun
  */
 public class GirOracleSpatialTran {
-
+  static   GiLogger logger = GirLoggerFactory.getLogger();
     /**
      * 判断值是否为 Oracle Spatial 几何数据
      *
@@ -27,6 +29,7 @@ public class GirOracleSpatialTran {
      * @return true=是几何数据，false=不是
      */
     public static boolean isSdoGeometry(Object value) {
+
         return GirOracleTran.isSdoGeometryType(value);
     }
 
@@ -68,6 +71,7 @@ public class GirOracleSpatialTran {
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
             return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
+            logger.error(e);
             return null;
         }
     }
@@ -94,6 +98,7 @@ public class GirOracleSpatialTran {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             return wkb.toSTRUCT(wkbBytes, connection);
         } catch (Exception e) {
+            logger.error(e);
             return null;
         }
     }
