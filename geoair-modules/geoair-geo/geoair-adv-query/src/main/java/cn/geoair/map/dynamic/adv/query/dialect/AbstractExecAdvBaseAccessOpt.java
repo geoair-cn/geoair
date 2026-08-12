@@ -611,26 +611,16 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         try {
             connection = dataSourceGetter.getConnection();
-            // 保存原始 autoCommit 状态
             originalAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
 
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
-                List<String> currentBatchSqls = new ArrayList<>();
-                List<Object> currentBatchParamList = new ArrayList<>();
-
-                for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
-                    currentBatchParamList.addAll(sqlStatement.getValue());
-                    currentBatchSqls.add(sqlStatement.getKey());
-                }
-
                 stopWatch.start();
-                int execute = SqlExecutor.execute(connection, StrUtil.join("; \n", currentBatchSqls), currentBatchParamList.toArray());
+                int batchSuccess = executeInsertIgnoreBatch(connection, currentBatchParam);
                 stopWatch.stop();
-
-                totalSuccess += execute;
+                totalSuccess += batchSuccess;
                 AdvLogSql.of(dataSourceGetter, getConfig()).debug("批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
-                        batchNum, currentBatchSqls.size(), stopWatch.getLastTaskTimeMillis());
+                        batchNum, batchSuccess, stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
 
@@ -706,6 +696,20 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     }
 
     // ====================== 工具方法 ======================
+
+    /**
+     * 执行一批 INSERT IGNORE 语句。PG/Oracle/DM 可拼接多语句执行。
+     * MySQL 因不支持多语句需覆写为 PreparedStatement.addBatch。
+     */
+    protected int executeInsertIgnoreBatch(Connection connection, List<Pair<String, List<Object>>> statements) throws SQLException {
+        List<String> sqls = new ArrayList<>();
+        List<Object> allParams = new ArrayList<>();
+        for (Pair<String, List<Object>> stmt : statements) {
+            allParams.addAll(stmt.getValue());
+            sqls.add(stmt.getKey());
+        }
+        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+    }
 
     private Integer executeUpdate(String sql, List<Object> params, String methodName) {
         StopWatch stopWatch = new StopWatch();
