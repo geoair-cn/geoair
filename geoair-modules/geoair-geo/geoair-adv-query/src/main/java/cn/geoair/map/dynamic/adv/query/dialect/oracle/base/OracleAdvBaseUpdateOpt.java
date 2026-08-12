@@ -30,9 +30,7 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
      */
     @Override
     protected String buildUpsertFieldClause(String field) {
-        // Oracle MERGE 语法：目标表字段 = 源表字段
-        // 源表使用 VALUES() 函数获取插入的值
-        return StrUtil.format("{} = VALUES({})", field, field);
+        return StrUtil.format("target.{} = source.{}", field, field);
     }
 
     /**
