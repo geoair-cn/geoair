@@ -13,6 +13,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
@@ -27,6 +28,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -45,11 +47,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     private final AdvBeanColumnMapper columnMapper;
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
+    private final AdvPreparedStatementBinder preparedStatementBinder;
 
     public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
         this.typeHandlerRegistry = registry;
         this.columnMapper = new AdvBeanColumnMapper(registry);
+        this.preparedStatementBinder = new AdvPreparedStatementBinder(registry);
     }
 
     @Override
@@ -970,9 +974,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     private Integer executeUpdate(String sql, List<Object> params, String methodName) {
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
+        PreparedStatement pstmt = null;
         try {
+            pstmt = connection.prepareStatement(sql);
+            preparedStatementBinder.bindAll(pstmt, params);
             stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, sql, params.toArray());
+            int result = pstmt.executeUpdate();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), methodName, sql, params, cost, result);
@@ -981,6 +988,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), methodName, sql, params, e);
             throw new RuntimeException("更新操作失败，SQL：" + sql, e);
         } finally {
+            if (pstmt != null) {
+                try { pstmt.close(); } catch (SQLException ignored) {}
+            }
             closeConnection(connection);
         }
     }
