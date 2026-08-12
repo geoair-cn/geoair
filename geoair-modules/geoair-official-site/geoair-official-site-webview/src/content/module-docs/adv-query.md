@@ -1218,6 +1218,64 @@ preparedStatement.setObject(index, jdbcValue);
 
 方案 D 的改动不影响注解机制，两者完全独立。
 
+### SQL 占位符表达式 —— SqlPlaceholder
+
+对于部分数据库（如 MySQL），简单用 `?` 传参无法正确写入空间字段：
+
+```sql
+-- MySQL 无法正确执行：? 传 WKT 字符串 → Data truncation 错误
+INSERT INTO t (geom) VALUES (?)
+
+-- 必须将 WKT 内嵌入 SQL 函数调用中
+INSERT INTO t (geom) VALUES (ST_GeomFromText('LINESTRING(...)', 4326))
+```
+
+为支持这类场景，`AdvTypeHandler` 接口提供了 `getSqlPlaceholder` 方法，返回 `SqlPlaceholder` 对象：
+
+```java
+public class SqlPlaceholder {
+    private final String sql;    // SQL 表达式，替代普通 `?` 的位置
+    private final Object param;  // 替换后的参数值（null 表示值已内嵌在 sql 中）
+
+    public SqlPlaceholder(String sql, Object param) { ... }
+    public String getSql() { return sql; }
+    public Object getParam() { return param; }
+}
+```
+
+**默认行为**（`getSqlPlaceholder` 返回 null）：
+```
+? 占位符 + 原值放入参数列表
+```
+
+**MySQL 几何覆盖**（返回 `SqlPlaceholder`）：
+```java
+public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
+    @Override
+    public SqlPlaceholder getSqlPlaceholder(Object value) {
+        if (value instanceof Geometry) {
+            Geometry geom = (Geometry) value;
+            String wkt = writeGeometry(geom); // 转换为 WKT 字符串
+            int srid = geom.getSRID();
+            // param=null → WKT 直接嵌入 SQL，不占用参数位
+            return new SqlPlaceholder(
+                "ST_GeomFromText('" + wkt.replace("'", "''") + "', " + srid + ")",
+                null);
+        }
+        return null;
+    }
+}
+```
+
+生成的 SQL 效果：
+
+| 列 | 占位符表达式 | 参数绑定 |
+|----|------------|---------|
+| 普通列 | `?` | 原值放入 params |
+| MySQL 几何列 | `ST_GeomFromText('LINESTRING(...)', 4326)` | param=null → 不占位 |
+
+`INSERT`/`UPDATE`/`UPSERT` 的 SQL 构建链路（`buildPlaceholders`、`buildSetClause`）均已接入 `getSqlPlaceholder`，几何列自动内嵌 SQL 函数，普通列保持 `?` 传参。
+
 ### 与 SPI 的关系
 
 SPI 仍然用于加载 6 个**方言无关**的公共 handler。`JtsGeometryAdvTypeHandler` 已从 SPI 中移除，改由各方言 Executor 在 `*AdvBaseOpt` 中按需注册对应的 Geometry handler 实现。
