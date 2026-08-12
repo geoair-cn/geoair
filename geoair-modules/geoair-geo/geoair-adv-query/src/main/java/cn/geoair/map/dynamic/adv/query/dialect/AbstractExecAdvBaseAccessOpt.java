@@ -703,13 +703,22 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
      * MySQL 因不支持多语句需覆写为 PreparedStatement.addBatch。
      */
     protected int executeInsertIgnoreBatch(Connection connection, List<Pair<String, List<Object>>> statements) throws SQLException {
-        List<String> sqls = new ArrayList<>();
-        List<Object> allParams = new ArrayList<>();
+        Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
         for (Pair<String, List<Object>> stmt : statements) {
-            allParams.addAll(stmt.getValue());
-            sqls.add(stmt.getKey());
+            groups.computeIfAbsent(stmt.getKey(), k -> new ArrayList<>()).add(stmt.getValue());
         }
-        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+        int total = 0;
+        for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
+            try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                for (List<Object> params : group.getValue()) {
+                    preparedStatementBinder.bindAll(pstmt, params);
+                    pstmt.addBatch();
+                }
+                int[] results = pstmt.executeBatch();
+                total += results.length;
+            }
+        }
+        return total;
     }
 
     private Integer executeUpdate(String sql, List<Object> params, String methodName) {

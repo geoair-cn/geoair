@@ -1024,29 +1024,47 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
      * MySQL 需覆写为 PreparedStatement.addBatch。
      */
     protected int executeUpdateBatch(Connection connection, List<Pair<String, List<Object>>> statements) throws SQLException {
-        List<String> sqls = new ArrayList<>();
-        List<Object> allParams = new ArrayList<>();
+        Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
         for (Pair<String, List<Object>> stmt : statements) {
-            allParams.addAll(stmt.getValue());
-            sqls.add(stmt.getKey());
+            groups.computeIfAbsent(stmt.getKey(), k -> new ArrayList<>()).add(stmt.getValue());
         }
-        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+        int total = 0;
+        for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
+            try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                for (List<Object> params : group.getValue()) {
+                    preparedStatementBinder.bindAll(pstmt, params);
+                    pstmt.addBatch();
+                }
+                int[] results = pstmt.executeBatch();
+                total += results.length;
+            }
+        }
+        return total;
     }
 
     /**
-     * 执行一批 Upsert 语句。PG/Oracle/DM 可拼接多语句执行。
-     * MySQL 需覆写为 PreparedStatement.addBatch。
+     * 执行一批 Upsert 语句。
      */
     protected int executeUpsertBatch(Connection connection, String tableName,
                                      List<Map<String, Object>> batchData, List<String> conflictKeys) throws SQLException {
-        List<String> sqls = new ArrayList<>();
-        List<Object> allParams = new ArrayList<>();
+        Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
         for (Map<String, Object> rowData : batchData) {
             Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
-            sqls.add(dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey()));
-            allParams.addAll(upsertSql.getValue());
+            String sql = dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey());
+            groups.computeIfAbsent(sql, k -> new ArrayList<>()).add(upsertSql.getValue());
         }
-        return SqlExecutor.execute(connection, StrUtil.join("; \n", sqls), allParams.toArray());
+        int total = 0;
+        for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
+            try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                for (List<Object> params : group.getValue()) {
+                    preparedStatementBinder.bindAll(pstmt, params);
+                    pstmt.addBatch();
+                }
+                int[] results = pstmt.executeBatch();
+                total += results.length;
+            }
+        }
+        return total;
     }
 
     /**
