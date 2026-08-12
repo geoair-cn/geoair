@@ -715,9 +715,12 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
     private Integer executeUpdate(String sql, List<Object> params, String methodName) {
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
+        PreparedStatement pstmt = null;
         try {
+            pstmt = connection.prepareStatement(sql);
+            preparedStatementBinder.bindAll(pstmt, params);
             stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, sql, params.toArray());
+            int result = pstmt.executeUpdate();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), methodName, sql, params, cost, result);
@@ -726,6 +729,9 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), methodName, sql, params, e);
             throw new RuntimeException("插入操作失败，SQL：" + sql, e);
         } finally {
+            if (pstmt != null) {
+                try { pstmt.close(); } catch (SQLException ignored) {}
+            }
             closeConnection(connection);
         }
     }
