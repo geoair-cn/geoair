@@ -2,13 +2,11 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
@@ -27,8 +25,6 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.Log;
 import cn.hutool.log.LogFactory;
 
-import com.alibaba.druid.pool.DruidDataSource;
- 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaFutureAction;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -52,7 +48,7 @@ import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
- 
+
 public class SparkVectorTileGenerator implements Serializable {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private transient SparkSession sparkSession;
@@ -404,7 +400,7 @@ public class SparkVectorTileGenerator implements Serializable {
         }
         PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
         DataSource dataSource = pgConnectInfo.toDataSource();
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
+        IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
         if (totalCount == 0) {
@@ -453,7 +449,7 @@ public class SparkVectorTileGenerator implements Serializable {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
         PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
 
         BBoxApo bBoxApo =
                 iAdvExecutor.eGetExtent(
@@ -505,7 +501,7 @@ public class SparkVectorTileGenerator implements Serializable {
         PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
         DataSource dataSource = outPutConnectWithTable.toDataSource();
 
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
+        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);
         boolean b = iAdvExecutor.dIsTableExists(tableName);
         String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
