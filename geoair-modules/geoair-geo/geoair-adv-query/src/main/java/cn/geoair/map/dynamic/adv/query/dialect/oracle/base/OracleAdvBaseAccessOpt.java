@@ -30,14 +30,17 @@ public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
     @Override
     protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
-        // Oracle 使用子查询判断：不存在则插入
-        String[] fieldArray = fields.split(",");
-        String pkField = fieldArray[0].trim();
+        if (conflictKeys == null || conflictKeys.isEmpty()) {
+            conflictKeys = java.util.Collections.singletonList(fields.split(",")[0].trim());
+        }
+        String conflictCondition = conflictKeys.stream()
+                .map(ck -> StrUtil.format("{} = ?", ck))
+                .collect(java.util.stream.Collectors.joining(" AND "));
 
         return StrUtil.format(
                 "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS " +
-                        "(SELECT 1 FROM {} WHERE {} = ?)",
-                tableName, fields, placeholders, tableName, pkField);
+                        "(SELECT 1 FROM {} WHERE {})",
+                tableName, fields, placeholders, tableName, conflictCondition);
     }
 
 
