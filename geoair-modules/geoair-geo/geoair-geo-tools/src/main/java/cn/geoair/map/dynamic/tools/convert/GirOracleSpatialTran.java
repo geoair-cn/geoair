@@ -71,8 +71,10 @@ public class GirOracleSpatialTran {
         }
 
         try {
+            STRUCT struct = (STRUCT) value;
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
-            byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
+            byte[] bytes = wkb.fromSTRUCT(struct);
+            Object[] attributes = struct.getAttributes();
             return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
             logger.error(e);
@@ -102,7 +104,7 @@ public class GirOracleSpatialTran {
         }
         try {
             if (srid > 0) geometry.setSRID(srid);
-            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN, true);
+            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN );
             byte[] wkbBytes = writer.write(geometry);
 
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
@@ -111,7 +113,7 @@ public class GirOracleSpatialTran {
             // 通过 STRUCT 的 setObject 或 getAttributes 修改 SRID
             // 注意：这种方式需要知道 STRUCT 的内部字段顺序
             Object[] attrs = sdoStruct.getAttributes();
-            attrs[0] = srid;  // 第1个字段是 SDO_SRID
+            attrs[1] = srid;  // 第1个字段是 SDO_SRID
             return new STRUCT(sdoStruct.getDescriptor(), connection, attrs);
 
         } catch (Exception e) {
