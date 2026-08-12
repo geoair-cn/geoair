@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
+import cn.hutool.core.util.StrUtil;
 import org.locationtech.jts.geom.Geometry;
 
 /**
@@ -33,7 +34,7 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
             Geometry geom = (Geometry) value;
             int srid = geom.getSRID();
             if (srid <= 0) srid = 4326;
-            return "ST_GeomFromText(?, " + srid + ", 'axis-order=long-lat')";
+            return StrUtil.format("ST_GeomFromText(\"{}\",  {}, 'axis-order=long-lat')","?",srid);
         }
         return null;
     }

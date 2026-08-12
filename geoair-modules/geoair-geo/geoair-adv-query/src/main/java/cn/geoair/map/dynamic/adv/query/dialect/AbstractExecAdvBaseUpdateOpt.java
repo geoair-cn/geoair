@@ -664,7 +664,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             dbKeyList.add(dialectTableNameProcessor.tbQuoteFieldName(field));
         }
         String fields = String.join(",", dbKeyList);
-        String placeholders = dbKeyList.stream().map(key -> "?").collect(Collectors.joining(","));
+        List<Object> params = new ArrayList<>(rowData.values());
+        String placeholders = buildPlaceholders(params);
 
         List<String> conflictKeysList = new ArrayList<>();
         for (String field : conflictKeys) {
@@ -673,7 +674,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String conflictFields = String.join(",", conflictKeysList);
         String updateClause = buildUpsertUpdateClause(rowData, conflictKeysList);
         String execSql = buildUpdateOrInsertSql(quoteTableName, fields, placeholders, conflictFields, updateClause);
-        List<Object> params = new ArrayList<>(rowData.values());
         return Pair.of(execSql, params);
     }
 
@@ -1065,4 +1065,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     protected abstract String buildUpdateOrInsertSql(
             String tableName, String fields, String placeholders,
             String conflictFields, String updateClause);
+
+    protected String buildPlaceholders(List<Object> values) {
+        return values.stream()
+                .map(v -> {
+                    String ph = typeHandlerRegistry.getSqlPlaceholder(v);
+                    return ph != null ? ph : "?";
+                })
+                .collect(Collectors.joining(", "));
+    }
 }
