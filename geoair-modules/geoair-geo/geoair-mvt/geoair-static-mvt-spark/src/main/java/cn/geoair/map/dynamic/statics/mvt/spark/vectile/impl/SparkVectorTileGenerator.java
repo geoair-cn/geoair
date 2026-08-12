@@ -4,9 +4,9 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
@@ -403,7 +403,7 @@ public class SparkVectorTileGenerator implements Serializable {
         }
         PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
         DataSource dataSource = pgConnectInfo.toDataSource();
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
+        IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
         if (totalCount == 0) {
@@ -452,7 +452,7 @@ public class SparkVectorTileGenerator implements Serializable {
             throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
         }
         PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
 
         BBoxApo bBoxApo =
                 iAdvExecutor.eGetExtent(
@@ -504,7 +504,7 @@ public class SparkVectorTileGenerator implements Serializable {
         PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
         DataSource dataSource = outPutConnectWithTable.toDataSource();
 
-        IAdvExecutor iAdvExecutor = new AdvExecutorPG(dataSource);
+        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);
         boolean b = iAdvExecutor.dIsTableExists(tableName);
         String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +

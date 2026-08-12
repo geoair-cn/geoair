@@ -5,7 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
-import cn.hutool.extra.spring.SpringUtil;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -16,15 +16,7 @@ import javax.sql.DataSource;
 
 public class AdvExecutorFactory {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    /**
-     * 根据数据源类型获取对应的执行器实例
-     *
-     * @return 匹配的IAdvExecutor实现类
-     */
-    public static IAdvExecutor getAdvExecutorByDataSource() {
-        DataSource dataSource = SpringUtil.getBean(DataSource.class);
-        return getAdvExecutorByDataSource(dataSource);
-    }
+
 
     public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
         return getAdvExecutorByDataSource(dataSource, null);
