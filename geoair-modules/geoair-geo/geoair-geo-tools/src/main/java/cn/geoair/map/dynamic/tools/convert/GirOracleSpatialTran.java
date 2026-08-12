@@ -66,7 +66,7 @@ public class GirOracleSpatialTran {
         try {
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
             byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            return  GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
+            return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
         } catch (Exception e) {
             return null;
         }
@@ -96,6 +96,10 @@ public class GirOracleSpatialTran {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static Object jtsGeomToSdoGeometryObj(Geometry geometry, java.sql.Connection connection) {
+        return jtsGeomToSdoGeometry(geometry, connection);
     }
 
     /**
