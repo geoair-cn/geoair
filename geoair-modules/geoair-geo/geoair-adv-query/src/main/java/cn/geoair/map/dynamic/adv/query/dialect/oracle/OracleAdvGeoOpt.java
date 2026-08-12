@@ -162,7 +162,8 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String aliasTableName = dialectTableNameProcessor.tbGetTempAliasTableName();
             tableNameS =   dialectTableNameProcessor.tbBuildAsTable(tableNameS,aliasTableName);
         } else {
-            tableNameS = StrUtil.wrap(tableNameOrSqlView, "( ", " )");
+            String quoteTableName= dialectTableNameProcessor.tbQuoteTableName(tableNameOrSqlView);
+            tableNameS = StrUtil.wrap(quoteTableName, "( ", " )");
         }
 
         String quotedField = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
