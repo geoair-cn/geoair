@@ -68,18 +68,10 @@ public class GirMysqlTran {
         }
     }
 
-    /**
-     * 将MySQL Geometry二进制数据转换为JTS Geometry对象
-     *
-     * @param value 从JDBC获取的值（byte[]或Blob类型）
-     * @return JTS Geometry对象，转换失败返回null
-     */
     public static Geometry mysqlBinaryToJtsGeom(Object value) {
         if (value == null) {
             return null;
         }
-
-        Geometry jtsGeom = null;
 
         try {
             // 1. 转换为字节数组
@@ -88,31 +80,41 @@ public class GirMysqlTran {
                 return null;
             }
 
-            // 2. 提取SRID（前4字节）
-            ByteBuffer buffer = ByteBuffer.wrap(mysqlBinary, 0, 4);
-            int srid = buffer.getInt();
+            // 2. 提取SRID（前4字节，小端序）
+            int srid = readLittleEndianInt(mysqlBinary, 0);
+
+
 
             // 3. 提取标准WKB数据（去除前4字节）
             byte[] wkbData = extractWkbData(mysqlBinary);
 
-
-            jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(wkbData);
-
+            Geometry jtsGeom = GirGeoTools.defaultInstance()
+                    .getFormatOpt()
+                    .getWKBReader()
+                    .read(wkbData);
 
             // 5. 设置SRID
             if (jtsGeom != null && srid != 0) {
                 jtsGeom.setSRID(srid);
             }
 
-        } catch (ParseException e) {
-            // 解析失败返回null
-            return null;
+            return jtsGeom;
+
         } catch (Exception e) {
             return null;
         }
-
-        return jtsGeom;
     }
+
+    /**
+     * 从字节数组中读取小端序的 int（4字节）
+     */
+    private static int readLittleEndianInt(byte[] bytes, int offset) {
+        return (bytes[offset] & 0xFF)
+               | ((bytes[offset + 1] & 0xFF) << 8)
+               | ((bytes[offset + 2] & 0xFF) << 16)
+               | ((bytes[offset + 3] & 0xFF) << 24);
+    }
+
 
     /**
      * 将各种类型的对象转换为字节数组
