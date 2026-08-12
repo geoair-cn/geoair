@@ -47,29 +47,9 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName = property.resolveColumnName(toUnderlineCase);
-            @SuppressWarnings("rawtypes")
-            AdvTypeHandler fieldHandler = property.getAdvTypeHandler();
-            Object jdbcValue;
-            if (fieldHandler != null) {
-                jdbcValue = fieldHandler.convertForWrite(
-                        value,
-                        property.getPropertyType(),
-                        AdvTypeHandlerContext.of(
-                                bean.getClass(),
-                                property.getPropertyName(),
-                                columnName,
-                                property.getPropertyType()));
-            } else {
-                jdbcValue = typeHandlerRegistry.convertForWrite(
-                        value,
-                        property.getPropertyType(),
-                        AdvTypeHandlerContext.of(
-                                bean.getClass(),
-                                property.getPropertyName(),
-                                columnName,
-                                property.getPropertyType()));
-            }
-            rowData.put(columnName, jdbcValue);
+            // 不在此处预转换：保留原始类型以便 buildPlaceholders 感知自定义占位符
+            // 最终的 JDBC 转换由 PreparedStatementBinder 在执行时完成
+            rowData.put(columnName, value);
         }
         return rowData;
     }
@@ -100,12 +80,9 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName = toUnderlineCase ? StrUtil.toUnderlineCase(propertyName) : propertyName;
-            Class<?> valueType = value == null ? Object.class : value.getClass();
-            Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                    value,
-                    valueType,
-                    AdvTypeHandlerContext.of(beanType, propertyName, columnName, valueType));
-            rowData.put(columnName, jdbcValue);
+            // 不在此处预转换：保留原始类型以便 buildPlaceholders 感知自定义占位符
+            // 最终的 JDBC 转换由 PreparedStatementBinder 在执行时完成
+            rowData.put(columnName, value);
         }
     }
 
