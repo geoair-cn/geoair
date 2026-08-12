@@ -6,12 +6,14 @@ import cn.geoair.map.dynamic.tools.GirGeoTools;
 import oracle.spatial.util.ByteOrder;
 import oracle.sql.STRUCT;
 import oracle.spatial.util.WKB;
+import oracle.sql.StructDescriptor;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ByteOrderValues;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -93,31 +95,28 @@ public class GirOracleSpatialTran {
     /**
      * 将 JTS Geometry 转换为 Oracle SDO_GEOMETRY STRUCT，含 SRID。
      */
-    public static STRUCT jtsGeomToSdoGeometry(Geometry geometry, java.sql.Connection connection, int srid) {
+    public static STRUCT jtsGeomToSdoGeometry(
+            Geometry geometry, Connection connection, int srid) {
         if (geometry == null || connection == null) {
             return null;
         }
-
         try {
-            // 设置 SRID 到 Geometry 上
             if (srid > 0) geometry.setSRID(srid);
-
-            // 使用 JTS 的 SRID-aware WKBWriter
             WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN, true);
             byte[] wkbBytes = writer.write(geometry);
 
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
-            return wkb.toSTRUCT(wkbBytes, connection);
+            STRUCT sdoStruct = wkb.toSTRUCT(wkbBytes, connection);
+
+            // 通过 STRUCT 的 setObject 或 getAttributes 修改 SRID
+            // 注意：这种方式需要知道 STRUCT 的内部字段顺序
+            Object[] attrs = sdoStruct.getAttributes();
+            attrs[0] = srid;  // 第1个字段是 SDO_SRID
+            return new STRUCT(sdoStruct.getDescriptor(), connection, attrs);
+
         } catch (Exception e) {
-            // 回退：不用 SRID 的方式
-            try {
-                WKBWriter writer = new WKBWriter();
-                WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
-                return wkb.toSTRUCT(writer.write(geometry), connection);
-            } catch (Exception e2) {
-                logger.error(e2);
-                return null;
-            }
+            logger.error("JTS to SDO_GEOMETRY conversion failed", e);
+            return null;
         }
     }
 
