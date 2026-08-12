@@ -32,4 +32,13 @@ public class AdvPreparedStatementBinder {
             bind(preparedStatement, i + 1, values.get(i));
         }
     }
+
+    /**
+     * 获取值的 SQL 占位符表达式（委托给 Registry）。
+     *
+     * @return 占位符表达式，null 表示使用默认 {@code ?}
+     */
+    public String getSqlPlaceholder(Object value) {
+        return typeHandlerRegistry.getSqlPlaceholder(value);
+    }
 }

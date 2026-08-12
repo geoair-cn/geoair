@@ -18,4 +18,17 @@ public interface AdvTypeHandler<T> {
     T convertForRead(Object value, Class<?> javaType, AdvTypeHandlerContext context);
 
     Object convertForWrite(T value, Class<?> javaType, AdvTypeHandlerContext context);
+
+    /**
+     * 返回 SQL 占位符表达式，用于替代 INSERT 语句中的普通 {@code ?}。
+     *
+     * <p>例如 MySQL 几何类型返回 {@code ST_GeomFromText(?, 4326, 'axis-order=long-lat')}。
+     * 返回 {@code null} 表示使用默认的 {@code ?}。</p>
+     *
+     * @param value 要写入的值
+     * @return SQL 占位符表达式，null 表示用默认 ?
+     */
+    default String getSqlPlaceholder(Object value) {
+        return null;
+    }
 }

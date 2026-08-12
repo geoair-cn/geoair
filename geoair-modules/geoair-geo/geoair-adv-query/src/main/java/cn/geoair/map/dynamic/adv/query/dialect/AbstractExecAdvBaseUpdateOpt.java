@@ -43,9 +43,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
     private final AdvBeanColumnMapper columnMapper;
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
     public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
+        this.typeHandlerRegistry = registry;
         this.columnMapper = new AdvBeanColumnMapper(registry);
     }
 
@@ -138,7 +140,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?",
                 quoteTableName, setClause, dialectTableNameProcessor.tbQuoteFieldName(idKey));
 
@@ -326,7 +328,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
             String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                     dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor);
+            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor, typeHandlerRegistry);
             String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
             String sql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?", quoteTableName, setClause, quotedIdKey);
             // 参数：更新字段值 + 主键id
@@ -540,7 +542,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
         String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
@@ -627,7 +629,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
         List<Object> params = new ArrayList<>(rowData.values());

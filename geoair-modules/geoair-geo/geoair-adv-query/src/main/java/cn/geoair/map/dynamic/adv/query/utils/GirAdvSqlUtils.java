@@ -296,10 +296,26 @@ public class GirAdvSqlUtils {
     }
 
     public static String buildSetClause(Map<String, Object> rowData, DialectTableNameProcessor dialectProcessor) {
+        return buildSetClause(rowData, dialectProcessor, null);
+    }
+
+    /**
+     * 构建 SET 子句（支持 TypeHandler 占位符表达式）。
+     */
+    public static String buildSetClause(Map<String, Object> rowData,
+                                        DialectTableNameProcessor dialectProcessor,
+                                        AdvTypeHandlerRegistry registry) {
         return rowData.keySet()
                 .stream()
-                .map(dialectProcessor::tbQuoteFieldName)
-                .map(field -> StrUtil.format("{} = ?", field))
+                .map(field -> {
+                    String quoted = dialectProcessor.tbQuoteFieldName(field);
+                    String placeholder = "?";
+                    if (registry != null) {
+                        String customPh = registry.getSqlPlaceholder(rowData.get(field));
+                        if (customPh != null) placeholder = customPh;
+                    }
+                    return StrUtil.format("{} = {}", quoted, placeholder);
+                })
                 .collect(Collectors.joining(","));
     }
 
