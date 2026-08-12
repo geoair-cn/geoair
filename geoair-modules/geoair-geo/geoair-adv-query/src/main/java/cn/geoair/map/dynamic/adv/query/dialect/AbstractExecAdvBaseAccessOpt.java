@@ -243,7 +243,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
 
         StopWatch stopWatch = new StopWatch();
         Connection connection = null;
-        PreparedStatement pstmt = null;
         boolean originalAutoCommit = true;
 
         try {
@@ -256,24 +255,30 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
                     .map(dialectTableNameProcessor::tbQuoteFieldName)
                     .collect(Collectors.toList());
             String fields = String.join(",", fieldNames);
-            String placeholders = buildPlaceholders(
-                    rowsData.isEmpty() ? Collections.emptyList() : new ArrayList<>(rowsData.get(0).values()));
-            String execSql = buildInsertSql(quoteTableName, fields, placeholders);
-            pstmt = connection.prepareStatement(execSql);
 
             stopWatch.start();
 
             for (List<Map<String, Object>> batch : batches) {
+                // 按 SQL 模板分组：不同行的 Geometry SRID 可能产生不同的占位符表达式
+                Map<String, List<Map<String, Object>>> groups = new LinkedHashMap<>();
                 for (Map<String, Object> row : batch) {
-                    int paramIndex = 1;
-                    for (String header : headers) {
-                        preparedStatementBinder.bind(pstmt, paramIndex++, row.get(header));
-                    }
-                    pstmt.addBatch();
+                    String ph = buildPlaceholders(new ArrayList<>(row.values()));
+                    String sql = buildInsertSql(quoteTableName, fields, ph);
+                    groups.computeIfAbsent(sql, k -> new ArrayList<>()).add(row);
                 }
-                int[] batchResults = pstmt.executeBatch();
-                totalSuccess += Arrays.stream(batchResults).sum();
-                pstmt.clearBatch();
+                for (Map.Entry<String, List<Map<String, Object>>> group : groups.entrySet()) {
+                    try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                        for (Map<String, Object> row : group.getValue()) {
+                            int paramIndex = 1;
+                            for (String header : headers) {
+                                preparedStatementBinder.bind(pstmt, paramIndex++, row.get(header));
+                            }
+                            pstmt.addBatch();
+                        }
+                        int[] batchResults = pstmt.executeBatch();
+                        totalSuccess += Arrays.stream(batchResults).sum();
+                    }
+                }
             }
 
             connection.commit();
@@ -302,14 +307,6 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             throw new RuntimeException("批量插入失败，表名：" + tableName, e);
 
         } finally {
-            // 关闭 PreparedStatement
-            if (pstmt != null) {
-                try {
-                    pstmt.close();
-                } catch (SQLException e) {
-                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("关闭 PreparedStatement 失败", e);
-                }
-            }
             // 恢复原始 autoCommit 状态（重要：防止连接池污染）
             if (connection != null) {
                 try {
