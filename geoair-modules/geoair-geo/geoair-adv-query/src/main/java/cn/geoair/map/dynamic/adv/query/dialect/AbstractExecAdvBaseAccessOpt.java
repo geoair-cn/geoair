@@ -260,22 +260,22 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
             stopWatch.start();
 
             for (List<Map<String, Object>> batch : batches) {
-                // 按 SQL 模板分组：不同行的 Geometry SRID 可能产生不同的占位符表达式
-                Map<String, List<Map<String, Object>>> groups = new LinkedHashMap<>();
+                // 每行同时构建 SQL 模板和过滤后的参数列表，按 SQL 分组执行
+                Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
                 for (Map<String, Object> row : batch) {
-                    String ph = buildPlaceholders(new ArrayList<>(row.values()));
+                    List<Object> params = new ArrayList<>();
+                    for (String header : headers) {
+                        params.add(row.get(header));
+                    }
+                    String ph = buildPlaceholders(params);
                     String sql = buildInsertSql(quoteTableName, fields, ph);
-                    groups.computeIfAbsent(sql, k -> new ArrayList<>()).add(row);
+                    groups.computeIfAbsent(sql, k -> new ArrayList<>()).add(params);
                 }
-                for (Map.Entry<String, List<Map<String, Object>>> group : groups.entrySet()) {
+                for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
                     try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
-                        for (Map<String, Object> row : group.getValue()) {
-                            int paramIndex = 1;
-                            for (String header : headers) {
-                                Object val = row.get(header);
-                                SqlPlaceholder ph = preparedStatementBinder.getSqlPlaceholder(val);
-                                if (ph != null && ph.getParam() == null) continue; // 值已嵌入 SQL，跳过
-                                preparedStatementBinder.bind(pstmt, paramIndex++, val);
+                        for (List<Object> params : group.getValue()) {
+                            for (int i = 0; i < params.size(); i++) {
+                                preparedStatementBinder.bind(pstmt, i + 1, params.get(i));
                             }
                             pstmt.addBatch();
                         }
