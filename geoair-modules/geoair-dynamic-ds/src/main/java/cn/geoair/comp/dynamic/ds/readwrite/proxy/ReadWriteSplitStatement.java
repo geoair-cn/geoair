@@ -18,8 +18,8 @@ public class ReadWriteSplitStatement implements Statement {
 
     protected final ReadWriteSplitConnection connection;
     protected Statement currentStatement;
-    protected int resultSetType;
-    protected int resultSetConcurrency;
+    protected int resultSetType = ResultSet.TYPE_FORWARD_ONLY;
+    protected int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
     protected int resultSetHoldability;
 
     public ReadWriteSplitStatement(ReadWriteSplitConnection connection) {
