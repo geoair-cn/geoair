@@ -36,7 +36,7 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
             if (srid <= 0) srid = 4326;
             String wkt = (String) writeGeometry(geom);
             return new SqlPlaceholder(
-                    "ST_GeomFromText('" + wkt.replace("'", "''") + "', " + srid + ")",
+                    "ST_GeomFromText('" + wkt.replace("'", "''") + "', " + srid + ", 'axis-order=long-lat')",
                     null);
         }
         return null;

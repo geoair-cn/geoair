@@ -329,11 +329,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
             String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                     dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor, typeHandlerRegistry, null);
+            List<Object> singleParams = new ArrayList<>(updateData.values());
+            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor, typeHandlerRegistry, singleParams);
             String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
             String sql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?", quoteTableName, setClause, quotedIdKey);
-            // 参数：更新字段值 + 主键id
-            List<Object> singleParams = new ArrayList<>(updateData.values());
             singleParams.add(id);
             sqlStatements.add(Pair.of(sql, singleParams));
         }
