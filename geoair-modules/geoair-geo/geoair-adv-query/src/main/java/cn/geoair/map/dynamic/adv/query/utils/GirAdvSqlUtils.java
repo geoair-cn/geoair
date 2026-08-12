@@ -106,6 +106,7 @@ public class GirAdvSqlUtils {
      * 仅用于非 Executor 上下文的工具类（如 BeanToQueryFilterConverter）。
      * Executor 内部请使用带 AdvBeanColumnMapper 参数的版本。
      */
+    @Deprecated
     public static <T> Map<String, Object> getRowData(T entity, boolean isToUnderlineCase, boolean ignoreNullValue, List<String> ignoreFieldNames) {
         return getRowData(entity, isToUnderlineCase, ignoreNullValue, true, ignoreFieldNames);
     }

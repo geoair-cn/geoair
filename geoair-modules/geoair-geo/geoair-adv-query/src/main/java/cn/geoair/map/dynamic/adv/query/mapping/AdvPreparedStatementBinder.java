@@ -24,7 +24,7 @@ public class AdvPreparedStatementBinder {
         Object jdbcValue = typeHandlerRegistry.convertForWrite(
                 value,
                 value == null ? Object.class : value.getClass(),
-                AdvTypeHandlerContext.simple(null));
+                AdvTypeHandlerContext.withConnection(preparedStatement.getConnection(), null));
         if (jdbcValue instanceof String) {
             preparedStatement.setString(index, (String) jdbcValue);
         } else {
