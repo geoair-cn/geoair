@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -298,24 +299,49 @@ public class GirAdvSqlUtils {
         return buildSetClause(rowData, dialectProcessor, null);
     }
 
+    /** 构建 SET 子句（含 TypeHandler 占位符）并同步过滤参数列表 */
+    public static String buildSetClause(Map<String, Object> rowData,
+                                        DialectTableNameProcessor dialectProcessor,
+                                        AdvTypeHandlerRegistry registry,
+                                        List<Object> params) {
+        List<String> parts = new ArrayList<>();
+        List<Object> filtered = new ArrayList<>();
+        for (String field : rowData.keySet()) {
+            String quoted = dialectProcessor.tbQuoteFieldName(field);
+            String placeholder = "?";
+            Object value = rowData.get(field);
+            if (registry != null) {
+                SqlPlaceholder ph = registry.getSqlPlaceholder(value);
+                if (ph != null) {
+                    placeholder = ph.getSql();
+                    if (ph.getParam() != null) {
+                        filtered.add(ph.getParam());
+                    }
+                    // param==null → 值已嵌入 SQL，不加入参数
+                } else {
+                    filtered.add(value);
+                }
+            } else {
+                filtered.add(value);
+            }
+            parts.add(StrUtil.format("{} = {}", quoted, placeholder));
+        }
+        if (params != null) {
+            params.clear();
+            params.addAll(filtered);
+        }
+        return String.join(",", parts);
+    }
+
     /**
      * 构建 SET 子句（支持 TypeHandler 占位符表达式）。
+     * @deprecated 请使用带 params 参数的重载版本，以保证参数列表与 SQL 占位符一致
      */
+    @Deprecated
     public static String buildSetClause(Map<String, Object> rowData,
                                         DialectTableNameProcessor dialectProcessor,
                                         AdvTypeHandlerRegistry registry) {
-        return rowData.keySet()
-                .stream()
-                .map(field -> {
-                    String quoted = dialectProcessor.tbQuoteFieldName(field);
-                    String placeholder = "?";
-                    if (registry != null) {
-                        String customPh = registry.getSqlPlaceholder(rowData.get(field));
-                        if (customPh != null) placeholder = customPh;
-                    }
-                    return StrUtil.format("{} = {}", quoted, placeholder);
-                })
-                .collect(Collectors.joining(","));
+        return buildSetClause(rowData, dialectProcessor, registry, null);
     }
 
     public static void rollbackConnection(Connection connection) {

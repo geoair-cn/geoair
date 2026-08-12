@@ -14,6 +14,7 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -140,11 +141,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?",
                 quoteTableName, setClause, dialectTableNameProcessor.tbQuoteFieldName(idKey));
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.add(id);
 
         return executeUpdate(execSql, params, "bUpdateByPK");
@@ -328,7 +329,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
             String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                     dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor, typeHandlerRegistry);
+            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor, typeHandlerRegistry, batchParams);
             String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
             String sql = StrUtil.format("UPDATE {} SET {} WHERE {} = ?", quoteTableName, setClause, quotedIdKey);
             // 参数：更新字段值 + 主键id
@@ -532,11 +533,11 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereMap.values());
 
         return executeUpdate(execSql, params, "bUpdateByMap");
@@ -619,10 +620,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
         String quoteTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(
                 dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String execSql = StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereParams);
 
         return executeUpdate(execSql, params, "bUpdateByWhere");
@@ -1066,12 +1067,23 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String tableName, String fields, String placeholders,
             String conflictFields, String updateClause);
 
-    protected String buildPlaceholders(List<Object> values) {
-        return values.stream()
-                .map(v -> {
-                    String ph = typeHandlerRegistry.getSqlPlaceholder(v);
-                    return ph != null ? ph : "?";
-                })
-                .collect(Collectors.joining(", "));
+    protected String buildPlaceholders(List<Object> params) {
+        List<String> parts = new ArrayList<>();
+        List<Object> filtered = new ArrayList<>();
+        for (Object value : params) {
+            SqlPlaceholder ph = typeHandlerRegistry.getSqlPlaceholder(value);
+            if (ph != null) {
+                parts.add(ph.getSql());
+                if (ph.getParam() != null) {
+                    filtered.add(ph.getParam());
+                }
+            } else {
+                parts.add("?");
+                filtered.add(value);
+            }
+        }
+        params.clear();
+        params.addAll(filtered);
+        return String.join(", ", parts);
     }
 }

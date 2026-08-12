@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
 import cn.hutool.core.util.StrUtil;
@@ -24,17 +25,19 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
     @Override
     protected Object writeGeometry(Geometry value) {
-        // MySQL JDBC 驱动原生支持 WKT 字符串写入 GEOMETRY 列，配合 getSqlPlaceholder 使用
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
     }
 
     @Override
-    public String getSqlPlaceholder(Object value) {
+    public SqlPlaceholder getSqlPlaceholder(Object value) {
         if (value instanceof Geometry) {
             Geometry geom = (Geometry) value;
             int srid = geom.getSRID();
             if (srid <= 0) srid = 4326;
-            return StrUtil.format("ST_GeomFromText({}, {},'axis-order=long-lat')", "?", srid);
+            String wkt = (String) writeGeometry(geom);
+            return new SqlPlaceholder(
+                    "ST_GeomFromText('" + wkt.replace("'", "''") + "', " + srid + ")",
+                    null);
         }
         return null;
     }

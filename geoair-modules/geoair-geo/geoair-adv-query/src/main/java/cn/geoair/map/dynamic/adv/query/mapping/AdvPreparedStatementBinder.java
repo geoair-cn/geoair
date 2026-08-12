@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.adv.query.mapping;
 
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -39,10 +40,8 @@ public class AdvPreparedStatementBinder {
 
     /**
      * 获取值的 SQL 占位符表达式（委托给 Registry）。
-     *
-     * @return 占位符表达式，null 表示使用默认 {@code ?}
      */
-    public String getSqlPlaceholder(Object value) {
+    public SqlPlaceholder getSqlPlaceholder(Object value) {
         return typeHandlerRegistry.getSqlPlaceholder(value);
     }
 }
