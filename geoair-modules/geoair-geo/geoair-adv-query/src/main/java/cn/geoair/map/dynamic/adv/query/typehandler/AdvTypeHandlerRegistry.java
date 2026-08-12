@@ -166,11 +166,8 @@ public class AdvTypeHandlerRegistry {
 
     /**
      * 获取值的 SQL 占位符表达式。
-     *
-     * <p>查询所有已注册 handler，第一个支持该值的 handler 决定占位符格式。
-     * 返回 {@code null} 表示使用默认 {@code ?}。</p>
      */
-    public String getSqlPlaceholder(Object value) {
+    public SqlPlaceholder getSqlPlaceholder(Object value) {
         if (value == null) return null;
         AdvTypeHandler<?> handler = resolve(value.getClass(), value);
         if (handler != null) {

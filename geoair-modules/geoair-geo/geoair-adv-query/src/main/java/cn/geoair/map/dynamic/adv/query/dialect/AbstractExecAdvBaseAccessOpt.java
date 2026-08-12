@@ -9,6 +9,7 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
 import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
@@ -731,13 +732,25 @@ public abstract class AbstractExecAdvBaseAccessOpt implements IAdvBaseAccessOpt 
      * （如 MySQL 几何列用 ST_GeomFromText(?, 4326, 'axis-order=long-lat')），
      * 未提供则使用默认 {@code ?}。
      */
-    protected String buildPlaceholders(List<Object> values) {
-        return values.stream()
-                .map(v -> {
-                    String ph = preparedStatementBinder.getSqlPlaceholder(v);
-                    return ph != null ? ph : "?";
-                })
-                .collect(Collectors.joining(", "));
+    protected String buildPlaceholders(List<Object> params) {
+        List<String> parts = new ArrayList<>();
+        List<Object> filtered = new ArrayList<>();
+        for (Object value : params) {
+            SqlPlaceholder ph = preparedStatementBinder.getSqlPlaceholder(value);
+            if (ph != null) {
+                parts.add(ph.getSql());
+                if (ph.getParam() != null) {
+                    filtered.add(ph.getParam());
+                }
+                // param == null → 值已内嵌入 SQL，不放入参数列表
+            } else {
+                parts.add("?");
+                filtered.add(value);
+            }
+        }
+        params.clear();
+        params.addAll(filtered);
+        return String.join(", ", parts);
     }
 
     protected String buildInsertSql(String tableName, String fields, String placeholders) {

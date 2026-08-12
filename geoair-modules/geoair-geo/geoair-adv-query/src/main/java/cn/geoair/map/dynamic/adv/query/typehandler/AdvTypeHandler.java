@@ -11,8 +11,6 @@ import cn.geoair.base.sp.support.GirJdkSpLoader;
 @GkSP(loader = GirJdkSpLoader.class)
 public interface AdvTypeHandler<T> {
 
-
-
     boolean supports(Class<?> javaType, Object value);
 
     T convertForRead(Object value, Class<?> javaType, AdvTypeHandlerContext context);
@@ -20,15 +18,13 @@ public interface AdvTypeHandler<T> {
     Object convertForWrite(T value, Class<?> javaType, AdvTypeHandlerContext context);
 
     /**
-     * 返回 SQL 占位符表达式，用于替代 INSERT 语句中的普通 {@code ?}。
+     * 返回 SQL 占位符表达式。
      *
-     * <p>例如 MySQL 几何类型返回 {@code ST_GeomFromText(?, 4326, 'axis-order=long-lat')}。
-     * 返回 {@code null} 表示使用默认的 {@code ?}。</p>
-     *
-     * @param value 要写入的值
-     * @return SQL 占位符表达式，null 表示用默认 ?
+     * <p>返回 {@code null} 表示使用默认 {@code ?}，值放入参数列表。
+     * 返回非空时，{@link SqlPlaceholder#getSql()} 直接拼入 SQL，
+     * {@link SqlPlaceholder#getParam()} 替换原始值放入参数列表（为 null 则不放）。</p>
      */
-    default String getSqlPlaceholder(Object value) {
+    default SqlPlaceholder getSqlPlaceholder(Object value) {
         return null;
     }
 }
