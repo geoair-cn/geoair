@@ -20,7 +20,7 @@ public class ReadWriteSplitStatement implements Statement {
     protected Statement currentStatement;
     protected int resultSetType = ResultSet.TYPE_FORWARD_ONLY;
     protected int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
-    protected int resultSetHoldability;
+    protected int resultSetHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
     public ReadWriteSplitStatement(ReadWriteSplitConnection connection) {
         this.connection = connection;
