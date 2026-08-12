@@ -34,7 +34,7 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
             Geometry geom = (Geometry) value;
             int srid = geom.getSRID();
             if (srid <= 0) srid = 4326;
-            return StrUtil.format("ST_GeomFromText({}, {}, 'axis-order=long-lat')", "?", srid);
+            return StrUtil.format("ST_GeomFromText({}, {})", "?", srid);
         }
         return null;
     }
