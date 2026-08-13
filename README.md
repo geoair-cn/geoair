@@ -248,7 +248,7 @@ DataSourceWrapper (Druid/Hikari/BoneCP/C3P0/DBCP2)     ← 连接池适配
 | **连接池** | Druid / HikariCP | 1.2.23 |
 | **ORM** | MyBatis / MyBatis-Plus / Spring Data JPA | 3.5.9 / 3.5.2 / 5.6.15 |
 | **API 文档** | Knife4j + SpringDoc / Springfox | 4.4.0 / 3.0.0 |
-| **JSON** | Jackson / FastJSON2 / Gson | 2.13.5 / 2.0.61 / 2.9.1 |
+| **JSON** | Jackson / FastJSON2 / Gson | 2.13.5 / 2.0.64 / 2.9.1 |
 | **缓存** | Redis (Redisson) / JSR Cache / Spring Cache | 3.18.0 |
 | **工具** | Hutool / Lombok | 5.8.42 / 1.18.30 |
 | **代码质量** | SpotBugs / Modernizer / fmt-maven-plugin | 4.7.3.6 / 2.7.0 / 2.6.0 |

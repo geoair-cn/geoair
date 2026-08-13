@@ -62,7 +62,7 @@
     <version.lib.ojdbc>${ojdbc.version}</version.lib.ojdbc>
       <!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
       <sdoutl.version>23.26</sdoutl.version>
-    <fastjson1x.version>2.0.61</fastjson1x.version>
+    <fastjson1x.version>2.0.64</fastjson1x.version>
     <jts.version>1.19.0</jts.version>
   </properties>
 
