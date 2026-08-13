@@ -102,7 +102,7 @@ public class SafeSqlExecutor {
                 int pageSize = giPageParam.pageSize();
                 Number number = iAdvExecutor.bSelectRecordRowCount(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
                 Long count = number.longValue();
-                String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, giPageParam.isPageNumStartZero());
+                String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
                 List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
                 iAdvExecutor.bSelectListStream(pageSql, SqlParamList.of(sqlMeta.getJdbcParamValues()), girAdvOneRow -> {
                     GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
