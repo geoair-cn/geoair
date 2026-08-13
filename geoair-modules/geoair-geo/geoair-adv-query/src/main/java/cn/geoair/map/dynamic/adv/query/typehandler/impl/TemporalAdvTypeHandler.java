@@ -80,6 +80,35 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         return value;
     }
 
+    @Override
+    protected Object convertNonNullForWrite(
+            Object value, Class<?> javaType, AdvTypeHandlerContext context) {
+        if (value instanceof java.sql.Date
+            || value instanceof Time
+            || value instanceof Timestamp) {
+            return value;
+        }
+        if (value instanceof Date) {
+            return new Timestamp(((Date) value).getTime());
+        }
+        if (value instanceof LocalDate) {
+            return java.sql.Date.valueOf((LocalDate) value);
+        }
+        if (value instanceof LocalTime) {
+            return Time.valueOf((LocalTime) value);
+        }
+        if (value instanceof LocalDateTime) {
+            return Timestamp.valueOf((LocalDateTime) value);
+        }
+        if (value instanceof Instant) {
+            return Timestamp.from((Instant) value);
+        }
+        if (value instanceof OffsetDateTime) {
+            return Timestamp.from(((OffsetDateTime) value).toInstant());
+        }
+        return value;
+    }
+
     private Date toDate(Object value) {
         if (value instanceof Date) {
             return (Date) value;
