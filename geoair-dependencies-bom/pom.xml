@@ -65,8 +65,8 @@
         <sa-token-version>1.44.0</sa-token-version>
         <tomcat.version>10.1.53</tomcat.version>
         <spring-boot.version>3.5.13</spring-boot.version>
-        <fastjson.version>2.0.61</fastjson.version>
-        <fastjson1x.version>2.0.61</fastjson1x.version>
+        <fastjson.version>2.0.64</fastjson.version>
+        <fastjson1x.version>2.0.64</fastjson1x.version>
         <dom4j.version>1.6.1</dom4j.version>
 
         <!--        <mapstruct.version>1.4.2.Final</mapstruct.version>-->
