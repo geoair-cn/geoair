@@ -237,41 +237,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
     // ==================== 流式写入 ====================
 
-    /**
-     * Serializable 包装器，将 GiPercentConsumer 包装为可序列化版本。
-     * <p>
-     * GiPercentConsumer 本身不继承 Serializable，直接传入 Spark 闭包会序列化失败。
-     * 此包装器实现了 Serializable，使闭包可以正常序列化。
-     */
-    private static class SerializableConsumer implements Serializable {
-        private static final long serialVersionUID = 1L;
-        private final GiPercentConsumer consumer;
-
-        SerializableConsumer(GiPercentConsumer consumer) {
-            this.consumer = consumer;
-        }
-
-        void accept(long allCount, long currentCount) {
-            if (consumer != null) {
-                consumer.accept(allCount, currentCount);
-            }
-        }
-
-        boolean isPresent() {
-            return consumer != null;
-        }
-    }
-
     private void streamWriteToPg(
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD,
             TileSliceParameter parameter,
             ProgressTracker tracker,
             long estimatedTotalTiles,
             GiPercentConsumer percentConsumer) {
-
-        // 用 Serializable 包装器包装 consumer，避免闭包序列化失败
-        final SerializableConsumer progressCallback =
-                percentConsumer != null ? new SerializableConsumer(percentConsumer) : null;
 
         aggregatedRDD.foreachPartition(
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>) partitionIterator -> {
@@ -296,9 +267,9 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
                     // 进度回调（仅 executor 侧，local 模式下 consumer 可直接调用）
                     Runnable notifyProgress = () -> {
-                        if (isExecutor && progressCallback != null) {
+                        if (isExecutor && percentConsumer != null) {
                             try {
-                                progressCallback.accept(estimatedTotalTiles, rootTotalCount.get());
+                                percentConsumer.accept(estimatedTotalTiles, rootTotalCount.get());
                             } catch (Exception ignored) {
                             }
                         }

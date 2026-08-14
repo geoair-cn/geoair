@@ -38,8 +38,8 @@ public class ProgressTracker implements Serializable {
     private final AtomicInteger currentStageIndex = new AtomicInteger(0);
     private final Map<Integer, String> stageNames = new ConcurrentHashMap<>();
 
-    // ===================== SparkListener =====================
-    private ProgressSparkListener listener;
+    // ===================== SparkListener（transient，仅 driver 侧使用，不参与闭包序列化）=====================
+    private   ProgressSparkListener listener;
 
     private ProgressTracker(SparkSession sparkSession, int totalStages) {
         this.startTime = System.currentTimeMillis();
@@ -149,7 +149,7 @@ public class ProgressTracker implements Serializable {
 
     // ===================== SparkListener =====================
 
-    public static class ProgressSparkListener extends SparkListener {
+    public static class ProgressSparkListener extends SparkListener implements   Serializable {
 
         private final Map<Integer, StageTracker> stageTrackers = new ConcurrentHashMap<>();
         private final AtomicInteger totalTasksCompleted = new AtomicInteger(0);
