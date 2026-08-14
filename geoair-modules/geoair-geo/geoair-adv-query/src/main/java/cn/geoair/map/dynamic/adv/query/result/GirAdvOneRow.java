@@ -1,11 +1,16 @@
 package cn.geoair.map.dynamic.adv.query.result;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMapMapper;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.simple.collection.map.OptNullGeomAndBasicTypeFromObjectGetter;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.CaseInsensitiveLinkedMap;
 import cn.hutool.db.Entity;
+import com.alibaba.fastjson2.JSONObject;
+import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
 import java.util.*;
@@ -174,6 +179,65 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
     }
 
     // ==================== 接口方法 ====================
+
+    /**
+     * 获取指定 key 对应的 JTS Geometry 对象。
+     * <p>
+     * 当 {@link #typeHandlerRegistry} 已注入时，优先使用 TypeHandler 链进行方言感知的转换
+     * （如 PostGIS PGobject、MySQL binary、Oracle SDO_GEOMETRY），性能更优；
+     * 对于 String 类型的值，保留原有的 GeoJSON → WKT → WKB 解析顺序。
+     * <p>
+     * 当 registry 未注入时（如反序列化后的实例），回退到父类默认的试错式解析。
+     */
+    @Override
+    public Geometry getGeometry(String key) {
+        Object value = getObj(key);
+        if (value == null) {
+            return null;
+        }
+
+        // registry 未注入时，回退到父类的全量试错实现
+        if (typeHandlerRegistry == null) {
+            return OptNullGeomAndBasicTypeFromObjectGetter.super.getGeometry(key);
+        }
+
+        // String 类型：保留 GeoJSON → WKT → WKB 的解析顺序
+        if (value instanceof String) {
+            return parseStringGeometry((String) value);
+        }
+
+        // 非 String 类型（PGobject、byte[]、SDO_GEOMETRY 等）：交给 registry 的方言 handler
+        return (Geometry) typeHandlerRegistry.convertForRead(
+                value, Geometry.class, AdvTypeHandlerContext.simple(key));
+    }
+
+    /**
+     * 将字符串解析为 Geometry，按 GeoJSON → WKT → WKB 顺序尝试。
+     */
+    private Geometry parseStringGeometry(String str) {
+        // 1. 尝试 GeoJSON
+        try {
+            JSONObject json = JSONObject.parseObject(str);
+            if (json != null) {
+                return GirGeoTools.defaultInstance().getFormatOpt()
+                        .geojsonToJtsGeometry(str, true);
+            }
+        } catch (Exception ignored) {
+        }
+        // 2. 尝试 WKT
+        try {
+            return GirGeoTools.defaultInstance().getFormatOpt()
+                    .wktToJtsGeometry(str, true);
+        } catch (Exception ignored) {
+        }
+        // 3. 尝试 WKB
+        try {
+            return GirGeoTools.defaultInstance().getFormatOpt()
+                    .wkbToJtsGeometry(str, true);
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
 
     @Override
     public Object getObj(String key, Object defaultValue) {
