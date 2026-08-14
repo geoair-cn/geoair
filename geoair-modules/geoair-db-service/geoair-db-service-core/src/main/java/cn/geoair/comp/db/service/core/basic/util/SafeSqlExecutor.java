@@ -11,7 +11,9 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.StrUtil;
+import org.locationtech.jts.geom.Geometry;
 
 import java.sql.*;
 import java.util.*;
@@ -141,6 +143,10 @@ public class SafeSqlExecutor {
             value = typeHandlerByJavaType.getResult(value);
             if (value instanceof Date) {
                 value = formatDate((Date) value);
+            } else if (value instanceof Geometry) {
+                // 空间字段统一输出 WKT 字符串（由 adv-query 的 AdvTypeHandler 产出 JTS Geometry，此处转为 WKT）
+                value = GirGeoTools.defaultInstance().getFormatOpt()
+                        .jtsGeometryToWktString((Geometry) value, true);
             }
             key = humpIs ? StrUtil.toCamelCase(key) : key;
             row.put(key, value);
