@@ -5,8 +5,6 @@ import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.comp.db.service.core.basic.dto.ApiSqlDto;
 import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
-import cn.geoair.comp.db.service.core.typehander.TypeHandler;
-import cn.geoair.comp.db.service.core.typehander.TypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
@@ -17,6 +15,7 @@ import org.locationtech.jts.geom.Geometry;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -103,6 +102,7 @@ public class SafeSqlExecutor {
             if (task.pageIs()) {
                 int pageSize = giPageParam.pageSize();
                 Number number = iAdvExecutor.bSelectRecordRowCount(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
+
                 Long count = number.longValue();
                 String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
                 List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
@@ -138,15 +138,19 @@ public class SafeSqlExecutor {
         for (Map.Entry<String, Object> entry : entries) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            TypeHandler typeHandlerByJavaType =
-                    TypeHandlerRegistry.getTypeHandlerByJavaType(value);
-            value = typeHandlerByJavaType.getResult(value);
-            if (value instanceof Date) {
-                value = formatDate((Date) value);
-            } else if (value instanceof Geometry) {
-                // 空间字段统一输出 WKT 字符串（由 adv-query 的 AdvTypeHandler 产出 JTS Geometry，此处转为 WKT）
-                value = GirGeoTools.defaultInstance().getFormatOpt()
-                        .jtsGeometryToWktString((Geometry) value, true);
+            if (value != null) {
+                if (value instanceof Date) {
+                    value = formatDate((Date) value);
+                } else if (value instanceof Geometry) {
+                    value = GirGeoTools.defaultInstance().getFormatOpt()
+                            .jtsGeometryToWktString((Geometry) value, true);
+                } else if (value instanceof Clob) {
+                    value = readClob((Clob) value);
+                } else if (value instanceof Blob) {
+                    value = "(Blob)";
+                } else if (value instanceof byte[] || value instanceof Byte[]) {
+                    value = Base64.getEncoder().encodeToString(cn.hutool.core.convert.Convert.toPrimitiveByteArray(value));
+                }
             }
             key = humpIs ? StrUtil.toCamelCase(key) : key;
             row.put(key, value);
@@ -164,41 +168,14 @@ public class SafeSqlExecutor {
     }
 
     /**
-     * 关闭结果集
+     * 读取 CLOB 内容
      */
-    private static void closeResultSet(ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                log.error("关闭ResultSet失败", e);
-            }
+    private static String readClob(Clob clob) {
+        try {
+            return clob.getSubString(1, (int) clob.length());
+        } catch (Exception e) {
+            return String.valueOf(clob);
         }
     }
 
-    /**
-     * 关闭语句
-     */
-    private static void closeStatement(Statement stmt) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                log.error("关闭Statement失败", e);
-            }
-        }
-    }
-
-    /**
-     * 批量执行安全检查（用于批量操作场景）
-     */
-    public static void checkBatchSqlSafety(List<String> sqlList) throws SecurityException {
-        for (String sql : sqlList) {
-            if (isDangerousSql(sql)) {
-                String errorMsg = "批量操作中包含危险SQL: " + sql;
-                log.error(errorMsg);
-                throw new SecurityException(errorMsg);
-            }
-        }
-    }
 }
