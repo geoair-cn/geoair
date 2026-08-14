@@ -57,10 +57,10 @@ public class DataSourceConfig implements Serializable {
         return config;
     }
 
-    public DataSourceConfig setProtocolUrl(String protocolUrl) {
-        if (GutilObject.isNotEmpty(protocolUrl)) {
-            ProtocolUrl parsed = new ProtocolUrl(protocolUrl);
-            this.protocolUrl = protocolUrl;
+    public DataSourceConfig setProtocolUrl(String protocolUrlStr) {
+        if (GutilObject.isNotEmpty(protocolUrlStr)) {
+            ProtocolUrl parsed = new ProtocolUrl(protocolUrlStr);
+            this.protocolUrlStr = protocolUrlStr;
             this.jdbcUrl = parsed.toJdbcUrl();
             this.username = parsed.getUsername();
             this.password = parsed.getPassword();
