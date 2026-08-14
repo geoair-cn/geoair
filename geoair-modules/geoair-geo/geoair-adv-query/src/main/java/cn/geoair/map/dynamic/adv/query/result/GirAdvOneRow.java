@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 public class GirAdvOneRow extends LinkedHashMap<String, Object>
         implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable {
 
-    /** 关联的 TypeHandler 注册表，用于 {@link #toBeanObj(Class)} 做正确的类型转换 */
+    /**
+     * 关联的 TypeHandler 注册表，用于 {@link #toBeanObj(Class)} 做正确的类型转换
+     */
     private transient AdvTypeHandlerRegistry typeHandlerRegistry;
 
     // ==================== 工厂方法 ====================
@@ -59,12 +61,16 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         super(map);
     }
 
-    /** 设置 TypeHandler 注册表（由 bSelectList / bSelectOne 等方法自动注入） */
+    /**
+     * 设置 TypeHandler 注册表（由 bSelectList / bSelectOne 等方法自动注入）
+     */
     public void setTypeHandlerRegistry(AdvTypeHandlerRegistry registry) {
         this.typeHandlerRegistry = registry;
     }
 
-    /** fluent 风格的 Registry 注入 */
+    /**
+     * fluent 风格的 Registry 注入
+     */
     public GirAdvOneRow withRegistry(AdvTypeHandlerRegistry registry) {
         this.typeHandlerRegistry = registry;
         return this;
@@ -92,7 +98,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         return new AdvBeanMapMapper(registry).mapToBean(this, clazz);
     }
 
-    /** 批量转换（自动检测各行已注入的 Registry） */
+    /**
+     * 批量转换（自动检测各行已注入的 Registry）
+     */
     public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz) {
         if (rowList == null) return Collections.emptyList();
         return rowList.stream()
@@ -101,7 +109,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
                 .collect(Collectors.toList());
     }
 
-    /** 批量转换（使用统一 Registry） */
+    /**
+     * 批量转换（使用统一 Registry）
+     */
     public static <T> List<T> toBeanObjList(List<GirAdvOneRow> rowList, Class<T> clazz, AdvTypeHandlerRegistry registry) {
         if (rowList == null) return Collections.emptyList();
         AdvBeanMapMapper mapper = new AdvBeanMapMapper(registry);
@@ -111,7 +121,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
                 .collect(Collectors.toList());
     }
 
-    /** 转换为大小写不敏感的 key */
+    /**
+     * 转换为大小写不敏感的 key
+     */
     public GirAdvOneRow toCaseInsensitive() {
         GirAdvOneRow result = new GirAdvOneRow(new CaseInsensitiveLinkedMap<>(this));
         result.typeHandlerRegistry = this.typeHandlerRegistry;
@@ -129,7 +141,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         return result;
     }
 
-    /** 转换 key 列表为驼峰 */
+    /**
+     * 转换 key 列表为驼峰
+     */
     public static List<GirAdvOneRow> toCamelCaseList(List<GirAdvOneRow> rowList) {
         if (rowList == null) return Collections.emptyList();
         return rowList.stream()
@@ -138,7 +152,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
                 .collect(Collectors.toList());
     }
 
-    /** 转换 key 列表为大小写不敏感 */
+    /**
+     * 转换 key 列表为大小写不敏感
+     */
     public static List<GirAdvOneRow> toCaseInsensitiveList(List<GirAdvOneRow> rowList) {
         if (rowList == null) return Collections.emptyList();
         return rowList.stream()
@@ -147,7 +163,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
                 .collect(Collectors.toList());
     }
 
-    /** 下划线转驼峰（snake_case → camelCase） */
+    /**
+     * 下划线转驼峰（snake_case → camelCase）
+     */
     private static String toCamelCaseKey(String key) {
         if (key == null || key.isEmpty()) return key;
         StringBuilder sb = new StringBuilder(key.length());
@@ -205,7 +223,12 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
         if (value instanceof String) {
             return parseStringGeometry((String) value);
         }
-
+        if (value instanceof Map) { // 判断是否为json对象
+            JSONObject jsonObject = new JSONObject((Map<String, Object>) value);
+            return
+                    GirGeoTools.defaultInstance().getFormatOpt()
+                            .geojsonToJtsGeometry(jsonObject.toJSONString(), true);
+        }
         // 非 String 类型（PGobject、byte[]、SDO_GEOMETRY 等）：交给 registry 的方言 handler
         return (Geometry) typeHandlerRegistry.convertForRead(
                 value, Geometry.class, AdvTypeHandlerContext.simple(key));
