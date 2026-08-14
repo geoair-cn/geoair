@@ -96,7 +96,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
      */
     public void doGenerate(TileSliceParameter parameter, GiPercentConsumer percentConsumer) throws Exception {
         // ==================== 初始化进度跟踪 ====================
-        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4);
+        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentConsumer);
 
         // ==================== 打印参数 ====================
         JSONObject entries = JSONUtil.parseObj(parameter);
@@ -165,10 +165,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         long tileCount = aggregatedRDD.count();
         tracker.completeStage("瓦片: " + String.format("%,d", tileCount));
 
-        // 阶段1-3 进度回调：60%
-        if (percentConsumer != null) {
-            percentConsumer.accept(100L, 60L);
-        }
+
 
         // ==================== Stage 4: 流式写入PG ====================
         tracker.setStageName("写入PG");
