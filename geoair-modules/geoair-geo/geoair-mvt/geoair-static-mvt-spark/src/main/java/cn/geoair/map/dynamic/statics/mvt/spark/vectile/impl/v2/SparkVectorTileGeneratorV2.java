@@ -71,7 +71,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private transient SparkSession sparkSession;
 
-    private static final int DEFAULT_REDUCE_PARTITION = 1000;
+    private static final int DEFAULT_REDUCE_PARTITION = 3000;
     private static final int TILE_BATCH_SIZE = 300;
     final long BATCH_SIZE_THRESHOLD = 900 * 1024; // 900KB
     String insertSqlTemplate = "INSERT INTO %s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -155,10 +155,10 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
             runStatisticsPipeline(parameter, transformedFeatures, count, tracker);
         }
 
-        // 聚合：reduceByKey 流式聚合，不需要 tileFeatures 先物化
+        // 聚合：使用有界合并函数，避免 reduceByKey 阶段内存膨胀
         JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD =
                 tileFeatures.reduceByKey(
-                        new SparkTaskSerializableUtil.AggregateAndLimitFeatureFunction(parameter),
+                        new SparkTaskFunctions.BoundedAggregateFunction(parameter),
                         DEFAULT_REDUCE_PARTITION);
 
         // 触发聚合计算并统计瓦片数
