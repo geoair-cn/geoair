@@ -5,7 +5,6 @@ import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
 import cn.geoair.comp.db.service.core.dao.GirDsApiConfigDao;
 import cn.geoair.comp.db.service.starter.model.dto.DsApiConfigDto;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiConfigPo;
-import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;

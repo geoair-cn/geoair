@@ -36,9 +36,6 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
 
     public static GirAdvOneRow ofByMap(Map<String, Object> row) {
         GirAdvOneRow result = new GirAdvOneRow(row);
-        if (row instanceof GirAdvOneRow) {
-            result.typeHandlerRegistry = ((GirAdvOneRow) row).typeHandlerRegistry;
-        }
         return result;
     }
 
@@ -59,6 +56,9 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
 
     private GirAdvOneRow(Map<String, Object> map) {
         super(map);
+        if (map instanceof GirAdvOneRow) {
+            this.typeHandlerRegistry = ((GirAdvOneRow) map).typeHandlerRegistry;
+        }
     }
 
     /**
@@ -97,6 +97,7 @@ public class GirAdvOneRow extends LinkedHashMap<String, Object>
     public <T> T toBeanObj(Class<T> clazz, AdvTypeHandlerRegistry registry) {
         return new AdvBeanMapMapper(registry).mapToBean(this, clazz);
     }
+
 
     /**
      * 批量转换（自动检测各行已注入的 Registry）

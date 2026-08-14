@@ -1,30 +1,9 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.base.Gir;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
 
 public class DESUtils {
-
-    private static final String ENCODE = "UTF-8";
-
-    public static void main(String[] args) {
-        String pass = "root123456";
-
-        try {
-            String s = Base64.encodeBase64String(pass.getBytes(StandardCharsets.UTF_8));
-            Gir.log.info(s);
-
-            byte[] bytes = Base64.decodeBase64(s);
-            String s1 = new String(bytes, StandardCharsets.UTF_8);
-            Gir.log.info(s1);
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Description 根据键值进行加密

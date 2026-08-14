@@ -149,6 +149,8 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
             return GirMysqlTran.mysqlBinaryToJtsGeom(value);
         } else if (GirOracleTran.isOracleSpatialAvailable() && GirOracleSpatialTran.isSdoGeometry(value)) {
             return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
+        } else if (GirDMTran.isDmDriverAvailable() && GirDMSpatialTran.isDmdbStruct(value)) {
+            return GirDMSpatialTran.dmStructToJtsGeom(value);
         }
         return jtsGeom;
     }
