@@ -22,211 +22,147 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @author ：张逢吉
- * @date ：Created in 2025/12/29 09:32 @description： 基于tippecanoe的瓦片参数设置
- * @note: 对应tippecanoe命令行参数，字段名与参数名保持语义一致
+ * 矢量瓦片切片参数。
+ * <p>
+ * 包含数据读取策略、输入/输出数据源配置、瓦片级别参数、要素优化策略等。
+ * 序列化为 JSON 后通过 Base32 编码在 Spark 任务间传递。
+ *
+ * @author 张逢吉
+ * @date 2025/12/29
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class TileSliceParameter implements Serializable {
 
-    // 获取数据的策略
+    // ===================== 数据读取策略 =====================
+
+    /** 数据读取策略（默认按 ID 分页） */
     private ReadStrategy readStrategy = ReadStrategy.ID_PAGE;
 
-    // ===================== 输入信息配置=====================
-    /**
-     * 输入连接信息
-     */
-    public PgConnectInfoSimple inputConnectSimple;
+    // ===================== 数据源配置 =====================
 
-    /**
-     * 输出连接信息
-     */
-    public PgConnectInfoWithTable outPutConnectWithTable;
+    /** 输入数据源配置（从数据库读取数据） */
+    private DataSourceConfig inputSource;
 
-    /**
-     * 几何字段名称
-     */
+    /** 输出数据源配置（写入瓦片缓存表） */
+    private DataSourceConfig outputSource;
+
+    // ===================== 数据字段配置 =====================
+
+    /** 几何字段名称 */
     private String geomFieldName;
 
-    /**
-     * ID字段名称
-     */
+    /** ID 字段名称 */
     private String idFieldName;
 
-    /**
-     * 查询语句
-     */
+    /** 查询语句 */
     private String queryStatement;
 
-    /**
-     * 瓦片图层名称 对应命令行：-l/--layer
-     */
+    /** 瓦片图层名称 */
     private String layerName;
 
-    /**
-     * 版本号
-     */
+    /** 版本号 */
     private String edition;
 
-    /**
-     * 数据坐标系（默认EPSG:3857 Web墨卡托） 对应命令行：-s/--srs
-     */
+    /** 数据坐标系（默认 EPSG:3857 Web 墨卡托） */
     private int sourceDataSrid = 3857;
 
-    // ===================== 输出信息配置=====================
+    // ===================== 输出坐标系配置 =====================
 
-    /**
-     * 输出的网格坐标，可选值 3857/4490
-     */
+    /** 输出的网格坐标，可选值 3857 / 4490 */
     private int outGridSrid = 3857;
 
     // ===================== 缩放级别配置 =====================
-    /**
-     * 最小缩放级别 对应命令行：-Z/--minimum-zoom
-     */
+
+    /** 最小缩放级别 */
     private Integer minZoom = 4;
 
-    /**
-     * 最大缩放级别 对应命令行：-z/--maximum-zoom
-     */
+    /** 最大缩放级别 */
     private Integer maxZoom = 15;
 
-    // /**
-    // * 瓦片分辨率（像素精度，默认4，值越小精度越低体积越小）
-    // * 对应命令行：-r/--resolution
-    // */
-    // private Integer resolution = 1;
-
-    // /**
-    // * 是否自动扩展缩放级别（当maxZoom下仍有要素丢弃时）
-    // * 对应命令行：--extend-zooms-if-still-dropping
-    // */
-    // private boolean extendZoomsIfStillDropping = true; // 这个参数需要重启任务，不太好调整，就暂时先不管了
-
     // ===================== 瓦片限制配置 =====================
-    /**
-     * 是否开启单瓦片要素数限制 对应命令行：--no-feature-limit
-     */
-    private boolean enableFeatureLimitIs = false;
 
-    /**
-     * 是否开启单瓦片大小限制 对应命令行：--no-tile-size-limit
-     */
-    private boolean enableFeatureSizeLimit = false;
+    /** 是否开启单瓦片要素数限制 */
+    private boolean featureLimitEnabled = false;
 
-    // ===================== 要素过滤/优化配置 =====================
-    /**
-     * 保留的属性字段列表（默认空，保留所有字段） 对应命令行：-y/--include
-     */
+    /** 是否开启单瓦片大小限制 */
+    private boolean featureSizeLimitEnabled = false;
+
+    // ===================== 要素过滤 / 优化配置 =====================
+
+    /** 保留的属性字段列表（默认空，保留所有字段） */
     private List<String> includeFields = new ArrayList<>();
 
-    /**
-     * 是否按密度丢弃要素（优先丢弃高密度区域） 对应命令行：--drop-densest-as-needed
-     */
+    /** 是否按密度丢弃要素（优先丢弃高密度区域） */
     private boolean dropDensestAsNeeded = true;
 
-    /**
-     * 是否按密度合并要素（合并高密度区域相邻要素） 对应命令行：--coalesce-densest-as-needed
-     */
+    /** 是否按密度合并要素（合并高密度区域相邻要素） */
     private boolean coalesceDensestAsNeeded = true;
 
     // ===================== 扩展参数 =====================
-    /**
-     * 单瓦片最大要素数（默认tippecanoe内置值，仅enableFeatureLimit=false时生效） 对应命令行：-f/--feature-limit
-     */
+
+    /** 单瓦片最大要素数（仅 featureLimitEnabled 时生效） */
     private Integer featureLimit;
 
-    /**
-     * 单瓦片最大字节数 输入100KB，1MB这样可读的字符（默认tippecanoe内置值，仅enableTileSizeLimit=false时生效）
-     * 对应命令行：-S/--tile-size
-     */
+    /** 单瓦片最大字节数，可读格式如 "100KB"、"2MB"（仅 featureSizeLimitEnabled 时生效） */
     private String tileSizeLimit = "2MB";
 
-    /**
-     * 是否启用要素简化（默认false） 对应命令行：-D/--simplification
-     */
+    /** 要素简化等级 */
     private Integer simplificationLevel;
 
-    /**
-     * 要素聚合距离（像素，默认0） 对应命令行：-g/--coalesce
-     */
+    /** 要素聚合距离（像素） */
     private Integer coalesceDistance;
 
     // ===================== 系统参数 =====================
 
-    /**
-     * 对应分页获取数据的时候，最大的页数
-     */
+    /** 分页读取时的最大分区数 */
     private Integer maxPartionNum = 20;
 
-    // ===================== 其他参数 =====================
-    /**
-     * 是否创建边界
-     *
-     * @return
-     */
+    // ===================== 边界图层配置 =====================
+
+    /** 是否创建边界图层 */
     private boolean createBoundary = Boolean.FALSE;
 
-    /**
-     * 边界的表名
-     */
+    /** 边界图层的表名 */
     private String tableNameBoundary = null;
 
-    /**
-     * 边界的图层名称
-     */
+    /** 边界图层的图层名称 */
     private String layerNameBoundary = null;
 
-    /**
-     * 是否创建标签
-     */
+    // ===================== 标签图层配置 =====================
+
+    /** 是否创建标签图层 */
     private boolean createLabel = Boolean.FALSE;
 
-    /**
-     * 标签的表名
-     */
+    /** 标签图层的表名 */
     private String tableNameLabel = null;
 
-    /**
-     * 标签的图层名称
-     */
+    /** 标签图层的图层名称 */
     private String layerNameLabel = null;
 
-    /**
-     * 统计属性值
-     *
-     * @return
-     */
-    private boolean statisticsIs = Boolean.FALSE;
+    // ===================== 统计配置 =====================
 
-    /**
-     * 统计的json存放的根路径
-     */
+    /** 是否生成属性统计信息 */
+    private boolean statisticsEnabled = Boolean.FALSE;
+
+    /** 统计 JSON 存放的表名 */
     private String staticTableName = "static_table_json_def";
 
-    /**
-     * 当前切片任务的主图层的图层类型，主要用于生成统计信息的json构建
-     *
-     * @return
-     */
+    /** 主图层的几何类型，用于生成统计 JSON */
     private AdvEnumsTypeGeom typeGeom;
 
-    /**
-     * 当前切片任务中产生的一些系统字段信息
-     *
-     * @return
-     */
+    /** 系统生成的字段名集合（不参与统计） */
     private Set<String> sysIncludeFields = new HashSet<>();
 
-    /**
-     * 当前任务的流水号，与系统参数无关
-     *
-     * @return
-     */
+    /** 当前任务的流水号（与系统参数无关，用于追踪） */
     private String trackId = IdUtil.fastSimpleUUID();
 
+    // ===================== 工具方法 =====================
+
+    /**
+     * 解析 tileSizeLimit 为字节数。
+     */
     public Long getTileSizeLimitByte() {
         if (tileSizeLimit == null) {
             return null;
@@ -234,68 +170,38 @@ public class TileSliceParameter implements Serializable {
         return DataSizeUtil.parse(tileSizeLimit);
     }
 
+    /**
+     * 深拷贝当前参数对象。
+     */
     public TileSliceParameter copy() {
         TileSliceParameter copy = new TileSliceParameter();
         BeanUtil.copyProperties(this, copy);
         return copy;
     }
 
+    // ===================== 序列化 =====================
+
+    /**
+     * 从 Base32 编码的 JSON 字符串反序列化。
+     */
     public static TileSliceParameter fromBase32(String baseString) {
         try {
-            // 缓存未命中，执行原逻辑
-            String encode = URLUtil.decode(baseString);
-            String s = Base32.decodeStr(encode);
-            TileSliceParameter params = JSON.parseObject(s, TileSliceParameter.class);
-            return params;
+            String encoded = URLUtil.decode(baseString);
+            String json = Base32.decodeStr(encoded);
+            return JSON.parseObject(json, TileSliceParameter.class);
         } catch (Exception e) {
-            // 处理异常（如解码失败）
             throw new RuntimeException(
-                    "Failed to parse TileRequestParams from base32: " + baseString, e);
+                    "Failed to parse TileSliceParameter from base32: " + baseString, e);
         }
     }
 
+    /**
+     * 序列化为 Base32 编码的 JSON 字符串（移除 null 值以压缩体积）。
+     */
     public String toBase32() {
-        // 序列化为JSON时，忽略值为null的字段
         String jsonStr = JSON.toJSONString(this);
-        // 移除空值，压缩体积
         JSONObject jsonObject = JSON.parseObject(jsonStr);
         jsonObject.entrySet().removeIf(entry -> ObjectUtil.isEmpty(entry.getValue()));
-        // 对处理后的JSON字符串进行Base32编码
-        String encode = Base32.encode(jsonObject.toString());
-        return encode;
-    }
-
-    @Deprecated
-    public TileSliceParameter setInputConnectInfo(PgConnectInfo pgConnectInfo) {
-        this.inputConnectSimple = pgConnectInfo.toPgConnectInfoSimple();
-        return this;
-    }
-
-    @Deprecated
-    public TileSliceParameter setOutPutConnectInfo(PgConnectInfo pgConnectInfo) {
-        this.outPutConnectWithTable = pgConnectInfo.toPgConnectInfoWithTable();
-        return this;
-    }
-
-    @Deprecated
-    public TileSliceParameter setInputConnectInfo(PgConnectInfoSimple inputConnectInfo) {
-        this.inputConnectSimple = inputConnectInfo;
-        return this;
-    }
-
-    @Deprecated
-    public TileSliceParameter setOutPutConnectInfo(PgConnectInfoWithTable outPutConnectInfo) {
-        this.outPutConnectWithTable = outPutConnectInfo;
-        return this;
-    }
-
-    @Deprecated
-    public PgConnectInfo getInputConnectInfo() {
-        return PgConnectInfo.fromPgConnectInfoSimple(inputConnectSimple);
-    }
-
-    @Deprecated
-    public PgConnectInfo getOutPutConnectInfo() {
-        return PgConnectInfo.fromPgConnectInfoWithTable(outPutConnectWithTable);
+        return Base32.encode(jsonObject.toString());
     }
 }

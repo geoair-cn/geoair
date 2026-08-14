@@ -16,6 +16,12 @@ public class SparkJavaTileLocalApp {
 
         TileSliceParameter tileSliceParameter = TileSliceParameter.fromBase32(base32);
 
+        runByTileSliceParameter(tileSliceParameter);
+    }
+
+    public static void runByTileSliceParameter(TileSliceParameter tileSliceParameter) throws Exception {
+
+
         SparkSession spark =
                 SparkSession.builder()
                         .appName("spark-tile-app")
@@ -34,4 +40,5 @@ public class SparkJavaTileLocalApp {
 
         spark.stop();
     }
+
 }
