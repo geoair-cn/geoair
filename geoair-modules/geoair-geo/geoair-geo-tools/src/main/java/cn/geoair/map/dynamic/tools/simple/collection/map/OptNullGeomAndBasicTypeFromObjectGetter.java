@@ -121,7 +121,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         }
         if (value instanceof String) {
             try {
-                value = JSONObject.parseObject(key); // 判断是否为geojson字符串
+                value = JSONObject.parseObject((String) value); // 判断是否为geojson字符串
             } catch (Exception e) {
                 try {
                     jtsGeom =
