@@ -69,7 +69,7 @@ public class SparkVectorTileGenerator implements Serializable {
     private static final int TILE_BATCH_SIZE = 300; //最大300条一次提交
 
     final long BATCH_SIZE_THRESHOLD = 900 * 1024; // 数据量限制900KB一次提交
-    String insertSqlTemplate = "INSERT INTO tile_cache.%s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    String insertSqlTemplate = "INSERT INTO  %s (id, z, x, tms_y, y, grid_srid, tile_data, layer_name, edition, insert_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public SparkVectorTileGenerator(SparkSession sparkSession) {
         this.sparkSession = sparkSession;
@@ -90,9 +90,9 @@ public class SparkVectorTileGenerator implements Serializable {
                 this.getClass().getSimpleName(),
                 entries.toStringPretty());
 
-        Map<String, String> pgParams = VectorTileCommonUtils.buildPgWriteParams(parameter);
-
-        createTableDDL(pgParams.get("table"), parameter);
+//        Map<String, String> pgParams = VectorTileCommonUtils.buildPgWriteParams(parameter);
+        DataSourceConfig outputSource = parameter.getOutputSource();
+        createTableDDL(parameter);
         // 1. 读取数据（仅此处持久化，避免重复读取PG）
         JavaRDD<GirAdvOneRow> rawFeatures = null;
         ReadStrategy strategy =
@@ -181,10 +181,10 @@ public class SparkVectorTileGenerator implements Serializable {
                         DEFAULT_REDUCE_PARTITION);
 
         // 主图层写入
-        log.info("开始流式写入主图层，表名：{}", pgParams.get("tableName"));
+        log.info("开始流式写入主图层，表名：{}", outputSource.getTableName());
 
         try {
-            streamWriteToPg(aggregatedRDD, parameter, pgParams);
+            streamWriteToPg(aggregatedRDD, parameter);
         } catch (Throwable e) {
             log.error("流式写入PG过程中发生异常", e);
             throw e;
@@ -195,8 +195,9 @@ public class SparkVectorTileGenerator implements Serializable {
 
     private void streamWriteToPg(
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD,
-            TileSliceParameter parameter,
-            Map<String, String> pgParams) {
+            TileSliceParameter parameter
+    ) {
+
         aggregatedRDD.foreachPartition(
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>)
                         partitionIterator -> {
@@ -213,7 +214,7 @@ public class SparkVectorTileGenerator implements Serializable {
                             long rootBatchNum = 0;
                             // 每个批次总字节数
                             long currentBatchSize = 0;
-                            String rootTableName = pgParams.get("tableName");
+                            String rootTableName = outputSource.getTableNameForSql();
                             try {
                                 SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
                                         new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, PbfTargetInfo.getInstance());
@@ -329,64 +330,46 @@ public class SparkVectorTileGenerator implements Serializable {
         // 日志汇总
         log.info(
                 "所有图层流式写入完成，表名：Root={}, Label={}, Boundary={}",
-                pgParams.get("tableName"),
+                parameter.getOutputSource().getTableName(),
                 parameter.getTableNameLabel(),
                 parameter.getTableNameBoundary());
     }
 
-    /**
-     * 执行批次插入
-     */
-    private void executeBatchInsert(PreparedStatement pstmt, List<Row> batchRows) throws Exception {
-        log.info("====================批量提交开始===================");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        for (Row row : batchRows) {
-            // 按schema顺序设置参数
-            pstmt.setString(1, IdUtil.getSnowflakeNextIdStr()); // id
-            pstmt.setInt(2, row.getInt(0)); // z
-            pstmt.setInt(3, row.getInt(1)); // x
-            pstmt.setInt(4, row.getInt(2)); // tms_ y
-            pstmt.setInt(5, row.getInt(3)); // y
-            pstmt.setInt(6, row.getInt(4)); // grid_srid
-            pstmt.setBytes(7, row.getAs(5)); // tile_data
-            pstmt.setString(8, row.getString(6)); // layer_name
-            pstmt.setString(9, row.getString(7)); // edition
-            pstmt.setLong(10, System.currentTimeMillis()); // 时间戳
-            pstmt.addBatch();
-        }
-        pstmt.executeBatch();
-        stopWatch.stop();
-        log.info("====================批量提交结束：耗时：{}，条数：{}=====", stopWatch.getLastTaskTimeMillis(), batchRows.size());
-    }
+
 
     private void executeBatchInsert(List<Row> batchRows, String tableName, DataSource dataSource) throws Exception {
         log.info("====================批量提交开始===================");
         Connection connection = dataSource.getConnection();
-        connection.setAutoCommit(false);
-        PreparedStatement preparedStatement = connection.prepareStatement(String.format(insertSqlTemplate, StrUtil.wrap(tableName, "\"")));
+        PreparedStatement preparedStatement = null;
         StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        for (Row row : batchRows) {
-            // 按schema顺序设置参数
-            preparedStatement.setString(1, IdUtil.getSnowflakeNextIdStr()); // id
-            preparedStatement.setInt(2, row.getInt(0)); // z
-            preparedStatement.setInt(3, row.getInt(1)); // x
-            preparedStatement.setInt(4, row.getInt(2)); // tms_ y
-            preparedStatement.setInt(5, row.getInt(3)); // y
-            preparedStatement.setInt(6, row.getInt(4)); // grid_srid
-            preparedStatement.setBytes(7, row.getAs(5)); // tile_data
-            preparedStatement.setString(8, row.getString(6)); // layer_name
-            preparedStatement.setString(9, row.getString(7)); // edition
-            preparedStatement.setLong(10, System.currentTimeMillis()); // 时间戳
-            preparedStatement.addBatch();
+        try {
+            connection.setAutoCommit(false);
+            preparedStatement = connection.prepareStatement(String.format(insertSqlTemplate, tableName));
+            stopWatch.start();
+            for (Row row : batchRows) {
+                // 按schema顺序设置参数
+                preparedStatement.setString(1, IdUtil.getSnowflakeNextIdStr()); // id
+                preparedStatement.setInt(2, row.getInt(0)); // z
+                preparedStatement.setInt(3, row.getInt(1)); // x
+                preparedStatement.setInt(4, row.getInt(2)); // tms_ y
+                preparedStatement.setInt(5, row.getInt(3)); // y
+                preparedStatement.setInt(6, row.getInt(4)); // grid_srid
+                preparedStatement.setBytes(7, row.getAs(5)); // tile_data
+                preparedStatement.setString(8, row.getString(6)); // layer_name
+                preparedStatement.setString(9, row.getString(7)); // edition
+                preparedStatement.setLong(10, System.currentTimeMillis()); // 时间戳
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
+            stopWatch.stop();
+        } finally {
+            IoUtil.close(preparedStatement);
+            IoUtil.close(connection);
         }
-        preparedStatement.executeBatch();
-        connection.commit();
-        connection.setAutoCommit(true);
-        IoUtil.close(preparedStatement);
-        IoUtil.close(connection);
-        stopWatch.stop();
+
+
         log.info("====================批量提交结束：耗时：{}，条数：{}=====", stopWatch.getLastTaskTimeMillis(), batchRows.size());
     }
 
@@ -496,13 +479,13 @@ public class SparkVectorTileGenerator implements Serializable {
         }
     }
 
-    private void createTableDDL(String tableName, TileSliceParameter parameter) {
+    private void createTableDDL(TileSliceParameter parameter) {
         DataSourceConfig outputSource = parameter.getOutputSource();
         DataSource dataSource = outputSource.toDataSource();
-
-        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
-        String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);
-        boolean b = iAdvExecutor.dIsTableExists(tableName);
+        IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
+        String tableNameForSql = outputSource.getTableNameForSql();
+        String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableNameForSql);
+        boolean b = iAdvExecutor.dIsTableExists(tableNameWithSchema);
         String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
                           "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
                           "                          \"z\" int4,\n" +
@@ -526,7 +509,7 @@ public class SparkVectorTileGenerator implements Serializable {
         if (!b) {
             log.info("检测到表不存在，执行创建表动作！");
             String sqlDDL = tempLate.replace("{tableNameWithSchema}", tableNameWithSchema).replace("{UUID}", IdUtil.getSnowflakeNextIdStr());
-            iAdvExecutor.dExecuteDDL(sqlDDL, tableName, "创建表");
+            iAdvExecutor.dExecuteDDL(sqlDDL, tableNameWithSchema, "创建表");
         }
     }
 }
