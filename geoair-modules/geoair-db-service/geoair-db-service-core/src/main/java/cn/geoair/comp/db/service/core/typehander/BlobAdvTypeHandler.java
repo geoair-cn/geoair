@@ -7,11 +7,21 @@ import java.sql.Blob;
 /**
  * BLOB 类型处理器：读取 {@link Blob} 为占位符字符串。
  * <p>
- * 注册到 ds-service 的 executor 上，在 bSelectListStream 读取阶段完成转换。
+ * 注册到 ds-service 的类型转换注册表中使用。
  *
  * @author zhangjun
  */
 public class BlobAdvTypeHandler extends AdvBaseTypeHandler<String> {
+
+    private final String placeholder;
+
+    public BlobAdvTypeHandler() {
+        this("(Blob)");
+    }
+
+    public BlobAdvTypeHandler(String placeholder) {
+        this.placeholder = placeholder;
+    }
 
     @Override
     public boolean supports(Class<?> javaType, Object value) {
@@ -20,6 +30,6 @@ public class BlobAdvTypeHandler extends AdvBaseTypeHandler<String> {
 
     @Override
     protected String convertNonNullForRead(Object value, Class<?> javaType, AdvTypeHandlerContext context) {
-        return "(Blob)";
+        return placeholder;
     }
 }

@@ -17,6 +17,8 @@ import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.convert.GirDMSpatialTran;
+import cn.geoair.map.dynamic.tools.convert.GirDMTran;
 import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
 import cn.geoair.map.dynamic.tools.convert.GirOracleSpatialTran;
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
@@ -101,6 +103,12 @@ public class SafeSqlExecutor {
         if (!hasClob) handlers.add(new ClobAdvTypeHandler());
         if (!hasBlob) handlers.add(new BlobAdvTypeHandler());
         if (!hasByteArray) handlers.add(new ByteArrayBase64AdvTypeHandler());
+        // Oracle 驱动存在时，注册 Oracle 特有的 Blob handler（输出 "(OracleBlob)"）
+        try {
+            Class.forName("oracle.sql.BLOB");
+            handlers.add(new BlobAdvTypeHandler("(OracleBlob)"));
+        } catch (ClassNotFoundException ignored) {
+        }
         return AdvTypeHandlerRegistry.create(null, handlers);
     }
 
@@ -232,6 +240,10 @@ public class SafeSqlExecutor {
         // Oracle — SDO_GEOMETRY
         if (GirOracleTran.isOracleSpatialAvailable() && GirOracleSpatialTran.isSdoGeometry(value)) {
             return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
+        }
+        // 达梦 — DmdbStruct (Gserialized)
+        if (GirDMTran.isDmDriverAvailable() && GirDMSpatialTran.isDmdbStruct(value)) {
+            return GirDMSpatialTran.dmStructToJtsGeom(value);
         }
         return value;
     }
