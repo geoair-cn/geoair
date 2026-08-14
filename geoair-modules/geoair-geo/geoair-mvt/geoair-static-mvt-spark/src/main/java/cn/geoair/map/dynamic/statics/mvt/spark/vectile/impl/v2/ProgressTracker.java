@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2;
 
+import cn.geoair.base.percent.GiPercentConsumer;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import org.apache.spark.scheduler.SparkListener;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -39,9 +40,9 @@ public class ProgressTracker implements Serializable {
     private final Map<Integer, String> stageNames = new ConcurrentHashMap<>();
 
     // ===================== SparkListener（transient，仅 driver 侧使用，不参与闭包序列化）=====================
-    private   ProgressSparkListener listener;
+    private ProgressSparkListener listener;
 
-    private ProgressTracker(SparkSession sparkSession, int totalStages) {
+    private ProgressTracker(SparkSession sparkSession, int totalStages, GiPercentConsumer percentConsumer) {
         this.startTime = System.currentTimeMillis();
         this.totalStages = totalStages;
 
@@ -50,12 +51,16 @@ public class ProgressTracker implements Serializable {
         this.bytesWritten = sparkSession.sparkContext().longAccumulator("bytesWritten");
         this.featuresRead = sparkSession.sparkContext().longAccumulator("featuresRead");
 
-        this.listener = new ProgressSparkListener();
+        this.listener = new ProgressSparkListener(percentConsumer);
         sparkSession.sparkContext().addSparkListener(listener);
     }
 
     public static ProgressTracker init(SparkSession sparkSession, int totalStages) {
-        return new ProgressTracker(sparkSession, totalStages);
+        return new ProgressTracker(sparkSession, totalStages, null);
+    }
+
+    public static ProgressTracker init(SparkSession sparkSession, int totalStages, GiPercentConsumer percentConsumer) {
+        return new ProgressTracker(sparkSession, totalStages, percentConsumer);
     }
 
     // ===================== Driver 侧 API =====================
@@ -149,7 +154,12 @@ public class ProgressTracker implements Serializable {
 
     // ===================== SparkListener =====================
 
-    public static class ProgressSparkListener extends SparkListener implements   Serializable {
+    public static class ProgressSparkListener extends SparkListener implements Serializable {
+        GiPercentConsumer percentConsumer;
+
+        public ProgressSparkListener(GiPercentConsumer percentConsumer) {
+            this.percentConsumer = percentConsumer;
+        }
 
         private final Map<Integer, StageTracker> stageTrackers = new ConcurrentHashMap<>();
         private final AtomicInteger totalTasksCompleted = new AtomicInteger(0);
@@ -188,6 +198,9 @@ public class ProgressTracker implements Serializable {
             StageTracker tracker = stageTrackers.get(taskEnd.stageId());
             if (tracker == null) return;
             int completed = tracker.completedTasks.incrementAndGet();
+            if(percentConsumer!=null) {
+                percentConsumer.accept((long)tracker.totalTasks,(long)completed);
+            }
             if (completed % printInterval == 0 && completed < tracker.totalTasks) {
                 double progress = (double) completed / tracker.totalTasks;
                 long elapsed = System.currentTimeMillis() - tracker.startTime;
