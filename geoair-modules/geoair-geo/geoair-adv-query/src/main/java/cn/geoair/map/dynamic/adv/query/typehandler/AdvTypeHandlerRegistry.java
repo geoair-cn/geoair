@@ -105,6 +105,7 @@ public class AdvTypeHandlerRegistry {
             case ORACLE:
                 return new OracleGeometryAdvTypeHandler();
             case DM:
+                return new DmGeometryAdvTypeHandler();
             default:
                 return new WktGeometryAdvTypeHandler();
         }
