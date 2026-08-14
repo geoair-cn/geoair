@@ -1,5 +1,6 @@
 package cn.geoair.comp.db.service.core.basic.servlet;
 
+import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
