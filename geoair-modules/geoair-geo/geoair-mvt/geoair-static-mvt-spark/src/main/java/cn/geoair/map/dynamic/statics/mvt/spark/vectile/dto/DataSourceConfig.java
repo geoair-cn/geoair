@@ -144,8 +144,6 @@ public class DataSourceConfig implements Serializable {
     private Object readResolve() {
         if (protocolUrlStr != null) {
             parsedUrl = new ProtocolUrl(protocolUrlStr);
-        } else if (jdbcUrl != null) {
-            parsedUrl = new ProtocolUrl(jdbcUrl);
         }
         if (dataSourceFactory == null) {
             dataSourceFactory = new DefaultDataSourceGetterFunction();
