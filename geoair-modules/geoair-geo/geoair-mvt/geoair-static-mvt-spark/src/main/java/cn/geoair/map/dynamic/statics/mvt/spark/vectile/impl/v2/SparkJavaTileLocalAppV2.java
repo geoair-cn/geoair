@@ -45,7 +45,7 @@ public class SparkJavaTileLocalAppV2 {
                 .appName("spark-tile-app-v2")
                 .master("local[*]")
                 .config("spark.executor.memory", "4g")
-                .config("spark.driver.memory", "4g")
+                .config("spark.driver.memory", "8g")
                 .config("spark.extraListeners",
                         "cn.geoair.map.dynamic.statics.mvt.spark.listener.SparkSQLListener")
                 .getOrCreate();
