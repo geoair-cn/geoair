@@ -8,54 +8,54 @@ import java.util.*;
 public enum PostgreSqlType implements DataBaseFieldType {
 
     // 字符串/文本类
-    VARCHAR("varchar", "VARCHAR", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
-    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CATEGORY.CHAR),
-    TEXT("text", "TEXT", DefaultJavaType.JAVA_TEXT, CATEGORY.TEXT),
-    UUID("uuid", "UUID", DefaultJavaType.JAVA_UUID, CATEGORY.CHAR),
-    JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CATEGORY.TEXT),
-    JSONB("jsonb", "JSONB", DefaultJavaType.JAVA_JSONB, CATEGORY.TEXT),
-    CITEXT("citext", "CITEXT", DefaultJavaType.JAVA_CITEXT, CATEGORY.CHAR),
+    VARCHAR("varchar", "VARCHAR", DefaultJavaType.JAVA_STRING, CategoryEnum.CHAR),
+    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CategoryEnum.CHAR),
+    TEXT("text", "TEXT", DefaultJavaType.JAVA_TEXT, CategoryEnum.TEXT),
+    UUID("uuid", "UUID", DefaultJavaType.JAVA_UUID, CategoryEnum.CHAR),
+    JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CategoryEnum.TEXT),
+    JSONB("jsonb", "JSONB", DefaultJavaType.JAVA_JSONB, CategoryEnum.TEXT),
+    CITEXT("citext", "CITEXT", DefaultJavaType.JAVA_CITEXT, CategoryEnum.CHAR),
 
     // 布尔类
-    BOOLEAN("boolean", "BOOLEAN", DefaultJavaType.JAVA_BOOLEAN, CATEGORY.BOOLEAN),
+    BOOLEAN("boolean", "BOOLEAN", DefaultJavaType.JAVA_BOOLEAN, CategoryEnum.BOOLEAN),
 
     // 整数类
-    INT2("int2", "SMALLINT", DefaultJavaType.JAVA_SHORT, CATEGORY.INT),
-    INT4("int4", "INTEGER", DefaultJavaType.JAVA_INTEGER, CATEGORY.INT),
-    INT8("int8", "BIGINT", DefaultJavaType.JAVA_BIGINT, CATEGORY.INT),
-    SERIAL("serial", "SERIAL", DefaultJavaType.JAVA_SERIAL, CATEGORY.INT),
-    BIGSERIAL("bigserial", "BIGSERIAL", DefaultJavaType.JAVA_BIGSERIAL, CATEGORY.INT),
+    INT2("int2", "SMALLINT", DefaultJavaType.JAVA_SHORT, CategoryEnum.INT),
+    INT4("int4", "INTEGER", DefaultJavaType.JAVA_INTEGER, CategoryEnum.INT),
+    INT8("int8", "BIGINT", DefaultJavaType.JAVA_BIGINT, CategoryEnum.INT),
+    SERIAL("serial", "SERIAL", DefaultJavaType.JAVA_SERIAL, CategoryEnum.INT),
+    BIGSERIAL("bigserial", "BIGSERIAL", DefaultJavaType.JAVA_BIGSERIAL, CategoryEnum.INT),
 
     // 浮点/小数类
-    FLOAT4("float4", "REAL", DefaultJavaType.JAVA_REAL, CATEGORY.FLOAT),
-    FLOAT8("float8", "DOUBLE PRECISION", DefaultJavaType.JAVA_DOUBLE, CATEGORY.FLOAT),
-    NUMERIC("numeric", "NUMERIC", DefaultJavaType.JAVA_NUMERIC, CATEGORY.FLOAT),
-    DECIMAL("decimal", "DECIMAL", DefaultJavaType.JAVA_DECIMAL, CATEGORY.FLOAT),
+    FLOAT4("float4", "REAL", DefaultJavaType.JAVA_REAL, CategoryEnum.FLOAT),
+    FLOAT8("float8", "DOUBLE PRECISION", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
+    NUMERIC("numeric", "NUMERIC", DefaultJavaType.JAVA_NUMERIC, CategoryEnum.FLOAT),
+    DECIMAL("decimal", "DECIMAL", DefaultJavaType.JAVA_DECIMAL, CategoryEnum.FLOAT),
 
     // 日期时间类
-    DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CATEGORY.DATE),
-    TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CATEGORY.TIME),
-    TIMETZ("timetz", "TIME WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_TIME, CATEGORY.TIME),
-    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CATEGORY.TIMESTAMP),
-    TIMESTAMPTZ("timestamptz", "TIMESTAMP WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_DATE_TIME, CATEGORY.TIMESTAMP),
-    INTERVAL("interval", "INTERVAL", DefaultJavaType.JAVA_INTERVAL, CATEGORY.INTERVAL),
+    DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CategoryEnum.DATE),
+    TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CategoryEnum.TIME),
+    TIMETZ("timetz", "TIME WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_TIME, CategoryEnum.TIME),
+    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
+    TIMESTAMPTZ("timestamptz", "TIMESTAMP WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
+    INTERVAL("interval", "INTERVAL", DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
 
     // 二进制/特殊类
-    BYTEA("bytea", "BYTEA", DefaultJavaType.JAVA_BYTES, CATEGORY.BYTES),
-    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CATEGORY.BLOB),
+    BYTEA("bytea", "BYTEA", DefaultJavaType.JAVA_BYTES, CategoryEnum.BYTES),
+    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CategoryEnum.BLOB),
 
     // 空间类
-    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
             "geometry", "\"public\".\"geometry\""),
-    GEOGRAPHY(DefaultJavaType.JAVA_GEOGRAPHY, CATEGORY.GEOMETRY,
+    GEOGRAPHY(DefaultJavaType.JAVA_GEOGRAPHY, CategoryEnum.GEOMETRY,
             "geography", "\"public\".\"geography\""),
 
-    MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CATEGORY.FLOAT);
+    MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CategoryEnum.FLOAT);
 
     private final List<String> udtNames;
     private final String standardName;
     private final DefaultJavaType javaType;
-    private final CATEGORY category;
+    private final CategoryEnum category;
 
     private static final Map<String, PostgreSqlType> UDT_NAME_MAP = new HashMap<>();
 
@@ -70,7 +70,7 @@ public enum PostgreSqlType implements DataBaseFieldType {
     /**
      * 单一 udtName 的构造器
      */
-    PostgreSqlType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
+    PostgreSqlType(String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
@@ -80,7 +80,7 @@ public enum PostgreSqlType implements DataBaseFieldType {
     /**
      * 多个 udtName 变体的构造器
      */
-    PostgreSqlType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
+    PostgreSqlType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();
         this.javaType = javaType;
@@ -110,12 +110,12 @@ public enum PostgreSqlType implements DataBaseFieldType {
     }
 
     @Override
-    public CATEGORY getCategory() {
+    public CategoryEnum getCategory() {
         return category;
     }
 
     @Override
-    public CATEGORY_GROUP getCategoryGroup() {
+    public CategoryGroupEnum getCategoryGroup() {
         return category.group();
     }
 

@@ -14,8 +14,8 @@ import cn.hutool.core.util.StrUtil;
  *
  * <h3>类型分类体系</h3>
  * <pre>
- * CATEGORY_GROUP (大分组: STRING / NUMBER / DATETIME / ...)
- *   └── CATEGORY (二级分组: CHAR / TEXT / INT / FLOAT / DATE / TIMESTAMP / ...)
+ * CategoryGroupEnum (大分组: STRING / NUMBER / DATETIME / ...)
+ *   └── CategoryEnum (二级分组: CHAR / TEXT / INT / FLOAT / DATE / TIMESTAMP / ...)
  *         └── IgnorePolicy (长度/精度/小数位的忽略策略)
  * </pre>
  *
@@ -24,161 +24,21 @@ import cn.hutool.core.util.StrUtil;
  */
 public interface TypeMetadata {
 
-    /**
-     * 长度/精度/小数位的忽略策略枚举。
-     * <p>
-     * 决定在 SQL DDL 生成时，是否需要输出 length、precision、scale 参数。
-     * 例如：VARCHAR 需要长度(KEEP)，TEXT 不需要长度(IGNORE)，
-     * INTERVAL 的精度和小数位存在互依赖关系(MUTUAL_DEPENDENT)。
-     */
-    enum IgnorePolicy {
-        /** 未设置，表示继承上级配置 */
-        NOT_SET(-1),
-        /** 保留，SQL 生成时必须输出该参数 */
-        KEEP(0),
-        /** 忽略，SQL 生成时省略该参数 */
-        IGNORE(1),
-        /** 视情况而定，需要根据上下文判断是否输出 */
-        CONDITIONAL(2),
-        /** 精度与小数位互依赖，需要联合计算 */
-        MUTUAL_DEPENDENT(3);
-
-        final int code;
-
-        IgnorePolicy(int code) {
-            this.code = code;
-        }
-
-        public int code() {
-            return code;
-        }
-
-        public static IgnorePolicy of(int code) {
-            for (IgnorePolicy p : values()) {
-                if (p.code == code) return p;
-            }
-            return NOT_SET;
-        }
-    }
-
-    /**
-     * 字段类型的大分组，按语义聚合为一级分类。
-     * <p>
-     * 每个 {@link CATEGORY} 属于一个 CATEGORY_GROUP。
-     * 用于快速判断字段属于哪一大类（如判断是否为数值型、日期型等）。
-     */
-    enum CATEGORY_GROUP {
-        /** 字符串类型（CHAR、TEXT 等） */
-        STRING,
-        /** 数值类型（INT、FLOAT 等） */
-        NUMBER,
-        /** 布尔类型 */
-        BOOLEAN,
-        /** 二进制类型（BYTES、BLOB） */
-        BYTES,
-        /** 日期时间类型（DATE、TIME、TIMESTAMP、DATETIME） */
-        DATETIME,
-        /** 集合类型（如 PostgreSQL 数组） */
-        COLLECTION,
-        /** 空间几何类型（GEOMETRY、GEOGRAPHY） */
-        GEOMETRY,
-        /** 时间间隔类型（INTERVAL） */
-        INTERVAL,
-        /** 其他未分类类型 */
-        OTHER,
-        /** 无类型（兜底） */
-        NONE
-    }
-
-    /**
-     * 基于长度/精度/小数位特性的二级类型分组。
-     * <p>
-     * 每个值关联一个 {@link CATEGORY_GROUP}（大分组）和三个 {@link IgnorePolicy}（长度/精度/小数位策略）。
-     * 例如：{@code CHAR} 属于 {@code STRING} 大分组，长度需要保留(KEEP)，精度和小数位忽略(IGNORE)。
-     */
-    enum CATEGORY {
-        /** 定长/变长字符串，如 CHAR、VARCHAR — 需要长度，忽略精度和小数位 */
-        CHAR(CATEGORY_GROUP.STRING, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 大文本类型，如 TEXT、CLOB — 长度/精度/小数位全部忽略 */
-        TEXT(CATEGORY_GROUP.STRING, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 布尔类型 — 全部忽略 */
-        BOOLEAN(CATEGORY_GROUP.BOOLEAN, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 定长二进制，如 RAW、BINARY — 需要长度 */
-        BYTES(CATEGORY_GROUP.BYTES, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 大二进制对象，如 BLOB — 全部忽略 */
-        BLOB(CATEGORY_GROUP.BYTES, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 整数类型，如 INT、BIGINT — 需要长度（显示宽度），忽略精度和小数位 */
-        INT(CATEGORY_GROUP.NUMBER, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 浮点/精确数值，如 FLOAT、NUMERIC、DECIMAL — 忽略长度，保留精度和小数位 */
-        FLOAT(CATEGORY_GROUP.NUMBER, IgnorePolicy.IGNORE, IgnorePolicy.KEEP, IgnorePolicy.KEEP),
-        /** 日期类型，如 DATE — 全部忽略 */
-        DATE(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 时间类型，如 TIME — 全部忽略 */
-        TIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 日期时间类型（无时区），如 DATETIME — 全部忽略 */
-        DATETIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 时间戳类型，如 TIMESTAMP — 全部忽略 */
-        TIMESTAMP(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 集合/数组类型 — 全部忽略 */
-        COLLECTION(CATEGORY_GROUP.COLLECTION, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 空间几何类型，如 GEOMETRY、GEOGRAPHY — 全部忽略 */
-        GEOMETRY(CATEGORY_GROUP.GEOMETRY, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 时间间隔类型，如 INTERVAL — 精度视情况，精度与小数位互依赖 */
-        INTERVAL(CATEGORY_GROUP.INTERVAL, IgnorePolicy.IGNORE, IgnorePolicy.CONDITIONAL, IgnorePolicy.MUTUAL_DEPENDENT),
-        /** 其他未分类类型 — 全部忽略 */
-        OTHER(CATEGORY_GROUP.OTHER, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        /** 无类型兜底 — 全部忽略 */
-        NONE(CATEGORY_GROUP.NONE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE);
-
-        private final CATEGORY_GROUP group;
-        private final IgnorePolicy ignoreLength;
-        private final IgnorePolicy ignorePrecision;
-        private final IgnorePolicy ignoreScale;
-        private Config config;
-
-        CATEGORY(CATEGORY_GROUP group, IgnorePolicy ignoreLength, IgnorePolicy ignorePrecision, IgnorePolicy ignoreScale) {
-            this.group = group;
-            this.ignoreLength = ignoreLength;
-            this.ignorePrecision = ignorePrecision;
-            this.ignoreScale = ignoreScale;
-        }
-
-        /** 获取该分类所属的大分组 */
-        public CATEGORY_GROUP group() {
-            return group;
-        }
-
-        /**
-         * 获取该分类的默认配置（懒加载，首次调用时从 IgnorePolicy 初始化）。
-         *
-         * @return 包含忽略策略的 {@link Config} 实例
-         */
-        public Config config() {
-            if (null == config) {
-                config = new Config();
-                config.setIgnoreLength(ignoreLength.code())
-                        .setIgnorePrecision(ignorePrecision.code())
-                        .setIgnoreScale(ignoreScale.code());
-            }
-            return config;
-        }
-    }
-
     // ========== 方法声明 ==========
 
     /**
      * 获取该类型的二级分类（基于长度/精度/小数位特性）。
      *
-     * @return {@link CATEGORY} 枚举值，如 CHAR、INT、FLOAT、GEOMETRY 等
+     * @return {@link CategoryEnum} 枚举值，如 CHAR、INT、FLOAT、GEOMETRY 等
      */
-    CATEGORY getCategory();
+    CategoryEnum getCategory();
 
     /**
      * 获取该类型的大分组。
      *
-     * @return {@link CATEGORY_GROUP} 枚举值
+     * @return {@link CategoryGroupEnum} 枚举值
      */
-    CATEGORY_GROUP getCategoryGroup();
+    CategoryGroupEnum getCategoryGroup();
 
     /**
      * 获取该类型的名称，用于 SQL 生成和显示。
@@ -242,7 +102,7 @@ public interface TypeMetadata {
      *   <li><b>列引用</b> — lengthRefers/precisionRefers/scaleRefers，从数据库元数据读取时对应的实际列名</li>
      * </ul>
      *
-     * <p>通常通过 {@link CATEGORY#config()} 获取实例，而非直接构造。
+     * <p>通常通过 {@link CategoryEnum#config()} 获取实例，而非直接构造。
      */
     class Config {
 

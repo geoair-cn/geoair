@@ -86,7 +86,7 @@ public class FieldBySchemaApo implements Serializable {
         }
         TypeMetadata dbType = getDbType();
         if (dbType != null) {
-            geometryFieldIs = dbType.getCategory() == TypeMetadata.CATEGORY.GEOMETRY;
+            geometryFieldIs = dbType.getCategory() == CategoryEnum.GEOMETRY;
         } else {
             // 兜底：类型系统未匹配到（如 PG JDBC 驱动降级为 PgObject），
             // 用原始 udtName 做模式匹配
