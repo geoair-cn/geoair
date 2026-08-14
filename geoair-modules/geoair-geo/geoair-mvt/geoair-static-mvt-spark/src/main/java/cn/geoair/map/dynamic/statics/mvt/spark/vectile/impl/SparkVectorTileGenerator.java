@@ -13,7 +13,6 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.unit.DataSizeUtil;
@@ -343,10 +342,11 @@ public class SparkVectorTileGenerator implements Serializable {
     private void executeBatchInsert(List<Row> batchRows, String tableName, DataSource dataSource) throws Exception {
         log.info("====================批量提交开始===================");
         Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
         PreparedStatement preparedStatement = null;
         StopWatch stopWatch = new StopWatch();
         try {
-            connection.setAutoCommit(false);
+
             preparedStatement = connection.prepareStatement(String.format(insertSqlTemplate, tableName));
             stopWatch.start();
             for (Row row : batchRows) {
@@ -365,9 +365,10 @@ public class SparkVectorTileGenerator implements Serializable {
             }
             preparedStatement.executeBatch();
             connection.commit();
-            connection.setAutoCommit(true);
+
             stopWatch.stop();
         } finally {
+            connection.setAutoCommit(true);
             IoUtil.close(preparedStatement);
             IoUtil.close(connection);
         }
