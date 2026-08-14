@@ -45,19 +45,29 @@ public class DataSourceConfig implements Serializable {
     }
 
     /**
-     * 通过自定义协议 URL 构造。
-     * <p>
-     * 格式：{@code #jdbc:postgresql://user#pass/host:port/db/schema/table}
-     *
-     * @param protocolUrl 以 {@code #jdbc:} 开头的自定义协议 URL
+     * 通过自定义协议 URL 字符串构造。
      */
-    public static DataSourceConfig fromProtocol(String protocolUrl) {
+    public static DataSourceConfig fromProtocolUrlStr(String protocolUrl) {
         DataSourceConfig config = new DataSourceConfig();
-        config.setProtocolUrl(protocolUrl);
+        config.setProtocolUrlStr(protocolUrl);
         return config;
     }
 
-    public DataSourceConfig setProtocolUrl(String protocolUrlStr) {
+    /**
+     * 通过已解析的 ProtocolUrl 对象构造（支持 builder 构建的 ProtocolUrl）。
+     */
+    public static DataSourceConfig fromProtocolUrlObj(ProtocolUrl parsed) {
+        DataSourceConfig config = new DataSourceConfig();
+        config.protocolUrlStr = parsed.toString();
+        config.jdbcUrl = parsed.toJdbcUrl();
+        config.username = parsed.getUsername();
+        config.password = parsed.getPassword();
+        config.tableName = parsed.getTableName();
+        config.parsedUrl = parsed;
+        return config;
+    }
+
+    public DataSourceConfig setProtocolUrlStr(String protocolUrlStr) {
         if (GutilObject.isNotEmpty(protocolUrlStr)) {
             ProtocolUrl parsed = new ProtocolUrl(protocolUrlStr);
             this.protocolUrlStr = protocolUrlStr;
@@ -103,7 +113,7 @@ public class DataSourceConfig implements Serializable {
     // ===================== 缓存 =====================
 
     /**
-     * 解析后的 JdbcUrl 对象（不参与 JSON 序列化，反序列化时从 protocolUrl 重建）
+     * 解析后的 ProtocolUrl 对象（不参与 JSON 序列化，反序列化时从 protocolUrlStr 重建）
      */
     @JSONField(serialize = false, deserialize = false)
     private transient ProtocolUrl parsedUrl;
@@ -143,10 +153,10 @@ public class DataSourceConfig implements Serializable {
         return this;
     }
 
-    // ===================== JdbcUrl 解析 =====================
+    // ===================== ProtocolUrl 解析 =====================
 
     /**
-     * 获取解析后的 JdbcUrl（如果通过 fromProtocol 构造则有值）。
+     * 获取解析后的 ProtocolUrl（如果通过 fromProtocol 构造则有值）。
      */
     public ProtocolUrl getParsedUrl() {
         return parsedUrl;
@@ -217,9 +227,9 @@ public class DataSourceConfig implements Serializable {
      */
     public String getTableNameForSql() {
         if (parsedUrl != null) {
-            // 有自定义协议解析结果时，用 JdbcUrl 的逻辑（考虑 schema）
+            // 有自定义协议解析结果时，用 ProtocolUrl 的逻辑（考虑 schema）
             String sqlTable = parsedUrl.getTableForSql();
-            // 如果 JdbcUrl 的 tableForSql 为 null（没有 schema 也没有 table），回退到 tableName
+            // 如果 ProtocolUrl 的 tableForSql 为 null（没有 schema 也没有 table），回退到 tableName
             return sqlTable != null ? sqlTable : tableName;
         }
         return tableName;

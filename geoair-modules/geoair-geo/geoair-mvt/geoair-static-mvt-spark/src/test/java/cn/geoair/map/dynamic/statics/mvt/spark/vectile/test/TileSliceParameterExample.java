@@ -86,8 +86,8 @@ public class TileSliceParameterExample {
                 .setDropDensestAsNeeded(true)
                 .setCoalesceDensestAsNeeded(true)
                 .setQueryStatement("SELECT * FROM flowable.\"amap_traffic_conditions\"")
-                .setInputSource(DataSourceConfig.fromProtocol(inputUrl))
-                .setOutputSource(DataSourceConfig.fromProtocol(outputUrl));
+                .setInputSource(DataSourceConfig.fromProtocolUrlStr(inputUrl))
+                .setOutputSource(DataSourceConfig.fromProtocolUrlStr(outputUrl));
 
         // 序列化
         String encoded = parameter.toBase32();
