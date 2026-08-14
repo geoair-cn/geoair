@@ -106,26 +106,26 @@ public class SafeSqlExecutor {
 
                 Long count = number.longValue();
                 String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
-                List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
-                iAdvExecutor.bSelectListStream(pageSql, SqlParamList.of(sqlMeta.getJdbcParamValues()), girAdvOneRow -> {
-                    GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
-                    girAdvOneRows.add(row);
+                List<GirAdvOneRow> advOneRows = new ArrayList<>();
+                iAdvExecutor.bSelectListStream(pageSql, SqlParamList.of(sqlMeta.getJdbcParamValues()), advOneRow -> {
+                    GirAdvOneRow row = tranOneRow(advOneRow, humpIs);
+                    advOneRows.add(row);
                 });
 
                 GiPager<GirAdvOneRow> pager = new GirPager<>();
                 giPageParam.setPageNumStartZero(true);
-                pager.put(girAdvOneRows, count, giPageParam, true);
+                pager.put(advOneRows, count, giPageParam, true);
                 dataList.add(pager);
             } else {
-                List<GirAdvOneRow> girAdvOneRows = new ArrayList<>();
+                List<GirAdvOneRow> advOneRows = new ArrayList<>();
                 iAdvExecutor.bSelectListStream(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), new Consumer<GirAdvOneRow>() {
                     @Override
-                    public void accept(GirAdvOneRow girAdvOneRow) {
-                        GirAdvOneRow row = tranOneRow(girAdvOneRow, humpIs);
-                        girAdvOneRows.add(row);
+                    public void accept(GirAdvOneRow advOneRow) {
+                        GirAdvOneRow row = tranOneRow(advOneRow, humpIs);
+                        advOneRows.add(row);
                     }
                 });
-                dataList.add(girAdvOneRows);
+                dataList.add(advOneRows);
 
             }
         }
@@ -133,9 +133,9 @@ public class SafeSqlExecutor {
         return dataList;
     }
 
-    public static GirAdvOneRow tranOneRow(GirAdvOneRow girAdvOneRow, boolean humpIs) {
+    private static GirAdvOneRow tranOneRow(GirAdvOneRow advOneRow, boolean humpIs) {
         GirAdvOneRow row = GirAdvOneRow.ofByMap(new HashMap<>());
-        Set<Map.Entry<String, Object>> entries = girAdvOneRow.entrySet();
+        Set<Map.Entry<String, Object>> entries = advOneRow.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
             String key = entry.getKey();
             Object value = entry.getValue();

@@ -1,6 +1,5 @@
 package cn.geoair.comp.db.service.core.utils;
 
-import cn.geoair.base.Gir;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.geoair.map.dynamic.tools.GirService;
 import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
@@ -104,20 +103,5 @@ public class TokenManager {
             // MD5算法不存在时抛出运行时异常（理论上不会发生）
             throw new RuntimeException("MD5加密算法不存在", e);
         }
-    }
-
-    // 测试示例（可选）
-    public static void main(String[] args) {
-        // 测试生成Token
-        String token = TokenManager.generateToken("admin", "123456");
-        Gir.log.info("生成的Token：" + token);
-
-        // 测试校验Token
-        boolean valid = TokenManager.validateToken(token, "admin", "123456");
-        Gir.log.info("Token是否有效：" + valid); // 输出：true
-
-        // 错误密码校验
-        boolean invalid = TokenManager.validateToken(token, "admin", "654321");
-        Gir.log.info("错误密码校验结果：" + invalid); // 输出：false
     }
 }
