@@ -1,14 +1,11 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Oracle 数据类型与Java类型映射枚举
  */
-public enum OracleType implements TypeMetadata {
+public enum OracleType implements DataBaseFieldType {
 
     // 字符串类
     VARCHAR2("varchar2", "VARCHAR2", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
@@ -90,6 +87,16 @@ public enum OracleType implements TypeMetadata {
     public static OracleType getByUdtName(String udtName) {
         if (udtName == null) return null;
         return UDT_NAME_MAP.get(udtName.toLowerCase());
+    }
+
+    @Override
+    public List<String> getUdtNames() {
+        return Collections.unmodifiableList(this.udtNames);
+    }
+
+    @Override
+    public String getStandardName() {
+        return this.standardName;
     }
 
     public DefaultJavaType getJavaType() {

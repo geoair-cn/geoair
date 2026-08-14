@@ -1,12 +1,11 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-/** MySQL 数据类型与Java类型映射枚举 */
-public enum MysqlType implements TypeMetadata {
+/**
+ * MySQL 数据类型与Java类型映射枚举
+ */
+public enum MysqlType implements DataBaseFieldType {
 
     // 整数类
     TINYINT("tinyint", "TINYINT", DefaultJavaType.JAVA_BYTE, CATEGORY.INT),
@@ -91,7 +90,9 @@ public enum MysqlType implements TypeMetadata {
         }
     }
 
-    /** 单一 udtName 的构造器 */
+    /**
+     * 单一 udtName 的构造器
+     */
     MysqlType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
@@ -99,7 +100,9 @@ public enum MysqlType implements TypeMetadata {
         this.category = category;
     }
 
-    /** 多个 udtName 变体的构造器 */
+    /**
+     * 多个 udtName 变体的构造器
+     */
     MysqlType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();
@@ -112,16 +115,67 @@ public enum MysqlType implements TypeMetadata {
         return UDT_NAME_MAP.get(udtName.toLowerCase());
     }
 
-    public DefaultJavaType getJavaType() { return javaType; }
+    @Override
+    public List<String> getUdtNames() {
+        return Collections.unmodifiableList(this.udtNames);
+    }
 
-    @Override public CATEGORY getCategory() { return category; }
-    @Override public CATEGORY_GROUP getCategoryGroup() { return category.group(); }
-    @Override public String getName() { return standardName; }
-    @Override public int ignoreLength() { return javaType.ignoreLength(); }
-    @Override public int ignorePrecision() { return javaType.ignorePrecision(); }
-    @Override public int ignoreScale() { return javaType.ignoreScale(); }
-    @Override public boolean support() { return javaType.support(); }
-    @Override public Class<?> supportClass() { return javaType.supportClass(); }
-    @Override public Config config() { return category.config(); }
-    @Override public String toString() { return standardName; }
+    @Override
+    public String getStandardName() {
+        return this.standardName;
+    }
+
+    public DefaultJavaType getJavaType() {
+        return javaType;
+    }
+
+    @Override
+    public CATEGORY getCategory() {
+        return category;
+    }
+
+    @Override
+    public CATEGORY_GROUP getCategoryGroup() {
+        return category.group();
+    }
+
+    @Override
+    public String getName() {
+        return standardName;
+    }
+
+    @Override
+    public int ignoreLength() {
+        return javaType.ignoreLength();
+    }
+
+    @Override
+    public int ignorePrecision() {
+        return javaType.ignorePrecision();
+    }
+
+    @Override
+    public int ignoreScale() {
+        return javaType.ignoreScale();
+    }
+
+    @Override
+    public boolean support() {
+        return javaType.support();
+    }
+
+    @Override
+    public Class<?> supportClass() {
+        return javaType.supportClass();
+    }
+
+    @Override
+    public Config config() {
+        return category.config();
+    }
+
+    @Override
+    public String toString() {
+        return standardName;
+    }
 }

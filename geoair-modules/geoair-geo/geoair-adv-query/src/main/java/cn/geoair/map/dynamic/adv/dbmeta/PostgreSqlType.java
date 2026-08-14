@@ -1,14 +1,11 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * PostgreSQL UDT类型与Java类型映射枚举
  */
-public enum PostgreSqlType implements TypeMetadata {
+public enum PostgreSqlType implements DataBaseFieldType {
 
     // 字符串/文本类
     VARCHAR("varchar", "VARCHAR", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
@@ -96,6 +93,16 @@ public enum PostgreSqlType implements TypeMetadata {
     public static PostgreSqlType getByUdtName(String udtName) {
         if (udtName == null) return null;
         return UDT_NAME_MAP.get(udtName.toLowerCase());
+    }
+
+    @Override
+    public List<String> getUdtNames() {
+        return Collections.unmodifiableList(this.udtNames);
+    }
+
+    @Override
+    public String getStandardName() {
+        return this.standardName;
     }
 
     public DefaultJavaType getJavaType() {
