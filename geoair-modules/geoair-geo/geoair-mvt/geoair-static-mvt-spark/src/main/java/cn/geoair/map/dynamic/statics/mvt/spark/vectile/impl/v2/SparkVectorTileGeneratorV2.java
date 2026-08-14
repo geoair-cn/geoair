@@ -173,7 +173,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         tracker.setStageName("写入PG");
 
         try {
-            streamWriteToPg(aggregatedRDD, parameter, tracker, tileCount, percentConsumer);
+            streamWriteToPg(aggregatedRDD, parameter, tracker );
         } catch (Throwable e) {
             log.error("流式写入PG过程中发生异常", e);
             throw e;
@@ -240,9 +240,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
     private void streamWriteToPg(
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD,
             TileSliceParameter parameter,
-            ProgressTracker tracker,
-            long estimatedTotalTiles,
-            GiPercentConsumer percentConsumer) {
+            ProgressTracker tracker ) {
 
         aggregatedRDD.foreachPartition(
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>) partitionIterator -> {
@@ -265,15 +263,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                     long currentBatchSize = 0;
                     long partitionStartTime = System.currentTimeMillis();
 
-                    // 进度回调（仅 executor 侧，local 模式下 consumer 可直接调用）
-                    Runnable notifyProgress = () -> {
-                        if (isExecutor && percentConsumer != null) {
-                            try {
-                                percentConsumer.accept(estimatedTotalTiles, rootTotalCount.get());
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    };
+
 
                     try {
                         SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
@@ -312,7 +302,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                             log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{},edition:{}",
                                                     rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
                                                     DataSizeUtil.format(currentBatchSize), outGridSrid, edition);
-                                            notifyProgress.run();
+
                                             rootBatchRows.clear();
                                             currentBatchSize = 0;
                                         }
@@ -325,7 +315,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                         tracker.getBytesWritten().add(singleSize);
                                         log.info("{}:分区内Root表单条超大数据提交完成，大小：{}，累计瓦片数：{} ,outGridSrid:{}",
                                                 rootTableName, DataSizeUtil.format(singleSize), rootTotalCount.get(), outGridSrid);
-                                        notifyProgress.run();
+
                                         rootBatchRows.clear();
                                         currentBatchSize = 0;
                                     } else {
@@ -343,7 +333,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                             log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{}",
                                                     rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
                                                     DataSizeUtil.format(currentBatchSize), outGridSrid);
-                                            notifyProgress.run();
+
                                             rootBatchRows.clear();
                                             currentBatchSize = 0;
                                         }
@@ -375,7 +365,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                             log.info("{}:分区内Root表最后批次写入完成，剩余条数：{}，累计总数：{}，提交大小：{} outGridSrid:{}",
                                     rootTableName, rootBatchRows.size(), rootTotalCount.get(),
                                     DataSizeUtil.format(currentBatchSize), outGridSrid);
-                            notifyProgress.run();
+
                         }
 
                         long partitionElapsed = System.currentTimeMillis() - partitionStartTime;
