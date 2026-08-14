@@ -76,15 +76,19 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     /**
-     * 边生成边写入，无全量缓存（极致内存优化版）
+     * 主流程：读取数据 → 转换 → 映射到瓦片 → 聚合 → 流式写入PG
      */
     public void doGenerate(TileSliceParameter parameter)
             throws Exception {
         JSONObject entries = JSONUtil.parseObj(parameter);
+        // 移除敏感字段和非参数字段，避免打印到日志
+        entries.remove("inputSource");
+        entries.remove("outputSource");
+        // 兼容旧版字段名
         entries.remove("inputConnectInfo");
         entries.remove("outPutConnectInfo");
-        entries.remove("outPutUrl");
-        entries.remove("inputUrl");
+        entries.remove("inputConnectSimple");
+        entries.remove("outPutConnectWithTable");
         Log log = LogFactory.get(CallerUtil.getCallerCaller());
         log.info(
                 "{} 执行器开始切片（流式逐批写入模式），切片参数信息：\n {}",
@@ -115,30 +119,30 @@ public class SparkVectorTileGenerator implements Serializable {
         long count = persistedFeaturesRDD.count();
         log.info("查询得到的所有的要素数量为:{}", count);
 
-        // // 2. 空间转换（无持久化，流式处理） 这一步改成在driver中执行
+        // 2. 空间转换（修复几何、坐标系转换）
         JavaRDD<GirAdvOneRow> transformedFeatures =
                 persistedFeaturesRDD.map(
                                 new SparkTaskSerializableUtil.TransformFeatureFunction(parameter))
                         .persist(StorageLevel.MEMORY_AND_DISK());
 
-        // 3. 要素映射到瓦片（无持久化）
+        // 3. 要素映射到瓦片
         JavaPairRDD<String, List<GirAdvOneRow>> tileFeatures = null;
         tileFeatures =
                 transformedFeatures.flatMapToPair(
                                 new SparkTaskSerializableUtil.MapToTileFunction1(parameter))
                         .persist(StorageLevel.MEMORY_AND_DISK());
-        log.error("=================================================");
+        log.info("=================================================");
         log.info("要素映射到瓦片总条数：{}", tileFeatures.count());
-        log.error("=================================================");
+        log.info("=================================================");
 
-        if (parameter.isStatisticsIs()) {
+        if (parameter.isStatisticsEnabled()) {
             JavaPairRDD<String, List<GirAdvOneRow>> tileFeaturesByZoom =
                     transformedFeatures.flatMapToPair(
                             new SparkTaskSerializableUtil.MapToTileFunctionToStatic(
                                     parameter, parameter.getMaxZoom()));
             TileSliceParameter copy = parameter.copy();
             copy.setFeatureLimit(1000)
-                    .setEnableFeatureLimitIs(true)
+                    .setFeatureLimitEnabled(true)
                     .setDropDensestAsNeeded(false)
                     .setCoalesceDensestAsNeeded(false);
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDDByZoom =
@@ -187,8 +191,8 @@ public class SparkVectorTileGenerator implements Serializable {
         try {
             streamWriteToPg(aggregatedRDD, parameter, pgParams);
         } catch (Throwable e) {
-            log.info("触发无法捕获的异常");
-            log.error(e);
+            log.error("流式写入PG过程中发生异常", e);
+            throw e;
         }
 
         log.info("流式边生成边写入流程执行完成");
@@ -202,8 +206,8 @@ public class SparkVectorTileGenerator implements Serializable {
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>)
                         partitionIterator -> {
                             Log log = Log.get();
-                            PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
-                            DataSource dataSource = outPutConnectWithTable.toDataSource();
+                            DataSourceConfig outputSource = parameter.getOutputSource();
+                            DataSource dataSource = outputSource.toDataSource();
                             // 最终日志
                             int outGridSrid = parameter.getOutGridSrid();
                             String edition = parameter.getEdition();
@@ -344,7 +348,7 @@ public class SparkVectorTileGenerator implements Serializable {
         stopWatch.start();
         for (Row row : batchRows) {
             // 按schema顺序设置参数
-            pstmt.setString(1, IdUtil.getSnowflakeNextIdStr()); // z
+            pstmt.setString(1, IdUtil.getSnowflakeNextIdStr()); // id
             pstmt.setInt(2, row.getInt(0)); // z
             pstmt.setInt(3, row.getInt(1)); // x
             pstmt.setInt(4, row.getInt(2)); // tms_ y
@@ -370,7 +374,7 @@ public class SparkVectorTileGenerator implements Serializable {
         stopWatch.start();
         for (Row row : batchRows) {
             // 按schema顺序设置参数
-            preparedStatement.setString(1, IdUtil.getSnowflakeNextIdStr()); // z
+            preparedStatement.setString(1, IdUtil.getSnowflakeNextIdStr()); // id
             preparedStatement.setInt(2, row.getInt(0)); // z
             preparedStatement.setInt(3, row.getInt(1)); // x
             preparedStatement.setInt(4, row.getInt(2)); // tms_ y
@@ -392,14 +396,14 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     /**
-     * 按ID分片读取PostGIS数据（仅此处persist rawFeatures）
+     * 按ID分片读取PostGIS数据
      */
     private JavaRDD<GirAdvOneRow> readDataByIdPage(TileSliceParameter parameter) throws Exception {
-        if (parameter == null || parameter.getInputConnectSimple() == null) {
-            throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
+        if (parameter == null || parameter.getInputSource() == null) {
+            throw new IllegalArgumentException("输入参数不能为空，inputSource 必须配置");
         }
-        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-        DataSource dataSource = pgConnectInfo.toDataSource();
+        DataSourceConfig inputSource = parameter.getInputSource();
+        DataSource dataSource = inputSource.toDataSource();
         IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
 
         long totalCount = iAdvExecutor.pCount(parameter.getQueryStatement());
@@ -442,14 +446,14 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     /**
-     * 按BBox空间分片读取PostGIS数据（仅此处persist rawFeatures）
+     * 按BBox空间分片读取PostGIS数据
      */
     private JavaRDD<GirAdvOneRow> readDataByBBox(TileSliceParameter parameter) throws Exception {
         if (parameter == null) {
-            throw new IllegalArgumentException("输入参数不能为空，inputUrl必须配置");
+            throw new IllegalArgumentException("输入参数不能为空，inputSource 必须配置");
         }
-        PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-        IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
+        DataSourceConfig inputSource = parameter.getInputSource();
+        IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(inputSource.toDataSource());
 
         BBoxApo bBoxApo =
                 iAdvExecutor.eGetExtent(
@@ -498,8 +502,8 @@ public class SparkVectorTileGenerator implements Serializable {
     }
 
     private void createTableDDL(String tableName, TileSliceParameter parameter) {
-        PgConnectInfoWithTable outPutConnectWithTable = parameter.getOutPutConnectWithTable();
-        DataSource dataSource = outPutConnectWithTable.toDataSource();
+        DataSourceConfig outputSource = parameter.getOutputSource();
+        DataSource dataSource = outputSource.toDataSource();
 
         IAdvExecutor iAdvExecutor =  AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableName);

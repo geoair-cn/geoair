@@ -9,8 +9,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
@@ -63,8 +63,8 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(Integer pageNum) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
+            DataSourceConfig inputSource = parameter.getInputSource();
+            IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource (inputSource.toDataSource());
 
             long startTime = System.currentTimeMillis();
             // 构建排序SQL
@@ -119,8 +119,8 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(String partitionCondition) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor =AdvExecutorFactory.getAdvExecutorByDataSource (pgConnectInfo.toDataSource());
+            DataSourceConfig inputSource = parameter.getInputSource();
+            IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource (inputSource.toDataSource());
 
             // 解析分区范围
             String[] coords = partitionCondition.split(",");
