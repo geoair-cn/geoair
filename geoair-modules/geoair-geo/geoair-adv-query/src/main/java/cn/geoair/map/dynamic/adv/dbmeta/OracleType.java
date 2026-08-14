@@ -1,61 +1,58 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Oracle 数据类型与Java类型映射枚举
  */
-public enum OracleType implements TypeMetadata {
+public enum OracleType implements DataBaseFieldType {
 
     // 字符串类
-    VARCHAR2("varchar2", "VARCHAR2", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
-    NVARCHAR2("nvarchar2", "NVARCHAR2", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
-    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CATEGORY.CHAR),
-    NCHAR("nchar", "NCHAR", DefaultJavaType.JAVA_CHAR, CATEGORY.CHAR),
-    CLOB("clob", "CLOB", DefaultJavaType.JAVA_TEXT, CATEGORY.TEXT),
-    NCLOB("nclob", "NCLOB", DefaultJavaType.JAVA_TEXT, CATEGORY.TEXT),
-    LONG("long", "LONG", DefaultJavaType.JAVA_TEXT, CATEGORY.TEXT),
-    ROWID("rowid", "ROWID", DefaultJavaType.JAVA_STRING, CATEGORY.OTHER),
-    UROWID("urowid", "UROWID", DefaultJavaType.JAVA_STRING, CATEGORY.OTHER),
+    VARCHAR2("varchar2", "VARCHAR2", DefaultJavaType.JAVA_STRING, CategoryEnum.CHAR),
+    NVARCHAR2("nvarchar2", "NVARCHAR2", DefaultJavaType.JAVA_STRING, CategoryEnum.CHAR),
+    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CategoryEnum.CHAR),
+    NCHAR("nchar", "NCHAR", DefaultJavaType.JAVA_CHAR, CategoryEnum.CHAR),
+    CLOB("clob", "CLOB", DefaultJavaType.JAVA_TEXT, CategoryEnum.TEXT),
+    NCLOB("nclob", "NCLOB", DefaultJavaType.JAVA_TEXT, CategoryEnum.TEXT),
+    LONG("long", "LONG", DefaultJavaType.JAVA_TEXT, CategoryEnum.TEXT),
+    ROWID("rowid", "ROWID", DefaultJavaType.JAVA_STRING, CategoryEnum.OTHER),
+    UROWID("urowid", "UROWID", DefaultJavaType.JAVA_STRING, CategoryEnum.OTHER),
 
     // 数值类
-    NUMBER("number", "NUMBER", DefaultJavaType.JAVA_NUMERIC, CATEGORY.FLOAT),
-    FLOAT("float", "FLOAT", DefaultJavaType.JAVA_FLOAT, CATEGORY.FLOAT),
-    BINARY_FLOAT("binary_float", "BINARY_FLOAT", DefaultJavaType.JAVA_FLOAT, CATEGORY.FLOAT),
-    BINARY_DOUBLE("binary_double", "BINARY_DOUBLE", DefaultJavaType.JAVA_DOUBLE, CATEGORY.FLOAT),
+    NUMBER("number", "NUMBER", DefaultJavaType.JAVA_NUMERIC, CategoryEnum.FLOAT),
+    FLOAT("float", "FLOAT", DefaultJavaType.JAVA_FLOAT, CategoryEnum.FLOAT),
+    BINARY_FLOAT("binary_float", "BINARY_FLOAT", DefaultJavaType.JAVA_FLOAT, CategoryEnum.FLOAT),
+    BINARY_DOUBLE("binary_double", "BINARY_DOUBLE", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
 
     // 日期时间类
-    DATE("date", "DATE", DefaultJavaType.JAVA_DATE, CATEGORY.DATE),
-    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_SQL_TIMESTAMP, CATEGORY.TIMESTAMP),
+    DATE("date", "DATE", DefaultJavaType.JAVA_DATE, CategoryEnum.DATE),
+    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_SQL_TIMESTAMP, CategoryEnum.TIMESTAMP),
     TIMESTAMP_WITH_TIME_ZONE("timestamp with time zone", "TIMESTAMP WITH TIME ZONE",
-            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CATEGORY.TIMESTAMP),
+            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
     TIMESTAMP_WITH_LOCAL_TIME_ZONE("timestamp with local time zone", "TIMESTAMP WITH LOCAL TIME ZONE",
-            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CATEGORY.TIMESTAMP),
+            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
     INTERVAL_YEAR_TO_MONTH("interval year to month", "INTERVAL YEAR TO MONTH",
-            DefaultJavaType.JAVA_INTERVAL, CATEGORY.INTERVAL),
+            DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
     INTERVAL_DAY_TO_SECOND("interval day to second", "INTERVAL DAY TO SECOND",
-            DefaultJavaType.JAVA_INTERVAL, CATEGORY.INTERVAL),
+            DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
 
     // 二进制类
-    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CATEGORY.BLOB),
-    RAW("raw", "RAW", DefaultJavaType.JAVA_BYTES, CATEGORY.BYTES),
-    LONG_RAW("long raw", "LONG RAW", DefaultJavaType.JAVA_BYTES, CATEGORY.BYTES),
-    BFILE("bfile", "BFILE", DefaultJavaType.JAVA_BYTES, CATEGORY.OTHER),
+    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CategoryEnum.BLOB),
+    RAW("raw", "RAW", DefaultJavaType.JAVA_BYTES, CategoryEnum.BYTES),
+    LONG_RAW("long raw", "LONG RAW", DefaultJavaType.JAVA_BYTES, CategoryEnum.BYTES),
+    BFILE("bfile", "BFILE", DefaultJavaType.JAVA_BYTES, CategoryEnum.OTHER),
 
     // XML
-    XMLTYPE("xmltype", "XMLTYPE", DefaultJavaType.JAVA_STRING, CATEGORY.TEXT),
+    XMLTYPE("xmltype", "XMLTYPE", DefaultJavaType.JAVA_STRING, CategoryEnum.TEXT),
 
     // 空间类型（多个变体名都指向同一个逻辑类型）
-    SDO_GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY,
+    SDO_GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
             "sdo_geometry", "SDO_GEOMETRY", "MDSYS.SDO_GEOMETRY", "mdsys.sdo_geometry");
 
     private final List<String> udtNames;
     private final String standardName;
     private final DefaultJavaType javaType;
-    private final CATEGORY category;
+    private final CategoryEnum category;
 
     private static final Map<String, OracleType> UDT_NAME_MAP = new HashMap<>();
 
@@ -70,7 +67,7 @@ public enum OracleType implements TypeMetadata {
     /**
      * 单一 udtName 的构造器
      */
-    OracleType(String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
+    OracleType(String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
@@ -80,7 +77,7 @@ public enum OracleType implements TypeMetadata {
     /**
      * 多个 udtName 变体的构造器
      */
-    OracleType(DefaultJavaType javaType, CATEGORY category, String... udtNames) {
+    OracleType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();
         this.javaType = javaType;
@@ -92,17 +89,27 @@ public enum OracleType implements TypeMetadata {
         return UDT_NAME_MAP.get(udtName.toLowerCase());
     }
 
+    @Override
+    public List<String> getUdtNames() {
+        return Collections.unmodifiableList(this.udtNames);
+    }
+
+    @Override
+    public String getStandardName() {
+        return this.standardName;
+    }
+
     public DefaultJavaType getJavaType() {
         return javaType;
     }
 
     @Override
-    public CATEGORY getCategory() {
+    public CategoryEnum getCategory() {
         return category;
     }
 
     @Override
-    public CATEGORY_GROUP getCategoryGroup() {
+    public CategoryGroupEnum getCategoryGroup() {
         return category.group();
     }
 

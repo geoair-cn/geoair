@@ -3,215 +3,107 @@ package cn.geoair.map.dynamic.adv.dbmeta;
 import cn.hutool.core.util.StrUtil;
 
 /**
- * 数据库类型的统一元数据接口（合并了旧的DataType接口）
+ * 数据库类型的统一元数据接口，描述一个数据库字段类型的完整语义。
+ * <p>
+ * 本接口是类型体系的核心契约，为 SQL DDL 生成、字段类型判断、Java 类型映射提供统一基础。
+ * 主要实现者：
+ * <ul>
+ *   <li>{@link DefaultJavaType} — Java 类型枚举，描述 Java 侧的类型语义</li>
+ *   <li>{@link DataBaseFieldType} — 继承本接口，增加数据库特定的 UDT 名称映射能力</li>
+ * </ul>
+ *
+ * <h3>类型分类体系</h3>
+ * <pre>
+ * CategoryGroupEnum (大分组: STRING / NUMBER / DATETIME / ...)
+ *   └── CategoryEnum (二级分组: CHAR / TEXT / INT / FLOAT / DATE / TIMESTAMP / ...)
+ *         └── IgnorePolicy (长度/精度/小数位的忽略策略)
+ * </pre>
+ *
+ * @author zhangjun
+ * @date 2026/8/14
  */
 public interface TypeMetadata {
 
-    /**
-     * 忽略策略枚举
-     */
-    enum IgnorePolicy {
-        NOT_SET(-1),
-        KEEP(0),
-        IGNORE(1),
-        CONDITIONAL(2),
-        MUTUAL_DEPENDENT(3);
-
-        final int code;
-
-        IgnorePolicy(int code) {
-            this.code = code;
-        }
-
-        public int code() {
-            return code;
-        }
-
-        public static IgnorePolicy of(int code) {
-            for (IgnorePolicy p : values()) {
-                if (p.code == code) return p;
-            }
-            return NOT_SET;
-        }
-    }
-
-    /**
-     * 字段类型的大分组
-     */
-    enum CATEGORY_GROUP {
-        STRING,
-        NUMBER,
-        BOOLEAN,
-        BYTES,
-        DATETIME,
-        COLLECTION,
-        GEOMETRY,
-        INTERVAL,
-        OTHER,
-        NONE
-    }
-
-    /**
-     * 基于长度/精度/小数位特性的二级分组
-     */
-    enum CATEGORY {
-        CHAR(CATEGORY_GROUP.STRING, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        TEXT(CATEGORY_GROUP.STRING, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        BOOLEAN(CATEGORY_GROUP.BOOLEAN, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        BYTES(CATEGORY_GROUP.BYTES, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        BLOB(CATEGORY_GROUP.BYTES, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        INT(CATEGORY_GROUP.NUMBER, IgnorePolicy.KEEP, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        FLOAT(CATEGORY_GROUP.NUMBER, IgnorePolicy.IGNORE, IgnorePolicy.KEEP, IgnorePolicy.KEEP),
-        DATE(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        TIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        DATETIME(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        TIMESTAMP(CATEGORY_GROUP.DATETIME, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        COLLECTION(CATEGORY_GROUP.COLLECTION, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        GEOMETRY(CATEGORY_GROUP.GEOMETRY, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        INTERVAL(CATEGORY_GROUP.INTERVAL, IgnorePolicy.IGNORE, IgnorePolicy.CONDITIONAL, IgnorePolicy.MUTUAL_DEPENDENT),
-        OTHER(CATEGORY_GROUP.OTHER, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE),
-        NONE(CATEGORY_GROUP.NONE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE, IgnorePolicy.IGNORE);
-
-        private final CATEGORY_GROUP group;
-        private final IgnorePolicy ignoreLength;
-        private final IgnorePolicy ignorePrecision;
-        private final IgnorePolicy ignoreScale;
-        private Config config;
-
-        CATEGORY(CATEGORY_GROUP group, IgnorePolicy ignoreLength, IgnorePolicy ignorePrecision, IgnorePolicy ignoreScale) {
-            this.group = group;
-            this.ignoreLength = ignoreLength;
-            this.ignorePrecision = ignorePrecision;
-            this.ignoreScale = ignoreScale;
-        }
-
-        public CATEGORY_GROUP group() {
-            return group;
-        }
-
-        public Config config() {
-            if (null == config) {
-                config = new Config();
-                config.setIgnoreLength(ignoreLength.code())
-                        .setIgnorePrecision(ignorePrecision.code())
-                        .setIgnoreScale(ignoreScale.code());
-            }
-            return config;
-        }
-    }
-
-    /**
-     * 判断两个TypeMetadata是否代表同一类型
-     */
-    default boolean isSameType(TypeMetadata other) {
-        if (null == other) {
-            return false;
-        }
-        if (this.getOrigin() == other) {
-            return true;
-        }
-        if (this == other) {
-            return true;
-        }
-        if (this == other.getOrigin()) {
-            return true;
-        }
-        if (this.getOrigin() == other.getOrigin()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 不识别的类型，原样输出
-     */
-    TypeMetadata NONE = new TypeMetadata() {
-        @Override
-        public CATEGORY getCategory() {
-            return CATEGORY.NONE;
-        }
-
-        @Override
-        public String getName() {
-            return "NONE";
-        }
-
-        @Override
-        public int ignoreLength() {
-            return -1;
-        }
-
-        @Override
-        public int ignorePrecision() {
-            return -1;
-        }
-
-        @Override
-        public int ignoreScale() {
-            return -1;
-        }
-
-        @Override
-        public boolean support() {
-            return true;
-        }
-
-        @Override
-        public Class<?> supportClass() {
-            return Object.class;
-        }
-
-        @Override
-        public Config config() {
-            return new Config();
-        }
-
-        @Override
-        public CATEGORY_GROUP getCategoryGroup() {
-            return CATEGORY_GROUP.NONE;
-        }
-    };
-
     // ========== 方法声明 ==========
 
-    CATEGORY getCategory();
+    /**
+     * 获取该类型的二级分类（基于长度/精度/小数位特性）。
+     *
+     * @return {@link CategoryEnum} 枚举值，如 CHAR、INT、FLOAT、GEOMETRY 等
+     */
+    CategoryEnum getCategory();
 
-    CATEGORY_GROUP getCategoryGroup();
+    /**
+     * 获取该类型的大分组。
+     *
+     * @return {@link CategoryGroupEnum} 枚举值
+     */
+    CategoryGroupEnum getCategoryGroup();
 
+    /**
+     * 获取该类型的名称，用于 SQL 生成和显示。
+     *
+     * @return 类型名称，如 "VARCHAR"、"NUMERIC"、"TIMESTAMP"
+     */
     String getName();
 
-    default TypeMetadata getOrigin() {
-        return this;
-    }
-
+    /**
+     * 获取长度参数的忽略策略值。
+     *
+     * @return {@link IgnorePolicy#code()} 的值：-1 未设置，0 保留，1 忽略，2 视情况，3 互依赖
+     */
     int ignoreLength();
 
+    /**
+     * 获取精度参数的忽略策略值。
+     *
+     * @return 同 {@link #ignoreLength()}
+     */
     int ignorePrecision();
 
+    /**
+     * 获取小数位参数的忽略策略值。
+     *
+     * @return 同 {@link #ignoreLength()}
+     */
     int ignoreScale();
 
     /**
-     * 是否支持该类型
+     * 判断当前类型是否受支持（可安全映射到 Java 类型）。
+     *
+     * @return {@code true} 表示支持，{@code false} 表示该类型需要特殊处理
      */
     boolean support();
 
     /**
-     * 该类型对应的Java类
+     * 获取该类型对应的 Java 类。
+     * <p>
+     * 例如：VARCHAR → String.class，NUMERIC → BigDecimal.class，GEOMETRY → byte[].class
+     *
+     * @return 对应的 Java 类
      */
     Class<?> supportClass();
 
-    default String formula() {
-        return null;
-    }
-
-    default boolean isArray() {
-        return false;
-    }
-
+    /**
+     * 获取该类型的运行时配置。
+     *
+     * @return {@link Config} 实例，包含忽略策略、长度/精度/小数位的列引用等配置
+     */
     Config config();
 
     // ========== Config 内部类 ==========
 
+    /**
+     * 类型的运行时配置，封装 SQL DDL 生成所需的元信息。
+     * <p>
+     * 主要包含两部分：
+     * <ul>
+     *   <li><b>忽略策略</b> — ignoreLength/ignorePrecision/ignoreScale，决定 SQL 生成时是否输出长度/精度/小数位参数</li>
+     *   <li><b>列引用</b> — lengthRefers/precisionRefers/scaleRefers，从数据库元数据读取时对应的实际列名</li>
+     * </ul>
+     *
+     * <p>通常通过 {@link CategoryEnum#config()} 获取实例，而非直接构造。
+     */
     class Config {
 
         /**
@@ -382,7 +274,10 @@ public interface TypeMetadata {
 
         /**
          * 合并非空且!= -1的属性
+         *
+         * @deprecated 当前无调用者，保留供未来扩展使用
          */
+        @Deprecated
         public Config merge(Config copy) {
             if (null != copy) {
                 if (StrUtil.isNotEmpty(copy.getMeta())) this.meta = copy.getMeta();

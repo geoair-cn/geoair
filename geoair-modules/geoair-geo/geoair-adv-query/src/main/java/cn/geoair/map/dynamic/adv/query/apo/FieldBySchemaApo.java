@@ -1,11 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.base.Gir;
-import cn.geoair.map.dynamic.adv.dbmeta.DefaultJavaType;
-import cn.geoair.map.dynamic.adv.dbmeta.MysqlType;
-import cn.geoair.map.dynamic.adv.dbmeta.OracleType;
-import cn.geoair.map.dynamic.adv.dbmeta.PostgreSqlType;
-import cn.geoair.map.dynamic.adv.dbmeta.TypeMetadata;
+import cn.geoair.map.dynamic.adv.dbmeta.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.hutool.db.dialect.DialectName;
 import java.io.Serializable;
@@ -90,7 +86,7 @@ public class FieldBySchemaApo implements Serializable {
         }
         TypeMetadata dbType = getDbType();
         if (dbType != null) {
-            geometryFieldIs = dbType.getCategory() == TypeMetadata.CATEGORY.GEOMETRY;
+            geometryFieldIs = dbType.getCategory() == CategoryEnum.GEOMETRY;
         } else {
             // 兜底：类型系统未匹配到（如 PG JDBC 驱动降级为 PgObject），
             // 用原始 udtName 做模式匹配
@@ -104,7 +100,7 @@ public class FieldBySchemaApo implements Serializable {
     }
 
     /** 根据内置 dialectName 获取数据库类型元数据 */
-    public TypeMetadata getDbType() {
+    public DataBaseFieldType getDbType() {
         if (udtName == null) return null;
         if (udtName.startsWith("_")) {
             Gir.log.info("该字段为数组类型{}:{}", originalColumnName, udtName);
@@ -127,7 +123,7 @@ public class FieldBySchemaApo implements Serializable {
 
     /** 获取对应的 Java 简单类名 */
     public String getJavaClassName() {
-        TypeMetadata dbType = getDbType();
+        DataBaseFieldType dbType = getDbType();
         if (dbType == null) {
             return DefaultJavaType.JAVA_STRING.supportClass().getSimpleName();
         }
