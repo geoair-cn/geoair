@@ -29,7 +29,6 @@ import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 import cn.hutool.core.util.StrUtil;
 import org.locationtech.jts.geom.Geometry;
 
-import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.util.function.Consumer;
@@ -42,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * SQL安全执行工具类 功能：拦截危险SQL操作（新增/删除/修改/清空表/删除库等），仅允许查询操作
  */
 public class SafeSqlExecutor {
+
 
     private static final Logger log = LoggerFactory.getLogger(SafeSqlExecutor.class);
 
@@ -94,21 +94,17 @@ public class SafeSqlExecutor {
     private static AdvTypeHandlerRegistry buildRegistry(IAdvExecutor executor) {
         List<AdvTypeHandler<?>> handlers = new ArrayList<>(executor.getConfig().getTypeHandlers());
         // 添加 ds-service 专用的 handler（如果尚未存在）
-        boolean hasClob = false, hasBlob = false, hasByteArray = false;
+        boolean hasClob = false, hasByteArray = false;
         for (AdvTypeHandler<?> h : handlers) {
-            if (h instanceof ClobAdvTypeHandler) hasClob = true;
-            else if (h instanceof BlobAdvTypeHandler) hasBlob = true;
+            if (GirOracleTran.isStructClassAvailable() && h instanceof ClobAdvTypeHandler) hasClob = true;
             else if (h instanceof ByteArrayBase64AdvTypeHandler) hasByteArray = true;
         }
-        if (!hasClob) handlers.add(new ClobAdvTypeHandler());
-        if (!hasBlob) handlers.add(new BlobAdvTypeHandler());
-        if (!hasByteArray) handlers.add(new ByteArrayBase64AdvTypeHandler());
-        // Oracle 驱动存在时，注册 Oracle 特有的 Blob handler（输出 "(OracleBlob)"）
-        try {
-            Class.forName("oracle.sql.BLOB");
-            handlers.add(new BlobAdvTypeHandler("(OracleBlob)"));
-        } catch (ClassNotFoundException ignored) {
+        if (!hasClob && GirOracleTran.isStructClassAvailable()) {
+            // Oracle 驱动存在时，注册 Oracle 特有的 Blob handler（输出 "(OracleBlob)"）
+            handlers.add(new ClobAdvTypeHandler());
+            handlers.add(new BlobAdvTypeHandler());
         }
+        if (!hasByteArray) handlers.add(new ByteArrayBase64AdvTypeHandler());
         return AdvTypeHandlerRegistry.create(null, handlers);
     }
 
