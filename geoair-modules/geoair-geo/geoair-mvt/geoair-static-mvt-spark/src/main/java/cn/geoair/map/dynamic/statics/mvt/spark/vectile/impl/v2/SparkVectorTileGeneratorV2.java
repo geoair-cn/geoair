@@ -35,6 +35,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.storage.StorageLevel;
+import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -240,18 +241,18 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
     private void streamWriteToPg(
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD,
             TileSliceParameter parameter,
-            ProgressTracker tracker ) {
+            ProgressTracker tracker) {
+
+        // 从 tracker 提取累加器（LongAccumulator 可独立序列化，ProgressTracker 整体不行）
+        final LongAccumulator accTilesWritten = tracker.getTilesWritten();
+        final LongAccumulator accBatchesWritten = tracker.getBatchesWritten();
+        final LongAccumulator accBytesWritten = tracker.getBytesWritten();
 
         aggregatedRDD.foreachPartition(
                 (VoidFunction<Iterator<Tuple2<String, List<GirAdvOneRow>>>>) partitionIterator -> {
                     Log log = Log.get();
                     DataSourceConfig outputSource = parameter.getOutputSource();
                     DataSource dataSource = outputSource.toDataSource();
-
-                    // 判断当前是否在 executor 环境
-                    // local 模式：executor 和 driver 同 JVM，consumer 可直接调用
-                    // cluster 模式：TaskContext.get() != null 但 consumer 需要 Serializable
-                    boolean isExecutor = TaskContext.get() != null;
 
                     int outGridSrid = parameter.getOutGridSrid();
                     String edition = parameter.getEdition();
@@ -262,8 +263,6 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                     long rootBatchNum = 0;
                     long currentBatchSize = 0;
                     long partitionStartTime = System.currentTimeMillis();
-
-
 
                     try {
                         SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
@@ -296,13 +295,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                             rootBatchNum++;
                                             executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                             rootTotalCount.addAndGet(rootBatchRows.size());
-                                            tracker.getTilesWritten().add(rootBatchRows.size());
-                                            tracker.getBatchesWritten().add(1);
-                                            tracker.getBytesWritten().add(currentBatchSize);
+                                            accTilesWritten.add(rootBatchRows.size());
+                                            accBatchesWritten.add(1);
+                                            accBytesWritten.add(currentBatchSize);
                                             log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{},edition:{}",
                                                     rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
                                                     DataSizeUtil.format(currentBatchSize), outGridSrid, edition);
-
                                             rootBatchRows.clear();
                                             currentBatchSize = 0;
                                         }
@@ -310,12 +308,11 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                         rootBatchNum++;
                                         executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                         rootTotalCount.addAndGet(1);
-                                        tracker.getTilesWritten().add(1);
-                                        tracker.getBatchesWritten().add(1);
-                                        tracker.getBytesWritten().add(singleSize);
+                                        accTilesWritten.add(1);
+                                        accBatchesWritten.add(1);
+                                        accBytesWritten.add(singleSize);
                                         log.info("{}:分区内Root表单条超大数据提交完成，大小：{}，累计瓦片数：{} ,outGridSrid:{}",
                                                 rootTableName, DataSizeUtil.format(singleSize), rootTotalCount.get(), outGridSrid);
-
                                         rootBatchRows.clear();
                                         currentBatchSize = 0;
                                     } else {
@@ -327,13 +324,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                                             rootBatchNum++;
                                             executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                                             rootTotalCount.addAndGet(rootBatchRows.size());
-                                            tracker.getTilesWritten().add(rootBatchRows.size());
-                                            tracker.getBatchesWritten().add(1);
-                                            tracker.getBytesWritten().add(currentBatchSize);
+                                            accTilesWritten.add(rootBatchRows.size());
+                                            accBatchesWritten.add(1);
+                                            accBytesWritten.add(currentBatchSize);
                                             log.info("{}:分区内Root表批次:{} 写入完成，本次提交条数：{}，累计瓦片数：{}，批量提交大小：{} ,outGridSrid:{}",
                                                     rootTableName, rootBatchNum, rootBatchRows.size(), rootTotalCount.get(),
                                                     DataSizeUtil.format(currentBatchSize), outGridSrid);
-
                                             rootBatchRows.clear();
                                             currentBatchSize = 0;
                                         }
@@ -359,13 +355,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                         if (!rootBatchRows.isEmpty()) {
                             executeBatchInsert(rootBatchRows, rootTableName, dataSource);
                             rootTotalCount.addAndGet(rootBatchRows.size());
-                            tracker.getTilesWritten().add(rootBatchRows.size());
-                            tracker.getBatchesWritten().add(1);
-                            tracker.getBytesWritten().add(currentBatchSize);
+                            accTilesWritten.add(rootBatchRows.size());
+                            accBatchesWritten.add(1);
+                            accBytesWritten.add(currentBatchSize);
                             log.info("{}:分区内Root表最后批次写入完成，剩余条数：{}，累计总数：{}，提交大小：{} outGridSrid:{}",
                                     rootTableName, rootBatchRows.size(), rootTotalCount.get(),
                                     DataSizeUtil.format(currentBatchSize), outGridSrid);
-
                         }
 
                         long partitionElapsed = System.currentTimeMillis() - partitionStartTime;
