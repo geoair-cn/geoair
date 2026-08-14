@@ -58,8 +58,7 @@ public class TypeHandlerRegistry {
             PgGeomRegister.register();
             Gir.log.info("PostGIS类型处理器注册成功");
         } catch (Throwable e) {
-            System.err.println("PostGIS类型处理器注册失败: " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 
@@ -69,8 +68,7 @@ public class TypeHandlerRegistry {
             TypeHandlerRegistry.register(dmdbStructClass, Singleton.get(DmGeomTypeHandler.class));
             Gir.log.info("达梦数据库类型处理器注册成功");
         } catch (Throwable e) {
-            System.err.println("达梦数据库类型处理器注册失败: " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 
@@ -87,8 +85,7 @@ public class TypeHandlerRegistry {
                     oracle.jdbc.OracleClob.class, Singleton.get(CLOBTypeHandler.class));
             Gir.log.info("Oracle BLOB/CLOB类型处理器注册成功");
         } catch (Throwable e) {
-            System.err.println("Oracle BLOB/CLOB类型处理器注册失败: " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 
@@ -99,8 +96,7 @@ public class TypeHandlerRegistry {
                     oracle.sql.STRUCT.class, Singleton.get(OracleGeomTypeHandler.class));
             Gir.log.info("Oracle空间类型处理器注册成功");
         } catch (Throwable e) {
-            System.err.println("Oracle空间类型处理器注册失败: " + e.getMessage());
-            e.printStackTrace();
+
         }
     }
 
