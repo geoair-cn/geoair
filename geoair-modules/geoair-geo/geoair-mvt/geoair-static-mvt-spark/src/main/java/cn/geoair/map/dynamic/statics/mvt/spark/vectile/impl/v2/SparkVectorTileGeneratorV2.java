@@ -151,7 +151,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
         // 统计路径（可选）
         if (parameter.isStatisticsEnabled()) {
-            runStatisticsPipeline(parameter, transformedFeatures, count, tracker);
+//            runStatisticsPipeline(parameter, transformedFeatures, count, tracker);
         }
 
         // 聚合：reduceByKey 流式聚合，不需要 tileFeatures 先物化
@@ -187,53 +187,53 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
     // ==================== 统计路径 ====================
 
-    private void runStatisticsPipeline(
-            TileSliceParameter parameter,
-            JavaRDD<GirAdvOneRow> transformedFeatures,
-            long count,
-            ProgressTracker tracker) {
-
-        JavaPairRDD<String, List<GirAdvOneRow>> tileFeaturesByZoom =
-                transformedFeatures.flatMapToPair(
-                        new SparkTaskFunctions.MapToTileFunctionSingleZoom(parameter, parameter.getMaxZoom()));
-
-        TileSliceParameter copy = parameter.copy();
-        copy.setFeatureLimit(1000)
-                .setFeatureLimitEnabled(true)
-                .setDropDensestAsNeeded(false)
-                .setCoalesceDensestAsNeeded(false);
-
-        JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDDByZoom =
-                tileFeaturesByZoom.reduceByKey(
-                        new SparkTaskSerializableUtil.AggregateAndLimitFeatureFunction(copy),
-                        DEFAULT_REDUCE_PARTITION);
-
-        PbfTargetInfo instance = PbfTargetInfo.getInstance();
-        instance.setSaveFeatureList(true);
-
-        JavaRDD<Tuple2<String, PbfInfo>> pbfRDD =
-                aggregatedRDDByZoom.map(
-                        new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, instance));
-
-        JavaFutureAction<List<Tuple2<String, PbfInfo>>> listJavaFutureAction = pbfRDD.takeAsync(500);
-        log.info("统计路径：抽样 500 个 PBF...");
-        try {
-            List<Tuple2<String, PbfInfo>> tuple2s = listJavaFutureAction.get();
-            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
-                    JavaConverters.asScalaIteratorConverter(tuple2s.iterator()).asScala().toSeq();
-            ClassTag<Tuple2<String, PbfInfo>> classTag = ClassTag$.MODULE$.apply(Tuple2.class);
-            JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
-                    sparkSession.sparkContext()
-                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION, classTag)
-                            .toJavaRDD();
-
-            AdvEnumsTypeGeom typeGeom = parameter.getTypeGeom();
-            String geomType = typeGeom != null ? typeGeom.name() : "Unknown";
-            StatisticUtils.statAndWriteJson(tuple2sRDD, geomType, parameter.getStaticTableName(), parameter, count, sparkSession);
-        } catch (Exception e) {
-            log.error("统计路径执行失败", e);
-        }
-    }
+//    private void runStatisticsPipeline(
+//            TileSliceParameter parameter,
+//            JavaRDD<GirAdvOneRow> transformedFeatures,
+//            long count,
+//            ProgressTracker tracker) {
+//
+//        JavaPairRDD<String, List<GirAdvOneRow>> tileFeaturesByZoom =
+//                transformedFeatures.flatMapToPair(
+//                        new SparkTaskFunctions.MapToTileFunctionSingleZoom(parameter, parameter.getMaxZoom()));
+//
+//        TileSliceParameter copy = parameter.copy();
+//        copy.setFeatureLimit(1000)
+//                .setFeatureLimitEnabled(true)
+//                .setDropDensestAsNeeded(false)
+//                .setCoalesceDensestAsNeeded(false);
+//
+//        JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDDByZoom =
+//                tileFeaturesByZoom.reduceByKey(
+//                        new SparkTaskSerializableUtil.AggregateAndLimitFeatureFunction(copy),
+//                        DEFAULT_REDUCE_PARTITION);
+//
+//        PbfTargetInfo instance = PbfTargetInfo.getInstance();
+//        instance.setSaveFeatureList(true);
+//
+//        JavaRDD<Tuple2<String, PbfInfo>> pbfRDD =
+//                aggregatedRDDByZoom.map(
+//                        new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, instance));
+//
+//        JavaFutureAction<List<Tuple2<String, PbfInfo>>> listJavaFutureAction = pbfRDD.takeAsync(500);
+//        log.info("统计路径：抽样 500 个 PBF...");
+//        try {
+//            List<Tuple2<String, PbfInfo>> tuple2s = listJavaFutureAction.get();
+//            Seq<Tuple2<String, PbfInfo>> tuple2Seq =
+//                    JavaConverters.asScalaIteratorConverter(tuple2s.iterator()).asScala().toSeq();
+//            ClassTag<Tuple2<String, PbfInfo>> classTag = ClassTag$.MODULE$.apply(Tuple2.class);
+//            JavaRDD<Tuple2<String, PbfInfo>> tuple2sRDD =
+//                    sparkSession.sparkContext()
+//                            .parallelize(tuple2Seq, DEFAULT_REDUCE_PARTITION, classTag)
+//                            .toJavaRDD();
+//
+//            AdvEnumsTypeGeom typeGeom = parameter.getTypeGeom();
+//            String geomType = typeGeom != null ? typeGeom.name() : "Unknown";
+//            StatisticUtils.statAndWriteJson(tuple2sRDD, geomType, parameter.getStaticTableName(), parameter, count, sparkSession);
+//        } catch (Exception e) {
+//            log.error("统计路径执行失败", e);
+//        }
+//    }
 
     // ==================== 流式写入 ====================
 
