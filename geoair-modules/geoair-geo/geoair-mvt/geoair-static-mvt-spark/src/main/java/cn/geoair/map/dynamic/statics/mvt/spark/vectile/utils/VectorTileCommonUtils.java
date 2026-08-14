@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
- 
+
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.util.GeometryFixer;
@@ -30,7 +30,7 @@ import scala.Tuple4;
 /**
  * 矢量瓦片生成通用工具类 抽离与运行环境无关的核心算法
  */
- 
+
 public class VectorTileCommonUtils {
     public static GiLogger log = GirLoggerFactory.getLogger();
     /**
@@ -249,16 +249,7 @@ public class VectorTileCommonUtils {
                 tileId, rawPbf, features, envelope, zoom, pbfTileParameter);
     }
 
-    /**
-     * 通用PG写入参数构建
-     */
-    public static Map<String, String> buildPgWriteParams(TileSliceParameter parameter) {
-        DataSourceConfig outputSource = parameter.getOutputSource();
-        Map<String, String> params = outputSource.toParams();
-        params.put("batchSize", "50");
-        params.put("tableName", outputSource.getTableName());
-        return params;
-    }
+
 
     public static PbfTileParameter formToPbfTileParameter(TileSliceParameter tileSliceParameter) {
         if (tileSliceParameter == null) {
