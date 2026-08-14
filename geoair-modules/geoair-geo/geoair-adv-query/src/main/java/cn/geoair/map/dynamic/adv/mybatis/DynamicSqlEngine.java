@@ -77,6 +77,14 @@ public class DynamicSqlEngine {
     }
 
     /**
+     * @deprecated 请使用 {@link #extractParameterNames(String)} 代替，方法语义更明确。
+     */
+    @Deprecated
+    public Set<String> parseParameter(String text) {
+        return extractParameterNames(text);
+    }
+
+    /**
      * 从缓存获取或解析 XML 为 SqlNode 树。
      */
     private SqlNode parseXml2SqlNode(String text) {
