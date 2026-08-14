@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataSourceGetterFunction;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DefaultDataSourceGetterFunction;
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -14,11 +15,10 @@ import java.util.Map;
 /**
  * 统一的数据源配置。
  * <p>
- * 替代原有的 {@code PgConnectInfoSimple}、{@code PgConnectInfoWithTable}、{@code PgConnectInfo} 三个类。
  * 支持两种构造方式：
  * <ul>
- *   <li>JDBC 直连：通过 {@link #jdbcUrl}、{@link #username}、{@link #password} 构造</li>
- *   <li>pg:// 协议：通过 {@link #pgUrl} 字符串构造，自动解析出各字段</li>
+ *   <li>自定义协议：通过 {@link #jdbcUrl} 传入 {@code #jdbc:postgresql://user#pass/host:port/db/schema/table} 格式，自动解析</li>
+ *   <li>直接配置：通过 {@link #jdbcUrl}、{@link #username}、{@link #password}、{@link #tableName} 逐项设置</li>
  * </ul>
  *
  * @author refactored from PgConnectInfoSimple / PgConnectInfoWithTable
@@ -29,10 +29,61 @@ public class DataSourceConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static DataSourceConfig of() {
+        return new DataSourceConfig();
+    }
+
+    /**
+     * 直接通过 JDBC 参数构造。
+     */
+    public static DataSourceConfig of(String jdbcUrl, String username, String password) {
+        DataSourceConfig config = new DataSourceConfig();
+        config.jdbcUrl = jdbcUrl;
+        config.username = username;
+        config.password = password;
+        return config;
+    }
+
+    /**
+     * 通过自定义协议 URL 构造。
+     * <p>
+     * 格式：{@code #jdbc:postgresql://user#pass/host:port/db/schema/table}
+     *
+     * @param protocolUrl 以 {@code #jdbc:} 开头的自定义协议 URL
+     */
+    public static DataSourceConfig fromProtocol(String protocolUrl) {
+        DataSourceConfig config = new DataSourceConfig();
+        config.setProtocolUrl(protocolUrl);
+        return config;
+    }
+
+    public DataSourceConfig setProtocolUrl(String protocolUrl) {
+        if (GutilObject.isNotEmpty(protocolUrl)) {
+            ProtocolUrl parsed = new ProtocolUrl(protocolUrl);
+            this.protocolUrl = protocolUrl;
+            this.jdbcUrl = parsed.toJdbcUrl();
+            this.username = parsed.getUsername();
+            this.password = parsed.getPassword();
+            this.tableName = parsed.getTableName();
+            this.parsedUrl = parsed;
+            return this;
+        }
+        return this;
+    }
+
     // ===================== 连接信息 =====================
 
-    /** JDBC URL，如 jdbc:postgresql://host:5432/dbname?currentSchema=schema */
-    @JSONField(name = "url")
+    /**
+     * 原始自定义协议 URL（序列化用，反序列化时从此重建 parsedUrl）
+     */
+    @JSONField(name = "protocolUrlStr")
+    private String protocolUrlStr;
+
+
+    /**
+     * JDBC URL（标准格式，不含用户名密码）
+     */
+    @JSONField(name = "jdbcUrl")
     private String jdbcUrl;
 
     @JSONField(name = "username")
@@ -41,42 +92,28 @@ public class DataSourceConfig implements Serializable {
     @JSONField(name = "password")
     private String password;
 
-    @JSONField(name = "host")
-    private String host;
-
-    @JSONField(name = "port")
-    private String port;
-
-    @JSONField(name = "database")
-    private String database;
-
-    @JSONField(name = "schemaName")
-    private String schemaName;
-
     // ===================== 表信息（输出端使用）=====================
 
-    /** 目标表名（可选，仅输出端使用） */
+    /**
+     * 目标表名（可选，仅输出端使用）
+     */
     @JSONField(name = "tableName")
     private String tableName;
 
-    // ===================== pg:// 协议 =====================
+    // ===================== 缓存 =====================
 
     /**
-     * pg:// 协议 URL 字符串。设置此字段后，其他连接字段会自动从解析结果中填充。
+     * 解析后的 JdbcUrl 对象（不参与 JSON 序列化，反序列化时从 protocolUrl 重建）
      */
-    @JSONField(name = "pgUrl")
-    private transient String pgUrlStr;
-
-    /** 解析后的 PgUrl 对象（缓存，不参与 JSON 序列化） */
-    @com.alibaba.fastjson2.annotation.JSONField(serialize = false, deserialize = false)
-    private transient PgUrl pgUrl;
+    @JSONField(serialize = false, deserialize = false)
+    private transient ProtocolUrl parsedUrl;
 
     // ===================== DataSource 工厂 =====================
 
     /**
      * 可插拔的 DataSource 创建工厂。默认使用 {@link DefaultDataSourceGetterFunction}。
      */
-    @com.alibaba.fastjson2.annotation.JSONField(serialize = false, deserialize = false)
+    @JSONField(serialize = false, deserialize = false)
     private DataSourceGetterFunction dataSourceFactory = new DefaultDataSourceGetterFunction();
 
     // ===================== 构造方式 =====================
@@ -84,61 +121,63 @@ public class DataSourceConfig implements Serializable {
     public DataSourceConfig() {
     }
 
-    /**
-     * 从 pg:// 协议 URL 构造。
-     *
-     * @param pgUrl pg:// 格式的 URL
-     */
-    public DataSourceConfig(String pgUrl) {
-        this.pgUrlStr = pgUrl;
-        applyPgUrl(new PgUrl(pgUrl));
-    }
-
-    /**
-     * 从 JDBC 参数直接构造。
-     */
     public DataSourceConfig(String jdbcUrl, String username, String password) {
         this.jdbcUrl = jdbcUrl;
         this.username = username;
         this.password = password;
     }
 
-    // ===================== pg:// 协议应用 =====================
-
     /**
-     * 应用 PgUrl 解析结果到当前配置。
+     * 反序列化后重建 parsedUrl（transient 字段在反序列化后为 null）。
+     * 优先从 protocolUrl 重建，否则从 jdbcUrl + tableName 重建。
      */
-    private void applyPgUrl(PgUrl parsed) {
-        this.pgUrl = parsed;
-        this.jdbcUrl = parsed.toJdbcUrl();
-        this.username = parsed.getUsername();
-        this.password = parsed.getPassword();
-        this.host = parsed.getHost();
-        this.port = String.valueOf(parsed.getPort());
-        this.database = parsed.getDatabase();
-        this.schemaName = parsed.getSchema();
-        this.tableName = parsed.getTableName();
-    }
-
-    /**
-     * 设置 pg:// 协议 URL（同时更新所有连接字段）。
-     */
-    public DataSourceConfig setPgUrl(String pgUrlStr) {
-        this.pgUrlStr = pgUrlStr;
-        if (pgUrlStr != null) {
-            applyPgUrl(new PgUrl(pgUrlStr));
+    private Object readResolve() {
+        if (protocolUrlStr != null) {
+            parsedUrl = new ProtocolUrl(protocolUrlStr);
+        } else if (jdbcUrl != null) {
+            parsedUrl = new ProtocolUrl(jdbcUrl);
+        }
+        if (dataSourceFactory == null) {
+            dataSourceFactory = new DefaultDataSourceGetterFunction();
         }
         return this;
     }
 
+    // ===================== JdbcUrl 解析 =====================
+
     /**
-     * 获取解析后的 PgUrl 对象（懒加载）。
+     * 获取解析后的 JdbcUrl（如果通过 fromProtocol 构造则有值）。
      */
-    public PgUrl getPgUrl() {
-        if (pgUrl == null && pgUrlStr != null) {
-            pgUrl = new PgUrl(pgUrlStr);
-        }
-        return pgUrl;
+    public ProtocolUrl getParsedUrl() {
+        return parsedUrl;
+    }
+
+    /**
+     * 获取 host（仅当通过 fromProtocol 构造时可用）。
+     */
+    public String getHost() {
+        return parsedUrl != null ? parsedUrl.getHost() : null;
+    }
+
+    /**
+     * 获取 port（仅当通过 fromProtocol 构造时可用）。
+     */
+    public int getPort() {
+        return parsedUrl != null ? parsedUrl.getPort() : 0;
+    }
+
+    /**
+     * 获取 database 名称（仅当通过 fromProtocol 构造时可用）。
+     */
+    public String getDatabase() {
+        return parsedUrl != null ? parsedUrl.getDatabase() : null;
+    }
+
+    /**
+     * 获取 schema 名称（仅当通过 fromProtocol 构造且数据库支持 schema 时可用）。
+     */
+    public String getSchemaName() {
+        return parsedUrl != null ? parsedUrl.getSchema() : null;
     }
 
     // ===================== DataSource =====================
@@ -172,16 +211,17 @@ public class DataSourceConfig implements Serializable {
     /**
      * 获取用于 SQL 语句的表名。
      * <p>
-     * 有 tableName 时返回 "schema.table"，无 tableName 时返回 schemaName，
-     * 两者都为空时返回 null。
+     * 有 tableName 且有 schema 时返回 "schema.table"，
+     * 有 tableName 无 schema 时返回 tableName，
+     * 无 tableName 时返回 schema（可能为 null）。
      */
     public String getTableNameForSql() {
-        if (tableName != null && schemaName != null) {
-            return schemaName + "." + tableName;
+        if (parsedUrl != null) {
+            // 有自定义协议解析结果时，用 JdbcUrl 的逻辑（考虑 schema）
+            String sqlTable = parsedUrl.getTableForSql();
+            // 如果 JdbcUrl 的 tableForSql 为 null（没有 schema 也没有 table），回退到 tableName
+            return sqlTable != null ? sqlTable : tableName;
         }
-        if (tableName != null) {
-            return tableName;
-        }
-        return schemaName;
+        return tableName;
     }
 }

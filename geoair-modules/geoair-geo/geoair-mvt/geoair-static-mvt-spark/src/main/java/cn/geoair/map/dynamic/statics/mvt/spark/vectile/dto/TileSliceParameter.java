@@ -10,7 +10,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.annotation.JSONField;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -43,16 +42,10 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 数据源配置 =====================
 
-    /**
-     * 输入数据源配置（从 PostGIS 读取数据）
-     */
-    @JSONField(deserializeUsing = DataSourceConfigDeserializer.class)
+    /** 输入数据源配置（从数据库读取数据） */
     private DataSourceConfig inputSource;
 
-    /**
-     * 输出数据源配置（写入瓦片缓存表）
-     */
-    @JSONField(deserializeUsing = DataSourceConfigDeserializer.class)
+    /** 输出数据源配置（写入瓦片缓存表） */
     private DataSourceConfig outputSource;
 
     // ===================== 数据字段配置 =====================
@@ -66,17 +59,13 @@ public class TileSliceParameter implements Serializable {
     /** 查询语句 */
     private String queryStatement;
 
-    /**
-     * 瓦片图层名称
-     */
+    /** 瓦片图层名称 */
     private String layerName;
 
     /** 版本号 */
     private String edition;
 
-    /**
-     * 数据坐标系（默认 EPSG:3857 Web 墨卡托）
-     */
+    /** 数据坐标系（默认 EPSG:3857 Web 墨卡托） */
     private int sourceDataSrid = 3857;
 
     // ===================== 输出坐标系配置 =====================
@@ -193,91 +182,17 @@ public class TileSliceParameter implements Serializable {
     // ===================== 序列化 =====================
 
     /**
-     * 从 Base32 编码的 JSON 字符串反序列化。兼容旧版 PgConnectInfoSimple / PgConnectInfoWithTable 格式。
+     * 从 Base32 编码的 JSON 字符串反序列化。
      */
     public static TileSliceParameter fromBase32(String baseString) {
         try {
             String encoded = URLUtil.decode(baseString);
             String json = Base32.decodeStr(encoded);
-
-            // 移除旧版兼容字段，避免反序列化到错误的类型
-            JSONObject jsonObject = JSON.parseObject(json);
-            jsonObject.remove("inputConnectInfo");
-            jsonObject.remove("outPutConnectInfo");
-            jsonObject.remove("inputConnectSimple");
-            jsonObject.remove("outPutConnectWithTable");
-            // 旧版的 dataSourceGetterFunction 字段不可反序列化，直接移除
-            removeNestedField(jsonObject, "inputSource", "dataSourceFactory");
-            removeNestedField(jsonObject, "outputSource", "dataSourceFactory");
-
-            TileSliceParameter params = jsonObject.to(TileSliceParameter.class);
-
-            // 兼容旧版字段名：如果新版字段为空，尝试从旧版字段迁移
-            migrateLegacyFields(jsonObject, params);
-
-            return params;
+            return JSON.parseObject(json, TileSliceParameter.class);
         } catch (Exception e) {
             throw new RuntimeException(
                     "Failed to parse TileSliceParameter from base32: " + baseString, e);
         }
-    }
-
-    /**
-     * 移除嵌套对象中的指定字段（忽略不存在的情况）。
-     */
-    private static void removeNestedField(JSONObject root, String parentKey, String childKey) {
-        JSONObject parent = root.getJSONObject(parentKey);
-        if (parent != null) {
-            parent.remove(childKey);
-        }
-    }
-
-    /**
-     * 从旧版 JSON 字段迁移到新版 DataSourceConfig。
-     * <p>
-     * 旧版使用 inputConnectSimple (PgConnectInfoSimple) 和 outPutConnectWithTable (PgConnectInfoWithTable)，
-     * 新版使用 inputSource 和 outputSource (DataSourceConfig)。
-     */
-    private static void migrateLegacyFields(JSONObject json, TileSliceParameter params) {
-        if (params.getInputSource() == null) {
-            JSONObject legacy = json.getJSONObject("inputConnectSimple");
-            if (legacy != null) {
-                params.setInputSource(buildConfigFromLegacy(legacy));
-            }
-        }
-        if (params.getOutputSource() == null) {
-            JSONObject legacy = json.getJSONObject("outPutConnectWithTable");
-            if (legacy != null) {
-                params.setOutputSource(buildConfigFromLegacy(legacy));
-            }
-        }
-    }
-
-    /**
-     * 从旧版 PgConnectInfoSimple / PgConnectInfoWithTable 的 JSON 对象构建 DataSourceConfig。
-     */
-    private static DataSourceConfig buildConfigFromLegacy(JSONObject legacy) {
-        DataSourceConfig config = new DataSourceConfig();
-        config.setHost(legacy.getString("ip"));
-        config.setPort(legacy.getString("port"));
-        config.setUsername(legacy.getString("userName"));
-        config.setPassword(legacy.getString("passwd"));
-        config.setDatabase(legacy.getString("dbName"));
-        config.setSchemaName(legacy.getString("schemaName"));
-        config.setTableName(legacy.getString("tableName"));
-
-        // 自动构建 JDBC URL
-        String host = config.getHost();
-        String port = config.getPort() != null ? config.getPort() : "5432";
-        String db = config.getDatabase() != null ? config.getDatabase() : "";
-        StringBuilder url = new StringBuilder("jdbc:postgresql://")
-                .append(host).append(':').append(port).append('/').append(db);
-        if (config.getSchemaName() != null) {
-            url.append("?currentSchema=").append(config.getSchemaName());
-        }
-        config.setJdbcUrl(url.toString());
-
-        return config;
     }
 
     /**
@@ -287,7 +202,6 @@ public class TileSliceParameter implements Serializable {
         String jsonStr = JSON.toJSONString(this);
         JSONObject jsonObject = JSON.parseObject(jsonStr);
         jsonObject.entrySet().removeIf(entry -> ObjectUtil.isEmpty(entry.getValue()));
-        String encode = Base32.encode(jsonObject.toString());
-        return encode;
+        return Base32.encode(jsonObject.toString());
     }
 }

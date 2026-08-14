@@ -84,11 +84,6 @@ public class SparkVectorTileGenerator implements Serializable {
         // 移除敏感字段和非参数字段，避免打印到日志
         entries.remove("inputSource");
         entries.remove("outputSource");
-        // 兼容旧版字段名
-        entries.remove("inputConnectInfo");
-        entries.remove("outPutConnectInfo");
-        entries.remove("inputConnectSimple");
-        entries.remove("outPutConnectWithTable");
         Log log = LogFactory.get(CallerUtil.getCallerCaller());
         log.info(
                 "{} 执行器开始切片（流式逐批写入模式），切片参数信息：\n {}",
