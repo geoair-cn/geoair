@@ -216,7 +216,7 @@ public class SparkVectorTileGenerator implements Serializable {
                             String rootTableName = outputSource.getTableNameForSql();
                             try {
                                 SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
-                                        new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, PbfTargetInfo.getInstance());
+                                        new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, PbfTargetInfo.newInstance());
 
                                 while (partitionIterator.hasNext()) {
                                     Tuple2<String, List<GirAdvOneRow>> aggregatedTuple = partitionIterator.next();
@@ -480,36 +480,47 @@ public class SparkVectorTileGenerator implements Serializable {
         }
     }
 
+    private static final String TABLE_NAME_PATTERN = "^[a-zA-Z0-9_\\.\"\\s]+$";
+
+    private void validateTableName(String tableName) {
+        if (tableName == null || tableName.trim().isEmpty()) {
+            throw new IllegalArgumentException("表名不能为空");
+        }
+        if (!tableName.matches(TABLE_NAME_PATTERN)) {
+            throw new IllegalArgumentException("表名包含非法字符: " + tableName);
+        }
+    }
+
     private void createTableDDL(TileSliceParameter parameter) {
         DataSourceConfig outputSource = parameter.getOutputSource();
         DataSource dataSource = outputSource.toDataSource();
         IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
         String tableNameForSql = outputSource.getTableNameForSql();
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableNameForSql);
-        boolean b = iAdvExecutor.dIsTableExists(tableNameWithSchema);
-        String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
-                          "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                          "                          \"z\" int4,\n" +
-                          "                          \"x\" int4,\n" +
-                          "                          \"tms_y\" int4,\n" +
-                          "                          \"y\" int4,\n" +
-                          "                          \"grid_srid\" int4,\n" +
-                          "                          \"tile_data\" bytea,\n" +
-                          "                          \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                          "                          \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                          "                          \"insert_time\" int8\n" +
-                          "                        )\n" +
-                          "                        ;\n" +
-                          "                        CREATE INDEX \"zxy_{UUID}\" ON {tableNameWithSchema} USING btree (\n" +
-                          "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                          "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                          "                          \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                          "                          \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                          "                          \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
-                          "                        );";
-        if (!b) {
+        validateTableName(tableNameWithSchema);
+        boolean tableExists = iAdvExecutor.dIsTableExists(tableNameWithSchema);
+        if (!tableExists) {
+            String ddlTemplate = "CREATE TABLE %s (\n" +
+                    "    \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"z\" int4,\n" +
+                    "    \"x\" int4,\n" +
+                    "    \"tms_y\" int4,\n" +
+                    "    \"y\" int4,\n" +
+                    "    \"grid_srid\" int4,\n" +
+                    "    \"tile_data\" bytea,\n" +
+                    "    \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"insert_time\" int8\n" +
+                    ");\n" +
+                    "CREATE INDEX \"zxy_%s\" ON %s USING btree (\n" +
+                    "    \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
+                    ");";
             log.info("检测到表不存在，执行创建表动作！");
-            String sqlDDL = tempLate.replace("{tableNameWithSchema}", tableNameWithSchema).replace("{UUID}", IdUtil.getSnowflakeNextIdStr());
+            String sqlDDL = String.format(ddlTemplate, tableNameWithSchema, IdUtil.getSnowflakeNextIdStr(), tableNameWithSchema);
             iAdvExecutor.dExecuteDDL(sqlDDL, tableNameWithSchema, "创建表");
         }
     }
