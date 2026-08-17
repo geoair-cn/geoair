@@ -11,10 +11,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -92,6 +89,17 @@ public class GirImageUtil extends ImgUtil {
     public static BufferedImage bytesToImage(byte[] tileData) throws IOException {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(tileData)) {
             return ImageIO.read(bais);
+        }
+    }
+
+
+    public static BufferedImage inputStreamToImage(InputStream inputStream, boolean closeStream) throws IOException {
+        try {
+            return ImageIO.read(inputStream);
+        } finally {
+            if (closeStream) {
+                inputStream.close();
+            }
         }
     }
 
