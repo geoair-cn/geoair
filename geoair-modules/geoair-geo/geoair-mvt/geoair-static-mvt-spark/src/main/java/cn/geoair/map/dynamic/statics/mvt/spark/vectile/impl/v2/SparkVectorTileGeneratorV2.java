@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.percent.GiPercentConsumer;
+import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
@@ -92,12 +92,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
      * 主流程（带外部进度回调）。
      *
      * @param parameter       切片参数
-     * @param percentConsumer 进度回调（可为 null），在 executor 线程中直接调用（local 模式），
-     *                        accept(allCount, currentCount)。内部用 Serializable 包装避免闭包序列化失败
+     * @param percentReporter 进度上报回调（可为 null），在 executor 线程中直接调用，
+     *                        report(allCount, currentCount)。内部用 Serializable 包装避免闭包序列化失败
      */
-    public void doGenerate(TileSliceParameter parameter, GiPercentConsumer percentConsumer) throws Exception {
+    public void doGenerate(TileSliceParameter parameter, GiProgressReporter percentReporter) throws Exception {
         // ==================== 初始化进度跟踪 ====================
-        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentConsumer);
+        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentReporter);
 
         // ==================== 打印参数 ====================
         JSONObject entries = JSONUtil.parseObj(parameter);
@@ -162,11 +162,9 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                         new SparkTaskFunctions.BoundedAggregateFunction(parameter),
                         DEFAULT_REDUCE_PARTITION);
 
-        // 触发聚合计算并统计瓦片数
-        long tileCount = aggregatedRDD.count();
-        tracker.completeStage("瓦片: " + String.format("%,d", tileCount));
-
-
+        // 不调用 aggregatedRDD.count()！它会强制物化全部聚合结果，高密度瓦片会撑爆内存。
+        // 瓦片数由 streamWriteToPg 中的累加器统计。
+        tracker.completeStage();
 
         // ==================== Stage 4: 流式写入PG ====================
         tracker.setStageName("写入PG");
@@ -497,37 +495,48 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
     // ==================== DDL ====================
 
+    private static final String TABLE_NAME_PATTERN = "^[a-zA-Z0-9_\\.\"\\s]+$";
+
+    private void validateTableName(String tableName) {
+        if (tableName == null || tableName.trim().isEmpty()) {
+            throw new IllegalArgumentException("表名不能为空");
+        }
+        if (!tableName.matches(TABLE_NAME_PATTERN)) {
+            throw new IllegalArgumentException("表名包含非法字符: " + tableName);
+        }
+    }
+
     private void createTableDDL(TileSliceParameter parameter) {
         DataSourceConfig outputSource = parameter.getOutputSource();
         DataSource dataSource = outputSource.toDataSource();
         IAdvExecutor iAdvExecutor = AdvExecutorFactory.getAdvExecutorByDataSource(dataSource);
         String tableNameForSql = outputSource.getTableNameForSql();
         String tableNameWithSchema = iAdvExecutor.tbGetTableNameWithSchema(tableNameForSql);
-        boolean exists = iAdvExecutor.dIsTableExists(tableNameWithSchema);
+        validateTableName(tableNameWithSchema);
+        boolean tableExists = iAdvExecutor.dIsTableExists(tableNameWithSchema);
 
-        if (!exists) {
-            String tempLate = "   CREATE TABLE {tableNameWithSchema} (\n" +
-                    "                          \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                    "                          \"z\" int4,\n" +
-                    "                          \"x\" int4,\n" +
-                    "                          \"tms_y\" int4,\n" +
-                    "                          \"y\" int4,\n" +
-                    "                          \"grid_srid\" int4,\n" +
-                    "                          \"tile_data\" bytea,\n" +
-                    "                          \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                    "                          \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
-                    "                          \"insert_time\" int8\n" +
-                    "                        )\n" +
-                    "                        ;\n" +
-                    "                        CREATE INDEX \"zxy_{UUID}\" ON {tableNameWithSchema} USING btree (\n" +
-                    "                          \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                    "                          \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                    "                          \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                    "                          \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
-                    "                          \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
-                    "                        );";
+        if (!tableExists) {
+            String ddlTemplate = "CREATE TABLE %s (\n" +
+                    "    \"id\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"z\" int4,\n" +
+                    "    \"x\" int4,\n" +
+                    "    \"tms_y\" int4,\n" +
+                    "    \"y\" int4,\n" +
+                    "    \"grid_srid\" int4,\n" +
+                    "    \"tile_data\" bytea,\n" +
+                    "    \"layer_name\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"edition\" text COLLATE \"pg_catalog\".\"default\",\n" +
+                    "    \"insert_time\" int8\n" +
+                    ");\n" +
+                    "CREATE INDEX \"zxy_%s\" ON %s USING btree (\n" +
+                    "    \"z\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"x\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"y\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"grid_srid\" \"pg_catalog\".\"int4_ops\" ASC NULLS LAST,\n" +
+                    "    \"insert_time\" \"pg_catalog\".\"int8_ops\" ASC NULLS LAST\n" +
+                    ");";
             log.info("检测到表不存在，执行创建表动作！");
-            String sqlDDL = tempLate.replace("{tableNameWithSchema}", tableNameWithSchema).replace("{UUID}", IdUtil.getSnowflakeNextIdStr());
+            String sqlDDL = String.format(ddlTemplate, tableNameWithSchema, IdUtil.getSnowflakeNextIdStr(), tableNameWithSchema);
             iAdvExecutor.dExecuteDDL(sqlDDL, tableNameWithSchema, "创建表");
         }
     }

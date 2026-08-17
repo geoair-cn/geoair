@@ -22,10 +22,21 @@ public class PbfTargetInfo implements Serializable {
     // 是否保存要素列表
     private boolean saveFeatureList = false;
 
-    public static PbfTargetInfo getInstance() {
+    /**
+     * 创建一个新的默认 PbfTargetInfo 实例（线程安全：每次返回独立对象）。
+     */
+    public static PbfTargetInfo newInstance() {
         return new PbfTargetInfo()
                 .setSaveFeatureList(false)
                 .setPPbfType(PPbfType.rootPbf)
                 .setOnly(false);
+    }
+
+    /**
+     * @deprecated 使用 {@link #newInstance()} 替代，避免多线程共享可变状态。
+     */
+    @Deprecated
+    public static PbfTargetInfo getInstance() {
+        return newInstance();
     }
 }

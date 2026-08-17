@@ -45,7 +45,6 @@
     <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 <!--    <hadoop-version>3.2.0</hadoop-version>-->
     <hadoop-version>3.4.0</hadoop-version>
     <spark.version>4.0.0</spark.version>
@@ -68,10 +67,10 @@
       <artifactId>spark-core_2.13</artifactId>
       <version>${spark.version}</version>
       <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>javax.servlet-api</artifactId>
-        </exclusion>
+          <exclusion>
+              <groupId>javax.servlet</groupId>
+              <artifactId>javax.servlet-api</artifactId>
+          </exclusion>
         <exclusion>
           <artifactId>log4j-over-slf4j</artifactId>
           <groupId>org.slf4j</groupId>

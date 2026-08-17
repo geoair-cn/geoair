@@ -1,6 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2;
 
-import cn.geoair.base.percent.GiPercentConsumer;
+import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import org.apache.spark.sql.SparkSession;
 
@@ -10,8 +10,8 @@ import org.apache.spark.sql.SparkSession;
  * 相对于原版 {@code SparkJavaTileLocalApp} 的改进：
  * <ul>
  *   <li>使用 {@link SparkVectorTileGeneratorV2} 替代原版生成器</li>
- *   <li>支持通过 {@link GiPercentConsumer} 回调进度</li>
- *   <li>可通过 {@code -Dprogress.consumer=xxx} 指定自定义进度回调类名（暂未实现，预留）</li>
+ *   <li>支持通过 {@link GiProgressReporter} 回调进度</li>
+ *   <li>可通过 {@code -Dprogress.reporter=xxx} 指定自定义进度回调类名（暂未实现，预留）</li>
  * </ul>
  *
  * @author refactored from SparkJavaTileLocalApp
@@ -35,11 +35,11 @@ public class SparkJavaTileLocalAppV2 {
      * 带进度回调的启动方式。
      *
      * @param tileSliceParameter 切片参数
-     * @param percentConsumer    进度回调（可为 null），在 executor 线程中直接调用，
-     *                          accept(allCount, currentCount)
+     * @param percentReporter    进度上报回调（可为 null），在 executor 线程中直接调用，
+     *                           report(allCount, currentCount)
      */
     public static void runByTileSliceParameter(TileSliceParameter tileSliceParameter,
-                                               GiPercentConsumer percentConsumer) throws Exception {
+                                               GiProgressReporter percentReporter) throws Exception {
 
         SparkSession spark = SparkSession.builder()
                 .appName("spark-tile-app-v2")
@@ -52,7 +52,7 @@ public class SparkJavaTileLocalAppV2 {
 
         try {
             SparkVectorTileGeneratorV2 generator = new SparkVectorTileGeneratorV2(spark);
-            generator.doGenerate(tileSliceParameter, percentConsumer);
+            generator.doGenerate(tileSliceParameter, percentReporter);
         } finally {
             spark.stop();
         }
