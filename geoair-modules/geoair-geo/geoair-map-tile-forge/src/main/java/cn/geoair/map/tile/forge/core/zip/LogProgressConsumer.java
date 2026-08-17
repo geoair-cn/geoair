@@ -4,6 +4,7 @@ package cn.geoair.map.tile.forge.core.zip;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.percent.GiProgressListener;
+import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.base.percent.GirProgressReporter;
 import cn.geoair.base.util.GutilPercent;
 
