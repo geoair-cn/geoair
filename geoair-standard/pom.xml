@@ -38,6 +38,7 @@
   <modules>
 
     <module>geoair-tools</module>
+    <module>geoair-log4j-processor</module>
     <module>geoair-base</module>
     <module>geoair-web</module>
     <module>geoair-core</module>
@@ -77,6 +78,12 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-tools</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-log4j-processor</artifactId>
         <version>${geoair.version}</version>
       </dependency>
 
