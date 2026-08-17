@@ -2,7 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.base.percent.GiPercentConsumer;
+import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
@@ -91,12 +91,12 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
      * 主流程（带外部进度回调）。
      *
      * @param parameter       切片参数
-     * @param percentConsumer 进度回调（可为 null），在 executor 线程中直接调用（local 模式），
-     *                        accept(allCount, currentCount)。内部用 Serializable 包装避免闭包序列化失败
+     * @param percentReporter 进度上报回调（可为 null），在 executor 线程中直接调用，
+     *                        report(allCount, currentCount)。内部用 Serializable 包装避免闭包序列化失败
      */
-    public void doGenerate(TileSliceParameter parameter, GiPercentConsumer percentConsumer) throws Exception {
+    public void doGenerate(TileSliceParameter parameter, GiProgressReporter percentReporter) throws Exception {
         // ==================== 初始化进度跟踪 ====================
-        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentConsumer);
+        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentReporter);
 
         // ==================== 打印参数 ====================
         JSONObject entries = JSONUtil.parseObj(parameter);

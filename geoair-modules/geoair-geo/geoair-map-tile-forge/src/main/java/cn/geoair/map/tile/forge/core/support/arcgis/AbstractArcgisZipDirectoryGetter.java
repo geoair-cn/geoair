@@ -55,7 +55,7 @@ public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSup
                 iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
                     try {
                         if (GutilObject.isNotEmpty(progressConsumers)) {
-                            progressConsumers.forEach(progressConsumer -> progressConsumer.accept(allCount, currentCount));
+                            progressConsumers.forEach(progressConsumer -> progressConsumer.report(allCount, currentCount));
                         }
                     } catch (Exception e) {
                     }

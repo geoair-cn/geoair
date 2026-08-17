@@ -2,8 +2,8 @@ package cn.geoair.map.dynamic.file.test.gj2pg;
 
 import static cn.geoair.base.Gir.log;
 
-import cn.geoair.base.percent.GiPercentUpdateConsumer;
-import cn.geoair.base.percent.GirPercentConsumer;
+import cn.geoair.base.percent.GiProgressListener;
+import cn.geoair.base.percent.GirProgressReporter;
 import cn.geoair.base.util.GutilPercent;
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import cn.geoair.map.dynamic.file.core.tran.GeoFileTran;
@@ -66,18 +66,18 @@ public class GeoJsonToPg {
                         // 自定义扩展参数
                         .putExtParam("tranId", "TRAN_20260209_001")
                         .putExtParam("operator", "admin");
-        GirPercentConsumer percentConsumerInt = GutilPercent.getPercentConsumerInt(new GiPercentUpdateConsumer() {
+        GirProgressReporter percentReporter = new GirProgressReporter(1, new GiProgressListener() {
             @Override
-            public void start(Number allCount) {
-                log.info("总数：{}", allCount);
+            public void onStart(Number total) {
+                log.info("总数：{}", total);
             }
 
             @Override
-            public void update(Number updatePercent) {
-                String progressBar = GutilPercent.getProgressBar(updatePercent.intValue());
-                log.info("{}: {}%", progressBar, updatePercent);
+            public void onUpdate(Number percent) {
+                String progressBar = GutilPercent.getProgressBar(percent.intValue());
+                log.info("{}: {}%", progressBar, percent);
             }
-        }, 1);
+        });
         // 3. 构建转换处理器
         GeoFileTran tran =
                 new GeoFileTranImpl()
@@ -89,7 +89,7 @@ public class GeoJsonToPg {
                         // 进度监听器（实时回调）
                         .setProgressListener(
                                 progress -> {
-                                    percentConsumerInt.accept(progress.getTotalFeatureCount(), progress.getBatchTotalCount());
+                                    percentReporter.report(progress.getTotalFeatureCount(), progress.getBatchTotalCount());
                                 });
 
         // 4. 执行转换
