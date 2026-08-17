@@ -161,11 +161,9 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                         new SparkTaskFunctions.BoundedAggregateFunction(parameter),
                         DEFAULT_REDUCE_PARTITION);
 
-        // 触发聚合计算并统计瓦片数
-        long tileCount = aggregatedRDD.count();
-        tracker.completeStage("瓦片: " + String.format("%,d", tileCount));
-
-
+        // 不调用 aggregatedRDD.count()！它会强制物化全部聚合结果，高密度瓦片会撑爆内存。
+        // 瓦片数由 streamWriteToPg 中的累加器统计。
+        tracker.completeStage();
 
         // ==================== Stage 4: 流式写入PG ====================
         tracker.setStageName("写入PG");

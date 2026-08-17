@@ -61,20 +61,30 @@ public class SparkTaskFunctions implements Serializable {
     }
 
     /**
-     * 有界聚合函数 — 在合并过程中提前截断，避免内存膨胀。
+     * 有界聚合函数 — 始终限制合并后的列表大小，防止 OOM。
      * <p>
-     * 原版 {@code AggregateAndLimitFeatureFunction} 先完整合并两个 list，再截断。
-     * 当高密度瓦片累积上万个要素时，合并瞬间内存翻倍。
+     * 即使用户未开启 featureLimitEnabled，也使用 DEFAULT_HARD_LIMIT 作为安全兜底，
+     * 避免高密度瓦片（如 zoom 4-6 覆盖大面积区域）累积数万要素导致内存溢出。
      * <p>
-     * 本函数在合并时即检查限制：如果两个 list 总和超过 limit，
-     * 直接截取 list1（保留全部）+ list2 的前 N 个，不创建超大临时 list。
-     * 然后再应用密度合并/过滤。
+     * 策略：
+     * <ul>
+     *   <li>合并前先检查两个 list 的总大小</li>
+     *   <li>超限时只保留 list1 全部 + list2 的前 N 个，不创建超大临时 list</li>
+     *   <li>合并后再应用密度优化/截断</li>
+     * </ul>
      */
     public static class BoundedAggregateFunction
             implements Function2<List<GirAdvOneRow>, List<GirAdvOneRow>, List<GirAdvOneRow>>,
             Serializable {
 
         private static final long serialVersionUID = 1L;
+
+        /**
+         * 硬上限：即使用户未配置 featureLimit，也最多保留此数量的要素。
+         * 用 CPU 换内存 —— 多余的要素会被丢弃，但不会 OOM。
+         */
+        private static final int DEFAULT_HARD_LIMIT = 8000;
+
         private final TileSliceParameter parameter;
 
         public BoundedAggregateFunction(TileSliceParameter parameter) {
@@ -83,15 +93,7 @@ public class SparkTaskFunctions implements Serializable {
 
         @Override
         public List<GirAdvOneRow> call(List<GirAdvOneRow> list1, List<GirAdvOneRow> list2) throws Exception {
-            // 无限制时直接合并
-            if (!parameter.isFeatureLimitEnabled() || parameter.getFeatureLimit() == null) {
-                List<GirAdvOneRow> merged = new ArrayList<>(list1.size() + list2.size());
-                merged.addAll(list1);
-                merged.addAll(list2);
-                return merged;
-            }
-
-            int limit = parameter.getFeatureLimit();
+            int limit = getEffectiveLimit();
             int totalSize = list1.size() + list2.size();
 
             // 未超限：正常合并
@@ -102,7 +104,7 @@ public class SparkTaskFunctions implements Serializable {
                 return merged;
             }
 
-            // 超限：先有界合并（不超过 limit），再应用密度优化
+            // 超限：有界合并（不超过 limit），再应用密度优化
             List<GirAdvOneRow> bounded = new ArrayList<>(limit);
             bounded.addAll(list1);
             int remaining = limit - list1.size();
@@ -110,8 +112,17 @@ public class SparkTaskFunctions implements Serializable {
                 int take = Math.min(remaining, list2.size());
                 bounded.addAll(list2.subList(0, take));
             }
-            // 应用密度合并/过滤/截断（在已限制大小的 list 上操作）
-            return VectorTileCommonUtils.limitTileFeatures(bounded, parameter);
+            return V2VectorTileUtils.limitTileFeatures(bounded, parameter);
+        }
+
+        /**
+         * 获取有效限制值：用户配置优先，否则使用硬上限兜底。
+         */
+        private int getEffectiveLimit() {
+            if (parameter.isFeatureLimitEnabled() && parameter.getFeatureLimit() != null) {
+                return parameter.getFeatureLimit();
+            }
+            return DEFAULT_HARD_LIMIT;
         }
     }
 }
