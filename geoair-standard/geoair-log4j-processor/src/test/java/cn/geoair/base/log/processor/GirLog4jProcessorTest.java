@@ -7,6 +7,7 @@ import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -147,7 +148,7 @@ public class GirLog4jProcessorTest {
         srcFile.getParentFile().mkdirs();
         Files.write(srcFile.toPath(), source.getBytes(StandardCharsets.UTF_8));
 
-        JavaCompiler compiler = (JavaCompiler) Class.forName("com.sun.tools.javac.api.JavacTool").newInstance();
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
                 StandardCharsets.UTF_8);
