@@ -26,6 +26,8 @@ public class GutilType {
     /**
      * 获得Type对应的原始类
      *
+     * <p>类型变量取第一个上界对应的原始类，通配符类型取第一个上界对应的原始类。
+     *
      * @param type {@link Type}
      * @return 原始类，如果无法获取原始类，返回{@code null}
      */
@@ -36,10 +38,15 @@ public class GutilType {
             } else if (type instanceof ParameterizedType) {
                 return (Class<?>) ((ParameterizedType) type).getRawType();
             } else if (type instanceof TypeVariable) {
-                return (Class<?>) ((TypeVariable<?>) type).getBounds()[0];
+                final Type[] bounds = ((TypeVariable<?>) type).getBounds();
+                if (bounds.length > 0) {
+                    // 上界可能是ParameterizedType等，递归解析对应的原始类
+                    return getClass(bounds[0]);
+                }
             } else if (type instanceof WildcardType) {
                 final Type[] upperBounds = ((WildcardType) type).getUpperBounds();
-                if (upperBounds.length == 1) {
+                if (upperBounds.length > 0) {
+                    // 通配符类型取第一个上界（多上界时按约定只取第一个）
                     return getClass(upperBounds[0]);
                 }
             }
@@ -85,7 +92,7 @@ public class GutilType {
     }
 
     // -----------------------------------------------------------------------------------
-    // Param Type
+    // 参数类型
 
     /**
      * 获取方法的第一个参数类型<br>
@@ -117,8 +124,12 @@ public class GutilType {
      * @param method 方法
      * @param index 第几个参数的索引，从0开始计数
      * @return {@link Type}，可能为{@code null}
+     * @throws IllegalArgumentException index为负数时抛出
      */
     public static Type getParamType(Method method, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Param index must not be negative: " + index);
+        }
         Type[] types = getParamTypes(method);
         if (null != types && types.length > index) {
             return types[index];
@@ -132,9 +143,13 @@ public class GutilType {
      * @param method 方法
      * @param index 第几个参数的索引，从0开始计数
      * @return 参数类，可能为{@code null}
+     * @throws IllegalArgumentException index为负数时抛出
      * @since 3.1.2
      */
     public static Class<?> getParamClass(Method method, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Param index must not be negative: " + index);
+        }
         Class<?>[] classes = getParamClasses(method);
         if (null != classes && classes.length > index) {
             return classes[index];
@@ -170,7 +185,7 @@ public class GutilType {
     }
 
     // -----------------------------------------------------------------------------------
-    // Return Type
+    // 返回类型
 
     /**
      * 获取方法的返回值类型<br>
@@ -199,7 +214,7 @@ public class GutilType {
     }
 
     // -----------------------------------------------------------------------------------
-    // Type Argument
+    // 泛型参数
 
     /**
      * 获得给定类的第一个泛型参数

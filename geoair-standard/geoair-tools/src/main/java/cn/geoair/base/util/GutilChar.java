@@ -237,14 +237,14 @@ public class GutilChar {
 
     /**
      * 字符转为字符串<br>
-     * 如果为ASCII字符，使用缓存
+     * 说明：hutool 的 ASCIIStrCache 缓存类在本模块中不存在（geoair-tools 未引入 hutool 依赖），
+     * 因此直接使用 {@link String#valueOf(char)} 完成转换，不再走 ASCII 字符缓存。
      *
      * @param c 字符
      * @return 字符串
-     * @see ASCIIStrCache#toString(char)
      */
     public static String toString(char c) {
-        return null; // ASCIIStrCache.toString(c);
+        return String.valueOf(c);
     }
 
     /**
@@ -267,15 +267,17 @@ public class GutilChar {
      *
      * <pre>
      * Character.class
-     * char.class
      * </pre>
      *
-     * @param value 被检查的对象
-     * @return true表示为字符类
+     * 注意：基本类型 char 传入本方法时会被自动装箱为 {@link Character}，因此
+     * {@code value.getClass() == char.class} 恒为 false，此处直接以 {@code instanceof Character} 判断；
+     * 当 value 为 {@code null} 时返回 false。
+     *
+     * @param value 被检查的对象，可为 null
+     * @return true表示为字符类；value 为 null 时返回 false
      */
     public static boolean isChar(Object value) {
-        // noinspection ConstantConditions
-        return value instanceof Character || value.getClass() == char.class;
+        return value instanceof Character;
     }
 
     /**
@@ -310,28 +312,23 @@ public class GutilChar {
     }
 
     /**
-     * 判断是否为emoji表情符<br>
+     * 判断是否为emoji表情符（仅限BMP基本多文种平面内的区间）<br>
+     * <p>
+     * 本方法使用单 char 参数，只能检测 BMP（0x0000~0xFFFF）内的 emoji 区间，包括：<br>
+     * <pre>
+     * 1. 0x2600~0x27BF：杂项符号（Miscellaneous Symbols）与装饰符号（Dingbats），如 ☀ ☎ ☺ ✈ ⚽
+     * 2. 0x2B00~0x2BFF：杂项符号和箭头（Miscellaneous Symbols and Arrows），如 ⬅ ⬆ ⬇ ➡
+     * </pre>
+     * 补充平面（0x1F300~0x1FAFF 等）的 emoji 由代理对（高、低代理项）组成，单个 char
+     * 无法判定是否为 emoji，本方法不检测代理项区间（0xD800~0xDFFF）；如需检测
+     * 补充平面 emoji，请遍历字符串中的代理对自行判断。
      *
      * @param c 字符
-     * @return 是否为emoji
+     * @return 是否为 BMP 内 emoji 表情符
      * @since 4.0.8
      */
     public static boolean isEmoji(char c) {
-        // noinspection ConstantConditions
-        return false
-                == ((c == 0x0)
-                        || //
-                        (c == 0x9)
-                        || //
-                        (c == 0xA)
-                        || //
-                        (c == 0xD)
-                        || //
-                        ((c >= 0x20) && (c <= 0xD7FF))
-                        || //
-                        ((c >= 0xE000) && (c <= 0xFFFD))
-                        || //
-                        ((c >= 0x100000) && (c <= 0x10FFFF)));
+        return (c >= 0x2600 && c <= 0x27BF) || (c >= 0x2B00 && c <= 0x2BFF);
     }
 
     /**

@@ -228,7 +228,8 @@ public class GutilArray extends PrimitiveArrayUtil {
     /**
      * 强转数组类型<br>
      * 强制转换的前提是数组元素类型可被强制转换<br>
-     * 强制转换后会生成一个新数组
+     * 强制转换后会生成一个新数组（浅拷贝）<br>
+     * 基本类型数组会先逐元素装箱为包装类型数组，避免直接强转抛 {@link ClassCastException}
      *
      * @param type 数组类型或数组元素类型
      * @param arrayObj 原数组
@@ -240,20 +241,46 @@ public class GutilArray extends PrimitiveArrayUtil {
     public static Object[] cast(Class<?> type, Object arrayObj)
             throws NullPointerException, IllegalArgumentException {
         if (null == arrayObj) {
-            throw new NullPointerException("Argument [arrayObj] is null !");
+            throw new NullPointerException("参数 [arrayObj] 不能为 null");
         }
         if (false == arrayObj.getClass().isArray()) {
-            throw new IllegalArgumentException("Argument [arrayObj] is not array !");
+            throw new IllegalArgumentException("参数 [arrayObj] 不是数组");
         }
+        // 基本类型数组先转为包装类型数组，避免直接强转抛 ClassCastException
+        final Object[] array = toObjectArray(arrayObj);
         if (null == type) {
-            return (Object[]) arrayObj;
+            return array;
         }
 
         final Class<?> componentType = type.isArray() ? type.getComponentType() : type;
-        final Object[] array = (Object[]) arrayObj;
+        if (componentType.isPrimitive()) {
+            // 目标元素类型为基本类型时，返回包装类型数组，保证返回值可安全作为 Object[] 使用
+            final Object[] result = new Object[array.length];
+            System.arraycopy(array, 0, result, 0, array.length);
+            return result;
+        }
         final Object[] result = GutilArray.newArray(componentType, array.length);
         System.arraycopy(array, 0, result, 0, array.length);
         return result;
+    }
+
+    /**
+     * 将数组转为包装类型对象数组<br>
+     * 基本类型数组逐元素装箱；对象数组直接返回原引用
+     *
+     * @param array 数组对象
+     * @return 包装类型对象数组
+     */
+    private static Object[] toObjectArray(Object array) {
+        if (array.getClass().getComponentType().isPrimitive()) {
+            final int len = Array.getLength(array);
+            final Object[] result = new Object[len];
+            for (int i = 0; i < len; i++) {
+                result[i] = Array.get(array, i);
+            }
+            return result;
+        }
+        return (Object[]) array;
     }
 
     /**
@@ -291,17 +318,18 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     /**
-     * 将元素值设置为数组的某个位置，当给定的index大于数组长度，则追加
+     * 将元素值设置为数组的某个位置，当给定的index大于数组长度，则追加<br>
+     * 注意：实际实现为 index 小于数组长度时替换，index 大于等于数组长度时追加
      *
      * @param <T> 数组元素类型
-     * @param buffer 已有数组
-     * @param index 位置，大于长度追加，否则替换
+     * @param buffer 已有数组，可为 null（视为追加到空数组）
+     * @param index 位置，大于等于长度追加，否则替换
      * @param value 新值
      * @return 新数组或原有数组
      * @since 4.1.2
      */
     public static <T> T[] setOrAppend(T[] buffer, int index, T value) {
-        if (index < buffer.length) {
+        if (null != buffer && index < buffer.length) {
             Array.set(buffer, index, value);
             return buffer;
         } else {
@@ -365,9 +393,18 @@ public class GutilArray extends PrimitiveArrayUtil {
             return newElements;
         }
 
+        // 基本类型数组先转为包装类型数组，避免新数组创建时的强转异常与元素写入时的 ArrayStoreException
+        if (array.getClass().getComponentType().isPrimitive()) {
+            array = toObjectArray(array);
+        }
+
         final int len = length(array);
         if (index < 0) {
+            // 负数索引：从原数组从后向前计数，仍为负数则钳制为 0
             index = (index % len) + len;
+            if (index < 0) {
+                index = 0;
+            }
         }
 
         final T[] result =
@@ -439,6 +476,9 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @return 调整后的新数组
      */
     public static <T> T[] resize(T[] buffer, int newSize) {
+        if (null == buffer) {
+            return null;
+        }
         return resize(buffer, newSize, buffer.getClass().getComponentType());
     }
 
@@ -452,8 +492,8 @@ public class GutilArray extends PrimitiveArrayUtil {
      */
     @SafeVarargs
     public static <T> T[] addAll(T[]... arrays) {
-        if (arrays.length == 1) {
-            return arrays[0];
+        if (null == arrays) {
+            return null;
         }
 
         int length = 0;
@@ -537,12 +577,10 @@ public class GutilArray extends PrimitiveArrayUtil {
         if (isArray(obj)) {
             final Object result;
             final Class<?> componentType = obj.getClass().getComponentType();
+            final int length = Array.getLength(obj);
             if (componentType.isPrimitive()) { // 原始类型
-                int length = Array.getLength(obj);
                 result = Array.newInstance(componentType, length);
-                while (length-- > 0) {
-                    Array.set(result, length, Array.get(obj, length));
-                }
+                System.arraycopy(obj, 0, result, 0, length);
             } else {
                 result = ((Object[]) obj).clone();
             }
@@ -566,6 +604,12 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @return 过滤后的数组
      */
     public static <T> T[] filter(T[] array, GkEditor<T> editor) {
+        if (null == array) {
+            return null;
+        }
+        if (null == editor) {
+            return array;
+        }
         ArrayList<T> list = new ArrayList<>(array.length);
         T modified;
         for (T t : array) {
@@ -574,7 +618,7 @@ public class GutilArray extends PrimitiveArrayUtil {
                 list.add(modified);
             }
         }
-        return list.toArray(Arrays.copyOf(array, list.size()));
+        return list.toArray(newArray(array.getClass().getComponentType(), 0));
     }
 
     /**
@@ -698,7 +742,7 @@ public class GutilArray extends PrimitiveArrayUtil {
      */
     public static <K, V> Map<K, V> zip(K[] keys, V[] values, boolean isOrder) {
         if (isEmpty(keys) || isEmpty(values)) {
-            return null;
+            return newHashMap(0, isOrder);
         }
 
         final int size = Math.min(keys.length, values.length);
@@ -733,8 +777,8 @@ public class GutilArray extends PrimitiveArrayUtil {
         return zip(keys, values, false);
     }
 
-    // ------------------------------------------------------------------- indexOf and
-    // lastIndexOf and contains
+    // ------------------------------------------------------------------- indexOf、
+    // lastIndexOf 和 contains
 
     /**
      * 返回数组中指定元素所在位置，未找到返回{@link #INDEX_NOT_FOUND}
@@ -941,7 +985,8 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     /**
-     * 获取数组中指定多个下标元素值，组成新数组
+     * 获取数组中指定多个下标元素值，组成新数组<br>
+     * 返回数组中元素的顺序与 indexes 的顺序一致
      *
      * @param <T> 数组元素类型
      * @param array 数组
@@ -954,8 +999,9 @@ public class GutilArray extends PrimitiveArrayUtil {
         }
 
         final T[] result = newArray(array.getClass().getComponentType(), indexes.length);
+        int pos = 0;
         for (int i : indexes) {
-            result[i] = get(array, i);
+            result[pos++] = get(array, i);
         }
         return result;
     }
@@ -975,9 +1021,15 @@ public class GutilArray extends PrimitiveArrayUtil {
         int length = length(array);
         if (start < 0) {
             start += length;
+            if (start < 0) {
+                start = 0;
+            }
         }
         if (end < 0) {
             end += length;
+            if (end < 0) {
+                end = 0;
+            }
         }
         if (start == length) {
             return newArray(array.getClass().getComponentType(), 0);
@@ -997,7 +1049,9 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     /**
-     * 获取子数组
+     * 获取子数组<br>
+     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}，
+     * 不保留原数组的组件类型
      *
      * @param array 数组
      * @param start 开始位置（包括）
@@ -1010,7 +1064,9 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     /**
-     * 获取子数组
+     * 获取子数组<br>
+     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}，
+     * 不保留原数组的组件类型
      *
      * @param array 数组
      * @param start 开始位置（包括）
@@ -1023,9 +1079,15 @@ public class GutilArray extends PrimitiveArrayUtil {
         int length = length(array);
         if (start < 0) {
             start += length;
+            if (start < 0) {
+                start = 0;
+            }
         }
         if (end < 0) {
             end += length;
+            if (end < 0) {
+                end = 0;
+            }
         }
         if (start == length) {
             return new Object[0];
@@ -1132,29 +1194,8 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     /**
-     * 以 conjunction 为分隔符将数组转换为字符串
-     *
-     * @param <T> 被处理的集合
-     * @param array 数组
-     * @param conjunction 分隔符
-     * @param prefix 每个元素添加的前缀，null表示不添加
-     * @param suffix 每个元素添加的后缀，null表示不添加
-     * @return 连接后的字符串
-     * @since 4.0.10
-     *     <p>public static <T> String join(T[] array, CharSequence conjunction, String prefix,
-     *     String suffix) { if (null == array) { return null; }
-     *     <p>final StringBuilder sb = new StringBuilder(); boolean isFirst = true; for (T item :
-     *     array) { if (isFirst) { isFirst = false; } else { sb.append(conjunction); } if (
-     *     gtcArrayUtil.isArray(item)) { sb.append(join( gtcArrayUtil.wrap(item), conjunction,
-     *     prefix, suffix)); } else if (item instanceof Iterable<?>) {
-     *     sb.append(CollUtil.join((Iterable<?>) item, conjunction, prefix, suffix)); } else if
-     *     (item instanceof Iterator<?>) { sb.append(IterUtil.join((Iterator<?>) item, conjunction,
-     *     prefix, suffix)); } else { sb.append( gtcStrUtil.wrap( gtcStrUtil.toString(item), prefix,
-     *     suffix)); } } return sb.toString(); }
-     */
-
-    /**
-     * 以 conjunction 为分隔符将数组转换为字符串
+     * 以 conjunction 为分隔符将数组转换为字符串<br>
+     * null 元素按空串处理（分隔符保留），例如 join([a,null,b], ",") = "a,,b"
      *
      * @param <T> 被处理的集合
      * @param array 数组
@@ -1219,6 +1260,9 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @return 连接后的字符串
      */
     public static String join(Object array, CharSequence conjunction) {
+        if (null == array) {
+            return null;
+        }
         if (isArray(array)) {
             final Class<?> componentType = array.getClass().getComponentType();
             if (componentType.isPrimitive()) {
@@ -1242,13 +1286,13 @@ public class GutilArray extends PrimitiveArrayUtil {
                         return join((double[]) array, conjunction);
                     default:
                         throw new IllegalStateException(
-                                GutilStr.format("Unknown primitive type: [{}]", componentTypeName));
+                                GutilStr.format("未知的基本类型：[{}]", componentTypeName));
                 }
             } else {
                 return join((Object[]) array, conjunction);
             }
         }
-        throw new IllegalStateException(GutilStr.format("[{}] is not a Array!", array.getClass()));
+        throw new IllegalStateException(GutilStr.format("[{}] 不是数组！", array.getClass()));
     }
 
     /**
@@ -1314,7 +1358,7 @@ public class GutilArray extends PrimitiveArrayUtil {
 
     /**
      * 移除数组中对应位置的元素<br>
-     * copy from commons-lang
+     * 参考自 commons-lang
      *
      * @param <T> 数组元素类型
      * @param array 数组对象，可以是对象数组，也可以原始类型数组
@@ -1332,7 +1376,7 @@ public class GutilArray extends PrimitiveArrayUtil {
 
     /**
      * 移除数组中指定的元素<br>
-     * 只会移除匹配到的第一个元素 copy from commons-lang
+     * 只会移除匹配到的第一个元素 参考自 commons-lang
      *
      * @param <T> 数组元素类型
      * @param array 数组对象，可以是对象数组，也可以原始类型数组
@@ -1345,8 +1389,7 @@ public class GutilArray extends PrimitiveArrayUtil {
         return remove(array, indexOf(array, element));
     }
 
-    // ---------------------------------------------------------------------- Reverse
-    // array
+    // ---------------------------------------------------------------------- 反转数组
 
     /**
      * 反转数组，会变更原数组
@@ -1389,7 +1432,7 @@ public class GutilArray extends PrimitiveArrayUtil {
     }
 
     // ------------------------------------------------------------------------------------------------------------
-    // min and max
+    // 最小值和最大值
 
     /**
      * 取最小值
@@ -1415,7 +1458,7 @@ public class GutilArray extends PrimitiveArrayUtil {
     public static <T extends Comparable<? super T>> T min(
             T[] numberArray, Comparator<T> comparator) {
         if (isEmpty(numberArray)) {
-            throw new IllegalArgumentException("Number array must not empty !");
+            throw new IllegalArgumentException("数字数组不能为空！");
         }
         T min = numberArray[0];
         for (T t : numberArray) {
@@ -1450,7 +1493,7 @@ public class GutilArray extends PrimitiveArrayUtil {
     public static <T extends Comparable<? super T>> T max(
             T[] numberArray, Comparator<T> comparator) {
         if (isEmpty(numberArray)) {
-            throw new IllegalArgumentException("Number array must not empty !");
+            throw new IllegalArgumentException("数字数组不能为空！");
         }
         T max = numberArray[0];
         for (int i = 1; i < numberArray.length; i++) {
@@ -1510,7 +1553,12 @@ public class GutilArray extends PrimitiveArrayUtil {
      */
     public static <T> T[] swap(T[] array, int index1, int index2) {
         if (isEmpty(array)) {
-            throw new IllegalArgumentException("Array must not empty !");
+            throw new IllegalArgumentException("数组不能为空！");
+        }
+        if (index1 < 0 || index2 < 0 || index1 >= array.length || index2 >= array.length) {
+            throw new IndexOutOfBoundsException(
+                    GutilStr.format(
+                            "索引越界：index1={}, index2={}, 数组长度={}", index1, index2, array.length));
         }
         T tmp = array[index1];
         array[index1] = array[index2];
@@ -1529,7 +1577,13 @@ public class GutilArray extends PrimitiveArrayUtil {
      */
     public static Object swap(Object array, int index1, int index2) {
         if (isEmpty(array)) {
-            throw new IllegalArgumentException("Array must not empty !");
+            throw new IllegalArgumentException("数组不能为空！");
+        }
+        final int len = length(array);
+        if (index1 < 0 || index2 < 0 || index1 >= len || index2 >= len) {
+            throw new IndexOutOfBoundsException(
+                    GutilStr.format(
+                            "索引越界：index1={}, index2={}, 数组长度={}", index1, index2, len));
         }
         Object tmp = get(array, index1);
         Array.set(array, index1, Array.get(array, index2));
@@ -1582,7 +1636,7 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @since 4.5.18
      */
     public static boolean isAllEmpty(Object... args) {
-        return emptyCount(args) == args.length;
+        return null == args || emptyCount(args) == args.length;
     }
 
     /**
@@ -1641,6 +1695,9 @@ public class GutilArray extends PrimitiveArrayUtil {
      */
     public static <T, R> R[] map(
             T[] array, Class<R> targetComponentType, Function<? super T, ? extends R> func) {
+        if (null == array || null == targetComponentType || null == func) {
+            throw new IllegalArgumentException("array、targetComponentType 与 func 均不能为 null");
+        }
         final R[] result = newArray(targetComponentType, array.length);
         for (int i = 0; i < array.length; i++) {
             result[i] = func.apply(array[i]);
@@ -1689,7 +1746,7 @@ public class GutilArray extends PrimitiveArrayUtil {
         } else if (array1 instanceof boolean[]) {
             return Arrays.equals((boolean[]) array1, (boolean[]) array2);
         } else {
-            // Not an array of primitives
+            // 非基本类型数组，按对象数组深度比较
             return Arrays.deepEquals((Object[]) array1, (Object[]) array2);
         }
     }
@@ -1720,18 +1777,23 @@ public class GutilArray extends PrimitiveArrayUtil {
         if (isEmpty(array) || isEmpty(subArray) || subArray.length > array.length) {
             return INDEX_NOT_FOUND;
         }
-        int firstIndex = indexOf(array, subArray[0]);
-        if (firstIndex < 0 || firstIndex + subArray.length > array.length) {
-            return INDEX_NOT_FOUND;
-        }
-
-        for (int i = 0; i < subArray.length; i++) {
-            if (false == GutilObject.equal(array[i + firstIndex], subArray[i])) {
-                return INDEX_NOT_FOUND;
+        final int maxIndex = array.length - subArray.length;
+        // 遍历首元素的每个出现位置，逐一比对后续元素
+        for (int i = 0; i <= maxIndex; i++) {
+            if (GutilObject.equal(array[i], subArray[0])) {
+                boolean matched = true;
+                for (int j = 1; j < subArray.length; j++) {
+                    if (false == GutilObject.equal(array[i + j], subArray[j])) {
+                        matched = false;
+                        break;
+                    }
+                }
+                if (matched) {
+                    return i;
+                }
             }
         }
-
-        return firstIndex;
+        return INDEX_NOT_FOUND;
     }
 
     /**
@@ -1748,18 +1810,24 @@ public class GutilArray extends PrimitiveArrayUtil {
             return INDEX_NOT_FOUND;
         }
 
-        int firstIndex = lastIndexOf(array, subArray[0]);
-        if (firstIndex < 0 || firstIndex + subArray.length > array.length) {
-            return INDEX_NOT_FOUND;
-        }
-
-        for (int i = 0; i < subArray.length; i++) {
-            if (false == GutilObject.equal(array[i + firstIndex], subArray[i])) {
-                return INDEX_NOT_FOUND;
+        final int maxIndex = array.length - subArray.length;
+        // 从后往前遍历首元素的每个出现位置，逐一比对后续元素，返回最后一次匹配
+        for (int i = maxIndex; i >= 0; i--) {
+            if (GutilObject.equal(array[i], subArray[0])) {
+                boolean matched = true;
+                for (int j = 1; j < subArray.length; j++) {
+                    if (false == GutilObject.equal(array[i + j], subArray[j])) {
+                        matched = false;
+                        break;
+                    }
+                }
+                if (matched) {
+                    return i;
+                }
             }
         }
 
-        return firstIndex;
+        return INDEX_NOT_FOUND;
     }
 
     // O(n)时间复杂度检查数组是否有序
@@ -1775,7 +1843,7 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @since 5.5.2
      */
     public static <T> boolean isSorted(T[] array, Comparator<? super T> comparator) {
-        if (array == null || comparator == null) {
+        if (array == null || comparator == null || array.length == 0) {
             return false;
         }
 
@@ -1810,7 +1878,7 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @since 5.5.2
      */
     public static <T extends Comparable<? super T>> boolean isSortedASC(T[] array) {
-        if (array == null) {
+        if (array == null || array.length == 0) {
             return false;
         }
 
@@ -1833,7 +1901,7 @@ public class GutilArray extends PrimitiveArrayUtil {
      * @since 5.5.2
      */
     public static <T extends Comparable<? super T>> boolean isSortedDESC(T[] array) {
-        if (array == null) {
+        if (array == null || array.length == 0) {
             return false;
         }
 

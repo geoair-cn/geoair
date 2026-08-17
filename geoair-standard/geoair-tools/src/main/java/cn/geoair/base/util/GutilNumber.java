@@ -4,15 +4,22 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * 数字工具类，提供精确的算术运算、数字解析、进制转换、随机数生成等能力。
+ *
+ * @author
+ */
 public abstract class GutilNumber {
 
     private static final BigInteger LONG_MIN = BigInteger.valueOf(Long.MIN_VALUE);
@@ -20,8 +27,7 @@ public abstract class GutilNumber {
     private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
     /**
-     * Standard number types (all immutable): Byte, Short, Integer, Long, BigInteger, Float, Double,
-     * BigDecimal.
+     * 标准数字类型（均为不可变类型）：Byte、Short、Integer、Long、BigInteger、Float、Double、BigDecimal。
      */
     public static final Set<Class<?>> STANDARD_NUMBER_TYPES;
 
@@ -39,13 +45,12 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Convert the given number into an instance of the given target class.
+     * 将给定的数字转换为指定目标类的实例。
      *
-     * @param number the number to convert
-     * @param targetClass the target class to convert to
-     * @return the converted number
-     * @throws IllegalArgumentException if the target class is not supported (i.e. not a standard
-     *     Number subclass as included in the JDK)
+     * @param number 要转换的数字
+     * @param targetClass 转换的目标类
+     * @return 转换后的数字
+     * @throws IllegalArgumentException 如果不支持目标类（即不是 JDK 内置的标准 Number 子类）
      * @see java.lang.Byte
      * @see java.lang.Short
      * @see java.lang.Integer
@@ -87,10 +92,10 @@ public abstract class GutilNumber {
             return (T) Long.valueOf(value);
         } else if (BigInteger.class == targetClass) {
             if (number instanceof BigDecimal) {
-                // do not lose precision - use BigDecimal's own conversion
+                // 不丢失精度 - 使用 BigDecimal 自身的转换
                 return (T) ((BigDecimal) number).toBigInteger();
             } else {
-                // original value is not a Big* number - use standard long conversion
+                // 原值不是 Big* 数字 - 使用标准的 long 转换
                 return (T) BigInteger.valueOf(number.longValue());
             }
         } else if (Float.class == targetClass) {
@@ -98,9 +103,8 @@ public abstract class GutilNumber {
         } else if (Double.class == targetClass) {
             return (T) Double.valueOf(number.doubleValue());
         } else if (BigDecimal.class == targetClass) {
-            // always use BigDecimal(String) here to avoid unpredictability of
-            // BigDecimal(double)
-            // (see BigDecimal javadoc for details)
+            // 这里始终使用 BigDecimal(String) 以避免 BigDecimal(double) 的不可预测性
+            // （详见 BigDecimal javadoc）
             return (T) new BigDecimal(number.toString());
         } else {
             throw new IllegalArgumentException(
@@ -115,13 +119,12 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Check for a {@code BigInteger}/{@code BigDecimal} long overflow before returning the given
-     * number as a long value.
+     * 在将给定数字以 long 值返回之前，检查 {@code BigInteger}/{@code BigDecimal} 是否存在 long 溢出。
      *
-     * @param number the number to convert
-     * @param targetClass the target class to convert to
-     * @return the long value, if convertible without overflow
-     * @throws IllegalArgumentException if there is an overflow
+     * @param number 要转换的数字
+     * @param targetClass 转换的目标类
+     * @return 无溢出时可转换的 long 值
+     * @throws IllegalArgumentException 如果存在溢出
      * @see #raiseOverflowException
      */
     private static long checkedLongValue(Number number, Class<? extends Number> targetClass) {
@@ -131,7 +134,7 @@ public abstract class GutilNumber {
         } else if (number instanceof BigDecimal) {
             bigInt = ((BigDecimal) number).toBigInteger();
         }
-        // Effectively analogous to JDK 8's BigInteger.longValueExact()
+        // 效果等同于 JDK 8 的 BigInteger.longValueExact()
         if (bigInt != null && (bigInt.compareTo(LONG_MIN) < 0 || bigInt.compareTo(LONG_MAX) > 0)) {
             raiseOverflowException(number, targetClass);
         }
@@ -139,11 +142,11 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Raise an <em>overflow</em> exception for the given number and target class.
+     * 为给定的数字和目标类抛出 <em>溢出</em> 异常。
      *
-     * @param number the number we tried to convert
-     * @param targetClass the target class we tried to convert to
-     * @throws IllegalArgumentException if there is an overflow
+     * @param number 我们尝试转换的数字
+     * @param targetClass 我们尝试转换的目标类
+     * @throws IllegalArgumentException 如果存在溢出
      */
     private static void raiseOverflowException(Number number, Class<?> targetClass) {
         throw new IllegalArgumentException(
@@ -157,19 +160,17 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Parse the given {@code text} into a {@link Number} instance of the given target class, using
-     * the corresponding {@code decode} / {@code valueOf} method.
+     * 将给定的 {@code text} 解析为给定目标类的 {@link Number} 实例，使用对应的 {@code decode} /
+     * {@code valueOf} 方法。
      *
-     * <p>Trims all whitespace (leading, trailing, and in between characters) from the input {@code
-     * String} before attempting to parse the number.
+     * <p>在尝试解析数字之前，会去除输入 {@code String} 中的所有空白字符（首部、尾部和字符之间）。
      *
-     * <p>Supports numbers in hex format (with leading "0x", "0X", or "#") as well.
+     * <p>同样支持十六进制格式的数字（以 "0x"、"0X" 或 "#" 开头）。
      *
-     * @param text the text to convert
-     * @param targetClass the target class to parse into
-     * @return the parsed number
-     * @throws IllegalArgumentException if the target class is not supported (i.e. not a standard
-     *     Number subclass as included in the JDK)
+     * @param text 要转换的文本
+     * @param targetClass 解析的目标类
+     * @return 解析后的数字
+     * @throws IllegalArgumentException 如果不支持目标类（即不是 JDK 内置的标准 Number 子类）
      * @see Byte#decode
      * @see Short#decode
      * @see Integer#decode
@@ -212,18 +213,16 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Parse the given {@code text} into a {@link Number} instance of the given target class, using
-     * the supplied {@link NumberFormat}.
+     * 使用提供的 {@link NumberFormat} 将给定的 {@code text} 解析为给定目标类的 {@link Number} 实例。
      *
-     * <p>Trims the input {@code String} before attempting to parse the number.
+     * <p>在尝试解析数字之前，会去除输入 {@code String} 中的空白字符。
      *
-     * @param text the text to convert
-     * @param targetClass the target class to parse into
-     * @param numberFormat the {@code NumberFormat} to use for parsing (if {@code null}, this method
-     *     falls back to {@link #parseNumber(String, Class)})
-     * @return the parsed number
-     * @throws IllegalArgumentException if the target class is not supported (i.e. not a standard
-     *     Number subclass as included in the JDK)
+     * @param text 要转换的文本
+     * @param targetClass 解析的目标类
+     * @param numberFormat 用于解析的 {@code NumberFormat}（如果为 {@code null}，
+     *     本方法回退到 {@link #parseNumber(String, Class)}）
+     * @return 解析后的数字
+     * @throws IllegalArgumentException 如果不支持目标类（即不是 JDK 内置的标准 Number 子类）
      * @see java.text.NumberFormat#parse
      * @see #convertNumberToTargetClass
      * @see #parseNumber(String, Class)
@@ -234,24 +233,20 @@ public abstract class GutilNumber {
         if (numberFormat != null) {
             GutilAssert.notNull(text, "Text must not be null");
             GutilAssert.notNull(targetClass, "Target class must not be null");
-            DecimalFormat decimalFormat = null;
-            boolean resetBigDecimal = false;
+            NumberFormat parseFormat = numberFormat;
             if (numberFormat instanceof DecimalFormat) {
-                decimalFormat = (DecimalFormat) numberFormat;
+                // 拷贝一份再操作，避免修改调用方传入的DecimalFormat
+                DecimalFormat decimalFormat = (DecimalFormat) ((DecimalFormat) numberFormat).clone();
                 if (BigDecimal.class == targetClass && !decimalFormat.isParseBigDecimal()) {
                     decimalFormat.setParseBigDecimal(true);
-                    resetBigDecimal = true;
                 }
+                parseFormat = decimalFormat;
             }
             try {
-                Number number = numberFormat.parse(GutilStr.trimAllWhitespace(text));
+                Number number = parseFormat.parse(GutilStr.trimAllWhitespace(text));
                 return convertNumberToTargetClass(number, targetClass);
             } catch (ParseException ex) {
                 throw new IllegalArgumentException("Could not parse number: " + ex.getMessage());
-            } finally {
-                if (resetBigDecimal) {
-                    decimalFormat.setParseBigDecimal(false);
-                }
             }
         } else {
             return parseNumber(text, targetClass);
@@ -259,8 +254,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Determine whether the given {@code value} String indicates a hex number, i.e. needs to be
-     * passed into {@code Integer.decode} instead of {@code Integer.valueOf}, etc.
+     * 判断给定的 {@code value} 字符串是否表示十六进制数字，即需要传入 {@code Integer.decode}
+     * 而不是 {@code Integer.valueOf} 等。
      */
     private static boolean isHexNumber(String value) {
         int index = (value.startsWith("-") ? 1 : 0);
@@ -270,9 +265,9 @@ public abstract class GutilNumber {
     }
 
     /**
-     * Decode a {@link java.math.BigInteger} from the supplied {@link String} value.
+     * 从给定的 {@link String} 值解码 {@link java.math.BigInteger}。
      *
-     * <p>Supports decimal, hex, and octal notation.
+     * <p>支持十进制、十六进制和八进制表示法。
      *
      * @see BigInteger#BigInteger(String, int)
      */
@@ -281,13 +276,13 @@ public abstract class GutilNumber {
         int index = 0;
         boolean negative = false;
 
-        // Handle minus sign, if present.
+        // 处理负号（如果存在）。
         if (value.startsWith("-")) {
             negative = true;
             index++;
         }
 
-        // Handle radix specifier, if present.
+        // 处理进制前缀（如果存在）。
         if (value.startsWith("0x", index) || value.startsWith("0X", index)) {
             index += 2;
             radix = 16;
@@ -802,7 +797,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况的时候,精确到小数点后10位,后面的四舍五入
+     * 提供(相对)精确的除法运算,当发生除不尽的情况的时候,精确到小数点后10位,后面的四舍五入<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -813,7 +809,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况的时候,精确到小数点后10位,后面的四舍五入
+     * 提供(相对)精确的除法运算,当发生除不尽的情况的时候,精确到小数点后10位,后面的四舍五入<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -896,7 +893,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度,后面的四舍五入
+     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度,后面的四舍五入<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -973,7 +971,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度
+     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -987,7 +986,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度
+     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -997,6 +997,9 @@ public abstract class GutilNumber {
      * @since 3.1.0
      */
     public static BigDecimal div(Number v1, Number v2, int scale, RoundingMode roundingMode) {
+        if (null == v1 || null == v2) {
+            return BigDecimal.ZERO;
+        }
         return div(v1.toString(), v2.toString(), scale, roundingMode);
     }
 
@@ -1014,7 +1017,8 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度
+     * 提供(相对)精确的除法运算,当发生除不尽的情况时,由scale指定精确度<br>
+     * 如果v1或v2为null则返回0
      *
      * @param v1 被除数
      * @param v2 除数
@@ -1025,8 +1029,7 @@ public abstract class GutilNumber {
      */
     public static BigDecimal div(
             BigDecimal v1, BigDecimal v2, int scale, RoundingMode roundingMode) {
-        GutilAssert.notNull(v2, "Divisor must be not null !");
-        if (null == v1) {
+        if (null == v1 || null == v2) {
             return BigDecimal.ZERO;
         }
         if (scale < 0) {
@@ -1036,19 +1039,30 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 补充Math.ceilDiv() JDK8中添加了和Math.floorDiv()但却没有ceilDiv()
+     * 补充Math.ceilDiv() JDK8中添加了和Math.floorDiv()但却没有ceilDiv()<br>
+     * 使用纯整数运算实现数学上的上取整（ceil），避免double精度问题<br>
+     * 例如：ceilDiv(7, 3) = 3，ceilDiv(-7, 3) = -2，ceilDiv(7, -3) = -2
      *
      * @param v1 被除数
      * @param v2 除数
-     * @return 两个参数的商
+     * @return 两个参数的商向上取整
+     * @throws ArithmeticException 除数为0时抛出
      * @since 5.3.3
      */
     public static int ceilDiv(int v1, int v2) {
-        return (int) Math.ceil((double) v1 / v2);
+        if (v2 == 0) {
+            throw new ArithmeticException("Division by zero!");
+        }
+        int result = v1 / v2;
+        // 余数不为0且同号时，向零截断的结果比数学上的上取整小1
+        if ((v1 % v2) != 0 && ((v1 ^ v2) >= 0)) {
+            result++;
+        }
+        return result;
     }
 
     // -------------------------------------------------------------------------------------------
-    // round
+    // round 四舍五入
 
     /**
      * 保留固定位数小数<br>
@@ -1269,11 +1283,12 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // decimalFormat
+    // decimalFormat 格式化
 
     /**
      * 格式化double<br>
      * 对 {@link DecimalFormat} 做封装<br>
+     * 使用{@link Locale#ROOT}区域设置，不受默认区域设置影响，例如小数点符号固定为"."<br>
      *
      * @param pattern 格式 格式中主要以 # 和 0 两种占位符号来指定数字长度。0 表示如果位数不足则以 0 填充，# 表示只要有可能就把数字拉上这个位置。<br>
      *     <ul>
@@ -1289,14 +1304,17 @@ public abstract class GutilNumber {
      *
      * @param value 值
      * @return 格式化后的值
+     * @see Locale#ROOT
      */
     public static String decimalFormat(String pattern, double value) {
-        return new DecimalFormat(pattern).format(value);
+        return new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT))
+                .format(value);
     }
 
     /**
      * 格式化double<br>
      * 对 {@link DecimalFormat} 做封装<br>
+     * 使用{@link Locale#ROOT}区域设置，不受默认区域设置影响，例如小数点符号固定为"."<br>
      *
      * @param pattern 格式 格式中主要以 # 和 0 两种占位符号来指定数字长度。0 表示如果位数不足则以 0 填充，# 表示只要有可能就把数字拉上这个位置。<br>
      *     <ul>
@@ -1315,12 +1333,14 @@ public abstract class GutilNumber {
      * @since 3.0.5
      */
     public static String decimalFormat(String pattern, long value) {
-        return new DecimalFormat(pattern).format(value);
+        return new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT))
+                .format(value);
     }
 
     /**
      * 格式化double<br>
      * 对 {@link DecimalFormat} 做封装<br>
+     * 使用{@link Locale#ROOT}区域设置，不受默认区域设置影响，例如小数点符号固定为"."<br>
      *
      * @param pattern 格式 格式中主要以 # 和 0 两种占位符号来指定数字长度。0 表示如果位数不足则以 0 填充，# 表示只要有可能就把数字拉上这个位置。<br>
      *     <ul>
@@ -1339,7 +1359,8 @@ public abstract class GutilNumber {
      * @since 5.1.6
      */
     public static String decimalFormat(String pattern, Object value) {
-        return new DecimalFormat(pattern).format(value);
+        return new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT))
+                .format(value);
     }
 
     /**
@@ -1368,7 +1389,7 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // isXXX
+    // isXXX 判断
 
     /**
      * 是否为数字，支持包括：
@@ -1394,7 +1415,7 @@ public abstract class GutilNumber {
         boolean hasDecPoint = false;
         boolean allowSigns = false;
         boolean foundDigit = false;
-        // deal with any possible sign up front
+        // 预先处理可能出现的正负号
         int start = (chars[0] == '-' || chars[0] == '+') ? 1 : 0;
         if (sz > start + 1) {
             if (chars[start] == '0' && (chars[start + 1] == 'x' || chars[start + 1] == 'X')) {
@@ -1402,7 +1423,7 @@ public abstract class GutilNumber {
                 if (i == sz) {
                     return false; // str == "0x"
                 }
-                // checking hex (it can't be anything else)
+                // 检查十六进制（不可能是其它格式）
                 for (; i < chars.length; i++) {
                     if ((chars[i] < '0' || chars[i] > '9')
                             && (chars[i] < 'a' || chars[i] > 'f')
@@ -1413,11 +1434,11 @@ public abstract class GutilNumber {
                 return true;
             }
         }
-        sz--; // don't want to loop to the last char, check it afterwords
-        // for type qualifiers
+        sz--; // 不想循环到最后一个字符，稍后再检查
+        // 用于类型标识
         int i = start;
-        // loop to the next to last char or to the last char if we need another digit to
-        // make a valid number (e.g. chars[0..5] = "1234E")
+        // 循环到倒数第二个字符，或者当需要再一个数字才能构成合法数字时循环到最后一个字符
+        // （例如 chars[0..5] = "1234E"）
         while (i < sz || (i < sz + 1 && allowSigns && !foundDigit)) {
             if (chars[i] >= '0' && chars[i] <= '9') {
                 foundDigit = true;
@@ -1425,14 +1446,14 @@ public abstract class GutilNumber {
 
             } else if (chars[i] == '.') {
                 if (hasDecPoint || hasExp) {
-                    // two decimal points or dec in exponent
+                    // 两个小数点或指数中带小数点
                     return false;
                 }
                 hasDecPoint = true;
             } else if (chars[i] == 'e' || chars[i] == 'E') {
-                // we've already taken care of hex.
+                // 十六进制的情况已处理过
                 if (hasExp) {
-                    // two E's
+                    // 两个 E
                     return false;
                 }
                 if (false == foundDigit) {
@@ -1445,7 +1466,7 @@ public abstract class GutilNumber {
                     return false;
                 }
                 allowSigns = false;
-                foundDigit = false; // we need a digit after the E
+                foundDigit = false; // E 后面需要一个数字
             } else {
                 return false;
             }
@@ -1453,19 +1474,19 @@ public abstract class GutilNumber {
         }
         if (i < chars.length) {
             if (chars[i] >= '0' && chars[i] <= '9') {
-                // no type qualifier, OK
+                // 无类型标识，合法
                 return true;
             }
             if (chars[i] == 'e' || chars[i] == 'E') {
-                // can't have an E at the last byte
+                // 最后一个字节不能是 E
                 return false;
             }
             if (chars[i] == '.') {
                 if (hasDecPoint || hasExp) {
-                    // two decimal points or dec in exponent
+                    // 两个小数点或指数中带小数点
                     return false;
                 }
-                // single trailing decimal point after non-exponent is ok
+                // 非指数形式末尾的单个小数点合法
                 return foundDigit;
             }
             if (!allowSigns
@@ -1473,14 +1494,14 @@ public abstract class GutilNumber {
                 return foundDigit;
             }
             if (chars[i] == 'l' || chars[i] == 'L') {
-                // not allowing L with an exponent
+                // 不允许带指数的 L
                 return foundDigit && !hasExp;
             }
-            // last character is illegal
+            // 最后一个字符非法
             return false;
         }
-        // allowSigns is true iff the val ends in 'E'
-        // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
+        // allowSigns 为 true 当且仅当以 'E' 结尾
+        // foundDigit 用于排除 '.' 和 '1E-' 之类的奇怪情况
         return false == allowSigns && foundDigit;
     }
 
@@ -1518,31 +1539,38 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 判断字符串是否是浮点数
+     * 判断字符串是否可解析为浮点数<br>
+     * 支持科学计数法（如1e5、1E-3），整数形式（如123）同样返回true
      *
      * @param s String
-     * @return 是否为{@link Double}类型
+     * @return 是否可解析为{@link Double}类型
      */
     public static boolean isDouble(String s) {
+        if (s == null) {
+            return false;
+        }
         try {
             Double.parseDouble(s);
-            return s.contains(".");
         } catch (NumberFormatException ignore) {
-            // ignore
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
      * 是否是质数（素数）<br>
-     * 质数表的质数又称素数。指整数在一个大于1的自然数中,除了1和此整数自身外,没法被其他自然数整除的数。
+     * 质数表的质数又称素数。指整数在一个大于1的自然数中,除了1和此整数自身外,没法被其他自然数整除的数。<br>
+     * n小于等于1（包括0、1和负数）时返回false
      *
      * @param n 数字
      * @return 是否是质数
      */
     public static boolean isPrimes(int n) {
-        GutilAssert.isTrue(n > 1, "The number must be > 1");
-        for (int i = 2; i <= Math.sqrt(n); i++) {
+        if (n <= 1) {
+            return false;
+        }
+        int sqrt = (int) Math.sqrt(n);
+        for (int i = 2; i <= sqrt; i++) {
             if (n % i == 0) {
                 return false;
             }
@@ -1551,30 +1579,62 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // generateXXX
+    // generateXXX 生成
 
     /**
-     * 生成不重复随机数 根据给定的最小数字和最大数字，以及随机数的个数，产生指定的不重复的数组
+     * 生成不重复随机数 根据给定的最小数字和最大数字，以及随机数的个数，产生指定的不重复的数组<br>
+     * 使用拒绝采样直接生成，不构造begin到end的中间数组，避免大区间时内存溢出（OOM）
      *
      * @param begin 最小数字（包含该数）
      * @param end 最大数字（不包含该数）
      * @param size 指定产生随机数的个数
      * @return 随机int数组
+     * @throws IllegalArgumentException size大于区间范围或区间过大时抛出
      */
     public static int[] generateRandomNumber(int begin, int end, int size) {
-        // 种子你可以随意生成，但不能重复
-        final int[] seed = GutilArray.range(begin, end);
-        return generateRandomNumber(begin, end, size, seed);
+        if (begin > end) {
+            int temp = begin;
+            begin = end;
+            end = temp;
+        }
+        GutilAssert.isTrue(size >= 0, "Size must be >= 0!");
+        long range = (long) end - begin;
+        if (range < size) {
+            throw new IllegalArgumentException(
+                    "Size is larger than range between begin and end!");
+        }
+        if (range > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "Range between begin and end is too large: " + range);
+        }
+        if (size == 0) {
+            return new int[0];
+        }
+
+        final Random random = ThreadLocalRandom.current();
+        final Set<Integer> set = new HashSet<>(size);
+        while (set.size() < size) {
+            set.add(begin + random.nextInt((int) range));
+        }
+
+        final int[] ranArr = new int[size];
+        int index = 0;
+        for (Integer value : set) {
+            ranArr[index++] = value;
+        }
+        return ranArr;
     }
 
     /**
-     * 生成不重复随机数 根据给定的最小数字和最大数字，以及随机数的个数，产生指定的不重复的数组
+     * 生成不重复随机数 根据给定的最小数字和最大数字，以及随机数的个数，产生指定的不重复的数组<br>
+     * 方法内部会拷贝传入的seed数组，不会修改调用方传入的数组
      *
      * @param begin 最小数字（包含该数）
      * @param end 最大数字（不包含该数）
      * @param size 指定产生随机数的个数
      * @param seed 种子，用于取随机数的int池
      * @return 随机int数组
+     * @throws IllegalArgumentException 参数不合法（size大于区间或seed长度等）时抛出
      * @since 5.4.5
      */
     public static int[] generateRandomNumber(int begin, int end, int size, int[] seed) {
@@ -1584,19 +1644,23 @@ public abstract class GutilNumber {
             end = temp;
         }
         // 加入逻辑判断，确保begin<end并且size不能大于该表示范围
+        GutilAssert.notNull(seed, "Seed must not be null!");
+        GutilAssert.isTrue(size >= 0, "Size must be >= 0!");
         GutilAssert.isTrue(
-                (end - begin) > size, "Size is larger than range between begin and end!");
+                ((long) end - begin) > size, "Size is larger than range between begin and end!");
         GutilAssert.isTrue(seed.length > size, "Size is larger than seed size!");
 
+        // 拷贝种子数组，避免改写调用方传入的数组
+        final int[] ranSeed = seed.clone();
         final int[] ranArr = new int[size];
         // 数量你可以自己定义。
         for (int i = 0; i < size; i++) {
             // 得到一个位置
-            int j = ThreadLocalRandom.current().nextInt(seed.length - i);
+            int j = ThreadLocalRandom.current().nextInt(ranSeed.length - i);
             // 得到那个位置的数值
-            ranArr[i] = seed[j];
+            ranArr[i] = ranSeed[j];
             // 将最后一个未用的数字放到这里
-            seed[j] = seed[seed.length - 1 - i];
+            ranSeed[j] = ranSeed[ranSeed.length - 1 - i];
         }
         return ranArr;
     }
@@ -1608,6 +1672,7 @@ public abstract class GutilNumber {
      * @param end 最大数字（不包含该数）
      * @param size 指定产生随机数的个数
      * @return 随机int数组
+     * @throws IllegalArgumentException size小于0、size大于区间范围或区间过大时抛出
      */
     public static Integer[] generateBySet(int begin, int end, int size) {
         if (begin > end) {
@@ -1616,21 +1681,30 @@ public abstract class GutilNumber {
             end = temp;
         }
         // 加入逻辑判断，确保begin<end并且size不能大于该表示范围
-        if ((end - begin) < size) {
-            throw new IllegalStateException("Size is larger than range between begin and end!");
+        if (size < 0) {
+            throw new IllegalArgumentException("Size must be >= 0!");
+        }
+        long range = (long) end - begin;
+        if (range < size) {
+            throw new IllegalArgumentException(
+                    "Size is larger than range between begin and end!");
+        }
+        if (range > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "Range between begin and end is too large: " + range);
         }
 
         Random ran = new Random();
         Set<Integer> set = new HashSet<>();
         while (set.size() < size) {
-            set.add(begin + ran.nextInt(end - begin));
+            set.add(begin + ran.nextInt((int) range));
         }
 
         return set.toArray(new Integer[size]);
     }
 
     // -------------------------------------------------------------------------------------------
-    // range
+    // range 范围
 
     /**
      * 从0开始给定范围内的整数列表，步进为1
@@ -1655,27 +1729,38 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 给定范围内的整数列表
+     * 给定范围内的整数列表<br>
+     * 步进的符号自动适配方向：start &lt; stop时按正步进递增，start &gt; stop时按负步进递减，因此负数步进同样支持（取其绝对值）
      *
      * @param start 开始（包含）
      * @param stop 结束（包含）
-     * @param step 步进
+     * @param step 步进，不能为0
      * @return 整数列表
+     * @throws IllegalArgumentException 步进为0时抛出
      */
     public static int[] range(int start, int stop, int step) {
+        if (step == 0) {
+            throw new IllegalArgumentException("Step must not be zero!");
+        }
         if (start < stop) {
             step = Math.abs(step);
         } else if (start > stop) {
             step = -Math.abs(step);
-        } else { // start == end
+        } else { // start == end 起点等于终点
             return new int[] {start};
         }
 
-        int size = Math.abs((stop - start) / step) + 1;
-        int[] values = new int[size];
+        // 使用long计算差值，避免stop - start溢出
+        long size = Math.abs(((long) stop - start) / step) + 1;
+        if (size > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(
+                    "Range between start and stop is too large: " + size);
+        }
+        int[] values = new int[(int) size];
         int index = 0;
-        for (int i = start; (step > 0) ? i <= stop : i >= stop; i += step) {
-            values[index] = i;
+        // 使用long循环变量，避免i += step时int溢出
+        for (long i = start; (step > 0) ? i <= stop : i >= stop; i += step) {
+            values[index] = (int) i;
             index++;
         }
         return values;
@@ -1694,21 +1779,27 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 将给定范围内的整数添加到已有集合中
+     * 将给定范围内的整数添加到已有集合中<br>
+     * 步进的符号自动适配方向：start &lt; stop时按正步进递增，start &gt; stop时按负步进递减，因此负数步进同样支持（取其绝对值）
      *
      * @param start 开始（包含）
      * @param stop 结束（包含）
-     * @param step 步进
+     * @param step 步进，不能为0
      * @param values 集合
      * @return 集合
+     * @throws IllegalArgumentException 步进为0或集合为null时抛出
      */
     public static Collection<Integer> appendRange(
             int start, int stop, int step, Collection<Integer> values) {
+        GutilAssert.notNull(values, "Collection must not be null!");
+        if (step == 0) {
+            throw new IllegalArgumentException("Step must not be zero!");
+        }
         if (start < stop) {
             step = Math.abs(step);
         } else if (start > stop) {
             step = -Math.abs(step);
-        } else { // start == end
+        } else { // start == end 起点等于终点
             values.add(start);
             return values;
         }
@@ -1720,7 +1811,7 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // others
+    // others 其它
 
     /**
      * 计算范围阶乘
@@ -1786,10 +1877,14 @@ public abstract class GutilNumber {
      * 平方根算法<br>
      * 推荐使用 {@link Math#sqrt(double)}
      *
-     * @param x 值
+     * @param x 值，必须大于等于0
      * @return 平方根
+     * @throws IllegalArgumentException x为负数时抛出
      */
     public static long sqrt(long x) {
+        if (x < 0) {
+            throw new IllegalArgumentException("Value must be >= 0, but got " + x);
+        }
         long y = 0;
         long b = (~Long.MAX_VALUE) >>> 1;
         while (b > 0) {
@@ -1807,26 +1902,46 @@ public abstract class GutilNumber {
 
     /**
      * 可以用于计算双色球、大乐透注数的方法<br>
-     * 比如大乐透35选5可以这样调用processMultiple(7,5); 就是数学中的：C75=7*6/2*1
+     * 比如大乐透35选5可以这样调用processMultiple(7,5); 就是数学中的：C75=7*6/2*1<br>
+     * 即计算组合数C(selectNum, minNum)，中间过程使用long计算避免int乘法溢出
      *
      * @param selectNum 选中小球个数
      * @param minNum 最少要选中多少个小球
-     * @return 注数
+     * @return 注数，当minNum大于selectNum时返回0
+     * @throws IllegalArgumentException selectNum或minNum为负数时抛出
+     * @throws ArithmeticException 计算结果超出int范围时抛出
      */
     public static int processMultiple(int selectNum, int minNum) {
-        int result;
-        result = mathSubnode(selectNum, minNum) / mathNode(selectNum - minNum);
-        return result;
+        GutilAssert.isTrue(selectNum >= 0, "selectNum must be >= 0!");
+        GutilAssert.isTrue(minNum >= 0, "minNum must be >= 0!");
+        if (minNum > selectNum) {
+            return 0;
+        }
+        // C(selectNum, minNum) = C(selectNum, selectNum - minNum)，取较小一侧计算
+        int k = Math.min(minNum, selectNum - minNum);
+        long result = 1;
+        // 使用连乘除的方式逐步计算，每一步中间结果均为整数，避免分子溢出
+        for (int i = 1; i <= k; i++) {
+            result = result * (selectNum - k + i) / i;
+        }
+        if (result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) {
+            throw new ArithmeticException(
+                    "Overflow in processMultiple(" + selectNum + ", " + minNum + ")");
+        }
+        return (int) result;
     }
 
     /**
-     * 最大公约数
+     * 最大公约数<br>
+     * 返回非负的最大公约数，负数参数取绝对值计算
      *
      * @param m 第一个值
      * @param n 第二个值
-     * @return 最大公约数
+     * @return 最大公约数（非负）
      */
     public static int divisor(int m, int n) {
+        m = Math.abs(m);
+        n = Math.abs(n);
         while (m % n != 0) {
             int temp = m % n;
             m = n;
@@ -1836,14 +1951,20 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 最小公倍数
+     * 最小公倍数<br>
+     * 使用long做中间计算，避免m * n先乘后除的int溢出
      *
      * @param m 第一个值
      * @param n 第二个值
      * @return 最小公倍数
+     * @throws ArithmeticException 计算结果超出int范围时抛出
      */
     public static int multiple(int m, int n) {
-        return m * n / divisor(m, n);
+        long result = Math.multiplyExact((long) m, (long) n) / divisor(m, n);
+        if (result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) {
+            throw new ArithmeticException("Overflow in multiple(" + m + ", " + n + ")");
+        }
+        return (int) result;
     }
 
     /**
@@ -1883,14 +2004,16 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // compare
+    // compare 比较
 
     /**
-     * 比较两个值的大小
+     * 比较两个值的大小<br>
+     * 返回两个字符的差值（x - y），与{@link Character#compare(char, char)}一致：<br>
+     * x==y返回0，x&lt;y返回负数，x&gt;y返回正数
      *
      * @param x 第一个值
      * @param y 第二个值
-     * @return x==y返回0，x&lt;y返回-1，x&gt;y返回1
+     * @return x - y的差值
      * @see Character#compare(char, char)
      * @since 3.0.1
      */
@@ -2021,8 +2144,9 @@ public abstract class GutilNumber {
 
     /**
      * 比较大小，值相等 返回true<br>
-     * 此方法通过调用{@link Double#doubleToLongBits(double)}方法来判断是否相等<br>
-     * 此方法判断值相等时忽略精度的，即0.00 == 0
+     * 使用{@link Double#compare(double, double)}的语义进行精确比较：<br>
+     * NaN与NaN视为相等；0.0与-0.0视为不相等（与==运算符不同，==认为它们相等）<br>
+     * 注意：此为精确比较，不忽略精度，例如0.1+0.2的结果不等于0.3
      *
      * @param num1 数字1
      * @param num2 数字2
@@ -2030,13 +2154,14 @@ public abstract class GutilNumber {
      * @since 5.4.2
      */
     public static boolean equals(double num1, double num2) {
-        return Double.doubleToLongBits(num1) == Double.doubleToLongBits(num2);
+        return Double.compare(num1, num2) == 0;
     }
 
     /**
      * 比较大小，值相等 返回true<br>
-     * 此方法通过调用{@link Float#floatToIntBits(float)}方法来判断是否相等<br>
-     * 此方法判断值相等时忽略精度的，即0.00 == 0
+     * 使用{@link Float#compare(float, float)}的语义进行精确比较：<br>
+     * NaN与NaN视为相等；0.0f与-0.0f视为不相等（与==运算符不同，==认为它们相等）<br>
+     * 注意：此为精确比较，不忽略精度，例如0.1f+0.2f的结果不等于0.3f
      *
      * @param num1 数字1
      * @param num2 数字2
@@ -2044,7 +2169,7 @@ public abstract class GutilNumber {
      * @since 5.4.5
      */
     public static boolean equals(float num1, float num2) {
-        return Float.floatToIntBits(num1) == Float.floatToIntBits(num2);
+        return Float.compare(num1, num2) == 0;
     }
 
     /**
@@ -2256,9 +2381,9 @@ public abstract class GutilNumber {
      * 数字转字符串<br>
      * 调用{@link Number#toString()}，并去除尾小数点儿后多余的0
      *
-     * @param number A Number
+     * @param number 数字
      * @param defaultValue 如果number参数为{@code null}，返回此默认值
-     * @return A String.
+     * @return 字符串
      * @since 3.0.9
      */
     public static String toStr(Number number, String defaultValue) {
@@ -2269,8 +2394,8 @@ public abstract class GutilNumber {
      * 数字转字符串<br>
      * 调用{@link Number#toString()}或 {@link BigDecimal#toPlainString()}，并去除尾小数点儿后多余的0
      *
-     * @param number A Number
-     * @return A String.
+     * @param number 数字
+     * @return 字符串
      */
     public static String toStr(Number number) {
         GutilAssert.notNull(number, "Number is null !");
@@ -2298,8 +2423,8 @@ public abstract class GutilNumber {
      * {@link BigDecimal}数字转字符串<br>
      * 调用{@link BigDecimal#toPlainString()}，并去除尾小数点儿后多余的0
      *
-     * @param bigDecimal A {@link BigDecimal}
-     * @return A String.
+     * @param bigDecimal 数字
+     * @return 字符串
      * @since 5.4.6
      */
     public static String toStr(BigDecimal bigDecimal) {
@@ -2349,7 +2474,9 @@ public abstract class GutilNumber {
 
     /**
      * 数字转{@link BigInteger}<br>
-     * null转换为0
+     * null转换为0<br>
+     * BigDecimal使用其自身的{@link BigDecimal#toBigInteger()}转换，不丢失精度；<br>
+     * Double、Float通过{@link BigDecimal#valueOf(double)}转换，避免longValue()截断或饱和
      *
      * @param number 数字
      * @return {@link BigInteger}
@@ -2362,11 +2489,15 @@ public abstract class GutilNumber {
 
         if (number instanceof BigInteger) {
             return (BigInteger) number;
-        } else if (number instanceof Long) {
-            return BigInteger.valueOf((Long) number);
+        } else if (number instanceof BigDecimal) {
+            // 使用BigDecimal自身的转换，避免longValue()截断丢失精度
+            return ((BigDecimal) number).toBigInteger();
+        } else if (number instanceof Double || number instanceof Float) {
+            // 使用BigDecimal.valueOf转换，避免longValue()截断与饱和
+            return BigDecimal.valueOf(number.doubleValue()).toBigInteger();
         }
 
-        return toBigInteger(number.longValue());
+        return BigInteger.valueOf(number.longValue());
     }
 
     /**
@@ -2473,18 +2604,18 @@ public abstract class GutilNumber {
             pos = 1;
         }
         if (str.startsWith("0x", pos) || str.startsWith("0X", pos)) {
-            // hex
+            // 十六进制
             radix = 16;
             pos += 2;
         } else if (str.startsWith("#", pos)) {
-            // alternative hex (allowed by Long/Integer)
+            // 十六进制的另一种写法（Long/Integer 允许）
             radix = 16;
             pos++;
         } else if (str.startsWith("0", pos) && str.length() > pos + 1) {
-            // octal; so long as there are additional digits
+            // 八进制；只要后面还有数字
             radix = 8;
             pos++;
-        } // default is to treat as decimal
+        } // 默认按十进制处理
 
         if (pos > 0) {
             str = str.substring(pos);
@@ -2495,7 +2626,8 @@ public abstract class GutilNumber {
 
     /**
      * 判断两个数字是否相邻，例如1和2相邻，1和3不相邻<br>
-     * 判断方法为做差取绝对值判断是否为1
+     * 判断方法为做差取绝对值判断是否为1<br>
+     * 使用{@link Math#subtractExact(long, long)}做差，减法溢出时返回false，避免溢出导致误判
      *
      * @param number1 数字1
      * @param number2 数字2
@@ -2503,12 +2635,18 @@ public abstract class GutilNumber {
      * @since 4.0.7
      */
     public static boolean isBeside(long number1, long number2) {
-        return Math.abs(number1 - number2) == 1;
+        try {
+            return Math.abs(Math.subtractExact(number1, number2)) == 1;
+        } catch (ArithmeticException e) {
+            // 减法溢出，两个数必然不相邻
+            return false;
+        }
     }
 
     /**
      * 判断两个数字是否相邻，例如1和2相邻，1和3不相邻<br>
-     * 判断方法为做差取绝对值判断是否为1
+     * 判断方法为做差取绝对值判断是否为1<br>
+     * 先转为long做差，避免int减法溢出导致误判
      *
      * @param number1 数字1
      * @param number2 数字2
@@ -2516,7 +2654,7 @@ public abstract class GutilNumber {
      * @since 4.0.7
      */
     public static boolean isBeside(int number1, int number2) {
-        return Math.abs(number1 - number2) == 1;
+        return Math.abs((long) number1 - number2) == 1;
     }
 
     /**
@@ -2553,9 +2691,10 @@ public abstract class GutilNumber {
     /**
      * 提供精确的幂运算
      *
-     * @param number 底数
-     * @param n 指数
+     * @param number 底数，为null时返回0
+     * @param n 指数，必须大于等于0
      * @return 幂的积
+     * @throws IllegalArgumentException 指数为负数时抛出
      * @since 4.1.0
      */
     public static BigDecimal pow(Number number, int n) {
@@ -2563,14 +2702,22 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 提供精确的幂运算
+     * 提供精确的幂运算<br>
+     * 底层调用{@link BigDecimal#pow(int)}，指数必须大于等于0
      *
-     * @param number 底数
-     * @param n 指数
+     * @param number 底数，为null时返回0
+     * @param n 指数，必须大于等于0
      * @return 幂的积
+     * @throws IllegalArgumentException 指数为负数时抛出
      * @since 4.1.0
      */
     public static BigDecimal pow(BigDecimal number, int n) {
+        if (null == number) {
+            return BigDecimal.ZERO;
+        }
+        if (n < 0) {
+            throw new IllegalArgumentException("Exponent must be >= 0, but got " + n);
+        }
         return number.pow(n);
     }
 
@@ -2588,15 +2735,15 @@ public abstract class GutilNumber {
      * 解析转换数字字符串为int型数字，规则如下：
      *
      * <pre>
-     * 1、0x开头的视为16进制数字
-     * 2、0开头的视为8进制数字
-     * 3、其它情况按照10进制转换
-     * 4、空串返回0
-     * 5、.123形式返回0（按照小于0的小数对待）
-     * 6、123.56截取小数点之前的数字，忽略小数部分
+     * 1、0x/0X开头的视为16进制数字
+     * 2、其它情况按照10进制转换（注意：不支持8进制，如"010"按10进制解析为10）
+     * 3、空串返回0
+     * 4、.123形式返回0（按照小于0的小数对待）
+     * 5、123.56截取小数点之前的数字，忽略小数部分
+     * 6、自动去除尾部的类型标识（D、F、L）
      * </pre>
      *
-     * @param number 数字，支持0x开头、0开头和普通十进制
+     * @param number 数字，支持0x/0X开头和普通十进制
      * @return int
      * @throws NumberFormatException 数字格式异常
      * @since 4.1.4
@@ -2624,17 +2771,20 @@ public abstract class GutilNumber {
      * 解析转换数字字符串为long型数字，规则如下：
      *
      * <pre>
-     * 1、0x开头的视为16进制数字
-     * 2、0开头的视为8进制数字
+     * 1、0x/0X开头的视为16进制数字
+     * 2、其它情况按照10进制转换（注意：不支持8进制，如"010"按10进制解析为10）
      * 3、空串返回0
-     * 4、其它情况按照10进制转换
+     * 4、.123形式返回0（按照小于0的小数对待）
+     * 5、123.56截取小数点之前的数字，忽略小数部分
+     * 6、自动去除尾部的类型标识（D、F、L）
      * </pre>
      *
-     * @param number 数字，支持0x开头、0开头和普通十进制
+     * @param number 数字，支持0x/0X开头和普通十进制
      * @return long
+     * @throws NumberFormatException 数字格式异常
      * @since 4.1.4
      */
-    public static long parseLong(String number) {
+    public static long parseLong(String number) throws NumberFormatException {
         if (GutilStr.isBlank(number)) {
             return 0;
         }
@@ -2645,7 +2795,7 @@ public abstract class GutilNumber {
             return 0;
         }
 
-        if (number.startsWith("0x")) {
+        if (GutilStr.startWithIgnoreCase(number, "0x")) {
             // 0x04表示16进制数
             return Long.parseLong(number.substring(2), 16);
         }
@@ -2654,13 +2804,19 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 将指定字符串转换为{@link Number} 对象
+     * 将指定字符串转换为{@link Number} 对象<br>
+     * 自动去除千位分隔符与尾部的类型标识（D、F、L）<br>
+     * 空串或空白串返回0（Long类型）
      *
      * @param numberStr Number字符串
      * @return Number对象
+     * @throws IllegalStateException 字符串格式不完整、无法解析时抛出（包装{@link java.text.ParseException}）
      * @since 4.1.15
      */
     public static Number parseNumber(String numberStr) {
+        if (GutilStr.isBlank(numberStr)) {
+            return 0L;
+        }
         numberStr = removeNumberFlag(numberStr);
         try {
             return NumberFormat.getInstance().parse(numberStr);
@@ -2692,11 +2848,17 @@ public abstract class GutilNumber {
      * byte数组转int，使用大端字节序（高位字节在前，低位字节在后）<br>
      * 见：http://www.ruanyifeng.com/blog/2016/11/byte-order.html
      *
-     * @param bytes byte数组
+     * @param bytes byte数组，长度必须大于等于4
      * @return int
+     * @throws IllegalArgumentException bytes为null或长度小于4时抛出
      * @since 4.4.5
      */
     public static int toInt(byte[] bytes) {
+        if (null == bytes || bytes.length < 4) {
+            throw new IllegalArgumentException(
+                    "Bytes length must be >= 4, but got "
+                            + (null == bytes ? "null" : String.valueOf(bytes.length)));
+        }
         return (bytes[0] & 0xff) << 24 //
                 | (bytes[1] & 0xff) << 16 //
                 | (bytes[2] & 0xff) << 8 //
@@ -2704,13 +2866,18 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 以无符号字节数组的形式返回传入值。
+     * 以无符号字节数组的形式返回传入值。<br>
+     * 去除{@link BigInteger#toByteArray()}结果中的符号字节（最高位为0的字节），返回无符号表示
      *
      * @param value 需要转换的值
      * @return 无符号bytes
+     * @throws IllegalArgumentException value为null时抛出
      * @since 4.5.0
      */
     public static byte[] toUnsignedByteArray(BigInteger value) {
+        if (null == value) {
+            throw new IllegalArgumentException("Value must not be null!");
+        }
         byte[] bytes = value.toByteArray();
 
         if (bytes[0] == 0) {
@@ -2724,18 +2891,23 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 以无符号字节数组的形式返回传入值。
+     * 以无符号字节数组的形式返回传入值。<br>
+     * 与无length版本语义一致：去除符号字节后得到无符号表示，再左补0填充至指定长度
      *
-     * @param length bytes长度
+     * @param length bytes长度，必须大于等于0
      * @param value 需要转换的值
      * @return 无符号bytes
+     * @throws IllegalArgumentException value为null、length为负数或值的无符号表示超出指定长度时抛出
      * @since 4.5.0
      */
     public static byte[] toUnsignedByteArray(int length, BigInteger value) {
-        byte[] bytes = value.toByteArray();
-        if (bytes.length == length) {
-            return bytes;
+        if (null == value) {
+            throw new IllegalArgumentException("Value must not be null!");
         }
+        if (length < 0) {
+            throw new IllegalArgumentException("Length must be >= 0, but got " + length);
+        }
+        byte[] bytes = value.toByteArray();
 
         int start = bytes[0] == 0 ? 1 : 0;
         int count = bytes.length - start;
@@ -2754,9 +2926,13 @@ public abstract class GutilNumber {
      *
      * @param buf buf 无符号bytes
      * @return {@link BigInteger}
+     * @throws IllegalArgumentException buf为null时抛出
      * @since 4.5.0
      */
     public static BigInteger fromUnsignedByteArray(byte[] buf) {
+        if (null == buf) {
+            throw new IllegalArgumentException("Buffer must not be null!");
+        }
         return new BigInteger(1, buf);
     }
 
@@ -2764,11 +2940,25 @@ public abstract class GutilNumber {
      * 无符号bytes转{@link BigInteger}
      *
      * @param buf 无符号bytes
-     * @param off 起始位置
-     * @param length 长度
+     * @param off 起始位置，必须大于等于0
+     * @param length 长度，必须大于等于0
      * @return {@link BigInteger}
+     * @throws IllegalArgumentException buf为null时抛出
+     * @throws IndexOutOfBoundsException off、length为负数或off + length超出buf范围时抛出
      */
     public static BigInteger fromUnsignedByteArray(byte[] buf, int off, int length) {
+        if (null == buf) {
+            throw new IllegalArgumentException("Buffer must not be null!");
+        }
+        if (off < 0 || length < 0 || (long) off + length > buf.length) {
+            throw new IndexOutOfBoundsException(
+                    "Invalid offset/length: off="
+                            + off
+                            + ", length="
+                            + length
+                            + ", buf.length="
+                            + buf.length);
+        }
         byte[] mag = buf;
         if (off != 0 || length != buf.length) {
             mag = new byte[length];
@@ -2797,20 +2987,40 @@ public abstract class GutilNumber {
     }
 
     // -------------------------------------------------------------------------------------------
-    // Private method start
-    private static int mathSubnode(int selectNum, int minNum) {
+    // Private method start 私有方法开始
+
+    /**
+     * 计算排列的一部分：selectNum * (selectNum - 1) * ... * minNum<br>
+     * 递归终止条件：selectNum小于minNum时无解返回0，selectNum等于minNum时返回1，避免无限递归
+     *
+     * @param selectNum 选中小球个数
+     * @param minNum 最少要选中多少个小球
+     * @return 乘积，selectNum小于minNum时返回0
+     */
+    private static long mathSubnode(int selectNum, int minNum) {
+        // 递归终止条件：selectNum小于minNum时无解，返回0，避免无限递归
+        if (selectNum < minNum) {
+            return 0;
+        }
         if (selectNum == minNum) {
             return 1;
         } else {
-            return selectNum * mathSubnode(selectNum - 1, minNum);
+            return (long) selectNum * mathSubnode(selectNum - 1, minNum);
         }
     }
 
-    private static int mathNode(int selectNum) {
-        if (selectNum == 0) {
+    /**
+     * 计算阶乘：selectNum!<br>
+     * 递归终止条件：selectNum小于等于0时返回1，避免负数导致无限递归
+     *
+     * @param selectNum 数字
+     * @return 阶乘结果
+     */
+    private static long mathNode(int selectNum) {
+        if (selectNum <= 0) {
             return 1;
         } else {
-            return selectNum * mathNode(selectNum - 1);
+            return (long) selectNum * mathNode(selectNum - 1);
         }
     }
 
@@ -2834,6 +3044,6 @@ public abstract class GutilNumber {
         return number;
     }
     // -------------------------------------------------------------------------------------------
-    // Private method end
+    // Private method end 私有方法结束
 
 }

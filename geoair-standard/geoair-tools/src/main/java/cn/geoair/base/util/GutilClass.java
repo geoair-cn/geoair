@@ -16,6 +16,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
+import java.security.ProtectionDomain;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,65 +41,60 @@ import java.util.Set;
  */
 public abstract class GutilClass {
 
-    /** Suffix for array class names: "[]" */
+    /** 数组类名的后缀："[]" */
     public static final String ARRAY_SUFFIX = "[]";
 
-    /** Prefix for internal array class names: "[" */
+    /** 内部数组类名的前缀："[" */
     private static final String INTERNAL_ARRAY_PREFIX = "[";
 
-    /** Prefix for internal non-primitive array class names: "[L" */
+    /** 内部非原始类型数组类名的前缀："[L" */
     private static final String NON_PRIMITIVE_ARRAY_PREFIX = "[L";
 
-    /** The package separator character: '.' */
+    /** 包分隔符：'.' */
     private static final char PACKAGE_SEPARATOR = '.';
 
-    /** The path separator character: '/' */
+    /** 路径分隔符：'/' */
     private static final char PATH_SEPARATOR = '/';
 
-    /** The inner class separator character: '$' */
+    /** 内部类分隔符：'$' */
     private static final char INNER_CLASS_SEPARATOR = '$';
 
-    /** The CGLIB class separator: "$$" */
+    /** CGLIB类分隔符："$$" */
     public static final String CGLIB_CLASS_SEPARATOR = "$$";
 
-    /** The LAMBDA class separator: "$$Lambda" */
+    /** LAMBDA类分隔符："$$Lambda" */
     public static final String LAMBDA_CLASS_SIGN = "$$Lambda";
 
-    /** The ".class" file suffix */
+    /** ".class"文件后缀 */
     public static final String CLASS_FILE_SUFFIX = ".class";
 
     /**
-     * Map with primitive wrapper type as key and corresponding primitive type as value, for
-     * example: Integer.class -> int.class.
+     * 以包装类型为键、对应原始类型为值的Map，例如：Integer.class -> int.class。
      */
     private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<>(8);
 
     /**
-     * Map with primitive type as key and corresponding wrapper type as value, for example:
-     * int.class -> Integer.class.
+     * 以原始类型为键、对应包装类型为值的Map，例如：int.class -> Integer.class。
      */
     private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap =
             new IdentityHashMap<>(8);
 
     /**
-     * Map with primitive type name as key and corresponding primitive type as value, for example:
-     * "int" -> "int.class".
+     * 以原始类型名为键、对应原始类型为值的Map，例如："int" -> int.class。
      */
     private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
 
     /**
-     * Map with common Java language class name as key and corresponding Class as value. Primarily
-     * for efficient deserialization of remote invocations.
+     * 以常见Java语言类名为键、对应Class为值的Map，主要用于远程调用的高效反序列化。
      */
     private static final Map<String, Class<?>> commonClassCache = new HashMap<>(64);
 
     /**
-     * Common Java language interfaces which are supposed to be ignored when searching for 'primary'
-     * user-level interfaces.
+     * 在查找'主'用户级接口时应忽略的常见Java语言接口集合。
      */
     private static final Set<Class<?>> javaLanguageInterfaces;
 
-    /** Cache for equivalent methods on an interface implemented by the declaring class. */
+    /** 声明类实现的接口上的等价方法的缓存。 */
     private static final Map<Method, Method> interfaceMethodCache =
             new GkConcurrentReferenceHashMap<>(256);
 
@@ -112,7 +108,7 @@ public abstract class GutilClass {
         primitiveWrapperTypeMap.put(Long.class, long.class);
         primitiveWrapperTypeMap.put(Short.class, short.class);
 
-        // Map entry iteration is less expensive to initialize than forEach with lambdas
+        // Map的entry迭代比使用forEach配合lambda初始化开销更低
         for (Map.Entry<Class<?>, Class<?>> entry : primitiveWrapperTypeMap.entrySet()) {
             primitiveTypeToWrapperMap.put(entry.getValue(), entry.getKey());
             registerCommonClasses(entry.getKey());
@@ -184,7 +180,7 @@ public abstract class GutilClass {
         javaLanguageInterfaces = new HashSet<>(Arrays.asList(javaLanguageInterfaceArray));
     }
 
-    /** Register the given common classes with the ClassUtils cache. */
+    /** 将给定的常见类注册到ClassUtils缓存中。 */
     private static void registerCommonClasses(Class<?>... commonClasses) {
         for (Class<?> clazz : commonClasses) {
             commonClassCache.put(clazz.getName(), clazz);
@@ -192,16 +188,14 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return the default ClassLoader to use: typically the thread context ClassLoader, if
-     * available; the ClassLoader that loaded the ClassUtils class will be used as fallback.
+     * 返回默认的ClassLoader：通常优先使用线程上下文ClassLoader（如果可用）；
+     * 否则回退到加载ClassUtils类的ClassLoader。
      *
-     * <p>Call this method if you intend to use the thread context ClassLoader in a scenario where
-     * you clearly prefer a non-null ClassLoader reference: for example, for class path resource
-     * loading (but not necessarily for {@code Class.forName}, which accepts a {@code null}
-     * ClassLoader reference as well).
+     * <p>如果你打算在明确希望得到非null ClassLoader引用的场景中使用线程上下文ClassLoader，
+     * 请调用此方法：例如用于类路径资源加载（但对于{@code Class.forName}则不是必需的，
+     * 因为它也接受{@code null} ClassLoader引用）。
      *
-     * @return the default ClassLoader (only {@code null} if even the system ClassLoader isn't
-     *     accessible)
+     * @return 默认ClassLoader（仅当系统ClassLoader也不可访问时返回{@code null}）
      * @see Thread#getContextClassLoader()
      * @see ClassLoader#getSystemClassLoader()
      */
@@ -210,18 +204,17 @@ public abstract class GutilClass {
         try {
             cl = Thread.currentThread().getContextClassLoader();
         } catch (Throwable ex) {
-            // Cannot access thread context ClassLoader - falling back...
+            // 无法访问线程上下文ClassLoader - 回退...
         }
         if (cl == null) {
-            // No thread context class loader -> use class loader of this class.
+            // 没有线程上下文类加载器 -> 使用本类的类加载器
             cl = GutilClass.class.getClassLoader();
             if (cl == null) {
-                // getClassLoader() returning null indicates the bootstrap ClassLoader
+                // getClassLoader()返回null表示bootstrap ClassLoader
                 try {
                     cl = ClassLoader.getSystemClassLoader();
                 } catch (Throwable ex) {
-                    // Cannot access system ClassLoader - oh well, maybe the caller can
-                    // live with null...
+                    // 无法访问系统ClassLoader - 没关系，调用方可以接受null...
                 }
             }
         }
@@ -229,11 +222,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Override the thread context ClassLoader with the environment's bean ClassLoader if necessary,
-     * i.e. if the bean ClassLoader is not equivalent to the thread context ClassLoader already.
+     * 必要时用环境的bean ClassLoader覆盖线程上下文ClassLoader，
+     * 即当bean ClassLoader与当前线程上下文ClassLoader不等价时。
      *
-     * @param classLoaderToUse the actual ClassLoader to use for the thread context
-     * @return the original thread context ClassLoader, or {@code null} if not overridden
+     * @param classLoaderToUse 用于线程上下文的实际ClassLoader
+     * @return 原始的线程上下文ClassLoader，如果未覆盖则返回{@code null}
      */
     public static ClassLoader overrideThreadContextClassLoader(ClassLoader classLoaderToUse) {
         Thread currentThread = Thread.currentThread();
@@ -247,17 +240,15 @@ public abstract class GutilClass {
     }
 
     /**
-     * Replacement for {@code Class.forName()} that also returns Class instances for primitives
-     * (e.g. "int") and array class names (e.g. "String[]"). Furthermore, it is also capable of
-     * resolving inner class names in Java source style (e.g. "java.lang.Thread.State" instead of
-     * "java.lang.Thread$State").
+     * 是{@code Class.forName()}的替代方法，同样支持原始类型（如"int"）和数组类名（如"String[]"）。
+     * 此外，它还支持以Java源码风格解析内部类名（如用"java.lang.Thread.State"代替
+     * "java.lang.Thread$State"）。
      *
-     * @param name the name of the Class
-     * @param classLoader the class loader to use (may be {@code null}, which indicates the default
-     *     class loader)
-     * @return a class instance for the supplied name
-     * @throws ClassNotFoundException if the class was not found
-     * @throws LinkageError if the class file could not be loaded
+     * @param name 类的名称
+     * @param classLoader 要使用的类加载器（可以为{@code null}，表示使用默认类加载器）
+     * @return 给定名称对应的类实例
+     * @throws ClassNotFoundException 如果找不到该类
+     * @throws LinkageError 如果类文件无法加载
      * @see Class#forName(String, boolean, ClassLoader)
      */
     public static Class<?> forName(String name, ClassLoader classLoader)
@@ -273,14 +264,14 @@ public abstract class GutilClass {
             return clazz;
         }
 
-        // "java.lang.String[]" style arrays
+        // "java.lang.String[]"风格的数组
         if (name.endsWith(ARRAY_SUFFIX)) {
             String elementClassName = name.substring(0, name.length() - ARRAY_SUFFIX.length());
             Class<?> elementClass = forName(elementClassName, classLoader);
             return Array.newInstance(elementClass, 0).getClass();
         }
 
-        // "[Ljava.lang.String;" style arrays
+        // "[Ljava.lang.String;"风格的数组
         if (name.startsWith(NON_PRIMITIVE_ARRAY_PREFIX) && name.endsWith(";")) {
             String elementName =
                     name.substring(NON_PRIMITIVE_ARRAY_PREFIX.length(), name.length() - 1);
@@ -288,7 +279,7 @@ public abstract class GutilClass {
             return Array.newInstance(elementClass, 0).getClass();
         }
 
-        // "[[I" or "[[Ljava.lang.String;" style arrays
+        // "[[I"或"[[Ljava.lang.String;"风格的数组
         if (name.startsWith(INTERNAL_ARRAY_PREFIX)) {
             String elementName = name.substring(INTERNAL_ARRAY_PREFIX.length());
             Class<?> elementClass = forName(elementName, classLoader);
@@ -313,7 +304,7 @@ public abstract class GutilClass {
                             ? clToUse.loadClass(innerClassName)
                             : Class.forName(innerClassName));
                 } catch (ClassNotFoundException ex2) {
-                    // Swallow - let original exception get through
+                    // 吞掉异常 - 让原始异常抛出来
                 }
             }
             throw ex;
@@ -321,18 +312,14 @@ public abstract class GutilClass {
     }
 
     /**
-     * Resolve the given class name into a Class instance. Supports primitives (like "int") and
-     * array class names (like "String[]").
+     * 将给定的类名解析为Class实例。支持原始类型（如"int"）和数组类名（如"String[]"）。
      *
-     * <p>This is effectively equivalent to the {@code forName} method with the same arguments, with
-     * the only difference being the exceptions thrown in case of class loading failure.
+     * <p>这实际上等价于参数相同的{@code forName}方法，唯一区别是类加载失败时抛出的异常不同。
      *
-     * @param className the name of the Class
-     * @param classLoader the class loader to use (may be {@code null}, which indicates the default
-     *     class loader)
-     * @return a class instance for the supplied name
-     * @throws IllegalArgumentException if the class name was not resolvable (that is, the class
-     *     could not be found or the class file could not be loaded)
+     * @param className 类的名称
+     * @param classLoader 要使用的类加载器（可以为{@code null}，表示使用默认类加载器）
+     * @return 给定名称对应的类实例
+     * @throws IllegalArgumentException 如果类名无法解析（即找不到该类或类文件无法加载）
      * @see #forName(String, ClassLoader)
      */
     public static Class<?> resolveClassName(String className, ClassLoader classLoader)
@@ -349,31 +336,28 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the {@link Class} identified by the supplied name is present and can be
-     * loaded. Will return {@code false} if either the class or one of its dependencies is not
-     * present or cannot be loaded.
+     * 判断由给定名称标识的{@link Class}是否存在且可加载。
+     * 如果类或其某个依赖不存在或无法加载，返回{@code false}。
      *
-     * @param className the name of the class to check
-     * @param classLoader the class loader to use (may be {@code null} which indicates the default
-     *     class loader)
-     * @return whether the specified class is present
+     * @param className 要检查的类名
+     * @param classLoader 要使用的类加载器（可以为{@code null}，表示使用默认类加载器）
+     * @return 指定类是否存在
      */
     public static boolean isPresent(String className, ClassLoader classLoader) {
         try {
             forName(className, classLoader);
             return true;
         } catch (Throwable ex) {
-            // Class or one of its dependencies is not present...
+            // 类或其某个依赖不存在...
             return false;
         }
     }
 
     /**
-     * Check whether the given class is visible in the given ClassLoader.
+     * 检查给定类在给定ClassLoader中是否可见。
      *
-     * @param clazz the class to check (typically an interface)
-     * @param classLoader the ClassLoader to check against (may be {@code null} in which case this
-     *     method will always return {@code true})
+     * @param clazz 要检查的类（通常是接口）
+     * @param classLoader 要检查的ClassLoader（可以为{@code null}，此时此方法始终返回{@code true}）
      */
     public static boolean isVisible(Class<?> clazz, ClassLoader classLoader) {
         if (classLoader == null) {
@@ -384,33 +368,31 @@ public abstract class GutilClass {
                 return true;
             }
         } catch (SecurityException ex) {
-            // Fall through to loadable check below
+            // 转入下面的可加载性检查
         }
 
-        // Visible if same Class can be loaded from given ClassLoader
+        // 如果可以从给定ClassLoader加载相同的Class则可见
         return isLoadable(clazz, classLoader);
     }
 
     /**
-     * Check whether the given class is cache-safe in the given context, i.e. whether it is loaded
-     * by the given ClassLoader or a parent of it.
+     * 检查给定类在给定上下文中是否可安全缓存，即该类是否由给定ClassLoader或其父级加载。
      *
-     * @param clazz the class to analyze
-     * @param classLoader the ClassLoader to potentially cache metadata in (may be {@code null}
-     *     which indicates the system class loader)
+     * @param clazz 要分析的类
+     * @param classLoader 可能用于缓存元数据的ClassLoader（可以为{@code null}，表示系统类加载器）
      */
     public static boolean isCacheSafe(Class<?> clazz, ClassLoader classLoader) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
         try {
             ClassLoader target = clazz.getClassLoader();
-            // Common cases
+            // 常见情况
             if (target == classLoader || target == null) {
                 return true;
             }
             if (classLoader == null) {
                 return false;
             }
-            // Check for match in ancestors -> positive
+            // 在祖先中查找匹配 -> 正向
             ClassLoader current = classLoader;
             while (current != null) {
                 current = current.getParent();
@@ -418,7 +400,7 @@ public abstract class GutilClass {
                     return true;
                 }
             }
-            // Check for match in children -> negative
+            // 在子代中查找匹配 -> 反向
             while (target != null) {
                 target = target.getParent();
                 if (target == classLoader) {
@@ -426,60 +408,56 @@ public abstract class GutilClass {
                 }
             }
         } catch (SecurityException ex) {
-            // Fall through to loadable check below
+            // 转入下面的可加载性检查
         }
 
-        // Fallback for ClassLoaders without parent/child relationship:
-        // safe if same Class can be loaded from given ClassLoader
+        // 对没有父子关系的ClassLoader的回退判断：
+        // 如果可以从给定ClassLoader加载相同的Class则安全
         return (classLoader != null && isLoadable(clazz, classLoader));
     }
 
     /**
-     * Check whether the given class is loadable in the given ClassLoader.
+     * 检查给定类在给定ClassLoader中是否可加载。
      *
-     * @param clazz the class to check (typically an interface)
-     * @param classLoader the ClassLoader to check against
+     * @param clazz 要检查的类（通常是接口）
+     * @param classLoader 要检查的ClassLoader
      * @since 5.0.6
      */
     private static boolean isLoadable(Class<?> clazz, ClassLoader classLoader) {
         try {
             return (clazz == classLoader.loadClass(clazz.getName()));
-            // Else: different class with same name found
+            // 否则：找到的是同名但不同的类
         } catch (ClassNotFoundException ex) {
-            // No corresponding class found at all
+            // 完全没有找到对应的类
             return false;
         }
     }
 
     /**
-     * Resolve the given class name as primitive class, if appropriate, according to the JVM's
-     * naming rules for primitive classes.
+     * 根据JVM对原始类名的命名规则，将给定的类名解析为原始类（如果合适）。
      *
-     * <p>Also supports the JVM's internal class names for primitive arrays. Does <i>not</i> support
-     * the "[]" suffix notation for primitive arrays; this is only supported by {@link
-     * #forName(String, ClassLoader)}.
+     * <p>也支持原始数组的JVM内部类名。但<i>不</i>支持原始数组的"[]"后缀记法；
+     * 该记法仅由{@link #forName(String, ClassLoader)}支持。
      *
-     * @param name the name of the potentially primitive class
-     * @return the primitive class, or {@code null} if the name does not denote a primitive class or
-     *     primitive array class
+     * @param name 可能是原始类的类名
+     * @return 原始类，如果该名称不表示原始类或原始数组类则返回{@code null}
      */
     public static Class<?> resolvePrimitiveClassName(String name) {
         Class<?> result = null;
-        // Most class names will be quite long, considering that they
-        // SHOULD sit in a package, so a length check is worthwhile.
+        // 大多数类名都会很长（考虑到它们
+        // 应当位于包中），因此长度检查是值得的
         if (name != null && name.length() <= 8) {
-            // Could be a primitive - likely.
+            // 可能是原始类型
             result = primitiveTypeNameMap.get(name);
         }
         return result;
     }
 
     /**
-     * Check if the given class represents a primitive wrapper, i.e. Boolean, Byte, Character,
-     * Short, Integer, Long, Float, or Double.
+     * 检查给定类是否表示原始类型包装类，即Boolean、Byte、Character、Short、Integer、Long、Float或Double。
      *
-     * @param clazz the class to check
-     * @return whether the given class is a primitive wrapper class
+     * @param clazz 要检查的类
+     * @return 给定类是否为原始类型包装类
      */
     public static boolean isPrimitiveWrapper(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -487,12 +465,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check if the given class represents a primitive (i.e. boolean, byte, char, short, int, long,
-     * float, or double) or a primitive wrapper (i.e. Boolean, Byte, Character, Short, Integer,
-     * Long, Float, or Double).
+     * 检查给定类是否表示原始类型（即boolean、byte、char、short、int、long、float或double）
+     * 或原始类型包装类（即Boolean、Byte、Character、Short、Integer、Long、Float或Double）。
      *
-     * @param clazz the class to check
-     * @return whether the given class is a primitive or primitive wrapper class
+     * @param clazz 要检查的类
+     * @return 给定类是否为原始类型或原始类型包装类
      */
     public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -500,11 +477,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check if the given class represents an array of primitives, i.e. boolean, byte, char, short,
-     * int, long, float, or double.
+     * 检查给定类是否表示原始类型数组，即boolean、byte、char、short、int、long、float或double的数组。
      *
-     * @param clazz the class to check
-     * @return whether the given class is a primitive array class
+     * @param clazz 要检查的类
+     * @return 给定类是否为原始类型数组类
      */
     public static boolean isPrimitiveArray(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -512,11 +488,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check if the given class represents an array of primitive wrappers, i.e. Boolean, Byte,
-     * Character, Short, Integer, Long, Float, or Double.
+     * 检查给定类是否表示原始类型包装类数组，即Boolean、Byte、Character、Short、Integer、Long、Float或Double的数组。
      *
-     * @param clazz the class to check
-     * @return whether the given class is a primitive wrapper array class
+     * @param clazz 要检查的类
+     * @return 给定类是否为原始类型包装类数组类
      */
     public static boolean isPrimitiveWrapperArray(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -524,11 +499,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Resolve the given class if it is a primitive class, returning the corresponding primitive
-     * wrapper type instead.
+     * 如果给定类是原始类型，则将其解析为对应的原始类型包装类。
      *
-     * @param clazz the class to check
-     * @return the original class, or a primitive wrapper for the original primitive type
+     * @param clazz 要检查的类
+     * @return 原始类，或原始类型对应的包装类
      */
     public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -538,13 +512,12 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check if the right-hand side type may be assigned to the left-hand side type, assuming
-     * setting by reflection. Considers primitive wrapper classes as assignable to the corresponding
-     * primitive types.
+     * 检查右侧类型是否可以赋给左侧类型，假设是通过反射进行设置。
+     * 将原始类型包装类视为可赋给对应的原始类型。
      *
-     * @param lhsType the target type
-     * @param rhsType the value type that should be assigned to the target type
-     * @return if the target type is assignable from the value type
+     * @param lhsType 目标类型
+     * @param rhsType 要赋给目标类型的值类型
+     * @return 目标类型是否可由值类型赋值
      * @see TypeUtils#isAssignable
      */
     public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
@@ -568,13 +541,12 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine if the given type is assignable from the given value, assuming setting by
-     * reflection. Considers primitive wrapper classes as assignable to the corresponding primitive
-     * types.
+     * 判断给定类型是否可以由给定值赋值，假设是通过反射进行设置。
+     * 将原始类型包装类视为可赋给对应的原始类型。
      *
-     * @param type the target type
-     * @param value the value that should be assigned to the type
-     * @return if the type is assignable from the value
+     * @param type 目标类型
+     * @param value 要赋给该类型的值
+     * @return 类型是否可由该值赋值
      */
     public static boolean isAssignableValue(Class<?> type, Object value) {
         GutilAssert.notNull(type, () -> "Type must not be null");
@@ -582,10 +554,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Convert a "/"-based resource path to a "."-based fully qualified class name.
+     * 将"/"形式的资源路径转换为"."形式的标准类名。
      *
-     * @param resourcePath the resource path pointing to a class
-     * @return the corresponding fully qualified class name
+     * @param resourcePath 指向类的资源路径
+     * @return 对应的标准类名
      */
     public static String convertResourcePathToClassName(String resourcePath) {
         GutilAssert.notNull(resourcePath, () -> "Resource path must not be null");
@@ -593,10 +565,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Convert a "."-based fully qualified class name to a "/"-based resource path.
+     * 将"."形式的标准类名转换为"/"形式的资源路径。
      *
-     * @param className the fully qualified class name
-     * @return the corresponding resource path, pointing to the class
+     * @param className 标准类名
+     * @return 指向类的资源路径
      */
     public static String convertClassNameToResourcePath(String className) {
         GutilAssert.notNull(className, () -> "Class name must not be null");
@@ -604,18 +576,16 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return a path suitable for use with {@code ClassLoader.getResource} (also suitable for use
-     * with {@code Class.getResource} by prepending a slash ('/') to the return value). Built by
-     * taking the package of the specified class file, converting all dots ('.') to slashes ('/'),
-     * adding a trailing slash if necessary, and concatenating the specified resource name to this.
+     * 返回适合与{@code ClassLoader.getResource}一起使用的路径（也适合与{@code Class.getResource}
+     * 一起使用，只需在返回值前加斜杠'/'）。构建方式：取指定类文件的包名，将所有点（'.'）转换为
+     * 斜杠（'/'），必要时添加尾斜杠，并将指定资源名拼接到其后。
      * <br>
-     * As such, this function may be used to build a path suitable for loading a resource file that
-     * is in the same package as a class file, although {@link
-     * org.springframework.core.io.ClassPathResource} is usually even more convenient.
+     * 因此，此方法可用于构建加载与类文件位于同一包中的资源文件的路径，
+     * 不过通常使用{@link org.springframework.core.io.ClassPathResource}更方便。
      *
-     * @param clazz the Class whose package will be used as the base
-     * @param resourceName the resource name to append. A leading slash is optional.
-     * @return the built-up resource path
+     * @param clazz 用作基础的类
+     * @param resourceName 要追加的资源名。前导斜杠可选。
+     * @return 构建好的资源路径
      * @see ClassLoader#getResource
      * @see Class#getResource
      */
@@ -628,16 +598,12 @@ public abstract class GutilClass {
     }
 
     /**
-     * Given an input class object, return a string which consists of the class's package name as a
-     * pathname, i.e., all dots ('.') are replaced by slashes ('/'). Neither a leading nor trailing
-     * slash is added. The result could be concatenated with a slash and the name of a resource and
-     * fed directly to {@code ClassLoader.getResource()}. For it to be fed to {@code
-     * Class.getResource} instead, a leading slash would also have to be prepended to the returned
-     * value.
+     * 给定一个输入类对象，返回由该类包名组成的路径字符串，即所有点（'.'）替换为斜杠（'/'）。
+     * 不添加前导或尾随斜杠。结果可以拼上斜杠和资源名直接用于{@code ClassLoader.getResource()}；
+     * 如果要用于{@code Class.getResource}，则还需要在返回值前加前导斜杠。
      *
-     * @param clazz the input class. A {@code null} value or the default (empty) package will result
-     *     in an empty string ("") being returned.
-     * @return a path which represents the package name
+     * @param clazz 输入类。{@code null}值或默认（空）包将返回空字符串（""）。
+     * @return 表示包名的路径
      * @see ClassLoader#getResource
      * @see Class#getResource
      */
@@ -655,13 +621,13 @@ public abstract class GutilClass {
     }
 
     /**
-     * Build a String that consists of the names of the classes/interfaces in the given array.
+     * 构建由给定数组中类的名称组成的字符串。
      *
-     * <p>Basically like {@code AbstractCollection.toString()}, but stripping the "class
-     * "/"interface " prefix before every class name.
+     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉
+     * "class "/"interface "前缀。
      *
-     * @param classes an array of Class objects
-     * @return a String of form "[com.foo.Bar, com.foo.Baz]"
+     * @param classes Class对象数组
+     * @return 形如"[com.foo.Bar, com.foo.Baz]"的字符串
      * @see java.util.AbstractCollection#toString()
      */
     public static String classNamesToString(Class<?>... classes) {
@@ -669,13 +635,13 @@ public abstract class GutilClass {
     }
 
     /**
-     * Build a String that consists of the names of the classes/interfaces in the given collection.
+     * 构建由给定集合中类的名称组成的字符串。
      *
-     * <p>Basically like {@code AbstractCollection.toString()}, but stripping the "class
-     * "/"interface " prefix before every class name.
+     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉
+     * "class "/"interface "前缀。
      *
-     * @param classes a Collection of Class objects (may be {@code null})
-     * @return a String of form "[com.foo.Bar, com.foo.Baz]"
+     * @param classes Class对象集合（可以为{@code null}）
+     * @return 形如"[com.foo.Bar, com.foo.Baz]"的字符串
      * @see java.util.AbstractCollection#toString()
      */
     public static String classNamesToString(Collection<Class<?>> classes) {
@@ -694,13 +660,13 @@ public abstract class GutilClass {
         return sb.toString();
     }
 
-    /**
-     * Copy the given {@code Collection} into a {@code Class} array.
+/**
+     * 将给定的{@code Collection}复制为{@code Class}数组。
      *
-     * <p>The {@code Collection} must contain {@code Class} elements only.
+     * <p>{@code Collection}中只能包含{@code Class}元素。
      *
-     * @param collection the {@code Collection} to copy
-     * @return the {@code Class} array
+     * @param collection 要复制的{@code Collection}
+     * @return {@code Class}数组
      * @since 3.1
      * @see StringUtils#toStringArray
      */
@@ -709,11 +675,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return all interfaces that the given instance implements as an array, including ones
-     * implemented by superclasses.
+     * 返回给定实例实现的所有接口（数组形式），包括其父类实现的接口。
      *
-     * @param instance the instance to analyze for interfaces
-     * @return all interfaces that the given instance implements as an array
+     * @param instance 要分析接口的实例
+     * @return 给定实例实现的所有接口（数组形式）
      */
     public static Class<?>[] getAllInterfaces(Object instance) {
         GutilAssert.notNull(instance, () -> "Instance must not be null");
@@ -721,39 +686,35 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return all interfaces that the given class implements as an array, including ones implemented
-     * by superclasses.
+     * 返回给定类实现的所有接口（数组形式），包括其父类实现的接口。
      *
-     * <p>If the class itself is an interface, it gets returned as sole interface.
+     * <p>如果类本身是接口，则将其作为唯一接口返回。
      *
-     * @param clazz the class to analyze for interfaces
-     * @return all interfaces that the given object implements as an array
+     * @param clazz 待分析接口的类
+     * @return 给定类实现的所有接口（数组形式）
      */
     public static Class<?>[] getAllInterfacesForClass(Class<?> clazz) {
         return getAllInterfacesForClass(clazz, null);
     }
 
     /**
-     * Return all interfaces that the given class implements as an array, including ones implemented
-     * by superclasses.
+     * 返回给定类实现的所有接口（数组形式），包括其父类实现的接口。
      *
-     * <p>If the class itself is an interface, it gets returned as sole interface.
+     * <p>如果类本身是接口，则将其作为唯一接口返回。
      *
-     * @param clazz the class to analyze for interfaces
-     * @param classLoader the ClassLoader that the interfaces need to be visible in (may be {@code
-     *     null} when accepting all declared interfaces)
-     * @return all interfaces that the given object implements as an array
+     * @param clazz 待分析接口的类
+     * @param classLoader 接口需要可见的ClassLoader（{@code null}表示接受所有声明的接口）
+     * @return 给定类实现的所有接口（数组形式）
      */
     public static Class<?>[] getAllInterfacesForClass(Class<?> clazz, ClassLoader classLoader) {
         return toClassArray(getAllInterfacesForClassAsSet(clazz, classLoader));
     }
 
     /**
-     * Return all interfaces that the given instance implements as a Set, including ones implemented
-     * by superclasses.
+     * 返回给定实例实现的所有接口（Set形式），包括其父类实现的接口。
      *
-     * @param instance the instance to analyze for interfaces
-     * @return all interfaces that the given instance implements as a Set
+     * @param instance 待分析接口的实例
+     * @return 给定实例实现的所有接口（Set形式）
      */
     public static Set<Class<?>> getAllInterfacesAsSet(Object instance) {
         GutilAssert.notNull(instance, () -> "Instance must not be null");
@@ -761,28 +722,29 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return all interfaces that the given class implements as a Set, including ones implemented by
-     * superclasses.
+     * 返回给定类实现的所有接口（Set形式），包括其父类实现的接口。
      *
-     * <p>If the class itself is an interface, it gets returned as sole interface.
+     * <p>如果类本身是接口，则将其作为唯一接口返回。
      *
-     * @param clazz the class to analyze for interfaces
-     * @return all interfaces that the given object implements as a Set
+     * <p>注意：此方法每次调用都会沿类继承层次全量遍历接口，无缓存。
+     *
+     * @param clazz 待分析接口的类
+     * @return 给定对象实现的所有接口（Set形式）
      */
     public static Set<Class<?>> getAllInterfacesForClassAsSet(Class<?> clazz) {
         return getAllInterfacesForClassAsSet(clazz, null);
     }
 
     /**
-     * Return all interfaces that the given class implements as a Set, including ones implemented by
-     * superclasses.
+     * 返回给定类实现的所有接口（Set形式），包括其父类实现的接口。
      *
-     * <p>If the class itself is an interface, it gets returned as sole interface.
+     * <p>如果类本身是接口，则将其作为唯一接口返回。
      *
-     * @param clazz the class to analyze for interfaces
-     * @param classLoader the ClassLoader that the interfaces need to be visible in (may be {@code
-     *     null} when accepting all declared interfaces)
-     * @return all interfaces that the given object implements as a Set
+     * <p>注意：此方法每次调用都会沿类继承层次全量遍历接口，无缓存。
+     *
+     * @param clazz 待分析接口的类
+     * @param classLoader 接口需要可见的ClassLoader（{@code null}表示接受所有声明的接口）
+     * @return 给定对象实现的所有接口（Set形式）
      */
     public static Set<Class<?>> getAllInterfacesForClassAsSet(
             Class<?> clazz, ClassLoader classLoader) {
@@ -805,16 +767,14 @@ public abstract class GutilClass {
     }
 
     /**
-     * Create a composite interface Class for the given interfaces, implementing the given
-     * interfaces in one single Class.
+     * 为给定接口创建复合接口Class，在一个Class中实现给定接口。
      *
-     * <p>This implementation builds a JDK proxy class for the given interfaces.
+     * <p>此实现为给定接口构建JDK代理类。
      *
-     * @param interfaces the interfaces to merge
-     * @param classLoader the ClassLoader to create the composite Class in
-     * @return the merged interface as Class
-     * @throws IllegalArgumentException if the specified interfaces expose conflicting method
-     *     signatures (or a similar constraint is violated)
+     * @param interfaces 要合并的接口
+     * @param classLoader 在其中创建复合Class的ClassLoader
+     * @return 合并后的接口Class
+     * @throws IllegalArgumentException 如果指定接口暴露了冲突的方法签名（或类似的约束被违反）
      * @see java.lang.reflect.Proxy#getProxyClass
      */
     @SuppressWarnings("deprecation")
@@ -825,13 +785,12 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine the common ancestor of the given classes, if any.
+     * 确定给定类的公共祖先（如果存在）。
      *
-     * @param clazz1 the class to introspect
-     * @param clazz2 the other class to introspect
-     * @return the common ancestor (i.e. common superclass, one interface extending the other), or
-     *     {@code null} if none found. If any of the given classes is {@code null}, the other class
-     *     will be returned.
+     * @param clazz1 要内省的类
+     * @param clazz2 要内省的另一个类
+     * @return 公共祖先（即公共父类，或一个接口继承另一个接口），如果未找到返回{@code null}。
+     *     如果任一给定类为{@code null}，则返回另一个类。
      * @since 3.2.6
      */
     public static Class<?> determineCommonAncestor(Class<?> clazz1, Class<?> clazz2) {
@@ -858,13 +817,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given interface is a common Java language interface: {@link
-     * Serializable}, {@link Externalizable}, {@link Closeable}, {@link AutoCloseable}, {@link
-     * Cloneable}, {@link Comparable} - all of which can be ignored when looking for 'primary'
-     * user-level interfaces. Common characteristics: no service-level operations, no bean property
-     * methods, no default methods.
+     * 判断给定接口是否为常见的Java语言接口：{@link Serializable}、{@link Externalizable}、
+     * {@link Closeable}、{@link AutoCloseable}、{@link Cloneable}、{@link Comparable}——
+     * 在查找'主'用户级接口时可以忽略这些接口。共同特征：无服务级操作、无bean属性方法、无默认方法。
      *
-     * @param ifc the interface to check
+     * @param ifc 要检查的接口
      * @since 5.0.3
      */
     public static boolean isJavaLanguageInterface(Class<?> ifc) {
@@ -872,10 +829,9 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine if the supplied class is an <em>inner class</em>, i.e. a non-static member of an
-     * enclosing class.
+     * 判断给定类是否为<em>内部类</em>，即外部类的非静态成员。
      *
-     * @return {@code true} if the supplied class is an inner class
+     * @return {@code true} 如果给定类是内部类
      * @since 5.0.5
      * @see Class#isMemberClass()
      */
@@ -884,9 +840,9 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check whether the given object is a CGLIB proxy.
+     * 检查给定对象是否为CGLIB代理。
      *
-     * @param object the object to check
+     * @param object 要检查的对象
      * @see #isCglibProxyClass(Class)
      * @see org.springframework.aop.support.AopUtils#isCglibProxy(Object)
      */
@@ -895,9 +851,9 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check whether the specified class is a CGLIB-generated class.
+     * 检查指定类是否为CGLIB生成的类。
      *
-     * @param clazz the class to check
+     * @param clazz 要检查的类
      * @see #isCglibProxyClassName(String)
      */
     public static boolean isCglibProxyClass(Class<?> clazz) {
@@ -905,20 +861,19 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check whether the specified class name is a CGLIB-generated class.
+     * 检查指定类名是否为CGLIB生成的类名。
      *
-     * @param className the class name to check
+     * @param className 要检查的类名
      */
     public static boolean isCglibProxyClassName(String className) {
         return (className != null && className.contains(CGLIB_CLASS_SEPARATOR));
     }
 
     /**
-     * Return the user-defined class for the given instance: usually simply the class of the given
-     * instance, but the original class in case of a CGLIB-generated subclass.
+     * 返回给定实例的用户定义类：通常就是该实例的类，但对于CGLIB生成的子类则返回原始类。
      *
-     * @param instance the instance to check
-     * @return the user-defined class
+     * @param instance 要检查的实例
+     * @return 用户定义类
      */
     public static Class<?> getUserClass(Object instance) {
         GutilAssert.notNull(instance, () -> "Instance must not be null");
@@ -926,11 +881,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return the user-defined class for the given class: usually simply the given class, but the
-     * original class in case of a CGLIB-generated subclass.
+     * 返回给定类的用户定义类：通常就是给定类，但对于CGLIB生成的子类则返回原始类。
      *
-     * @param clazz the class to check
-     * @return the user-defined class
+     * @param clazz 要检查的类
+     * @return 用户定义类
      */
     public static Class<?> getUserClass(Class<?> clazz) {
         if (clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
@@ -943,12 +897,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return a descriptive name for the given object's type: usually simply the class name, but
-     * component type class name + "[]" for arrays, and an appended list of implemented interfaces
-     * for JDK proxies.
+     * 返回给定对象类型的描述性名称：通常就是类名，但对于数组是组件类型类名加"[]"，
+     * 对于JDK代理则是追加其实现接口列表。
      *
-     * @param value the value to introspect
-     * @return the qualified name of the class
+     * @param value 要内省的值
+     * @return 类的限定名
      */
     public static String getDescriptiveType(Object value) {
         if (value == null) {
@@ -972,10 +925,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Check whether the given class matches the user-specified type name.
+     * 检查给定类是否匹配用户指定的类型名。
      *
-     * @param clazz the class to check
-     * @param typeName the type name to match
+     * @param clazz 要检查的类
+     * @param typeName 要匹配的类型名
      */
     public static boolean matchesTypeName(Class<?> clazz, String typeName) {
         return (typeName != null
@@ -984,11 +937,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Get the class name without the qualified package name.
+     * 获取不带限定包名的类名。
      *
-     * @param className the className to get the short name for
-     * @return the class name of the class without the package name
-     * @throws IllegalArgumentException if the className is empty
+     * @param className 要获取短名的类名
+     * @return 不带包名的类名
+     * @throws IllegalArgumentException 如果类名为空
      */
     public static String getShortName(String className) {
         GutilAssert.hasText(className, () -> "Class name must not be empty");
@@ -1003,21 +956,20 @@ public abstract class GutilClass {
     }
 
     /**
-     * Get the class name without the qualified package name.
+     * 获取不带限定包名的类名。
      *
-     * @param clazz the class to get the short name for
-     * @return the class name of the class without the package name
+     * @param clazz 要获取短名的类
+     * @return 不带包名的类名
      */
     public static String getShortName(Class<?> clazz) {
         return getShortName(getQualifiedName(clazz));
     }
 
     /**
-     * Return the short string name of a Java class in uncapitalized JavaBeans property format.
-     * Strips the outer class name in case of an inner class.
+     * 以小写开头的JavaBeans属性格式返回Java类的短字符串名。如果是内部类，则去掉外部类名。
      *
-     * @param clazz the class
-     * @return the short name rendered in a standard JavaBeans property format
+     * @param clazz 类
+     * @return 以标准JavaBeans属性格式呈现的短名
      * @see java.beans.Introspector#decapitalize(String)
      */
     public static String getShortNameAsProperty(Class<?> clazz) {
@@ -1028,10 +980,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine the name of the class file, relative to the containing package: e.g. "String.class"
+     * 确定类文件的名称，相对于包含包：例如"String.class"。
      *
-     * @param clazz the class
-     * @return the file name of the ".class" file
+     * @param clazz 类
+     * @return ".class"文件的文件名
      */
     public static String getClassFileName(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1041,11 +993,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine the name of the package of the given class, e.g. "java.lang" for the {@code
-     * java.lang.String} class.
+     * 确定给定类的包名，例如{@code java.lang.String}类的包名为"java.lang"。
      *
-     * @param clazz the class
-     * @return the package name, or the empty String if the class is defined in the default package
+     * @param clazz 类
+     * @return 包名，如果类定义在默认包中则返回空字符串
      */
     public static String getPackageName(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1053,11 +1004,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine the name of the package of the given fully-qualified class name, e.g. "java.lang"
-     * for the {@code java.lang.String} class name.
+     * 确定给定全限定类名的包名，例如{@code java.lang.String}类名的包名为"java.lang"。
      *
-     * @param fqClassName the fully-qualified class name
-     * @return the package name, or the empty String if the class is defined in the default package
+     * @param fqClassName 全限定类名
+     * @return 包名，如果类名没有包名则返回空字符串
      */
     public static String getPackageName(String fqClassName) {
         GutilAssert.notNull(fqClassName, () -> "Class name must not be null");
@@ -1066,11 +1016,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return the qualified name of the given class: usually simply the class name, but component
-     * type class name + "[]" for arrays.
+     * 返回给定类的限定名：通常就是类名，但对于数组是组件类型类名加"[]"。
      *
-     * @param clazz the class
-     * @return the qualified name of the class
+     * @param clazz 类
+     * @return 类的限定名
      */
     public static String getQualifiedName(Class<?> clazz) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1078,24 +1027,21 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return the qualified name of the given method, consisting of fully qualified interface/class
-     * name + "." + method name.
+     * 返回给定方法的限定名，由全限定接口/类名 + "." + 方法名组成。
      *
-     * @param method the method
-     * @return the qualified name of the method
+     * @param method 方法
+     * @return 方法的限定名
      */
     public static String getQualifiedMethodName(Method method) {
         return getQualifiedMethodName(method, null);
     }
 
     /**
-     * Return the qualified name of the given method, consisting of fully qualified interface/class
-     * name + "." + method name.
+     * 返回给定方法的限定名，由全限定接口/类名 + "." + 方法名组成。
      *
-     * @param method the method
-     * @param clazz the clazz that the method is being invoked on (may be {@code null} to indicate
-     *     the method's declaring class)
-     * @return the qualified name of the method
+     * @param method 方法
+     * @param clazz 调用该方法的类（可以为{@code null}，表示使用方法的声明类）
+     * @return 方法的限定名
      * @since 4.3.4
      */
     public static String getQualifiedMethodName(Method method, Class<?> clazz) {
@@ -1106,13 +1052,13 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given class has a public constructor with the given signature.
+     * 判断给定类是否具有给定签名的公共构造方法。
      *
-     * <p>Essentially translates {@code NoSuchMethodException} to "false".
+     * <p>本质上将{@code NoSuchMethodException}转换为"false"。
      *
-     * @param clazz the clazz to analyze
-     * @param paramTypes the parameter types of the method
-     * @return whether the class has a corresponding constructor
+     * @param clazz 要分析的类
+     * @param paramTypes 构造方法的参数类型
+     * @return 类是否具有对应的构造方法
      * @see Class#getMethod
      */
     public static boolean hasConstructor(Class<?> clazz, Class<?>... paramTypes) {
@@ -1120,14 +1066,13 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given class has a public constructor with the given signature, and
-     * return it if available (else return {@code null}).
+     * 判断给定类是否具有给定签名的公共构造方法，如果有则返回（否则返回{@code null}）。
      *
-     * <p>Essentially translates {@code NoSuchMethodException} to {@code null}.
+     * <p>本质上将{@code NoSuchMethodException}转换为{@code null}。
      *
-     * @param clazz the clazz to analyze
-     * @param paramTypes the parameter types of the method
-     * @return the constructor, or {@code null} if not found
+     * @param clazz 要分析的类
+     * @param paramTypes 构造方法的参数类型
+     * @return 构造方法，如果未找到返回{@code null}
      * @see Class#getConstructor
      */
     public static <T> Constructor<T> getConstructorIfAvailable(
@@ -1141,14 +1086,14 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given class has a public method with the given signature.
+     * 判断给定类是否具有给定签名的公共方法。
      *
-     * <p>Essentially translates {@code NoSuchMethodException} to "false".
+     * <p>本质上将{@code NoSuchMethodException}转换为"false"。
      *
-     * @param clazz the clazz to analyze
-     * @param methodName the name of the method
-     * @param paramTypes the parameter types of the method
-     * @return whether the class has a corresponding method
+     * @param clazz 要分析的类
+     * @param methodName 方法名
+     * @param paramTypes 方法的参数类型
+     * @return 类是否具有对应的方法
      * @see Class#getMethod
      */
     public static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
@@ -1156,20 +1101,18 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given class has a public method with the given signature, and return it
-     * if available (else throws an {@code IllegalStateException}).
+     * 判断给定类是否具有给定签名的公共方法，如果有则返回（否则抛出{@code IllegalStateException}）。
      *
-     * <p>In case of any signature specified, only returns the method if there is a unique
-     * candidate, i.e. a single public method with the specified name.
+     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法，
+     * 即具有指定名称的唯一公共方法。
      *
-     * <p>Essentially translates {@code NoSuchMethodException} to {@code IllegalStateException}.
+     * <p>本质上将{@code NoSuchMethodException}转换为{@code IllegalStateException}。
      *
-     * @param clazz the clazz to analyze
-     * @param methodName the name of the method
-     * @param paramTypes the parameter types of the method (may be {@code null} to indicate any
-     *     signature)
-     * @return the method (never {@code null})
-     * @throws IllegalStateException if the method has not been found
+     * @param clazz 要分析的类
+     * @param methodName 方法名
+     * @param paramTypes 方法的参数类型（可以为{@code null}表示任意签名）
+     * @return 方法（永远不会是{@code null}）
+     * @throws IllegalStateException 如果未找到方法
      * @see Class#getMethod
      */
     public static Method getMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
@@ -1202,19 +1145,17 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given class has a public method with the given signature, and return it
-     * if available (else return {@code null}).
+     * 判断给定类是否具有给定签名的公共方法，如果有则返回（否则返回{@code null}）。
      *
-     * <p>In case of any signature specified, only returns the method if there is a unique
-     * candidate, i.e. a single public method with the specified name.
+     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法，
+     * 即具有指定名称的唯一公共方法。
      *
-     * <p>Essentially translates {@code NoSuchMethodException} to {@code null}.
+     * <p>本质上将{@code NoSuchMethodException}转换为{@code null}。
      *
-     * @param clazz the clazz to analyze
-     * @param methodName the name of the method
-     * @param paramTypes the parameter types of the method (may be {@code null} to indicate any
-     *     signature)
-     * @return the method, or {@code null} if not found
+     * @param clazz 要分析的类
+     * @param methodName 方法名
+     * @param paramTypes 方法的参数类型（可以为{@code null}表示任意签名）
+     * @return 方法，如果未找到返回{@code null}
      * @see Class#getMethod
      */
     public static Method getMethodIfAvailable(
@@ -1243,12 +1184,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return the number of methods with a given name (with any argument types), for the given class
-     * and/or its superclasses. Includes non-public methods.
+     * 返回给定类及其父类中具有给定名称（任意参数类型）的方法数量。包括非公共方法。
      *
-     * @param clazz the clazz to check
-     * @param methodName the name of the method
-     * @return the number of methods with the given name
+     * @param clazz 要检查的类
+     * @param methodName 方法名
+     * @return 具有给定名称的方法数量
      */
     public static int getMethodCountForName(Class<?> clazz, String methodName) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1271,12 +1211,11 @@ public abstract class GutilClass {
     }
 
     /**
-     * Does the given class or one of its superclasses at least have one or more methods with the
-     * supplied name (with any argument types)? Includes non-public methods.
+     * 给定类或其某个父类是否至少具有一个或多个具有给定名称（任意参数类型）的方法？包括非公共方法。
      *
-     * @param clazz the clazz to check
-     * @param methodName the name of the method
-     * @return whether there is at least one method with the given name
+     * @param clazz 要检查的类
+     * @param methodName 方法名
+     * @return 是否至少有一个具有给定名称的方法
      */
     public static boolean hasAtLeastOneMethodWithName(Class<?> clazz, String methodName) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1298,26 +1237,21 @@ public abstract class GutilClass {
     }
 
     /**
-     * Given a method, which may come from an interface, and a target class used in the current
-     * reflective invocation, find the corresponding target method if there is one. E.g. the method
-     * may be {@code IFoo.bar()} and the target class may be {@code DefaultFoo}. In this case, the
-     * method may be {@code DefaultFoo.bar()}. This enables attributes on that method to be found.
+     * 给定一个可能来自接口的方法，以及当前反射调用中使用的目标类，找到对应的目标方法（如果存在）。
+     * 例如方法可能是{@code IFoo.bar()}，目标类可能是{@code DefaultFoo}。在这种情况下，
+     * 方法可能是{@code DefaultFoo.bar()}。这样可以找到该方法上的属性。
      *
-     * <p><b>NOTE:</b> In contrast to {@link
-     * org.springframework.aop.support.AopUtils#getMostSpecificMethod}, this method does <i>not</i>
-     * resolve Java 5 bridge methods automatically. Call {@link
-     * org.springframework.core.BridgeMethodResolver#findBridgedMethod} if bridge method resolution
-     * is desirable (e.g. for obtaining metadata from the original method definition).
+     * <p><b>注意：</b>与{@link org.springframework.aop.support.AopUtils#getMostSpecificMethod}
+     * 相反，此方法<i>不</i>自动解析Java 5桥接方法。如果需要桥接方法解析
+     * （例如获取原始方法定义的元数据），请调用{@link
+     * org.springframework.core.BridgeMethodResolver#findBridgedMethod}。
      *
-     * <p><b>NOTE:</b> Since Spring 3.1.1, if Java security settings disallow reflective access
-     * (e.g. calls to {@code Class#getDeclaredMethods} etc, this implementation will fall back to
-     * returning the originally provided method.
+     * <p><b>注意：</b>自Spring 3.1.1起，如果Java安全设置不允许反射访问
+     * （例如调用{@code Class#getDeclaredMethods}等），此实现将回退到返回原始方法。
      *
-     * @param method the method to be invoked, which may come from an interface
-     * @param targetClass the target class for the current invocation (may be {@code null} or may
-     *     not even implement the method)
-     * @return the specific target method, or the original method if the {@code targetClass} does
-     *     not implement it
+     * @param method 要调用的方法，可能来自接口
+     * @param targetClass 当前调用的目标类（可以为{@code null}，或者甚至不实现该方法）
+     * @return 特定的目标方法，如果{@code targetClass}未实现该方法则返回原始方法
      */
     public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
         if (targetClass != null
@@ -1337,21 +1271,19 @@ public abstract class GutilClass {
                     return (specificMethod != null ? specificMethod : method);
                 }
             } catch (SecurityException ex) {
-                // Security settings are disallowing reflective access; fall back to
-                // 'method' below.
+                // 安全设置不允许反射访问；回退到下面的'method'
             }
         }
         return method;
     }
 
     /**
-     * Determine a corresponding interface method for the given method handle, if possible.
+     * 如果可能，为给定的方法句柄确定对应的接口方法。
      *
-     * <p>This is particularly useful for arriving at a public exported type on Jigsaw which can be
-     * reflectively invoked without an illegal access warning.
+     * <p>这对于获得Jigsaw上可公开导出的类型特别有用，可以在没有非法访问警告的情况下被反射调用。
      *
-     * @param method the method to be invoked, potentially from an implementation class
-     * @return the corresponding interface method, or the original method if none found
+     * @param method 要调用的方法，可能来自实现类
+     * @return 对应的接口方法，如果未找到则返回原始方法
      * @since 5.1
      * @see #getMostSpecificMethod
      */
@@ -1369,7 +1301,7 @@ public abstract class GutilClass {
                             try {
                                 return ifc.getMethod(key.getName(), key.getParameterTypes());
                             } catch (NoSuchMethodException ex) {
-                                // ignore
+                                // 忽略
                             }
                         }
                         current = current.getSuperclass();
@@ -1379,18 +1311,15 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given method is declared by the user or at least pointing to a
-     * user-declared method.
+     * 判断给定方法是由用户声明的，或者至少指向用户声明的方法。
      *
-     * <p>Checks {@link Method#isSynthetic()} (for implementation methods) as well as the {@code
-     * GroovyObject} interface (for interface methods; on an implementation class, implementations
-     * of the {@code GroovyObject} methods will be marked as synthetic anyway). Note that, despite
-     * being synthetic, bridge methods ({@link Method#isBridge()}) are considered as user-level
-     * methods since they are eventually pointing to a user-declared generic method.
+     * <p>检查{@link Method#isSynthetic()}（针对实现方法）以及{@code GroovyObject}接口
+     * （针对接口方法；在实现类上，{@code GroovyObject}方法的实现无论如何都会被标记为合成方法）。
+     * 注意，尽管是合成的，桥接方法（{@link Method#isBridge()}）仍被视为用户级方法，
+     * 因为它们最终指向用户声明的泛型方法。
      *
-     * @param method the method to check
-     * @return {@code true} if the method can be considered as user-declared; [@code false}
-     *     otherwise
+     * @param method 要检查的方法
+     * @return {@code true} 如果该方法可被视为用户声明的；否则为{@code false}
      */
     public static boolean isUserLevelMethod(Method method) {
         GutilAssert.notNull(method, () -> "Method must not be null");
@@ -1402,10 +1331,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * Determine whether the given method is overridable in the given target class.
+     * 判断给定方法在给定目标类中是否可被重写。
      *
-     * @param method the method to check
-     * @param targetClass the target class to check against
+     * @param method 要检查的方法
+     * @param targetClass 要检查的目标类
      */
     private static boolean isOverridable(Method method, Class<?> targetClass) {
         if (Modifier.isPrivate(method.getModifiers())) {
@@ -1420,13 +1349,13 @@ public abstract class GutilClass {
     }
 
     /**
-     * Return a public static method of a class.
+     * 返回类的公共静态方法。
      *
-     * @param clazz the class which defines the method
-     * @param methodName the static method name
-     * @param args the parameter types to the method
-     * @return the static method, or {@code null} if no static method was found
-     * @throws IllegalArgumentException if the method name is blank or the clazz is null
+     * @param clazz 定义该方法的类
+     * @param methodName 静态方法名
+     * @param args 方法的参数类型
+     * @return 静态方法，如果未找到静态方法则返回{@code null}
+     * @throws IllegalArgumentException 如果方法名为空或clazz为null
      */
     public static Method getStaticMethod(Class<?> clazz, String methodName, Class<?>... args) {
         GutilAssert.notNull(clazz, () -> "Class must not be null");
@@ -1560,10 +1489,10 @@ public abstract class GutilClass {
     }
 
     // -----------------------------------------------------------------------------------------
-    // Method
+    // 方法
 
     // -----------------------------------------------------------------------------------------
-    // Field
+    // 字段
 
     /**
      * 查找指定类中的所有字段（包括非public字段）， 字段不存在则返回<code>null</code>
@@ -1581,7 +1510,7 @@ public abstract class GutilClass {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            // e.printStackTrace();
+            // 未找到字段，忽略
         }
         return null;
     }
@@ -1611,6 +1540,8 @@ public abstract class GutilClass {
     /**
      * 比较判断types1和types2两组类，如果types1中所有的类都与types2对应位置的类相同，或者是其父类或接口，则返回<code>true</code>
      *
+     * <p>数组中的{@code null}元素按{@link Object}类型处理，即null参数可以匹配任意类型。
+     *
      * @param types1 类组1
      * @param types2 类组2
      * @return 是否相同、父类或接口
@@ -1630,8 +1561,9 @@ public abstract class GutilClass {
         Class<?> type1;
         Class<?> type2;
         for (int i = 0; i < types1.length; i++) {
-            type1 = types1[i];
-            type2 = types2[i];
+            // 数组元素为null时按Object类型处理，避免空指针
+            type1 = (null == types1[i]) ? Object.class : types1[i];
+            type2 = (null == types2[i]) ? Object.class : types2[i];
             if (isBasicType(type1) && isBasicType(type2)) {
                 // 原始类型和包装类型存在不一致情况
                 if (GkBasicType.unWrap(type1) != GkBasicType.unWrap(type2)) {
@@ -1645,7 +1577,7 @@ public abstract class GutilClass {
     }
 
     // ----------------------------------------------------------------------------------------------------
-    // Invoke end
+    // 调用相关工具方法结束
 
     /**
      * 是否为基本类型（包括包装类和原始类）
@@ -1703,12 +1635,12 @@ public abstract class GutilClass {
                 || clazz.equals(URL.class) //
                 || clazz.equals(Locale.class) //
                 || clazz.equals(Class.class) //
-                // jdk8 date object
+                // jdk8日期对象
                 || TemporalAccessor.class.isAssignableFrom(clazz); //
     }
 
     /**
-     * 检查目标类是否可以从原类转化<br>
+     * 检查目标类是否可以从原类转化（历史版本说明）<br>
      * 转化包括：<br>
      * 1、原类是对象，目标类型是原类型实现的接口<br>
      * 2、目标类型是原类型的父类<br>
@@ -1717,14 +1649,6 @@ public abstract class GutilClass {
      * @param targetType 目标类型
      * @param sourceType 原类型
      * @return 是否可转化
-     *     <p>public static boolean isAssignable(Class<?> targetType, Class<?> sourceType) { if
-     *     (null == targetType || null == sourceType) { return false; }
-     *     <p>// 对象类型 if (targetType.isAssignableFrom(sourceType)) { return true; }
-     *     <p>// 基本类型 if (targetType.isPrimitive()) { // 原始类型 Class<?> resolvedPrimitive =
-     *     BasicType.WRAPPER_PRIMITIVE_MAP.get(sourceType); return
-     *     targetType.equals(resolvedPrimitive); } else { // 包装类型 Class<?> resolvedWrapper =
-     *     BasicType.PRIMITIVE_WRAPPER_MAP.get(sourceType); return resolvedWrapper != null &&
-     *     targetType.isAssignableFrom(resolvedWrapper); } }
      */
 
     /**
@@ -1974,27 +1898,33 @@ public abstract class GutilClass {
 
     /**
      * 获取class类路径URL, 不管是否在jar包中都会返回文件夹的路径<br>
-     * class在jar包中返回jar所在文件夹,class不在jar中返回文件夹目录<br>
+     * 类在jar包中返回jar所在文件夹,类不在jar中返回文件夹目录<br>
      * jdk中的类不能使用此方法
      *
+     * <p>如果类的保护域或其代码源为{@code null}（例如JDK内置类、bootstrap类），返回{@code null}。
+     *
      * @param clazz 类
-     * @return URL
+     * @return URL，无法获取时返回{@code null}
      * @since 5.2.4
      */
     public static URL getLocation(Class<?> clazz) {
         if (null == clazz) {
             return null;
         }
-        return clazz.getProtectionDomain().getCodeSource().getLocation();
+        final ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+        if (null == protectionDomain || null == protectionDomain.getCodeSource()) {
+            return null;
+        }
+        return protectionDomain.getCodeSource().getLocation();
     }
 
     /**
      * 获取class类路径, 不管是否在jar包中都会返回文件夹的路径<br>
-     * class在jar包中返回jar所在文件夹,class不在jar中返回文件夹目录<br>
+     * 类在jar包中返回jar所在文件夹,类不在jar中返回文件夹目录<br>
      * jdk中的类不能使用此方法
      *
      * @param clazz 类
-     * @return class路径
+     * @return class路径，无法获取时返回{@code null}
      * @since 5.2.4
      */
     public static String getLocationPath(Class<?> clazz) {
