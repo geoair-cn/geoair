@@ -64,7 +64,7 @@ public class TileResponseByInputStream extends TileResponse {
             // 如果流已关闭，会抛出IOException
             int available = is.available();
             // available() 返回 -1 表示流已结束或关闭
-            return available > 0;
+            return available >= 0;
         } catch (IOException e) {
             // 抛出IOException通常表示流已关闭或不可读
             return false;
@@ -145,7 +145,7 @@ public class TileResponseByInputStream extends TileResponse {
             try {
                 // 注意：available() 不一定准确，但作为参考值
                 int available = inputStream.available();
-                if (available > 0) {
+                if (available >=0) {
                     return (long) available;
                 }
             } catch (Exception e) {
