@@ -2,7 +2,7 @@ package cn.geoair.comp.knife4j.ext.springdoc.builder;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-import cn.geoair.base.log.GirLog4j;
+
 import cn.hutool.core.util.TypeUtil;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
@@ -20,7 +20,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author Administrator
  * @version $Id: $Id
  */
-@GirLog4j
+
 public class GaModelFieldConverter implements ModelConverter {
 
     /** {@inheritDoc} */
