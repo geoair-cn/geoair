@@ -20,7 +20,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author Administrator
  * @version $Id: $Id
  */
-@GirLog4j
+
 public class GaModelFieldConverter implements ModelConverter {
 
     /** {@inheritDoc} */
