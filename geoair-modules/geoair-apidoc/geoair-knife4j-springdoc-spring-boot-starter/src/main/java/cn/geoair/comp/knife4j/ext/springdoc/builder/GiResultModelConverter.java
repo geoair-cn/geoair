@@ -2,7 +2,7 @@ package cn.geoair.comp.knife4j.ext.springdoc.builder;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.result.GiResult;
-import cn.geoair.base.log.GirLog4j;
+
 import cn.geoair.web.data.result.GirWebResult;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
