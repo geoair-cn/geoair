@@ -19,7 +19,6 @@ geoair-dependencies-bom
 ├── geoair-geotools-dependencies  # GIS 空间数据处理依赖
 ├── geoair-spring-dependencies    # Spring 生态依赖
 ├── geoair-openapi-dependencies   # API 文档依赖
-├── geoair-template-dependencies  # 模板预留模块
 └── geoair-common-dependencies     # 其他第三方依赖
 ```
 
@@ -123,10 +122,6 @@ gt-cql (查询语言), gt-process (处理引擎)
 **功能定位**：其他常用第三方依赖集合
 
 ---
-
-### 5. geoair-template-dependencies
-**功能定位**：预留模板模块
-**当前状态**：空模块，用于未来扩展或作为新项目依赖模板参考
 
 ## 🚀 使用指南
 

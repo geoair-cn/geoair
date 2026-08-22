@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-dependencies</artifactId>
-    <version>3.5.13</version>
+    <version>3.5.16</version>
     <relativePath></relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
@@ -43,8 +43,8 @@
   <properties>
     <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
-    <tomcat.version>10.1.53</tomcat.version>
-    <spring-boot.version>3.5.13</spring-boot.version>
+    <tomcat.version>10.1.55</tomcat.version>
+    <spring-boot.version>3.5.16</spring-boot.version>
     <resource.delimiter>@</resource.delimiter>
     <skipTests>true</skipTests>
     <fmt-maven-plugin.version>2.29</fmt-maven-plugin.version>
@@ -180,7 +180,7 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>3.5.13</version>
+          <version>${spring-boot.version}</version>
           <executions>
             <execution>
               <id>repackage</id>
@@ -226,7 +226,7 @@
             <dependency>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-maven-plugin</artifactId>
-              <version>3.5.13</version>
+              <version>${spring-boot.version}</version>
             </dependency>
           </dependencies>
           <configuration>

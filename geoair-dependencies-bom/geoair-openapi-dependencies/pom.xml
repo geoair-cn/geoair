@@ -40,18 +40,6 @@
     <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-  <properties>
-    <knife4j.openapi2.version>3.0.3</knife4j.openapi2.version>
-    <knife4j-openapi3.version>4.5.0</knife4j-openapi3.version>
-    <springfox.version>3.0.0</springfox.version>
-    <springdoc.version>2.8.16</springdoc.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
-    <spring-boot.version>3.5.13</spring-boot.version>
-    <java.version>17</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
 
