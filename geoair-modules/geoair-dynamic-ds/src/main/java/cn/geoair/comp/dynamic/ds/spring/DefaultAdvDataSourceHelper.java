@@ -4,12 +4,10 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import cn.hutool.extra.spring.SpringUtil;
-import com.alibaba.druid.pool.DruidDataSource;
-import java.util.Date;
-import javax.sql.DataSource;
- 
+
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
 
@@ -17,7 +15,7 @@ import org.springframework.util.StringUtils;
  * @author ：张逢吉
  * @date ：Created in 15:34 @description： spring默认的数据源获取器
  */
- 
+
 public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
     public static GiLogger log = GirLoggerFactory.getLogger();
     @Override
@@ -69,11 +67,14 @@ public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
 
         // 基于URL生成名称
         if (StringUtils.hasText(properties.getUrl())) {
-            String url = properties.getUrl();
-            if (url.contains("://")) {
-                String dbPart = url.substring(url.lastIndexOf("/") + 1);
-                String dbName = dbPart.split("\\?")[0];
-                return "DataSource-" + dbName;
+            try {
+                JdbcUrl jdbcUrl = GirJdbcUrlCodecs.defaultCodec().parse(properties.getUrl());
+                String dbName = jdbcUrl.getDatabaseName();
+                if (StringUtils.hasText(dbName)) {
+                    return "DataSource-" + dbName;
+                }
+            } catch (IllegalArgumentException ignored) {
+                // 无法理解的自定义驱动 URL 使用默认名称，避免在 Spring 初始化阶段失败。
             }
         }
 

@@ -1,5 +1,6 @@
 package cn.geoair.comp.dynamic.ds.readwrite.spring;
 
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import cn.geoair.base.log.GemLogLevel;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.base.util.GutilStr;
@@ -279,7 +280,7 @@ public class GirRdDataSourceProperties {
                     String url = slave.getUrl();
                     String id = slave.getId();
                     slave.setId(id + "by_copy_" + IdUtil.fastSimpleUUID());
-                    slave.setUrl(appendSchemaToUrl(url, schema));
+                    slave.setUrl(GirJdbcUrlCodecs.defaultCodec().rewriteSchema(url, schema));
                 });
             }
         });
@@ -326,27 +327,15 @@ public class GirRdDataSourceProperties {
     /**
      * 为 URL 添加 schema 参数
      */
+    @Deprecated
     public static String appendSchemaToUrl(String url, String schema) {
-        if (url == null || url.trim().isEmpty() || schema == null || schema.trim().isEmpty()) {
-            return url;
-        }
-
-        // 如果 URL 已经包含 currentSchema，先移除旧的
-        if (url.contains("currentSchema=")) {
-            url = removeParameterFromUrl(url, "currentSchema");
-        }
-
-        // 添加新的 schema 参数
-        if (url.contains("?")) {
-            return url + "&currentSchema=" + schema;
-        } else {
-            return url + "?currentSchema=" + schema;
-        }
+        return GirJdbcUrlCodecs.defaultCodec().rewriteSchema(url, schema);
     }
 
     /**
      * 从 URL 中移除指定参数
      */
+    @Deprecated
     public static String removeParameterFromUrl(String url, String paramName) {
         if (url == null || !url.contains(paramName + "=")) {
             return url;
