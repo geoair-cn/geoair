@@ -84,6 +84,34 @@
         <version>${mapper-module.version}</version>
       </dependency>
 
+      <!--
+        mapper-spring-boot 的 BOM 内部管理的版本滞后于当前 Spring Boot 3.5 基线，
+        在其导入后重新声明 MyBatis 组件，保证全工程使用根 POM 中统一的版本。
+      -->
+      <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>${mybatis.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis-spring</artifactId>
+        <version>${mybatis-spring.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
+        <version>${mybatis-spring-boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+        <version>${mybatis-spring-boot.version}</version>
+      </dependency>
+
       <!-- 这里不能低于1.4.1 否则高版本的spring boot会让 pagehelper有循环引用问题,需要设置高于1.4.4因为spring data jpa会有sql解析错误               https://blog.csdn.net/weixin_40816738/article/details/124377632       -->
       <dependency>
         <groupId>com.github.pagehelper</groupId>
