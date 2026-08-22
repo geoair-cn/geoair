@@ -39,22 +39,6 @@
         <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
         <url>https://github.com/geoair-cn/geoair</url>
     </scm>
-    <properties>
-        <java.version>8</java.version>
-        <geoair.version>J8-dev-SNAPSHOT</geoair.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <geotools.version>28.6.1</geotools.version>
-        <lombok.version>1.18.30</lombok.version>
-        <aspectj.version>1.9.7</aspectj.version>
-        <druid.version>1.2.23</druid.version>
-
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
-
-        <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>
-    </properties>
-
     <dependencies>
 
         <dependency>

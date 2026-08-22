@@ -38,14 +38,6 @@
     <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
-    <geotrellis.version>3.7.1</geotrellis.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
-
   <dependencies>
 
     <dependency>

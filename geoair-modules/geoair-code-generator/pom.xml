@@ -47,15 +47,6 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties>
-    <skipTests>true</skipTests>
-    <velocity.version>1.7</velocity.version>
-    <commons.collections.version>3.2.2</commons.collections.version>
-    <commons.io.version>2.11.0</commons.io.version>
-    <commons.fileupload.version>1.4</commons.fileupload.version>
-    <commons.collections.version>3.2.2</commons.collections.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
