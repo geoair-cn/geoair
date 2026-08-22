@@ -39,19 +39,41 @@ public class MvtTilesServlet extends D3TilesServlet {
         return config;
     }
 
-    public void toHttpResponse(TileRequest tileRequest, HttpServletResponse response, TileParseResult tileParseResult) {
+    @Override
+    protected TileResponse createTileResponse(TileRequest tileRequest,
+                                                TileParseResult tileParseResult,
+                                                String requestUri) {
         String requestURI = tileParseResult.getRequestURI();
 
         if (requestURI.contains("style.json")) {
             byte[] bytes = tileRequest.getBytes();
             String jsonContent = new String(bytes);
-            String requestURL = GirServletUtil.getHttpPathByRequest() + GirWeb.getRequest().getRequestURI();
-            String replace = requestURL.replace("/style.json", "");
+            String replace = requestUri.replace("/style.json", "");
             jsonContent = jsonContent.replace("{BASE_URL}", replace);
             tileRequest.setBytes(jsonContent.getBytes());
         }
-        TileResponse tileResponse = tileRequest.toTileResponse();
-        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+        return tileRequest.toTileResponse();
+    }
+
+    @Override
+    protected String getRequestUri(HttpServletRequest request) {
+        return GirServletUtil.getHttpPathByRequest() + super.getRequestUri(request);
+    }
+
+    /**
+     * @deprecated 使用 {@link #getTileResponse(String)}。
+     */
+    @Deprecated
+    @Override
+    public void toHttpResponse(TileRequest tileRequest,
+                               HttpServletResponse response,
+                               TileParseResult tileParseResult) {
+        String requestUri = tileParseResult.getRequestURI();
+        if (!requestUri.startsWith("http://") && !requestUri.startsWith("https://")) {
+            requestUri = GirServletUtil.getHttpPathByRequest() + requestUri;
+        }
+        GirTileResponseUtil.buildFromTileResponse(
+                createTileResponse(tileRequest, tileParseResult, requestUri), response);
     }
 
 }

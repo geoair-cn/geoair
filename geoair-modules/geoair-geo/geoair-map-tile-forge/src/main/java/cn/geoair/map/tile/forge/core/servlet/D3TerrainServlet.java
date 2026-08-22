@@ -3,7 +3,7 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
@@ -34,41 +34,33 @@ public class D3TerrainServlet extends D3TilesServlet {
     }
 
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        requestURI= URLUtil.decode(requestURI);
+    @Override
+    public TileResponse getTileResponse(String requestUri) {
+        if (requestUri == null || requestUri.trim().isEmpty()) {
+            return TileResponse.error("Request URI must not be blank");
+        }
+        String requestPath = URLUtil.decode(getRequestPath(requestUri));
         // 解析请求URI
-        TileParseResult parseResult = parseRequest(requestURI);
+        TileParseResult parseResult = parseRequest(requestPath);
         if (parseResult == null) {
-            log.warn("无法解析请求URI: {}", requestURI);
-            GirTileResponseUtil.buildFromException(
-                    new IllegalArgumentException("Invalid request URI: " + requestURI),
-                    response
-            );
-            return;
+            log.warn("无法解析请求URI: {}", requestUri);
+            return TileResponse.error("Invalid request URI: " + requestUri);
         }
-        GirLayerConfigContext layerConfigContext = null;
+        parseResult.setRequestURI(requestUri);
         try {
-            layerConfigContext
-                    = getGirLayerConfigContext(parseResult.getFileId(), parseResult.getFileName(), parseResult.getServiceName());
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
-            return;
-        }
-
-        layerConfigContext.setFormat(parseResult.getFormat());
-        try {
+            GirLayerConfigContext layerConfigContext = getGirLayerConfigContext(
+                    parseResult.getFileId(), parseResult.getFileName(), parseResult.getServiceName());
+            layerConfigContext.setFormat(parseResult.getFormat());
             TileRequest layerTile = mapTileService.getLayerTile(
                     layerConfigContext,
                     parseResult.getZ(),
                     parseResult.getY(),
                     parseResult.getX()
             );
-            toHttpResponse(layerTile, response, parseResult);
+            return createTileResponse(layerTile, parseResult, requestUri);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
+            return TileResponse.error(e.getMessage());
         }
     }
 
