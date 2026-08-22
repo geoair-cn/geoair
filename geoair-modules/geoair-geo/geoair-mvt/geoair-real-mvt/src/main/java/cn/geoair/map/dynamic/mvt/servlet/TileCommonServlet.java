@@ -10,12 +10,12 @@ import cn.geoair.map.dynamic.mvt.exec.ITileExecutor;
 import cn.geoair.map.dynamic.mvt.exec.TileExecutorFactory;
 import cn.geoair.map.dynamic.mvt.exec.dto.TileRequest;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
+import cn.geoair.map.dynamic.tools.simple.collection.map.GirFastStrObjMap;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
+import cn.geoair.map.dynamic.tools.simple.response.TileResponseProvider;
 import cn.geoair.web.mime.GirApplicationMime;
-import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.io.IoUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
@@ -24,11 +24,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import java.util.Objects;
 
 
-public class TileCommonServlet extends HttpServlet {
+public class TileCommonServlet extends HttpServlet implements TileResponseProvider {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     /**
@@ -51,50 +49,65 @@ public class TileCommonServlet extends HttpServlet {
         }
     }
 
-    /**
-     * 核心 MVT 瓦片生成逻辑
-     */
-    public void doMvt(
-            String layerName,
-            TileRequestParams params,
-            int zoom,
-            int col,
-            int row,
-            HttpServletResponse response,
-            HttpServletRequest request
-    ) throws Exception {
-        byte[] data = new byte[0];
-        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params, layerName);
+    @Override
+    public TileResponse getTileResponse(String requestUri) {
+        return TileResponse.error("Unsupported vector tile URI: " + requestUri);
+    }
 
+    /** 核心 MVT 瓦片生成逻辑；此方法不依赖 HttpServletRequest。 */
+    protected TileResponse buildMvtTileResponse(
+            String layerName, TileRequestParams params, int zoom, int col, int row) throws Exception {
+        ParamCheckResult result = GirRealMvtHelper.getInstance().checkTileRequestParams(params, layerName);
         if (!result.isSuccess()) {
-            String msg = result.getMessage();
-            TileResponse error = TileResponse.error(msg);
-            GirTileResponseUtil.buildFromTileResponse(error, response);
-            return;
+            return TileResponse.error(result.getMessage());
         }
 
         ITileExecutor executor = TileExecutorFactory.getInstance(params, layerName);
         TileRequest tileData = executor.getTileData(zoom, col, row);
-        data = tileData.getPbfInfo().getData();
+        if (tileData == null || tileData.getPbfInfo() == null || tileData.getPbfInfo().getData() == null) {
+            return TileResponse.error("MVT tile data is empty");
+        }
 
-        // 必须保留，业务依赖
-        request.getSession();
-
-        boolean success = tileData.isSuccessIs();
         String httpUrl = tileData.getHttpUrl();
         if (httpUrl != null) {
-            response.sendRedirect(httpUrl);
-            return;
+            return new TileResponse()
+                    .setHttpCode(HttpServletResponse.SC_FOUND)
+                    .setExtrasHeaders(GirFastStrObjMap.<String>of().addOne("Location", httpUrl))
+                    .setDataSource("real-mvt-redirect");
         }
-        TileResponse tileResponse = TileResponseByByte.of().
-                setBytesAndUpdateSize(data).
-                setMimeType(GirApplicationMime.mapboxVector)
-                .setSuccess(success)
+
+        return TileResponseByByte.of()
+                .setBytesAndUpdateSize(tileData.getPbfInfo().getData())
+                .setMimeType(GirApplicationMime.mapboxVector)
+                .setSuccess(tileData.isSuccessIs())
                 .setLastModified(GkSystemClock.now())
                 .setDataSource("real-mvt")
                 .setCoordinate(TileZxyApo.of().setZ(zoom).setX(col).setY(row))
                 .setGridEpsgStr(params.isGeoIs() ? "EPSG:4490" : "EPSG:3857");
-        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+    }
 
+    /**
+     * @deprecated 请使用 {@link #buildMvtTileResponse(String, TileRequestParams, int, int, int)}
+     * 与 {@link #writeTileResponse(TileResponse, HttpServletResponse)}。
+     */
+    @Deprecated
+    public void doMvt(
+            String layerName, TileRequestParams params, int zoom, int col, int row,
+            HttpServletResponse response, HttpServletRequest request) throws Exception {
+        if (request != null) {
+            request.getSession();
+        }
+        writeTileResponse(buildMvtTileResponse(layerName, params, zoom, col, row), response);
+    }
+
+    protected void writeTileResponse(TileResponse tileResponse, HttpServletResponse response) throws java.io.IOException {
+        if (tileResponse != null
+                && Integer.valueOf(HttpServletResponse.SC_FOUND).equals(tileResponse.getHttpCode())
+                && tileResponse.getExtrasHeaders() != null
+                && tileResponse.getExtrasHeaders().get("Location") != null) {
+            response.sendRedirect(tileResponse.getExtrasHeaders().get("Location"));
+            return;
+        }
+        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
     }
 }

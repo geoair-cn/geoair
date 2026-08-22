@@ -38,7 +38,7 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
             format = "png";
         }
 
-        String remoteTilePath = getTilePath(layerConfigContext.getObjectKey(), z, y, x, format, "/");
+        String remoteTilePath = getTilePath(layerConfigContext.getTilePathPrefix(), z, y, x, format, "/");
 
         // 构建本地临时目录路径
         String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
@@ -47,7 +47,8 @@ public class S3UnzippedXYZTileStorageSupport extends LocalUnzippedXYZTileStorage
 
         File localTileFile = new File(localTilePath);
         if (!localTileFile.exists()) {
-            S3ClientGetter.getInstance().downloadFromS3IfNeeded(layerConfigContext.getObjectKey(), remoteTilePath, localTilePath);
+            S3ClientGetter.getInstance().downloadFromS3ToFileIfNeeded(
+                    layerConfigContext.getObjectKey(), remoteTilePath, localTileFile);
         }
         tileRequest.setBytes(FileUtil.readBytes(localTileFile));
         tileRequest.setLastModified(localTileFile.lastModified());

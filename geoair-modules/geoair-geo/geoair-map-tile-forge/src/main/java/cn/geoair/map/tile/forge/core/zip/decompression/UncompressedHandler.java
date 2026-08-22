@@ -17,6 +17,7 @@ public class UncompressedHandler implements DecompressionHandler {
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
+        DecompressionLimits.validateExpectedSize(expectedSize);
         if (expectedSize > 0 && compressedData.length != expectedSize) {
             log.warn("未压缩数据大小不匹配，预期:{}，实际:{}", expectedSize, compressedData.length);
         }
