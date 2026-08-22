@@ -42,12 +42,6 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties>
-    <skipTests>true</skipTests>
-    <ojdbc.version>21.5.0.0</ojdbc.version>
-    <sdoutl.version>23.26</sdoutl.version>
-  </properties>
-
   <dependencies>
 <!--    <dependency>-->
 <!--      <groupId>com.graphhopper.external</groupId>-->

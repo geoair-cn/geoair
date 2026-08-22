@@ -41,11 +41,6 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties>
-    <skipTests>true</skipTests>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -57,15 +52,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies>
-    <!--        <dependency>-->
-    <!--           <groupId>cn.geoair.devkit</groupId>-->
-    <!--            <artifactId>geoair-project-parent</artifactId>-->
-    <!--            <version>${geoair.version}</version>-->
-    <!--            <type>pom</type>-->
-    <!--        </dependency>-->
-  </dependencies>
 
   <build>
 
