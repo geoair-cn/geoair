@@ -150,6 +150,37 @@
 - 服务层也不直接拼响应
 - 所有瓦片返回结果会先统一落到 `TileRequest`
 
+## 新版服务契约：先得到 TileResponse，再决定是否写 HTTP
+
+我把 servlet 中“解析请求、读取瓦片”和“把结果写入 `HttpServletResponse`”拆开了。所有具体 servlet 都实现工具包中的 `TileResponseProvider`：
+
+```java
+TileResponse response = servlet.getTileResponse(
+    "/3dTilesService/file-id/tileset.json/demo-layer/tileset.json");
+```
+
+`getTileResponse(String requestUri)` 可以接收请求 URI，也可以接收手工传入的完整 URL；这让定时预热、内部转发、单元测试和非 Web 调用不再依赖 `HttpServletRequest`。真正的 `doGet` 只负责：
+
+```java
+TileResponse response = getTileResponse(requestUri);
+GirTileResponseUtil.buildFromTileResponse(response, httpServletResponse);
+```
+
+因此，**只想解析并取得瓦片时不需要 request 对象**；只有需要向浏览器或客户端输出时才需要 response 对象。
+
+旧的 `toHttpResponse(...)` 仍被保留为兼容入口，但已经标记为过时。新扩展应返回 `TileResponse`，让调用端自行决定写 HTTP、缓存或继续处理。
+
+## 压缩包安全边界
+
+瓦片归档读取使用 `DecompressionLimits` 限制单条目的压缩和解压大小，避免异常归档造成内存耗尽。默认限制分别为 128 MiB 与 256 MiB；部署方可按数据规模在启动时显式设置：
+
+```java
+DecompressionLimits.setMaxCompressedEntrySize(128L * 1024 * 1024);
+DecompressionLimits.setMaxDecompressedEntrySize(256L * 1024 * 1024);
+```
+
+不要为了兼容未知归档无限调大限制；应按照单瓦片或单元数据的合理上限配置。
+
 ## 适配矩阵是怎么工作的
 
 ### LOCAL_ZIP

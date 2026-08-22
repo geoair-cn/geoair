@@ -9,6 +9,20 @@
 
 在需要同时连接多个库、专题库或主从库的 GIS 服务中，这个模块负责把这些访问链路组织起来。
 
+## JDBC URL 不再由业务代码拆分
+
+动态数据源的配置读取、schema 切换和 GeoTools 数据源组装已统一使用 `geoair-jdbc-url`。我把连接串的解析职责从动态数据源模块中抽走，避免 PostgreSQL、SQL Server、Oracle、H2 等方言在不同位置各写一套字符串逻辑。
+
+新代码应使用：
+
+```java
+JdbcUrlCodec codec = GirJdbcUrlCodecs.defaultCodec();
+String tenantUrl = codec.rewriteSchema(jdbcUrl, "tenant_gis");
+JdbcUrl parsed = codec.parse(jdbcUrl);
+```
+
+原有 `AdvJdbcUrlUtil`、`JdbcUrlSplitter` 和部分旧 schema 重写方法仍保留，但已经标记为 `@Deprecated`；它们会委托到统一编解码器，便于已有项目平滑迁移。
+
 ## 核心入口
 
 ### Spring 启用入口

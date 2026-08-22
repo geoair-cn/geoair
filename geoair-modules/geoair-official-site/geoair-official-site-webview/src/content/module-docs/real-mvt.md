@@ -18,6 +18,17 @@
 - 也能围绕 4490 组织瓦片范围与输出逻辑
 - 在线服务和离线切片在网格体系上可以保持一致
 
+## 与 Web 解耦的瓦片响应
+
+实时 MVT servlet 也采用 `TileResponseProvider`。`VectorTileV2Servlet#getTileResponse(String)` 可直接解析 URI 或完整 URL，返回包含 PBF 字节、MIME 类型、网格 EPSG、状态码或重定向信息的 `TileResponse`。
+
+```java
+TileResponse response = vectorTileServlet.getTileResponse(
+    "/vectorTileV2/real/your-layer/10/845/388");
+```
+
+Servlet 的职责只剩会话初始化和把 `TileResponse` 写回 HTTP；离线预热、网关转发或测试代码可以直接复用同一条解析与生成链路。
+
 ## 适用场景
 
 适合：

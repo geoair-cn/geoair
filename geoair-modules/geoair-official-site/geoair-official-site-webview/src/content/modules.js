@@ -71,6 +71,15 @@ const dependencyModules = [
       }
     ],
     related: ['base-parent']
+  },
+  {
+    slug: 'architecture',
+    route: '/standard/architecture',
+    title: 'GeoAir 工程设计',
+    group: 'standard',
+    summary: '从依赖治理、标准抽象到 GIS 业务组件的整体分层与模块选型指南。',
+    tags: ['架构', '模块选型', '工程治理'],
+    related: ['dependencies-bom', 'base-parent', 'framework-bom', 'jdbc-url', 'geo']
   }
 ]
 
@@ -630,6 +639,27 @@ const businessModules = [
     related: ['apidoc', 'db-service']
   },
   {
+    slug: 'jdbc-url',
+    route: '/modules/jdbc-url',
+    title: 'geoair-jdbc-url',
+    group: 'business',
+    summary: 'JDBC URL 的统一解析、重写与构建组件，消除业务代码中的字符串拆分与方言判断。',
+    tags: ['JDBC', '数据库方言', '连接串', '基础设施'],
+    sourceExamples: [
+      {
+        title: 'GirJdbcUrlCodecsExample',
+        path: 'geoair-jdbc-url/src/main/java/cn/geoair/comp/jdbc/url/GirJdbcUrlCodecsExample.java',
+        description: '展示 PostgreSQL URL 解析、schema 重写，以及 MySQL、SQL Server URL 构建。'
+      },
+      {
+        title: 'JdbcUrlCodec',
+        path: 'https://github.com/geoair-cn/geoair/tree/master/geoair-framework/geoair-modules/geoair-jdbc-url/src/main/java/cn/geoair/comp/jdbc/url',
+        description: '统一编解码入口、方言扩展接口与结构化 URL 模型。'
+      }
+    ],
+    related: ['dynamic-ds', 'db-service', 'adv-query']
+  },
+  {
     slug: 'geo',
     route: '/modules/geo',
     title: 'geoair-geo',
@@ -680,7 +710,7 @@ const businessModules = [
         description: '直接跳到 geoair-dynamic-ds 模块目录。'
       }
     ],
-    related: ['adv-query', 'db-service']
+    related: ['jdbc-url', 'adv-query', 'db-service']
   },
   {
     slug: 'db-service',
@@ -711,7 +741,7 @@ const businessModules = [
         description: '前端管理界面目录。'
       }
     ],
-    related: ['dynamic-ds', 'apidoc']
+    related: ['jdbc-url', 'dynamic-ds', 'apidoc']
   },
   {
     slug: 'message-jts-jackson',
