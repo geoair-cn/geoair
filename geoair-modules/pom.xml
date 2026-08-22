@@ -38,6 +38,7 @@
   <modules>
     <module>geoair-apidoc</module>
     <module>geoair-code-generator</module>
+    <module>geoair-jdbc-url</module>
     <module>geoair-geo</module>
     <module>geoair-dynamic-ds</module>
     <module>geoair-db-service</module>
@@ -102,6 +103,12 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-db-service-spring-boot-starter</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-jdbc-url</artifactId>
         <version>${geoair.version}</version>
       </dependency>
 

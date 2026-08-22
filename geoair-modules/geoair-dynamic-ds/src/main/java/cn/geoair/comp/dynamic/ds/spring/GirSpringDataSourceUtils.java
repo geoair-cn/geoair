@@ -1,7 +1,9 @@
 package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
 
@@ -33,14 +35,15 @@ public class GirSpringDataSourceUtils {
         if (StringUtils.hasText(properties.getDriverClassName())) {
             apo.setDriver(properties.getDriverClassName());
         }
-        AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(properties.getUrl());
+        JdbcUrl jdbcUrl = GirJdbcUrlCodecs.defaultCodec().parse(properties.getUrl());
         apo.setJdbcUrl(properties.getUrl());
-        apo.setDbName(jdbcUrlSplitter.database);
-        if (StringUtils.hasText(jdbcUrlSplitter.port)) {
-            apo.setPort(Integer.valueOf(jdbcUrlSplitter.port));   // 端口是可以为空的，具体的数据源会去补充默认端口
+        apo.setDbName(jdbcUrl.getDatabaseName());
+        JdbcEndpoint endpoint = jdbcUrl.getPrimaryEndpoint();
+        if (endpoint != null && endpoint.getPort() != null) {
+            apo.setPort(endpoint.getPort());   // 端口是可以为空的，具体的数据源会去补充默认端口
         }
-        apo.setSchemaName(jdbcUrlSplitter.params.get("currentSchema"));
-        apo.setAddress(jdbcUrlSplitter.host);
+        apo.setSchemaName(GirJdbcUrlCodecs.defaultCodec().getSchema(properties.getUrl()));
+        apo.setAddress(endpoint == null ? null : endpoint.getHost());
         // 设置用户名和密码
         apo.setUsername(properties.getUsername());
         apo.setPassword(properties.getPassword());

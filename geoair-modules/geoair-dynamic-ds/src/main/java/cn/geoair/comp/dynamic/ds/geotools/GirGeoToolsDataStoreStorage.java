@@ -1,7 +1,9 @@
 package cn.geoair.comp.dynamic.ds.geotools;
 
 import cn.geoair.base.Gir;
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
+import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import java.io.IOException;
@@ -35,9 +37,13 @@ public class GirGeoToolsDataStoreStorage implements GtDataStoreGetter {
 
         // 解析JDBC URL获取主机和端口信息
         String rawJdbcUrl = druidDataSource.getRawJdbcUrl();
-        AdvJdbcUrlUtil jdbcUrlSplitter = new AdvJdbcUrlUtil(rawJdbcUrl);
-        params.put(PostgisNGDataStoreFactory.HOST.key, jdbcUrlSplitter.host);
-        params.put(PostgisNGDataStoreFactory.PORT.key, jdbcUrlSplitter.port);
+        JdbcUrl jdbcUrl = GirJdbcUrlCodecs.defaultCodec().parse(rawJdbcUrl);
+        JdbcEndpoint endpoint = jdbcUrl.getPrimaryEndpoint();
+        if (endpoint == null || endpoint.getHost() == null || endpoint.getPort() == null) {
+            throw new IllegalArgumentException("无法从 JDBC URL 解析 PostGIS 主机或端口：" + rawJdbcUrl);
+        }
+        params.put(PostgisNGDataStoreFactory.HOST.key, endpoint.getHost());
+        params.put(PostgisNGDataStoreFactory.PORT.key, endpoint.getPort());
         params.put(PostgisNGDataStoreFactory.USER.key, druidDataSource.getUsername());
         params.put(PostgisNGDataStoreFactory.DATASOURCE.key, druidDataSource);
 

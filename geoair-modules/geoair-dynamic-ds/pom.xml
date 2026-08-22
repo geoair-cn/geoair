@@ -58,6 +58,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>cn.geoair.devkit</groupId>
+            <artifactId>geoair-jdbc-url</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
