@@ -76,7 +76,7 @@ public class FileTileCache implements TileCache {
      */
     private Path getCachePath(String layerName, int z, int x, int y, GiMimeType format) {
         boolean needReverse = isNeedReverseY(layerName);
-        int storeY = FuserCacheUtils.getStoreY(z, y, needReverse);
+        int storeY = FuserCacheUtils.getStoreY(z, y, needReverse, FuserCacheUtils.getCacheGridSrid(layerName));
         // 使用layerName/z/x/目录结构，文件名为storeY.format
         String subDir = layerName + "/" + z + "/" + x;
         return Paths.get(cacheRoot, subDir, storeY + "." + format.getFileExtension());

@@ -3,9 +3,8 @@ package cn.geoair.map.tile.forge.fuser.provider.impl.google;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.fuser.utils.HttpTileRequestUtils;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.enums.OriginType;
+import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 
@@ -44,10 +43,7 @@ public class GoogleWebTileGetter extends BaseTileGetter {
 
     @Override
     public Resource getTileResource(int z, int x, int y) {
-        OriginType originType = OriginType.fromMode(getLayerInfo().getOriginType());
-        if (originType.isGoogle()) {
-            y = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
-        }
+        y = FuserCacheUtils.getSourceY(getLayerInfo(), z, y);
         String httpUrl = urlTemplate.replace("{z}", String.valueOf(z))
                 .replace("{x}", String.valueOf(x))
                 .replace("{y}", String.valueOf(y));

@@ -61,7 +61,7 @@ public class TileTaskExecutor {
             log.error("图层不存在: {}", layerName);
             throw new RuntimeException("图层不存在: " + layerName);
         }
-        this.googleGridIs = pxyLayerInfo.isGoogleGrid();
+        this.googleGridIs = pxyLayerInfo.isWebMercatorGrid();
 
         // 根据配置判断任务类型
         this.taskType = config.getTaskType();
@@ -440,8 +440,8 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileGetter
             CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
@@ -479,8 +479,8 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileCache
             CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
