@@ -354,6 +354,54 @@
         <version>${geotools.version}</version>
       </dependency>
 
+      <!--
+        GeoTools 28.6.1 的传递依赖与 Spring Boot 2.7 的默认版本存在差异。
+        将版本约束置于 GeoTools BOM 导入之后，确保所有 GeoTools 模块使用同一组依赖。
+      -->
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.xerial</groupId>
+        <artifactId>sqlite-jdbc</artifactId>
+        <version>${sqlite-jdbc.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons.lang3.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.checkerframework</groupId>
+        <artifactId>checker-qual</artifactId>
+        <version>${checker-qual.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>si.uom</groupId>
+        <artifactId>si-quantity</artifactId>
+        <version>${si-quantity.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
