@@ -40,7 +40,6 @@
   </scm>
 
   <properties>
-    <java.version>8</java.version>
     <geoair.version>J17-dev-SNAPSHOT</geoair.version>
     <maven.install.skip>true</maven.install.skip>
     <maven.deploy.skip>true</maven.deploy.skip>

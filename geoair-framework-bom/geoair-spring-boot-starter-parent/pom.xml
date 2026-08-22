@@ -226,7 +226,7 @@
             <dependency>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-maven-plugin</artifactId>
-              <version>3.5.13</version>
+              <version>${spring-boot.version}</version>
             </dependency>
           </dependencies>
           <configuration>

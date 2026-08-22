@@ -190,7 +190,7 @@
       </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-s3-geotiff </artifactId>
+            <artifactId>gt-s3-geotiff</artifactId>
             <version>${geotools.version}</version>
         </dependency>
       <dependency>
@@ -252,11 +252,6 @@
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-geotiff</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gt-s3-geotiff </artifactId>
         <version>${geotools.version}</version>
       </dependency>
       <dependency>
