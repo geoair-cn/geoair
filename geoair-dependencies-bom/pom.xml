@@ -38,7 +38,6 @@
         <module>geoair-geotools-dependencies</module>
         <module>geoair-openapi-dependencies</module>
         <module>geoair-spring-dependencies</module>
-        <module>geoair-template-dependencies</module>
         <module>geoair-common-dependencies</module>
     </modules>
 
@@ -70,13 +69,6 @@
                 <version>${geoair.version}</version>
 
             </dependency>
-            <dependency>
-                <groupId>cn.geoair.devkit</groupId>
-                <artifactId>geoair-template-dependencies</artifactId>
-                <version>${geoair.version}</version>
-
-            </dependency>
-
             <dependency>
                 <groupId>cn.geoair.devkit</groupId>
                 <artifactId>geoair-common-dependencies</artifactId>
