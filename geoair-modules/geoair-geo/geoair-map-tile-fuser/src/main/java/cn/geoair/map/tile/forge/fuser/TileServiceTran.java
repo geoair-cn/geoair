@@ -22,6 +22,12 @@ import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import cn.hutool.core.util.URLUtil;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * XYZ 瓦片图层叠加服务转换类
