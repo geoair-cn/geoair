@@ -4,13 +4,11 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuserLayerTileHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.constant.Constant;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
 import cn.geoair.web.mime.GirImageMime;
@@ -37,13 +35,10 @@ public class FuserCacheUtils {
         try {
             PxyLayerInfo pxyLayerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
             if (pxyLayerInfo != null) {
-                String originTypeStr = pxyLayerInfo.getOriginType();
-                OriginType originType = OriginType.fromMode(originTypeStr);
-                // Google 坐标系需要翻转 Y（TMS 风格）
-                return originType.isGoogle();
+                return pxyLayerInfo.getTileRowOriginEnums().isTopLeft();
             }
         } catch (Exception e) {
-            log.debug("获取图层 {} 的 OriginType 失败，默认不翻转", layerName);
+            log.debug("获取图层 {} 的行原点失败，默认不翻转", layerName);
         }
         // 默认不翻转
         return false;
@@ -53,37 +48,73 @@ public class FuserCacheUtils {
      * 保存到文件的时候，判断是否需要翻转 Y
      */
     public static boolean fileCheckIsNeedReverseY(String layerName) {
-        //layerName请求找缓存的时候，用的是 google原点
-        // layerName_orgin_grid_请求找缓存的时候，用的是tms原点
-//        try {
-//            PxyLayerInfo pxyLayerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
-//            if (pxyLayerInfo != null) {
-//                String originTypeStr = pxyLayerInfo.getOriginType();
-//                OriginType originType = OriginType.fromMode(originTypeStr);
-//                // Google 坐标系需要翻转 Y（TMS 风格）
-//                return !originType.isGoogle();
-//            }
-//        } catch (Exception e) {
-//            log.debug("获取图层 {} 的 OriginType 失败，默认不翻转", layerName);
-//        }
-//        // 默认翻转
-//        return true;
+        // 保持既有文件缓存布局：其行号方向与 MBTiles 缓存布局相反。
         return !mbtilesCheckIsNeedReverseY(layerName);
     }
 
     /**
-     * XYZ → TMS Y 转换（如果需要）
-     *
-     * @param z           层级
-     * @param y           原始 Y 坐标
-     * @param needReverse 是否需要翻转
-     * @return 转换后的 Y 坐标
+     * @deprecated 未提供 gridSrid 时只能按历史行为使用 3857 网格。请使用带 gridSrid 的重载。
      */
+    @Deprecated
     public static int getStoreY(int z, int y, boolean needReverse) {
+        return getStoreY(z, y, needReverse, 3857);
+    }
+
+    /**
+     * 根据指定网格转换 Y 行号。
+     */
+    public static int getStoreY(int z, int y, boolean needReverse, Integer gridSrid) {
         if (needReverse) {
-            return GirAdvTools.getTileGrid3857Opt().reverseY(y, z);  // 这里使用3857的网格翻转逻辑来进行翻转Y，不进行判断43426的网格原因是因为mbtile规范并不支持4326网格，这里在4326网格的时候就把mbtiles当做一个存储器
+            return reverseY(z, y, gridSrid);
         }
         return y;
+    }
+
+    /**
+     * 将内部 TMS（bottom-left）行号转换为图层源的行号。
+     */
+    public static int getSourceY(PxyLayerInfo layerInfo, int z, int y) {
+        if (layerInfo == null || !layerInfo.getTileRowOriginEnums().isTopLeft()) {
+            return y;
+        }
+        return reverseY(z, y, layerInfo.getGridSrid());
+    }
+
+    /**
+     * 获取缓存行号转换所用的网格。
+     *
+     * <p>未配置 tileRowOrigin 的旧图层固定返回 3857，以保持既有缓存布局；
+     * 显式使用新字段后才按 gridSrid 计算。原始缓存名称无法反查时同样按历史默认值处理。</p>
+     */
+    public static int getCacheGridSrid(String layerName) {
+        try {
+            PxyLayerInfo layerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
+            if (layerInfo == null && layerName != null && layerName.endsWith(ORIGINAL_GRID_SUFFIX)) {
+                String sourceLayerName = layerName.substring(0, layerName.length() - ORIGINAL_GRID_SUFFIX.length());
+                layerInfo = GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(sourceLayerName);
+            }
+            if (layerInfo != null && layerInfo.isTileRowOriginConfigured() && layerInfo.getGridSrid() != null) {
+                return layerInfo.getGridSrid();
+            }
+        } catch (Exception e) {
+            log.debug("获取图层 {} 的 gridSrid 失败，使用历史默认值 3857", layerName);
+        }
+        return 3857;
+    }
+
+    /** 获取单个图层用于缓存行号转换的网格。 */
+    public static int getCacheGridSrid(PxyLayerInfo layerInfo) {
+        if (layerInfo != null && layerInfo.isTileRowOriginConfigured() && layerInfo.getGridSrid() != null) {
+            return layerInfo.getGridSrid();
+        }
+        return 3857;
+    }
+
+    private static int reverseY(int z, int y, Integer gridSrid) {
+        if (gridSrid != null && (gridSrid == 3857 || gridSrid == 900913)) {
+            return GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+        }
+        return GirAdvTools.getTileGrid4326SeparateOpt().reverseY(y, z);
     }
 
 

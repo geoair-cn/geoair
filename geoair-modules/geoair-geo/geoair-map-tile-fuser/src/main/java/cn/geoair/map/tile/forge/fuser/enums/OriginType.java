@@ -8,6 +8,10 @@ import lombok.Getter;
  * @date ：Created in 2026/6/15 11:01
  * @description：
  */
+/**
+ * @deprecated 使用 {@link TileRowOrigin} 表示行号原点；WMTS 是协议，不应作为坐标原点名称。
+ */
+@Deprecated
 @Getter
 public enum OriginType  implements GiVisualValuable<String> {
 

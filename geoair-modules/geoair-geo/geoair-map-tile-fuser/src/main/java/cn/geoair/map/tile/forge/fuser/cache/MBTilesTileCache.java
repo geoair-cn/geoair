@@ -138,6 +138,7 @@ public class MBTilesTileCache implements TileCache {
                         return new LayerCacheHolder(
                                 dbPath,
                                 FuserCacheUtils.mbtilesCheckIsNeedReverseY(key),
+                                FuserCacheUtils.getCacheGridSrid(key),
                                 maxReadPoolSize,
                                 maxWritePoolSize,
                                 minIdle
@@ -157,6 +158,7 @@ public class MBTilesTileCache implements TileCache {
                             return new LayerCacheHolder(
                                     dbPath,
                                     FuserCacheUtils.mbtilesCheckIsNeedReverseY(key),
+                                    FuserCacheUtils.getCacheGridSrid(key),
                                     maxReadPoolSize,
                                     maxWritePoolSize,
                                     minIdle
@@ -397,6 +399,7 @@ public class MBTilesTileCache implements TileCache {
         private static GiLogger log = GirLoggerFactory.getLogger( );
         private String dbPath;
         private boolean needReverseY;
+        private int gridSrid;
         private DruidDataSource readDataSource;
         private DruidDataSource writeDataSource;
         private AtomicBoolean initialized = new AtomicBoolean(false);
@@ -404,9 +407,11 @@ public class MBTilesTileCache implements TileCache {
         public LayerCacheHolder() {
         }
 
-        public LayerCacheHolder(String dbPath, boolean needReverseY, int maxReadPoolSize, int maxWritePoolSize, int minIdle) {
+        public LayerCacheHolder(String dbPath, boolean needReverseY, int gridSrid,
+                                int maxReadPoolSize, int maxWritePoolSize, int minIdle) {
             this.dbPath = dbPath;
             this.needReverseY = needReverseY;
+            this.gridSrid = gridSrid;
 
             // 确保目录存在
             MbtilesUtils.ensureDirectoryExists(dbPath);
@@ -472,7 +477,7 @@ public class MBTilesTileCache implements TileCache {
          */
         public byte[] get(int z, int x, int y) {
             checkInitialized();
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             return MbtilesUtils.getTile(readDataSource, z, x, storeY).getTileData();
         }
 
@@ -481,7 +486,7 @@ public class MBTilesTileCache implements TileCache {
          */
         public boolean put(int z, int x, int y, byte[] data) {
             checkInitialized();
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             return MbtilesUtils.putTile(writeDataSource, z, x, storeY, data);
         }
 
@@ -490,7 +495,7 @@ public class MBTilesTileCache implements TileCache {
          */
         public boolean delete(int z, int x, int y) {
             checkInitialized();
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             boolean result = MbtilesUtils.deleteTile(writeDataSource, z, x, storeY);
             log.info("删除瓦片成功: z={}, x={}, y={}, db={}", z, x, y, dbPath);
             return result;
@@ -531,7 +536,7 @@ public class MBTilesTileCache implements TileCache {
          */
         public boolean exists(int z, int x, int y) {
             checkInitialized();
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             return MbtilesUtils.existsTile(readDataSource, z, x, storeY);
         }
 

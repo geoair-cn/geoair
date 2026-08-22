@@ -2,19 +2,17 @@ package cn.geoair.map.tile.forge.fuser.provider.impl.grid4490;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.FileUtil;
 
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
+import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 /**
@@ -38,10 +36,7 @@ public class Grid4490LocalFileTileGetter extends BaseTileGetter {
     @Override
     public Resource getTileResource(int z, int x, int y) {
 
-        OriginType originType = OriginType.fromMode(super.getLayerInfo().getOriginType());
-        if (originType.isGoogle()) {
-            y = GirAdvTools.getTileGrid4326SeparateOpt().reverseY(y, z);
-        }
+        y = FuserCacheUtils.getSourceY(getLayerInfo(), z, y);
         String filePath = filePathTemplate.replace("{z}", String.valueOf(z))
                 .replace("{x}", String.valueOf(x))
                 .replace("{y}", String.valueOf(y));
@@ -55,16 +50,13 @@ public class Grid4490LocalFileTileGetter extends BaseTileGetter {
         }
 
         try {
-            BufferedImage read = ImageIO.read(file);
+            BufferedImage read = TileImageUtils.readImage(file);
             byte[] imageBytes;
 
             if (read != null) {
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    GiMimeType srcFormat = getSrcFormat();
-                    String internalName = srcFormat.getInternalName();
-                    ImageIO.write(read, internalName, baos);
-                    imageBytes = baos.toByteArray();
-                }
+                GiMimeType srcFormat = getSrcFormat();
+                String internalName = srcFormat != null ? srcFormat.getInternalName() : "png";
+                imageBytes = TileImageUtils.writeImage(read, internalName);
                 log.info("从本地文件读取瓦片成功（转换为PNG）: {}", file.getAbsolutePath());
             } else {
                 imageBytes = FileUtil.readBytes(file);

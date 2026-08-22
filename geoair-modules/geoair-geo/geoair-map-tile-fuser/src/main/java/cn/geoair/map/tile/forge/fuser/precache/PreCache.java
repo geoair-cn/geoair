@@ -23,25 +23,31 @@ import static cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils.ORIGINAL_GRID
  */
 public class PreCache {
     private static GiLogger log = GirLoggerFactory.getLogger();
+    private static final int MAX_ZOOM_TASKS_PER_EXECUTION = 64;
     private final ExecutorService executorService;
+    private final int maxConcurrentTiles;
 
     public static PreCache getInstance() {
         return new PreCache();
     }
 
     public PreCache() {
-        this.executorService = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors(),
-                r -> {
-                    Thread t = new Thread(r, "precache-" + System.currentTimeMillis());
-                    t.setDaemon(true);
-                    return t;
-                }
-        );
+        this(Math.max(1, Runtime.getRuntime().availableProcessors()));
     }
 
-    public PreCache(int threadCount) {
-        this.executorService = Executors.newFixedThreadPool(threadCount);
+    /**
+     * @param maxConcurrentTiles 同一时刻最多处理的瓦片数；层级会顺序调度，避免嵌套线程池放大并发。
+     */
+    public PreCache(int maxConcurrentTiles) {
+        if (maxConcurrentTiles <= 0) {
+            throw new IllegalArgumentException("maxConcurrentTiles 必须大于 0");
+        }
+        this.maxConcurrentTiles = maxConcurrentTiles;
+        this.executorService = Executors.newSingleThreadExecutor(r -> {
+            Thread thread = new Thread(r, "precache-coordinator");
+            thread.setDaemon(true);
+            return thread;
+        });
     }
 
     // ==================== 普通预缓存 ====================
@@ -130,6 +136,9 @@ public class PreCache {
      */
     public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom,
                         GirImageMime format, boolean isPreCheck, boolean isOriginalGrid, String originalCacheName) {
+        if (config == null || minZoom > maxZoom || (long) maxZoom - minZoom + 1 > MAX_ZOOM_TASKS_PER_EXECUTION) {
+            throw new IllegalArgumentException("预缓存图层配置或层级范围无效");
+        }
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
@@ -160,7 +169,7 @@ public class PreCache {
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
             Runnable task = buildTask(config, zoom, geometry, format,
                     isPreCheck, isOriginalGrid, originalCacheName,
-                    latch, totalCount, successCount, failCount, checkedCount, repairedCount);
+                    latch, totalCount, successCount, failCount, checkedCount, repairedCount, maxConcurrentTiles);
             executorService.submit(task);
         }
 
@@ -182,7 +191,8 @@ public class PreCache {
     private Runnable buildTask(PxyLayerInfo config, int zoom, Geometry geometry, GirImageMime format,
                                 boolean isPreCheck, boolean isOriginalGrid, String originalCacheName,
                                 CountDownLatch latch, AtomicLong totalCount, AtomicLong successCount,
-                                AtomicLong failCount, AtomicLong checkedCount, AtomicLong repairedCount) {
+                                AtomicLong failCount, AtomicLong checkedCount, AtomicLong repairedCount,
+                                int maxConsumerThreads) {
         String layerName = config.getLayerName();
 
         if (isOriginalGrid) {
@@ -190,12 +200,12 @@ public class PreCache {
             if (isPreCheck) {
                 return new TileOriginalCheckAndRepairTask(
                         layerName, originalCacheName, zoom, geometry,
-                        latch, totalCount, checkedCount, repairedCount, failCount, format
+                        latch, totalCount, checkedCount, repairedCount, failCount, format, maxConsumerThreads
                 );
             } else {
                 return new TileOriginalPreCacheTask(
                         layerName, originalCacheName, zoom, geometry,
-                        latch, totalCount, successCount, failCount, format
+                        latch, totalCount, successCount, failCount, format, maxConsumerThreads
                 );
             }
         } else {
@@ -203,12 +213,12 @@ public class PreCache {
             if (isPreCheck) {
                 return new TileFuserCheckAndRepairTask(
                         layerName, zoom, geometry,
-                        latch, totalCount, checkedCount, repairedCount, failCount, format
+                        latch, totalCount, checkedCount, repairedCount, failCount, format, maxConsumerThreads
                 );
             } else {
                 return new TileFuserPreCacheTask(
                         layerName, zoom, geometry,
-                        latch, totalCount, successCount, failCount, format
+                        latch, totalCount, successCount, failCount, format, maxConsumerThreads
                 );
             }
         }

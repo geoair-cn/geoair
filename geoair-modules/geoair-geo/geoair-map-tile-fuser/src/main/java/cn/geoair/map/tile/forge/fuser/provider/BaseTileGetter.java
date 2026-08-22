@@ -8,9 +8,6 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
-import cn.geoair.web.mime.GiMimeType;
-import cn.geoair.web.mime.GirImageMime;
-import cn.geoair.web.util.GutilMimeType;
 import lombok.Getter;
 
 
@@ -51,8 +48,7 @@ public abstract class BaseTileGetter implements LayerTileGetter {
 
     @Override
     public GridSubset getSrcGridSubset() {
-        Integer gridSrid = layerInfo.getGridSrid();
-        if (gridSrid.equals(3857) || gridSrid.equals(900913)) {
+        if (layerInfo.isWebMercatorGrid()) {
             return GridInitUtils.getWorldGrid3857();
         } else {
             return GridInitUtils.getTdtGrid4490();

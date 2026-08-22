@@ -61,7 +61,7 @@ public class TileTaskExecutor {
             log.error("图层不存在: {}", layerName);
             throw new RuntimeException("图层不存在: " + layerName);
         }
-        this.googleGridIs = pxyLayerInfo.isGoogleGrid();
+        this.googleGridIs = pxyLayerInfo.isWebMercatorGrid();
 
         // 根据配置判断任务类型
         this.taskType = config.getTaskType();
@@ -107,21 +107,21 @@ public class TileTaskExecutor {
             int minY = rangeApo.getMinY();
             int maxY = rangeApo.getMaxY();
 
-            int totalTiles = (maxX - minX + 1) * (maxY - minY + 1);
+            long totalTiles = ((long) maxX - minX + 1) * ((long) maxY - minY + 1);
+            if (totalTiles <= 0) {
+                log.warn("层级 {} 的瓦片范围无效", zoom);
+                return;
+            }
             config.getTotalCount().addAndGet(totalTiles);
 
             log.info("{} - 层级: {}, X范围: [{}, {}], Y范围: [{}, {}], 总瓦片数: {}",
                     taskType.getDescription(), zoom, minX, maxX, minY, maxY, totalTiles);
 
-            if (totalTiles == 0) {
-                log.warn("层级 {} 没有瓦片需要处理", zoom);
-                return;
-            }
-
             // 计算线程池大小
             int batchSize = 10000;
-            int totalBatches = (totalTiles + batchSize - 1) / batchSize;
-            int threadPoolSize = Math.min(totalBatches, Runtime.getRuntime().availableProcessors() * 2);
+            long totalBatches = (totalTiles + batchSize - 1) / batchSize;
+            int configuredThreads = Math.max(1, config.getMaxConsumerThreads());
+            int threadPoolSize = (int) Math.min(totalBatches, configuredThreads);
             threadPoolSize = Math.max(1, threadPoolSize);
 
             log.info("层级 {} 启动消费者线程数量：{}", zoom, threadPoolSize);
@@ -138,7 +138,7 @@ public class TileTaskExecutor {
             AtomicLong totalValidTiles = new AtomicLong(0);
             AtomicLong processedCount = new AtomicLong(0);
 
-            int progressInterval = Math.max(100, totalTiles / 100);
+            long progressInterval = Math.max(100L, totalTiles / 100);
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
             BlockingQueue<TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
 
@@ -229,7 +229,7 @@ public class TileTaskExecutor {
                                  int threadPoolSize) {
         Thread producerThread = new Thread(() -> {
             try {
-                int validTileCount = 0;
+                long validTileCount = 0;
                 for (int x = minX; x <= maxX; x++) {
                     for (int y = minY; y <= maxY; y++) {
                         if (isTileIntersects(x, y)) {
@@ -278,7 +278,7 @@ public class TileTaskExecutor {
                                 AtomicLong zoomSkipped,
                                 AtomicLong processedCount,
                                 AtomicLong totalValidTiles,
-                                int progressInterval) {
+                                long progressInterval) {
         for (int i = 0; i < threadPoolSize; i++) {
             final int consumerId = i;
             executorService.submit(() -> {
@@ -440,8 +440,8 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileGetter
             CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
@@ -479,8 +479,8 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileCache
             CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
@@ -538,7 +538,7 @@ public class TileTaskExecutor {
      */
     private void updateProgress(AtomicLong processedCount,
                                 AtomicLong totalValidTiles,
-                                int progressInterval,
+                                long progressInterval,
                                 AtomicLong zoomSuccess, AtomicLong zoomFail,
                                 AtomicLong zoomChecked, AtomicLong zoomRepaired,
                                 AtomicLong zoomSkipped) {
