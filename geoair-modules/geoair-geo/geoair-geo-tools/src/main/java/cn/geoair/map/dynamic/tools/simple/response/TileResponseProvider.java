@@ -1,6 +1,4 @@
-package cn.geoair.map.tile.forge.core.servlet;
-
-import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+package cn.geoair.map.dynamic.tools.simple.response;
 
 /**
  * 将瓦片请求 URI 解析并转换为统一的 {@link TileResponse}。
