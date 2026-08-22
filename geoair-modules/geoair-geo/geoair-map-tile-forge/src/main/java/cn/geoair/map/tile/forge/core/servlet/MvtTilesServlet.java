@@ -3,7 +3,6 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -12,8 +11,8 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,17 +46,25 @@ public class MvtTilesServlet extends D3TilesServlet {
 
         if (requestURI.contains("style.json")) {
             byte[] bytes = tileRequest.getBytes();
-            String jsonContent = new String(bytes);
-            String replace = requestUri.replace("/style.json", "");
+            String jsonContent = new String(bytes, StandardCharsets.UTF_8);
+            String replace = getMvtBasePath(requestUri);
             jsonContent = jsonContent.replace("{BASE_URL}", replace);
-            tileRequest.setBytes(jsonContent.getBytes());
+            byte[] responseBytes = jsonContent.getBytes(StandardCharsets.UTF_8);
+            tileRequest.setBytes(responseBytes).setSize(responseBytes.length);
         }
         return tileRequest.toTileResponse();
     }
 
-    @Override
-    protected String getRequestUri(HttpServletRequest request) {
-        return GirServletUtil.getHttpPathByRequest() + super.getRequestUri(request);
+    private String getMvtBasePath(String requestUri) {
+        String requestPath = getRequestPath(requestUri);
+        int protocolIndex = requestPath.indexOf("://");
+        if (protocolIndex >= 0) {
+            int pathStart = requestPath.indexOf('/', protocolIndex + 3);
+            requestPath = pathStart >= 0 ? requestPath.substring(pathStart) : "/";
+        }
+        return requestPath.endsWith("/style.json")
+                ? requestPath.substring(0, requestPath.length() - "/style.json".length())
+                : requestPath;
     }
 
     /**
@@ -68,12 +75,8 @@ public class MvtTilesServlet extends D3TilesServlet {
     public void toHttpResponse(TileRequest tileRequest,
                                HttpServletResponse response,
                                TileParseResult tileParseResult) {
-        String requestUri = tileParseResult.getRequestURI();
-        if (!requestUri.startsWith("http://") && !requestUri.startsWith("https://")) {
-            requestUri = GirServletUtil.getHttpPathByRequest() + requestUri;
-        }
         GirTileResponseUtil.buildFromTileResponse(
-                createTileResponse(tileRequest, tileParseResult, requestUri), response);
+                createTileResponse(tileRequest, tileParseResult, tileParseResult.getRequestURI()), response);
     }
 
 }

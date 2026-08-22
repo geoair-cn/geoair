@@ -27,6 +27,8 @@ import cn.hutool.core.util.StrUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -68,19 +70,19 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
         TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-        StringBuilder inLocalPathBuilder = new StringBuilder();
         String format = layerConfigContext.getFormat();
+        Path rootPath = Paths.get(tempDirAbsolutePath).toAbsolutePath().normalize();
+        Path localPath;
         if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
-            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
-                    .append(z);
+            localPath = rootPath.resolve(z).normalize();
         } else {
-            inLocalPathBuilder.append(tempDirAbsolutePath).append(File.separator)
-                    .append(z).append(File.separator)
-                    .append(y).append(File.separator)
-                    .append(x).append(".").append(format);
+            localPath = rootPath.resolve(z).resolve(y).resolve(x + "." + format).normalize();
         }
-        String inLocalPath = inLocalPathBuilder.toString().trim();
-        File localTileFile = new File(inLocalPath);
+        if (!localPath.startsWith(rootPath)) {
+            throw new IOException("瓦片路径越出临时目录");
+        }
+        File localTileFile = localPath.toFile();
+        String inLocalPath = localTileFile.getAbsolutePath();
         boolean localStatu = localTileFile.exists();
         if (!localStatu) {
             localStatu = byPreCache(layerConfigContext, z, y, x, inLocalPath);

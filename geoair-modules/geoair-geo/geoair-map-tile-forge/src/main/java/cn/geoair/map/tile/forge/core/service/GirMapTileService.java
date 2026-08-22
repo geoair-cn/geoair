@@ -10,13 +10,19 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import lombok.Getter;
 import org.springframework.http.MediaType;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GirMapTileService {
     public static GiLogger log = GirLoggerFactory.getLogger();
     static GirMapTileService self = null;
+    private static final Set<String> PRECACHING_LAYERS = ConcurrentHashMap.newKeySet();
     @Getter
     GirLayerConfigContextHelper contextHelper;
     @Getter
@@ -74,17 +80,19 @@ public class GirMapTileService {
             // 3. 调用实例方法获取瓦片数据
             String configXml = arcgisConfigXmlGetter.getCapabilities(config);
             if (configXml != null) {
-                tileRequest.setBytes(configXml.getBytes());
+                byte[] bytes = configXml.getBytes(StandardCharsets.UTF_8);
+                tileRequest.setBytes(bytes);
                 tileRequest.mimeTypeBySpring(MediaType.APPLICATION_XML);
                 tileRequest.setExists(true);
-                tileRequest.setSize(configXml.getBytes().length);
+                tileRequest.setSize(bytes.length);
                 tileRequest.setLastModified(System.currentTimeMillis());
                 tileRequest.setLayerName(layerName);
                 tileRequest.setMapTileType(config.getMapTileType());
                 tileRequest.setStorageType(config.getStorageType());
+                return tileRequest;
             }
         }
-        tileRequest.setBytes(new String("无法找到配置文件").getBytes("UTF-8"));
+        tileRequest.setBytes("无法找到配置文件".getBytes(StandardCharsets.UTF_8));
         tileRequest.mimeTypeBySpring(MediaType.TEXT_XML);
         tileRequest.setExists(false);
         tileRequest.setSize(0);
@@ -102,21 +110,28 @@ public class GirMapTileService {
                 .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
+        if (!PRECACHING_LAYERS.add(layerName)) {
+            log.warn("图层正在预缓存，忽略重复请求：{}", layerName);
+            return;
+        }
         log.info("开始预缓存图层：{}, 执行器 {}", layerName, storageSupport.getClass().getName());
-        // 创建新线程来执行预缓存任务
-        Thread precacheThread = new Thread(() -> {
-            try {
-                log.info("异步线程开始预缓存图层：{}", layerName);
-                storageSupport.preCacheTiles(config, TileCacheRegistry.getDefaultTileCache());
-                log.info("异步线程预缓存图层完成：{}", layerName);
-            } catch (Exception e) {
-                // 记录异常日志
-                e.printStackTrace();
-            }
-        });
-
-        // 启动线程
-        precacheThread.start();
+        // 使用共享且有界的执行器，避免每次请求都创建一个原生线程。
+        try {
+            ForgeExecutorUtils.getExecutor().execute(() -> {
+                try {
+                    log.info("异步线程开始预缓存图层：{}", layerName);
+                    storageSupport.preCacheTiles(config, TileCacheRegistry.getDefaultTileCache());
+                    log.info("异步线程预缓存图层完成：{}", layerName);
+                } catch (Exception e) {
+                    log.error("图层预缓存失败：{}", layerName, e);
+                } finally {
+                    PRECACHING_LAYERS.remove(layerName);
+                }
+            });
+        } catch (RuntimeException e) {
+            PRECACHING_LAYERS.remove(layerName);
+            throw e;
+        }
     }
 
 }

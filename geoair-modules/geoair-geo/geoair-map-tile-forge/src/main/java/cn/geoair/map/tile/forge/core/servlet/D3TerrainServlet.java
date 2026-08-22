@@ -41,6 +41,10 @@ public class D3TerrainServlet extends D3TilesServlet {
             log.warn("无法解析请求URI: {}", requestUri);
             return TileResponse.error("Invalid request URI: " + requestUri);
         }
+        if (!isSafeTerrainRequest(parseResult)) {
+            log.warn("地形瓦片请求包含非法坐标或路径: {}", requestUri);
+            return TileResponse.error("Invalid terrain tile path");
+        }
         parseResult.setRequestURI(requestUri);
         try {
             GirLayerConfigContext layerConfigContext = getGirLayerConfigContext(

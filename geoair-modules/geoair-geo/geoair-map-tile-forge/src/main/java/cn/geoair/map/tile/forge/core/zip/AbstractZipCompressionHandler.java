@@ -5,6 +5,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
 import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionLimits;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
@@ -150,6 +151,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
     @Override
     public byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source) throws IOException {
+        DecompressionLimits.validateCompressedSize(entry.getCompressedSize());
+        DecompressionLimits.validateExpectedSize(entry.getUncompressedSize());
         if (Objects.isNull(entry.getDataOffset())) {
             try {
                 LocalFileHeader header = readLocalFileHeader(entry.getLocalHeaderOffset(), source, getFileSize(source));

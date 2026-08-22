@@ -52,6 +52,10 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
             log.warn("无法解析请求URI: {}", requestUri);
             return TileResponse.error("Invalid request URI: " + requestUri);
         }
+        if (!isSafeRelativePath(parseResult.getContentAfterPrefix())) {
+            log.warn("请求路径包含非法片段: {}", requestUri);
+            return TileResponse.error("Invalid tile path");
+        }
         parseResult.setRequestURI(requestUri);
         try {
             GirLayerConfigContext layerConfigContext = getGirLayerConfigContext(
@@ -86,6 +90,44 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
             endIndex = Math.min(endIndex, fragmentIndex);
         }
         return requestUri.substring(0, endIndex);
+    }
+
+    /**
+     * 校验归档内路径或本地缓存相对路径，禁止绝对路径与目录回退。
+     */
+    protected boolean isSafeRelativePath(String relativePath) {
+        if (relativePath == null || relativePath.isEmpty()) {
+            return false;
+        }
+        String normalized = relativePath.replace('\\', '/');
+        if (normalized.startsWith("/") || normalized.indexOf('\u0000') >= 0) {
+            return false;
+        }
+        for (String segment : normalized.split("/")) {
+            if (segment.isEmpty() || ".".equals(segment) || "..".equals(segment)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 校验地形瓦片坐标或单个元数据文件名，避免其参与本地路径拼接时越界。
+     */
+    protected boolean isSafeTerrainRequest(TileParseResult parseResult) {
+        if (parseResult.isTile()) {
+            return isNonNegativeInteger(parseResult.getZ())
+                    && isNonNegativeInteger(parseResult.getX())
+                    && isNonNegativeInteger(parseResult.getY())
+                    && parseResult.getFormat() != null
+                    && parseResult.getFormat().matches("[A-Za-z0-9]+$");
+        }
+        return parseResult.getZ() != null && parseResult.getZ().matches("[A-Za-z0-9._-]+$")
+                && !".".equals(parseResult.getZ()) && !"..".equals(parseResult.getZ());
+    }
+
+    private boolean isNonNegativeInteger(String value) {
+        return value != null && value.matches("[0-9]+");
     }
 
     /**
