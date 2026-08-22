@@ -125,7 +125,7 @@ public class TileServiceTranController extends TileServiceTran {
 
 - `layerName`
 - `path`
-- `originType`
+- `tileRowOrigin`
 - `srcType`
 - `imageType`
 - `gridSrid`
@@ -139,12 +139,30 @@ public class TileServiceTranController extends TileServiceTran {
 - 图层叫什么
 - 瓦片从哪里来
 - 是本地文件还是远程服务
-- 是 Google 原点还是其他原点
+- 行号从顶部还是底部开始计数
 - 是 3857 网格还是 4490 网格
 - 是否走缓存
 - 是否要走网络代理
 
 换句话说，`PxyLayerInfo` 几乎就是这个模块的图层配置核心。
+
+### 迁移后的网格与行号语义
+
+我把原来容易混淆的两个概念拆开：
+
+- `gridSrid`：网格矩阵及坐标参考，例如 3857、4490。
+- `tileRowOrigin`：Y 行号从顶部还是底部开始计数。
+
+旧字段 `originType` 仍保留并标记为过时，旧值 `wmts` 会兼容映射为顶部起算、`tms` 映射为底部起算。新配置应明确填写 `tileRowOrigin`，不要再用协议名表达坐标原点：
+
+```java
+PxyLayerInfo layer = new PxyLayerInfo()
+    .setLayerName("base-layer")
+    .setPath("https://tile.example.com/{z}/{x}/{y}.png")
+    .setSrcType(SrcType.WEB.getCode())
+    .setGridSrid(3857)
+    .setTileRowOrigin(TileRowOrigin.TOP_LEFT.getMode());
+```
 
 ## SrcType：为什么这个枚举很重要
 
@@ -259,6 +277,27 @@ LayerTileGetter getTileGetterByPxyLayerInfo(PxyLayerInfo layerInfo);
 
 > 默认实现存在，但不是唯一实现；项目方可以按约定挂接自己的实现。
 
+## TileServiceTran：Web 兼容与非 Web 调用同时成立
+
+`TileServiceTran` 现在实现 `TileServiceTranResponseProvider`，该接口继承工具包的 `TileResponseProvider`。原有 `void` 方法仍然直接写 Servlet 响应，保证已有 Controller 不需要改；每个主要入口同时提供返回 `TileResponse` 的 `...ForTileResponse` 方法。
+
+```java
+TileResponse response = tileServiceTran
+    .googleServiceTo4326RequestForTileResponse("base-layer", 10, 845, 388, "image/png");
+```
+
+如果调用方只持有一个 URL，也可以先构建稳定 URI，再统一解析：
+
+```java
+String uri = TileServiceTran.buildTileRequestUri(
+    TileServiceTran.GOOGLE_TO_4326_OPERATION,
+    "base-layer", 10, 845, 388, "image/png", false);
+
+TileResponse response = tileServiceTran.getTileResponse(uri);
+```
+
+这使瓦片转换逻辑可以被 Controller、任务调度、缓存预热和测试共同复用。仅在最终回写浏览器时才需要 `HttpServletResponse`；不再为了获取瓦片而构造伪造的 Servlet request。
+
 ## 核心 API 示例
 
 ### 示例1：Google 服务转 4326 请求
@@ -288,7 +327,7 @@ PxyLayerInfo webLayer = new PxyLayerInfo()
     .setLayerName("web_layer")
     .setPath("https://tile.example.com/{z}/{x}/{y}.png")
     .setSrcType(SrcType.WEB.getCode())
-    .setOriginType(OriginType.TMS.getMode())
+    .setTileRowOrigin(TileRowOrigin.BOTTOM_LEFT.getMode())
     .setGridSrid(4490)
     .setEnableCache("false");
 ```
