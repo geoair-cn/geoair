@@ -13,7 +13,7 @@
   <version>J17-dev-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>geoair-base-parent</name>
-  <description>geoair base parent 用于Gir基础库的依赖约束</description>
+  <description>GeoAir 通用父 POM，统一提供构建约定与第三方依赖版本约束</description>
 
   <url>https://github.com/geoair-cn/geoair</url>
 
@@ -39,13 +39,6 @@
     <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-
-  <properties>
-
-
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
-    <slf4j.version>1.7.36</slf4j.version>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -77,7 +70,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-geotools-dependencies</artifactId>
@@ -92,7 +84,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 
