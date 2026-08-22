@@ -12,7 +12,6 @@ import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.hutool.core.util.URLUtil;
 
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class D3TilesServlet extends HttpServlet {
+public class D3TilesServlet extends HttpServlet implements TileResponseProvider {
 
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -37,47 +36,94 @@ public class D3TilesServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String requestURI = request.getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-//        requestURI= URLUtil.decode(requestURI);
+        GirTileResponseUtil.buildFromTileResponse(getTileResponse(getRequestUri(request)), response);
+    }
+
+    @Override
+    public TileResponse getTileResponse(String requestUri) {
+        if (requestUri == null || requestUri.trim().isEmpty()) {
+            return TileResponse.error("Request URI must not be blank");
+        }
+        String requestPath = getRequestPath(requestUri);
 
         // 解析请求
-        TileParseResult parseResult = parseRequest(requestURI);
+        TileParseResult parseResult = parseRequest(requestPath);
         if (parseResult == null || !parseResult.isValid()) {
-            log.warn("无法解析请求URI: {}", requestURI);
-            GirTileResponseUtil.buildFromException(
-                    new IllegalArgumentException("Invalid request URI: " + requestURI),
-                    response
-            );
-            return;
+            log.warn("无法解析请求URI: {}", requestUri);
+            return TileResponse.error("Invalid request URI: " + requestUri);
         }
-        GirLayerConfigContext layerConfigContext = null;
+        parseResult.setRequestURI(requestUri);
         try {
-            layerConfigContext = getGirLayerConfigContext(
+            GirLayerConfigContext layerConfigContext = getGirLayerConfigContext(
                     parseResult.getFileId(),
                     parseResult.getFileName(),
                     parseResult.getServiceName()
             );
-        } catch (Exception e) {
-            GirTileResponseUtil.buildFromException(e, response);
-            return;
-        }
-        try {
             TileRequest layerTile = mapTileService.getLayerTile(
                     layerConfigContext,
                     parseResult.getContentAfterPrefix(),
                     "",
                     ""
             );
-            toHttpResponse(layerTile, response,parseResult );
+            return createTileResponse(layerTile, parseResult, requestUri);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
+            return TileResponse.error(e.getMessage());
         }
+    }
+
+    /**
+     * 从 URI 或完整 URL 中提取不含查询参数、片段标识的请求路径。
+     */
+    protected String getRequestPath(String requestUri) {
+        int queryIndex = requestUri.indexOf('?');
+        int fragmentIndex = requestUri.indexOf('#');
+        int endIndex = requestUri.length();
+        if (queryIndex >= 0) {
+            endIndex = queryIndex;
+        }
+        if (fragmentIndex >= 0) {
+            endIndex = Math.min(endIndex, fragmentIndex);
+        }
+        return requestUri.substring(0, endIndex);
+    }
+
+    /**
+     * 获取 Web 请求的 URI；子类可按协议需要返回完整 URL。
+     */
+    protected String getRequestUri(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        String queryString = request.getQueryString();
+        return queryString == null || queryString.isEmpty() ? requestUri : requestUri + "?" + queryString;
+    }
+
+    /**
+     * 从 URI 查询参数中读取请求参数，以支持非 Web 的手工 URL 调用。
+     */
+    protected String getRequestParameter(String requestUri, String parameterName) {
+        int queryIndex = requestUri.indexOf('?');
+        if (queryIndex < 0 || queryIndex == requestUri.length() - 1) {
+            return null;
+        }
+        String query = requestUri.substring(queryIndex + 1);
+        int fragmentIndex = query.indexOf('#');
+        if (fragmentIndex >= 0) {
+            query = query.substring(0, fragmentIndex);
+        }
+        for (String item : query.split("&")) {
+            int separatorIndex = item.indexOf('=');
+            String name = separatorIndex >= 0 ? item.substring(0, separatorIndex) : item;
+            if (parameterName.equals(URLUtil.decode(name))) {
+                String value = separatorIndex >= 0 ? item.substring(separatorIndex + 1) : "";
+                return URLUtil.decode(value);
+            }
+        }
+        return null;
     }
 
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         doGet(req, resp);
     }
 
@@ -118,9 +164,25 @@ public class D3TilesServlet extends HttpServlet {
     }
 
 
-    public void toHttpResponse(TileRequest tileRequest, HttpServletResponse response, TileParseResult tileParseResult) {
-        TileResponse tileResponse = tileRequest.toTileResponse();
-        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+    /**
+     * 将服务返回的瓦片结果转换为统一响应，子类可在此补充协议特有的处理。
+     */
+    protected TileResponse createTileResponse(TileRequest tileRequest,
+                                                TileParseResult tileParseResult,
+                                                String requestUri) {
+        return tileRequest.toTileResponse();
+    }
+
+    /**
+     * @deprecated 使用 {@link #getTileResponse(String)} 获取业务响应，
+     * 由 servlet 统一写出 HTTP 响应。
+     */
+    @Deprecated
+    public void toHttpResponse(TileRequest tileRequest,
+                               HttpServletResponse response,
+                               TileParseResult tileParseResult) {
+        GirTileResponseUtil.buildFromTileResponse(
+                createTileResponse(tileRequest, tileParseResult, tileParseResult.getRequestURI()), response);
     }
 }
 
