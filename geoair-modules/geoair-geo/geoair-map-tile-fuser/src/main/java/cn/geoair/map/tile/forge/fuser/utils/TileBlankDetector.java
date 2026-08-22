@@ -3,9 +3,7 @@ package cn.geoair.map.tile.forge.fuser.utils;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 
 /**
  * 瓦片空白检测工具类
@@ -51,9 +49,7 @@ public class TileBlankDetector {
         }
 
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
-            BufferedImage image = ImageIO.read(bis);
-            bis.close();
+            BufferedImage image = TileImageUtils.readImage(imageBytes);
 
             if (image == null) {
                 if (tileInfo != null) {

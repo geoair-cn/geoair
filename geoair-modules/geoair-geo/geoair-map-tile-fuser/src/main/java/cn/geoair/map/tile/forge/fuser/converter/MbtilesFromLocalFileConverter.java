@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
+import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.Data;
@@ -16,7 +17,10 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * @author ：张俊
@@ -33,6 +37,11 @@ import java.util.function.Consumer;
 public class MbtilesFromLocalFileConverter {
 
     private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromLocalFileConverter.class);
+    private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
+        Thread thread = new Thread(r, "tile-convert-delete");
+        thread.setDaemon(true);
+        return thread;
+    });
 
 
     /**
@@ -154,6 +163,11 @@ public class MbtilesFromLocalFileConverter {
         @Override
         public void accept(TileInfo tile) {
             try {
+                if (Files.size(tile.path) > TileResourceLimits.getMaxTileBytes()) {
+                    stats.failed++;
+                    log.warn("瓦片文件超过大小限制，跳过: {}", tile.path);
+                    return;
+                }
                 byte[] data = Files.readAllBytes(tile.path);
                 stats.total++;
                 stats.totalSize += data.length;
@@ -599,25 +613,23 @@ public class MbtilesFromLocalFileConverter {
      * 异步删除目录
      */
     private static void asyncDeleteDirectory(Path path) {
-        Thread deleteThread = new Thread(() -> {
+        DELETE_EXECUTOR.execute(() -> {
             try {
-                Files.walk(path)
-                        .sorted((a, b) -> -a.compareTo(b))
-                        .forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (IOException e) {
-                                log.error("删除文件/目录失败: {}", p, e);
-                            }
-                        });
+                try (Stream<Path> paths = Files.walk(path)) {
+                    paths.sorted((a, b) -> -a.compareTo(b))
+                            .forEach(p -> {
+                                try {
+                                    Files.deleteIfExists(p);
+                                } catch (IOException e) {
+                                    log.error("删除文件/目录失败: {}", p, e);
+                                }
+                            });
+                }
                 log.info("异步删除临时目录成功: {}", path);
             } catch (IOException e) {
                 log.error("异步删除临时目录失败: {}", path, e);
             }
         });
-        deleteThread.setDaemon(true);
-        deleteThread.setName("tile-convert-delete-" + System.currentTimeMillis());
-        deleteThread.start();
     }
 
     // ==================== 便捷方法 ====================

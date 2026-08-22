@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -51,6 +52,16 @@ public class MbtilesFromLocalZipConverter {
         private int minIdle = 2;                // 最小空闲连接数
         private TileNameProcessor processor = TileNameProcessor.DEFAULT_PROCESSOR;  // 文件名处理器
         private List<String> extensions = ListUtil.of(".png", ".jpg");  // 允许的扩展名
+        /** ZIP 内单个瓦片的最大解压后字节数。 */
+        private long maxEntryBytes = 10L * 1024 * 1024;
+        /** ZIP 文件本身允许的最大字节数。 */
+        private long maxZipFileBytes = 4L * 1024 * 1024 * 1024;
+        /** ZIP 导入期间允许读取的最大解压后总字节数。 */
+        private long maxTotalUncompressedBytes = 4L * 1024 * 1024 * 1024;
+        /** ZIP 中允许的最大条目数（包含目录）。 */
+        private int maxEntries = 1_000_000;
+        /** 已知压缩大小时允许的最大压缩比。 */
+        private int maxCompressionRatio = 1_000;
     }
 
     /**
@@ -121,6 +132,13 @@ public class MbtilesFromLocalZipConverter {
             errorResult.costTime = System.currentTimeMillis() - startTime;
             return errorResult;
         }
+        if (FileUtil.size(new File(config.getZipPath())) > config.getMaxZipFileBytes()) {
+            log.error("ZIP 文件超过大小限制: {}", config.getZipPath());
+            ImportResult errorResult = new ImportResult();
+            errorResult.failedTiles = -1;
+            errorResult.costTime = System.currentTimeMillis() - startTime;
+            return errorResult;
+        }
 
         ImportResult result = new ImportResult();
         result.zipPath = config.getZipPath();
@@ -165,6 +183,13 @@ public class MbtilesFromLocalZipConverter {
                 result.costTime = System.currentTimeMillis() - startTime;
                 return result;
             }
+            if (zipFile.size() > config.getMaxEntries()) {
+                log.error("ZIP 条目数超过限制: {} > {}", zipFile.size(), config.getMaxEntries());
+                result.failedTiles = -1;
+                result.costTime = System.currentTimeMillis() - startTime;
+                IoUtil.close(zipFile);
+                return result;
+            }
             MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
                     config.getOverwrite(),
                     config.batchSize,
@@ -175,6 +200,7 @@ public class MbtilesFromLocalZipConverter {
             // 处理 ZIP 文件
             try {
                 Enumeration<? extends ZipEntry> entryEnum = zipFile.entries();
+                long totalReadBytes = 0;
                 while (entryEnum.hasMoreElements()) {
                     ZipEntry entry = entryEnum.nextElement();
                     String entryName = entry.getName();
@@ -190,6 +216,12 @@ public class MbtilesFromLocalZipConverter {
                         continue;
                     }
 
+                    if (!isEntryWithinLimits(entry, config)) {
+                        result.failedTiles++;
+                        log.warn("ZIP 瓦片条目超过安全限制，跳过: {}", entryName);
+                        continue;
+                    }
+
                     result.totalTiles++;
 
                     // 打印进度
@@ -199,20 +231,39 @@ public class MbtilesFromLocalZipConverter {
                     // 读取瓦片数据
                     byte[] tileBytes = null;
                     try {
-                        tileBytes = readEntryBytes(zipFile, entry);
+                        tileBytes = readEntryBytes(zipFile, entry, config.getMaxEntryBytes());
                     } catch (Exception e) {
-                        log.info("读取瓦片二进制失败：" + entryName + "，跳过");
+                        result.failedTiles++;
+                        log.warn("读取瓦片二进制失败，跳过: {}，原因: {}", entryName, e.getMessage());
+                        continue;
                     }
+                    if (tileBytes.length > config.getMaxTotalUncompressedBytes() - totalReadBytes) {
+                        log.error("ZIP 解压后总数据量超过限制: {}", config.getMaxTotalUncompressedBytes());
+                        result.failedTiles = -1;
+                        break;
+                    }
+                    totalReadBytes += tileBytes.length;
                     // 使用处理器解析瓦片信息
                     MbtilesInfo tileInfo = null;
                     try {
                         tileInfo = config.getProcessor().apply(entryName, tileBytes);
                     } catch (Exception e) {
-                        log.info("瓦片坐标解析失败：" + entryName + "，跳过");
+                        result.failedTiles++;
+                        log.warn("瓦片坐标解析失败，跳过: {}，原因: {}", entryName, e.getMessage());
+                        continue;
+                    }
+                    if (tileInfo == null) {
+                        result.failedTiles++;
+                        log.warn("瓦片坐标解析结果为空，跳过: {}", entryName);
+                        continue;
                     }
                     mbtilesInfoBatchPutConsumer.accept(tileInfo);
                 }
                 mbtilesInfoBatchPutConsumer.close();
+                if (result.failedTiles == -1) {
+                    result.costTime = System.currentTimeMillis() - startTime;
+                    return result;
+                }
                 ConvertStats stats = mbtilesInfoBatchPutConsumer.getStats();
                 result.costTime = System.currentTimeMillis() - startTime;
 
@@ -254,6 +305,10 @@ public class MbtilesFromLocalZipConverter {
      * 验证配置
      */
     private static boolean validateConfig(ImportConfig config) {
+        if (config == null) {
+            System.err.println("ZIP 导入配置不能为空");
+            return false;
+        }
         if (StrUtil.isBlank(config.getZipPath())) {
             System.err.println("ZIP 文件路径不能为空");
             return false;
@@ -274,6 +329,11 @@ public class MbtilesFromLocalZipConverter {
             System.err.println("瓦片处理器不能为空");
             return false;
         }
+        if (config.getMaxEntryBytes() <= 0 || config.getMaxZipFileBytes() <= 0 || config.getMaxTotalUncompressedBytes() <= 0
+                || config.getMaxEntries() <= 0 || config.getMaxCompressionRatio() <= 0) {
+            System.err.println("ZIP 安全限制必须大于 0");
+            return false;
+        }
         return true;
     }
 
@@ -292,17 +352,41 @@ public class MbtilesFromLocalZipConverter {
     /**
      * 读取 ZipEntry 完整二进制
      */
-    private static byte[] readEntryBytes(ZipFile zipFile, ZipEntry entry) throws IOException {
+    private static byte[] readEntryBytes(ZipFile zipFile, ZipEntry entry, long maxEntryBytes) throws IOException {
+        long expectedSize = entry.getSize();
+        if (expectedSize > maxEntryBytes) {
+            throw new IOException("ZIP 条目超过大小限制: " + expectedSize);
+        }
         try (InputStream is = zipFile.getInputStream(entry);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream((int) entry.getSize())) {
+             ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(Math.max(expectedSize, 0), BUF_SIZE))) {
 
             byte[] buf = new byte[BUF_SIZE];
             int len;
+            long total = 0;
             while ((len = is.read(buf)) != -1) {
+                total += len;
+                if (total > maxEntryBytes) {
+                    throw new IOException("ZIP 条目超过大小限制: " + total);
+                }
                 bos.write(buf, 0, len);
             }
             return bos.toByteArray();
         }
+    }
+
+    private static boolean isEntryWithinLimits(ZipEntry entry, ImportConfig config) {
+        long uncompressedSize = entry.getSize();
+        if (uncompressedSize > config.getMaxEntryBytes()) {
+            return false;
+        }
+        long compressedSize = entry.getCompressedSize();
+        if (uncompressedSize < 0 || compressedSize < 0) {
+            return true;
+        }
+        if (compressedSize == 0) {
+            return uncompressedSize == 0;
+        }
+        return uncompressedSize / compressedSize <= config.getMaxCompressionRatio();
     }
 
     /**

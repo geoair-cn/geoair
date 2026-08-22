@@ -9,12 +9,11 @@ import cn.hutool.core.io.FileUtil;
 
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
 
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 /**
@@ -54,16 +53,13 @@ public class GoogleLocalFileTileGetter extends BaseTileGetter {
         }
 
         try {
-            BufferedImage read = ImageIO.read(file);
+            BufferedImage read = TileImageUtils.readImage(file);
             byte[] imageBytes;
 
             if (read != null) {
-                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    GiMimeType srcFormat = getSrcFormat();
-                    String internalName = srcFormat.getInternalName();
-                    ImageIO.write(read, internalName, baos);
-                    imageBytes = baos.toByteArray();
-                }
+                GiMimeType srcFormat = getSrcFormat();
+                String internalName = srcFormat != null ? srcFormat.getInternalName() : "png";
+                imageBytes = TileImageUtils.writeImage(read, internalName);
                 log.info("从本地文件读取瓦片成功（转换为PNG）: {}", file.getAbsolutePath());
             } else {
                 imageBytes = FileUtil.readBytes(file);
