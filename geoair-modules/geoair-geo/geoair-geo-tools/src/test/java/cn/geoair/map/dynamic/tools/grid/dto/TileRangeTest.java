@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
+import cn.geoair.map.dynamic.tools.grid.converter.AbstractWgs84TileConverter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -81,6 +82,29 @@ public class TileRangeTest {
         Assert.assertEquals(-90D, tileConverter.tileYToCoordinateY(4, 3), 0D);
         Assert.assertEquals(3, tileConverter.tileRangeByBox(
                 3, new org.locationtech.jts.geom.Envelope(-180D, 180D, -90D, 90D)).getMaxY());
+    }
+
+    @Test
+    public void shouldConvertCurrentSeparateAndEqualAxisYUsingActualRowCount() {
+        GirTileConverterOpt separate = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
+        GirTileConverterOpt equal = GirGeoTools.defaultInstance().getTileGrid4326Opt();
+
+        Assert.assertEquals(4, separate.getTileRowCount(3));
+        Assert.assertEquals(4, equal.getTileRowCount(3));
+        for (int y = 0; y < 4; y++) {
+            Assert.assertEquals(y, separate.convertSeparateAxisYToEqualAxisY(
+                    y, 3, AbstractWgs84TileConverter.RoundingType.FLOOR));
+            Assert.assertEquals(y, equal.convertEqualAxisYToSeparateAxisY(
+                    y, 3, AbstractWgs84TileConverter.RoundingType.CEIL));
+        }
+
+        try {
+            separate.convertSeparateAxisYToEqualAxisY(
+                    4, 3, AbstractWgs84TileConverter.RoundingType.ROUND);
+            Assert.fail("z=3 的 Separate 网格仅有 4 行，Y=4 必须被拒绝");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertTrue(expected.getMessage().contains("合法范围0~3"));
+        }
     }
 
     private boolean contains(Set<TileZxyApo> tiles, int x, int y) {

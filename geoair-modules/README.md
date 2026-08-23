@@ -319,8 +319,9 @@ double[] gcj02 = tools.getCoordinateOpt().wgs84ToGcj02(116.40, 39.90);
 // GeoJSON 转 WKT
 String wkt = tools.getFormatOpt().geojsonToWktString(geojsonStr, false);
 
-// 面积计算
-double area = tools.getMeasureOpt().calculateAreaByUTM(polygon, 4326, "km²");
+// 面积计算：单位与测量方式均使用枚举
+double area = tools.getMeasureOpt().calculateArea(
+    polygon, 4326, MeasureUnitEnum.SQUARE_KILOMETER, MeasureMethodEnum.UTM);
 
 // 瓦片坐标
 TileZxyApo tile = tools.getTileGrid4326Opt().wgs84ToTileZxy(116.40, 39.90, 10);

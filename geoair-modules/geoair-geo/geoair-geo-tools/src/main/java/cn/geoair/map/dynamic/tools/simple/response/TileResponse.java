@@ -11,9 +11,14 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 /**
- * @author ：张俊
- * @date ：Created in 2025/11/13 16:17
- * @description：瓦片请求数据传输对象
+ * 瓦片请求的统一响应元数据。
+ *
+ * <p>本类只承载状态和元数据，默认不携带内容；实际内容由
+ * {@link TileResponseByByte} 或 {@link TileResponseByInputStream} 提供。
+ * {@link #success} 表示处理是否成功，{@link #exists} 表示目标瓦片是否存在，
+ * {@link #isValid()} 同时要求两者为 {@code true}。</p>
+ *
+ * @author 张逢吉
  */
 @Data
 @Accessors(chain = true)
@@ -104,7 +109,10 @@ public class TileResponse implements Serializable {
 
 
     /**
-     * 创建失败的响应
+     * 创建无具体错误码的失败响应。
+     *
+     * @param errorMessage 失败说明
+     * @return 不存在且处理失败的响应
      */
     public static TileResponse error(String errorMessage) {
         TileResponse response = new TileResponse();
@@ -115,7 +123,9 @@ public class TileResponse implements Serializable {
     }
 
     /**
-     * 创建空瓦片响应（瓦片不存在）
+     * 创建“瓦片不存在”的失败响应。
+     *
+     * @return 错误码为 {@code TILE_NOT_FOUND} 的响应
      */
     public static TileResponse notFound() {
         TileResponse response = new TileResponse();
@@ -126,7 +136,13 @@ public class TileResponse implements Serializable {
         return response;
     }
 
-
+    /**
+     * 判断响应是否表示一个有效瓦片。
+     *
+     * <p>子类会额外校验其内容是否可读。</p>
+     *
+     * @return 是否处理成功且瓦片存在
+     */
     public boolean isValid() {
         return success && exists;
     }
@@ -149,17 +165,31 @@ public class TileResponse implements Serializable {
         return eTag;
     }
 
+    /**
+     * 获取瓦片内容流。
+     *
+     * @return 内容流；基础实现不保存内容，固定返回 {@code null}
+     */
     public InputStream toInputStream() {
         return null;
     }
 
-
+    /**
+     * 获取瓦片内容字节。
+     *
+     * @return 内容字节；基础实现固定返回空数组
+     */
     public byte[] toByteArrays() {
         return new byte[0];
     }
 
     /**
-     * 设置瓦片字节并自动更新size
+     * 设置瓦片字节并同步内容长度。
+     *
+     * <p>基础实现不保存内容，子类覆盖此方法以提供实际行为。</p>
+     *
+     * @param bytes 瓦片字节
+     * @return 当前响应对象
      */
     public TileResponse setBytesAndUpdateSize(byte[] bytes) {
         // 由子类实现

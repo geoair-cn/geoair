@@ -22,7 +22,11 @@ import org.geotools.api.referencing.operation.MathTransform;
 import org.geotools.api.referencing.operation.TransformException;
 
 /**
- * 基于GeoTools的SRID坐标转换工具类（单例模式） 支持EPSG标准SRID互转，内置常用CRS缓存
+ * 基于 GeoTools 的 SRID 坐标转换实现。
+ *
+ * <p>实例持有 {@link MathTransform} 缓存，并按 {@link ToolsConfig} 对象身份复用。
+ * {@link #getInstance()} 是保留的默认单例入口；新代码应通过
+ * {@link #getInstance(ToolsConfig)} 取得与配置绑定的实例。</p>
  *
  * @author 张逢吉
  * @date 2024/12/05
@@ -33,13 +37,25 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     /** 按 ToolsConfig 对象身份复用 CRS 与坐标转换缓存。 */
     private static final Map<ToolsConfig, GirSridConvertUtils> CONFIGURED_INSTANCES =
             Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirSridConvertUtils>());
-    ToolsConfig advToolsConfig;
+    /** 当前实例使用的几何工厂及格式化配置。 */
+    private final ToolsConfig advToolsConfig;
 
+    /**
+     * 使用指定工具配置创建转换器，并预加载常用坐标转换算子。
+     *
+     * @param advToolsConfig 工具配置，不能为空
+     */
     public GirSridConvertUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         preloadCommonTransforms();
     }
 
+    /**
+     * 获取与配置对象绑定的转换器。
+     *
+     * @param advToolsConfig 工具配置；为 {@code null} 时返回默认单例
+     * @return 坐标转换器
+     */
     public static GirSridConvertUtils getInstance(ToolsConfig advToolsConfig) {
         if (advToolsConfig == null) {
             return getInstance();
@@ -55,13 +71,18 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     }
 
 
-    // 转换算子缓存：key=srcSrid_targetSrid，value=MathTransform
+    /** 转换算子缓存，键格式为 {@code 源SRID_目标SRID}。 */
     private final Map<String, MathTransform> transformCache = new HashMap<>();
 
-    // 缓存锁（保证线程安全）
+    /** 保护转换算子缓存的互斥锁。 */
     private final Lock cacheLock = new ReentrantLock();
 
-    /** 获取单例实例（双重校验锁） */
+    /**
+     * 获取使用默认配置的遗留单例。
+     *
+     * @deprecated 请使用 {@link #getInstance(ToolsConfig)}，以便明确配置与缓存归属。
+     * @return 默认配置的坐标转换器
+     */
     @Deprecated
     public static GirSridConvertUtils getInstance() {
         if (INSTANCE == null) {
@@ -313,7 +334,13 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
         }
     }
 
-    /** 获取坐标转换算子（带缓存） */
+    /**
+     * 获取坐标转换算子；缓存未命中时按宽松模式创建并写入缓存。
+     *
+     * @param srcSrid 源 EPSG SRID
+     * @param targetSrid 目标 EPSG SRID
+     * @return 坐标转换算子
+     */
     public MathTransform getMathTransform(int srcSrid, int targetSrid) {
         String cacheKey = srcSrid + "_" + targetSrid;
 

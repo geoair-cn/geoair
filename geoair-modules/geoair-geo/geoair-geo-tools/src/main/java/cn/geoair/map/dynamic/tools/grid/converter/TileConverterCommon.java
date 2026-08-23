@@ -21,15 +21,33 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 
+/**
+ * 瓦片转换器的公共基础实现。
+ *
+ * <p>负责通用的几何范围处理、SRID 转换、闭区间 {@link RangeApo} 遍历及 XYZ/TMS 适配。
+ * 子类只需实现本坐标系的范围与坐标计算。所有不带 {@link TileYAxis} 参数的方法均采用
+ * Google/XYZ 顶部原点。</p>
+ *
+ * @author 张逢吉
+ */
 public abstract class TileConverterCommon implements GirTileConverterOpt {
 
-    protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
+    /** 将点或零面积范围扩展为可计算范围时使用的坐标偏移量。 */
+    protected static final double POINT_OFFSET = 0.0001;
 
+    /** 坐标参考系转换工具。 */
     protected GirSridConvertOpt sridConvertOpt;
+    /** 空间格式转换工具。 */
     protected GirGeoFormatOpt formatOpt;
 
-    ToolsConfig advToolsConfig;
+    /** 当前转换器使用的工具配置。 */
+    protected final ToolsConfig advToolsConfig;
 
+    /**
+     * 使用指定配置创建瓦片转换器基础实例。
+     *
+     * @param advToolsConfig 工具配置；为 {@code null} 时创建默认配置
+     */
     public TileConverterCommon(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
         GirGeoTools geoTools = GirGeoTools.getInstance(this.advToolsConfig);
@@ -50,11 +68,16 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     }
 
     /**
-     * 校验XYZ参数合法性
+     * 校验瓦片计算的基础参数。
      *
      * @param z 缩放级别（0~22）
      * @param x 瓦片X索引（非负）
      * @param y 瓦片Y索引（非负）
+     * @throws IllegalArgumentException 层级超出支持范围或行列号为负时抛出
+     *
+     * <p>本方法有意不校验 {@code x/y < 2^z}：边界计算会使用 {@code x + 1} 或
+     * {@code y + 1} 表示瓦片的右/下边界。需要验证实际瓦片行列号时，应由调用方按当前
+     * 网格的列数和 {@link #getTileRowCount(int)} 校验。</p>
      */
     protected void validateXyz(int z, int x, int y) {
         if (z < 0 || z > 22) {

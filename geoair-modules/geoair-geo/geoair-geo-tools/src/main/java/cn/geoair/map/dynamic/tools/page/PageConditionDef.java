@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 分页定义
+ * 分页执行所需的查询、消费与错误处理回调。
+ *
+ * <p>页码从 0 还是 1 开始由 {@link PageConfig#isPageNumStartByZero()} 决定；
+ * {@link #getPageRecords(Integer, Integer)} 必须按传入页码和页大小返回对应页数据。</p>
  *
  * @param <T> 数据记录类型（泛型）
  */
@@ -15,7 +18,7 @@ public interface PageConditionDef<T> {
     /**
      * 获取总条数，用于计算分页信息
      *
-     * @param
+     * @return 总记录数；返回 {@code null} 时由 {@link PageConfig#getTotalCount()} 兜底
      */
     Long getTotalRecordCount();
 
@@ -60,7 +63,13 @@ public interface PageConditionDef<T> {
     List<T> getPageRecords(Integer pageNo, Integer pageSize);
 
     /**
-     * 当查询结束的时候。
+     * 当分页任务正常完成或提前终止后执行的回调。
+     *
+     * @param resultList      仅在启用保存结果时包含收集的数据，否则为空列表
+     * @param actualPageSize  实际采用的页大小
+     * @param totalPages      实际执行的总页数
+     * @param countConsume    已消费的记录数
+     * @param totalCount      查询前得到的总记录数
      */
     default void onComplete(List<T> resultList, long actualPageSize, long totalPages, long countConsume, long totalCount) {
         StaticLog.info("查询结束，结果列表大小：{},计算后的分页大小 {}，总页数:{} ,消费总条数：{},分页总条数：{}", resultList.size(), actualPageSize, totalPages,

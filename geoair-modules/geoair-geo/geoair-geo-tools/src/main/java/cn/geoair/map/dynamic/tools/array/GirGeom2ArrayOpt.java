@@ -4,15 +4,17 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.List;
 
 /**
  * 几何对象与坐标数组互转核心接口
  * <p>
- * 定义 Point / LineString 与 double 类型数组、List集合 的互相转换规范；
+ * 定义 Point / LineString / Polygon 与 double 类型数组、List集合 的互相转换规范；
  * 支持自定义坐标顺序（X在前 / Y在前），支持自定义 GeometryFactory；
- * 提供常规转换（带校验）和快速转换（跳过校验，高性能）两种模式。
+ * 提供常规转换（带校验）和快速转换（跳过数值校验，高性能）两种模式。
+ * 所有 {@code double} 数组 API 均为二维 XY 表达，转换三维或带 M 值 Geometry 时会丢弃额外维度。
  * </p>
  *
  * @author 张逢吉
@@ -152,8 +154,8 @@ public interface GirGeom2ArrayOpt {
      * 通用坐标对象转换为 Geometry 几何对象
      * <p>
      * 自动识别类型：
-     * 一维数组/集合 → Point
-     * 二维数组/集合 → LineString
+      * 一维数组 → Point
+      * 二维数组 → LineString
      * </p>
      *
      * @param coords 坐标数据（一维/二维）
@@ -310,5 +312,46 @@ public interface GirGeom2ArrayOpt {
      * @return JTS LineString 对象
      */
     LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order);
+
+    // ====================== double[][] 转 Polygon ======================
+
+    /**
+     * 二维坐标数组转 Polygon，仅包含外环；未闭合外环会自动闭合。
+     *
+     * @param shell 外环坐标，格式为 {@code [[x1,y1], ...]}
+     * @return 面几何对象
+     */
+    Polygon doubleArrayToPolygon(double[][] shell);
+
+    /**
+     * 二维坐标数组转 Polygon，支持坐标顺序与自定义 GeometryFactory；未闭合外环会自动闭合。
+     *
+     * @param shell 外环坐标
+     * @param order 坐标顺序
+     * @param factory 几何工厂
+     * @return 面几何对象
+     */
+    Polygon doubleArrayToPolygon(double[][] shell, CoordOrder order, GeometryFactory factory);
+
+    /**
+     * 根据外环和洞构造 Polygon；所有环未闭合时会自动闭合。
+     *
+     * @param shell 外环坐标
+     * @param holes 洞坐标集合，每个元素为一个环
+     * @param order 坐标顺序
+     * @param factory 几何工厂
+     * @return 面几何对象
+     */
+    Polygon doubleArrayToPolygon(
+            double[][] shell, List<double[][]> holes, CoordOrder order, GeometryFactory factory);
+
+    /**
+     * 将 Polygon 的全部环转为坐标数组；第一项是外环，其余项依次为洞。
+     *
+     * @param polygon 面几何对象
+     * @param order 输出坐标顺序
+     * @return 环坐标数组，格式为 {@code [ring][point][xy]}
+     */
+    double[][][] polygonToDoubleArrays(Polygon polygon, CoordOrder order);
 
 }

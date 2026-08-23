@@ -8,13 +8,17 @@ import lombok.experimental.Accessors;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * @author ：张俊
- * @date ：Created in 2026/7/17 11:14
- * @description：基于输入流的瓦片响应
+ * 以输入流承载瓦片内容的响应。
+ *
+ * <p>未缓存字节时，{@link #toInputStream()} 返回原始输入流，调用方负责按一次性流处理。
+ * {@link #toByteArrays()} 会读取并关闭原始流，再缓存读取到的字节；缓存存在后可重复取得流。
+ * {@link InputStream#available()} 不能可靠表示总长度，因此仅显式指定的长度或已缓存字节会
+ * 作为 HTTP Content-Length 使用。</p>
+ *
+ * @author 张逢吉
  */
 @Data
 @Accessors(chain = true)
@@ -30,45 +34,26 @@ public class TileResponseByInputStream extends TileResponse {
      */
     private byte[] bytes;
 
+    /** @return 空的输入流瓦片响应。 */
     public static TileResponseByInputStream of() {
         return new TileResponseByInputStream();
     }
 
 
+    /**
+     * 获取内容流；缓存存在时返回新建内存流，否则返回原始流。
+     *
+     * @return 可读取的内容流；无可用内容时返回 {@code null}
+     */
     public InputStream toInputStream() {
-        // 2. 如果原始输入流不可用，从缓存的字节数组创建
+        // 优先从缓存字节创建新流。
 
         if (bytes != null && bytes.length > 0) {
             return new ByteArrayInputStream(bytes);
         }
-        // 1. 检查原始输入流是否可用
-        if (isInputStreamAvailable(inputStream)) {
-            return inputStream;
-        }
-
-
-        // 3. 都没有则返回null
-        return null;
-    }
-
-    /**
-     * 检查输入流是否可用（未关闭且可读）
-     */
-    private boolean isInputStreamAvailable(InputStream is) {
-        if (is == null) {
-            return false;
-        }
-
-        try {
-            // 检查流是否已关闭：调用available()方法
-            // 如果流已关闭，会抛出IOException
-            int available = is.available();
-            // available() 返回 -1 表示流已结束或关闭
-            return available >= 0;
-        } catch (IOException e) {
-            // 抛出IOException通常表示流已关闭或不可读
-            return false;
-        }
+        // InputStream 没有通用的“未关闭”检测方式，available() 也不能代表可读总长度。
+        // 因此只要调用方提供了流就交由实际写出过程消费；写出失败由输出链路处理。
+        return inputStream;
     }
 
     /**
@@ -85,7 +70,6 @@ public class TileResponseByInputStream extends TileResponse {
         if (inputStream != null) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 IoUtil.copy(inputStream, baos);
-                IoUtil.close(inputStream);
                 this.bytes = baos.toByteArray();
                 this.size = (long) this.bytes.length;
                 this.exists = this.bytes.length > 0;
@@ -95,6 +79,10 @@ public class TileResponseByInputStream extends TileResponse {
                 this.size = 0L;
                 this.exists = false;
                 return null;
+            } finally {
+                IoUtil.close(inputStream);
+                // 原始流已被读取并关闭，后续必须从缓存字节创建新流。
+                this.inputStream = null;
             }
         }
 
@@ -102,10 +90,7 @@ public class TileResponseByInputStream extends TileResponse {
     }
 
     /**
-     * 判断响应是否有效
-     */
-    /**
-     * 判断响应是否有效
+     * 判断响应是否成功、存在且至少拥有可读取的内容来源。
      */
     public boolean isValid() {
         // 基础验证
@@ -113,24 +98,14 @@ public class TileResponseByInputStream extends TileResponse {
             return false;
         }
 
-        boolean hasBytes = bytes != null && bytes.length > 0;
-        boolean hasInputStream = inputStream != null;
-        if (hasInputStream) {
-            try {
-                if (inputStream.available() < 0) {
-                    return false;
-                }
-            } catch (IOException e) {
-                return false;
-            }
-        }
-
-        return hasBytes || hasInputStream;
+        return (bytes != null && bytes.length > 0) || inputStream != null;
     }
 
     /**
-     * 获取内容长度（兼容HTTP Content-Length）
-     * 优先级：size>bytes > inputStream.available()
+     * 获取可可靠声明的内容长度（兼容 HTTP Content-Length）。
+     *
+     * <p>优先级为显式 {@code size}、缓存字节长度。仅持有输入流时返回 {@code null}，
+     * 因为 {@link InputStream#available()} 只表示当前非阻塞可读取字节数，不能作为内容总长度。</p>
      */
     public Long getContentLength() {
 
@@ -141,18 +116,7 @@ public class TileResponseByInputStream extends TileResponse {
         if (bytes != null && bytes.length > 0) {
             return (long) bytes.length;
         }
-        if (inputStream != null) {
-            try {
-                // 注意：available() 不一定准确，但作为参考值
-                int available = inputStream.available();
-                if (available >=0) {
-                    return (long) available;
-                }
-            } catch (Exception e) {
-                // 忽略异常，继续使用size
-            }
-        }
-        return size;
+        return null;
     }
 
     /**
@@ -166,24 +130,16 @@ public class TileResponseByInputStream extends TileResponse {
     }
 
     /**
-     * 设置输入流（同时清空之前缓存的字节）
+     * 设置输入流（同时清空之前缓存的字节和长度）。
+     *
+     * <p>不再根据 {@code available()} 推测长度；需要写出 Content-Length 时，请使用
+     * {@link #success(InputStream, GiMimeType, long)} 或显式设置 {@link #setSize(Long)}。</p>
      */
     public TileResponseByInputStream setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
         this.bytes = null;
-        // 如果有输入流且支持available，尝试获取大小
-        if (inputStream != null) {
-            try {
-                long available = inputStream.available();
-                if (available > 0) {
-                    this.size = available;
-                    this.setSuccess(true);
-                    this.setExists(true);
-                }
-            } catch (Exception e) {
-                // 忽略异常
-            }
-        }
+        this.size = null;
+        this.exists = inputStream != null;
         return this;
     }
 
@@ -195,7 +151,7 @@ public class TileResponseByInputStream extends TileResponse {
         response.setSuccess(true);
         response.setInputStream(inputStream);
         response.setMimeType(mimeType != null ? mimeType : GirImageMime.png);
-        response.setExists(true);
+        response.setExists(inputStream != null);
         response.setLastModified(System.currentTimeMillis());
         return response;
     }
