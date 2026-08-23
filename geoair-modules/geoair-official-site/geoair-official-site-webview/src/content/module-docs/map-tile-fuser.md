@@ -298,6 +298,18 @@ TileResponse response = tileServiceTran.getTileResponse(uri);
 
 这使瓦片转换逻辑可以被 Controller、任务调度、缓存预热和测试共同复用。仅在最终回写浏览器时才需要 `HttpServletResponse`；不再为了获取瓦片而构造伪造的 Servlet request。
 
+## 预缓存范围的闭区间约定
+
+`TileTaskExecutor` 使用 `tileRangeByGeom(...)` 计算任务范围。这个范围是闭区间：
+
+```text
+[minX, maxX] × [minY, maxY]
+```
+
+因此生产者会遍历到 `maxX`、`maxY` 本身。这样定义后，空间工具层、瓦片列表、预缓存、
+检查修复与融合任务共享同一个范围规则，不需要在 fuser 侧额外对最大索引做减一或加一。
+这也保证了既有缓存预热和修复任务的瓦片输出保持一致。
+
 ## 核心 API 示例
 
 ### 示例1：Google 服务转 4326 请求
