@@ -124,6 +124,11 @@
       <artifactId>gt-referencing</artifactId>
       <version>${geotools.version}</version>
     </dependency>
+    <!-- GeoTools 34.x 的 CRS 初始化会直接使用 si-quantity 中的量纲类型。 -->
+    <dependency>
+      <groupId>si.uom</groupId>
+      <artifactId>si-quantity</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.alibaba.fastjson2</groupId>
       <artifactId>fastjson2</artifactId>
