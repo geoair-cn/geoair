@@ -27,7 +27,7 @@ public class TileSliceParameterExample {
      */
     private static void testJdbcUrlParser() {
         // PostgreSQL：完整格式
-        String pgUrl = "#jdbc:postgresql://postgres#tcsd1234/116.198.227.117:35432/address/test1/big_mian";
+        String pgUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/address/test1/big_mian";
         ProtocolUrl pg = new ProtocolUrl(pgUrl);
         System.out.println("[PostgreSQL 完整格式]");
         System.out.println("  输入:     " + pgUrl);
@@ -69,9 +69,9 @@ public class TileSliceParameterExample {
      * 测试 TileSliceParameter 的 Base32 序列化 / 反序列化
      */
     private static void testTileSliceParameter() {
-        String inputUrl = "#jdbc:postgresql://postgres#tcsd1234/192.168.0.110:5432/jwyt_v3/flowable";
+        String inputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable";
         String tableName = "t_" + IdUtil.getSnowflakeNextId();
-        String outputUrl = "#jdbc:postgresql://postgres#tcsd1234/192.168.0.110:5432/jwyt_v3/flowable/" + tableName;
+        String outputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
 
         TileSliceParameter parameter = new TileSliceParameter()
                 .setLayerName("road_layer")
