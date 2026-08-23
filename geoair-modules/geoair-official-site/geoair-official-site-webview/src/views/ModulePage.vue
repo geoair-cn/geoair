@@ -21,17 +21,6 @@
       </div>
     </section>
 
-    <nav class="module-nav" aria-label="当前模块导航">
-      <div class="section-block module-nav-inner">
-        <span class="module-nav-label">{{ moduleItem.title }}</span>
-        <div class="module-nav-items">
-          <button v-for="item in navItems" :key="item.id" type="button" @click="scrollToSection(item.id)">
-            {{ item.label }}
-          </button>
-        </div>
-      </div>
-    </nav>
-
     <section class="page-section">
       <div class="section-block module-page-layout" :class="{ 'has-md': !!moduleDoc }">
         <aside v-if="moduleDoc && navItems.length" class="left-sidebar surface-card">
@@ -381,54 +370,6 @@ export default {
 .hero-links a {
   color: var(--primary);
   font-weight: 600;
-}
-
-.module-nav {
-  position: sticky;
-  top: 72px;
-  z-index: 12;
-  background: rgba(245, 247, 251, 0.94);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(37, 99, 235, 0.08);
-  border-bottom: 1px solid rgba(37, 99, 235, 0.1);
-}
-
-.module-nav-inner {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  min-height: 60px;
-  flex-wrap: wrap;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.module-nav-label {
-  flex-shrink: 0;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.module-nav-items {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.module-nav-items button {
-  border: 1px solid var(--border-color);
-  background: #fff;
-  color: var(--text-secondary);
-  border-radius: 999px;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.module-nav-items button:hover {
-  color: var(--primary);
-  border-color: rgba(37, 99, 235, 0.35);
-  background: var(--primary-soft);
 }
 
 .page-section {
