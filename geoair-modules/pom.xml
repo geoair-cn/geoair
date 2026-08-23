@@ -44,7 +44,7 @@
     <module>geoair-db-service</module>
     <module>geoair-message-jts-jackson</module>
     <module>geoair-message-jts-mybatis</module>
-    <module>geoair-official-site</module>
+<!--    <module>geoair-official-site</module>-->
 
   </modules>
 
