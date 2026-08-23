@@ -10,7 +10,11 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
 /**
- * WGS84（4326）非等轴瓦片转换实现类 核心特征：经度/纬度轴独立计算瓦片跨度（经度360/2^z，纬度180/2^z）
+ * WGS84（4326）非等轴瓦片转换实现类。
+ *
+ * <p>网格在同一层级的经纬度行列数不同：经度方向为 {@code 2^z} 列，纬度方向为
+ * {@code max(1, 2^(z-1))} 行。例如 z=3 时为 8 列 × 4 行。纬度跨度始终按实际行数
+ * 计算，确保瓦片完整覆盖 [-90°, 90°]。</p>
  */
 public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
@@ -45,7 +49,9 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
     @Override
     protected double calculateTileLatSpan(int z) {
-        return 180.0 / (1 << z); // 纬度跨度：180/2^z（非等轴核心）
+        // 纬度总行数为 2^(z-1)，故跨度为 180 / 2^(z-1) = 360 / 2^z。
+        // 写成后者可自然覆盖 z=0 的单行全球瓦片。
+        return 360.0 / (1 << z);
     }
 
     // ========== 核心转换方法（复用父类公共逻辑） ==========
@@ -66,8 +72,9 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         // 边界修正（复用父类工具方法）
         lon_min = clamp(lon_min, MIN_LON, MAX_LON);
         lon_max = clamp(lon_max, MIN_LON, MAX_LON);
-        lat_min = clamp(lat_min, MIN_VALID_LAT, MAX_VALID_LAT);
-        lat_max = clamp(lat_max, MIN_VALID_LAT, MAX_VALID_LAT);
+        // Separate 是线性 EPSG:4326 网格，允许到达南北极；不能套用 Web Mercator 的有效纬度。
+        lat_min = clamp(lat_min, MIN_LAT, MAX_LAT);
+        lat_max = clamp(lat_max, MIN_LAT, MAX_LAT);
 
         // 转换为目标坐标系
         ReferencedEnvelope envelope4326 =
@@ -107,7 +114,8 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         // 调用子类实现的跨度计算方法
         double tileLonSpan = calculateTileLonSpan(z);
         double tileLatSpan = calculateTileLatSpan(z);
-        int maxTileIndex = (1 << z) - 1;
+        int maxTileXIndex = (1 << z) - 1;
+        int maxTileYIndex = getTileLevelMetadata(z).getNumTilesHigh() - 1;
 
         // 逆算瓦片范围（添加精度补偿）
         double tileXmin = Math.floor((envMinX - MIN_LON - PRECISION) / tileLonSpan);
@@ -116,10 +124,10 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         double tileYmax = Math.ceil((MAX_LAT - envMinY + PRECISION) / tileLatSpan);
 
         // 索引边界修正
-        tileXmin = clamp(tileXmin, 0, maxTileIndex);
-        tileXmax = clamp(tileXmax, 0, maxTileIndex);
-        tileYmin = clamp(tileYmin, 0, maxTileIndex);
-        tileYmax = clamp(tileYmax, 0, maxTileIndex);
+        tileXmin = clamp(tileXmin, 0, maxTileXIndex);
+        tileXmax = clamp(tileXmax, 0, maxTileXIndex);
+        tileYmin = clamp(tileYmin, 0, maxTileYIndex);
+        tileYmax = clamp(tileYmax, 0, maxTileYIndex);
 
         return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax,z);
     }
@@ -134,8 +142,7 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
     @Override
     public double tileYToCoordinateY(int y, int z) {
         validateXyz(z, 0, y);
-        // 非等轴保留球面投影公式（若需线性计算可改为：MAX_LAT - y * calculateTileLatSpan(z)）
-        double n = Math.PI - (2.0 * Math.PI * y) / (1 << z);
-        return Math.toDegrees(Math.atan(Math.sinh(n)));
+        // 4326 Separate 为线性经纬度网格，必须与 xyzToTileBox 的纬度边界计算一致。
+        return clamp(MAX_LAT - y * calculateTileLatSpan(z), MIN_LAT, MAX_LAT);
     }
 }

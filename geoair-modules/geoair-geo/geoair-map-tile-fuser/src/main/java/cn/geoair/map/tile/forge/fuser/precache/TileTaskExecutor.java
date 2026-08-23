@@ -102,7 +102,7 @@ public class TileTaskExecutor {
     public void execute() {
         try {
             // 计算瓦片范围
-            RangeApo rangeApo = calculateTileRange();
+            RangeApo rangeApo = calculateClosedTileRange();
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
@@ -168,9 +168,13 @@ public class TileTaskExecutor {
     }
 
     /**
-     * 计算瓦片范围
+     * 计算待处理的闭区间瓦片范围。
+     *
+     * <p>{@link RangeApo#getMaxX()} 和 {@link RangeApo#getMaxY()} 均为最后一个
+     * 实际瓦片索引；生产者随后以 {@code <=} 遍历，保持既有预缓存和修复任务的
+     * 输出不变。</p>
      */
-    private RangeApo calculateTileRange() {
+    private RangeApo calculateClosedTileRange() {
         if (taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE) {
             // 原始网格使用不同的坐标计算
             if (googleGridIs) {

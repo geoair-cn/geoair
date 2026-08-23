@@ -4,8 +4,7 @@ package cn.geoair.map.dynamic.tools.grid.dto;
  * 语义明确的瓦片索引范围。
  *
  * <p>本类型的四个边界均为闭区间，即 {@code [minX, maxX] × [minY, maxY]}。
- * 它用于新代码，避免 {@link RangeApo} 的历史上下界语义被误用。旧 API 保持不变，
- * 以兼容既有瓦片融合任务。</p>
+ * 它用于需要携带 Y 轴约定的新代码；{@link RangeApo} 也统一为相同的闭区间约定。</p>
  *
  * @author 张逢吉
  */
@@ -53,21 +52,6 @@ public final class TileRange {
     public static TileRange closed(
             int z, int minX, int maxX, int minY, int maxY, TileYAxis yAxis) {
         return new TileRange(z, minX, maxX, minY, maxY, yAxis);
-    }
-
-    /**
-     * 将历史范围转换为闭区间。
-     *
-     * <p>geo-tools 的历史 {@code tileRangeByBox/tileRangeByGeom} 使用
-     * {@code ceil} 产生上界，因此此处将最大 X/Y 视为排除上界。该转换方法只供
-     * 新增的 V2 API 使用，不能用于 fuser 自行构造的 {@link RangeApo}。</p>
-     */
-    public static TileRange fromGeoToolsExclusiveMax(RangeApo legacyRange) {
-        if (legacyRange == null) {
-            throw new IllegalArgumentException("历史瓦片范围不能为空");
-        }
-        return closed(legacyRange.getZ(), legacyRange.getMinX(), legacyRange.getMaxX() - 1,
-                legacyRange.getMinY(), legacyRange.getMaxY() - 1);
     }
 
     /** 返回闭区间覆盖的瓦片数量。 */

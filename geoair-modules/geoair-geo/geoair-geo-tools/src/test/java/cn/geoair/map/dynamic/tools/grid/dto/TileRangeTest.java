@@ -6,24 +6,28 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
 
 /** TileRange 闭区间语义测试。 */
 public class TileRangeTest {
 
     @Test
-    public void shouldConvertGeoToolsExclusiveMaximumToClosedRange() {
-        RangeApo legacyRange = new RangeApo(10, 13, 20, 22, 8);
+    public void shouldTreatRangeApoMaximumAsClosedForGeometryAndTileList() {
+        GirTileConverterOpt tileConverter = GirGeoTools.defaultInstance().getTileGrid3857Opt();
+        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(
+                tileConverter.xyzToTileBox(3, 2, 4, 3857));
 
-        TileRange range = TileRange.fromGeoToolsExclusiveMax(legacyRange);
+        RangeApo range = tileConverter.tileRangeByGeom(3, geometry);
+        Set<TileZxyApo> tiles = tileConverter.zxyListByGeom(geometry, 3857, 3);
 
-        Assert.assertEquals(10, range.getMinX());
-        Assert.assertEquals(12, range.getMaxX());
-        Assert.assertEquals(20, range.getMinY());
-        Assert.assertEquals(21, range.getMaxY());
-        Assert.assertEquals(6L, range.getTileCount());
-        Assert.assertEquals(TileYAxis.XYZ, range.getYAxis());
-        Assert.assertEquals(13, legacyRange.getMaxX());
-        Assert.assertEquals(22, legacyRange.getMaxY());
+        Assert.assertTrue(range.getMinX() <= range.getMaxX());
+        Assert.assertTrue(range.getMinY() <= range.getMaxY());
+        // 该几何在历史计算中会因边界精度补偿覆盖 3 × 3 个瓦片；语义收敛后保持不变。
+        Assert.assertEquals(9, tiles.size());
+        Assert.assertTrue(contains(tiles, range.getMinX(), range.getMinY()));
+        Assert.assertTrue(contains(tiles, range.getMaxX(), range.getMaxY()));
     }
 
     @Test
@@ -40,10 +44,6 @@ public class TileRangeTest {
                 tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMinY(), 0D);
         Assert.assertEquals(tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMaxY(),
                 tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMaxY(), 0D);
-        Assert.assertEquals(TileYAxis.TMS,
-                tileConverter.tileRangeClosedByBox(3, tileConverter.xyzToTileBox(
-                        3, 2, 0, TileYAxis.TMS, 3857), TileYAxis.TMS).getYAxis());
-
         GirTileConverterOpt separateAxisConverter = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
         Assert.assertEquals(1, separateAxisConverter.getTileLevelMetadata(0).getNumTilesHigh());
         Assert.assertEquals(0, separateAxisConverter.convertY(0, 0, TileYAxis.XYZ, TileYAxis.TMS));
@@ -69,5 +69,26 @@ public class TileRangeTest {
         Assert.assertEquals(expected.getMaxX(), fromTiles.getMaxX(), 0D);
         Assert.assertEquals(expected.getMinY(), fromTiles.getMinY(), 0D);
         Assert.assertEquals(expected.getMaxY(), fromTiles.getMaxY(), 0D);
+    }
+
+    @Test
+    public void shouldUseFourLatitudeRowsForSeparateAxisAtZoomThree() {
+        GirTileConverterOpt tileConverter = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
+
+        Assert.assertEquals(4, tileConverter.getTileLevelMetadata(3).getNumTilesHigh());
+        Assert.assertEquals(45D, tileConverter.xyzToTileBox(3, 0, 0, 4326).getMinY(), 0D);
+        Assert.assertEquals(-90D, tileConverter.xyzToTileBox(3, 0, 3, 4326).getMinY(), 0D);
+        Assert.assertEquals(-90D, tileConverter.tileYToCoordinateY(4, 3), 0D);
+        Assert.assertEquals(3, tileConverter.tileRangeByBox(
+                3, new org.locationtech.jts.geom.Envelope(-180D, 180D, -90D, 90D)).getMaxY());
+    }
+
+    private boolean contains(Set<TileZxyApo> tiles, int x, int y) {
+        for (TileZxyApo tile : tiles) {
+            if (tile.getX() == x && tile.getY() == y) {
+                return true;
+            }
+        }
+        return false;
     }
 }

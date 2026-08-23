@@ -34,4 +34,26 @@ public class GirGeoToolsTest {
             Assert.assertTrue(expected.getMessage().contains("SRID"));
         }
     }
+
+    @Test
+    public void shouldUseKnownCrsTypeChecksBeforeFactoryResolution() {
+        GirSridConvertUtils sridUtils = GirSridConvertUtils.getInstance(ToolsConfig.of());
+
+        Assert.assertTrue(sridUtils.isGeographicCRS(4326));
+        Assert.assertTrue(sridUtils.isGeographicCRS(4490));
+        Assert.assertTrue(sridUtils.isGeographicCRS(4480));
+        Assert.assertTrue(sridUtils.isGeographicCRS(4979));
+        Assert.assertTrue(sridUtils.isGeographicCRS(4269));
+        Assert.assertFalse(sridUtils.isGeographicCRS(3857));
+        Assert.assertFalse(sridUtils.isGeographicCRS(900913));
+        Assert.assertFalse(sridUtils.isGeographicCRS(32650));
+        Assert.assertFalse(sridUtils.isGeographicCRS(4491));
+
+        try {
+            sridUtils.isGeographicCRS(0);
+            Assert.fail("非法 SRID 应抛出异常");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertTrue(expected.getMessage().contains("SRID"));
+        }
+    }
 }

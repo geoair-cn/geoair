@@ -148,10 +148,12 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
         // 4. 遍历瓦片索引范围，生成TileZxyApo
         Set<String> zxySet = new LinkedHashSet<>();
-        int startX = (int) Math.floor(rangeApo.getMinX());
-        int endX = (int) Math.ceil(rangeApo.getMaxX());
-        int startY = (int) Math.floor(rangeApo.getMinY());
-        int endY = (int) Math.ceil(rangeApo.getMaxY());
+        // RangeApo 采用闭区间，尾部索引本身就是最后一个需要处理的瓦片。
+        // 不再对最大值作 ceil/减一等二次解释，保持历史瓦片列表输出不变。
+        int startX = rangeApo.getMinX();
+        int endX = rangeApo.getMaxX();
+        int startY = rangeApo.getMinY();
+        int endY = rangeApo.getMaxY();
 
         // 5. 边界过滤 & 生成ZXY对象
         int maxTileIndex = (1 << targetZ) - 1;
