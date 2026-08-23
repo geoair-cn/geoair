@@ -37,7 +37,7 @@
 
   <modules>
     <module>geoair-code-gen-module</module>
-    <module>geoair-code-gen-demo</module>
+<!--    <module>geoair-code-gen-demo</module>-->
   </modules>
 
   <scm>

@@ -40,7 +40,7 @@
     <module>geoair-file-geojson</module>
     <module>geoair-file-postgis</module>
     <module>geoair-file-shp</module>
-    <module>geoair-file-test</module>
+<!--    <module>geoair-file-test</module>-->
   </modules>
 
   <scm>

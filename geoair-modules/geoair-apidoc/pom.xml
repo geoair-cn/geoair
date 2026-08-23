@@ -39,7 +39,7 @@
     <module>geoair-knife4j-core</module>
     <module>geoair-knife4j-springfox-spring-boot-starter</module>
     <module>geoair-knife4j-springdoc-spring-boot-starter</module>
-    <module>geoair-knife4j-spring-boot-demo</module>
+<!--    <module>geoair-knife4j-spring-boot-demo</module>-->
   </modules>
 
   <scm>
