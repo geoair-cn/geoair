@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
@@ -101,7 +102,7 @@ public class TileTaskExecutor {
     public void execute() {
         try {
             // 计算瓦片范围
-            RangeApo rangeApo = calculateTileRange();
+            RangeApo rangeApo = calculateClosedTileRange();
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
@@ -167,9 +168,13 @@ public class TileTaskExecutor {
     }
 
     /**
-     * 计算瓦片范围
+     * 计算待处理的闭区间瓦片范围。
+     *
+     * <p>{@link RangeApo#getMaxX()} 和 {@link RangeApo#getMaxY()} 均为最后一个
+     * 实际瓦片索引；生产者随后以 {@code <=} 遍历，保持既有预缓存和修复任务的
+     * 输出不变。</p>
      */
-    private RangeApo calculateTileRange() {
+    private RangeApo calculateClosedTileRange() {
         if (taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE) {
             // 原始网格使用不同的坐标计算
             if (googleGridIs) {
@@ -198,15 +203,15 @@ public class TileTaskExecutor {
             if (taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE) {
                 // 原始网格使用相反的坐标计算
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 } else {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 }
             } else {
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 } else {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 }
             }
 
@@ -347,8 +352,8 @@ public class TileTaskExecutor {
     private void processPreCacheTile(int z, int x, int y, AtomicLong success, AtomicLong fail) {
         try {
             BoxReferencedEnvelope box = googleGridIs ?
-                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857) :
-                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857) :
+                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
                     box.getMaxX(), box.getMaxY());
@@ -377,8 +382,8 @@ public class TileTaskExecutor {
                                            AtomicLong fail, AtomicLong skipped) {
         try {
             BoxReferencedEnvelope box = googleGridIs ?
-                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857) :
-                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857) :
+                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
                     box.getMaxX(), box.getMaxY());

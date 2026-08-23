@@ -208,7 +208,8 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         validateXyz(maxZoom, 0, 0);
 
         Double tileWidth = Math.pow(2, maxZoom);
-        Double tileHeight = tileWidth / 2;
+        // z=0 时仍至少应存在一行瓦片，避免 TMS/XYZ 行号转换出现零行网格。
+        Double tileHeight = Math.max(1D, tileWidth / 2D);
         Double totalTiles = tileHeight * tileWidth;
 
         // 计算经度和纬度的瓦片跨度（度）

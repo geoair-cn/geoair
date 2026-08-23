@@ -15,6 +15,7 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -323,9 +324,9 @@ public class SparkTaskSerializableUtil implements Serializable {
     static int getTmsY(int zoom, int y, int x, int gridSrid) {
         int tms_y = y;
         if (gridSrid == 3857) {
-            tms_y = GirGeoTools.defaultInstance().getTileGrid3857Opt().reverseY(y, zoom);
+            tms_y = GirGeoTools.defaultInstance().getTileGrid3857Opt().convertY(zoom, y, TileYAxis.XYZ, TileYAxis.TMS);
         } else {
-            tms_y = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt().reverseY(y, zoom);
+            tms_y = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt().convertY(zoom, y, TileYAxis.XYZ, TileYAxis.TMS);
         }
         return tms_y;
     }

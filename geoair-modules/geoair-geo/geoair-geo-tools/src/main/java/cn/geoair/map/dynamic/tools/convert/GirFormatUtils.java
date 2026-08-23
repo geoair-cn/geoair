@@ -9,7 +9,10 @@ import cn.hutool.core.util.StrUtil;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.*;
@@ -28,6 +31,10 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirFormatUtils INSTANCE;
+
+    /** 按 ToolsConfig 对象身份复用格式工具，避免同配置下重复创建工具实例。 */
+    private static final Map<ToolsConfig, GirFormatUtils> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirFormatUtils>());
 
 
     ToolsConfig advToolsConfig;
@@ -55,7 +62,17 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
 
     public static GirFormatUtils getInstance(ToolsConfig advToolsConfig) {
-        return new GirFormatUtils(advToolsConfig);
+        if (advToolsConfig == null) {
+            return getInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirFormatUtils formatUtils = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (formatUtils == null) {
+                formatUtils = new GirFormatUtils(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, formatUtils);
+            }
+            return formatUtils;
+        }
     }
 
     // ==============================geojson转换功能==============================

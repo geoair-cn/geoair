@@ -3,12 +3,7 @@ package cn.geoair.map.dynamic.tools.grid.converter;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-
-import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 

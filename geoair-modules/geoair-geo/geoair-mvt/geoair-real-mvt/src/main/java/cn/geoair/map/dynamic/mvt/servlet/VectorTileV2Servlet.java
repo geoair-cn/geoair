@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
 import cn.hutool.core.util.ObjectUtil;
@@ -126,10 +127,10 @@ public class VectorTileV2Servlet extends TileCommonServlet {
             int gridSrid = params.isGeoIs() ? 4326 : 3857;
             if (params.isGeoIs()) {
                 boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt()
-                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, 4326);
+                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 4326);
             } else {
                 boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt()
-                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, 3857);
+                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 3857);
             }
             Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(boxReferencedEnvelope);
             re.put("bbox", geometry.toText());

@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.GirFuserLayerTileHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
@@ -112,9 +113,9 @@ public class FuserCacheUtils {
 
     private static int reverseY(int z, int y, Integer gridSrid) {
         if (gridSrid != null && (gridSrid == 3857 || gridSrid == 900913)) {
-            return GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            return GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
         }
-        return GirAdvTools.getTileGrid4326SeparateOpt().reverseY(y, z);
+        return GirAdvTools.getTileGrid4326SeparateOpt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
     }
 
 

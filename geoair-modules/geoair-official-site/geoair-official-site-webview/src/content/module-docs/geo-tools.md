@@ -125,6 +125,39 @@ String quadKey = GirGeoTools.defaultInstance()
     .xyzToQuadKey(845, 388, 10);
 ```
 
+### 范围、Y 轴与 4326 网格约定
+
+在 GeoAir 中，`tileRangeByBox(...)` 与 `tileRangeByGeom(...)` 返回的
+`RangeApo` 统一采用尾部闭区间：
+
+```text
+[minX, maxX] × [minY, maxY]
+```
+
+也就是说，`maxX`、`maxY` 都是最后一个要处理的瓦片索引，遍历时直接使用
+`<=`，不要再对最大值减一。这与 `zxyListByGeom(...)`、预缓存和瓦片融合任务使用的
+范围一致。
+
+默认瓦片接口保持 Google/XYZ（左上角原点）语义；需要和 TMS（左下角原点）交互时，
+请明确传入 `TileYAxis`，而不是在业务代码中手写 `2^z - 1 - y`：
+
+```java
+GirTileConverterOpt tileOpt = GirGeoTools.defaultInstance().getTileGrid3857Opt();
+
+int tmsY = tileOpt.convertY(10, xyzY, TileYAxis.XYZ, TileYAxis.TMS);
+BoxReferencedEnvelope box = tileOpt.xyzToTileBox(10, x, tmsY, TileYAxis.TMS, 4326);
+```
+
+`getTileGrid4326SeparateOpt()` 表示非等轴 4326 网格：经度列数为 `2^z`，纬度行数为
+`max(1, 2^(z-1))`。例如 z=3 时是 **8 列 × 4 行**，每行覆盖 45° 纬度并完整覆盖
+`[-90°, 90°]`。这适合需要保持历史 4326 非等轴瓦片定义的项目。
+
+### CRS 使用建议
+
+`GirSridConvertOpt` 对常见 CRS 提供快速类型判断，并会在无法解析 CRS 时显式抛错；
+不要把未知 SRID 默认为地理坐标系。常见的 4326、4490、4480、4979 等地理 CRS 会被
+直接识别，3857、常见 UTM 与 CGCS2000 高斯-克吕格分带会识别为投影 CRS。
+
 ## 阅读建议
 
 建议顺序：

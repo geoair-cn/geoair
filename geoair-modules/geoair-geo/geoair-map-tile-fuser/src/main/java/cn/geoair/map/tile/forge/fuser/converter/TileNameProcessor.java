@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.converter;
 
 
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 
 import java.util.function.BiFunction;
@@ -29,7 +30,7 @@ public interface TileNameProcessor extends BiFunction<String, byte[], MbtilesInf
             int y = Integer.parseInt(pathArr[1]);
             String yFile = pathArr[2];
             int x = Integer.parseInt(yFile.replaceAll("\\.(png|jpg)$", ""));
-            int reverseY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            int reverseY = GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
             return MbtilesInfo.of()
                     .setX(x)
                     .setZoomLevel(z)
@@ -51,7 +52,7 @@ public interface TileNameProcessor extends BiFunction<String, byte[], MbtilesInf
             int z = Integer.parseInt(pathArr[0]);
             int x = Integer.parseInt(pathArr[1]);
             int y = Integer.parseInt(pathArr[2].replaceAll("\\.(png|jpg)$", ""));
-            int reverseY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            int reverseY = GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
             return MbtilesInfo.of()
                     .setX(x)
                     .setZoomLevel(z)

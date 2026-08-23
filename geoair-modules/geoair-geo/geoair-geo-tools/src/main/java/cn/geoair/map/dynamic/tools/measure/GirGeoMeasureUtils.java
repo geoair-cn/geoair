@@ -7,7 +7,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -25,19 +27,32 @@ import org.locationtech.jts.operation.distance.DistanceOp;
 public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     // 单例实例
     private static volatile GirGeoMeasureUtils INSTANCE;
+    /** 按 ToolsConfig 对象身份复用测量工具及其单位换算缓存。 */
+    private static final Map<ToolsConfig, GirGeoMeasureUtils> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirGeoMeasureUtils>());
     ToolsConfig advToolsConfig;
-    private GirFormatUtils formatOpt = GirFormatUtils.getInstance();
-    private GirSridConvertUtils sridConvert = GirSridConvertUtils.getInstance();
+    private final GirFormatUtils formatOpt;
+    private final GirSridConvertUtils sridConvert;
 
     public GirGeoMeasureUtils(ToolsConfig advToolsConfig) {
-        this.advToolsConfig = advToolsConfig;
+        this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
         initUnitFactors();
-        this.formatOpt = GirFormatUtils.getInstance(advToolsConfig);
-        this.sridConvert = GirSridConvertUtils.getInstance(advToolsConfig);
+        this.formatOpt = GirFormatUtils.getInstance(this.advToolsConfig);
+        this.sridConvert = GirSridConvertUtils.getInstance(this.advToolsConfig);
     }
 
     public static GirGeoMeasureUtils getInstance(ToolsConfig advToolsConfig) {
-        return new GirGeoMeasureUtils(advToolsConfig);
+        if (advToolsConfig == null) {
+            return getInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirGeoMeasureUtils measureUtils = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (measureUtils == null) {
+                measureUtils = new GirGeoMeasureUtils(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, measureUtils);
+            }
+            return measureUtils;
+        }
     }
 
 

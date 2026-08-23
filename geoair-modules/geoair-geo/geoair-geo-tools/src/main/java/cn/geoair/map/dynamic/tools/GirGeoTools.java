@@ -22,6 +22,10 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
 import lombok.Getter;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 /**
  * @author ：张俊
  * @date ：Created in 2026/4/24 15:57
@@ -32,19 +36,40 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     private static volatile GirGeoTools INSTANCE;
 
+    /** 按 ToolsConfig 对象身份缓存的工具入口，避免同一配置重复创建 CRS 缓存等重资源。 */
+    private static final Map<ToolsConfig, GirGeoTools> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirGeoTools>());
+
     protected ToolsConfig advToolsConfig;
+
+    private final GirGeoFormatOpt formatOpt;
+    private final GirGeoMeasureOpt measureOpt;
+    private final GirSridConvertOpt sridOpt;
 
 
     public GirGeoTools(ToolsConfig advToolsConfig) {
-        this.advToolsConfig = advToolsConfig;
+        this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
+        this.formatOpt = GirFormatUtils.getInstance(this.advToolsConfig);
+        this.sridOpt = GirSridConvertUtils.getInstance(this.advToolsConfig);
+        this.measureOpt = GirGeoMeasureUtils.getInstance(this.advToolsConfig);
     }
 
     public GirGeoTools() {
-        this.advToolsConfig = new ToolsConfig();
+        this(new ToolsConfig());
     }
 
     public static GirGeoTools getInstance(ToolsConfig advToolsConfig) {
-        return new GirGeoTools(advToolsConfig);
+        if (advToolsConfig == null) {
+            return defaultInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirGeoTools tools = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (tools == null) {
+                tools = new GirGeoTools(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, tools);
+            }
+            return tools;
+        }
     }
 
     /**
@@ -81,7 +106,7 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     @Override
     public GirGeoFormatOpt getFormatOpt() {
-        return GirFormatUtils.getInstance(advToolsConfig);
+        return formatOpt;
     }
 
     @Override
@@ -111,7 +136,7 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     @Override
     public GirGeoMeasureOpt getMeasureOpt() {
-        return GirGeoMeasureUtils.getInstance(advToolsConfig);
+        return measureOpt;
     }
 
     @Override
@@ -121,7 +146,7 @@ public class GirGeoTools implements GirGeoToolsInterface {
 
     @Override
     public GirSridConvertOpt getSridOpt() {
-        return GirSridConvertUtils.getInstance(advToolsConfig);
+        return sridOpt;
     }
 
     @Override

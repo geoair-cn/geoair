@@ -7,6 +7,8 @@ import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileRange;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.hutool.core.util.StrUtil;
@@ -23,15 +25,16 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     protected static final double POINT_OFFSET = 0.0001; // 点几何缓冲偏移
 
-    protected GirSridConvertOpt sridConvertOpt = GirGeoTools.defaultInstance().getSridOpt();
-    protected GirGeoFormatOpt formatOpt = GirGeoTools.defaultInstance().getFormatOpt();
+    protected GirSridConvertOpt sridConvertOpt;
+    protected GirGeoFormatOpt formatOpt;
 
     ToolsConfig advToolsConfig;
 
     public TileConverterCommon(ToolsConfig advToolsConfig) {
-        this.advToolsConfig = advToolsConfig;
-        sridConvertOpt = GirGeoTools.getInstance(advToolsConfig).getSridOpt();
-        formatOpt = GirGeoTools.getInstance(advToolsConfig).getFormatOpt();
+        this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
+        GirGeoTools geoTools = GirGeoTools.getInstance(this.advToolsConfig);
+        sridConvertOpt = geoTools.getSridOpt();
+        formatOpt = geoTools.getFormatOpt();
     }
 
 
@@ -63,19 +66,6 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         if (y < 0) {
             throw new IllegalArgumentException("瓦片Y索引不能为负数");
         }
-    }
-
-    /**
-     * 等轴场景的时候可以直接翻转
-     *
-     * @param y Y索引
-     * @param z 缩放级别
-     * @return
-     */
-    public int reverseY(int y, int z) {
-        validateXyz(z, 0, y);
-        int maxYIndex = (1 << z) - 1;
-        return maxYIndex - y;
     }
 
     public RangeApo tileRangeByGeom(int z, Geometry geometry) {
@@ -158,10 +148,12 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
         // 4. 遍历瓦片索引范围，生成TileZxyApo
         Set<String> zxySet = new LinkedHashSet<>();
-        int startX = (int) Math.floor(rangeApo.getMinX());
-        int endX = (int) Math.ceil(rangeApo.getMaxX());
-        int startY = (int) Math.floor(rangeApo.getMinY());
-        int endY = (int) Math.ceil(rangeApo.getMaxY());
+        // RangeApo 采用闭区间，尾部索引本身就是最后一个需要处理的瓦片。
+        // 不再对最大值作 ceil/减一等二次解释，保持历史瓦片列表输出不变。
+        int startX = rangeApo.getMinX();
+        int endX = rangeApo.getMaxX();
+        int startY = rangeApo.getMinY();
+        int endY = rangeApo.getMaxY();
 
         // 5. 边界过滤 & 生成ZXY对象
         int maxTileIndex = (1 << targetZ) - 1;
@@ -187,19 +179,21 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
     }
 
     @Override
-    public Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, List<Integer> targetZs) {
+    public Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, List<Integer> targetZs, TileYAxis yAxis) {
         if (targetZs == null || targetZs.isEmpty()) {
             throw new IllegalArgumentException("目标Z级别列表不能为空");
         }
         Set<TileZxyApo> zxySet = new LinkedHashSet<>();
         for (int z : targetZs) {
-            zxySet.addAll(zxyListByBox(envelope, srcSrid, z));
+            zxySet.addAll(zxyListByBox(envelope, srcSrid, z, yAxis));
         }
         return zxySet;
     }
 
     @Override
-    public Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int minZ, int maxZ) {
+    public Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, int minZ, int maxZ, TileYAxis yAxis) {
         if (minZ < 0 || maxZ < 0 || minZ > maxZ) {
             throw new IllegalArgumentException("层级范围不合法：minZ=" + minZ + ", maxZ=" + maxZ);
         }
@@ -207,14 +201,16 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         for (int z = minZ; z <= maxZ; z++) {
             targetZs.add(z);
         }
-        return zxyListByBox(envelope, srcSrid, targetZs);
+        return zxyListByBox(envelope, srcSrid, targetZs, yAxis);
     }
 
     @Override
-    public BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList, int targetSrid) {
+    public BoxReferencedEnvelope boundsFromTileZxyApos(
+            Set<TileZxyApo> zxyList, TileYAxis yAxis, int targetSrid) {
         if (zxyList == null || zxyList.isEmpty()) {
             throw new IllegalArgumentException("zxyList 不能为空");
         }
+        zxyList = toXyzTiles(zxyList, yAxis);
 
         // 检查并获取统一的 zoom
         int zoom = -1;
@@ -236,7 +232,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
             maxY = Math.max(maxY, tile.getY());
         }
 
-        return boundsFromTileRange(minX, maxX, minY, maxY, zoom, targetSrid);
+        return boundsFromTileRange(TileRange.closed(
+                zoom, (int) minX, (int) maxX, (int) minY, (int) maxY, TileYAxis.XYZ), targetSrid);
     }
 
 
@@ -263,10 +260,11 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
 
     @Override
-    public Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ) {
+    public Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, int targetZ, TileYAxis yAxis) {
 
         Geometry geometry = sridConvertOpt.convertToGeom(envelope);
 
-        return zxyListByGeom(geometry, srcSrid, targetZ);
+        return fromXyzTiles(zxyListByGeom(geometry, srcSrid, targetZ), yAxis);
     }
 }

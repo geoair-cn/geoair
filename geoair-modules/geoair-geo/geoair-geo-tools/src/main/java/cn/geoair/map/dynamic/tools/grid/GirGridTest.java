@@ -5,6 +5,7 @@ import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import java.util.List;
 import java.util.Set;
@@ -26,16 +27,16 @@ public class GirGridTest {
 
     private static void test(
             int level, int x, int y, GirTileConverterOpt tileConverterOpt, int srid) {
-        BoxReferencedEnvelope referencedEnvelope = tileConverterOpt.xyzToTileBox(level, x, y, srid);
+        BoxReferencedEnvelope referencedEnvelope = tileConverterOpt.xyzToTileBox(level, x, y, TileYAxis.XYZ, srid);
         Gir.log.info("tile:{}", referencedEnvelope);
         RangeApo envelope = tileConverterOpt.tileRangeByBox(level, referencedEnvelope);
         Gir.log.info("envelope:{}", envelope);
         double v = tileConverterOpt.tileXToCoordinateX(x, level);
         Gir.log.info("tileXToLon:{}", String.valueOf(v));
-        double y1 = tileConverterOpt.tileYToCoordinateY(y, level);
+        double y1 = tileConverterOpt.tileYToCoordinateY(y, level, TileYAxis.XYZ);
         Gir.log.info("tileYToLat:{}", String.valueOf(y1));
         Set<TileZxyApo> tileZxyApos =
-                tileConverterOpt.zxyListByBox(referencedEnvelope, srid, level);
+                tileConverterOpt.zxyListByBox(referencedEnvelope, srid, level, TileYAxis.XYZ);
         Gir.log.info("zxyListByBox:{}", tileZxyApos);
         Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(referencedEnvelope, srid, srid);
         Gir.log.info("geometry:{}", geometry);

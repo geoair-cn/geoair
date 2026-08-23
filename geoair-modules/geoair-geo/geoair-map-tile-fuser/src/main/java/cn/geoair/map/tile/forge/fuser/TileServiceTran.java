@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
@@ -257,8 +258,8 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
         int requestGridSrid = googleTo4326 ? 4326 : 3857;
         try {
             BoxReferencedEnvelope box = googleTo4326
-                    ? GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, DEFAULT_SRID)
-                    : GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                    ? GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, DEFAULT_SRID)
+                    : GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
             return buildTileResponse(layerName, z, x, y, buildBoundingBox(box), outputFormat,
                     deleteCache, requestGridSrid);
         } catch (Exception e) {
