@@ -85,7 +85,11 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
 
 
-        response.setContentLengthLong(tileResponse.getContentLength());
+        Long contentLength = tileResponse.getContentLength();
+        // 输入流响应在未知长度时不应伪造 Content-Length，让 Servlet 容器使用流式传输。
+        if (contentLength != null && contentLength >= 0) {
+            response.setContentLengthLong(contentLength);
+        }
         response.setStatus(GutilObject.isNotEmpty(httpCode) ? httpCode : HttpServletResponse.SC_OK);
 
         // 如果有自定义缓存头，额外设置

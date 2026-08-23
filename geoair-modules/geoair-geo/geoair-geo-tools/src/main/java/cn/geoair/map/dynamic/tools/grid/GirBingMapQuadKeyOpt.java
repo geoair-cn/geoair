@@ -8,7 +8,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-/** 必应地图QuadKey操作接口 */
+/**
+ * Bing Maps QuadKey 的生成、解析与层级聚合契约。
+ *
+ * <p>QuadKey 的 Y 行号采用 Bing/Google/XYZ 顶部原点约定，并非 TMS 行号。</p>
+ *
+ * @author 张逢吉
+ */
 public interface GirBingMapQuadKeyOpt {
 
     /**
@@ -149,11 +155,12 @@ public interface GirBingMapQuadKeyOpt {
     }
 
     /**
-     * 获取QuadKey对应的缩放级别Z
+     * 将多个 QuadKey 截断到指定层级，并以列表形式返回去重后的父级 QuadKey。
      *
-     * @param quadKeys 四叉键字符串
-     * @return 缩放级别Z
-     * @throws IllegalArgumentException QuadKey不合法时抛出
+     * @param targetLevel 要截断到的层级
+     * @param quadKeys    待聚合的 QuadKey
+     * @return 按输入出现顺序去重的父级 QuadKey 列表
+     * @throws IllegalArgumentException 入参不合法时抛出
      */
     default List<String> getCommonParentQuadKeyList(int targetLevel, String... quadKeys) {
         String[] commonParentQuadKey = getCommonParentQuadKey(targetLevel, quadKeys);
@@ -161,11 +168,12 @@ public interface GirBingMapQuadKeyOpt {
     }
 
     /**
-     * 获取QuadKey对应的缩放级别Z
+     * 将集合中的 QuadKey 截断到指定层级，并返回去重后的父级 QuadKey 数组。
      *
-     * @param quadKeyList 四叉键字符串
-     * @return 缩放级别Z
-     * @throws IllegalArgumentException QuadKey不合法时抛出
+     * @param targetLevel 要截断到的层级
+     * @param quadKeyList 待聚合的 QuadKey 集合
+     * @return 父级 QuadKey 数组
+     * @throws IllegalArgumentException 入参不合法时抛出
      */
     default String[] getCommonParentQuadKey(int targetLevel, Collection<String> quadKeyList) {
         return getCommonParentQuadKey(targetLevel, quadKeyList.toArray(new String[0]));

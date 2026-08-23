@@ -4,7 +4,11 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 
 /**
- * 坐标转换核心接口 定义WGS84/GCJ02/BD09等坐标系互转、平面/地理坐标转换规范 支持JTS Geometry对象、批量转换、点线面全类型转换
+ * 坐标转换核心接口，定义 WGS84、GCJ02、BD09 与 Web Mercator 的互转。
+ *
+ * <p>所有坐标数组均按 {@code [x, y]} 排列；地理坐标即 {@code [longitude, latitude]}。
+ * WGS84 与 GCJ02 的转换仅在内置中国范围经验框内施加偏移，范围外坐标保持不变。
+ * Web Mercator 方法使用球形 Web Mercator 公式，而非通用的任意墨卡托投影。</p>
  *
  * @author 张逢吉
  * @date 2024/12/05
@@ -66,7 +70,7 @@ public interface GirCoordinateConvertOpt {
     double[] bd09ToWgs84(double lng, double lat);
 
     /**
-     * 墨卡托转WGS84（墨卡托坐标入参）
+     * Web Mercator 转 WGS84（Web Mercator 米制坐标入参）。
      *
      * @param mercatorX 墨卡托X坐标
      * @param mercatorY 墨卡托Y坐标
@@ -75,7 +79,7 @@ public interface GirCoordinateConvertOpt {
     double[] mercatorToWgs84(double mercatorX, double mercatorY);
 
     /**
-     * WGS84转墨卡托（经纬度入参）
+     * WGS84 转 Web Mercator（经纬度入参）。
      *
      * @param lng WGS84经度
      * @param lat WGS84纬度
@@ -84,9 +88,9 @@ public interface GirCoordinateConvertOpt {
     double[] wgs84ToMercator(double lng, double lat);
 
     /**
-     * 度分秒转十进制度（DMS转DD）
+     * 度分秒转十进制度（DMS 转 DD）。
      *
-     * @param dmsStr 度分秒格式字符串 如 "123°45′67″"
+     * @param dmsStr 同时包含经度和纬度的字符串，例如 {@code 116°23′45.6″E, 39°54′32.1″N}
      * @return 十进制度坐标数组 [lng,lat]
      */
     double[] dmsToDd(String dmsStr);
@@ -96,7 +100,7 @@ public interface GirCoordinateConvertOpt {
      *
      * @param lng 经度
      * @param lat 纬度
-     * @return 度分秒格式字符串 如 "123°45′67″"
+     * @return 同时包含经度和纬度的度分秒字符串，例如 {@code 116°23′45.6″E, 39°54′32.1″N}
      */
     String ddToDms(double lng, double lat);
 
@@ -176,7 +180,7 @@ public interface GirCoordinateConvertOpt {
     Point mercatorToWgs84(Point point);
 
     /**
-     * WGS84转墨卡托（Point对象入参）
+     * WGS84 转 Web Mercator（Point 对象入参）。
      *
      * @param point WGS84坐标Point对象
      * @return 转换后的墨卡托Point对象
@@ -229,7 +233,7 @@ public interface GirCoordinateConvertOpt {
     double[][] wgs84ToMercatorBatch(double[][] coords, boolean ifExceptionReturnNull);
 
     /**
-     * 墨卡托转WGS84（批量坐标数组）
+     * Web Mercator 转 WGS84（批量坐标数组）。
      *
      * @param coords 墨卡托坐标二维数组 [[x1,y1],[x2,y2]...]
      * @param ifExceptionReturnNull 异常时是否返回null
@@ -270,7 +274,7 @@ public interface GirCoordinateConvertOpt {
     Geometry bd09ToWgs84Geometry(Geometry geometry);
 
     /**
-     * WGS84转墨卡托（任意Geometry对象）
+     * WGS84 转 Web Mercator（任意 Geometry 对象）。
      *
      * @param geometry WGS84坐标的Geometry对象
      * @return 转换后的墨卡托坐标Geometry对象
@@ -278,7 +282,7 @@ public interface GirCoordinateConvertOpt {
     Geometry wgs84ToMercatorGeometry(Geometry geometry);
 
     /**
-     * 墨卡托转WGS84（任意Geometry对象）
+     * Web Mercator 转 WGS84（任意 Geometry 对象）。
      *
      * @param geometry 墨卡托坐标的Geometry对象
      * @return 转换后的WGS84坐标Geometry对象

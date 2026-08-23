@@ -22,7 +22,10 @@ import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 
 /**
- * 空间类型转换工具类（单例模式） 实现GeoConvertService接口，提供所有空间类型互转能力
+ * 空间格式转换工具的 {@link GirGeoFormatOpt} 实现。
+ *
+ * <p>支持 GeoJSON、WKT、WKB、JTS Geometry 及运行期可识别的 PostGIS Geometry 对象互转。
+ * 实例按 {@link ToolsConfig} 对象身份复用；默认单例入口仅用于兼容旧代码。</p>
  *
  * @author 张逢吉
  * @date 2024/10/24 15:29
@@ -37,16 +40,23 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirFormatUtils>());
 
 
-    ToolsConfig advToolsConfig;
+    /** 当前实例使用的格式组件配置。 */
+    private final ToolsConfig advToolsConfig;
 
+    /**
+     * 使用指定配置创建格式转换器。
+     *
+     * @param advToolsConfig 格式化配置，不能为空
+     */
     public GirFormatUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
     }
 
     /**
-     * 获取单例实例（双重校验锁）
+     * 获取默认配置的遗留单例。
      *
-     * @return 单例对象
+     * @deprecated 请使用 {@link #getInstance(ToolsConfig)}，以显式绑定格式化配置。
+     * @return 默认格式转换器
      */
     @Deprecated
     public static GirFormatUtils getInstance() {
@@ -60,7 +70,12 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         return INSTANCE;
     }
 
-
+    /**
+     * 获取与配置对象绑定的格式转换器。
+     *
+     * @param advToolsConfig 格式化配置；为 {@code null} 时返回默认单例
+     * @return 格式转换器
+     */
     public static GirFormatUtils getInstance(ToolsConfig advToolsConfig) {
         if (advToolsConfig == null) {
             return getInstance();

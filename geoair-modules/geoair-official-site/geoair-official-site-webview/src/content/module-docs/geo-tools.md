@@ -63,17 +63,33 @@ String wkt = GirGeoTools.defaultInstance()
 - 面积计算
 - 长度计算
 - 点点 / 点线 / 点面 / 线线距离
-- UTM 投影精确计算
+- Web Mercator 快速测量与 UTM 局部测量
 - 单位换算
 
 ```java
-double area = GirGeoTools.defaultInstance()
-    .getMeasureOpt()
-    .calculateArea(polygon, 4326, GirGeoMeasureOpt.UNIT_SQUARE_KILOMETER);
+GirGeoMeasureOpt measureOpt = GirGeoTools.defaultInstance().getMeasureOpt();
 
-double distance = GirGeoTools.defaultInstance()
-    .getMeasureOpt()
-    .calculatePointToPointDistance(point1, point2, 4326, GirGeoMeasureOpt.UNIT_METER);
+// 面向瓦片地图和快速展示：明确使用 Web Mercator，纬度越高形变越明显。
+double mapArea = measureOpt.calculateArea(
+    polygon, 4326, MeasureUnitEnum.SQUARE_KILOMETER, MeasureMethodEnum.WEB_MERCATOR);
+
+// 范围较小且基本位于同一 UTM 投影带：使用局部 UTM 平面测量。
+double localArea = measureOpt.calculateArea(
+    polygon, 4326, MeasureUnitEnum.SQUARE_KILOMETER, MeasureMethodEnum.UTM);
+
+// 两点距离使用大地线；其余方式也可作为 method 传入。
+double distance = measureOpt.calculatePointToPointDistance(
+    point1, point2, 4326, MeasureUnitEnum.METER, MeasureMethodEnum.GEODETIC);
+```
+
+测量方式统一由 `MeasureMethodEnum` 输入：`WEB_MERCATOR` 用于快速展示，`UTM` 用于局部平面测量，
+`GEODETIC` 用于两点和线、面边界的大地线长度。单位由 `MeasureUnitEnum` 输入，长度与面积量纲不能混用。
+测量接口只接收 JTS `Geometry` / `Point`；WKT 请先用 `GirFormatUtils` 转换，坐标数组请先构造为 JTS 几何对象。
+UTM 以几何中心选择一个投影带，不适合跨带、跨半球、极区或测绘级结算；大地线面积暂未提供，传入时会显式报错。
+
+```java
+double distanceInKilometers = measureOpt.calculatePointToPointDistance(
+    point1, point2, 4326, MeasureUnitEnum.KILOMETER, MeasureMethodEnum.GEODETIC);
 ```
 
 ## 几何合并
@@ -151,6 +167,34 @@ BoxReferencedEnvelope box = tileOpt.xyzToTileBox(10, x, tmsY, TileYAxis.TMS, 432
 `getTileGrid4326SeparateOpt()` 表示非等轴 4326 网格：经度列数为 `2^z`，纬度行数为
 `max(1, 2^(z-1))`。例如 z=3 时是 **8 列 × 4 行**，每行覆盖 45° 纬度并完整覆盖
 `[-90°, 90°]`。这适合需要保持历史 4326 非等轴瓦片定义的项目。
+
+Separate 与 Equal 两套 4326 网格当前按同一份实际 Y 行数工作，z=3 都只有 4 行。因此
+`convertSeparateAxisYToEqualAxisY(...)` 和反向方法会按当前层级元数据校验 `y`，并在
+`0..3` 间一一对应；不能再把 `2^z` 当作 Separate 的 Y 行数。保留的 `roundingType`
+参数只是为了兼容旧调用，不参与当前映射：
+
+```java
+GirTileConverterOpt separate = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
+
+int equalY = separate.convertSeparateAxisYToEqualAxisY(
+    3, 3, AbstractWgs84TileConverter.RoundingType.FLOOR);
+// equalY == 3；Y=4 会因越过 z=3 的最后一行而抛出 IllegalArgumentException。
+```
+
+## TileResponse 与流式瓦片输出
+
+瓦片服务可以先把读取逻辑收敛为 `TileResponse`，再交给 Servlet 输出。字节数据用
+`TileResponseByByte`；来源是文件、HTTP 或对象存储流时使用 `TileResponseByInputStream`。
+
+```java
+TileResponse response = TileResponseByInputStream.success(inputStream, GirImageMime.png, contentLength);
+GirTileResponseUtil.buildFromTileResponse(response, servletResponse);
+```
+
+如果上游无法提供可靠的 `contentLength`，使用不带长度的 `success(inputStream, mimeType)`。
+GeoAir 不会再以 `InputStream.available()` 猜测总长度，也不会写入错误的 `Content-Length`；
+Servlet 容器会按流式响应处理。原始输入流只可消费一次；需要重复读取或进行图像增强时，
+调用 `toByteArrays()` 将其缓存为字节数据。
 
 ### CRS 使用建议
 

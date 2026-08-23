@@ -19,8 +19,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author ：张逢吉
- * @date ：Created in 2024/3/29 12:30 @description： TODO
+ * Servlet 请求地址、响应输出和响应头读取工具。
+ *
+ * <p>地址推断方法依赖当前线程中的 Servlet 请求及部分 Spring 配置；它们不解析
+ * {@code X-Forwarded-Proto}，返回协议固定为 {@code http}，部署在 HTTPS 反向代理后时
+ * 不应将结果直接视为外部访问地址。</p>
+ *
+ * @author 张逢吉
  */
 public class GirServletUtil extends ServletUtil {
 
@@ -39,9 +44,9 @@ public class GirServletUtil extends ServletUtil {
     }
 
     /**
-     * 获取自己这台服务器的地址，通过httpRequest
+     * 从当前请求推导服务根路径，并追加 Spring 配置的 context path。
      *
-     * @return
+     * @return 形如 {@code http://host:port/context-path} 的地址
      */
     public static String getServerPathByRequest() {
         String property = Gir.property.getProperty("server.servlet.context-path");
@@ -55,9 +60,11 @@ public class GirServletUtil extends ServletUtil {
     }
 
     /**
-     * 获取自己这台服务器的地址   类似与 http://wuhan.zzzz.com.cn:9196
+     * 从当前请求的 {@code Host} 头推导 HTTP 地址。
      *
-     * @return
+     * <p>协议固定为 {@code http}；仅当 Host 未带端口且请求头中存在有效代理端口时才补充端口。</p>
+     *
+     * @return 形如 {@code http://host:port} 的地址
      */
     public static String getHttpPathByRequest() {
         HttpServletRequest request = GirHttpServletHelper.getRequest();
@@ -74,10 +81,10 @@ public class GirServletUtil extends ServletUtil {
     }
 
     /**
-     * 获取服务的真实端口
+     * 从已支持的代理端口请求头中获取原始端口。
      *
-     * @param request
-     * @return
+     * @param request 当前 HTTP 请求
+     * @return 第一个可解析的 {@code x-forwarded-port} 或 {@code X-Real-PORT}；没有则返回 {@code null}
      */
     public static Integer getOriginPort(HttpServletRequest request) {
         // 可能的代理端口头信息，按优先级排序
@@ -102,9 +109,9 @@ public class GirServletUtil extends ServletUtil {
 
 
     /**
-     * 获取自己这台服务器的地址，通过httpRequest
+     * 收集当前请求和服务地址的诊断信息。
      *
-     * @return
+     * @return 包含 Host、端口、context path、request URI 等信息的映射
      */
     public static Map<String, String> getServerInfoByRequest() {
         HttpServletRequest request = GirHttpServletHelper.getRequest();
@@ -122,9 +129,12 @@ public class GirServletUtil extends ServletUtil {
     }
 
     /**
-     * 获取自己这台服务器的地址，通过spring配置文件
+     * 根据 Spring 配置和本机 IP 构造服务地址。
      *
-     * @return
+     * <p>不读取当前请求，也不解析反向代理配置；若 {@code server.port} 未设置，结果会包含
+     * 字符串 {@code null}。</p>
+     *
+     * @return 形如 {@code http://本机IP:端口/context-path} 的地址
      */
     public static String getServerPathBySpring() {
         String localhostStr = NetUtil.getLocalhostStr();
@@ -138,6 +148,16 @@ public class GirServletUtil extends ServletUtil {
         return "http://" + localhostStr + ":" + port + "/" + property;
     }
 
+    /**
+     * 将字节数组写入 HTTP 响应并关闭输出流。
+     *
+     * <p>方法会设置 Content-Type 和 Content-Length；写入异常会被吞掉，调用方无法从返回值
+     * 感知失败。</p>
+     *
+     * @param response    HTTP 响应
+     * @param re          输出字节
+     * @param contentType 响应 Content-Type
+     */
     public static void toResponse(HttpServletResponse response, byte[] re, String contentType) {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
@@ -154,6 +174,15 @@ public class GirServletUtil extends ServletUtil {
         }
     }
 
+    /**
+     * 将输入流复制到 HTTP 响应并关闭输入、输出流。
+     *
+     * <p>不会设置 Content-Length；写入异常会被吞掉。</p>
+     *
+     * @param response    HTTP 响应
+     * @param inputStream 待输出的输入流，调用后会被关闭
+     * @param contentType 响应 Content-Type
+     */
     public static void toResponse(HttpServletResponse response, InputStream inputStream, String contentType) {
         ServletOutputStream outputStream = null;
         response.setContentType(contentType);
@@ -167,7 +196,14 @@ public class GirServletUtil extends ServletUtil {
         }
     }
 
-
+    /**
+     * 将字节数组以指定 HTTP 状态写入响应并关闭输出流。
+     *
+     * @param response    HTTP 响应
+     * @param re          输出字节
+     * @param contentType 响应 Content-Type
+     * @param code        HTTP 状态码
+     */
     public static void toResponse(HttpServletResponse response, byte[] re, String contentType, int code) {
         ServletOutputStream outputStream = null;
         ByteArrayInputStream byteArrayInputStream = null;
@@ -185,6 +221,14 @@ public class GirServletUtil extends ServletUtil {
         }
     }
 
+    /**
+     * 读取当前响应已设置的首个 Header 值。
+     *
+     * <p>对允许重复的 Header，只保留 {@link HttpServletResponse#getHeader(String)} 返回的单个值。</p>
+     *
+     * @param response HTTP 响应
+     * @return Header 名称到值的映射；没有 Header 时返回空映射
+     */
     public static Map<String, String> getResponseHeaderMap(HttpServletResponse response) {
         Map<String, String> headers = new HashMap<>();
         Collection<String> headerNames = response.getHeaderNames();

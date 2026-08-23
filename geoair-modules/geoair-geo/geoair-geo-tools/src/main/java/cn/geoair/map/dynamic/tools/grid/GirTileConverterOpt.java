@@ -16,7 +16,12 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 /**
- * 瓦片转换核心接口 定义XYZ瓦片与地理范围的互转规范，支持不同坐标系扩展
+ * 瓦片坐标、地理范围和瓦片集合之间的转换契约。
+ *
+ * <p>不带 {@link TileYAxis} 参数的历史方法一律按 Google/XYZ 顶部原点解释 Y 值。
+ * 使用 TMS 时必须调用带 {@code TileYAxis} 参数的扩展方法，不能仅靠变量名推断。</p>
+ *
+ * @author 张逢吉
  */
 public interface GirTileConverterOpt {
 
@@ -152,30 +157,34 @@ public interface GirTileConverterOpt {
     }
 
     /**
-     * 非等轴Y索引转换为等轴Y索引（4326坐标系）
+     * 将当前 Separate 网格的 XYZ Y 行号转换为 Equal 网格行号。
      *
-     * <p>核心逻辑： 1. 非等轴Y索引 → 对应纬度坐标（基于非等轴跨度：180/2^z） 2. 纬度坐标 → 等轴Y索引（基于等轴跨度：360/2^z）
+     * <p>当前两种 EPSG:4326 网格在同层级使用相同的实际 Y 行数，z=3 均为 4 行，
+     * 因此是一一对应映射。方法会按照当前网格元数据校验行号；{@code roundingType} 为
+     * 保持历史签名而保留，当前不会参与计算。XYZ/TMS 的方向转换应使用
+     * {@link #convertY(int, int, TileYAxis, TileYAxis)}。</p>
      *
-     * <p>注意：转换后的等轴Y索引可能是浮点数，需根据业务需求取整（默认向下取整）
-     *
-     * @param separateAxisY 非等轴Y索引（XYZ规范，原点左上角）
-     * @param zoom          缩放级别（0-30）
-     * @param roundingType  取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
-     * @return 等轴Y索引（XYZ规范，原点左上角）
-     * @throws IllegalArgumentException 入参不合法时抛出
+     * @param separateAxisY Separate 网格的 XYZ Y 行号
+     * @param zoom          缩放级别（0～22）
+     * @param roundingType  兼容参数；当前映射中不参与计算
+     * @return 对应的 Equal 网格 XYZ Y 行号
+     * @throws IllegalArgumentException 行号或层级不合法时抛出
      */
     int convertSeparateAxisYToEqualAxisY(
             int separateAxisY, int zoom, AbstractWgs84TileConverter.RoundingType roundingType);
 
     /**
-     * 反向转换：等轴Y索引 → 非等轴Y索引
+     * 将当前 Equal 网格的 XYZ Y 行号转换为 Separate 网格行号。
      *
-     * <p>与convertSeparateAxisYToEqualAxisY互为逆运算
+     * <p>与 {@link #convertSeparateAxisYToEqualAxisY(int, int,
+     * AbstractWgs84TileConverter.RoundingType)} 严格互逆；当前网格不存在小数行号，
+     * 因此 {@code roundingType} 仅为兼容原方法签名而保留。</p>
      *
-     * @param equalAxisY   等轴Y索引（XYZ规范）
-     * @param zoom         缩放级别（0-30）
-     * @param roundingType 取整方式
-     * @return 非等轴Y索引（XYZ规范）
+     * @param equalAxisY   Equal 网格的 XYZ Y 行号
+     * @param zoom         缩放级别（0～22）
+     * @param roundingType 兼容参数；当前映射中不参与计算
+     * @return 对应的 Separate 网格 XYZ Y 行号
+     * @throws IllegalArgumentException 行号或层级不合法时抛出
      */
     int convertEqualAxisYToSeparateAxisY(
             int equalAxisY, int zoom, AbstractWgs84TileConverter.RoundingType roundingType);
@@ -229,15 +238,12 @@ public interface GirTileConverterOpt {
     Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ, TileYAxis yAxis);
 
     /**
-     * 根据指定地理范围和多个缩放级别获取覆盖的瓦片列表
+     * 根据地理范围和多个缩放级别获取覆盖瓦片，默认返回 Google/XYZ 顶部原点行号。
      *
-     * @param envelope 地理范围对象
-     * @param srcSrid  源坐标系EPSG代码
+     * @param envelope 地理范围
+     * @param srcSrid  地理范围的 EPSG SRID
      * @param targetZs 目标缩放级别列表
      * @return 覆盖的瓦片坐标集合
-     */
-    /**
-     * 默认返回 Google/XYZ 顶部原点的瓦片列表。
      */
     default Set<TileZxyApo> zxyListByBox(
             Envelope envelope, int srcSrid, List<Integer> targetZs) {
@@ -248,16 +254,13 @@ public interface GirTileConverterOpt {
             Envelope envelope, int srcSrid, List<Integer> targetZs, TileYAxis yAxis);
 
     /**
-     * 根据指定地理范围和缩放级别范围获取覆盖的瓦片列表
+     * 根据地理范围和连续缩放级别获取覆盖瓦片，默认返回 Google/XYZ 顶部原点行号。
      *
-     * @param envelope 地理范围对象
-     * @param srcSrid  源坐标系EPSG代码
-     * @param minZ     最小缩放级别
-     * @param maxZ     最大缩放级别
+     * @param envelope 地理范围
+     * @param srcSrid  地理范围的 EPSG SRID
+     * @param minZ     最小缩放级别（包含）
+     * @param maxZ     最大缩放级别（包含）
      * @return 覆盖的瓦片坐标集合
-     */
-    /**
-     * 默认返回 Google/XYZ 顶部原点的瓦片列表。
      */
     default Set<TileZxyApo> zxyListByBox(
             Envelope envelope, int srcSrid, int minZ, int maxZ) {
@@ -269,13 +272,11 @@ public interface GirTileConverterOpt {
 
 
     /**
-     * 通过一组zxy获取这个zxy覆盖的大边界框
+     * 根据一组同层级瓦片计算覆盖边界，默认按 Google/XYZ 顶部原点解释行号。
      *
-     * @param zxyList
-     * @return
-     */
-    /**
-     * 默认按 Google/XYZ 顶部原点解释瓦片列表。
+     * @param zxyList    同一缩放级别的瓦片集合
+     * @param targetSrid 输出范围的 EPSG SRID
+     * @return 所有瓦片覆盖的最小外包范围
      */
     default BoxReferencedEnvelope boundsFromTileZxyApos(
             Set<TileZxyApo> zxyList, int targetSrid) {
@@ -317,10 +318,13 @@ public interface GirTileConverterOpt {
     }
 
     /**
-     * 通过一组瓦片行列号的最大最小值获取覆盖的大边界框
+     * 根据 {@link RangeApo} 的首尾行列号计算覆盖边界。
      *
-     * @param rangeApo
-     * @return
+     * <p>{@code RangeApo} 的四个边界均为闭区间；其边界计算保留既有实现语义。</p>
+     *
+     * @param rangeApo   闭区间瓦片范围
+     * @param targetSrid 输出范围的 EPSG SRID
+     * @return 覆盖范围
      */
     BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo, int targetSrid);
 

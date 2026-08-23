@@ -9,30 +9,58 @@ import lombok.experimental.Accessors;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
 
+/**
+ * 瓦片坐标值对象，按 {@code z/x/y} 保存层级、列号和行号。
+ *
+ * <p>该对象本身不携带 Y 轴原点约定；使用 TMS 行号时，需在调用转换 API 时显式传入
+ * {@link TileYAxis}。无 Y 轴参数的本类边界方法固定按 Google/XYZ 顶部原点解释。</p>
+ *
+ * @author 张逢吉
+ */
 @Data
 @Accessors(chain = true)
 public class TileZxyApo {
 
-    private int z; // 层级
+    /** 缩放级别。 */
+    private int z;
 
-    private int x; // 列号
+    /** 瓦片列号。 */
+    private int x;
 
-    private int y; // 行号
+    /** 瓦片行号；其原点由调用上下文决定。 */
+    private int y;
 
+    /**
+     * 创建空的瓦片坐标对象，适用于 Lombok 链式赋值。
+     *
+     * @return 空坐标对象
+     */
     public static TileZxyApo of() {
         return new TileZxyApo();
     }
 
+    /** 创建空的瓦片坐标对象。 */
     public TileZxyApo() {
     }
 
+    /**
+     * 使用数值坐标创建对象，不校验层级和行列号范围。
+     *
+     * @param z 缩放级别
+     * @param x 瓦片列号
+     * @param y 瓦片行号
+     */
     public TileZxyApo(int z, int x, int y) {
         this.z = z;
         this.x = x;
         this.y = y;
     }
 
-
+    /**
+     * 从三个数值字符串创建对象。
+     *
+     * @throws IllegalArgumentException 任一字符串不是整数时抛出
+     */
     public TileZxyApo(String z, String x, String y) {
         try {
             this.z = Integer.parseInt(z);
@@ -56,7 +84,10 @@ public class TileZxyApo {
     }
 
     /**
-     * 从单个字符串解析（格式：z/x/y）
+     * 从 {@code z/x/y} 格式的字符串解析瓦片坐标。
+     *
+     * @param zxyString 以斜杠分隔的层级、列号和行号
+     * @throws IllegalArgumentException 字符串为空、格式不符或包含非整数时抛出
      */
     public TileZxyApo(String zxyString) {
         if (zxyString == null || zxyString.isEmpty()) {
@@ -76,7 +107,10 @@ public class TileZxyApo {
     }
 
     /**
-     * 从数组构造（格式：[z, x, y]）
+     * 从数组的前三项构造（格式：{@code [z, x, y]}）。
+     *
+     * @param zxyArray 至少包含三个元素的数组
+     * @throws IllegalArgumentException 数组为空或长度不足三时抛出
      */
     public TileZxyApo(int[] zxyArray) {
         if (zxyArray == null || zxyArray.length < 3) {
@@ -106,10 +140,20 @@ public class TileZxyApo {
         return "z=" + z + ", x=" + x + ", y=" + y;
     }
 
+    /**
+     * 返回 {@code z/x/y} 格式的瓦片坐标文本。
+     *
+     * @return 以斜杠分隔的层级、列号与行号
+     */
     public String getZxyString() {
         return z + "/" + x + "/" + y;
     }
 
+    /**
+     * 按 Google/XYZ 顶部原点解释当前行号，返回 EPSG:4326 瓦片边界的 WKT。
+     *
+     * @return 瓦片边界多边形的 WKT 文本
+     */
     public String toBox4326WktString() {
         ReferencedEnvelope referencedEnvelope =
                 GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
@@ -117,6 +161,11 @@ public class TileZxyApo {
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
+    /**
+     * 按 Google/XYZ 顶部原点解释当前行号，返回 EPSG:3857 瓦片边界的 WKT。
+     *
+     * @return 瓦片边界多边形的 WKT 文本
+     */
     public String toBox3857WktString() {
         ReferencedEnvelope referencedEnvelope =
                 GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857);
