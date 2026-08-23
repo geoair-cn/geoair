@@ -11,6 +11,7 @@ GirGeoTools tools = GirGeoTools.defaultInstance();
 
 GirCoordinateConvertOpt coordinateOpt = tools.getCoordinateOpt();
 GirGeoFormatOpt formatOpt = tools.getFormatOpt();
+GirGeom2ArrayOpt geom2ArrayOpt = tools.getGeom2ArrayOpt();
 GirGeoMeasureOpt measureOpt = tools.getMeasureOpt();
 GirGeoMergeOpt mergeOpt = tools.getMergeOpt();
 GirSridConvertOpt sridOpt = tools.getSridOpt();
@@ -42,6 +43,7 @@ Point pointBd09 = GirGeoTools.defaultInstance()
 
 - GeoJSON <-> JTS Geometry
 - WKT <-> JTS Geometry
+- EWKT（`SRID=xxxx;WKT`）<-> JTS Geometry
 - WKB <-> JTS Geometry
 - PGGeometry <-> JTS Geometry
 - Point、Reader、Writer、GeometryJSON 等底层入口
@@ -54,7 +56,62 @@ Geometry geometry = GirGeoTools.defaultInstance()
 String wkt = GirGeoTools.defaultInstance()
     .getFormatOpt()
     .jtsGeometryToWktString(geometry, false);
+
+String ewkt = GirGeoTools.defaultInstance()
+    .getFormatOpt()
+    .jtsGeometryToEwktString(geometry, false);
+// 例如：SRID=4326;POINT (116.4 39.9)
+
+Geometry geometryWithSrid = GirGeoTools.defaultInstance()
+    .getFormatOpt()
+    .ewktToJtsGeometry(ewkt, false);
 ```
+
+当业务需要让 WKT/WKB 解析结果默认带指定 SRID 或精度模型时，先构造 `ToolsConfig`，再取得工具入口：
+
+```java
+ToolsConfig config = new ToolsConfig()
+    .setGeometryFactory(new GeometryFactory(new PrecisionModel(), 4490));
+GirGeoFormatOpt formatOpt = GirGeoTools.getInstance(config).getFormatOpt();
+
+Geometry cgcs2000Geometry = formatOpt.wktToJtsGeometry("POINT (116.4 39.9)", false);
+// cgcs2000Geometry.getSRID() == 4490
+```
+
+`GeometryJSON`、WKT/WKB 的 Reader/Writer 自身都不是线程安全对象；GeoAir 的底层获取方法每次
+都会返回独立实例，正常情况下直接通过 `GirGeoFormatOpt` 调用即可。若自定义 `ToolsConfig` 的
+Supplier，也应保证每次创建新实例。GeoJSON 转换面向 Geometry；`Feature`、`FeatureCollection`
+以及属性读写仍应由上层业务或专用 GeoJSON 组件处理。
+
+## 坐标数组与 Geometry
+
+`GirGeom2ArrayOpt` 适合接口传输、前端绘制数据和 JTS Geometry 之间的轻量转换。常规方法会校验
+坐标结构与有限数值；名称带 `Fast` 的方法只适用于已在上游校验过的批量数据。
+
+```java
+GirGeom2ArrayOpt arrayOpt = GirGeoTools.defaultInstance().getGeom2ArrayOpt();
+
+double[][] shell = {
+    {116.40D, 39.90D}, {116.45D, 39.90D},
+    {116.45D, 39.95D}, {116.40D, 39.95D}
+};
+double[][] hole = {
+    {116.41D, 39.91D}, {116.42D, 39.91D},
+    {116.42D, 39.92D}, {116.41D, 39.92D}
+};
+
+Polygon polygon = arrayOpt.doubleArrayToPolygon(
+    shell,
+    Collections.singletonList(hole),
+    GirGeom2ArrayOpt.CoordOrder.X_FIRST,
+    new GeometryFactory(new PrecisionModel(), 4326));
+
+double[][][] rings = arrayOpt.polygonToDoubleArrays(polygon, GirGeom2ArrayOpt.CoordOrder.X_FIRST);
+// rings[0] 是外环，rings[1...] 是洞；未闭合的输入环会自动闭合。
+```
+
+数组转换目前以二维 `x/y` 坐标为目标，不承诺保留 Z/M 值。传入 `null` 工厂时使用当前 `ToolsConfig`
+中的 `GeometryFactory`，因此可统一继承项目的 SRID 与精度模型。
 
 ## 测量计算
 

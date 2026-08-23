@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.*;
@@ -32,6 +34,10 @@ import org.locationtech.jts.io.WKTReader;
  */
 public class GirFormatUtils implements GirGeoFormatOpt {
 
+    /** EWKT 中 SRID 前缀的匹配规则。 */
+    private static final Pattern EWKT_PATTERN =
+            Pattern.compile("^\\s*SRID\\s*=\\s*(\\d+)\\s*;\\s*(.+)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirFormatUtils INSTANCE;
 
@@ -49,7 +55,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
      * @param advToolsConfig 格式化配置，不能为空
      */
     public GirFormatUtils(ToolsConfig advToolsConfig) {
-        this.advToolsConfig = advToolsConfig;
+        this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
     }
 
     /**
@@ -193,6 +199,18 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     }
 
     @Override
+    public String jtsGeometryToEwktString(Geometry jtsGeometry, boolean ifExceptionValueReturnNull) {
+        if (ObjectUtil.isNull(jtsGeometry)) {
+            return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
+        }
+        try {
+            return "SRID=" + jtsGeometry.getSRID() + ";" + jtsGeometry.toText();
+        } catch (Exception e) {
+            return handleException(e, ifExceptionValueReturnNull);
+        }
+    }
+
+    @Override
     public String jtsGeometryToGeoJson(Geometry jtsGeometry, boolean ifExceptionValueReturnNull) {
         if (ObjectUtil.isNull(jtsGeometry)) {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
@@ -211,7 +229,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
         }
         try {
-            return WKBWriter.toHex(advToolsConfig.getWkbWriter().write(jtsGeometry));
+            return WKBWriter.toHex(getWKBWriter().write(jtsGeometry));
         } catch (Exception e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -229,6 +247,10 @@ public class GirFormatUtils implements GirGeoFormatOpt {
                 jtsGeom = GirPostGisOrgTran.toJtsGeometry(pgGeometry);
             } else if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(pgGeometry)) {
                 jtsGeom = GirPostGisNetTran.toJtsGeometry(pgGeometry);
+            }
+            if (jtsGeom == null) {
+                throw new IllegalArgumentException(
+                        "不支持的 PostGIS Geometry 类型：" + pgGeometry.getClass().getName());
             }
             return jtsGeom;
         } catch (Exception e) {
@@ -257,7 +279,25 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("wktString");
         }
         try {
-            return advToolsConfig.getWktReaderSupplier().get().read(wktString);
+            return getWKTReader().read(wktString);
+        } catch (Exception e) {
+            return handleException(e, ifExceptionValueReturnNull);
+        }
+    }
+
+    @Override
+    public Geometry ewktToJtsGeometry(String ewktString, boolean ifExceptionValueReturnNull) {
+        if (StrUtil.isBlank(ewktString)) {
+            return ifExceptionValueReturnNull ? null : throwEmptyParamException("ewktString");
+        }
+        try {
+            Matcher matcher = EWKT_PATTERN.matcher(ewktString);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException("EWKT必须使用SRID=xxxx;WKT格式");
+            }
+            Geometry geometry = getWKTReader().read(matcher.group(2));
+            geometry.setSRID(Integer.parseInt(matcher.group(1)));
+            return geometry;
         } catch (Exception e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -325,7 +365,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("geometry");
         }
         try {
-            return advToolsConfig.getWkbWriter().write(geometry);
+            return getWKBWriter().write(geometry);
         } catch (Exception e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -351,7 +391,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
         try {
             byte[] bytes = WKBReader.hexToBytes(wkbByteString);
-            return advToolsConfig.getWkbReaderSupplier().get().read(bytes);
+            return getWKBReader().read(bytes);
         } catch (Exception e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -429,7 +469,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("wkbBytes");
         }
         try {
-            return advToolsConfig.getWkbReaderSupplier().get().read(wkbBytes);
+            return getWKBReader().read(wkbBytes);
         } catch (ParseException e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -441,7 +481,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
         }
         try {
-            return advToolsConfig.getWkbWriter().write(jtsGeometry);
+            return getWKBWriter().write(jtsGeometry);
         } catch (Exception e) {
             return handleException(e, ifExceptionValueReturnNull);
         }
@@ -449,23 +489,39 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     @Override
     public WKTReader getWKTReader() {
-        return advToolsConfig.getWktReaderSupplier().get();
+        WKTReader reader = advToolsConfig.getWktReaderSupplier().get();
+        if (reader == null) {
+            throw new IllegalStateException("wktReaderSupplier不能返回null");
+        }
+        return reader;
     }
 
     @Override
     public WKBWriter getWKBWriter() {
-        return advToolsConfig.getWkbWriter();
+        WKBWriter writer = advToolsConfig.getWkbWriterSupplier().get();
+        if (writer == null) {
+            throw new IllegalStateException("wkbWriterSupplier不能返回null");
+        }
+        return writer;
     }
 
     @Override
     public WKBReader getWKBReader() {
-        return advToolsConfig.getWkbReaderSupplier().get();
+        WKBReader reader = advToolsConfig.getWkbReaderSupplier().get();
+        if (reader == null) {
+            throw new IllegalStateException("wkbReaderSupplier不能返回null");
+        }
+        return reader;
     }
 
 
     @Override
     public GeometryJSON getGeometryJSON() {
-        return advToolsConfig.getGeometryJSON();
+        GeometryJSON geometryJSON = advToolsConfig.getGeometryJsonSupplier().get();
+        if (geometryJSON == null) {
+            throw new IllegalStateException("geometryJsonSupplier不能返回null");
+        }
+        return geometryJSON;
     }
 
     // ==============================私有工具方法==============================
