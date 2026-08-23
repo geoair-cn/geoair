@@ -15,6 +15,9 @@ import java.util.List;
  */
 public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
 
+    /** 单次向下展开时允许返回的最大 QuadKey 数量，防止 4 的幂级内存占用。 */
+    private static final int MAX_EXPANDED_QUAD_KEY_COUNT = 262_144;
+
     // 1. 私有静态实例（volatile保证可见性，防止指令重排）
     private static volatile BingMapQuadKeyUtils INSTANCE;
 
@@ -70,8 +73,12 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
 
     @Override
     public TileZxyApo quadKeyToXyz(String quadKey) {
-        if (quadKey == null || quadKey.isEmpty() || quadKey.length() > 23) {
-            throw new IllegalArgumentException("QuadKey不能为空且长度需在1~23之间");
+        if (quadKey == null || quadKey.length() > 23) {
+            throw new IllegalArgumentException("QuadKey长度需在0~23之间");
+        }
+        // 空字符串是 z=0 的世界根节点，也是 xyzToQuadKey(0, 0, 0) 的合法结果。
+        if (quadKey.isEmpty()) {
+            return new TileZxyApo(0, 0, 0);
         }
         if (!quadKey.matches("[0-3]+")) {
             throw new IllegalArgumentException("QuadKey只能包含0/1/2/3字符");
@@ -181,6 +188,7 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
 
         // 场景3：向下细化（目标级别 > 当前级别）→ 递归生成所有子节点
         int levelDiff = targetLevel - currentLevel;
+        validateExpandedQuadKeyCount(levelDiff);
         return generateAllChildKeys(sourceQuadKey, levelDiff);
     }
 
@@ -274,6 +282,22 @@ public class BingMapQuadKeyUtils implements GirBingMapQuadKeyOpt {
         }
 
         return allChildren.toArray(new String[0]);
+    }
+
+    /**
+     * 校验 QuadKey 展开结果数量，避免高层级父节点被一次性展开成海量字符串。
+     *
+     * @param levelDiff 向下展开的层级差
+     */
+    private void validateExpandedQuadKeyCount(int levelDiff) {
+        long count = 1L;
+        for (int i = 0; i < levelDiff; i++) {
+            if (count > MAX_EXPANDED_QUAD_KEY_COUNT / 4L) {
+                throw new IllegalArgumentException("QuadKey展开结果超过上限 "
+                        + MAX_EXPANDED_QUAD_KEY_COUNT + "，请改用 getTargetLevelQuadKeyRange 获取范围");
+            }
+            count *= 4L;
+        }
     }
 
     // ===================== 测试示例 =====================

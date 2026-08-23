@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.fuser.precache.bask;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
@@ -146,7 +147,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                                 if (googleGridIs) {
                                     // 先过滤不相交的瓦片
                                     BoxReferencedEnvelope box = GirAdvTools.getTileGrid4326Opt()
-                                            .xyzToTileBox(zoom, x, y, 3857);
+                                            .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                                     String wktString = box.getWktString(4326);
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
@@ -157,7 +158,7 @@ public class TileFuserCheckAndRepairTask implements Runnable {
                                 } else {
                                     // 先过滤不相交的瓦片
                                     BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt()
-                                            .xyzToTileBox(zoom, x, y, 4326);
+                                            .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                                     String wktString = box.getWktString(4326);
                                     Geometry geometryByBox = GirAdvTools.getFormatOpt()
                                             .wktToJtsGeometry(wktString);
@@ -345,10 +346,10 @@ public class TileFuserCheckAndRepairTask implements Runnable {
             BoxReferencedEnvelope box = null;
             if (googleGridIs) {
                 box = GirAdvTools.getTileGrid4326Opt()
-                        .xyzToTileBox(z, x, y, 3857);
+                        .xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857);
             } else {
                 box = GirAdvTools.getTileGrid3857Opt()
-                        .xyzToTileBox(z, x, y, 4326);
+                        .xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
             }
 
             // 2. 创建缓存融合器

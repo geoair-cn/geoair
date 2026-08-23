@@ -138,19 +138,4 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         double n = Math.PI - (2.0 * Math.PI * y) / (1 << z);
         return Math.toDegrees(Math.atan(Math.sinh(n)));
     }
-
-    /**
-     * 在 4326 非等轴场景下，把 “原点在左下角（TMS）” 的 Y 索引，转为 “原点在左上角（XYZ/WMS）” 的合法 Y 索引
-     *
-     * @param y Y索引
-     * @param z 缩放级别
-     * @return
-     */
-    public int reverseY(int y, int z) {
-        validateXyz(z, 0, y);
-        // zoom-1 4326 纬度非等轴场景瓦片数减半
-        int maxYIndex = (1 << z - 1) - 1;
-        // -y翻转 Y 轴原点（左下→左上）
-        return maxYIndex - y;
-    }
 }

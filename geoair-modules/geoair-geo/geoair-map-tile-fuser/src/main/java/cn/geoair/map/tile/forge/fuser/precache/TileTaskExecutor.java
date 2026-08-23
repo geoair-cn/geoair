@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.fuser.GirFuser;
@@ -198,15 +199,15 @@ public class TileTaskExecutor {
             if (taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE) {
                 // 原始网格使用相反的坐标计算
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 } else {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 }
             } else {
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 } else {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 }
             }
 
@@ -347,8 +348,8 @@ public class TileTaskExecutor {
     private void processPreCacheTile(int z, int x, int y, AtomicLong success, AtomicLong fail) {
         try {
             BoxReferencedEnvelope box = googleGridIs ?
-                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857) :
-                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857) :
+                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
                     box.getMaxX(), box.getMaxY());
@@ -377,8 +378,8 @@ public class TileTaskExecutor {
                                            AtomicLong fail, AtomicLong skipped) {
         try {
             BoxReferencedEnvelope box = googleGridIs ?
-                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857) :
-                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                    GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857) :
+                    GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds = new BoundingBox(box.getMinX(), box.getMinY(),
                     box.getMaxX(), box.getMaxY());

@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.tools.srid;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.log.StaticLog;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -30,8 +29,10 @@ import org.opengis.referencing.operation.TransformException;
  */
  
 public class GirSridConvertUtils implements GirSridConvertOpt {
-    public static GiLogger log = GirLoggerFactory.getLogger();
     private static volatile GirSridConvertUtils INSTANCE;
+    /** 按 ToolsConfig 对象身份复用 CRS 与坐标转换缓存。 */
+    private static final Map<ToolsConfig, GirSridConvertUtils> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirSridConvertUtils>());
     ToolsConfig advToolsConfig;
 
     public GirSridConvertUtils(ToolsConfig advToolsConfig) {
@@ -40,7 +41,17 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     }
 
     public static GirSridConvertUtils getInstance(ToolsConfig advToolsConfig) {
-        return new GirSridConvertUtils(advToolsConfig);
+        if (advToolsConfig == null) {
+            return getInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirSridConvertUtils sridConvertUtils = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (sridConvertUtils == null) {
+                sridConvertUtils = new GirSridConvertUtils(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, sridConvertUtils);
+            }
+            return sridConvertUtils;
+        }
     }
 
 
@@ -162,6 +173,9 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
 
     @Override
     public CoordinateReferenceSystem getCRS(int srid) {
+        if (srid <= 0) {
+            throw new IllegalArgumentException("SRID必须为正整数，实际值=" + srid);
+        }
         try {
             // EPSG:4326是WGS84地理坐标系，特殊处理（提升兼容性）
             if (srid == 4326) {
@@ -170,7 +184,7 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
             // 通过SRID获取CRS（自动识别EPSG标准）
             return CRS.decode("EPSG:" + srid, true);
         } catch (FactoryException e) {
-            throw new RuntimeException("获取坐标参考系失败，SRID=" + srid, e);
+            throw new IllegalArgumentException("无法解析CRS，SRID=" + srid, e);
         }
     }
 
@@ -184,24 +198,19 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
         if (CRS_GEOGRAPHIC_CACHE.containsKey(srid)) {
             return CRS_GEOGRAPHIC_CACHE.get(srid);
         }
-        boolean isGeographic = true;
         try {
             org.locationtech.proj4j.CoordinateReferenceSystem crs =
                     CRS_FACTORY.createFromName("EPSG:" + srid);
+            if (crs == null) {
+                throw new IllegalArgumentException("无法解析CRS，SRID=" + srid);
+            }
             Unit units = crs.getProjection().getUnits();
-            isGeographic = units == Units.DEGREES || units.name.equalsIgnoreCase("degree");
+            boolean isGeographic = units == Units.DEGREES || units.name.equalsIgnoreCase("degree");
+            CRS_GEOGRAPHIC_CACHE.put(srid, isGeographic);
             return isGeographic;
         } catch (Exception e) {
-            log.error("识别坐标异常", e);
-            if (srid == 3857 || srid == 900913) {
-                isGeographic = false;
-            }
-            // 异常处理：默认按经验判断（4326=度，其他=米）
-            StaticLog.warn("无法识别SRID={}的坐标系单位，按经验判断 {}", srid, isGeographic);
-        } finally {
-            CRS_GEOGRAPHIC_CACHE.put(srid, isGeographic);
+            throw new IllegalArgumentException("无法识别CRS坐标单位，SRID=" + srid, e);
         }
-        return isGeographic;
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.hutool.core.collection.ListUtil;
@@ -450,7 +451,7 @@ public class MbtilesFromLocalZipConverter {
                         int y = Integer.parseInt(pathArr[1]);
                         String yFile = pathArr[2];
                         int x = Integer.parseInt(yFile.replaceAll("\\.(png|jpg)$", ""));
-                        int reverseY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+                        int reverseY = GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
 
                         // 可以在这里添加额外过滤逻辑
                         // if (x < 0 || x > 100) return null;

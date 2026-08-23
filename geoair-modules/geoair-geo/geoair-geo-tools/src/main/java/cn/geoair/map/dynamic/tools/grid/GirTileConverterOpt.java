@@ -3,9 +3,12 @@ package cn.geoair.map.dynamic.tools.grid;
 import cn.geoair.map.dynamic.tools.grid.converter.AbstractWgs84TileConverter;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileRange;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +31,16 @@ public interface GirTileConverterOpt {
     String xyzToWkt(int z, int x, int y, int targetSrid);
 
     /**
+     * 将指定 Y 轴约定的瓦片转换为 WKT。
+     *
+     * <p>未传 {@link TileYAxis} 的旧方法固定按 Google/XYZ 顶部原点解释，
+     * 以兼容已有第三方依赖。</p>
+     */
+    default String xyzToWkt(int z, int x, int y, TileYAxis yAxis, int targetSrid) {
+        return xyzToWkt(z, x, toXyzY(z, y, yAxis), targetSrid);
+    }
+
+    /**
      * XYZ瓦片转换为瓦片范围DTO
      *
      * @param z          缩放级别
@@ -39,6 +52,16 @@ public interface GirTileConverterOpt {
     BoxReferencedEnvelope xyzToTileBox(int z, int x, int y, int targetSrid);
 
     /**
+     * 将指定 Y 轴约定的瓦片转换为地理范围。
+     *
+     * <p>未传 {@link TileYAxis} 的旧方法固定按 Google/XYZ 顶部原点解释。</p>
+     */
+    default BoxReferencedEnvelope xyzToTileBox(
+            int z, int x, int y, TileYAxis yAxis, int targetSrid) {
+        return xyzToTileBox(z, x, toXyzY(z, y, yAxis), targetSrid);
+    }
+
+    /**
      * 地理范围转换为瓦片索引范围
      *
      * @param z       缩放级别
@@ -46,6 +69,22 @@ public interface GirTileConverterOpt {
      * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
      */
     RangeApo tileRangeByBox(int z, Envelope tileBox);
+
+    /**
+     * 将地理范围转换为闭区间瓦片范围。
+     *
+     * <p>这是新增 API，返回的 {@link TileRange} 明确包含最大 X/Y。旧的
+     * {@link #tileRangeByBox(int, Envelope)} 保持原行为，以保证
+     * geoair-map-tile-fuser 的既有融合与预缓存链路不变。</p>
+     */
+    default TileRange tileRangeClosedByBox(int z, Envelope tileBox) {
+        return TileRange.fromGeoToolsExclusiveMax(tileRangeByBox(z, tileBox));
+    }
+
+    /** 将地理范围转换为指定 Y 轴约定的闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByBox(int z, Envelope tileBox, TileYAxis yAxis) {
+        return fromXyzRange(z, tileRangeClosedByBox(z, tileBox), yAxis);
+    }
     /**
      * 地理范围转换为瓦片索引范围
      *
@@ -55,6 +94,16 @@ public interface GirTileConverterOpt {
      * @return 瓦片索引范围DTO（xmin/xmax: 瓦片X索引；ymin/ymax: 瓦片Y索引）
      */
     RangeApo tileRangeByBox(int z, Envelope tileBox, int srcSrid);
+
+    /** 将指定 SRID 的地理范围转换为闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByBox(int z, Envelope tileBox, int srcSrid) {
+        return TileRange.fromGeoToolsExclusiveMax(tileRangeByBox(z, tileBox, srcSrid));
+    }
+
+    /** 将指定 SRID 的地理范围转换为指定 Y 轴约定的闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByBox(int z, Envelope tileBox, int srcSrid, TileYAxis yAxis) {
+        return fromXyzRange(z, tileRangeClosedByBox(z, tileBox, srcSrid), yAxis);
+    }
     /**
      * 将几何图形转换为瓦片坐标范围
      *
@@ -63,6 +112,16 @@ public interface GirTileConverterOpt {
      * @return 瓦片坐标范围对象
      */
     RangeApo tileRangeByGeom(int z, Geometry geometry);
+
+    /** 将几何对象转换为闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByGeom(int z, Geometry geometry) {
+        return TileRange.fromGeoToolsExclusiveMax(tileRangeByGeom(z, geometry));
+    }
+
+    /** 将几何对象转换为指定 Y 轴约定的闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByGeom(int z, Geometry geometry, TileYAxis yAxis) {
+        return fromXyzRange(z, tileRangeClosedByGeom(z, geometry), yAxis);
+    }
 
     /**
      * 将几何图形转换为瓦片坐标范围
@@ -74,18 +133,63 @@ public interface GirTileConverterOpt {
      */
     RangeApo tileRangeByGeom(int z, Geometry geometry, int srcSrid);
 
+    /** 将指定 SRID 的几何对象转换为闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByGeom(int z, Geometry geometry, int srcSrid) {
+        return TileRange.fromGeoToolsExclusiveMax(tileRangeByGeom(z, geometry, srcSrid));
+    }
+
+    /** 将指定 SRID 的几何对象转换为指定 Y 轴约定的闭区间瓦片范围。 */
+    default TileRange tileRangeClosedByGeom(int z, Geometry geometry, int srcSrid, TileYAxis yAxis) {
+        return fromXyzRange(z, tileRangeClosedByGeom(z, geometry, srcSrid), yAxis);
+    }
+
     double tileXToCoordinateX(int x, int z);
 
+    /**
+     * 获取 Google/XYZ 顶部原点 Y 行号对应的坐标值。
+     */
     double tileYToCoordinateY(int y, int z);
 
+    /** 根据指定 Y 轴约定获取瓦片行的坐标值。 */
+    default double tileYToCoordinateY(int y, int z, TileYAxis yAxis) {
+        if (yAxis == null) {
+            throw new IllegalArgumentException("Y轴约定不能为空");
+        }
+        int xyzY = yAxis == TileYAxis.XYZ ? y
+                : yAxis.convertBoundaryY(y, getTileRowCount(z), TileYAxis.XYZ);
+        return tileYToCoordinateY(xyzY, z);
+    }
+
     /**
-     * TMS Y索引（原点左下角） 与 XYZ Y索引（原点左上角） 的互相转换
+     * 在 XYZ 与 TMS 之间转换 Y 行号。
      *
-     * @param y Y索引
-     * @param z 缩放级别
-     * @return 翻转后的Y索引
+     * <p>总行数从当前网格层级元数据取得，因此可同时适用于 3857、等轴 4326
+     * 和非等轴 4326 网格。</p>
      */
-    int reverseY(int y, int z);
+    default int convertY(int z, int y, TileYAxis sourceYAxis, TileYAxis targetYAxis) {
+        if (sourceYAxis == null || targetYAxis == null) {
+            throw new IllegalArgumentException("Y轴约定不能为空");
+        }
+        return sourceYAxis.convertY(y, getTileRowCount(z), targetYAxis);
+    }
+
+    /**
+     * Google/XYZ 与 TMS 之间翻转 Y 行号。
+     *
+     * <p>等价于 {@code convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS)}。</p>
+     */
+    default int reverseY(int y, int z) {
+        return convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
+    }
+
+    /** 返回当前网格在指定层级的总 Y 行数。 */
+    default int getTileRowCount(int z) {
+        int tileRowCount = getTileLevelMetadata(z).getNumTilesHigh();
+        if (tileRowCount <= 0) {
+            throw new IllegalStateException("瓦片网格总行数必须大于0");
+        }
+        return tileRowCount;
+    }
 
     /**
      * 非等轴Y索引转换为等轴Y索引（4326坐标系）
@@ -155,7 +259,12 @@ public interface GirTileConverterOpt {
      * @param targetZ  目标缩放级别
      * @return 覆盖的瓦片坐标集合
      */
-    Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ);
+    /** 默认返回 Google/XYZ 顶部原点的瓦片列表。 */
+    default Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ) {
+        return zxyListByBox(envelope, srcSrid, targetZ, TileYAxis.XYZ);
+    }
+
+    Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int targetZ, TileYAxis yAxis);
 
     /**
      * 根据指定地理范围和多个缩放级别获取覆盖的瓦片列表
@@ -165,7 +274,14 @@ public interface GirTileConverterOpt {
      * @param targetZs 目标缩放级别列表
      * @return 覆盖的瓦片坐标集合
      */
-    Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, List<Integer> targetZs);
+    /** 默认返回 Google/XYZ 顶部原点的瓦片列表。 */
+    default Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, List<Integer> targetZs) {
+        return zxyListByBox(envelope, srcSrid, targetZs, TileYAxis.XYZ);
+    }
+
+    Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, List<Integer> targetZs, TileYAxis yAxis);
 
     /**
      * 根据指定地理范围和缩放级别范围获取覆盖的瓦片列表
@@ -176,7 +292,14 @@ public interface GirTileConverterOpt {
      * @param maxZ     最大缩放级别
      * @return 覆盖的瓦片坐标集合
      */
-    Set<TileZxyApo> zxyListByBox(Envelope envelope, int srcSrid, int minZ, int maxZ);
+    /** 默认返回 Google/XYZ 顶部原点的瓦片列表。 */
+    default Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, int minZ, int maxZ) {
+        return zxyListByBox(envelope, srcSrid, minZ, maxZ, TileYAxis.XYZ);
+    }
+
+    Set<TileZxyApo> zxyListByBox(
+            Envelope envelope, int srcSrid, int minZ, int maxZ, TileYAxis yAxis);
 
 
     /**
@@ -185,7 +308,45 @@ public interface GirTileConverterOpt {
      * @param zxyList
      * @return
      */
-    BoxReferencedEnvelope boundsFromTileZxyApos(Set<TileZxyApo> zxyList, int targetSrid);
+    /** 默认按 Google/XYZ 顶部原点解释瓦片列表。 */
+    default BoxReferencedEnvelope boundsFromTileZxyApos(
+            Set<TileZxyApo> zxyList, int targetSrid) {
+        return boundsFromTileZxyApos(zxyList, TileYAxis.XYZ, targetSrid);
+    }
+
+    BoxReferencedEnvelope boundsFromTileZxyApos(
+            Set<TileZxyApo> zxyList, TileYAxis yAxis, int targetSrid);
+
+    /**
+     * 根据闭区间瓦片范围计算覆盖边界。
+     *
+     * <p>{@link TileRange} 的最大 X/Y 为最后一个实际瓦片索引。本方法直接通过首尾
+     * 瓦片边界组合范围；旧的 {@link RangeApo} 接口不经过本方法，以避免改变其既有
+     * 边界语义。</p>
+     *
+     * @param tileRange 闭区间瓦片范围
+     * @param targetSrid 目标坐标系 EPSG 代码
+     * @return 覆盖范围
+     */
+    default BoxReferencedEnvelope boundsFromTileRange(TileRange tileRange, int targetSrid) {
+        if (tileRange == null) {
+            throw new IllegalArgumentException("TileRange 不能为空");
+        }
+
+        int minY = tileRange.getMinY();
+        int maxY = tileRange.getMaxY();
+        if (tileRange.getYAxis() == TileYAxis.TMS) {
+            minY = toXyzY(tileRange.getZ(), tileRange.getMaxY(), TileYAxis.TMS);
+            maxY = toXyzY(tileRange.getZ(), tileRange.getMinY(), TileYAxis.TMS);
+        }
+        BoxReferencedEnvelope topLeft = xyzToTileBox(
+                tileRange.getZ(), tileRange.getMinX(), minY, targetSrid);
+        BoxReferencedEnvelope bottomRight = xyzToTileBox(
+                tileRange.getZ(), tileRange.getMaxX(), maxY, targetSrid);
+        return new BoxReferencedEnvelope(new Envelope(
+                topLeft.getMinX(), bottomRight.getMaxX(),
+                bottomRight.getMinY(), topLeft.getMaxY()), targetSrid);
+    }
 
     /**
      * 通过一组瓦片行列号的最大最小值获取覆盖的大边界框
@@ -243,4 +404,52 @@ public interface GirTileConverterOpt {
      * @return 瓦片层级元数据对象
      */
     TileLevelMetadata getTileLevelMetadata(int maxZoom, int tilePixelSize, double dpi);
+
+    /** 将指定 Y 轴约定的行号归一为旧 API 使用的 XYZ 行号。 */
+    default int toXyzY(int z, int y, TileYAxis yAxis) {
+        if (yAxis == null) {
+            throw new IllegalArgumentException("Y轴约定不能为空");
+        }
+        // XYZ 是既有 API 的原生约定，保留原有的索引校验与边界行为。
+        return yAxis == TileYAxis.XYZ ? y : convertY(z, y, yAxis, TileYAxis.XYZ);
+    }
+
+    /** 将旧 API 产生的 XYZ 闭区间范围转换为目标 Y 轴约定。 */
+    default TileRange fromXyzRange(int z, TileRange xyzRange, TileYAxis yAxis) {
+        if (xyzRange == null || yAxis == null) {
+            throw new IllegalArgumentException("瓦片范围和Y轴约定不能为空");
+        }
+        return yAxis == TileYAxis.XYZ ? xyzRange : xyzRange.reverseY(getTileRowCount(z));
+    }
+
+    /** 将旧 API 产生的 XYZ 瓦片列表转换为目标 Y 轴约定。 */
+    default Set<TileZxyApo> fromXyzTiles(Set<TileZxyApo> xyzTiles, TileYAxis yAxis) {
+        if (xyzTiles == null || yAxis == null) {
+            throw new IllegalArgumentException("瓦片列表和Y轴约定不能为空");
+        }
+        if (yAxis == TileYAxis.XYZ) {
+            return xyzTiles;
+        }
+        Set<TileZxyApo> converted = new LinkedHashSet<>();
+        for (TileZxyApo tile : xyzTiles) {
+            converted.add(new TileZxyApo(tile.getZ(), tile.getX(),
+                    convertY(tile.getZ(), tile.getY(), TileYAxis.XYZ, TileYAxis.TMS)));
+        }
+        return converted;
+    }
+
+    /** 将指定 Y 轴约定的瓦片列表归一为旧 API 使用的 XYZ 瓦片列表。 */
+    default Set<TileZxyApo> toXyzTiles(Set<TileZxyApo> tiles, TileYAxis yAxis) {
+        if (tiles == null || yAxis == null) {
+            throw new IllegalArgumentException("瓦片列表和Y轴约定不能为空");
+        }
+        if (yAxis == TileYAxis.XYZ) {
+            return tiles;
+        }
+        Set<TileZxyApo> converted = new LinkedHashSet<>();
+        for (TileZxyApo tile : tiles) {
+            converted.add(new TileZxyApo(tile.getZ(), tile.getX(), toXyzY(tile.getZ(), tile.getY(), TileYAxis.TMS)));
+        }
+        return converted;
+    }
 }
