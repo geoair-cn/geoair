@@ -14,9 +14,9 @@ import cn.hutool.core.util.IdUtil;
  */
 public class SparkJavaTileLocalAppV2Example {
     public static void main(String[] args) throws Exception {
-        String inputUrl = "#jdbc:postgresql://postgres#tcsd1234/192.168.0.110:5432/jwyt_v3/flowable";
+        String inputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable";
         String tableName = "t_" + IdUtil.getSnowflakeNextId();
-        String outputUrl = "#jdbc:postgresql://postgres#tcsd1234/192.168.0.110:5432/jwyt_v3/flowable/" + tableName;
+        String outputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
 
         TileSliceParameter parameter = new TileSliceParameter()
                 .setLayerName("amap_traffic_conditions")

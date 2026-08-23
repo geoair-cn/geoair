@@ -49,6 +49,12 @@
     </dependency>
 
     <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-jdbc-url</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.13</artifactId>
       <version>${spark.version}</version>
@@ -179,6 +185,12 @@
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>${jakarta-servlet.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

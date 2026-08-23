@@ -1,39 +1,21 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
+import cn.geoair.comp.jdbc.url.JdbcUrlCodec;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 import cn.hutool.core.util.StrUtil;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
- * 自定义数据库连接协议的解析器和值对象。
+ * 静态切片任务约定的数据库连接协议解析器和值对象。
  *
- * <h2>协议格式</h2>
- * <pre>
- * #jdbc:{subprotocol}://用户名#密码/主机:端口/数据库名[/模式名[/表名]]
- * </pre>
- * <p>
- * 以 {@code #jdbc:} 开头标识自定义协议，区别于标准 JDBC URL。
- *
- * <h2>两种构造方式</h2>
- * <pre>
- * // 1. 从协议字符串解析
- * ProtocolUrl url = new ProtocolUrl("#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public/tile_cache");
- *
- * // 2. 从零散参数构建
- * ProtocolUrl url = ProtocolUrl.builder()
- *     .subProtocol("postgresql")
- *     .username("postgres").password("secret")
- *     .host("10.0.0.1").port(5432)
- *     .database("mydb").schema("public").tableName("tile_cache")
- *     .build();
- * </pre>
- *
- * <h2>示例</h2>
- * <pre>
- * #jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public/tile_cache
- * #jdbc:mysql://root#secret/10.0.0.1:3306/gisdb//tile_cache
- * #jdbc:sqlserver://sa#secret/10.0.0.1:1433/mydb/dbo/tile_cache
- * </pre>
+ * <p>协议格式由外部约定，必须保持为：
+ * {@code #jdbc:{subprotocol}://用户名#密码/主机:端口/数据库名[/模式名[/表名]]}。
+ * 本类只负责该任务协议中的用户名、密码、schema 和表名；标准 JDBC URL 的构建委托给
+ * {@link JdbcUrlCodec}，避免在此重复维护各数据库的 URL 方言。</p>
  *
  * @author refactored from PgUrl / PgConnectInfoWithTable
  */
@@ -42,111 +24,91 @@ public final class ProtocolUrl implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String PROTOCOL_PREFIX = "#jdbc:";
 
+    /** 第三方协议中声明的子协议，保留原始值以便无损输出。 */
     private final String subProtocol;
+    /** 数据库用户名。 */
     private final String username;
+    /** 数据库密码。 */
     private final String password;
+    /** 主机名或方括号包裹的 IPv6 地址。 */
     private final String host;
+    /** 端口号。 */
     private final int port;
+    /** 数据库名称。 */
     private final String database;
+    /** 标准 JDBC URL 中数据库名后的原始参数，例如 {@code ?sslmode=require}。 */
+    private final String jdbcProperties;
+    /** 协议中的可选 schema 段。 */
     private final String schema;
+    /** 协议中的可选表名段。 */
     private final String tableName;
-    /** true = 从 builder 构建，toJdbcUrl() 用字段拼接；false = 从 URL 字符串解析，toJdbcUrl() 从原始 URL 还原 */
-    private final boolean builtFromBuilder;
-
-    // ===================== 从协议字符串解析 =====================
 
     /**
-     * 解析自定义协议格式的 URL。
+     * 解析第三方约定的任务协议。
      *
-     * @param url 格式：#jdbc:{subprotocol}://user#pass/host:port/db[/schema[/table]]
-     * @throws IllegalArgumentException 格式不合法时抛出
+     * @param url 协议字符串：{@code #jdbc:{subprotocol}://user#password/host:port/db[/schema[/table]]}
      */
     public ProtocolUrl(String url) {
-        if (url == null || !url.startsWith(PROTOCOL_PREFIX)) {
-            throw new IllegalArgumentException(
-                    "URL 必须以 " + PROTOCOL_PREFIX + " 开头，实际值: " + url);
+        if (StrUtil.isBlank(url) || !url.startsWith(PROTOCOL_PREFIX)) {
+            throw new IllegalArgumentException("URL 必须以 " + PROTOCOL_PREFIX + " 开头，实际值: " + url);
         }
 
-        this.builtFromBuilder = false;
-
-        // 去掉前缀 #jdbc:，找到 "://" 分隔前缀和路径
         String afterPrefix = url.substring(PROTOCOL_PREFIX.length());
         int schemeEnd = afterPrefix.indexOf("://");
-        if (schemeEnd < 0) {
-            throw new IllegalArgumentException(
-                    "缺少 '://' 分隔符，格式示例: #jdbc:postgresql://user#pass/host:port/db");
+        if (schemeEnd <= 0) {
+            throw new IllegalArgumentException("缺少子协议或 '://' 分隔符，格式示例: "
+                    + "#jdbc:postgresql://user#password/host:port/database");
         }
-
         this.subProtocol = afterPrefix.substring(0, schemeEnd);
-        String path = afterPrefix.substring(schemeEnd + 3);
 
-        // 按 / 拆分，过滤空段
-        String[] parts = path.split("/");
-        parts = java.util.Arrays.stream(parts)
-                .filter(StrUtil::isNotBlank)
-                .toArray(String[]::new);
-
-        if (parts.length < 3) {
-            throw new IllegalArgumentException(
-                    "路径不完整，至少需要 user#pass/host:port/database，实际: " + url);
+        String[] parts = afterPrefix.substring(schemeEnd + 3).split("/", -1);
+        if (parts.length < 3 || parts.length > 5) {
+            throw new IllegalArgumentException("路径应为 user#password/host:port/database[/schema[/table]]，实际: " + url);
         }
 
-        // [0] 认证：user#pass
         String auth = parts[0];
-        int hashIdx = auth.indexOf('#');
-        if (hashIdx < 0) {
-            throw new IllegalArgumentException(
-                    "用户名和密码之间缺少 '#' 分隔符，格式示例: #jdbc:postgresql://user#pass/...");
+        int passwordSeparator = auth.indexOf('#');
+        if (passwordSeparator < 0) {
+            throw new IllegalArgumentException("用户名和密码之间缺少 '#' 分隔符");
         }
-        this.username = auth.substring(0, hashIdx);
-        this.password = auth.substring(hashIdx + 1);
+        this.username = auth.substring(0, passwordSeparator);
+        this.password = auth.substring(passwordSeparator + 1);
         if (StrUtil.isBlank(this.username)) {
             throw new IllegalArgumentException("用户名不能为空");
         }
 
-        // [1] host:port
-        String[] hostPort = parts[1].split(":");
-        if (hostPort.length != 2) {
-            throw new IllegalArgumentException(
-                    "host:port 格式错误，期望 'host:port'，实际: " + parts[1]);
+        HostPort hostPort = parseHostPort(parts[1]);
+        this.host = hostPort.host;
+        this.port = hostPort.port;
+
+        DatabaseAndProperties databaseAndProperties = splitDatabaseProperties(parts[2]);
+        if (StrUtil.isBlank(databaseAndProperties.database)) {
+            throw new IllegalArgumentException("数据库名不能为空");
         }
-        this.host = hostPort[0];
-        try {
-            this.port = Integer.parseInt(hostPort[1]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("端口必须是数字，实际: " + hostPort[1], e);
-        }
-
-        // [2] database
-        this.database = parts[2];
-
-        // [3] schema（可选）
-        this.schema = parts.length > 3 && StrUtil.isNotBlank(parts[3]) ? parts[3] : null;
-
-        // [4] tableName（可选）
-        this.tableName = parts.length > 4 && StrUtil.isNotBlank(parts[4]) ? parts[4] : null;
+        this.database = databaseAndProperties.database;
+        this.jdbcProperties = databaseAndProperties.properties;
+        this.schema = parts.length >= 4 && StrUtil.isNotBlank(parts[3]) ? parts[3] : null;
+        this.tableName = parts.length == 5 && StrUtil.isNotBlank(parts[4]) ? parts[4] : null;
     }
 
-    // ===================== 从 builder 构建 =====================
-
     private ProtocolUrl(Builder builder) {
-        this.builtFromBuilder = true;
         this.subProtocol = builder.subProtocol;
         this.username = builder.username;
         this.password = builder.password;
         this.host = builder.host;
         this.port = builder.port;
         this.database = builder.database;
+        this.jdbcProperties = "";
         this.schema = builder.schema;
         this.tableName = builder.tableName;
+        validateState();
     }
-
-    // ===================== Builder =====================
 
     public static Builder builder() {
         return new Builder();
     }
 
+    /** 第三方协议的构造器，字段顺序与字符串协议保持一致。 */
     public static class Builder {
         private String subProtocol = "postgresql";
         private String username;
@@ -198,20 +160,9 @@ public final class ProtocolUrl implements Serializable {
         }
 
         public ProtocolUrl build() {
-            if (StrUtil.isBlank(username)) {
-                throw new IllegalArgumentException("username 不能为空");
-            }
-            if (StrUtil.isBlank(host)) {
-                throw new IllegalArgumentException("host 不能为空");
-            }
-            if (StrUtil.isBlank(database)) {
-                throw new IllegalArgumentException("database 不能为空");
-            }
             return new ProtocolUrl(this);
         }
     }
-
-    // ===================== 查询方法 =====================
 
     public String getSubProtocol() {
         return subProtocol;
@@ -253,83 +204,139 @@ public final class ProtocolUrl implements Serializable {
         return schema != null;
     }
 
-    /**
-     * 获取用于 SQL 语句的表名（有 schema 时返回 "schema.table"）。
-     */
+    /** 获取 SQL 使用的表名；schema 存在时返回 {@code schema.table}。 */
     public String getTableForSql() {
         if (StrUtil.isNotBlank(tableName) && schema != null) {
             return schema + "." + tableName;
         }
-        if (StrUtil.isNotBlank(tableName)) {
-            return tableName;
-        }
-        return schema;
+        return StrUtil.isNotBlank(tableName) ? tableName : schema;
     }
 
-    // ===================== 输出 =====================
-
     /**
-     * 构建标准 JDBC URL（不含用户名密码，不含自定义表名段）。
-     * <pre>
-     * jdbc:postgresql://host:port/database?currentSchema=schema
-     * jdbc:mysql://host:port/database
-     * </pre>
+     * 将第三方协议的连接部分转换为标准 JDBC URL，不输出用户名、密码和任务表名。
+     *
+     * <p>{@code postgis} 是任务协议允许的 PostgreSQL 别名，输出时会归一化为 JDBC 驱动实际使用的
+     * {@code postgresql}。其它 URL 细节由 {@code geoair-jdbc-url} 的方言实现负责。</p>
      */
     public String toJdbcUrl() {
-        StringBuilder sb = new StringBuilder("jdbc:").append(subProtocol)
-                .append("://").append(host).append(':').append(port)
-                .append('/').append(database);
-        if (builtFromBuilder) {
-            // builder 构建的：从 schema 字段拼接 currentSchema 参数
-            if (schema != null
-                    && ("postgresql".equals(subProtocol) || "postgis".equals(subProtocol))) {
-                sb.append("?currentSchema=").append(schema);
-            }
-        } else {
-            // 解析的：从原始 URL 中还原 ? 参数部分（如 currentSchema）
-            String remainder = getOriginalPathAfterDatabase();
-            int qIdx = remainder.indexOf('?');
-            if (qIdx >= 0) {
-                sb.append(remainder.substring(qIdx));
-            }
+        JdbcUrlCodec codec = GirJdbcUrlCodecs.defaultCodec();
+        DatabaseType databaseType = resolveDatabaseType();
+        JdbcUrl jdbcUrl = codec.create(databaseType, host, Integer.valueOf(port), database);
+        String result = codec.format(jdbcUrl) + jdbcProperties;
+        if (StrUtil.isNotBlank(schema) && supportsSchemaRewrite(databaseType)) {
+            return codec.rewriteSchema(result, schema);
         }
-        return sb.toString();
+        return result;
     }
 
-    /**
-     * 获取原始 URL 中 database 之后、table 之前的路径部分（含 ? 参数）。
-     */
-    private String getOriginalPathAfterDatabase() {
-        String afterPrefix = toString().substring(PROTOCOL_PREFIX.length());
-        int schemeEnd = afterPrefix.indexOf("://");
-        String path = afterPrefix.substring(schemeEnd + 3);
-        String[] rawParts = path.split("/", 4);
-        if (rawParts.length > 3) {
-            return rawParts[3];
-        }
-        return "";
-    }
-
-    /**
-     * 还原为自定义协议字符串。
-     * <pre>
-     * #jdbc:postgresql://user#pass/host:port/database/schema/table
-     * </pre>
-     */
+    /** 按约定还原协议字符串；空 schema 段会保留，确保 {@code //table} 不丢失表名语义。 */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(PROTOCOL_PREFIX).append(subProtocol)
+        StringBuilder result = new StringBuilder(PROTOCOL_PREFIX).append(subProtocol)
                 .append("://").append(username).append('#').append(password)
                 .append('/').append(host).append(':').append(port)
-                .append('/').append(database);
+                .append('/').append(database).append(jdbcProperties);
         if (schema != null) {
-            sb.append('/').append(schema);
+            result.append('/').append(schema);
         } else if (tableName != null) {
-            sb.append('/');
+            result.append('/');
         }
         if (tableName != null) {
-            sb.append('/').append(tableName);
+            result.append('/').append(tableName);
         }
-        return sb.toString();
+        return result.toString();
+    }
+
+    private void validateState() {
+        if (StrUtil.isBlank(subProtocol)) {
+            throw new IllegalArgumentException("子协议不能为空");
+        }
+        if (StrUtil.isBlank(username)) {
+            throw new IllegalArgumentException("用户名不能为空");
+        }
+        if (StrUtil.isBlank(host)) {
+            throw new IllegalArgumentException("主机不能为空");
+        }
+        if (StrUtil.isBlank(database)) {
+            throw new IllegalArgumentException("数据库名不能为空");
+        }
+        validatePort(port);
+        validateHost(host);
+    }
+
+    private DatabaseType resolveDatabaseType() {
+        String jdbcDriverName = "postgis".equalsIgnoreCase(subProtocol) ? "postgresql" : subProtocol;
+        DatabaseType databaseType = DatabaseType.fromJdbcDriverName(jdbcDriverName.toLowerCase(Locale.ROOT));
+        if (databaseType == DatabaseType.UNKNOWN) {
+            throw new IllegalArgumentException("不支持生成 JDBC URL 的子协议: " + subProtocol);
+        }
+        return databaseType;
+    }
+
+    private static boolean supportsSchemaRewrite(DatabaseType databaseType) {
+        return databaseType == DatabaseType.POSTGRESQL || databaseType == DatabaseType.ORACLE
+                || databaseType == DatabaseType.SQLSERVER || databaseType == DatabaseType.H2;
+    }
+
+    private static HostPort parseHostPort(String value) {
+        int separator = value == null ? -1 : value.lastIndexOf(':');
+        if (separator <= 0 || separator == value.length() - 1) {
+            throw new IllegalArgumentException("host:port 格式错误，实际: " + value);
+        }
+        String host = value.substring(0, separator);
+        validateHost(host);
+        int port;
+        try {
+            port = Integer.parseInt(value.substring(separator + 1));
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("端口必须是数字，实际: " + value.substring(separator + 1), ex);
+        }
+        validatePort(port);
+        return new HostPort(host, port);
+    }
+
+    private static DatabaseAndProperties splitDatabaseProperties(String value) {
+        int queryIndex = value == null ? -1 : value.indexOf('?');
+        if (queryIndex < 0) {
+            return new DatabaseAndProperties(value, "");
+        }
+        return new DatabaseAndProperties(value.substring(0, queryIndex), value.substring(queryIndex));
+    }
+
+    private static void validateHost(String host) {
+        if (StrUtil.isBlank(host)) {
+            throw new IllegalArgumentException("主机不能为空");
+        }
+        boolean containsColon = host.indexOf(':') >= 0;
+        boolean bracketedIpv6 = host.startsWith("[") && host.endsWith("]");
+        if (containsColon && !bracketedIpv6) {
+            throw new IllegalArgumentException("IPv6 主机必须使用方括号，例如 [2001:db8::1]");
+        }
+    }
+
+    private static void validatePort(int port) {
+        if (port <= 0 || port > 65535) {
+            throw new IllegalArgumentException("端口必须在 1 到 65535 之间，实际: " + port);
+        }
+    }
+
+    private static final class HostPort {
+        private final String host;
+        private final int port;
+
+        private HostPort(String host, int port) {
+            this.host = host;
+            this.port = port;
+        }
+    }
+
+    private static final class DatabaseAndProperties {
+        private final String database;
+        private final String properties;
+
+        private DatabaseAndProperties(String database, String properties) {
+            this.database = database;
+            this.properties = properties;
+        }
     }
 }

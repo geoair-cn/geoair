@@ -32,6 +32,30 @@
 - 参数和执行逻辑都在 Java 体系内，便于和现有项目整合
 - 比直接依赖外部命令行工具更容易和业务系统集成
 
+## 数据源任务协议
+
+静态切片为了让任务参数可以独立传递，保留与第三方约定的连接协议：
+
+```text
+#jdbc:{subprotocol}://用户名#密码/主机:端口/数据库名[/模式名[/表名]]
+```
+
+例如：
+
+```text
+#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public/tile_cache
+```
+
+`ProtocolUrl` 只解析这个任务协议中额外的用户名、密码、schema 与表名；标准 JDBC URL 的构建交给 `geoair-jdbc-url`。因此 PostgreSQL 会按方言生成 `currentSchema`，`postgis` 会归一化为 JDBC 驱动使用的 `postgresql`，而原始 `#jdbc:` 字符串及其字段顺序保持不变。
+
+当不需要 schema、但需要表名时，可保留空 schema 段：
+
+```text
+#jdbc:mysql://root#secret/10.0.0.1:3306/gisdb//tile_cache
+```
+
+该写法会得到表名 `tile_cache`，不会将它误解析为 schema。IPv6 主机需使用方括号，例如 `[2001:db8::1]:5432`。
+
 ## TileSliceParameter：为什么它是核心
 
 `TileSliceParameter` 是这一层最核心的参数对象。它不是简单 DTO，而是把切片任务几乎所有关键开关都统一收口了。
