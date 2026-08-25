@@ -394,6 +394,10 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             } catch (Exception e) {
             }
         }
+        if(httpCode==204){
+            response.setStatus(httpCode);
+            return;
+        }
         String errorMessage = tileResponse.getErrorMessage();
         if (GutilObject.isEmpty(errorMessage) && GutilObject.isNotEmpty(coordinate)) {
             errorMessage = StrUtil.format("无法找到瓦片  {}", coordinate.getZxyString());

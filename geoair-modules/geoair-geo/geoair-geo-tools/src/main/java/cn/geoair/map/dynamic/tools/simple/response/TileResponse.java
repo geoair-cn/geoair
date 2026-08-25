@@ -31,6 +31,8 @@ public class TileResponse implements Serializable {
      */
     Integer httpCode;
 
+
+
     /**
      * 最后修改时间戳
      */
