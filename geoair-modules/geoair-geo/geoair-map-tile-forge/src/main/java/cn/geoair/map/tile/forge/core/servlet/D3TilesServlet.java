@@ -262,7 +262,6 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
      * @return TileParseResult 对象
      */
     public TileParseResult parseRequest(String requestURI) {
-        requestURI = URLDecoder.decode(requestURI);
         Matcher matcher = getPattern().matcher(requestURI);
 
         if (!matcher.find()) {

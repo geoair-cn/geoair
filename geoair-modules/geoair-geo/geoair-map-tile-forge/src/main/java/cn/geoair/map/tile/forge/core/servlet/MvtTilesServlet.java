@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import cn.geoair.web.GirWeb;
 
-
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
@@ -55,6 +55,19 @@ public class MvtTilesServlet extends D3TilesServlet {
         }
         return tileRequest.toTileResponse();
     }
+
+
+    /**
+     * 解析请求URI
+     *
+     * @param requestURI 请求URI
+     * @return TileParseResult 对象
+     */
+    public TileParseResult parseRequest(String requestURI) {
+        requestURI = URLDecoder.decode(requestURI);
+        super.parseRequest(requestURI);
+    }
+
 
     /**
      * 生成 style.json 中的瓦片基础地址。
