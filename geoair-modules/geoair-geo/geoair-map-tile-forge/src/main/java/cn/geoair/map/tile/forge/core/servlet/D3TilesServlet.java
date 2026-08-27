@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -199,8 +200,8 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
 
     private String appendPortIfNecessary(String host, int port, String scheme) {
         if (host == null || host.isEmpty() || port <= 0 || hasExplicitPort(host)
-                || ("http".equalsIgnoreCase(scheme) && port == 80)
-                || ("https".equalsIgnoreCase(scheme) && port == 443)) {
+            || ("http".equalsIgnoreCase(scheme) && port == 80)
+            || ("https".equalsIgnoreCase(scheme) && port == 443)) {
             return host;
         }
         if (host.indexOf(':') >= 0 && !host.startsWith("[")) {
@@ -261,6 +262,7 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
      * @return TileParseResult 对象
      */
     public TileParseResult parseRequest(String requestURI) {
+        requestURI = URLDecoder.decode(requestURI);
         Matcher matcher = getPattern().matcher(requestURI);
 
         if (!matcher.find()) {
