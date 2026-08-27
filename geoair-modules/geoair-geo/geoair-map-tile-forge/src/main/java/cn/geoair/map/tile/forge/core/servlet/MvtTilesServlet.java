@@ -65,7 +65,7 @@ public class MvtTilesServlet extends D3TilesServlet {
      */
     public TileParseResult parseRequest(String requestURI) {
         requestURI = URLDecoder.decode(requestURI);
-        super.parseRequest(requestURI);
+       return super.parseRequest(requestURI);
     }
 
 
