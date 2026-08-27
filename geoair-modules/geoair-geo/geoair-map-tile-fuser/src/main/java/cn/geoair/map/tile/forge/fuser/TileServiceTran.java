@@ -90,6 +90,11 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
      */
     @Override
     public TileResponse getTileResponse(String requestUri) {
+        return getTileResponse(requestUri, null);
+    }
+
+    @Override
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         try {
             ParsedTileRequest parsed = ParsedTileRequest.parse(requestUri);
             if (parsed == null) {

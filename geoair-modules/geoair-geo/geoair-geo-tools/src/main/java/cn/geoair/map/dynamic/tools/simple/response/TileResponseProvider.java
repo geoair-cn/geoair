@@ -8,10 +8,21 @@ package cn.geoair.map.dynamic.tools.simple.response;
 public interface TileResponseProvider {
 
     /**
-     * 根据手工提供的请求 URI 或完整 URL 构建瓦片响应。
+     * 根据手工提供的请求 URI 构建瓦片响应。
      *
-     * @param requestUri 待解析的请求 URI 或完整 URL
+     * @param requestUri 待解析的请求 URI；不包含协议、IP 或端口
      * @return 瓦片响应；请求无法处理时返回携带错误信息的响应对象
      */
     TileResponse getTileResponse(String requestUri);
+
+    /**
+     * 根据手工提供的请求 URI 与请求源构建瓦片响应。
+     *
+     * @param requestUri  待解析的请求 URI；不包含协议、IP 或端口
+     * @param requestHost 请求源（协议、IP 或域名与端口）；为空时由实现按原有单参数逻辑处理
+     * @return 瓦片响应；请求无法处理时返回携带错误信息的响应对象
+     */
+    default TileResponse getTileResponse(String requestUri, String requestHost) {
+        return getTileResponse(requestUri);
+    }
 }

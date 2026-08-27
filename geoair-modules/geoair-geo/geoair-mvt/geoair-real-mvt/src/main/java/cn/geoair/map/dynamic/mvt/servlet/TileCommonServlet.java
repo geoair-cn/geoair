@@ -52,6 +52,11 @@ public class TileCommonServlet extends HttpServlet implements TileResponseProvid
 
     @Override
     public TileResponse getTileResponse(String requestUri) {
+        return getTileResponse(requestUri, null);
+    }
+
+    @Override
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         return TileResponse.error("Unsupported vector tile URI: " + requestUri);
     }
 

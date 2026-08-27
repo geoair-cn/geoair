@@ -37,11 +37,17 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        GirTileResponseUtil.buildFromTileResponse(getTileResponse(getRequestUri(request)), response);
+        GirTileResponseUtil.buildFromTileResponse(getTileResponse(getRequestUri(request), getRequestHost(request)), response);
     }
+
 
     @Override
     public TileResponse getTileResponse(String requestUri) {
+        return getTileResponse(requestUri, null);
+    }
+
+    @Override
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         if (requestUri == null || requestUri.trim().isEmpty()) {
             return TileResponse.error("Request URI must not be blank");
         }
@@ -70,6 +76,7 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
                     "",
                     ""
             );
+            parseResult.setRequestHost(requestHost);
             return createTileResponse(layerTile, parseResult, requestUri);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -118,13 +125,13 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
     protected boolean isSafeTerrainRequest(TileParseResult parseResult) {
         if (parseResult.isTile()) {
             return isNonNegativeInteger(parseResult.getZ())
-                    && isNonNegativeInteger(parseResult.getX())
-                    && isNonNegativeInteger(parseResult.getY())
-                    && parseResult.getFormat() != null
-                    && parseResult.getFormat().matches("[A-Za-z0-9]+$");
+                   && isNonNegativeInteger(parseResult.getX())
+                   && isNonNegativeInteger(parseResult.getY())
+                   && parseResult.getFormat() != null
+                   && parseResult.getFormat().matches("[A-Za-z0-9]+$");
         }
         return parseResult.getZ() != null && parseResult.getZ().matches("[A-Za-z0-9._-]+$")
-                && !".".equals(parseResult.getZ()) && !"..".equals(parseResult.getZ());
+               && !".".equals(parseResult.getZ()) && !"..".equals(parseResult.getZ());
     }
 
     private boolean isNonNegativeInteger(String value) {
@@ -138,6 +145,73 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
         String requestUri = request.getRequestURI();
         String queryString = request.getQueryString();
         return queryString == null || queryString.isEmpty() ? requestUri : requestUri + "?" + queryString;
+    }
+
+
+    /**
+     * 从当前 Servlet 请求构建对外访问源。
+     *
+     * <p>优先使用反向代理透传的协议、主机和端口；没有代理头时使用 Servlet 请求本身。
+     * 调用方应只在受信任的反向代理环境中接受 {@code X-Forwarded-*} 请求头。</p>
+     */
+    protected String getRequestHost(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        String scheme = firstHeaderValue(request.getHeader("X-Forwarded-Proto"));
+        if (scheme == null) {
+            scheme = request.getScheme();
+        }
+        String host = firstHeaderValue(request.getHeader("X-Forwarded-Host"));
+        if (host == null) {
+            host = firstHeaderValue(request.getHeader("Host"));
+        }
+        String forwardedPort = firstHeaderValue(request.getHeader("X-Forwarded-Port"));
+        if (host == null) {
+            host = request.getServerName();
+        }
+        int port = parsePort(forwardedPort, request.getServerPort());
+        host = appendPortIfNecessary(host, port, scheme);
+        return scheme + "://" + host;
+    }
+
+    private String firstHeaderValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        int separator = value.indexOf(',');
+        String firstValue = (separator >= 0 ? value.substring(0, separator) : value).trim();
+        return firstValue.isEmpty() ? null : firstValue;
+    }
+
+    private int parsePort(String portValue, int defaultPort) {
+        if (portValue == null) {
+            return defaultPort;
+        }
+        try {
+            return Integer.parseInt(portValue);
+        } catch (NumberFormatException ignored) {
+            return defaultPort;
+        }
+    }
+
+    private String appendPortIfNecessary(String host, int port, String scheme) {
+        if (host == null || host.isEmpty() || port <= 0 || hasExplicitPort(host)
+                || ("http".equalsIgnoreCase(scheme) && port == 80)
+                || ("https".equalsIgnoreCase(scheme) && port == 443)) {
+            return host;
+        }
+        if (host.indexOf(':') >= 0 && !host.startsWith("[")) {
+            return "[" + host + "]:" + port;
+        }
+        return host + ":" + port;
+    }
+
+    private boolean hasExplicitPort(String host) {
+        if (host.startsWith("[")) {
+            return host.indexOf("]:") > 0;
+        }
+        return host.indexOf(':') >= 0;
     }
 
     /**
@@ -211,8 +285,8 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
      * 将服务返回的瓦片结果转换为统一响应，子类可在此补充协议特有的处理。
      */
     protected TileResponse createTileResponse(TileRequest tileRequest,
-                                                TileParseResult tileParseResult,
-                                                String requestUri) {
+                                              TileParseResult tileParseResult,
+                                              String requestUri) {
         return tileRequest.toTileResponse();
     }
 
@@ -228,4 +302,3 @@ public class D3TilesServlet extends HttpServlet implements TileResponseProvider 
                 createTileResponse(tileRequest, tileParseResult, tileParseResult.getRequestURI()), response);
     }
 }
-
