@@ -14,7 +14,8 @@ public class TileParseResult {
     private String y;
     private String format;
     private String fullPath; // 可选：完整路径
-    private String requestURI; // 原始请求URI
+    private String requestURI; // 原始请求URI   不带ip和端口的真实url
+    private String requestHost; // 原始请求 的ip和端口。http开头
     private String contentAfterPrefix; // prefixName后的内容
 
     public static TileParseResult of() {

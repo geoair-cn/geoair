@@ -44,8 +44,6 @@ public class VectorTileV2Servlet extends TileCommonServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            // 保持原有 Web 调用的会话初始化行为；getTileResponse 本身不依赖 request。
-            request.getSession();
             String requestUri = request.getRequestURI();
             if (request.getQueryString() != null) {
                 requestUri += "?" + request.getQueryString();
@@ -61,7 +59,7 @@ public class VectorTileV2Servlet extends TileCommonServlet {
      * 根据 URI 或完整 URL 构建 MVT 响应，不依赖 HttpServletRequest。
      */
     @Override
-    public TileResponse getTileResponse(String requestUri) {
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         JSONObject re = new JSONObject();
         try {
             ParsedTileUri parsed = ParsedTileUri.parse(requestUri);

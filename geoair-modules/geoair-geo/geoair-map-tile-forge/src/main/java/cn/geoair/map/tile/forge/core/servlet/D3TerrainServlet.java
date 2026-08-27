@@ -35,7 +35,7 @@ public class D3TerrainServlet extends D3TilesServlet {
 
 
     @Override
-    public TileResponse getTileResponse(String requestUri) {
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         if (requestUri == null || requestUri.trim().isEmpty()) {
             return TileResponse.error("Request URI must not be blank");
         }

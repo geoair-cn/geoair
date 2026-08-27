@@ -43,7 +43,7 @@ public class XYZServlet extends D3TilesServlet {
 
     //    /rest/xyz
     @Override
-    public TileResponse getTileResponse(String requestUri) {
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
         if (requestUri == null || requestUri.trim().isEmpty()) {
             return TileResponse.error("Request URI must not be blank");
         }

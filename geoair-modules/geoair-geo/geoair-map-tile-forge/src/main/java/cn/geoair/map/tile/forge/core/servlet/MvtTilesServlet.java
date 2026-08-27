@@ -45,28 +45,62 @@ public class MvtTilesServlet extends D3TilesServlet {
                                                 TileParseResult tileParseResult,
                                                 String requestUri) {
         String requestURI = tileParseResult.getRequestURI();
-
-        if (requestURI.contains("style.json")) {
+        if (isStyleJsonRequest(requestURI)) {
             byte[] bytes = tileRequest.getBytes();
             String jsonContent = new String(bytes, StandardCharsets.UTF_8);
-            String replace = getMvtBasePath(requestUri);
-            jsonContent = jsonContent.replace("{BASE_URL}", replace);
+            String baseUrl = getMvtBaseUrl(requestURI, tileParseResult.getRequestHost());
+            jsonContent = jsonContent.replace("{BASE_URL}", baseUrl);
             byte[] responseBytes = jsonContent.getBytes(StandardCharsets.UTF_8);
             tileRequest.setBytes(responseBytes).setSize(responseBytes.length);
         }
         return tileRequest.toTileResponse();
     }
 
-    private String getMvtBasePath(String requestUri) {
+    /**
+     * 生成 style.json 中的瓦片基础地址。
+     *
+     * <p>请求 URI 只负责定位资源路径；只有显式传入请求源时才生成绝对地址。
+     * 未传入请求源时保持相对地址，兼容历史单参数 API。</p>
+     */
+    private String getMvtBaseUrl(String requestUri, String requestHost) {
+        String basePath = getMvtBasePath(requestUri);
+        String origin = normalizeOrigin(requestHost);
+        return origin == null ? basePath : origin + basePath;
+    }
+
+    /**
+     * 获取不带查询参数、协议和主机的 MVT 请求路径。
+     */
+    private String getMvtRequestPath(String requestUri) {
         String requestPath = getRequestPath(requestUri);
         int protocolIndex = requestPath.indexOf("://");
         if (protocolIndex >= 0) {
             int pathStart = requestPath.indexOf('/', protocolIndex + 3);
-            requestPath = pathStart >= 0 ? requestPath.substring(pathStart) : "/";
+            return pathStart >= 0 ? requestPath.substring(pathStart) : "/";
         }
+        return requestPath;
+    }
+
+    private boolean isStyleJsonRequest(String requestUri) {
+        return getMvtRequestPath(requestUri).endsWith("/style.json");
+    }
+
+    private String getMvtBasePath(String requestUri) {
+        String requestPath = getMvtRequestPath(requestUri);
         return requestPath.endsWith("/style.json")
                 ? requestPath.substring(0, requestPath.length() - "/style.json".length())
                 : requestPath;
+    }
+
+    private String normalizeOrigin(String requestHost) {
+        if (requestHost == null || requestHost.trim().isEmpty()) {
+            return null;
+        }
+        String origin = requestHost.trim();
+        while (origin.endsWith("/")) {
+            origin = origin.substring(0, origin.length() - 1);
+        }
+        return origin.isEmpty() ? null : origin;
     }
 
     /**
