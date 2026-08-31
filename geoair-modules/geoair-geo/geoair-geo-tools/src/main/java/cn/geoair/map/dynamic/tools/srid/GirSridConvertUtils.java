@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.tools.srid;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.log.StaticLog;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -22,32 +21,64 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
- * 基于GeoTools的SRID坐标转换工具类（单例模式） 支持EPSG标准SRID互转，内置常用CRS缓存
+ * 基于 GeoTools 的 SRID 坐标转换实现。
+ *
+ * <p>实例持有 {@link MathTransform} 缓存，并按 {@link ToolsConfig} 对象身份复用。 {@link #getInstance()}
+ * 是保留的默认单例入口；新代码应通过 {@link #getInstance(ToolsConfig)} 取得与配置绑定的实例。
  *
  * @author 张逢吉
  * @date 2024/12/05
  */
 public class GirSridConvertUtils implements GirSridConvertOpt {
-    public static GiLogger log = GirLoggerFactory.getLogger();
     private static volatile GirSridConvertUtils INSTANCE;
-    ToolsConfig advToolsConfig;
+    /** 按 ToolsConfig 对象身份复用 CRS 与坐标转换缓存。 */
+    private static final Map<ToolsConfig, GirSridConvertUtils> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirSridConvertUtils>());
+    /** 当前实例使用的几何工厂及格式化配置。 */
+    private final ToolsConfig advToolsConfig;
 
+    /**
+     * 使用指定工具配置创建转换器，并预加载常用坐标转换算子。
+     *
+     * @param advToolsConfig 工具配置，不能为空
+     */
     public GirSridConvertUtils(ToolsConfig advToolsConfig) {
         this.advToolsConfig = advToolsConfig;
         preloadCommonTransforms();
     }
 
+    /**
+     * 获取与配置对象绑定的转换器。
+     *
+     * @param advToolsConfig 工具配置；为 {@code null} 时返回默认单例
+     * @return 坐标转换器
+     */
     public static GirSridConvertUtils getInstance(ToolsConfig advToolsConfig) {
-        return new GirSridConvertUtils(advToolsConfig);
+        if (advToolsConfig == null) {
+            return getInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirSridConvertUtils sridConvertUtils = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (sridConvertUtils == null) {
+                sridConvertUtils = new GirSridConvertUtils(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, sridConvertUtils);
+            }
+            return sridConvertUtils;
+        }
     }
 
-    // 转换算子缓存：key=srcSrid_targetSrid，value=MathTransform
+    /** 转换算子缓存，键格式为 {@code 源SRID_目标SRID}。 */
     private final Map<String, MathTransform> transformCache = new HashMap<>();
 
-    // 缓存锁（保证线程安全）
+    /** 保护转换算子缓存的互斥锁。 */
     private final Lock cacheLock = new ReentrantLock();
 
-    /** 获取单例实例（双重校验锁） */
+    /**
+     * 获取使用默认配置的遗留单例。
+     *
+     * @deprecated 请使用 {@link #getInstance(ToolsConfig)}，以便明确配置与缓存归属。
+     * @return 默认配置的坐标转换器
+     */
     @Deprecated
     public static GirSridConvertUtils getInstance() {
         if (INSTANCE == null) {
@@ -159,6 +190,9 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
 
     @Override
     public CoordinateReferenceSystem getCRS(int srid) {
+        if (srid <= 0) {
+            throw new IllegalArgumentException("SRID必须为正整数，实际值=" + srid);
+        }
         try {
             // EPSG:4326是WGS84地理坐标系，特殊处理（提升兼容性）
             if (srid == 4326) {
@@ -167,38 +201,100 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
             // 通过SRID获取CRS（自动识别EPSG标准）
             return CRS.decode("EPSG:" + srid, true);
         } catch (FactoryException e) {
-            throw new RuntimeException("获取坐标参考系失败，SRID=" + srid, e);
+            throw new IllegalArgumentException("无法解析CRS，SRID=" + srid, e);
         }
     }
 
     private final org.locationtech.proj4j.CRSFactory CRS_FACTORY =
             new org.locationtech.proj4j.CRSFactory();
 
+    /**
+     * 常用 SRID 的经验判断表。
+     *
+     * <p>这些编码在业务中使用频率高，且坐标单位是确定的。先走该表可避免部分历史 EPSG 别名在不同 Proj4J 数据版本中的解析差异；未命中的 SRID 仍必须完成 CRS
+     * 解析后才允许返回结果。
+     */
+    private static final Map<Integer, Boolean> COMMON_CRS_GEOGRAPHIC_TYPES =
+            createCommonCrsGeographicTypes();
+
     private final Map<Integer, Boolean> CRS_GEOGRAPHIC_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public boolean isGeographicCRS(int srid) {
+        if (srid <= 0) {
+            throw new IllegalArgumentException("SRID必须为正整数，实际值=" + srid);
+        }
         if (CRS_GEOGRAPHIC_CACHE.containsKey(srid)) {
             return CRS_GEOGRAPHIC_CACHE.get(srid);
         }
-        boolean isGeographic = true;
+
+        Boolean knownType = COMMON_CRS_GEOGRAPHIC_TYPES.get(srid);
+        if (knownType != null) {
+            CRS_GEOGRAPHIC_CACHE.put(srid, knownType);
+            return knownType;
+        }
+        if (isCommonProjectedSrid(srid)) {
+            CRS_GEOGRAPHIC_CACHE.put(srid, false);
+            return false;
+        }
+
         try {
+            // 未知 SRID 先交给 GeoTools 校验，避免 Proj4J 对未知编码返回默认坐标系。
+            getCRS(srid);
             org.locationtech.proj4j.CoordinateReferenceSystem crs =
                     CRS_FACTORY.createFromName("EPSG:" + srid);
+            if (crs == null) {
+                throw new IllegalArgumentException("无法解析CRS，SRID=" + srid);
+            }
             Unit units = crs.getProjection().getUnits();
-            isGeographic = units == Units.DEGREES || units.name.equalsIgnoreCase("degree");
+            boolean isGeographic = units == Units.DEGREES || units.name.equalsIgnoreCase("degree");
+            CRS_GEOGRAPHIC_CACHE.put(srid, isGeographic);
             return isGeographic;
         } catch (Exception e) {
-            log.error("识别坐标异常", e);
-            if (srid == 3857 || srid == 900913) {
-                isGeographic = false;
-            }
-            // 异常处理：默认按经验判断（4326=度，其他=米）
-            StaticLog.warn("无法识别SRID={}的坐标系单位，按经验判断 {}", srid, isGeographic);
-        } finally {
-            CRS_GEOGRAPHIC_CACHE.put(srid, isGeographic);
+            throw new IllegalArgumentException("无法识别CRS坐标单位，SRID=" + srid, e);
         }
-        return isGeographic;
+    }
+
+    /** 创建常用地理/投影坐标系的经验判断表。 */
+    private static Map<Integer, Boolean> createCommonCrsGeographicTypes() {
+        Map<Integer, Boolean> types = new HashMap<>();
+
+        // 地理坐标系：坐标单位为度。
+        types.put(4326, true); // WGS 84
+        types.put(4979, true); // WGS 84（三维）
+        types.put(4490, true); // CGCS 2000
+        types.put(4480, true); // CGCS 2000（三维）
+        types.put(4214, true); // 北京 1954
+        types.put(4610, true); // 西安 1980
+        types.put(4267, true); // NAD27
+        types.put(4269, true); // NAD83
+        types.put(4230, true); // ED50
+        types.put(4258, true); // ETRS89
+        types.put(4277, true); // OSGB36
+        types.put(4283, true); // GDA94
+        types.put(7844, true); // GDA2020
+        types.put(4301, true); // Tokyo
+        types.put(4314, true); // DHDN
+        types.put(4807, true); // NTF (Paris)
+
+        // 常见 Web Mercator 别名：坐标单位为米。
+        types.put(3857, false);
+        types.put(900913, false);
+        types.put(3785, false);
+        types.put(102100, false);
+        types.put(102113, false);
+        return Collections.unmodifiableMap(types);
+    }
+
+    /**
+     * 判断常用投影坐标系号段。
+     *
+     * <p>UTM 北/南半球和 CGCS2000 高斯—克吕格号段均以米作为平面坐标单位， 无需再进入 CRS 工厂解析。
+     */
+    private static boolean isCommonProjectedSrid(int srid) {
+        boolean isUtm = (srid >= 32601 && srid <= 32660) || (srid >= 32701 && srid <= 32760);
+        boolean isCgcs2000GaussKruger = srid >= 4491 && srid <= 4554;
+        return isUtm || isCgcs2000GaussKruger;
     }
 
     @Override
@@ -232,7 +328,13 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
         }
     }
 
-    /** 获取坐标转换算子（带缓存） */
+    /**
+     * 获取坐标转换算子；缓存未命中时按宽松模式创建并写入缓存。
+     *
+     * @param srcSrid 源 EPSG SRID
+     * @param targetSrid 目标 EPSG SRID
+     * @return 坐标转换算子
+     */
     public MathTransform getMathTransform(int srcSrid, int targetSrid) {
         String cacheKey = srcSrid + "_" + targetSrid;
 

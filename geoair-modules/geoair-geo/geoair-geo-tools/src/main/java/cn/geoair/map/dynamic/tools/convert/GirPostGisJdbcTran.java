@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.StrUtil;
 import org.locationtech.jts.geom.Geometry;
@@ -26,10 +27,18 @@ public class GirPostGisJdbcTran {
              * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
              */
             PGobject pObject = (PGobject) value;
-            jtsGeom =
-                    GirGeoTools.defaultInstance()
-                            .getFormatOpt()
-                            .wkbToJtsGeometry(StrUtil.toString(pObject), true);
+            if (value.getClass().getSimpleName().contains("geometry")) {
+                jtsGeom =
+                        GirGeoTools.defaultInstance()
+                                .getFormatOpt()
+                                .wktToJtsGeometry(StrUtil.toString(pObject), true);
+            }
+            if (GutilObject.isEmpty(jtsGeom)) {
+                jtsGeom =
+                        GirGeoTools.defaultInstance()
+                                .getFormatOpt()
+                                .wkbToJtsGeometry(StrUtil.toString(pObject), true);
+            }
         }
         return jtsGeom;
     }

@@ -7,6 +7,8 @@ import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,6 +24,8 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
     /**
      * 获取接口的默认实现类 不带泛型区分
      *
+     * <p>如果接口未添加@GkSP注解，返回空数组
+     *
      * @param <T>
      * @param requiredType
      * @return
@@ -29,7 +33,7 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
     public static <T> Class<? extends T>[] getPlaceHolderClasses(Class<T> requiredType) {
         GkSP spiAn = requiredType.getAnnotation(GkSP.class);
         if (spiAn == null) {
-            throw new GirException("获取sp实现的接口必须包含GkSP注解：{} ", requiredType.getName());
+            return (Class<? extends T>[]) new Class<?>[0];
         }
         Class<?>[] ts = null;
         if (PLACEHOLDERCLASS_CACHE.containsKey(requiredType)) {
@@ -86,6 +90,8 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
     /**
      * 获取接口的默认实现类,带泛型区分
      *
+     * <p>如果接口未添加@GkSP注解，返回空数组
+     *
      * @param <T>
      * @param requiredType
      * @param types 泛型
@@ -133,11 +139,10 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
     public <T> T load(Class<T> requiredType, Type[] types) {
 
         GkSP spiAn = requiredType.getAnnotation(GkSP.class);
-        if (spiAn == null) {
-            throw new GirException("获取sp实现的接口必须包含GkSP注解：{} ", requiredType.getName());
-        }
+        boolean singleton = (spiAn != null) ? spiAn.singleton() : true;
+
         T res = null;
-        if (spiAn.singleton()) {
+        if (singleton) {
             res = super.load(requiredType, types);
         }
         if (res == null) {
@@ -161,10 +166,73 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
             }
         }
         if (res != null) {
-            if (spiAn.singleton()) {
+            if (singleton) {
                 setCache(requiredType, types, res);
             }
         }
         return res;
+    }
+
+    @Override
+    public <T> T load(Class<T> requiredType, String name, Type[] types) {
+
+        GkSP spiAn = requiredType.getAnnotation(GkSP.class);
+        boolean singleton = (spiAn != null) ? spiAn.singleton() : true;
+
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+
+        T res = null;
+        if (singleton) {
+            res = super.load(requiredType, name, types);
+        }
+        if (res == null) {
+            Class<? extends T>[] phClzs = getPlaceHolderClasses(requiredType, types);
+            List<Class<? extends T>> matched = new ArrayList<>();
+            for (Class<? extends T> cls : phClzs) {
+                // 通过实现类的Class简单名称匹配name
+                if (name.equals(cls.getSimpleName())) {
+                    matched.add(cls);
+                }
+            }
+            if (matched.size() == 1) {
+                try {
+                    res = matched.get(0).newInstance();
+                } catch (Exception e) {
+                    throw new GirException(
+                            e,
+                            "类 {} 配置sp 默认placeHolder实现类 ：{} 实例化对象发生错误",
+                            requiredType.getName(),
+                            matched.get(0).getName());
+                }
+            } else if (matched.size() > 1) {
+                throw new GirNoUniqueBeanException(
+                        "类 {} 配置sp 默认placeHolder根据name[{}]发现多个实现类", requiredType.getName(), name);
+            }
+        }
+        if (res != null && singleton) {
+            setCache(requiredType, name, types, res);
+        }
+        return res;
+    }
+
+    @Override
+    public <T> List<T> loadAll(Class<T> requiredType, Type[] types) {
+
+        List<T> result = new ArrayList<>();
+        Class<? extends T>[] phClzs = getPlaceHolderClasses(requiredType, types);
+        for (Class<? extends T> cls : phClzs) {
+            try {
+                result.add(cls.newInstance());
+            } catch (Exception e) {
+                throw new GirException(
+                        e,
+                        "类 {} 配置sp 默认placeHolder实现类 ：{} 实例化对象发生错误",
+                        requiredType.getName(),
+                        cls.getName());
+            }
+        }
+        return result;
     }
 }

@@ -1,12 +1,14 @@
 package cn.geoair.comp.dynamic.ds.apo;
 
-import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
-import cn.hutool.core.map.MapUtil;
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
+import cn.geoair.comp.jdbc.url.JdbcUrlCodec;
+import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.db.dialect.DriverNamePool;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 import lombok.Data;
 
 /**
@@ -73,24 +75,22 @@ public class DataSourceApo implements Serializable {
     private String validationQuery; // 验证链接的SQL
 
     public void setJdbcUrl(String jdbcUrl) {
-        AdvJdbcUrlUtil splitter = AdvJdbcUrlUtil.splitter(jdbcUrl);
-        setDbName(splitter.getDatabase());
-        if (getPort() == null) {
-            setPort(splitter.port == null ? null : Integer.parseInt(splitter.getPort()));
+        JdbcUrl parsed = GirJdbcUrlCodecs.defaultCodec().parse(jdbcUrl);
+        setDbName(parsed.getDatabaseName());
+        JdbcEndpoint endpoint = parsed.getPrimaryEndpoint();
+        if (getPort() == null && endpoint != null) {
+            setPort(endpoint.getPort());
         }
-        setAddress(splitter.getHost());
+        setAddress(endpoint == null ? null : endpoint.getHost());
         if (getSchemaName() == null) {
-            Map<String, String> params = splitter.getParams();
-            if (!MapUtil.isEmpty(params)) {
-                setSchemaName(params.get("currentSchema"));
-            }
+            setSchemaName(GirJdbcUrlCodecs.defaultCodec().getSchema(jdbcUrl));
         }
         this.jdbcUrl = jdbcUrl;
     }
 
     public String getJdbcUrl() {
         if (jdbcUrl == null) {
-            jdbcUrl = buildJdbcUrl(this);
+            jdbcUrl = createJdbcUrl(this);
         }
 
         return jdbcUrl;
@@ -121,32 +121,10 @@ public class DataSourceApo implements Serializable {
      * @return 数据库类型枚举值，默认返回POSTGRESQL
      */
     public DialectName getDbType() {
-        if (driver == null) {
-            return DialectName.POSTGRESQL;
-        }
-        // 按驱动类名匹配数据库类型
-        if (driver.contains(DriverNamePool.DRIVER_MYSQL)) {
-            return DialectName.MYSQL;
-        } else if (driver.contains(DriverNamePool.DRIVER_ORACLE)) {
-            return DialectName.ORACLE;
-        } else if (driver.contains(DriverNamePool.DRIVER_POSTGRESQL)) {
-            return DialectName.POSTGRESQL;
-        } else if (driver.contains(DriverNamePool.DRIVER_SQLSERVER)) {
-            return DialectName.SQLSERVER;
-        } else if (driver.contains(DriverNamePool.DRIVER_SQLLITE3)) {
-            return DialectName.SQLITE3;
-        } else if (driver.contains(DriverNamePool.DRIVER_H2)) {
-            return DialectName.H2;
-        } else if (driver.contains(DriverNamePool.DRIVER_DM7)) {
-            return DialectName.DM;
-        } else if (driver.contains(DriverNamePool.DRIVER_HANA)) {
-            return DialectName.HANA;
-        } else if (driver.contains(DriverNamePool.DRIVER_PHOENIX)) {
-            return DialectName.PHOENIX;
-        } else {
-            // 默认返回PostgreSQL
-            return DialectName.POSTGRESQL;
-        }
+        DatabaseType databaseType = DatabaseType.fromDriverClassName(driver);
+        return databaseType == DatabaseType.UNKNOWN
+                ? DialectName.POSTGRESQL
+                : databaseType.getDialectName();
     }
 
     /**
@@ -161,67 +139,35 @@ public class DataSourceApo implements Serializable {
      * @param dataSourceApo 数据源配置
      * @return 对应数据库的JDBC URL
      */
-    public static String buildJdbcUrl(DataSourceApo dataSourceApo) {
+    public static String createJdbcUrl(DataSourceApo dataSourceApo) {
         DialectName dbType = dataSourceApo.getDbType();
         String address = dataSourceApo.getAddress();
         Integer port = dataSourceApo.getPort();
         String dbName = dataSourceApo.getDbName();
         String schemaName = dataSourceApo.getSchemaName();
 
-        // Java 8兼容的switch语句（替换Switch表达式）
-        String jdbcUrl;
-        switch (dbType) {
-            case MYSQL:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:mysql://%s:%d/%s?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC",
-                                address, port, dbName);
-                break;
-            case ORACLE:
-                jdbcUrl = String.format("jdbc:oracle:thin:@%s:%d:%s", address, port, dbName);
-                break;
-            case POSTGRESQL:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:postgresql://%s:%d/%s%s",
-                                address,
-                                port,
-                                dbName,
-                                schemaName != null ? "?currentSchema=" + schemaName : "");
-                break;
-            case SQLSERVER:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:sqlserver://%s:%d;databaseName=%s", address, port, dbName);
-                break;
-            case SQLITE3:
-                jdbcUrl = String.format("jdbc:sqlite:%s", dbName); // SQLite无需地址端口，dbName为文件路径
-                break;
-            case H2:
-                jdbcUrl = String.format("jdbc:h2:%s/%s", address, dbName); // H2支持多种模式，此处为文件模式示例
-                break;
-            case DM:
-                jdbcUrl = String.format("jdbc:dm://%s:%d/%s", address, port, dbName); // 达梦数据库
-                break;
-            case HANA:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:sap://%s:%d/?databaseName=%s",
-                                address, port, dbName); // 华为HANA
-                break;
-            case PHOENIX:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:phoenix:%s:%d", address, port); // Phoenix无dbName，端口默认2181
-                break;
-            default:
-                jdbcUrl =
-                        String.format(
-                                "jdbc:postgresql://%s:%d/%s",
-                                address, port, dbName); // 默认PostgreSQL
-                break;
+        DatabaseType databaseType = DatabaseType.fromDialectName(dbType);
+        if (databaseType == DatabaseType.UNKNOWN) {
+            databaseType = DatabaseType.POSTGRESQL;
         }
-        return jdbcUrl;
+        JdbcUrlCodec codec = GirJdbcUrlCodecs.defaultCodec();
+        JdbcUrl jdbcUrl = codec.create(databaseType, address, port, dbName);
+        if (databaseType == DatabaseType.MYSQL) {
+            jdbcUrl = codec.withProperty(jdbcUrl, "useUnicode", "true");
+            jdbcUrl = codec.withProperty(jdbcUrl, "characterEncoding", "utf8");
+            jdbcUrl = codec.withProperty(jdbcUrl, "useSSL", "false");
+            jdbcUrl = codec.withProperty(jdbcUrl, "serverTimezone", "UTC");
+        }
+        String result = codec.format(jdbcUrl);
+        return databaseType == DatabaseType.POSTGRESQL && schemaName != null
+                ? codec.rewriteSchema(result, schemaName)
+                : result;
+    }
+
+    /** @deprecated 请使用 {@link #createJdbcUrl(DataSourceApo)}，新实现由 geoair-jdbc-url 模块负责。 */
+    @Deprecated
+    public static String buildJdbcUrl(DataSourceApo dataSourceApo) {
+        return createJdbcUrl(dataSourceApo);
     }
 
     /**

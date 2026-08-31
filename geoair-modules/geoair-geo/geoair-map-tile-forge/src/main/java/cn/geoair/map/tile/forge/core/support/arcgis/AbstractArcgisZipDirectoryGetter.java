@@ -63,7 +63,7 @@ public abstract class AbstractArcgisZipDirectoryGetter extends AbstractArcgisSup
                                 if (GutilObject.isNotEmpty(progressConsumers)) {
                                     progressConsumers.forEach(
                                             progressConsumer ->
-                                                    progressConsumer.accept(
+                                                    progressConsumer.report(
                                                             allCount, currentCount));
                                 }
                             } catch (Exception e) {

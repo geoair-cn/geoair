@@ -1,7 +1,5 @@
 package cn.geoair.comp.db.service.core.basic.service;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.db.service.core.DsApiUserInfoHelper;
 import cn.geoair.comp.db.service.core.basic.apo.ApiConfigApo;
@@ -36,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class DsApiConfigService {
-    public static GiLogger log = GirLoggerFactory.getLogger();
     @Autowired GirDsApiGroupDao girDsApiGroupDao;
 
     @Autowired GirDsApiConfigDao girDsApiConfigDao;

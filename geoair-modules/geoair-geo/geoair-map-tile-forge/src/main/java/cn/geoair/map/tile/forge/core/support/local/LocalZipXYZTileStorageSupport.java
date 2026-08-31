@@ -235,7 +235,7 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter
                                 if (GutilObject.isNotEmpty(progressConsumers)) {
                                     progressConsumers.forEach(
                                             progressConsumer ->
-                                                    progressConsumer.accept(
+                                                    progressConsumer.report(
                                                             allCount, currentCount));
                                 }
                             } catch (Exception e) {

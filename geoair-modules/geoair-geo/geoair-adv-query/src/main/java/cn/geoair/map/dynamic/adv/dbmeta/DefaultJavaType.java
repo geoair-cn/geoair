@@ -10,163 +10,312 @@ import java.time.OffsetTime;
 import java.util.Date;
 import java.util.UUID;
 
-/** java类型的枚举 */
-public enum DefaultJavaType implements DataType {
+/** Java类型枚举，实现TypeMetadata统一接口 */
+public enum DefaultJavaType implements TypeMetadata {
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * JAVA DATA TYPE
-     *
-     * ===================================================================================
-     * ============================== String number-int/long number-double/float date
-     * byte[] byte[]-geometry
-     *
-     ******************************************************************************************************************/
+    // ========== 字符串/文本类 ==========
+    JAVA_STRING(
+            "VARCHAR",
+            String.class,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.CHAR),
+    JAVA_CHAR(
+            "CHAR",
+            String.class,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.CHAR),
+    JAVA_TEXT(
+            "TEXT",
+            String.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TEXT),
+    JAVA_UUID(
+            "UUID",
+            UUID.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.CHAR),
+    JAVA_JSON(
+            "JSON",
+            String.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TEXT),
+    JAVA_JSONB(
+            "JSONB",
+            String.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TEXT),
+    JAVA_CITEXT(
+            "CITEXT",
+            String.class,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.CHAR),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     *
-     *
-     ****************************************************************************************************************/
-    JAVA_STRING("VARCHAR", String.class, 0, 1, 1) {},
-    JAVA_CHAR("CHAR", String.class, 0, 1, 1) {}, // 对应PG CHAR类型
-    JAVA_TEXT("TEXT", String.class, 1, 1, 1) {}, // 对应PG TEXT类型（无长度限制，忽略长度）
-    JAVA_UUID("UUID", UUID.class, 1, 1, 1) {}, // 对应PG UUID类型
-    JAVA_JSON("JSON", String.class, 1, 1, 1) {}, // 对应PG JSON类型
-    JAVA_JSONB("JSONB", String.class, 1, 1, 1) {}, // 对应PG JSONB类型
-    JAVA_CITEXT("CITEXT", String.class, 0, 1, 1) {}, // 对应PG 大小写不敏感文本类型
+    // ========== 布尔类 ==========
+    JAVA_BOOLEAN(
+            "BOOLEAN",
+            Boolean.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.BOOLEAN),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * Boolean 类型
-     *
-     ****************************************************************************************************************/
-    JAVA_BOOLEAN("BOOLEAN", Boolean.class, 1, 1, 1) {},
+    // ========== 整数类 ==========
+    JAVA_SHORT(
+            "SMALLINT",
+            Short.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_INTEGER(
+            "INT",
+            Integer.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_LONG(
+            "LONG",
+            Long.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_BYTE(
+            "TINYINT",
+            Byte.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_BIGINT(
+            "BIGINT",
+            Long.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_SERIAL(
+            "SERIAL",
+            Integer.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
+    JAVA_BIGSERIAL(
+            "BIGSERIAL",
+            Long.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.INT),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * 整数类型（补充PG高精度整数）
-     *
-     ****************************************************************************************************************/
-    JAVA_INTEGER("INT", Integer.class, 1, 1, 1) {},
-    JAVA_LONG("LONG", Long.class, 1, 1, 1) {},
-    JAVA_SHORT("SMALLINT", Short.class, 1, 1, 1) {}, // 对应PG SMALLINT类型
-    JAVA_BYTE("TINYINT", Byte.class, 1, 1, 1) {}, // 对应PG TINYINT（扩展类型）
-    JAVA_BIGINT("BIGINT", Long.class, 1, 1, 1) {}, // 对应PG BIGINT类型
-    JAVA_SERIAL("SERIAL", Integer.class, 1, 1, 1) {}, // 对应PG SERIAL自增类型
-    JAVA_BIGSERIAL("BIGSERIAL", Long.class, 1, 1, 1) {}, // 对应PG BIGSERIAL自增类型
+    // ========== 浮点/小数类 ==========
+    JAVA_FLOAT(
+            "FLOAT",
+            Float.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT),
+    JAVA_DOUBLE(
+            "DOUBLE",
+            Double.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT),
+    JAVA_DECIMAL(
+            "DECIMAL",
+            BigDecimal.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT),
+    JAVA_NUMERIC(
+            "NUMERIC",
+            BigDecimal.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT),
+    JAVA_REAL(
+            "REAL",
+            Float.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * 浮点/小数类型（补充PG高精度小数）
-     *
-     ****************************************************************************************************************/
-    JAVA_FLOAT("FLOAT", Float.class, 1, 0, 0) {},
-    JAVA_DOUBLE("DOUBLE", Double.class, 1, 0, 0) {},
-    JAVA_DECIMAL("DECIMAL", BigDecimal.class, 1, 0, 0) {},
-    JAVA_NUMERIC("NUMERIC", BigDecimal.class, 1, 0, 0) {}, // 对应PG NUMERIC类型（与DECIMAL等价）
-    JAVA_REAL("REAL", Float.class, 1, 0, 0) {}, // 对应PG REAL类型（单精度浮点）
+    // ========== 日期时间类 ==========
+    JAVA_DATE(
+            "DATE",
+            Date.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.DATE),
+    JAVA_SQL_TIMESTAMP(
+            "TIMESTAMP",
+            java.sql.Timestamp.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIMESTAMP),
+    JAVA_SQL_TIME(
+            "TIME",
+            Time.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIME),
+    JAVA_SQL_DATE(
+            "DATE",
+            java.sql.Date.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.DATE),
+    JAVA_LOCAL_DATE(
+            "DATE",
+            LocalDate.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.DATE),
+    JAVA_LOCAL_TIME(
+            "TIME",
+            LocalTime.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIME),
+    JAVA_LOCAL_DATE_TIME(
+            "TIMESTAMP",
+            LocalDateTime.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIMESTAMP),
+    JAVA_OFFSET_DATE_TIME(
+            "TIMESTAMPTZ",
+            OffsetDateTime.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIMESTAMP),
+    JAVA_OFFSET_TIME(
+            "TIMETZ",
+            OffsetTime.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.TIME),
+    JAVA_INTERVAL(
+            "INTERVAL",
+            String.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.CONDITIONAL,
+            IgnorePolicy.MUTUAL_DEPENDENT,
+            CategoryEnum.INTERVAL),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * 日期时间类型（补充PG时间间隔/时区类型）
-     *
-     ****************************************************************************************************************/
-    JAVA_DATE("DATE", Date.class, 1, 1, 1) {},
-    JAVA_SQL_TIMESTAMP("TIMESTAMP", java.sql.Timestamp.class, 1, 1, 1) {},
-    JAVA_SQL_TIME("TIME", Time.class, 1, 1, 1) {},
-    JAVA_SQL_DATE("DATE", java.sql.Date.class, 1, 1, 1) {},
-    JAVA_LOCAL_DATE("DATE", LocalDate.class, 1, 1, 1) {},
-    JAVA_LOCAL_TIME("TIME", LocalTime.class, 1, 1, 1) {},
-    JAVA_LOCAL_DATE_TIME("TIMESTAMP", LocalDateTime.class, 1, 1, 1) {},
-    JAVA_OFFSET_DATE_TIME("TIMESTAMPTZ", OffsetDateTime.class, 1, 1, 1) {}, // 对应PG带时区时间
-    JAVA_OFFSET_TIME("TIMETZ", OffsetTime.class, 1, 1, 1) {}, // 对应PG带时区时间
-    JAVA_INTERVAL("INTERVAL", String.class, 1, 2, 3) {}, // 对应PG INTERVAL类型（映射为String，需自定义解析）
+    // ========== 二进制/大对象类 ==========
+    JAVA_BYTES(
+            "BYTEA",
+            byte[].class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.BYTES),
+    JAVA_BLOB(
+            "BLOB",
+            byte[].class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.BLOB),
+    JAVA_GEOMETRY(
+            "GEOMETRY",
+            byte[].class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.GEOMETRY),
+    JAVA_GEOGRAPHY(
+            "GEOGRAPHY",
+            byte[].class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.IGNORE,
+            CategoryEnum.GEOMETRY),
 
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * 二进制类型（补充PG大对象类型）
-     *
-     ****************************************************************************************************************/
-    JAVA_BYTES("BYTEA", Byte[].class, 1, 1, 1) {}, // 对应PG BYTEA类型
-    JAVA_BLOB("BLOB", Byte[].class, 1, 1, 1) {}, // 对应PG BLOB（通过扩展类型支持）
-    JAVA_GEOMETRY("GEOMETRY", Byte[].class, 1, 1, 1) {}, // 对应PG GEOMETRY空间类型
-
-    /*
-     * ***********************************************************************************
-     * ******************************
-     *
-     * 特殊数值类型
-     *
-     ****************************************************************************************************************/
-    JAVA_MONEY("MONEY", BigDecimal.class, 1, 0, 0) {}; // 对应PG MONEY类型（映射为BigDecimal避免精度丢失）
+    // ========== 特殊类型 ==========
+    JAVA_MONEY(
+            "MONEY",
+            BigDecimal.class,
+            IgnorePolicy.IGNORE,
+            IgnorePolicy.KEEP,
+            IgnorePolicy.KEEP,
+            CategoryEnum.FLOAT);
 
     private final String name;
+    private final Class<?> clazz;
+    private final IgnorePolicy ignoreLength;
+    private final IgnorePolicy ignorePrecision;
+    private final IgnorePolicy ignoreScale;
+    private final CategoryEnum category;
 
-    private final Class clazz;
-
-    private final int ignoreLength;
-
-    private final int ignorePrecision;
-
-    private final int ignoreScale;
-
-    private DefaultJavaType(
-            String name, Class clazz, int ignoreLength, int ignorePrecision, int ignoreScale) {
+    DefaultJavaType(
+            String name,
+            Class<?> clazz,
+            IgnorePolicy ignoreLength,
+            IgnorePolicy ignorePrecision,
+            IgnorePolicy ignoreScale,
+            CategoryEnum category) {
         this.name = name;
         this.clazz = clazz;
         this.ignoreLength = ignoreLength;
         this.ignorePrecision = ignorePrecision;
         this.ignoreScale = ignoreScale;
+        this.category = category;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-    public Class getJavaClazz() {
+    public Class<?> getJavaClazz() {
         return clazz;
-    }
-
-    public int getIgnoreLength() {
-        return ignoreLength;
-    }
-
-    public int getIgnorePrecision() {
-        return ignorePrecision;
-    }
-
-    public int getIgnoreScale() {
-        return ignoreScale;
     }
 
     @Override
     public int ignoreLength() {
-        return ignoreLength;
+        return ignoreLength.code();
     }
 
     @Override
     public int ignorePrecision() {
-        return ignorePrecision;
+        return ignorePrecision.code();
     }
 
     @Override
     public int ignoreScale() {
-        return ignoreScale;
+        return ignoreScale.code();
     }
 
     @Override
@@ -175,7 +324,22 @@ public enum DefaultJavaType implements DataType {
     }
 
     @Override
-    public Class supportClass() {
+    public Class<?> supportClass() {
         return clazz;
+    }
+
+    @Override
+    public CategoryEnum getCategory() {
+        return category;
+    }
+
+    @Override
+    public CategoryGroupEnum getCategoryGroup() {
+        return category.group();
+    }
+
+    @Override
+    public Config config() {
+        return category.config();
     }
 }

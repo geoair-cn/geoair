@@ -14,7 +14,11 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class PostgisWriterLinkInfo extends PostgisLinkInfo {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     private String tableName;
+
+    // 批量插入的批次大小
+    private int batchSize = 1000;
 
     /** 检查链接信息有效性 */
     @Override

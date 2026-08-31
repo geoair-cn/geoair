@@ -104,7 +104,11 @@ public class PostgresTileCache implements TileCache {
                     try {
                         String tableName = getTableName(k);
                         boolean needReverse = FuserCacheUtils.fileCheckIsNeedReverseY(k);
-                        return new TableCacheHolder(dataSource, tableName, needReverse);
+                        return new TableCacheHolder(
+                                dataSource,
+                                tableName,
+                                needReverse,
+                                FuserCacheUtils.getCacheGridSrid(k));
                     } catch (Exception e) {
                         log.error("创建图层缓存失败: {}", layerName, e);
                         return null;
@@ -264,12 +268,15 @@ public class PostgresTileCache implements TileCache {
         private final IAdvExecutor iAdvExecutor;
         private final String tableName;
         private final boolean needReverseY;
+        private final int gridSrid;
         private volatile boolean initialized = false;
 
-        public TableCacheHolder(DataSource dataSource, String tableName, boolean needReverseY) {
+        public TableCacheHolder(
+                DataSource dataSource, String tableName, boolean needReverseY, int gridSrid) {
             this.iAdvExecutor = GirAdvQuery.getIAdvExecutor(dataSource);
             this.tableName = tableName;
             this.needReverseY = needReverseY;
+            this.gridSrid = gridSrid;
             init();
         }
 
@@ -295,7 +302,7 @@ public class PostgresTileCache implements TileCache {
         }
 
         public byte[] get(int z, int x, int y) {
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             GirAdvOneRow girAdvOneRow =
                     iAdvExecutor.bSelectOne(
                             "SELECT tile_data FROM "
@@ -306,7 +313,7 @@ public class PostgresTileCache implements TileCache {
         }
 
         public boolean put(int z, int x, int y, byte[] data, String format) {
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
 
             String sql =
                     "INSERT INTO "
@@ -318,7 +325,7 @@ public class PostgresTileCache implements TileCache {
         }
 
         public boolean delete(int z, int x, int y) {
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             String sql = "DELETE FROM " + tableName + " WHERE z = ? AND x = ? AND y = ?";
             boolean b = iAdvExecutor.bInsertBySql(sql, SqlParamList.of(z, x, storeY)) > 0;
             log.debug("删除瓦片成功: z={}, x={}, y={}", z, x, y);
@@ -340,7 +347,7 @@ public class PostgresTileCache implements TileCache {
         }
 
         public boolean exists(int z, int x, int y) {
-            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+            int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
             String sql =
                     "SELECT count(1) as count FROM "
                             + tableName

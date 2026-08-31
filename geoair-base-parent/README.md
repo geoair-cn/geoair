@@ -244,7 +244,7 @@ geoair-framework (根 POM)
 <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
 </parent>
 ```
 | | 外部项目引用 | 仅导入 dependencyManagement | 
@@ -254,7 +254,7 @@ geoair-framework (根 POM)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-base-parent</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -298,7 +298,7 @@ geoair-framework (根 POM)
 
 ## 👥 开发者信息
 - **作者**: 张逢吉
-- **邮箱**: zhangjun7570@qq.com
+- **邮箱**: zfj20250104@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
 - **Gitee 仓库**: https://github.com/geoair-cn/geoair
@@ -308,5 +308,5 @@ geoair-framework (根 POM)
 
 ---
 **最后更新**: 2026-03-14  
-**当前版本**: J8.1.5
+**当前版本**: J8.1.6
 ```

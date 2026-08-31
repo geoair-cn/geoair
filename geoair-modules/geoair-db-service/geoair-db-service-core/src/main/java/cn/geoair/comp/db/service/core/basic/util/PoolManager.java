@@ -1,7 +1,5 @@
 package cn.geoair.comp.db.service.core.basic.util;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
@@ -16,7 +14,6 @@ import javax.sql.DataSource;
  * @create: 2020-12-11 10:51
  */
 public class PoolManager {
-    public static GiLogger log = GirLoggerFactory.getLogger();
 
     static ConcurrentHashMap<String, IAdvExecutor> advExecutorConcurrentHashMap =
             new ConcurrentHashMap<>();

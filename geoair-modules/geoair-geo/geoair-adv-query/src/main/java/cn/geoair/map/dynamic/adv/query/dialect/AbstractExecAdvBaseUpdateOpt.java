@@ -11,7 +11,11 @@ import cn.geoair.map.dynamic.adv.query.IAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanColumnMapper;
+import cn.geoair.map.dynamic.adv.query.mapping.AdvPreparedStatementBinder;
 import cn.geoair.map.dynamic.adv.query.strategy.UpdateStrategy;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
 import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
@@ -23,6 +27,7 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.sql.SqlExecutor;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -34,8 +39,16 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
     Supplier<AdvQueryGlobalConfig> configAdvQueryGetter;
 
-    public AbstractExecAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    private final AdvBeanColumnMapper columnMapper;
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+    private final AdvPreparedStatementBinder preparedStatementBinder;
+
+    public AbstractExecAdvBaseUpdateOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         this.configAdvQueryGetter = configAdvQueryGetter;
+        this.typeHandlerRegistry = registry;
+        this.columnMapper = new AdvBeanColumnMapper(registry);
+        this.preparedStatementBinder = new AdvPreparedStatementBinder(registry);
     }
 
     @Override
@@ -134,7 +147,10 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause =
+                GirAdvSqlUtils.buildSetClause(
+                        rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String execSql =
                 StrUtil.format(
                         "UPDATE {} SET {} WHERE {} = ?",
@@ -142,7 +158,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         setClause,
                         dialectTableNameProcessor.tbQuoteFieldName(idKey));
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.add(id);
 
         return executeUpdate(execSql, params, "bUpdateByPK");
@@ -182,13 +197,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
-            if (CollUtil.isNotEmpty(idKeys)) {
-                idKey = idKeys.get(0);
-            }
-        }
-        if (GutilObject.isEmpty(idKey)) {
-            throw new IllegalArgumentException("主键字段名不能为空");
+            idKey = resolveIdKey(entity.getClass(), strategy);
         }
 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
@@ -201,7 +210,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         toUnderlineCase,
                         ignoreNullValue,
                         strategy.isIgnoreEmptyString(),
-                        ignoreFieldNames);
+                        ignoreFieldNames,
+                        this.columnMapper);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -263,20 +273,15 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(entity.getClass(), true);
-            if (CollUtil.isNotEmpty(idKeys)) {
-                idKey = idKeys.get(0);
-            }
-        }
-        if (GutilObject.isEmpty(idKey)) {
-            throw new IllegalArgumentException("主键字段名不能为空");
+            idKey = resolveIdKey(entity.getClass(), strategy);
         }
 
         boolean toUnderlineCase = strategy.isToUnderlineCase();
         List<String> ignoreFieldNames = strategy.getIgnoreFieldNames();
 
         Map<String, Object> rowData =
-                GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+                GirAdvSqlUtils.getRowData(
+                        entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
 
         if (toUnderlineCase) {
             idKey = StrUtil.toUnderlineCase(idKey);
@@ -333,7 +338,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String quoteTableName =
                     dialectTableNameProcessor.tbGetTableNameWithSchema(
                             dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-            String setClause = GirAdvSqlUtils.buildSetClause(updateData, dialectTableNameProcessor);
+            List<Object> singleParams = new ArrayList<>(updateData.values());
+            String setClause =
+                    GirAdvSqlUtils.buildSetClause(
+                            updateData,
+                            dialectTableNameProcessor,
+                            typeHandlerRegistry,
+                            singleParams);
             String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
             String sql =
                     StrUtil.format(
@@ -341,8 +352,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                             quoteTableName,
                             setClause,
                             quotedIdKey);
-            // 参数：更新字段值 + 主键id
-            List<Object> singleParams = new ArrayList<>(updateData.values());
             singleParams.add(id);
             sqlStatements.add(Pair.of(sql, singleParams));
         }
@@ -363,19 +372,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
             // 循环每一批执行
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
-                List<String> currentBatchSqls = new ArrayList<>();
-                List<Object> currentBatchParamList = new ArrayList<>();
-
-                for (Pair<String, List<Object>> sqlStatement : currentBatchParam) {
-                    currentBatchParamList.addAll(sqlStatement.getValue());
-                    currentBatchSqls.add(sqlStatement.getKey());
-                }
-
                 stopWatch.start();
-                // 多条sql用;分隔执行
-                String batchSql = StrUtil.join("; \n", currentBatchSqls);
-                int execute =
-                        SqlExecutor.execute(connection, batchSql, currentBatchParamList.toArray());
+                int execute = executeUpdateBatch(connection, currentBatchParam);
                 stopWatch.stop();
 
                 totalSuccess += execute;
@@ -383,7 +381,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         .debug(
                                 "批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
                                 batchNum,
-                                currentBatchSqls.size(),
+                                execute,
                                 stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
@@ -439,7 +437,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         List<Map<String, Object>> rowsData = new ArrayList<>();
         for (T entity : entities) {
             Map<String, Object> rowData =
-                    GirAdvSqlUtils.getRowData(entity, true, false, ListUtil.empty());
+                    GirAdvSqlUtils.getRowData(
+                            entity, true, false, ListUtil.empty(), this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -454,6 +453,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             T first = entities.iterator().next();
             String tableName = GirAdvSqlUtils.getTableName(first.getClass());
             List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
+            if (CollUtil.isEmpty(idKeys)) throw new IllegalArgumentException("未指定主键字段，且未找到 @Id 注解");
             bUpdateBatchByPK(tableName, idKeys.get(0), entities);
             return;
         }
@@ -466,8 +466,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String idKey = strategy.getIdKey();
         if (GutilObject.isEmpty(idKey)) {
             T first = entities.iterator().next();
-            List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(first.getClass(), true);
-            idKey = idKeys.get(0);
+            idKey = resolveIdKey(first.getClass(), strategy);
         }
 
         List<Map<String, Object>> rowsData = new ArrayList<>();
@@ -477,7 +476,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                             entity,
                             strategy.isToUnderlineCase(),
                             strategy.isIgnoreNullValue(),
-                            strategy.getIgnoreFieldNames());
+                            strategy.getIgnoreFieldNames(),
+                            this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData, strategy.getBatchSize());
@@ -507,7 +507,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         for (T entity : entities) {
             // 忽略null值字段
             Map<String, Object> rowData =
-                    GirAdvSqlUtils.getRowData(entity, true, true, ListUtil.empty());
+                    GirAdvSqlUtils.getRowData(
+                            entity, true, true, ListUtil.empty(), this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -547,7 +548,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         for (T entity : entities) {
             // 使用策略中的配置，但强制忽略null值
             Map<String, Object> rowData =
-                    GirAdvSqlUtils.getRowData(entity, toUnderlineCase, true, ignoreFieldNames);
+                    GirAdvSqlUtils.getRowData(
+                            entity, toUnderlineCase, true, ignoreFieldNames, this.columnMapper);
             rowsData.add(rowData);
         }
         bUpdateBatchByPK(tableName, idKey, rowsData);
@@ -578,12 +580,14 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause =
+                GirAdvSqlUtils.buildSetClause(
+                        rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
         String execSql =
                 StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereMap.values());
 
         return executeUpdate(execSql, params, "bUpdateByMap");
@@ -617,7 +621,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         toUnderlineCase,
                         ignoreNullValue,
                         strategy.isIgnoreEmptyString(),
-                        ignoreFieldNames);
+                        ignoreFieldNames,
+                        this.columnMapper);
 
         return bUpdateByWhere(tableName, rowData, whereFilter.toWhereFilter());
     }
@@ -678,11 +683,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String quoteTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameNotSchema, schemaNameByTableName);
-        String setClause = GirAdvSqlUtils.buildSetClause(rowData, dialectTableNameProcessor);
+        List<Object> params = new ArrayList<>(rowData.values());
+        String setClause =
+                GirAdvSqlUtils.buildSetClause(
+                        rowData, dialectTableNameProcessor, typeHandlerRegistry, params);
         String execSql =
                 StrUtil.format("UPDATE {} SET {} WHERE {}", quoteTableName, setClause, whereClause);
 
-        List<Object> params = new ArrayList<>(rowData.values());
         params.addAll(whereParams);
 
         return executeUpdate(execSql, params, "bUpdateByWhere");
@@ -729,7 +736,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             dbKeyList.add(dialectTableNameProcessor.tbQuoteFieldName(field));
         }
         String fields = String.join(",", dbKeyList);
-        String placeholders = dbKeyList.stream().map(key -> "?").collect(Collectors.joining(","));
+        List<Object> params = new ArrayList<>(rowData.values());
+        String placeholders = buildPlaceholders(params);
 
         List<String> conflictKeysList = new ArrayList<>();
         for (String field : conflictKeys) {
@@ -740,7 +748,6 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String execSql =
                 buildUpdateOrInsertSql(
                         quoteTableName, fields, placeholders, conflictFields, updateClause);
-        List<Object> params = new ArrayList<>(rowData.values());
         return Pair.of(execSql, params);
     }
 
@@ -796,7 +803,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         toUnderlineCase,
                         ignoreNullValue,
                         strategy.isIgnoreEmptyString(),
-                        ignoreFieldNames);
+                        ignoreFieldNames,
+                        this.columnMapper);
 
         if (toUnderlineCase) {
             List<String> underlineConflictKeys = new ArrayList<>();
@@ -886,25 +894,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             connection.setAutoCommit(false);
 
             for (List<Map<String, Object>> currentBatchData : batchGroupParams) {
-                List<String> currentBatchSqls = new ArrayList<>();
-                List<Object> currentBatchParamList = new ArrayList<>();
-
-                for (Map<String, Object> rowData : currentBatchData) {
-                    Pair<String, List<Object>> upsertSql =
-                            getUpsertSql(tableName, rowData, conflictKeys);
-                    // 表名去除空格处理
-                    String sql = dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey());
-                    currentBatchSqls.add(sql);
-                    currentBatchParamList.addAll(upsertSql.getValue());
-                }
-
                 stopWatch.start();
-
                 int execute =
-                        SqlExecutor.execute(
-                                connection,
-                                StrUtil.join("; \n", currentBatchSqls),
-                                currentBatchParamList.toArray());
+                        executeUpsertBatch(connection, tableName, currentBatchData, conflictKeys);
                 stopWatch.stop();
 
                 totalSuccess += execute;
@@ -912,7 +904,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                         .debug(
                                 "批次：{} 提交成功，成功条数量：{}，当前批次耗时：{}ms",
                                 batchNum,
-                                currentBatchSqls.size(),
+                                execute,
                                 stopWatch.getLastTaskTimeMillis());
                 batchNum++;
             }
@@ -1027,7 +1019,8 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                             toUnderlineCase,
                             ignoreNullValue,
                             strategy.isIgnoreEmptyString(),
-                            ignoreFieldNames);
+                            ignoreFieldNames,
+                            this.columnMapper);
             allRows.add(rowData);
         }
         bUpsertBatch(tableName, allRows, finalConflictKeys, strategy.getBatchSize());
@@ -1092,9 +1085,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
     private Integer executeUpdate(String sql, List<Object> params, String methodName) {
         StopWatch stopWatch = new StopWatch();
         Connection connection = dataSourceGetter.getConnection();
+        PreparedStatement pstmt = null;
         try {
+            pstmt = connection.prepareStatement(sql);
+            preparedStatementBinder.bindAll(pstmt, params);
             stopWatch.start();
-            Integer result = SqlExecutor.execute(connection, sql, params.toArray());
+            int result = pstmt.executeUpdate();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig())
@@ -1105,6 +1101,12 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
                     .logExecuteError(this.getClass(), methodName, sql, params, e);
             throw new RuntimeException("更新操作失败，SQL：" + sql, e);
         } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException ignored) {
+                }
+            }
             closeConnection(connection);
         }
     }
@@ -1133,6 +1135,64 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         }
     }
 
+    /** 执行一批 UPDATE 语句。PG/Oracle/DM 可拼接多语句执行。 MySQL 需覆写为 PreparedStatement.addBatch。 */
+    protected int executeUpdateBatch(
+            Connection connection, List<Pair<String, List<Object>>> statements)
+            throws SQLException {
+        Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
+        for (Pair<String, List<Object>> stmt : statements) {
+            groups.computeIfAbsent(stmt.getKey(), k -> new ArrayList<>()).add(stmt.getValue());
+        }
+        int total = 0;
+        for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
+            try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                for (List<Object> params : group.getValue()) {
+                    preparedStatementBinder.bindAll(pstmt, params);
+                    pstmt.addBatch();
+                }
+                int[] results = pstmt.executeBatch();
+                total += results.length;
+            }
+        }
+        return total;
+    }
+
+    /** 执行一批 Upsert 语句。 */
+    protected int executeUpsertBatch(
+            Connection connection,
+            String tableName,
+            List<Map<String, Object>> batchData,
+            List<String> conflictKeys)
+            throws SQLException {
+        Map<String, List<List<Object>>> groups = new LinkedHashMap<>();
+        for (Map<String, Object> rowData : batchData) {
+            Pair<String, List<Object>> upsertSql = getUpsertSql(tableName, rowData, conflictKeys);
+            String sql = dialectTableNameProcessor.tbRemoveSqlSpaces(upsertSql.getKey());
+            groups.computeIfAbsent(sql, k -> new ArrayList<>()).add(upsertSql.getValue());
+        }
+        int total = 0;
+        for (Map.Entry<String, List<List<Object>>> group : groups.entrySet()) {
+            try (PreparedStatement pstmt = connection.prepareStatement(group.getKey())) {
+                for (List<Object> params : group.getValue()) {
+                    preparedStatementBinder.bindAll(pstmt, params);
+                    pstmt.addBatch();
+                }
+                int[] results = pstmt.executeBatch();
+                total += results.length;
+            }
+        }
+        return total;
+    }
+
+    /** 解析主键字段：注解 → conflictKeys → 异常。 */
+    private String resolveIdKey(Class<?> clazz, UpdateStrategy strategy) {
+        List<String> idKeys = GirAdvSqlUtils.getIdColumnNames(clazz, true);
+        if (CollUtil.isNotEmpty(idKeys)) return idKeys.get(0);
+        List<String> conflictKeys = strategy.getConflictKeys();
+        if (CollUtil.isNotEmpty(conflictKeys)) return conflictKeys.get(0);
+        throw new IllegalArgumentException("未指定主键字段，且未找到 @Id 注解或 conflictKeys");
+    }
+
     protected String buildUpsertUpdateClause(
             Map<String, Object> rowData, List<String> conflictKeys) {
         return rowData.keySet()
@@ -1151,4 +1211,24 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             String placeholders,
             String conflictFields,
             String updateClause);
+
+    protected String buildPlaceholders(List<Object> params) {
+        List<String> parts = new ArrayList<>();
+        List<Object> filtered = new ArrayList<>();
+        for (Object value : params) {
+            SqlPlaceholder ph = typeHandlerRegistry.getSqlPlaceholder(value);
+            if (ph != null) {
+                parts.add(ph.getSql());
+                if (ph.getParam() != null) {
+                    filtered.add(ph.getParam());
+                }
+            } else {
+                parts.add("?");
+                filtered.add(value);
+            }
+        }
+        params.clear();
+        params.addAll(filtered);
+        return String.join(", ", parts);
+    }
 }

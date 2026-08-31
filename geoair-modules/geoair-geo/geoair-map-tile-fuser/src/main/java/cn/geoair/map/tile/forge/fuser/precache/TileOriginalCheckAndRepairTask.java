@@ -25,6 +25,32 @@ public class TileOriginalCheckAndRepairTask implements Runnable {
             AtomicLong repairedCount,
             AtomicLong failCount,
             GirImageMime format) {
+        this(
+                layerName,
+                originalCacheName,
+                zoom,
+                geometry4326,
+                latch,
+                totalCount,
+                checkedCount,
+                repairedCount,
+                failCount,
+                format,
+                Math.max(1, Runtime.getRuntime().availableProcessors()));
+    }
+
+    public TileOriginalCheckAndRepairTask(
+            String layerName,
+            String originalCacheName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong checkedCount,
+            AtomicLong repairedCount,
+            AtomicLong failCount,
+            GirImageMime format,
+            int maxConsumerThreads) {
         TileTaskConfig config =
                 TileTaskConfig.forOriginalCheckAndRepair(
                                 layerName, originalCacheName, zoom, geometry4326, format)
@@ -32,7 +58,8 @@ public class TileOriginalCheckAndRepairTask implements Runnable {
                         .setTotalCount(totalCount)
                         .setCheckedCount(checkedCount)
                         .setRepairedCount(repairedCount)
-                        .setFailCount(failCount);
+                        .setFailCount(failCount)
+                        .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
         this.executor = TileTaskExecutor.forOriginalCheckAndRepair(config);
     }
 

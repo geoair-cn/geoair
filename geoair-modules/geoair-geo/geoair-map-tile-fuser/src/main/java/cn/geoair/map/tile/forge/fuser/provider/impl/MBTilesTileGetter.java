@@ -6,7 +6,6 @@ import cn.geoair.base.runtime.GutilShutdownHook;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
@@ -23,7 +22,6 @@ public class MBTilesTileGetter extends BaseTileGetter {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final String mbtilesFilePath;
     private final DruidDataSource dataSource;
-    private final boolean needReverseY;
     private volatile boolean initialized = false;
 
     public MBTilesTileGetter(PxyLayerInfo layerInfo) {
@@ -35,7 +33,6 @@ public class MBTilesTileGetter extends BaseTileGetter {
         }
 
         this.mbtilesFilePath = path.trim();
-        this.needReverseY = OriginType.fromMode(layerInfo.getOriginType()).isGoogle();
 
         // 检查文件是否存在
         if (!MbtilesUtils.existsFile(this.mbtilesFilePath)) {
@@ -96,7 +93,12 @@ public class MBTilesTileGetter extends BaseTileGetter {
             log.debug("MBTiles 文件不存在: {}", mbtilesFilePath);
             return null;
         }
-        int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY);
+        int storeY =
+                FuserCacheUtils.getStoreY(
+                        z,
+                        y,
+                        getLayerInfo().getTileRowOriginEnums().isTopLeft(),
+                        FuserCacheUtils.getCacheGridSrid(getLayerInfo()));
         long startTime = System.currentTimeMillis();
         MbtilesInfo tile = MbtilesUtils.getTile(dataSource, z, x, storeY);
         byte[] imageBytes = tile.getTileData();

@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.supplier.GirSysSupplierGetter;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.geoair.comp.dynamic.ds.dswrapper.DataSourceWrapperRegistry;
 import cn.geoair.comp.dynamic.ds.simple.AdvSimpleDataSource;
@@ -42,52 +43,88 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     @Override
     public String getSchemaName() {
-        return schemaName;
+
+        if (schemaName != null) {
+            return schemaName;
+        }
+
+        if (schemaNameGetterFunction != null
+                && !(schemaNameGetterFunction instanceof GirSysSupplierGetter)) {
+            String userGetter = schemaNameGetterFunction.get(); // 用户指定的getter 优先级最高
+            schemaName = GutilObject.isEmpty(userGetter) ? "" : userGetter;
+            return schemaName;
+        }
+
+        // 尝试从缓存中获取
+        if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
+            schemaName = schemaNameMap.get(dataSourceName);
+            return schemaName;
+        }
+
+        if (dataSource instanceof AdvSimpleDataSource) {
+            return "";
+        }
+
+        // 这应该是系统的getter
+        if (schemaNameGetterFunction != null) {
+            String name = schemaNameGetterFunction.get();
+            if (name != null) {
+                schemaName = name;
+                if (GutilObject.isNotEmpty(dataSourceName)) {
+                    schemaNameMap.put(dataSourceName, schemaName);
+                }
+            } else {
+                schemaName = "";
+            }
+            return schemaName;
+        }
+        return "";
     }
 
     @Override
     public String getDatabaseName() {
-        return databaseName;
+        if (databaseName != null) {
+            return databaseName;
+        }
+        if (databaseNameGetterFunction != null
+                && !(databaseNameGetterFunction instanceof GirSysSupplierGetter)) {
+            String userGetter = databaseNameGetterFunction.get();
+            databaseName = GutilObject.isEmpty(userGetter) ? "" : userGetter;
+            return databaseName;
+        }
+        if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
+            databaseName = dataBaseNameMap.get(dataSourceName);
+            return databaseName;
+        }
+        if (dataSource instanceof AdvSimpleDataSource) {
+            return "";
+        }
+
+        if (databaseNameGetterFunction != null) {
+            String name = databaseNameGetterFunction.get();
+            if (name != null) {
+                databaseName = name;
+                if (GutilObject.isNotEmpty(dataSourceName)) {
+                    dataBaseNameMap.put(dataSourceName, databaseName);
+                }
+            } else {
+                databaseName = "";
+            }
+            return databaseName;
+        }
+        return "";
     }
 
     @Override
     public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
-        this.schemaNameGetterFunction = schemaNameGetterFunction;
-        if (schemaName != null) {
-            return;
-        }
-        if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
-            schemaName = schemaNameMap.get(dataSourceName);
-            return;
-        }
         if (schemaNameGetterFunction != null) {
-            schemaName = schemaNameGetterFunction.get();
-            if (schemaName == null) {
-                schemaName = "";
-            }
-            if (GutilObject.isNotEmpty(dataSourceName)) {
-                schemaNameMap.put(dataSourceName, schemaName);
-            }
+            this.schemaNameGetterFunction = schemaNameGetterFunction;
         }
     }
 
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
-        this.databaseNameGetterFunction = databaseNameGetterFunction;
-        if (databaseName != null) {
-            return;
-        }
-        if (GutilObject.isNotEmpty(dataSourceName) && dataBaseNameMap.containsKey(dataSourceName)) {
-            databaseName = dataBaseNameMap.get(dataSourceName);
-            return;
-        }
         if (databaseNameGetterFunction != null) {
-            databaseName = databaseNameGetterFunction.get();
-            if (databaseName == null) {
-                databaseName = "";
-            }
-            if (GutilObject.isNotEmpty(dataSourceName)) {
-                dataBaseNameMap.put(dataSourceName, databaseName);
-            }
+            this.databaseNameGetterFunction = databaseNameGetterFunction;
         }
     }
 
@@ -102,7 +139,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
     public void initByDataSourceApo(DataSourceApo dataSourceApo) {
         this.dataSourceApo = dataSourceApo;
         this.dataSourceId = dataSourceApo.getId();
-        this.dataSourceName = dataSourceApo.getId();
+        this.dataSourceName = dataSourceApo.getId() + "_" + dataSourceApo.getSchemaName();
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
@@ -130,7 +167,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             }
         }
         this.dataSource = dataSource;
-        this.dataSourceId = dataSourceName;
+        this.dataSourceId = dataSourceName; // 这里不应该这样
         this.dataSourceApo = null;
         if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;

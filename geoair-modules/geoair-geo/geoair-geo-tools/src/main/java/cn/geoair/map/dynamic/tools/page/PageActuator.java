@@ -11,17 +11,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.LongStream;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author ：张逢吉
- * @date ：Created in 2025/12/18 13:34 @description： 分页执行器
+ * 可配置的分页查询执行器。
+ *
+ * <p>执行器为一次性对象：首次调用 {@link #getFinalDataList()} 会触发 {@link #execute()}， 后续调用不会再次查询。是否并行执行页面、是否收集结果由
+ * {@link PageConfig} 控制。
+ *
+ * @param <T> 单条记录类型
+ * @author 张逢吉
  */
 public class PageActuator<T> {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final PageConditionDef<T> pageConditionDef;
 
-    /** 分页配置 */
+    /** 当前任务的分页配置，由 {@link PageConditionDef#setPageConfig(PageConfig)} 初始化。 */
     PageConfig pageConfig = new PageConfig();
 
     boolean executeIs = false;
@@ -31,12 +35,19 @@ public class PageActuator<T> {
     // 仅用于标记是否终止
     private final AtomicBoolean isTerminate = new AtomicBoolean(false);
 
-    // 私有化构造器，通过静态方法创建实例
+    /** 私有构造器，使用 {@link #getInstance(PageConditionDef)} 创建。 */
     private PageActuator(PageConditionDef<T> pageConditionDef) {
         this.pageConditionDef = pageConditionDef;
     }
 
-    // 静态工厂方法
+    /**
+     * 创建新的分页执行器。
+     *
+     * @param pageConditionDef 分页查询与消费定义
+     * @param <T> 单条记录类型
+     * @return 独立的分页执行器
+     * @throws NullPointerException 分页定义为空时抛出
+     */
     public static <T> PageActuator<T> getInstance(PageConditionDef<T> pageConditionDef) {
         // 参数校验
         Objects.requireNonNull(pageConditionDef, "PageConditionDef 不能为null");
@@ -44,6 +55,11 @@ public class PageActuator<T> {
         return new PageActuator<>(pageConditionDef);
     }
 
+    /**
+     * 获取已收集的结果；首次调用会自动执行分页任务。
+     *
+     * @return 结果列表；未开启结果保存时通常为空
+     */
     public List<T> getFinalDataList() {
         if (!executeIs) {
             execute();
@@ -51,6 +67,11 @@ public class PageActuator<T> {
         return finalDataList;
     }
 
+    /**
+     * 执行分页任务。
+     *
+     * @return 当前执行器，便于链式调用
+     */
     public PageActuator<T> execute() {
         executeIs = true;
         pageConditionDef.setPageConfig(pageConfig);
@@ -125,7 +146,7 @@ public class PageActuator<T> {
         return this;
     }
 
-    /** 并行消费（原有逻辑，边查边消费） */
+    /** 根据配置并行或串行查询页面，并在查询到页面后立即消费记录。 */
     private void parallelConsume(
             long actualPageSize, long actualTotalPages, Consumer<T> eachRecordConsumer) {
         LongStream pageNumStream = null;
@@ -163,7 +184,7 @@ public class PageActuator<T> {
                         });
     }
 
-    /** 并行消费（原有逻辑，边查边消费） */
+    /** 串行查询页面，并在查询到页面后立即消费记录。 */
     private void serialConsumeByPage(
             long actualPageSize, long actualTotalPages, Consumer<T> eachRecordConsumer) {
         LongStream pageNumStream = LongStream.range(0, actualTotalPages);

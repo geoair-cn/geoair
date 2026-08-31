@@ -7,6 +7,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
@@ -59,7 +60,7 @@ public class TileTaskExecutor {
             log.error("图层不存在: {}", layerName);
             throw new RuntimeException("图层不存在: " + layerName);
         }
-        this.googleGridIs = pxyLayerInfo.isGoogleGrid();
+        this.googleGridIs = pxyLayerInfo.isWebMercatorGrid();
 
         // 根据配置判断任务类型
         this.taskType = config.getTaskType();
@@ -89,13 +90,17 @@ public class TileTaskExecutor {
     public void execute() {
         try {
             // 计算瓦片范围
-            RangeApo rangeApo = calculateTileRange();
+            RangeApo rangeApo = calculateClosedTileRange();
             int minX = rangeApo.getMinX();
             int maxX = rangeApo.getMaxX();
             int minY = rangeApo.getMinY();
             int maxY = rangeApo.getMaxY();
 
-            int totalTiles = (maxX - minX + 1) * (maxY - minY + 1);
+            long totalTiles = ((long) maxX - minX + 1) * ((long) maxY - minY + 1);
+            if (totalTiles <= 0) {
+                log.warn("层级 {} 的瓦片范围无效", zoom);
+                return;
+            }
             config.getTotalCount().addAndGet(totalTiles);
 
             log.info(
@@ -108,16 +113,11 @@ public class TileTaskExecutor {
                     maxY,
                     totalTiles);
 
-            if (totalTiles == 0) {
-                log.warn("层级 {} 没有瓦片需要处理", zoom);
-                return;
-            }
-
             // 计算线程池大小
             int batchSize = 10000;
-            int totalBatches = (totalTiles + batchSize - 1) / batchSize;
-            int threadPoolSize =
-                    Math.min(totalBatches, Runtime.getRuntime().availableProcessors() * 2);
+            long totalBatches = (totalTiles + batchSize - 1) / batchSize;
+            int configuredThreads = Math.max(1, config.getMaxConsumerThreads());
+            int threadPoolSize = (int) Math.min(totalBatches, configuredThreads);
             threadPoolSize = Math.max(1, threadPoolSize);
 
             log.info("层级 {} 启动消费者线程数量：{}", zoom, threadPoolSize);
@@ -134,7 +134,7 @@ public class TileTaskExecutor {
             AtomicLong totalValidTiles = new AtomicLong(0);
             AtomicLong processedCount = new AtomicLong(0);
 
-            int progressInterval = Math.max(100, totalTiles / 100);
+            long progressInterval = Math.max(100L, totalTiles / 100);
             AtomicBoolean shutdownSignalSent = new AtomicBoolean(false);
             BlockingQueue<TileCoordinate> taskQueue = new LinkedBlockingQueue<>(batchSize * 2);
 
@@ -181,8 +181,13 @@ public class TileTaskExecutor {
         }
     }
 
-    /** 计算瓦片范围 */
-    private RangeApo calculateTileRange() {
+    /**
+     * 计算待处理的闭区间瓦片范围。
+     *
+     * <p>{@link RangeApo#getMaxX()} 和 {@link RangeApo#getMaxY()} 均为最后一个 实际瓦片索引；生产者随后以 {@code <=}
+     * 遍历，保持既有预缓存和修复任务的 输出不变。
+     */
+    private RangeApo calculateClosedTileRange() {
         if (taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE) {
             // 原始网格使用不同的坐标计算
             if (googleGridIs) {
@@ -210,15 +215,23 @@ public class TileTaskExecutor {
                     || taskType == TaskType.ORIGINAL_PRE_CACHE) {
                 // 原始网格使用相反的坐标计算
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box =
+                            GirAdvTools.getTileGrid3857Opt()
+                                    .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 } else {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box =
+                            GirAdvTools.getTileGrid4326Opt()
+                                    .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 }
             } else {
                 if (googleGridIs) {
-                    box = GirAdvTools.getTileGrid4326Opt().xyzToTileBox(zoom, x, y, 3857);
+                    box =
+                            GirAdvTools.getTileGrid4326Opt()
+                                    .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 3857);
                 } else {
-                    box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(zoom, x, y, 4326);
+                    box =
+                            GirAdvTools.getTileGrid3857Opt()
+                                    .xyzToTileBox(zoom, x, y, TileYAxis.XYZ, 4326);
                 }
             }
 
@@ -245,7 +258,7 @@ public class TileTaskExecutor {
                 new Thread(
                         () -> {
                             try {
-                                int validTileCount = 0;
+                                long validTileCount = 0;
                                 for (int x = minX; x <= maxX; x++) {
                                     for (int y = minY; y <= maxY; y++) {
                                         if (isTileIntersects(x, y)) {
@@ -294,7 +307,7 @@ public class TileTaskExecutor {
             AtomicLong zoomSkipped,
             AtomicLong processedCount,
             AtomicLong totalValidTiles,
-            int progressInterval) {
+            long progressInterval) {
         for (int i = 0; i < threadPoolSize; i++) {
             final int consumerId = i;
             executorService.submit(
@@ -388,8 +401,10 @@ public class TileTaskExecutor {
         try {
             BoxReferencedEnvelope box =
                     googleGridIs
-                            ? GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857)
-                            : GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                            ? GirAdvTools.getTileGrid4326Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857)
+                            : GirAdvTools.getTileGrid3857Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds =
                     new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
@@ -423,8 +438,10 @@ public class TileTaskExecutor {
         try {
             BoxReferencedEnvelope box =
                     googleGridIs
-                            ? GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, 3857)
-                            : GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
+                            ? GirAdvTools.getTileGrid4326Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857)
+                            : GirAdvTools.getTileGrid3857Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
 
             BoundingBox bounds =
                     new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
@@ -488,8 +505,10 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY =
+                    FuserCacheUtils.getStoreY(
+                            z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileGetter
             CachedTileGetter layerTileGetter =
@@ -528,8 +547,10 @@ public class TileTaskExecutor {
         }
 
         try {
-            // 反转Y坐标（原始网格使用谷歌原点）
-            int reversedY = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
+            int reversedY =
+                    FuserCacheUtils.getStoreY(
+                            z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileCache
             CachedTileGetter layerTileGetter =
@@ -585,7 +606,7 @@ public class TileTaskExecutor {
     private void updateProgress(
             AtomicLong processedCount,
             AtomicLong totalValidTiles,
-            int progressInterval,
+            long progressInterval,
             AtomicLong zoomSuccess,
             AtomicLong zoomFail,
             AtomicLong zoomChecked,

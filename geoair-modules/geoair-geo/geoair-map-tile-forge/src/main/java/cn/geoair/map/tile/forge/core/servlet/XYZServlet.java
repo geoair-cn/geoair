@@ -4,7 +4,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileParamEnums;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -13,13 +12,10 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.hutool.core.util.StrUtil;
-import java.io.IOException;
+import cn.hutool.core.util.URLUtil;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
 /** url构建逻辑参考 TileUrlBuilder */
@@ -35,10 +31,13 @@ public class XYZServlet extends D3TilesServlet {
                     "/xyzTileService/rest/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)");
 
     //    /rest/xyz
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String requestURI = request.getRequestURI();
-        Matcher matcher = pattern.matcher(requestURI); // /
+    @Override
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
+        if (requestUri == null || requestUri.trim().isEmpty()) {
+            return TileResponse.error("Request URI must not be blank");
+        }
+        String requestURI = URLUtil.decode(requestUri);
+        Matcher matcher = pattern.matcher(getRequestPath(requestURI)); // /
         // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
         String fileId = null;
         String type = null;
@@ -67,16 +66,16 @@ public class XYZServlet extends D3TilesServlet {
             layerConfigContext = getGirLayerConfigContext(type, fileId, fileName, serviceName);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
-            return;
+            return TileResponse.error(e.getMessage());
         }
         layerConfigContext.setFormat("png");
 
         try {
 
-            String zxyType = request.getParameter(TileParamEnums.ZXY_TYPE.getValue());
-            String gridSet = request.getParameter(TileParamEnums.GRID_SET.getValue());
-            String originType = request.getParameter(TileParamEnums.ORIGIN_TYPE.getValue());
+            String zxyType = getRequestParameter(requestURI, TileParamEnums.ZXY_TYPE.getValue());
+            String gridSet = getRequestParameter(requestURI, TileParamEnums.GRID_SET.getValue());
+            String originType =
+                    getRequestParameter(requestURI, TileParamEnums.ORIGIN_TYPE.getValue());
             int wmtsY = Integer.parseInt(y);
 
             if (GutilObject.isEmpty(gridSet)) {
@@ -100,9 +99,8 @@ public class XYZServlet extends D3TilesServlet {
                     wmtsY = (int) (Math.pow(2, zInt) - wmtsY - 1);
                 }
             }
-            TileRequest tileRequest = null;
             try {
-                tileRequest =
+                TileRequest tileRequest =
                         mapTileService.getLayerTile(
                                 layerConfigContext, zInt + "", wmtsY + "", xInt + "");
                 TileResponse tileResponse = tileRequest.toTileResponse();
@@ -113,26 +111,19 @@ public class XYZServlet extends D3TilesServlet {
                 tileResponse
                         .setCoordinate(new TileZxyApo(zInt, xInt, wmtsY))
                         .setGridEpsgStr(gridSet);
-                GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
+                return tileResponse;
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 TileResponse tileResponse = TileResponse.error(e.getMessage());
                 tileResponse
                         .setCoordinate(new TileZxyApo(zInt, xInt, wmtsY))
                         .setGridEpsgStr(gridSet);
-                GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-                return;
+                return tileResponse;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
+            return TileResponse.error(e.getMessage());
         }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        doGet(req, resp);
     }
 
     public GirLayerConfigContext getGirLayerConfigContext(

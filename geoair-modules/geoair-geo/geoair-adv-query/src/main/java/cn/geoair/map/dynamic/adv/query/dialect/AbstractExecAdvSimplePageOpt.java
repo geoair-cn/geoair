@@ -84,8 +84,8 @@ public abstract class AbstractExecAdvSimplePageOpt implements IAdvSimplePageOpt 
             throw new RuntimeException("获取字段信息异常：" + e.getMessage(), e);
         }
 
-        List<String> fieldNames = dataFieldsApo.getFieldList(FieldBySchemaApo::getColumnName, true);
-        List<String> geomFieldNameList = dataFieldsApo.getGeomFieldNameList();
+        List<String> fieldNames = dataFieldsApo.mapFields(FieldBySchemaApo::getColumnName, true);
+        List<String> geomFieldNameList = dataFieldsApo.geomFieldNames();
         String quotedFields =
                 fieldNames.stream().map(this::quoteFieldName).collect(Collectors.joining(", "));
         String tableAlias = dialectTableNameProcessor.tbGetTempAliasTableName();

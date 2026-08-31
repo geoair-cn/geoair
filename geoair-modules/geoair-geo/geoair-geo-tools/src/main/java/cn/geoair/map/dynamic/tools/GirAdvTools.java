@@ -12,7 +12,10 @@ import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 
 /**
- * 地理空间动态工具包总入口 提供对所有工具类的统一访问接口
+ * 地理空间工具的静态快捷入口。
+ *
+ * <p>所有方法均委托给 {@link GirGeoTools#defaultInstance()}，因此只能使用默认配置。 需要自定义 {@link ToolsConfig}（例如
+ * GeometryFactory、瓦片尺寸或 DPI）时，应直接使用 {@link GirGeoTools#getInstance(ToolsConfig)}，而不是本类。
  *
  * @author 张逢吉
  * @date 2024/12/05
@@ -47,7 +50,7 @@ public class GirAdvTools {
     }
 
     /**
-     * 获取WGS84坐标系瓦片转换操作接口
+     * 获取 WGS84 等轴瓦片转换工具。
      *
      * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
      */
@@ -56,7 +59,7 @@ public class GirAdvTools {
     }
 
     /**
-     * 获取WGS84坐标系瓦片转换操作接口(非等轴)
+     * 获取 WGS84 非等轴瓦片转换工具（z=3 为 8 列 × 4 行）。
      *
      * @return GirTileConverterOpt WGS84瓦片转换工具接口实例
      */

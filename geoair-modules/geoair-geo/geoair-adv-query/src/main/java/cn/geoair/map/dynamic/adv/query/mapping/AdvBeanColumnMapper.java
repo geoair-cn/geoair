@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.hutool.core.util.StrUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +10,15 @@ import java.util.Map;
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/7/22
- * @description： bean到列值的映射器
+ * @description： bean到列值的映射器（写方向）
  */
 public class AdvBeanColumnMapper {
 
-    private final AdvTypeHandlerRegistry typeHandlerRegistry = AdvTypeHandlerRegistry.getInstance();
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
+    public AdvBeanColumnMapper(AdvTypeHandlerRegistry typeHandlerRegistry) {
+        this.typeHandlerRegistry = typeHandlerRegistry;
+    }
 
     public Map<String, Object> toColumnValueMap(
             Object bean,
@@ -47,16 +51,9 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName = property.resolveColumnName(toUnderlineCase);
-            Object jdbcValue =
-                    typeHandlerRegistry.convertForWrite(
-                            value,
-                            property.getPropertyType(),
-                            AdvTypeHandlerContext.of(
-                                    bean.getClass(),
-                                    property.getPropertyName(),
-                                    columnName,
-                                    property.getPropertyType()));
-            rowData.put(columnName, jdbcValue);
+            // 不在此处预转换：保留原始类型以便 buildPlaceholders 感知自定义占位符
+            // 最终的 JDBC 转换由 PreparedStatementBinder 在执行时完成
+            rowData.put(columnName, value);
         }
         return rowData;
     }
@@ -88,17 +85,10 @@ public class AdvBeanColumnMapper {
                 continue;
             }
             String columnName =
-                    toUnderlineCase
-                            ? cn.hutool.core.util.StrUtil.toUnderlineCase(propertyName)
-                            : propertyName;
-            Class<?> valueType = value == null ? Object.class : value.getClass();
-            Object jdbcValue =
-                    typeHandlerRegistry.convertForWrite(
-                            value,
-                            valueType,
-                            AdvTypeHandlerContext.of(
-                                    beanType, propertyName, columnName, valueType));
-            rowData.put(columnName, jdbcValue);
+                    toUnderlineCase ? StrUtil.toUnderlineCase(propertyName) : propertyName;
+            // 不在此处预转换：保留原始类型以便 buildPlaceholders 感知自定义占位符
+            // 最终的 JDBC 转换由 PreparedStatementBinder 在执行时完成
+            rowData.put(columnName, value);
         }
     }
 

@@ -21,7 +21,7 @@ public class GirLogger {
 
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.log.Log4Gir")
     public static GiLogger getLoger(String name) {
-        return (GiLogger) GkMethodHand.invokeSelf(name);
+        return GirLoggerFactory.getLogger(name);
     }
 
     public static GiLogger getLoger() {

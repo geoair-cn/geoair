@@ -23,12 +23,35 @@ public class TileFuserPreCacheTask implements Runnable {
             AtomicLong successCount,
             AtomicLong failCount,
             GirImageMime format) {
+        this(
+                layerName,
+                zoom,
+                geometry4326,
+                latch,
+                totalCount,
+                successCount,
+                failCount,
+                format,
+                Math.max(1, Runtime.getRuntime().availableProcessors()));
+    }
+
+    public TileFuserPreCacheTask(
+            String layerName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong successCount,
+            AtomicLong failCount,
+            GirImageMime format,
+            int maxConsumerThreads) {
         TileTaskConfig config =
                 TileTaskConfig.forPreCache(layerName, zoom, geometry4326, format)
                         .setLatch(latch)
                         .setTotalCount(totalCount)
                         .setSuccessCount(successCount)
-                        .setFailCount(failCount);
+                        .setFailCount(failCount)
+                        .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
         this.executor = TileTaskExecutor.forPreCache(config);
     }
 

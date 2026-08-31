@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-map-tile-forge</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <name>geoair-map-tile-forge</name>
 
   <description>静态栅格瓦片相关的解决方案</description>
@@ -26,7 +26,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -37,14 +37,6 @@
     <developerConnection>scm:git:ssh://git@gitee.com:geoair/map-tile-forge.git</developerConnection>
     <url>https://gitee.com/geoair/map-tile-forge</url>
   </scm>
-
-  <properties>
-    <sqlite-jdbc.version>3.36.0.3</sqlite-jdbc.version>
-
-    <aws-java-sdk-s3.version>1.12.625</aws-java-sdk-s3.version>
-
-    <commons-compress.version>1.26.2</commons-compress.version>
-  </properties>
 
   <dependencies>
 
@@ -129,6 +121,13 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
       <version>${commons-compress.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

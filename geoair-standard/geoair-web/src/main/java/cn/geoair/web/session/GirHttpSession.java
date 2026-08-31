@@ -2,7 +2,6 @@ package cn.geoair.web.session;
 
 import cn.geoair.web.util.GirHttpServletHelper;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,67 +14,90 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
 
     private static final long serialVersionUID = 7733215043083700732L;
 
+    private static final String REQUEST_SESSION_CACHE_KEY = " geoair-session-request-cache";
+
     public static HttpSession getSession(GirSessionConfig sessionConfig, boolean autoCreate) {
 
-        Class<? extends HttpSession> sessionClass = sessionConfig.getSessionClass();
-        if (sessionClass == HttpSession.class) {
-            return GirHttpServletHelper.getRequest().getSession(autoCreate);
+        if (sessionConfig.isNativeHttpSessionClass()) {
+            return GirHttpServletHelper.getSession(autoCreate);
         }
 
-        if (sessionConfig.isUseCache()) {
-            Object se =
-                    GirHttpServletHelper.getRequest().getAttribute(" geoair-session-request-cache");
-            if (se != null && se instanceof GirHttpSession) {
-                if (sessionConfig.equals(((GirHttpSession) se).getSessionCfg())) {
-                    return (GirHttpSession) se;
-                }
-            }
+        GirHttpSession requestCachedSession = resolveRequestCachedSession(sessionConfig);
+        if (requestCachedSession != null) {
+            return requestCachedSession;
         }
-        String code = sessionConfig.getRequestSessionCode(autoCreate);
+
+        String code = resolveSessionCode(sessionConfig, autoCreate);
         if (code == null) {
             return null;
         }
-        String sessionKey = sessionConfig.getCatalog() + code;
-        Object obj = sessionConfig.getSessionCache().getObject(sessionKey);
-        if (obj != null && obj instanceof HttpSession) {
-            if (sessionConfig.isUseCache()) {
-                GirHttpServletHelper.getRequest()
-                        .setAttribute(" geoair-session-request-cache", obj);
-            }
-            return (HttpSession) obj;
-        } else {
-            HttpSession session = null;
-            try {
-                Constructor<? extends HttpSession> cont =
-                        sessionClass.getDeclaredConstructor(String.class, GirSessionConfig.class);
-                session = (GirHttpSession) cont.newInstance(code, sessionConfig);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            sessionConfig
-                    .getSessionCache()
-                    .put(sessionKey, session, sessionConfig.getTokenTimeout()); // 一次登录最长登录时间
-            if (sessionConfig.isUseCache()) {
-                GirHttpServletHelper.getRequest()
-                        .setAttribute(" geoair-session-request-cache", session);
-                // gtcSessionConfig.sessionThreadLocal.set(session);
-            }
-            return session;
+
+        String sessionKey = buildSessionKey(sessionConfig, code);
+        HttpSession cachedSession = resolveBackingCachedSession(sessionConfig, sessionKey);
+        if (cachedSession != null) {
+            cacheInRequestIfEnabled(sessionConfig, cachedSession);
+            return cachedSession;
         }
+
+        HttpSession session = GirHttpSessionFactory.create(sessionConfig, code);
+        putBackingCache(sessionConfig, sessionKey, session);
+        cacheInRequestIfEnabled(sessionConfig, session);
+        return session;
     }
 
     public static HttpSession getSession(String sessionCode, GirSessionConfig sessionConfig) {
 
-        Class<? extends HttpSession> sessionClass = sessionConfig.getSessionClass();
-        if (sessionClass == HttpSession.class) {
+        if (sessionConfig.isNativeHttpSessionClass()) {
             return null;
         }
-        String sessionKey = sessionConfig.getCatalog() + sessionCode;
-        Object obj = sessionConfig.getSessionCache().getObject(sessionKey);
-        if (obj != null) {
-            return (HttpSession) obj;
+        String sessionKey = buildSessionKey(sessionConfig, sessionCode);
+        return resolveBackingCachedSession(sessionConfig, sessionKey);
+    }
+
+    private static GirHttpSession resolveRequestCachedSession(GirSessionConfig sessionConfig) {
+        if (!sessionConfig.isUseCache()) {
+            return null;
+        }
+        Object session = GirHttpServletHelper.getRequestAttribute(REQUEST_SESSION_CACHE_KEY);
+        if (session instanceof GirHttpSession) {
+            GirHttpSession requestCachedSession = (GirHttpSession) session;
+            if (sessionConfig.equals(requestCachedSession.getSessionCfg())) {
+                return requestCachedSession;
+            }
         }
         return null;
+    }
+
+    private static String resolveSessionCode(GirSessionConfig sessionConfig, boolean autoCreate) {
+        return sessionConfig.getRequestSessionCode(autoCreate);
+    }
+
+    private static String buildSessionKey(GirSessionConfig sessionConfig, String code) {
+        return sessionConfig.getCatalog() + code;
+    }
+
+    private static HttpSession resolveBackingCachedSession(
+            GirSessionConfig sessionConfig, String sessionKey) {
+        Object session = sessionConfig.getSessionCache().getObject(sessionKey);
+        if (session instanceof HttpSession) {
+            return (HttpSession) session;
+        }
+        return null;
+    }
+
+    private static void putBackingCache(
+            GirSessionConfig sessionConfig, String sessionKey, HttpSession session) {
+        sessionConfig
+                .getSessionCache()
+                .put(sessionKey, session, sessionConfig.getTokenTimeout()); // 一次登录最长登录时间
+    }
+
+    private static void cacheInRequestIfEnabled(
+            GirSessionConfig sessionConfig, HttpSession session) {
+        if (sessionConfig.isUseCache()) {
+            GirHttpServletHelper.setRequestAttribute(REQUEST_SESSION_CACHE_KEY, session);
+            // gtcSessionConfig.sessionThreadLocal.set(session);
+        }
     }
 
     protected GirHttpSession(String id, GirSessionConfig cfg) {
@@ -94,7 +116,7 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
     protected void freshCache() {
         getSessionCfg()
                 .getSessionCache()
-                .put(sessionCfg.getCatalog() + id, this, sessionCfg.getTokenTimeout());
+                .put(buildSessionKey(sessionCfg, id), this, sessionCfg.getTokenTimeout());
     }
 
     @Override
@@ -178,7 +200,7 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
 
     @Override
     public void invalidate() {
-        getSessionCfg().getSessionCache().evict(sessionCfg.getCatalog() + this.getId());
+        getSessionCfg().getSessionCache().evict(buildSessionKey(sessionCfg, this.getId()));
     }
 
     @Override

@@ -137,7 +137,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-base-parent</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -154,7 +154,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -169,7 +169,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-spring-dependencies</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -185,7 +185,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-geotools-dependencies</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -194,7 +194,7 @@ gt-cql (查询语言), gt-process (处理引擎)
         <dependency>
             <groupId>cn.geoair.devkit</groupId>
             <artifactId>geoair-openapi-dependencies</artifactId>
-            <version>J8.1.5</version>
+            <version>J8.1.6</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -210,7 +210,7 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ## 👥 开发者信息
 - **作者**: 张逢吉
-- **邮箱**: zhangjun7570@qq.com
+- **邮箱**: zfj20250104@qq.com
 - **组织**: geoair
 - **官网**: https://xmt.geoair.cn/
 
@@ -219,5 +219,5 @@ gt-cql (查询语言), gt-process (处理引擎)
 
 ---
 **最后更新**: 2026-03-14  
-**当前版本**: J8.1.5
+**当前版本**: J8.1.6
 ```

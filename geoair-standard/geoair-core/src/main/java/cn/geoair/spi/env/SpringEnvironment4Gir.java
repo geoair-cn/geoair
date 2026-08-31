@@ -36,7 +36,7 @@ public class SpringEnvironment4Gir
             implMethod = "getPropertier",
             type = ImplType.expectfirst)
     private static GiPropertier getPropertier() {
-        return me;
+        return SpringEnvironmentProviderResolver.getProvider();
     }
 
     @GaMethodHandImpl(
@@ -44,7 +44,7 @@ public class SpringEnvironment4Gir
             implMethod = "getEnvironmenter",
             type = ImplType.expectfirst)
     private static GiEnvironmenter getEnvironmenter() {
-        return me;
+        return SpringEnvironmentProviderResolver.getProvider();
     }
 
     protected static SpringEnvironment4Gir me;
@@ -147,11 +147,17 @@ public class SpringEnvironment4Gir
     @Override
     public void afterPropertiesSet() throws Exception {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
         SpringEnvironment4Gir.applicationContext = applicationContext;
     }
 
@@ -159,5 +165,9 @@ public class SpringEnvironment4Gir
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
             throws BeansException {
         me = this;
+        GirPropertyHelper.setPropertier(this);
+        GirEnvironmentHelper.setEnvironmenter(this);
+        SpringEnvironmentProviderResolver.setProvider(this);
+        SpringEnvironment4Gir.beanFactory = beanFactory;
     }
 }

@@ -30,6 +30,26 @@ public enum AdvEnumsTypeGeom implements Serializable {
         return unknown;
     }
 
+    public static AdvEnumsTypeGeom findByGeoToolsValue(Geometries value) {
+        for (AdvEnumsTypeGeom type : AdvEnumsTypeGeom.values()) {
+            if (type.getGeotoolsType() == (value)) {
+                return type;
+            }
+        }
+        return unknown;
+    }
+
+    public static AdvEnumsTypeGeom findByGeoToolsClassValue(Class<?> jtsGeomClass) {
+        for (AdvEnumsTypeGeom type : AdvEnumsTypeGeom.values()) {
+            // 判断 type 的 GeoTools 类型是否与传入的类型兼容
+            if (type.getGeotoolsType() != null
+                    && type.getGeotoolsType().getBinding().isAssignableFrom(jtsGeomClass)) {
+                return type;
+            }
+        }
+        return unknown;
+    }
+
     /** 小写的名称 */
     private String code;
 

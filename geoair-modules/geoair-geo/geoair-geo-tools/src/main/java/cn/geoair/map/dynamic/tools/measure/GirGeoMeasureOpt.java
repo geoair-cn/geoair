@@ -1,278 +1,84 @@
 package cn.geoair.map.dynamic.tools.measure;
 
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
 /**
- * 空间几何面积/长度/距离计算核心接口 支持多输入格式（Geometry/坐标数组/WKT）、多单位转换、多维度距离计算
+ * 空间几何面积、长度和距离测量接口。
+ *
+ * <p>支持 Geometry、坐标数组和 WKT 三类输入。面积和长度结果取决于所选择的测量方式： Web Mercator 适合地图展示和快速估算，UTM
+ * 适合单个投影带内的局部测量；大地线方式适合 两点距离和线、面边界长度。调用方应先使用 {@code GirFormatUtils} 或 JTS 将输入转换为 {@link
+ * Geometry}，所有输出单位均由 {@link MeasureUnitEnum} 明确指定。
  *
  * @author 张逢吉
  * @date 2024/12/05
  */
 public interface GirGeoMeasureOpt {
 
-    // ====================== 常量定义（统一单位规范） ======================
-    /** 长度单位：米 */
-    String UNIT_METER = "m";
-
-    /** 长度单位：千米 */
-    String UNIT_KILOMETER = "km";
-
-    /** 长度单位：度（地理坐标系） */
-    String UNIT_DEGREE = "degree";
-
-    /** 长度单位：英里 */
-    String UNIT_MILE = "mile";
-
-    /** 面积单位：平方米 */
-    String UNIT_SQUARE_METER = "m²";
-
-    /** 面积单位：平方千米 */
-    String UNIT_SQUARE_KILOMETER = "km²";
-
-    /** 面积单位：亩 */
-    String UNIT_ACRE = "acre";
-
-    /** 面积单位：公顷 */
-    String UNIT_HECTARE = "hectare";
-
     /**
-     * Geometry对象计算面积（使用UTM投影 ）
+     * 计算几何对象所在的 UTM 投影带号。
      *
-     * @param geometry 几何对象（仅支持Polygon/MultiPolygon）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
-     */
-    double calculateAreaByUTM(Geometry geometry, int srid, String unit);
-
-    /**
-     * 坐标数组计算面积（使用UTM投影）
-     *
-     * @param coords 坐标数组（[[x1,y1],[x2,y2]...]，需闭合，未闭合则自动补全最后一个点）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
-     */
-    double calculateAreaByUTM(double[][] coords, int srid, String unit);
-
-    /**
-     * WKT字符串计算面积（使用UTM投影）
-     *
-     * @param wkt WKT字符串（如POLYGON((x1 y1,x2 y2,...))）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
-     */
-    double calculateAreaByUTM(String wkt, int srid, String unit);
-
-    // ====================== 长度计算 ======================
-    /**
-     * Geometry对象计算长度（使用UTM投影）
-     *
-     * @param geometry 几何对象（支持LineString/MultiLineString/Polygon/MultiPolygon）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
-     */
-    double calculateLengthByUTM(Geometry geometry, int srid, String unit);
-
-    /**
-     * 坐标数组计算长度（使用UTM投影）
-     *
-     * @param coords 坐标数组（[[x1,y1],[x2,y2]...]）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
-     */
-    double calculateLengthByUTM(double[][] coords, int srid, String unit);
-
-    /**
-     * WKT字符串计算长度（使用UTM投影）
-     *
-     * @param wkt WKT字符串（如LINESTRING(x1 y1,x2 y2,...)、POLYGON((x1 y1,x2 y2,...))）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
-     */
-    double calculateLengthByUTM(String wkt, int srid, String unit);
-
-    // ====================== UTM投影带工具方法 ======================
-    /**
-     * 计算几何对象所属的UTM投影带号
-     *
-     * @param geometry 几何对象（任意类型）
-     * @param srid 源坐标系SRID（4326/4490等地理坐标系）
-     * @return UTM带号（如50、51）
+     * @param geometry 几何对象
+     * @param srid 源坐标系 SRID
+     * @return UTM 带号，范围为 1 至 60
      */
     int getUTMZone(Geometry geometry, int srid);
 
     /**
-     * 根据UTM带号和纬度判断半球，获取对应的SRID
+     * 根据 UTM 带号和纬度获取对应的投影坐标系 SRID。
      *
-     * @param zone UTM带号（1-60）
-     * @param latitude 纬度（用于判断南北半球，北纬>0，南纬<0）
-     * @return UTM投影SRID（如32650=UTM 50N，32750=UTM 50S）
+     * @param zone UTM 带号，范围为 1 至 60
+     * @param latitude 纬度，用于判断南北半球
+     * @return 北半球为 EPSG:326xx，南半球为 EPSG:327xx
      */
     int getUTMSRID(int zone, double latitude);
 
-    // ====================== 面积计算 ======================
-
     /**
-     * Geometry对象计算面积
+     * 按指定测量方式计算面积。
      *
-     * @param geometry 几何对象（仅支持Polygon/MultiPolygon）
-     * @param srid 坐标系SRID（4326=WGS84，3857=Web墨卡托，4490=2000国家大地坐标系）
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
-     */
-    double calculateArea(Geometry geometry, int srid, String unit);
-
-    /**
-     * 坐标数组计算面积（多边形）
+     * <p>{@link MeasureMethodEnum#GEODETIC} 当前不支持面积计算；请使用 Web Mercator、UTM 或专业椭球面积算法。
      *
-     * @param coords 坐标数组（[[x1,y1],[x2,y2]...]，需闭合，未闭合则自动补全最后一个点）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
+     * @param geometry 面几何对象
+     * @param srid 源坐标系 SRID
+     * @param unit 输出面积单位
+     * @param method 测量方式
+     * @return 面积值
      */
-    double calculateArea(double[][] coords, int srid, String unit);
+    double calculateArea(
+            Geometry geometry, int srid, MeasureUnitEnum unit, MeasureMethodEnum method);
+
+    /** 按指定测量方式计算几何对象的长度或周长。 */
+    double calculateLength(
+            Geometry geometry, int srid, MeasureUnitEnum unit, MeasureMethodEnum method);
 
     /**
-     * WKT字符串计算面积
+     * 按指定测量方式计算两点距离。
      *
-     * @param wkt WKT字符串（如POLYGON((x1 y1,x2 y2,...))）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m²/km²/acre/hectare）
-     * @return 面积值（保留6位小数）
+     * <p>Web Mercator 用于地图展示，UTM 用于局部平面测量，GEODETIC 使用椭球大地线距离。
      */
-    double calculateArea(String wkt, int srid, String unit);
-
-    // ====================== 长度计算 ======================
+    double calculatePointToPointDistance(
+            Point point1, Point point2, int srid, MeasureUnitEnum unit, MeasureMethodEnum method);
 
     /**
-     * Geometry对象计算长度（线/多边形周长 ）
+     * 按指定方式计算任意两个几何对象之间的最短距离。
      *
-     * @param geometry 几何对象（支持LineString/MultiLineString/Polygon/MultiPolygon）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
+     * <p>Web Mercator 与 UTM 支持任意 JTS Geometry。大地线最短距离仅支持两点，其他组合会被拒绝。
      */
-    double calculateLength(Geometry geometry, int srid, String unit);
+    double calculateGeometryToGeometryMinDistance(
+            Geometry geometry1,
+            Geometry geometry2,
+            int srid,
+            MeasureUnitEnum unit,
+            MeasureMethodEnum method);
 
     /**
-     * 坐标数组计算长度（线）
-     *
-     * @param coords 坐标数组（[[x1,y1],[x2,y2]...]）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
-     */
-    double calculateLength(double[][] coords, int srid, String unit);
-
-    /**
-     * WKT字符串计算长度
-     *
-     * @param wkt WKT字符串（如LINESTRING(x1 y1,x2 y2,...)、POLYGON((x1 y1,x2 y2,...))）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 长度值（保留6位小数）
-     */
-    double calculateLength(String wkt, int srid, String unit);
-
-    // ====================== 距离计算======================
-
-    /**
-     * 两点最短距离（Point对象入参 ） 地理坐标系（如4326）使用大地测量计算球面最短距离，投影坐标系计算欧氏距离
-     *
-     * @param point1 点1几何对象（仅支持Point类型）
-     * @param point2 点2几何对象（仅支持Point类型）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最短距离（保留6位小数）
-     */
-    double calculatePointToPointDistance(Point point1, Point point2, int srid, String unit);
-
-    /**
-     * 两点最短距离（坐标数组入参 ）
-     *
-     * @param point1 点1坐标 [x1,y1]
-     * @param point2 点2坐标 [x2,y2]
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最短距离（保留6位小数）
-     */
-    double calculatePointToPointDistance(double[] point1, double[] point2, int srid, String unit);
-
-    /**
-     * 点到线的最近距离（Point+LineString对象入参 ）
-     *
-     * @param point 点几何对象（仅支持Point类型）
-     * @param line 线几何对象（仅支持LineString/MultiLineString类型）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最近距离（保留6位小数）
-     */
-    double calculatePointToLineMinDistance(Point point, LineString line, int srid, String unit);
-
-    /**
-     * 点到线的最近距离（坐标数组入参 ）
-     *
-     * @param point 点坐标 [x,y]
-     * @param lineCoords 线坐标数组 [[x1,y1],[x2,y2]...]
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最近距离（保留6位小数）
-     */
-    double calculatePointToLineMinDistance(
-            double[] point, double[][] lineCoords, int srid, String unit);
-
-    /**
-     * 点到几何对象的最短距离
-     *
-     * @param point 点几何对象（仅支持Point类型）
-     * @param geometry 目标几何对象（支持任意Geometry类型）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最短距离（保留6位小数）
-     */
-    double calculatePointToGeometryDistance(Point point, Geometry geometry, int srid, String unit);
-
-    /**
-     * 线到线的最短距离（LineString对象入参 ）
-     *
-     * @param line1 线1几何对象（仅支持LineString/MultiLineString类型）
-     * @param line2 线2几何对象（仅支持LineString/MultiLineString类型）
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最短距离（保留6位小数）
-     */
-    double calculateLineToLineMinDistance(
-            LineString line1, LineString line2, int srid, String unit);
-
-    /**
-     * 线到线的最短距离（坐标数组入参 ）
-     *
-     * @param line1Coords 线1坐标数组 [[x1,y1],[x2,y2]...]
-     * @param line2Coords 线2坐标数组 [[x1,y1],[x2,y2]...]
-     * @param srid 坐标系SRID
-     * @param unit 输出单位（支持：m/km/degree/mile）
-     * @return 最短距离（保留6位小数）
-     */
-    double calculateLineToLineMinDistance(
-            double[][] line1Coords, double[][] line2Coords, int srid, String unit);
-
-    // ====================== 单位转换 ======================
-
-    /**
-     * 单位转换
+     * 在相同量纲内进行单位转换。
      *
      * @param value 原始值
-     * @param srcUnit 原始单位（长度：m/km/degree/mile；面积：m²/km²/acre/hectare）
-     * @param targetUnit 目标单位（长度：m/km/degree/mile；面积：m²/km²/acre/hectare）
-     * @param srid 坐标系SRID（地理坐标系需球面转换，投影坐标系直接转换）
-     * @return 转换后值（保留6位小数）
+     * @param srcUnit 原始单位
+     * @param targetUnit 目标单位
+     * @return 转换后的值
+     * @throws IllegalArgumentException 长度与面积单位混用时抛出
      */
-    double convertUnit(double value, String srcUnit, String targetUnit, int srid);
+    double convertUnit(double value, MeasureUnitEnum srcUnit, MeasureUnitEnum targetUnit);
 }

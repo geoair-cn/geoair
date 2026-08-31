@@ -11,6 +11,18 @@ import java.util.Locale;
 
 public class GutilBean {
 
+    private static volatile BeanCopyProvider beanCopyProvider;
+
+    public interface BeanCopyProvider {
+        void copyProperties(
+                Object source, Object target, Class<?> editable, String... ignoreProperties)
+                throws GirBeanException;
+    }
+
+    public static void setBeanCopyProvider(BeanCopyProvider beanCopyProvider) {
+        GutilBean.beanCopyProvider = beanCopyProvider;
+    }
+
     public static void copyProperties(Object source, Object target) throws GirBeanException {
         copyProperties(source, target, null, (String[]) null);
     }
@@ -32,6 +44,11 @@ public class GutilBean {
     public static void copyProperties(
             Object source, Object target, Class<?> editable, String... ignoreProperties)
             throws GirBeanException {
+        BeanCopyProvider provider = beanCopyProvider;
+        if (provider != null) {
+            provider.copyProperties(source, target, editable, ignoreProperties);
+            return;
+        }
         GkMethodHand.invokeSelf(source, target, editable, ignoreProperties);
     }
 

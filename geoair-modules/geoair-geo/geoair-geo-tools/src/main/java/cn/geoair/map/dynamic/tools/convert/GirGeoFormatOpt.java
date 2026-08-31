@@ -98,6 +98,15 @@ public interface GirGeoFormatOpt {
     String jtsGeometryToWktString(Geometry jtsGeometry, boolean ifExceptionValueReturnNull);
 
     /**
+     * 将 JTS Geometry 转为包含 SRID 的 EWKT 字符串。
+     *
+     * @param jtsGeometry JTS Geometry
+     * @param ifExceptionValueReturnNull 转换失败时是否返回 {@code null}
+     * @return {@code SRID=xxxx;WKT} 形式的 EWKT 字符串
+     */
+    String jtsGeometryToEwktString(Geometry jtsGeometry, boolean ifExceptionValueReturnNull);
+
+    /**
      * JTS Geometry转GeoJSON字符串
      *
      * @param jtsGeometry JTS Geometry对象
@@ -161,6 +170,17 @@ public interface GirGeoFormatOpt {
      * @return JTS Geometry
      */
     Geometry wktToJtsGeometry(String wktString, boolean ifExceptionValueReturnNull);
+
+    /**
+     * EWKT 字符串转 JTS Geometry。
+     *
+     * <p>EWKT 使用 {@code SRID=4326;POINT(...)} 形式，可在文本中同时携带坐标与 SRID。
+     *
+     * @param ewktString EWKT 字符串
+     * @param ifExceptionValueReturnNull 解析失败时是否返回 {@code null}
+     * @return 带 EWKT 中 SRID 的 Geometry
+     */
+    Geometry ewktToJtsGeometry(String ewktString, boolean ifExceptionValueReturnNull);
 
     /**
      * WKT字符串转JTS LineString
@@ -331,6 +351,11 @@ public interface GirGeoFormatOpt {
         return wktToJtsGeometry(wktString, false);
     }
 
+    /** EWKT 字符串转 JTS Geometry，解析失败时抛出异常。 */
+    default Geometry ewktToJtsGeometry(String ewktString) {
+        return ewktToJtsGeometry(ewktString, false);
+    }
+
     /**
      * JTS Geometry转GeoJSON（默认异常抛错）
      *
@@ -377,9 +402,9 @@ public interface GirGeoFormatOpt {
      * 可通过配置修复结构无效的输入（如缺失坐标的线串），但不保证拓扑有效性； 3. 关键字大小写不敏感，支持非标准 "LINEARRING" 标签； 4. 数值解析兼容 Java
      * 浮点字面量语法（含科学计数法）。
      *
-     * <p>线程安全：<b>非线程安全</b>，每个线程应使用独立实例，禁止多线程共享。 若需复用，建议通过 ThreadLocal 为每个线程缓存实例以提升性能。
+     * <p>返回的解析器本身非线程安全；本方法每次调用均返回独立实例，可由不同线程分别获取后使用。
      *
-     * @return WKT 解析器实例，已绑定默认的 GeometryFactory（含默认精度模型和 SRID=0）
+     * @return 独立的 WKT 解析器实例，已绑定当前 {@code ToolsConfig} 配置的 GeometryFactory
      * @see org.locationtech.jts.io.WKTReader
      */
     WKTReader getWKTReader();
@@ -392,9 +417,9 @@ public interface GirGeoFormatOpt {
      * 对空几何有明确的序列化规则（如空点用 NaN 坐标表示，空线串用 0 个点表示）； 3. LinearRing 会被序列化为 LineString 类型的 WKB； 4. SRID
      * 仅在顶层几何中写入（遵循 JTS 约定：集合内所有几何共享同一 SRID）。
      *
-     * <p>线程安全：<b>非线程安全</b>，每个线程应使用独立实例，禁止多线程共享。
+     * <p>返回的写入器本身非线程安全；本方法每次调用均返回独立实例，可由不同线程分别获取后使用。
      *
-     * @return WKB 写入器实例，默认支持 2D 坐标，不包含 SRID（可通过实例方法配置 3D/SRID 支持）
+     * @return 独立的 WKB 写入器实例，默认支持二维坐标并写入 SRID
      * @see org.locationtech.jts.io.WKBWriter
      */
     WKBWriter getWKBWriter();
@@ -407,9 +432,9 @@ public interface GirGeoFormatOpt {
      * 规范（Spatialite/Geopackage）； 2. 自动修复结构无效的输入（如顶点不足的线串/环、未闭合的环）； 3. 校验畸形/恶意 WKB
      * 数据（如字段值超限、读取越界），异常时抛出 ParseException； 4. 空点兼容 NaN 坐标表示，SRID 未指定时继承父几何的 SRID（默认 SRID=0）。
      *
-     * <p>线程安全：<b>非线程安全</b>，每个线程应使用独立实例，禁止多线程共享。
+     * <p>返回的解析器本身非线程安全；本方法每次调用均返回独立实例，可由不同线程分别获取后使用。
      *
-     * @return WKB 解析器实例，支持 InStream 输入流，适配任意字节源（文件/网络/数据库 Blob）
+     * @return 独立的 WKB 解析器实例，已绑定当前 {@code ToolsConfig} 配置的 GeometryFactory，支持 InStream 输入流
      * @see org.locationtech.jts.io.WKBReader
      */
     WKBReader getWKBReader();
@@ -417,13 +442,13 @@ public interface GirGeoFormatOpt {
     /**
      * 获取 GeoJSON 几何序列化/反序列化工具实例，用于 {@link org.locationtech.jts.geom.Geometry} 与 GeoJSON 格式的双向转换。
      *
-     * <p>核心特性： 1. 遵循 RFC 7946 标准，支持点、线、面、多几何、几何集合的 GeoJSON 解析/生成； 2. 可配置坐标精度（默认保留 15 位小数），避免浮点精度冗余；
-     * 3. 支持带 CRS 信息的 GeoJSON 格式，兼容常见的地理坐标系（如 WGS84/SRID=4326）。
+     * <p>核心特性： 1. 支持点、线、面、多几何、几何集合等 GeoJSON Geometry 对象的解析/生成； 2. 可配置坐标精度（默认保留 15 位小数），避免浮点精度冗余。
+     * 本接口仅处理 Geometry，不负责 GeoJSON Feature 与 FeatureCollection 的属性及集合语义。
      *
-     * <p>线程安全：<b>非线程安全</b>，多线程使用时建议每个线程创建独立实例。
+     * <p>返回的转换器本身非线程安全；本方法每次调用均返回独立实例，可由不同线程分别获取后使用。
      *
      * @return GeometryJSON 实例，默认配置适配大多数 GeoJSON 场景
-     * @see org.locationtech.jts.io.geojson.GeometryJSON
+     * @see org.geotools.geojson.geom.GeometryJSON
      */
     GeometryJSON getGeometryJSON();
 }

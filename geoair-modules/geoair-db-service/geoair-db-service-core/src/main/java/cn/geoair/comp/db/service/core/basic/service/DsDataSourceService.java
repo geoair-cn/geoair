@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
-import cn.geoair.base.log.GiLogger;
-import cn.geoair.base.log.GirLoggerFactory;
+
 import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.event.DsDataSourceEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +47,6 @@ import cn.geoair.comp.db.service.core.dao.GirDsDataSourceDao;
 @Service
  
 public class DsDataSourceService {
-    public static GiLogger log = GirLoggerFactory.getLogger();
     // /** Spring缓存管理器 */
     // @Autowired
     // CacheManager cacheManager;

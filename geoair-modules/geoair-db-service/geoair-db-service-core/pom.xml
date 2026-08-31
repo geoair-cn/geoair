@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-db-service</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service-core</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-db-service-core</name>
 
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -38,28 +38,6 @@
     <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-    <!-- 数据库驱动版本 -->
-    <ojdbc.version>21.5.0.0</ojdbc.version>
-    <sdoutl.version>23.26</sdoutl.version>
-    <dm.jdbc.version>18</dm.jdbc.version>
-    <dameng.geoutil.version>1.0</dameng.geoutil.version>
-
-    <!-- Apache Commons 版本 -->
-    <commons.codec.version>1.15</commons.codec.version>
-    <commons.text.version>1.15.0</commons.text.version>
-    <commons.lang3.version>3.12.0</commons.lang3.version>
-
-    <!-- Maven 插件版本 -->
-    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>cn.hutool</groupId>
@@ -219,6 +197,12 @@
       <version>${spring-boot.version}</version>
       <scope>provided</scope>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

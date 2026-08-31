@@ -2,6 +2,7 @@ package cn.geoair.orm.spi.support;
 
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.base.util.GutilStr;
+import cn.geoair.orm.spi.GirEntityResolve;
 import cn.geoair.orm.spi.entity.GirEntityColumn;
 import cn.geoair.orm.spi.entity.GirEntityField;
 import cn.geoair.orm.spi.entity.GirEntityTable;
@@ -74,11 +75,28 @@ public class GirExample {
      * @param notNull - true时，如果值为空，就会抛出异常，false时，如果为空就不使用该字段的条件
      */
     public GirExample(Class<?> entityClass, boolean exists, boolean notNull) {
+        this(entityClass, exists, notNull, null);
+    }
+
+    public GirExample(Class<?> entityClass, GirEntityResolve resolve) {
+        this(entityClass, true, false, resolve);
+    }
+
+    public GirExample(Class<?> entityClass, boolean exists, GirEntityResolve resolve) {
+        this(entityClass, exists, false, resolve);
+    }
+
+    public GirExample(
+            Class<?> entityClass, boolean exists, boolean notNull, GirEntityResolve resolve) {
         this.exists = exists;
         this.notNull = notNull;
         oredCriteria = new ArrayList<Criteria>();
         this.entityClass = entityClass;
-        table = GirEntityHelper.getEntityTable(entityClass);
+        if (resolve != null) {
+            table = resolve.resolveEntity(entityClass);
+        } else {
+            table = GirEntityHelper.getEntityTable(entityClass);
+        }
         tableName = table.getName();
         // 根据李领北建议修改#159
         propertyMap = table.getPropertyMap();
@@ -114,12 +132,14 @@ public class GirExample {
         this.notNull = builder.notNull;
         this.distinct = builder.distinct;
         this.entityClass = builder.entityClass;
+        this.table = builder.table;
         this.propertyMap = builder.propertyMap;
         this.selectColumns = builder.selectColumns;
         this.excludeColumns = builder.excludeColumns;
         this.oredCriteria = builder.exampleCriterias;
         this.forUpdate = builder.forUpdate;
         this.tableName = builder.tableName;
+        this.ORDERBY = new OrderBy(this, propertyMap);
 
         if (!GutilStr.isEmpty(builder.orderByClause.toString())) {
             this.orderByClause = builder.orderByClause.toString();
@@ -128,6 +148,10 @@ public class GirExample {
 
     public static Builder builder(Class<?> entityClass) {
         return new Builder(entityClass);
+    }
+
+    public static Builder builder(Class<?> entityClass, GirEntityResolve resolve) {
+        return new Builder(entityClass, true, false, resolve);
     }
 
     public OrderBy orderBy(String property) {
@@ -907,12 +931,30 @@ public class GirExample {
         }
 
         public Builder(Class<?> entityClass, boolean exists, boolean notNull) {
+            this(entityClass, exists, notNull, null);
+        }
+
+        public Builder(Class<?> entityClass, GirEntityResolve resolve) {
+            this(entityClass, true, false, resolve);
+        }
+
+        public Builder(Class<?> entityClass, boolean exists, GirEntityResolve resolve) {
+            this(entityClass, exists, false, resolve);
+        }
+
+        public Builder(
+                Class<?> entityClass, boolean exists, boolean notNull, GirEntityResolve resolve) {
             this.entityClass = entityClass;
             this.exists = exists;
             this.notNull = notNull;
             this.orderByClause = new StringBuilder();
-            this.table = GirEntityHelper.getEntityTable(entityClass);
+            if (resolve != null) {
+                this.table = resolve.resolveEntity(entityClass);
+            } else {
+                this.table = GirEntityHelper.getEntityTable(entityClass);
+            }
             this.propertyMap = table.getPropertyMap();
+            this.tableName = table.getName();
             this.sqlsCriteria = new ArrayList<GirSqls.Criteria>(2);
         }
 

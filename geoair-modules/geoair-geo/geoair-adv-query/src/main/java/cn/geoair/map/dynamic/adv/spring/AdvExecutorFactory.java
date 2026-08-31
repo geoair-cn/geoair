@@ -5,7 +5,6 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
-import cn.hutool.extra.spring.SpringUtil;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -14,15 +13,6 @@ import javax.sql.DataSource;
 /** 高级查询执行器工厂，根据数据源类型自动创建对应执行器 */
 public class AdvExecutorFactory {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    /**
-     * 根据数据源类型获取对应的执行器实例
-     *
-     * @return 匹配的IAdvExecutor实现类
-     */
-    public static IAdvExecutor getAdvExecutorByDataSource() {
-        DataSource dataSource = SpringUtil.getBean(DataSource.class);
-        return getAdvExecutorByDataSource(dataSource);
-    }
 
     public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
         return getAdvExecutorByDataSource(dataSource, null);
@@ -32,22 +22,44 @@ public class AdvExecutorFactory {
             DataSource dataSource, String dataSourceName) {
 
         DialectName dbType = getDbTypeFromDataSource(dataSource);
+        log.trace("检测到{}数据源，创建对应Executor执行器", dbType);
+        return createByDialect(dbType, dataSource, dataSourceName);
+    }
 
-        switch (dbType) {
+    /**
+     * 根据方言名称直接创建执行器（跳过 JDBC 连接探测，性能更高）
+     *
+     * <p>适用于调用方已经明确知道数据库类型的场景，避免 {@link #getAdvExecutorByDataSource(DataSource)} 中通过 {@code
+     * DatabaseMetaData.getDatabaseProductName()} 探测数据库类型带来的额外连接开销。
+     *
+     * @param dialectName 数据库方言
+     * @param dataSource 数据源对象
+     * @param dataSourceName 数据源名称（可为 null）
+     * @return 匹配的 IAdvExecutor 实现类
+     */
+    public static IAdvExecutor getAdvExecutorByDialect(
+            DialectName dialectName, DataSource dataSource, String dataSourceName) {
+
+        if (dialectName == null) {
+            throw new IllegalArgumentException("dialectName 不能为空，请指定数据库方言");
+        }
+        return createByDialect(dialectName, dataSource, dataSourceName);
+    }
+
+    /** 根据方言创建对应的 Executor 实例（所有创建路径的统一出口） */
+    private static IAdvExecutor createByDialect(
+            DialectName dialect, DataSource dataSource, String dataSourceName) {
+        switch (dialect) {
             case MYSQL:
-                log.trace("检测到MySQL数据源，创建GirSpringMysqlAdvExecutor执行器");
                 return GirSpringMysqlAdvExecutor.newInstance(dataSource, dataSourceName);
             case POSTGRESQL:
-                log.trace("检测到PostgreSQL数据源，创建GirSpringPGAdvExecutor执行器");
                 return GirSpringPGAdvExecutor.newInstance(dataSource, dataSourceName);
             case ORACLE:
-                log.trace("检测到ORACLE数据源，创建GirSpringOracleAdvExecutor执行器");
                 return GirSpringOracleAdvExecutor.newInstance(dataSource, dataSourceName);
             case DM:
-                log.trace("检测到达梦数据源，创建GirSpringDmAdvExecutor执行器");
                 return GirSpringDmAdvExecutor.newInstance(dataSource, dataSourceName);
             default:
-                throw new UnsupportedOperationException("不支持的数据库类型：" + dbType);
+                throw new UnsupportedOperationException("不支持的数据库方言：" + dialect);
         }
     }
 

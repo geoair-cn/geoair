@@ -95,6 +95,8 @@ public class TileStorageSupportAdapter {
                 return new LocalZip3DTerrainStorageSupport(contextHelper);
             case XYZ:
                 return new LocalZipXYZTileStorageSupport(contextHelper);
+            case MVT_TILES:
+                return new LocalZipMvtTilesStorageSupport(contextHelper);
             default:
                 throw new RuntimeException("LOCAL_ZIP不支持的瓦片格式：" + mapTileType.getValue());
         }
@@ -114,6 +116,8 @@ public class TileStorageSupportAdapter {
                 return new S3Zip3DTileStorageSupport(contextHelper);
             case TERRAIN_3D:
                 return new S3Zip3DTerrainStorageSupport(contextHelper);
+            case MVT_TILES:
+                return new S3ZipMvtTilesSupport(contextHelper);
 
             default:
                 throw new RuntimeException("S3_ZIP不支持的瓦片格式：" + mapTileType.getValue());

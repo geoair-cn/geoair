@@ -38,7 +38,7 @@ Knife4j SpringDoc Starter 模块，提供了与 SpringDoc 集成的启动器，�
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
 </dependency>
 ```
 
@@ -100,7 +100,7 @@ public class DemoController {
 
 ## 版本历史
 
-- J8.1.5：当前开发版本
+- J8.1.6：当前开发版本
 
 ## 贡献指南
 
@@ -117,6 +117,6 @@ public class DemoController {
 ## 联系方式
 
 - 开发者：张逢吉
-- 邮箱：zhangjun7570@qq.com
+- 邮箱：zfj20250104@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/

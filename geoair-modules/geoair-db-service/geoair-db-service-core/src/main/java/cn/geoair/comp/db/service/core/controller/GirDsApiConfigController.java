@@ -15,6 +15,7 @@ import cn.geoair.comp.db.service.core.basic.service.DsGroupService;
 import cn.geoair.comp.db.service.core.basic.util.*;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
+import cn.geoair.map.dynamic.adv.mybatis.SqlEngineUtil;
 import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
@@ -93,7 +94,7 @@ public class GirDsApiConfigController {
     @GaApiAction(text = "转换参数")
     public ResponseDto parseParam(String sql) {
         try {
-            Set<String> set = SqlEngineUtil.getEngine().parseParameter(sql);
+            Set<String> set = SqlEngineUtil.getEngine().extractParameterNames(sql);
             // 转化成前端需要的格式
             List<JSONObject> list =
                     set.stream()

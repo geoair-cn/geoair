@@ -15,8 +15,18 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
  */
 public class GirCacheHelper {
 
+    private static volatile CacheProvider cacheProvider;
+
     /** 私有构造函数，防止实例化 */
     private GirCacheHelper() {}
+
+    public interface CacheProvider {
+        GiCache getCache(String name);
+    }
+
+    public static void setCacheProvider(CacheProvider cacheProvider) {
+        GirCacheHelper.cacheProvider = cacheProvider;
+    }
 
     static {
         GkMethodHand.implFromClass(GirCacheHelper.class);
@@ -32,6 +42,10 @@ public class GirCacheHelper {
      */
     @GaMethodHandDefine()
     public static GiCache getCache(String name) {
+        CacheProvider provider = cacheProvider;
+        if (provider != null) {
+            return provider.getCache(name);
+        }
         return (GiCache) GkMethodHand.invokeSelf(name);
     }
 
@@ -77,7 +91,7 @@ public class GirCacheHelper {
  * JSR107 API核心组件说明
  *
  * CachingProvider：创建、配置、获取、管理和控制多个CacheManager
- * CacheManager：创建、配置、获取、管理和控制多个唯一命名的Cache。（一个CacheManager仅被一个CachingProvider所拥有）
- * Cache：一个类似Map的数据结构。（一个Cache仅被一个CacheManager所拥有） Entry：一个存储在Cache中的key-value对
- * Expiry：每一个存储在Cache中的条目有一个定义的有效期，过期后不可访问、更新、删除。缓存有效期可以通过ExpiryPolicy设置
+ *81 * CacheManager：创建、配置、获取、管理和控制多个唯一命名的Cache。（一个CacheManager仅被一个CachingProvider所拥有）
+ *82 * Cache：一个类似Map的数据结构。（一个Cache仅被一个CacheManager所拥有） Entry：一个存储在Cache中的key-value对
+ *83 * Expiry：每一个存储在Cache中的条目有一个定义的有效期，过期后不可访问、更新、删除。缓存有效期可以通过ExpiryPolicy设置
  */

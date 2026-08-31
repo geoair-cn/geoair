@@ -15,7 +15,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import java.sql.*;
 import java.util.*;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Oracle Spatial 空间操作实现类 已修复：所有查询字段增加双引号，强制小写别名
@@ -103,6 +102,30 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        if (StrUtil.isEmpty(layerNameKeyword)) {
+            return eGetAllGeoLayerName();
+        }
+        String schemaName = dataSourceGetter.getSchemaName();
+        // 转义单引号防止 SQL 注入
+        String safeKeyword = layerNameKeyword.replace("'", "''");
+        String sql =
+                StrUtil.format(
+                        "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS "
+                                + "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') "
+                                + "AND TABLE_NAME LIKE '%{}%' "
+                                + "GROUP BY TABLE_NAME",
+                        schemaName, safeKeyword);
+
+        List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
+        List<String> layerNames = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(result)) {
+            result.forEach(row -> layerNames.add(row.getStr("table_name")));
+        }
+        return layerNames;
+    }
+
+    @Override
     public Map<String, AdvEnumsTypeGeom> eGetGeoTypeByTable(
             String tableName, List<String> geomFieldNames) {
         validateTableName(tableName);
@@ -131,13 +154,17 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String tableNameS = "";
         if (b) {
-            tableNameS =
+            tableNameS = StrUtil.wrap(tableNameOrSqlView, "( ", " )");
+            String aliasTableName = dialectTableNameProcessor.tbGetTempAliasTableName();
+            tableNameS = dialectTableNameProcessor.tbBuildAsTable(tableNameS, aliasTableName);
+        } else {
+            String tableNameWithSchema =
                     dialectTableNameProcessor.tbGetTableNameWithSchema(
                             dataSourceGetter, tableNameOrSqlView);
-        } else {
-            tableNameS = StrUtil.wrap(tableNameOrSqlView, "( ", " )");
+            tableNameS = StrUtil.wrap(tableNameWithSchema, "( ", " )");
         }
 
+        String quotedField = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "SELECT CASE "
@@ -150,15 +177,15 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
                                 + "  WHEN SDO_GEOMETRY.GET_GTYPE({}) = 7 THEN 'MULTIPOLYGON' "
                                 + "  ELSE 'GEOMETRY' END AS \"geom_type\" "
                                 + "FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
-                        geomFieldName,
-                        geomFieldName,
-                        geomFieldName,
-                        geomFieldName,
-                        geomFieldName,
-                        geomFieldName,
-                        geomFieldName,
+                        quotedField,
+                        quotedField,
+                        quotedField,
+                        quotedField,
+                        quotedField,
+                        quotedField,
+                        quotedField,
                         tableNameS,
-                        geomFieldName);
+                        quotedField);
 
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
         if (row != null) {
@@ -211,7 +238,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 String colType = metaData.getColumnTypeName(i);
-                if ("SDO_GEOMETRY".equalsIgnoreCase(colType)) {
+                if (colType.contains("SDO_GEOMETRY")) { // 还有可能是MDSYS.SDO_GEOMETRY
                     return metaData.getColumnName(i);
                 }
             }
@@ -225,18 +252,131 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public Integer eGetSrid(String tableNameOrSqlView, String geomFieldName) {
-        log.info("暂时不支持oracle获取srid");
-        return 0;
+        if (StrUtil.isEmpty(tableNameOrSqlView) || StrUtil.isEmpty(geomFieldName)) {
+            return 0;
+        }
+
+        Integer sridFromMeta = getSridFromMetadata(tableNameOrSqlView, geomFieldName);
+        if (sridFromMeta != null && sridFromMeta > 0) {
+            return sridFromMeta;
+        }
+        String qualifiedName = null;
+        String aliasTableName = dialectTableNameProcessor.tbGetTempAliasTableName();
+        if (isTableOrViewName(tableNameOrSqlView)) {
+            qualifiedName =
+                    StrUtil.format(
+                            "({}) {}",
+                            dialectTableNameProcessor.tbGetTableNameWithSchema(
+                                    dataSourceGetter, tableNameOrSqlView),
+                            aliasTableName);
+        } else {
+            qualifiedName =
+                    StrUtil.format(
+                            "({}) {}",
+                            dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                            aliasTableName);
+        }
+
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        String sql =
+                StrUtil.format(
+                        "SELECT {}.{}.SDO_SRID AS \"srid\" FROM {} WHERE {} IS NOT NULL AND ROWNUM = 1",
+                        aliasTableName,
+                        quotedGeomFieldName,
+                        qualifiedName,
+                        quotedGeomFieldName);
+        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
+        return row != null ? row.getInt("srid", 0) : 0;
     }
 
     @Override
     public Map<String, Integer> eGetSrid(String tableNameOrSqlView, List<String> geomFieldNames) {
-        log.info("暂时不支持oracle获取srid");
+        if (StrUtil.isEmpty(tableNameOrSqlView) || CollectionUtil.isEmpty(geomFieldNames)) {
+            return MapUtil.empty();
+        }
         Map<String, Integer> sridMap = new HashMap<>();
-        for (String field : geomFieldNames) {
-            sridMap.put(field, 0);
+        for (String geomFieldName : geomFieldNames) {
+            sridMap.put(geomFieldName, eGetSrid(tableNameOrSqlView, geomFieldName));
         }
         return sridMap;
+    }
+
+    /** 从 Oracle 空间元数据表中获取 SRID */
+    private Integer getSridFromMetadata(String tableNameOrSqlView, String geomFieldName) {
+        String owner = resolveOwner(tableNameOrSqlView);
+        if (StrUtil.isEmpty(owner)) {
+            return null;
+        }
+
+        String tableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableNameOrSqlView);
+        String columnName = dialectTableNameProcessor.tbUnquoteTableName(geomFieldName);
+
+        try {
+            String allMetaSql =
+                    StrUtil.format(
+                            "SELECT SRID AS \"srid\" FROM ALL_SDO_GEOM_METADATA WHERE OWNER = UPPER('{}') AND TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
+                            owner,
+                            tableName,
+                            columnName);
+            GirAdvOneRow row = getAdvBaseOpt().bSelectOne(allMetaSql);
+            if (row != null) {
+                return row.getInt("srid", 0);
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            String userMetaSql =
+                    StrUtil.format(
+                            "SELECT SRID AS \"srid\" FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
+                            tableName,
+                            columnName);
+            GirAdvOneRow row = getAdvBaseOpt().bSelectOne(userMetaSql);
+            if (row != null) {
+                return row.getInt("srid", 0);
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    /** 判断是否为实际存在的表名或视图名 */
+    private boolean isTableOrViewName(String tableNameOrSqlView) {
+        if (StrUtil.isEmpty(tableNameOrSqlView)
+                || dialectTableNameProcessor.tbTableIsSqlView(tableNameOrSqlView)) {
+            return false;
+        }
+        String name = dialectTableNameProcessor.tbGetTableNameNotSchema(tableNameOrSqlView);
+        String schema = dialectTableNameProcessor.tbExtractSchemaName(tableNameOrSqlView);
+        List<SchemaTableApo> objects =
+                StrUtil.isNotEmpty(schema)
+                        ? getAdvDDLOpt().dGetTableAndViewBySchema(schema)
+                        : getAdvDDLOpt().dGetTableAndViewBySchema();
+        if (CollectionUtil.isEmpty(objects)) {
+            return false;
+        }
+        for (SchemaTableApo object : objects) {
+            if (object != null && StrUtil.equalsIgnoreCase(name, object.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** 解析表的 owner（schema） */
+    private String resolveOwner(String tableNameOrSqlView) {
+        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableNameOrSqlView);
+        if (StrUtil.isNotEmpty(schemaName)) {
+            return schemaName.toUpperCase();
+        }
+
+        String currentSchema = dataSourceGetter.getSchemaName();
+        if (StrUtil.isNotEmpty(currentSchema)) {
+            return currentSchema.toUpperCase();
+        }
+
+        String detectedSchema = getAdvDDLOpt().dGetCurrentSchema();
+        return StrUtil.isEmpty(detectedSchema) ? null : detectedSchema.toUpperCase();
     }
 
     // ===================== DDL 操作 =====================
@@ -250,9 +390,12 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
 
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
-                        "ALTER TABLE {} ADD {} SDO_GEOMETRY", qualifiedTableName, geomFieldName);
+                        "ALTER TABLE {} ADD {} SDO_GEOMETRY",
+                        qualifiedTableName,
+                        quotedGeomFieldName);
         ddlOpt.dExecuteDDL(sql, tableName, "添加空间字段[" + geomFieldName + "]");
 
         String insertMetaSql =
@@ -294,8 +437,10 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
             log.warn("删除空间元数据失败: {}", e.getMessage());
         }
 
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
-                StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, geomFieldName);
+                StrUtil.format(
+                        "ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedGeomFieldName);
         ddlOpt.dExecuteDDL(sql, tableName, "删除空间字段[" + geomFieldName + "]");
     }
 
@@ -307,14 +452,15 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
 
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql =
                 StrUtil.format(
                         "UPDATE {} SET {} = SDO_CS.TRANSFORM({}, {}) WHERE {} IS NOT NULL",
                         qualifiedTableName,
-                        geomFieldName,
-                        geomFieldName,
+                        quotedGeomFieldName,
+                        quotedGeomFieldName,
                         targetSrid,
-                        geomFieldName);
+                        quotedGeomFieldName);
 
         ddlOpt.dExecuteDDL(sql, tableName, "转换SRID为" + targetSrid);
 
@@ -361,10 +507,11 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public String getQueryIntersectsSql(
             String qualifiedTableName, String geomFieldName, String geometry, int srid) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT * FROM {} WHERE SDO_RELATE({}, SDO_GEOMETRY('{}', {}), 'MASK=ANYINTERACT') = 'TRUE'",
                 qualifiedTableName,
-                geomFieldName,
+                quotedGeomFieldName,
                 geometry,
                 srid);
     }
@@ -372,10 +519,11 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public String getQueryWithinBBoxSql(
             String qualifiedTableName, String geomFieldName, String bboxWkt, int srid) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT * FROM {} WHERE SDO_RELATE({}, SDO_GEOMETRY('{}', {}), 'MASK=INSIDE') = 'TRUE'",
                 qualifiedTableName,
-                geomFieldName,
+                quotedGeomFieldName,
                 bboxWkt,
                 srid);
     }
@@ -387,9 +535,10 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
             int srid,
             String distanceAlias,
             String qualifiedTableName) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT *, SDO_GEOM.SDO_DISTANCE({}, SDO_GEOMETRY('{}', {}), 0.005) AS \"{}\" FROM {}",
-                geomFieldName,
+                quotedGeomFieldName,
                 geometry,
                 srid,
                 distanceAlias,
@@ -399,34 +548,38 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public String getCentroidSql(
             String geomFieldName, String centerAlias, String qualifiedTableName) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT {}, SDO_GEOM.SDO_CENTROID({}, 0.005) AS \"{}\" FROM {}",
                 "*",
-                geomFieldName,
+                quotedGeomFieldName,
                 centerAlias,
                 qualifiedTableName);
     }
 
     @Override
     public String getValidateGeometriesSql(String qualifiedTableName, String geomFieldName) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT id FROM {} WHERE SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT({}, 0.005) <> 'TRUE'",
                 qualifiedTableName,
-                geomFieldName);
+                quotedGeomFieldName);
     }
 
     @Override
     public String getRepairGeometriesSql(String qualifiedTableName, String geomFieldName) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "UPDATE {} SET {} = SDO_UTIL.RECTIFY_GEOMETRY({}, 0.005) WHERE SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT({}, 0.005) <> 'TRUE'",
                 qualifiedTableName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName);
+                quotedGeomFieldName,
+                quotedGeomFieldName,
+                quotedGeomFieldName);
     }
 
     @Override
     public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT "
                         + "SDO_GEOM.SDO_MIN_MBR_ORDINATE(extent, 1) AS \"minx\","
@@ -438,7 +591,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
                         + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 1) AS \"maxx_gs\","
                         + "SDO_GEOM.SDO_MAX_MBR_ORDINATE(SDO_CS.TRANSFORM(extent, 4326), 2) AS \"maxy_gs\" "
                         + "FROM ( SELECT SDO_AGGR_MBR({}) AS extent FROM {} )",
-                geomFieldName,
+                quotedGeomFieldName,
                 qualifiedTableName);
     }
 

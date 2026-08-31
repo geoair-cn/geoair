@@ -8,14 +8,17 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * @author ：张俊
- * @date ：Created in 2025/11/13 16:17
- * @description：瓦片请求数据传输对象
+ * 以字节数组承载瓦片内容的响应。
+ *
+ * <p>每次 {@link #toInputStream()} 都创建新的内存流，可重复读取。
+ *
+ * @author 张逢吉
  */
 @Data
 @Accessors(chain = true)
 public class TileResponseByByte extends TileResponse {
 
+    /** @return 空的字节瓦片响应。 */
     public static TileResponseByByte of() {
         return new TileResponseByByte();
     }
@@ -23,14 +26,17 @@ public class TileResponseByByte extends TileResponse {
     /** 瓦片输入字节 */
     private byte[] bytes;
 
+    /** @return 基于当前字节数组新建的输入流。 */
     public InputStream toInputStream() {
         return new ByteArrayInputStream(bytes);
     }
 
+    /** @return 当前瓦片字节数组本身，不创建副本。 */
     public byte[] toByteArrays() {
         return bytes;
     }
 
+    /** @return 是否成功、存在且包含非空字节数据。 */
     public boolean isValid() {
         return success && exists && bytes != null && bytes.length > 0;
     }
@@ -48,7 +54,13 @@ public class TileResponseByByte extends TileResponse {
         return this;
     }
 
-    /** 创建成功的响应 */
+    /**
+     * 创建成功的字节瓦片响应。
+     *
+     * @param bytes 瓦片内容
+     * @param mimeType 内容类型；为 {@code null} 时使用 PNG
+     * @return 字节瓦片响应
+     */
     public static TileResponse success(byte[] bytes, GiMimeType mimeType) {
         TileResponseByByte response = new TileResponseByByte();
         response.setSuccess(true);

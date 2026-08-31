@@ -8,6 +8,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
@@ -169,7 +170,12 @@ public class TileOriginalCheckAndRepairTask implements Runnable {
                                                     // 先过滤不相交的瓦片
                                                     BoxReferencedEnvelope box =
                                                             GirAdvTools.getTileGrid4326Opt()
-                                                                    .xyzToTileBox(zoom, x, y, 3857);
+                                                                    .xyzToTileBox(
+                                                                            zoom,
+                                                                            x,
+                                                                            y,
+                                                                            TileYAxis.XYZ,
+                                                                            3857);
                                                     String wktString = box.getWktString(4326);
                                                     Geometry geometryByBox =
                                                             GirAdvTools.getFormatOpt()
@@ -185,7 +191,12 @@ public class TileOriginalCheckAndRepairTask implements Runnable {
                                                     // 先过滤不相交的瓦片
                                                     BoxReferencedEnvelope box =
                                                             GirAdvTools.getTileGrid3857Opt()
-                                                                    .xyzToTileBox(zoom, x, y, 4326);
+                                                                    .xyzToTileBox(
+                                                                            zoom,
+                                                                            x,
+                                                                            y,
+                                                                            TileYAxis.XYZ,
+                                                                            4326);
                                                     String wktString = box.getWktString(4326);
                                                     Geometry geometryByBox =
                                                             GirAdvTools.getFormatOpt()
@@ -405,7 +416,7 @@ public class TileOriginalCheckAndRepairTask implements Runnable {
         // 这里的坐标是谷歌原点
         try {
             // 1. 获取瓦片的边界框
-            y = GirAdvTools.getTileGrid3857Opt().reverseY(y, z);
+            y = GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
 
             // 4. 只检查已存在的瓦片
             if (!tileCache.exists(originalCacheName, z, x, y, format)) {

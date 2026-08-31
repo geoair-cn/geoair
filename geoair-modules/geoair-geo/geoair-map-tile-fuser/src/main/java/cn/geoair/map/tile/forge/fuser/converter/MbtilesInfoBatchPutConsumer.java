@@ -6,6 +6,7 @@ import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import com.alibaba.druid.pool.DruidDataSource;
 import java.io.Closeable;
@@ -78,7 +79,9 @@ public class MbtilesInfoBatchPutConsumer implements Consumer<MbtilesInfo>, Close
 
         try {
             // 校验数据
-            if (tile.getTileData() == null || tile.getTileData().length == 0) {
+            if (tile.getTileData() == null
+                    || tile.getTileData().length == 0
+                    || tile.getTileData().length > TileResourceLimits.getMaxTileBytes()) {
                 synchronized (stats) {
                     stats.failed++;
                 }

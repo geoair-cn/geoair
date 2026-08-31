@@ -4,15 +4,16 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-import cn.geoair.map.dynamic.adv.query.dialect.pg.AdvExecutorPG;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.IdUtil;
@@ -60,8 +61,9 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(Integer pageNum) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+            DataSourceConfig inputSource = parameter.getInputSource();
+            IAdvExecutor iAdvExecutor =
+                    AdvExecutorFactory.getAdvExecutorByDataSource(inputSource.toDataSource());
 
             long startTime = System.currentTimeMillis();
             // 构建排序SQL
@@ -116,8 +118,9 @@ public class SparkTaskSerializableUtil implements Serializable {
         @Override
         public Iterator<GirAdvOneRow> call(String partitionCondition) throws Exception {
 
-            PgConnectInfoSimple pgConnectInfo = parameter.getInputConnectSimple();
-            IAdvExecutor iAdvExecutor = new AdvExecutorPG(pgConnectInfo.toDataSource());
+            DataSourceConfig inputSource = parameter.getInputSource();
+            IAdvExecutor iAdvExecutor =
+                    AdvExecutorFactory.getAdvExecutorByDataSource(inputSource.toDataSource());
 
             // 解析分区范围
             String[] coords = partitionCondition.split(",");
@@ -320,9 +323,15 @@ public class SparkTaskSerializableUtil implements Serializable {
     static int getTmsY(int zoom, int y, int x, int gridSrid) {
         int tms_y = y;
         if (gridSrid == 3857) {
-            tms_y = GirGeoTools.defaultInstance().getTileGrid3857Opt().reverseY(y, zoom);
+            tms_y =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid3857Opt()
+                            .convertY(zoom, y, TileYAxis.XYZ, TileYAxis.TMS);
         } else {
-            tms_y = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt().reverseY(y, zoom);
+            tms_y =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid4326SeparateOpt()
+                            .convertY(zoom, y, TileYAxis.XYZ, TileYAxis.TMS);
         }
         return tms_y;
     }

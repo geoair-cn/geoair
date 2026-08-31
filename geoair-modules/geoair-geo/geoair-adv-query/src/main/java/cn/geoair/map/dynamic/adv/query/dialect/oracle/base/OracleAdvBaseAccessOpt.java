@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.function.Supplier;
@@ -14,25 +15,36 @@ import java.util.function.Supplier;
  */
 public class OracleAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
-    public OracleAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(configAdvQueryGetter);
+    public OracleAdvBaseAccessOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+        super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
+    }
+
+    @Override
+    protected boolean needsConflictKeyParams() {
+        return true;
     }
 
     @Override
     protected String buildInsertIgnoreSql(
             String tableName, String fields, String placeholders, List<String> conflictKeys) {
-        // Oracle 使用子查询判断：不存在则插入
-        String[] fieldArray = fields.split(",");
-        String pkField = fieldArray[0].trim();
+        if (conflictKeys == null || conflictKeys.isEmpty()) {
+            conflictKeys = java.util.Collections.singletonList(fields.split(",")[0].trim());
+        }
+        String conflictCondition =
+                conflictKeys
+                        .stream()
+                        .map(ck -> StrUtil.format("{} = ?", ck))
+                        .collect(java.util.stream.Collectors.joining(" AND "));
 
         return StrUtil.format(
                 "INSERT INTO {} ({}) SELECT {} FROM DUAL WHERE NOT EXISTS "
-                        + "(SELECT 1 FROM {} WHERE {} = ?)",
+                        + "(SELECT 1 FROM {} WHERE {})",
                 tableName,
                 fields,
                 placeholders,
                 tableName,
-                pkField);
+                conflictCondition);
     }
 }

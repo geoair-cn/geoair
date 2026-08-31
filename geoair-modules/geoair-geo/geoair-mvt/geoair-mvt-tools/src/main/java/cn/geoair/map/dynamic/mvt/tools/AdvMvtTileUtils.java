@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
@@ -24,10 +25,10 @@ public class AdvMvtTileUtils {
 	public static Envelope getTileRect(int level, int x, int y, int sourceGrid) {
 		ReferencedEnvelope referencedEnvelope = null;
 		if (sourceGrid == 3857) {
-			referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(level, x, y, 3857);
+			referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(level, x, y, TileYAxis.XYZ, 3857);
 		}
 		else {
-			referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(level, x, y, 4326);
+			referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(level, x, y, TileYAxis.XYZ, 4326);
 		}
 		return referencedEnvelope;
 	}

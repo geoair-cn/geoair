@@ -9,7 +9,14 @@ import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
-/** WGS84（4326）瓦片转换抽象父类 提取等轴/非等轴瓦片转换的公共逻辑，子类仅实现差异化的核心计算 */
+/**
+ * WGS84（EPSG:4326）线性瓦片网格的公共实现。
+ *
+ * <p>子类定义经纬度方向的瓦片跨度和行列数量；本类负责范围换算、坐标系转换及层级元数据。 {@link #MAX_VALID_LAT} 只适用于等轴网格为兼容 Web Mercator
+ * 所作的纬度裁剪，Separate 网格可覆盖完整的 {@code [-90°, 90°]}。
+ *
+ * @author 张逢吉
+ */
 public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
 
     // 公共常量（4326坐标系基础参数）
@@ -50,65 +57,21 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     }
 
     /**
-     * 非等轴Y索引转换为等轴Y索引（4326坐标系）
+     * 将当前 Separate 网格的 Y 行号转换为 Equal 网格的 Y 行号。
      *
-     * <p>核心逻辑： 1. 非等轴Y索引 → 对应纬度坐标（基于非等轴跨度：180/2^z） 2. 纬度坐标 → 等轴Y索引（基于等轴跨度：360/2^z）
+     * <p>当前两种 EPSG:4326 网格使用相同的实际 Y 行定义（z=3 均为 4 行）和相同的 行号方向，因此映射是一一对应的。该实现通过层级元数据校验行号，不再采用旧的
+     * {@code 2^z} 行公式。{@code roundingType} 因不存在小数行号而不参与计算，仅为保持 原方法签名而保留。
      *
-     * <p>注意：转换后的等轴Y索引可能是浮点数，需根据业务需求取整（默认向下取整）
-     *
-     * @param separateAxisY 非等轴Y索引（XYZ规范，原点左上角）
-     * @param zoom 缩放级别（0-30）
-     * @param roundingType 取整方式：FLOOR(向下取整)/CEIL(向上取整)/ROUND(四舍五入)
-     * @return 等轴Y索引（XYZ规范，原点左上角）
-     * @throws IllegalArgumentException 入参不合法时抛出
+     * @param separateAxisY Separate 网格的 XYZ Y 行号
+     * @param zoom 缩放级别（0～22）
+     * @param roundingType 兼容参数；当前网格映射中不参与计算
+     * @return 对应的 Equal 网格 XYZ Y 行号
+     * @throws IllegalArgumentException 行号或层级不合法时抛出
      */
     public int convertSeparateAxisYToEqualAxisY(
             int separateAxisY, int zoom, RoundingType roundingType) {
-        // 1. 基础参数校验
-        if (zoom < 0 || zoom > 30) {
-            throw new IllegalArgumentException("缩放级别不合法：zoom=" + zoom + "（合法范围0-30）");
-        }
-        // 非等轴Y索引的合法范围：0 ~ 2^z -1
-        int separateMaxY = (1 << zoom) - 1;
-        if (separateAxisY < 0 || separateAxisY > separateMaxY) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "非等轴Y索引不合法：Y=%d, zoom=%d（合法范围0~%d）",
-                            separateAxisY, zoom, separateMaxY));
-        }
-        if (roundingType == null) {
-            roundingType = RoundingType.FLOOR; // 默认向下取整
-        }
-
-        // 2. 步骤1：非等轴Y索引 → 对应的纬度坐标（顶部纬度）
-        double separateLatSpan = 180.0 / (1 << zoom); // 非等轴纬度跨度：180/2^z
-        double lat = MAX_LAT - separateAxisY * separateLatSpan; // 非等轴Y索引对应的顶部纬度
-
-        // 3. 步骤2：纬度坐标 → 等轴Y索引（浮点数）
-        double equalLatSpan = 360.0 / (1 << zoom); // 等轴纬度跨度：360/2^z
-        double equalAxisY = (MAX_LAT - lat) / equalLatSpan; // 反向计算等轴Y索引
-
-        // 4. 根据业务需求取整（ 不同取整方式适配不同场景）
-        int finalEqualY;
-        switch (roundingType) {
-            case FLOOR:
-                finalEqualY = (int) Math.floor(equalAxisY);
-                break;
-            case CEIL:
-                finalEqualY = (int) Math.ceil(equalAxisY);
-                break;
-            case ROUND:
-                finalEqualY = (int) Math.round(equalAxisY);
-                break;
-            default:
-                finalEqualY = (int) Math.floor(equalAxisY);
-        }
-
-        // 5. 修正等轴Y索引的合法范围（0 ~ 2^z -1）
-        int equalMaxY = (1 << zoom) - 1;
-        finalEqualY = Math.max(0, Math.min(finalEqualY, equalMaxY));
-
-        return finalEqualY;
+        validateCurrent4326Y(separateAxisY, zoom, "Separate");
+        return separateAxisY;
     }
 
     /** 取整方式枚举（便于明确业务规则） */
@@ -119,66 +82,44 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     }
 
     /**
-     * 反向转换：等轴Y索引 → 非等轴Y索引
+     * 将当前 Equal 网格的 Y 行号转换为 Separate 网格的 Y 行号。
      *
-     * <p>与convertSeparateAxisYToEqualAxisY互为逆运算
+     * <p>当前两种 EPSG:4326 网格在同一层级的实际 Y 行数相同，故该映射与 {@link #convertSeparateAxisYToEqualAxisY(int, int,
+     * RoundingType)} 严格互逆。 {@code roundingType} 仅为兼容原方法签名而保留。
      *
-     * @param equalAxisY 等轴Y索引（XYZ规范）
-     * @param zoom 缩放级别（0-30）
-     * @param roundingType 取整方式
-     * @return 非等轴Y索引（XYZ规范）
+     * @param equalAxisY Equal 网格的 XYZ Y 行号
+     * @param zoom 缩放级别（0～22）
+     * @param roundingType 兼容参数；当前网格映射中不参与计算
+     * @return 对应的 Separate 网格 XYZ Y 行号
+     * @throws IllegalArgumentException 行号或层级不合法时抛出
      */
     public int convertEqualAxisYToSeparateAxisY(
             int equalAxisY, int zoom, RoundingType roundingType) {
-        // 1. 参数校验
-        if (zoom < 0 || zoom > 30) {
-            throw new IllegalArgumentException("缩放级别不合法：zoom=" + zoom + "（合法范围0-30）");
-        }
-        int equalMaxY = (1 << zoom) - 1;
-        if (equalAxisY < 0 || equalAxisY > equalMaxY) {
+        validateCurrent4326Y(equalAxisY, zoom, "Equal");
+        return equalAxisY;
+    }
+
+    /** 校验当前 EPSG:4326 网格中可用的 XYZ Y 行号。 */
+    private void validateCurrent4326Y(int y, int zoom, String gridName) {
+        // getTileRowCount 会同时校验当前实现支持的层级范围，并读取真实网格行数。
+        int rowCount = getTileRowCount(zoom);
+        if (y < 0 || y >= rowCount) {
             throw new IllegalArgumentException(
-                    String.format("等轴Y索引不合法：Y=%d, zoom=%d（合法范围0~%d）", equalAxisY, zoom, equalMaxY));
+                    String.format(
+                            "%s网格Y索引不合法：Y=%d, zoom=%d（合法范围0~%d）", gridName, y, zoom, rowCount - 1));
         }
-        if (roundingType == null) {
-            roundingType = RoundingType.FLOOR;
-        }
-
-        // 2. 等轴Y索引 → 纬度坐标
-        double equalLatSpan = 360.0 / (1 << zoom);
-        double lat = MAX_LAT - equalAxisY * equalLatSpan;
-
-        // 3. 纬度坐标 → 非等轴Y索引
-        double separateLatSpan = 180.0 / (1 << zoom);
-        double separateAxisY = (MAX_LAT - lat) / separateLatSpan;
-
-        // 4. 取整并修正范围
-        int finalSeparateY;
-        switch (roundingType) {
-            case FLOOR:
-                finalSeparateY = (int) Math.floor(separateAxisY);
-                break;
-            case CEIL:
-                finalSeparateY = (int) Math.ceil(separateAxisY);
-                break;
-            case ROUND:
-                finalSeparateY = (int) Math.round(separateAxisY);
-                break;
-            default:
-                finalSeparateY = (int) Math.floor(separateAxisY);
-        }
-
-        int separateMaxY = (1 << zoom) - 1;
-        finalSeparateY = Math.max(0, Math.min(finalSeparateY, separateMaxY));
-
-        return finalSeparateY;
     }
 
     // ========== 子类需实现的差异化核心方法 ==========
 
-    /** 计算经度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回360/2^z） */
+    /** 计算经度方向单瓦片跨度，单位为度。 */
     protected abstract double calculateTileLonSpan(int z);
 
-    /** 计算纬度瓦片跨度（子类实现：等轴返回360/2^z，非等轴返回180/2^z） */
+    /**
+     * 计算纬度方向单瓦片跨度，单位为度。
+     *
+     * <p>当前等轴和 Separate 实现均返回 {@code 360 / 2^z}；两者的差异体现在实际 行数与纬度裁剪策略，而不是这里的数值公式。
+     */
     protected abstract double calculateTileLatSpan(int z);
 
     /**
@@ -193,7 +134,8 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
         validateXyz(maxZoom, 0, 0);
 
         Double tileWidth = Math.pow(2, maxZoom);
-        Double tileHeight = tileWidth / 2;
+        // z=0 时仍至少应存在一行瓦片，避免 TMS/XYZ 行号转换出现零行网格。
+        Double tileHeight = Math.max(1D, tileWidth / 2D);
         Double totalTiles = tileHeight * tileWidth;
 
         // 计算经度和纬度的瓦片跨度（度）

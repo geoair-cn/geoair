@@ -2,6 +2,7 @@ package cn.geoair.web.mime;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.sp.GirSpHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -29,7 +30,7 @@ public class SpiMimeLoader {
     public static void loadMimes() {
         iMimeGetters = new ArrayList<>();
 
-        List<IMimeTypeGetter> spiIMimeTypeGetters = loadFromSpi();
+        List<IMimeTypeGetter> spiIMimeTypeGetters = GirSpHelper.loadAll(IMimeTypeGetter.class);
         for (IMimeTypeGetter handler : spiIMimeTypeGetters) {
             iMimeGetters.add(handler);
             log.trace("通过Java SPI加载IMimeTypeGetter: {}", handler.getClass().getSimpleName());
@@ -56,6 +57,11 @@ public class SpiMimeLoader {
     public static void main(String[] args) {
         List<IMimeTypeGetter> proxyIMimeTypeGetters = loadFromSpi();
         for (IMimeTypeGetter handler : proxyIMimeTypeGetters) {
+            System.out.println(handler.getClass().getSimpleName());
+        }
+        System.out.println("=========");
+        List<IMimeTypeGetter> iMimeTypeGetters = GirSpHelper.loadAll(IMimeTypeGetter.class);
+        for (IMimeTypeGetter handler : iMimeTypeGetters) {
             System.out.println(handler.getClass().getSimpleName());
         }
     }

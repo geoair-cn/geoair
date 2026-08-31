@@ -83,6 +83,14 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     List<String> eGetAllGeoLayerName();
 
     /**
+     * 根据名称关键词模糊查询包含空间字段的图层（表）名称
+     *
+     * @param layerNameKeyword 图层名称关键词，支持模糊匹配（SQL LIKE %keyword%），为空时返回全部
+     * @return 匹配的空间图层名称列表，若不存在则返回空列表
+     */
+    List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword);
+
+    /**
      * 获取指定表的空间字段类型
      *
      * @param tableName 表名称，支持带schema的格式（如"schema.table"）

@@ -6,13 +6,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../geoair-base-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-standard</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-standard</name>
 
@@ -30,7 +30,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -38,6 +38,7 @@
   <modules>
 
     <module>geoair-tools</module>
+    <module>geoair-log4j-processor</module>
     <module>geoair-base</module>
     <module>geoair-web</module>
     <module>geoair-core</module>
@@ -54,7 +55,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J8.1.5</geoair.version>
+    <geoair.version>J8.1.6</geoair.version>
     <skipTests>true</skipTests>
   </properties>
 
@@ -77,6 +78,12 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-tools</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-log4j-processor</artifactId>
         <version>${geoair.version}</version>
       </dependency>
 

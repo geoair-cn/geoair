@@ -1,7 +1,6 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -12,17 +11,11 @@ public class Bzip2Handler implements DecompressionHandler {
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
+        DecompressionLimits.validateExpectedSize(expectedSize);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
-                BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais)) {
 
-            byte[] buffer = new byte[BUFFER_SIZE];
-            int len;
-            while ((len = bzis.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-
-            byte[] result = baos.toByteArray();
+            byte[] result = DecompressionLimits.readAllLimited(bzis);
             if (expectedSize > 0 && result.length != expectedSize) {
                 throw new IOException("BZIP2解压大小不匹配，预期:" + expectedSize + ", 实际:" + result.length);
             }

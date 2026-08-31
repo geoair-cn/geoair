@@ -159,7 +159,7 @@ goair-base/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
 </dependency>
 ```
 
@@ -252,7 +252,7 @@ long total = pager.getTotal();
 
 ## 版本历史
 
-- J8.1.5：当前开发版本
+- J8.1.6：当前开发版本
 
 ## 贡献指南
 
@@ -269,7 +269,7 @@ long total = pager.getTotal();
 ## 联系方式
 
 - 开发者：张逢吉
-- 邮箱：zhangjun7570@qq.com
+- 邮箱：zfj20250104@qq.com
 - 组织：geoair
 - 官网：https://xmt.geoair.cn/
 

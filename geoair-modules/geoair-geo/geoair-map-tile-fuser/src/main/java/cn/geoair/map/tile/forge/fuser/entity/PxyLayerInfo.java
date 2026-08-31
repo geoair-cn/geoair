@@ -3,6 +3,7 @@ package cn.geoair.map.tile.forge.fuser.entity;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.map.tile.forge.fuser.enums.OriginType;
 import cn.geoair.map.tile.forge.fuser.enums.SrcType;
+import cn.geoair.map.tile.forge.fuser.enums.TileRowOrigin;
 import javax.persistence.Transient;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -44,9 +45,27 @@ public class PxyLayerInfo {
     @GaModelField(text = "资源路径模板")
     private String path;
 
-    /** 坐标原点类型，默认谷歌原点 */
-    @GaModelField(text = "坐标原点类型，默认谷歌原点", em = OriginType.class)
+    /** @deprecated 使用 {@link #tileRowOrigin}。该字段保留以兼容旧项目：wmts 映射为 top-left，tms 映射为 bottom-left。 */
+    @Deprecated
+    @GaModelField(text = "旧版坐标原点类型（已过时）", em = OriginType.class)
     private String originType;
+
+    /** 瓦片行号原点。仅表示 Y 轴方向；网格矩阵由 {@link #gridSrid} 单独定义。 */
+    @GaModelField(text = "瓦片行号原点", em = TileRowOrigin.class)
+    private String tileRowOrigin;
+
+    /** @deprecated 使用 {@link #getTileRowOrigin()}；保留旧 getter 以兼容既有调用方。 */
+    @Deprecated
+    public String getOriginType() {
+        return originType;
+    }
+
+    /** @deprecated 使用 {@link #setTileRowOrigin(String)}；保留旧 setter 以兼容既有调用方。 */
+    @Deprecated
+    public PxyLayerInfo setOriginType(String originType) {
+        this.originType = originType;
+        return this;
+    }
 
     /**
      * 获取器类型
@@ -113,8 +132,24 @@ public class PxyLayerInfo {
     private Integer webPxyPort;
 
     @Transient
+    @Deprecated
     public OriginType getOriginTypeEnums() {
         return OriginType.fromMode(originType);
+    }
+
+    /** 获取有效的瓦片行原点；新字段优先，未配置时兼容旧 originType。 */
+    @Transient
+    public TileRowOrigin getTileRowOriginEnums() {
+        TileRowOrigin origin = TileRowOrigin.fromMode(tileRowOrigin);
+        return origin != null
+                ? origin
+                : TileRowOrigin.fromLegacyOriginType(OriginType.fromMode(originType));
+    }
+
+    /** 新版行原点是否已显式配置。显式配置后，缓存行号会按 gridSrid 使用对应网格计算。 */
+    @Transient
+    public boolean isTileRowOriginConfigured() {
+        return TileRowOrigin.fromMode(tileRowOrigin) != null;
     }
 
     @Transient
@@ -128,8 +163,14 @@ public class PxyLayerInfo {
      * @return
      */
     @Transient
+    @Deprecated
     public boolean isGoogleGrid() {
-        return gridSrid == 3857;
+        return isWebMercatorGrid();
+    }
+
+    @Transient
+    public boolean isWebMercatorGrid() {
+        return gridSrid != null && (gridSrid == 3857 || gridSrid == 900913);
     }
 
     /** 检查缓存是否启用 */

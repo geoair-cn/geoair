@@ -66,7 +66,6 @@ public class TileGetterFactory {
     /** 创建真实的获取器（不带缓存） */
     private static LayerTileGetter createRealGetter(PxyLayerInfo pxyLayerInfo) {
         SrcType srcType = pxyLayerInfo.getSrcTypeEnums();
-        Integer gridSrid = pxyLayerInfo.getGridSrid();
         if (srcType.isCustom()) {
             CustomTileGetterHelper instance = CustomTileGetterHelper.getInstance();
             return instance.getTileGetterByPxyLayerInfo(pxyLayerInfo);
@@ -75,12 +74,12 @@ public class TileGetterFactory {
             return new MBTilesTileGetter(pxyLayerInfo);
         }
         if (srcType.isLocal()) {
-            if (gridSrid.equals(3857)) {
+            if (pxyLayerInfo.isWebMercatorGrid()) {
                 return new GoogleLocalFileTileGetter(pxyLayerInfo);
             }
             return new Grid4490LocalFileTileGetter(pxyLayerInfo);
         } else {
-            if (gridSrid.equals(3857)) {
+            if (pxyLayerInfo.isWebMercatorGrid()) {
                 return new GoogleWebTileGetter(pxyLayerInfo);
             }
             return new Grid4490WebTileGetter(pxyLayerInfo);

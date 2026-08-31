@@ -4,13 +4,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geo</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-geo</name>
   <description>空间处理相关的模块</description>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -53,7 +53,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
+    <geoair.version>J8.1.6</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -96,11 +96,11 @@
         <version>${geoair.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geoserver</artifactId>
-        <version>${geoair.version}</version>
-      </dependency>
+      <!--      <dependency>-->
+      <!--        <groupId>cn.geoair.devkit</groupId>-->
+      <!--        <artifactId>geoair-geoserver</artifactId>-->
+      <!--        <version>${geoair.version}</version>-->
+      <!--      </dependency>-->
 
       <dependency>
         <groupId>cn.geoair.devkit</groupId>

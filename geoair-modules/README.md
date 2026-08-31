@@ -76,7 +76,7 @@ geoair-modules/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
 </dependency>
 ```
 
@@ -295,7 +295,7 @@ JTS `Geometry` 对象的 MyBatis TypeHandler：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <type>pom</type>
 </dependency>
 
@@ -303,7 +303,7 @@ JTS `Geometry` 对象的 MyBatis TypeHandler：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo-tools</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
 </dependency>
 ```
 
@@ -319,8 +319,9 @@ double[] gcj02 = tools.getCoordinateOpt().wgs84ToGcj02(116.40, 39.90);
 // GeoJSON 转 WKT
 String wkt = tools.getFormatOpt().geojsonToWktString(geojsonStr, false);
 
-// 面积计算
-double area = tools.getMeasureOpt().calculateAreaByUTM(polygon, 4326, "km²");
+// 面积计算：单位与测量方式均使用枚举
+double area = tools.getMeasureOpt().calculateArea(
+    polygon, 4326, MeasureUnitEnum.SQUARE_KILOMETER, MeasureMethodEnum.UTM);
 
 // 瓦片坐标
 TileZxyApo tile = tools.getTileGrid4326Opt().wgs84ToTileZxy(116.40, 39.90, 10);
@@ -337,7 +338,7 @@ TileZxyApo tile = tools.getTileGrid4326Opt().wgs84ToTileZxy(116.40, 39.90, 10);
 ## 👥 开发者
 
 - **作者**: 张逢吉
-- **邮箱**: zhangjun7570@qq.com
+- **邮箱**: zfj20250104@qq.com
 - **组织**: GeoAir
 - **官网**: https://xmt.geoair.cn/
 

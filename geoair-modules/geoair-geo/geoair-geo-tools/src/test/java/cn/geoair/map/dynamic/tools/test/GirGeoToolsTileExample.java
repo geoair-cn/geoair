@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
@@ -16,12 +17,13 @@ public class GirGeoToolsTileExample {
         GirTileConverterOpt tileOpt = GirGeoTools.defaultInstance().getTileGrid4326Opt();
         GirBingMapQuadKeyOpt quadKeyOpt = GirGeoTools.defaultInstance().getTileGridBingMapOpt();
 
-        BoxReferencedEnvelope tileBox = tileOpt.xyzToTileBox(10, 845, 388, 4326);
-        String wkt = tileOpt.xyzToWkt(10, 845, 388, 4326);
+        BoxReferencedEnvelope tileBox = tileOpt.xyzToTileBox(10, 845, 388, TileYAxis.XYZ, 4326);
+        String wkt = tileOpt.xyzToWkt(10, 845, 388, TileYAxis.XYZ, 4326);
         RangeApo range =
                 tileOpt.tileRangeByBox(10, new Envelope(116.35, 116.55, 39.85, 40.05), 4326);
         Set<TileZxyApo> zxyList =
-                tileOpt.zxyListByBox(new Envelope(116.35, 116.55, 39.85, 40.05), 4326, 10);
+                tileOpt.zxyListByBox(
+                        new Envelope(116.35, 116.55, 39.85, 40.05), 4326, 10, TileYAxis.XYZ);
 
         System.out.println("xyzToTileBox = " + tileBox);
         System.out.println("xyzToWkt = " + wkt);

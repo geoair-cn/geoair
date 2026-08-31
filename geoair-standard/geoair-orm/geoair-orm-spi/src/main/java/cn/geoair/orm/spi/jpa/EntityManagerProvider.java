@@ -5,28 +5,22 @@ import java.beans.PropertyDescriptor;
 import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
 import org.hibernate.metamodel.internal.MetamodelImpl;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.persister.entity.SingleTableEntityPersister;
 import org.hibernate.persister.walking.spi.AttributeDefinition;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
 
 /**
  * @author ：张俊
  * @date ：Created in 2022/7/1 14:05 @description： EntityManager提供者
  */
-@Component
-public class EntityManagerProvider {
+public abstract class EntityManagerProvider {
 
-    @PersistenceContext EntityManager entityManager;
-
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
+    public abstract EntityManager getEntityManager();
 
     public void Test() {
+        EntityManager entityManager = getEntityManager();
         // 通过EntityManager获取factory
         EntityManagerFactory entityManagerFactory = entityManager.getEntityManagerFactory();
         MetamodelImpl metaData = (MetamodelImpl) entityManagerFactory.getMetamodel();
@@ -56,6 +50,7 @@ public class EntityManagerProvider {
 
     public EntityPersister getEntityPersister(Class<?> entityClass) {
         String canonicalName = entityClass.getCanonicalName();
+        EntityManager entityManager = getEntityManager();
         // 通过EntityManager获取factory
         EntityManagerFactory entityManagerFactory = entityManager.getEntityManagerFactory();
         MetamodelImpl metaData = (MetamodelImpl) entityManagerFactory.getMetamodel();

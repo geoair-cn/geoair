@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-jts-all</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
 
   <packaging>jar</packaging>
   <name>geoair-jts-all</name>
@@ -29,7 +29,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -40,19 +40,6 @@
     <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <geotools.version>28.6.1</geotools.version>
-    <jts.version>1.19.0</jts.version>
-    <proj4j.version>1.3.0</proj4j.version>
-    <lombok.version>1.18.30</lombok.version>
-    <spring-boot.version>2.7.18</spring-boot.version>
-    <geojson-jackson.version>3.0</geojson-jackson.version>
-  </properties>
 
   <dependencies>
     <dependency>

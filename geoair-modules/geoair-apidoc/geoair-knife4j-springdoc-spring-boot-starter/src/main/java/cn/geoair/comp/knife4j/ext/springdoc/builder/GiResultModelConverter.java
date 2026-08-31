@@ -27,6 +27,7 @@ public class GiResultModelConverter implements ModelConverter {
             AnnotatedType annotatedType,
             ModelConverterContext context,
             Iterator<ModelConverter> chain) {
+
         // 先执行默认解析，获取基础Schema
         Schema<?> schema = chain.next().resolve(annotatedType, context, chain);
         if (schema == null) {

@@ -27,6 +27,7 @@ public class GaModelFieldConverter implements ModelConverter {
             AnnotatedType annotatedType,
             ModelConverterContext context,
             Iterator<ModelConverter> chain) {
+
         // 先执行默认的转换器逻辑，获取基础Schema
         Schema<?> schema = chain.next().resolve(annotatedType, context, chain);
         if (schema == null) {

@@ -11,37 +11,36 @@ public class AdvTypeHandlerContext {
     private final String propertyName;
     private final String columnName;
     private final Class<?> propertyType;
+    private final java.sql.Connection connection;
 
     private AdvTypeHandlerContext(
-            Class<?> entityClass, String propertyName, String columnName, Class<?> propertyType) {
+            Class<?> entityClass,
+            String propertyName,
+            String columnName,
+            Class<?> propertyType,
+            java.sql.Connection connection) {
         this.entityClass = entityClass;
         this.propertyName = propertyName;
         this.columnName = columnName;
         this.propertyType = propertyType;
+        this.connection = connection;
     }
 
     public static AdvTypeHandlerContext of(
             Class<?> entityClass, String propertyName, String columnName, Class<?> propertyType) {
-        return new AdvTypeHandlerContext(entityClass, propertyName, columnName, propertyType);
+        return new AdvTypeHandlerContext(entityClass, propertyName, columnName, propertyType, null);
     }
 
     public static AdvTypeHandlerContext simple(String columnName) {
-        return new AdvTypeHandlerContext(null, null, columnName, null);
+        return new AdvTypeHandlerContext(null, null, columnName, null, null);
     }
 
-    public Class<?> getEntityClass() {
-        return entityClass;
+    public static AdvTypeHandlerContext withConnection(
+            java.sql.Connection connection, String columnName) {
+        return new AdvTypeHandlerContext(null, null, columnName, null, connection);
     }
 
-    public String getPropertyName() {
-        return propertyName;
-    }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public Class<?> getPropertyType() {
-        return propertyType;
+    public java.sql.Connection getConnection() {
+        return connection;
     }
 }

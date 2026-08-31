@@ -9,9 +9,11 @@ import cn.geoair.map.dynamic.adv.query.dialect.dm.DmAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmAdvSimplePageOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.adv.spring.GirSpringDmAdvExecutor;
 import cn.hutool.core.lang.Pair;
+import cn.hutool.db.dialect.DialectName;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -45,7 +47,10 @@ public class DmAdaptationTest {
 
     @Test
     public void shouldBuildMergeUpsertSqlForDameng() {
-        DmAdvBaseUpdateOpt updateOpt = new DmAdvBaseUpdateOpt(AdvQueryGlobalConfig::of);
+        DmAdvBaseUpdateOpt updateOpt =
+                new DmAdvBaseUpdateOpt(
+                        AdvQueryGlobalConfig::of,
+                        AdvTypeHandlerRegistry.create(DialectName.DM, null));
         updateOpt.setDataSourceGetter(buildDataSourceGetter());
 
         LinkedHashMap<String, Object> rowData = new LinkedHashMap<>();
@@ -74,7 +79,10 @@ public class DmAdaptationTest {
 
     @Test
     public void shouldBuildValidUpsertWhenAllFieldsAreConflictKeys() {
-        DmAdvBaseUpdateOpt updateOpt = new DmAdvBaseUpdateOpt(AdvQueryGlobalConfig::of);
+        DmAdvBaseUpdateOpt updateOpt =
+                new DmAdvBaseUpdateOpt(
+                        AdvQueryGlobalConfig::of,
+                        AdvTypeHandlerRegistry.create(DialectName.DM, null));
         updateOpt.setDataSourceGetter(buildDataSourceGetter());
 
         LinkedHashMap<String, Object> rowData = new LinkedHashMap<>();

@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-core</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-core</name>
   <description>核心工具包</description>
@@ -26,7 +26,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -45,13 +45,6 @@
       <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-base</artifactId>
       <version>${geoair.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-web</artifactId>
-      <version>${geoair.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>

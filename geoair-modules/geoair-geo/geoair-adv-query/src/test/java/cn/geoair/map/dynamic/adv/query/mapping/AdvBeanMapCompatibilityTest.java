@@ -1,5 +1,6 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -15,6 +16,8 @@ import org.junit.Test;
 
 public class AdvBeanMapCompatibilityTest {
 
+    private final AdvTypeHandlerRegistry registry = AdvTypeHandlerRegistry.defaultInstance();
+
     @Test
     public void shouldResolveColumnNameForMapClass() {
         AdvBeanMappingMeta mappingMeta = AdvBeanMappingMeta.of(Map.class);
@@ -26,7 +29,7 @@ public class AdvBeanMapCompatibilityTest {
 
     @Test
     public void shouldConvertMapToColumnValueMap() {
-        AdvBeanColumnMapper mapper = new AdvBeanColumnMapper();
+        AdvBeanColumnMapper mapper = new AdvBeanColumnMapper(registry);
         LinkedHashMap<String, Object> input = new LinkedHashMap<>();
         input.put("userName", "Alice");
         input.put("age", 18);
@@ -51,7 +54,7 @@ public class AdvBeanMapCompatibilityTest {
                 buildSingleRowResultSet(
                         new String[] {"user_name", "age"}, new Object[] {"Alice", 18});
 
-        AdvBeanMapper mapper = new AdvBeanMapper();
+        AdvBeanMapper mapper = new AdvBeanMapper(registry);
         Assert.assertTrue(rs.next());
         Map<String, Object> mapped = mapper.mapRow(rs, Map.class);
 
@@ -71,7 +74,7 @@ public class AdvBeanMapCompatibilityTest {
                             {"Bob", 20}
                         });
 
-        AdvBeanMapper mapper = new AdvBeanMapper();
+        AdvBeanMapper mapper = new AdvBeanMapper(registry);
         List<Map> mapped = mapper.mapList(rs, Map.class);
 
         Assert.assertEquals(2, mapped.size());

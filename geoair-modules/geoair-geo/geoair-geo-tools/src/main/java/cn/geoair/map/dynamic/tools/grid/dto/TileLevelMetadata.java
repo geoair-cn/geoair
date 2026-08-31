@@ -4,9 +4,12 @@ import lombok.Data;
 import org.locationtech.jts.geom.Envelope;
 
 /**
- * @author ：张俊
- * @date ：Created in 2026/5/9 09:55
- * @description： 瓦片层级元数据类
+ * 单个瓦片层级的网格与显示参数。
+ *
+ * <p>数值单位取决于 {@link #gridSetName}：EPSG:3857 通常使用米，EPSG:4326 使用度。 因而 {@link #tileSizeM}、{@link
+ * #groundResolution} 和 {@link #resolution} 的名称为 历史 API，不能一律理解为米制值。
+ *
+ * @author 张逢吉
  */
 @Data
 public class TileLevelMetadata {
@@ -20,13 +23,13 @@ public class TileLevelMetadata {
     /** 每列的瓦片数量（垂直方向/Y轴） */
     private final int numTilesHigh;
 
-    /** 每个瓦片的地理尺寸（米），计算公式：globalWidthMeters / numTilesWide */
+    /** 每个瓦片在当前网格坐标单位下的横向跨度。 */
     private final double tileSizeM;
 
-    /** 地面分辨率（米/像素），每个像素代表的地面实际距离，计算公式：tileSizeM / tilePixelSize */
+    /** 每像素在当前网格坐标单位下的跨度。 */
     private final double groundResolution;
 
-    /** 分辨率（米/像素） （度/像素） */
+    /** 网格分辨率；3857 通常为米/像素，4326 通常为度/像素。 */
     private final double resolution;
 
     /** 比例尺（如 1:scale），表示地图上的1单位长度对应的实际地面长度 */
@@ -44,10 +47,10 @@ public class TileLevelMetadata {
     /** 每像素代表的毫米数，计算公式：25.4 / dpi */
     private final double mmPerPixel;
 
-    /** 当前缩放级别的全局范围（EPSG:3857 平面坐标，单位：米） */
+    /** 当前网格坐标参考系中的全局范围。 */
     private final Envelope extent;
 
-    /** 网格集名称（如 EPSG:4326 或 EPSG:3857） */
+    /** 网格集标识（例如 {@code EPSG:4326} 或 {@code EPSG:3857}）。 */
     private final String gridSetName;
 
     public TileLevelMetadata(
@@ -79,7 +82,11 @@ public class TileLevelMetadata {
         this.gridSetName = gridSetName;
     }
 
-    /** 获取格式化的比例尺字符串 */
+    /**
+     * 获取格式化的比例尺字符串。
+     *
+     * @return {@code 1:xxx} 格式的比例尺文本
+     */
     public String getScaleString() {
         if (scale >= 1000000) {
             return String.format("1:%.1f万", scale / 10000);

@@ -1,108 +1,128 @@
 package cn.geoair.map.dynamic.adv.dbmeta;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-/** PostgreSQL UDT类型与Java类型映射枚举（含内部类型名+TypeMetadata.CATEGORY关联） */
-public enum PostgreSqlType implements TypeMetadata {
+/** PostgreSQL UDT类型与Java类型映射枚举 */
+public enum PostgreSqlType implements DataBaseFieldType {
 
-    // 字符串/文本类（关联CATEGORY.CHAR/TEXT）
-    VARCHAR("varchar", "VARCHAR", DefaultJavaType.JAVA_STRING, CATEGORY.CHAR),
-    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CATEGORY.CHAR),
-    TEXT("text", "TEXT", DefaultJavaType.JAVA_TEXT, CATEGORY.TEXT),
-    UUID("uuid", "UUID", DefaultJavaType.JAVA_UUID, CATEGORY.CHAR),
-    JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CATEGORY.TEXT),
-    JSONB("jsonb", "JSONB", DefaultJavaType.JAVA_JSONB, CATEGORY.TEXT),
-    CITEXT("citext", "CITEXT", DefaultJavaType.JAVA_CITEXT, CATEGORY.CHAR),
+    // 字符串/文本类
+    VARCHAR("varchar", "VARCHAR", DefaultJavaType.JAVA_STRING, CategoryEnum.CHAR),
+    CHAR("char", "CHAR", DefaultJavaType.JAVA_CHAR, CategoryEnum.CHAR),
+    TEXT("text", "TEXT", DefaultJavaType.JAVA_TEXT, CategoryEnum.TEXT),
+    UUID("uuid", "UUID", DefaultJavaType.JAVA_UUID, CategoryEnum.CHAR),
+    JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CategoryEnum.TEXT),
+    JSONB("jsonb", "JSONB", DefaultJavaType.JAVA_JSONB, CategoryEnum.TEXT),
+    CITEXT("citext", "CITEXT", DefaultJavaType.JAVA_CITEXT, CategoryEnum.CHAR),
 
-    // 布尔类（关联CATEGORY.BOOLEAN）
-    BOOLEAN("boolean", "BOOLEAN", DefaultJavaType.JAVA_BOOLEAN, CATEGORY.BOOLEAN),
+    // 布尔类
+    BOOLEAN("boolean", "BOOLEAN", DefaultJavaType.JAVA_BOOLEAN, CategoryEnum.BOOLEAN),
 
-    // 整数类（含内部类型名，关联CATEGORY.INT）
-    INT2("int2", "SMALLINT", DefaultJavaType.JAVA_SHORT, CATEGORY.INT), // 16位整数
-    INT4("int4", "INTEGER", DefaultJavaType.JAVA_INTEGER, CATEGORY.INT), // 32位整数
-    INT8("int8", "BIGINT", DefaultJavaType.JAVA_BIGINT, CATEGORY.INT), // 64位整数
-    SERIAL("serial", "SERIAL", DefaultJavaType.JAVA_SERIAL, CATEGORY.INT), // 自增int4
-    BIGSERIAL("bigserial", "BIGSERIAL", DefaultJavaType.JAVA_BIGSERIAL, CATEGORY.INT),
+    // 整数类
+    INT2("int2", "SMALLINT", DefaultJavaType.JAVA_SHORT, CategoryEnum.INT),
+    INT4("int4", "INTEGER", DefaultJavaType.JAVA_INTEGER, CategoryEnum.INT),
+    INT8("int8", "BIGINT", DefaultJavaType.JAVA_BIGINT, CategoryEnum.INT),
+    SERIAL("serial", "SERIAL", DefaultJavaType.JAVA_SERIAL, CategoryEnum.INT),
+    BIGSERIAL("bigserial", "BIGSERIAL", DefaultJavaType.JAVA_BIGSERIAL, CategoryEnum.INT),
 
-    // 浮点/小数类（关联CATEGORY.FLOAT）
-    FLOAT4("float4", "REAL", DefaultJavaType.JAVA_REAL, CATEGORY.FLOAT), // 32位浮点
-    FLOAT8("float8", "DOUBLE PRECISION", DefaultJavaType.JAVA_DOUBLE, CATEGORY.FLOAT), // 64位浮点
-    NUMERIC("numeric", "NUMERIC", DefaultJavaType.JAVA_NUMERIC, CATEGORY.FLOAT),
-    DECIMAL("decimal", "DECIMAL", DefaultJavaType.JAVA_DECIMAL, CATEGORY.FLOAT),
+    // 浮点/小数类
+    FLOAT4("float4", "REAL", DefaultJavaType.JAVA_REAL, CategoryEnum.FLOAT),
+    FLOAT8("float8", "DOUBLE PRECISION", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
+    NUMERIC("numeric", "NUMERIC", DefaultJavaType.JAVA_NUMERIC, CategoryEnum.FLOAT),
+    DECIMAL("decimal", "DECIMAL", DefaultJavaType.JAVA_DECIMAL, CategoryEnum.FLOAT),
 
-    // 日期时间类（关联CATEGORY.DATE/TIME/DATETIME/TIMESTAMP）
-    DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CATEGORY.DATE),
-    TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CATEGORY.TIME),
-    TIMETZ("timetz", "TIME WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_TIME, CATEGORY.TIME),
-    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CATEGORY.TIMESTAMP),
+    // 日期时间类
+    DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CategoryEnum.DATE),
+    TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CategoryEnum.TIME),
+    TIMETZ("timetz", "TIME WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_TIME, CategoryEnum.TIME),
+    TIMESTAMP(
+            "timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
     TIMESTAMPTZ(
             "timestamptz",
             "TIMESTAMP WITH TIME ZONE",
             DefaultJavaType.JAVA_OFFSET_DATE_TIME,
-            CATEGORY.TIMESTAMP),
-    INTERVAL("interval", "INTERVAL", DefaultJavaType.JAVA_INTERVAL, CATEGORY.INTERVAL),
+            CategoryEnum.TIMESTAMP),
+    INTERVAL("interval", "INTERVAL", DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
 
-    // 二进制/特殊类（关联CATEGORY.BYTES/GEOMETRY/OTHER）
-    BYTEA("bytea", "BYTEA", DefaultJavaType.JAVA_BYTES, CATEGORY.BYTES),
-    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CATEGORY.BLOB),
-    GEOMETRY("geometry", "GEOMETRY", DefaultJavaType.JAVA_GEOMETRY, CATEGORY.GEOMETRY),
-    MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CATEGORY.FLOAT); // 货币类型归为浮点类
+    // 二进制/特殊类
+    BYTEA("bytea", "BYTEA", DefaultJavaType.JAVA_BYTES, CategoryEnum.BYTES),
+    BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CategoryEnum.BLOB),
 
-    // 原有字段
-    private final String udtName;
+    // 空间类
+    GEOMETRY(
+            DefaultJavaType.JAVA_GEOMETRY,
+            CategoryEnum.GEOMETRY,
+            "geometry",
+            "\"public\".\"geometry\""),
+    GEOGRAPHY(
+            DefaultJavaType.JAVA_GEOGRAPHY,
+            CategoryEnum.GEOMETRY,
+            "geography",
+            "\"public\".\"geography\""),
 
+    MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CategoryEnum.FLOAT);
+
+    private final List<String> udtNames;
     private final String standardName;
-
     private final DefaultJavaType javaType;
+    private final CategoryEnum category;
 
-    private final CATEGORY category;
-
-    // 缓存：udtName -> 枚举实例（加速查询）
     private static final Map<String, PostgreSqlType> UDT_NAME_MAP = new HashMap<>();
 
     static {
-        // 初始化缓存，忽略大小写（PostgreSQL类型名大小写不敏感）
         for (PostgreSqlType type : values()) {
-            UDT_NAME_MAP.put(type.udtName.toLowerCase(), type);
+            for (String name : type.udtNames) {
+                UDT_NAME_MAP.put(name.toLowerCase(), type);
+            }
         }
     }
 
-    // 构造方法新增category参数
+    /** 单一 udtName 的构造器 */
     PostgreSqlType(
-            String udtName, String standardName, DefaultJavaType javaType, CATEGORY category) {
-        this.udtName = udtName;
+            String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
+        this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
         this.category = category;
     }
 
-    /** 根据PostgreSQL内部类型名（如int4、int8）获取枚举实例 */
+    /** 多个 udtName 变体的构造器 */
+    PostgreSqlType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
+        this.udtNames = Arrays.asList(udtNames);
+        this.standardName = this.name();
+        this.javaType = javaType;
+        this.category = category;
+    }
+
+    /** 根据 udtName 查找（匹配任一变体名） */
     public static PostgreSqlType getByUdtName(String udtName) {
-        if (udtName == null) {
-            return null;
-        }
+        if (udtName == null) return null;
         return UDT_NAME_MAP.get(udtName.toLowerCase());
     }
 
-    /** 获取对应的Java类型 */
+    @Override
+    public List<String> getUdtNames() {
+        return Collections.unmodifiableList(this.udtNames);
+    }
+
+    @Override
+    public String getStandardName() {
+        return this.standardName;
+    }
+
     public DefaultJavaType getJavaType() {
         return javaType;
     }
 
-    /** 新增：获取TypeMetadata.CATEGORY（实现接口方法） */
     @Override
-    public CATEGORY getCategory() {
-        return this.category; // 直接返回枚举中定义的category
+    public CategoryEnum getCategory() {
+        return category;
     }
 
-    /** 新增：通过category获取对应的CATEGORY_GROUP（实现接口方法） */
     @Override
-    public CATEGORY_GROUP getCategoryGroup() {
-        return this.category.group(); // 复用CATEGORY枚举中定义的group关联
+    public CategoryGroupEnum getCategoryGroup() {
+        return category.group();
     }
 
-    // 其他接口方法实现（保持不变）
     @Override
     public String getName() {
         return standardName;
@@ -129,9 +149,13 @@ public enum PostgreSqlType implements TypeMetadata {
     }
 
     @Override
+    public Class<?> supportClass() {
+        return javaType.supportClass();
+    }
+
+    @Override
     public Config config() {
-        // 复用CATEGORY的config配置
-        return this.category.config();
+        return category.config();
     }
 
     @Override

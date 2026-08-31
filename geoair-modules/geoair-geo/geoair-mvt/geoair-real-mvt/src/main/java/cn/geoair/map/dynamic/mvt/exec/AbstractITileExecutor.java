@@ -72,6 +72,11 @@ public abstract class AbstractITileExecutor implements ITileExecutor {
     String layerName;
 
     public AbstractITileExecutor(TileRequestParams requestParams, String layerName) {
+        this(requestParams, layerName, null);
+    }
+
+    public AbstractITileExecutor(
+            TileRequestParams requestParams, String layerName, IAdvExecutor iAdvExecutor) {
         this.requestParams = requestParams;
         this.layerName = layerName;
         // 初始化执行器（从Params获取数据源ID和Schema）
@@ -86,10 +91,16 @@ public abstract class AbstractITileExecutor implements ITileExecutor {
         } else {
             sourceDataSrid = Integer.parseInt(srid);
         }
-        this.iAdvExecutor =
-                GirAdvQuery.getIAdvExecutor(
-                        Objects.isNull(requestParams.getDsId()) ? "-1" : requestParams.getDsId(),
-                        requestParams.getSchemaName());
+        if (iAdvExecutor != null) {
+            this.iAdvExecutor = iAdvExecutor;
+        } else {
+            this.iAdvExecutor =
+                    GirAdvQuery.getIAdvExecutor(
+                            Objects.isNull(requestParams.getDsId())
+                                    ? "-1"
+                                    : requestParams.getDsId(),
+                            requestParams.getSchemaName());
+        }
     }
 
     @Override

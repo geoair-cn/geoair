@@ -35,7 +35,7 @@ public class JdbcUtil {
         List<JSONObject> list = new ArrayList<>();
         PreparedStatement pst = null;
         try {
-            dataFieldsApo.getFieldList(
+            dataFieldsApo.mapFields(
                     new Function<FieldBySchemaApo, JSONObject>() {
                         @Override
                         public JSONObject apply(FieldBySchemaApo fieldBySchemaApo) {

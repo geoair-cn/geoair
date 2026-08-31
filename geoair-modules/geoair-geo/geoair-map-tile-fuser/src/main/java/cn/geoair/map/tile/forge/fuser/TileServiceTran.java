@@ -4,6 +4,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
@@ -19,6 +20,12 @@ import cn.geoair.web.mime.GirImageMime;
 import cn.geoair.web.util.GirHttpServletHelper;
 import cn.geoair.web.util.GutilMimeType;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -29,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author 张俊
  * @date Created in 2023/12/4 15:47
  */
-public class TileServiceTran {
+public class TileServiceTran implements TileServiceTranResponseProvider {
     private static GiLogger log = GirLoggerFactory.getLogger();
 
     /** 默认瓦片大小 */
@@ -40,6 +47,96 @@ public class TileServiceTran {
 
     /** 默认坐标系 SRID */
     private static final int DEFAULT_SRID = 3857;
+
+    /** 手工 URI 中表示 Google 网格转 4326 网格的操作名。 */
+    public static final String GOOGLE_TO_4326_OPERATION = "google-to-4326";
+
+    /** 手工 URI 中表示 Grid4490 网格转 3857 网格的操作名。 */
+    public static final String GRID4490_TO_3857_OPERATION = "grid4490-to-3857";
+
+    private static final String URI_PATH_PREFIX = "tile-fuser";
+
+    /**
+     * 构建可直接传入 {@link #getTileResponse(String)} 的标准 URI。
+     *
+     * <p>格式：{@code
+     * /tile-fuser/{operation}/{layer}/{z}/{x}/{y}?format=image%2Fpng&deleteCache=false}
+     */
+    public static String buildTileRequestUri(
+            String operation,
+            String layerName,
+            Integer z,
+            Integer x,
+            Integer y,
+            String outputFormat,
+            boolean deleteCache) {
+        if (!GOOGLE_TO_4326_OPERATION.equals(operation)
+                && !GRID4490_TO_3857_OPERATION.equals(operation)) {
+            throw new IllegalArgumentException("Unsupported tile-fuser operation: " + operation);
+        }
+        if (StrUtil.isBlank(layerName) || z == null || x == null || y == null) {
+            throw new IllegalArgumentException("layerName, z, x and y must not be empty");
+        }
+        String format = StrUtil.isBlank(outputFormat) ? DEFAULT_OUTPUT_FORMAT : outputFormat;
+        return "/"
+                + URI_PATH_PREFIX
+                + "/"
+                + operation
+                + "/"
+                + urlEncode(layerName)
+                + "/"
+                + z
+                + "/"
+                + x
+                + "/"
+                + y
+                + "?format="
+                + urlEncode(format)
+                + "&deleteCache="
+                + deleteCache;
+    }
+
+    /**
+     * 解析由 {@link #buildTileRequestUri(String, String, Integer, Integer, Integer, String, boolean)}
+     * 构建的 URI 或完整 URL，并生成瓦片响应。
+     */
+    @Override
+    public TileResponse getTileResponse(String requestUri) {
+        return getTileResponse(requestUri, null);
+    }
+
+    @Override
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
+        try {
+            ParsedTileRequest parsed = ParsedTileRequest.parse(requestUri);
+            if (parsed == null) {
+                return TileResponse.notFound()
+                        .setHttpCode(HttpServletResponse.SC_NOT_FOUND)
+                        .setErrorMessage("Invalid tile-fuser URI: " + requestUri);
+            }
+            if (GOOGLE_TO_4326_OPERATION.equals(parsed.operation)) {
+                return buildConvertedTileResponse(
+                        parsed.layerName,
+                        parsed.z,
+                        parsed.x,
+                        parsed.y,
+                        parsed.outputFormat,
+                        parsed.deleteCache,
+                        true);
+            }
+            return buildConvertedTileResponse(
+                    parsed.layerName,
+                    parsed.z,
+                    parsed.x,
+                    parsed.y,
+                    parsed.outputFormat,
+                    parsed.deleteCache,
+                    false);
+        } catch (Exception e) {
+            log.error("解析 tile-fuser URI 失败: {}", requestUri, e);
+            return TileResponse.error("Failed to parse tile-fuser URI: " + e.getMessage());
+        }
+    }
 
     // ==================== 公开方法 - Google 服务 ====================
 
@@ -52,7 +149,14 @@ public class TileServiceTran {
      * @param y y 坐标
      */
     public void googleServiceTo4326Request(String layerName, Integer z, Integer x, Integer y) {
-        googleServiceTo4326Request(layerName, z, x, y, DEFAULT_OUTPUT_FORMAT);
+        writeTileResponse(googleServiceTo4326RequestForTileResponse(layerName, z, x, y));
+    }
+
+    /** Google 服务转 4326 请求，并返回统一瓦片响应（默认 PNG 格式）。 */
+    @Override
+    public TileResponse googleServiceTo4326RequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y) {
+        return googleServiceTo4326RequestForTileResponse(layerName, z, x, y, DEFAULT_OUTPUT_FORMAT);
     }
 
     /**
@@ -66,6 +170,14 @@ public class TileServiceTran {
      */
     public void googleServiceTo4326Request(
             String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        writeTileResponse(
+                googleServiceTo4326RequestForTileResponse(layerName, z, x, y, outputFormat));
+    }
+
+    /** Google 服务转 4326 请求，并返回统一瓦片响应。 */
+    @Override
+    public TileResponse googleServiceTo4326RequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
         log.debug(
                 "Google服务转4326请求: layer={}, z={}, x={}, y={}, format={}",
                 layerName,
@@ -73,10 +185,7 @@ public class TileServiceTran {
                 x,
                 y,
                 outputFormat);
-        BoxReferencedEnvelope box =
-                GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, DEFAULT_SRID);
-        BoundingBox bounds = buildBoundingBox(box);
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, false, 4326);
+        return buildConvertedTileResponse(layerName, z, x, y, outputFormat, false, true);
     }
 
     /**
@@ -90,6 +199,15 @@ public class TileServiceTran {
      */
     public void googleServiceTo4326RequestDelCache(
             String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        writeTileResponse(
+                googleServiceTo4326RequestDelCacheForTileResponse(
+                        layerName, z, x, y, outputFormat));
+    }
+
+    /** Google 服务转 4326 请求、删除缓存后返回统一瓦片响应。 */
+    @Override
+    public TileResponse googleServiceTo4326RequestDelCacheForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
         log.debug(
                 "Google服务转4326请求并删除缓存: layer={}, z={}, x={}, y={}, format={}",
                 layerName,
@@ -97,10 +215,7 @@ public class TileServiceTran {
                 x,
                 y,
                 outputFormat);
-        BoxReferencedEnvelope box =
-                GirAdvTools.getTileGrid4326Opt().xyzToTileBox(z, x, y, DEFAULT_SRID);
-        BoundingBox bounds = buildBoundingBox(box);
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, true, 4326);
+        return buildConvertedTileResponse(layerName, z, x, y, outputFormat, true, true);
     }
 
     // ==================== 公开方法 - Grid4490 服务 ====================
@@ -114,7 +229,15 @@ public class TileServiceTran {
      * @param y y 坐标
      */
     public void grid4490ServiceTo3857Request(String layerName, Integer z, Integer x, Integer y) {
-        grid4490ServiceTo3857Request(layerName, z, x, y, DEFAULT_OUTPUT_FORMAT);
+        writeTileResponse(grid4490ServiceTo3857RequestForTileResponse(layerName, z, x, y));
+    }
+
+    /** Grid4490 服务转 3857 请求，并返回统一瓦片响应（默认 PNG 格式）。 */
+    @Override
+    public TileResponse grid4490ServiceTo3857RequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y) {
+        return grid4490ServiceTo3857RequestForTileResponse(
+                layerName, z, x, y, DEFAULT_OUTPUT_FORMAT);
     }
 
     /**
@@ -128,6 +251,14 @@ public class TileServiceTran {
      */
     public void grid4490ServiceTo3857Request(
             String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        writeTileResponse(
+                grid4490ServiceTo3857RequestForTileResponse(layerName, z, x, y, outputFormat));
+    }
+
+    /** Grid4490 服务转 3857 请求，并返回统一瓦片响应。 */
+    @Override
+    public TileResponse grid4490ServiceTo3857RequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
         log.debug(
                 "Grid4490服务转3857请求: layer={}, z={}, x={}, y={}, format={}",
                 layerName,
@@ -135,11 +266,7 @@ public class TileServiceTran {
                 x,
                 y,
                 outputFormat);
-
-        BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
-        BoundingBox bounds =
-                new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, false, 3857);
+        return buildConvertedTileResponse(layerName, z, x, y, outputFormat, false, false);
     }
 
     /**
@@ -153,6 +280,15 @@ public class TileServiceTran {
      */
     public void grid4490ServiceTo3857RequestDelCache(
             String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        writeTileResponse(
+                grid4490ServiceTo3857RequestDelCacheForTileResponse(
+                        layerName, z, x, y, outputFormat));
+    }
+
+    /** Grid4490 服务转 3857 请求、删除缓存后返回统一瓦片响应。 */
+    @Override
+    public TileResponse grid4490ServiceTo3857RequestDelCacheForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
         log.debug(
                 "Grid4490服务转3857请求并删除缓存: layer={}, z={}, x={}, y={}, format={}",
                 layerName,
@@ -160,13 +296,40 @@ public class TileServiceTran {
                 x,
                 y,
                 outputFormat);
-        BoxReferencedEnvelope box = GirAdvTools.getTileGrid3857Opt().xyzToTileBox(z, x, y, 4326);
-        BoundingBox bounds =
-                new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
-        processTileRequest(layerName, z, x, y, bounds, outputFormat, true, 3857);
+        return buildConvertedTileResponse(layerName, z, x, y, outputFormat, true, false);
     }
 
     // ==================== 核心处理方法 ====================
+
+    private TileResponse buildConvertedTileResponse(
+            String layerName,
+            Integer z,
+            Integer x,
+            Integer y,
+            String outputFormat,
+            boolean deleteCache,
+            boolean googleTo4326) {
+        int requestGridSrid = googleTo4326 ? 4326 : 3857;
+        try {
+            BoxReferencedEnvelope box =
+                    googleTo4326
+                            ? GirAdvTools.getTileGrid4326Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, DEFAULT_SRID)
+                            : GirAdvTools.getTileGrid3857Opt()
+                                    .xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
+            return buildTileResponse(
+                    layerName,
+                    z,
+                    x,
+                    y,
+                    buildBoundingBox(box),
+                    outputFormat,
+                    deleteCache,
+                    requestGridSrid);
+        } catch (Exception e) {
+            return buildErrorTileResponse(layerName, z, x, y, requestGridSrid, e);
+        }
+    }
 
     /**
      * 处理瓦片请求的核心方法
@@ -179,7 +342,7 @@ public class TileServiceTran {
      * @param outputFormat 输出格式
      * @param deleteCache 是否删除缓存
      */
-    private void processTileRequest(
+    private TileResponse buildTileResponse(
             String layerName,
             Integer z,
             Integer x,
@@ -188,8 +351,6 @@ public class TileServiceTran {
             String outputFormat,
             boolean deleteCache,
             int requestGridSrid) {
-        HttpServletResponse response = GirHttpServletHelper.getResponse();
-
         try {
             GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
 
@@ -224,31 +385,33 @@ public class TileServiceTran {
             // 生成瓦片
             byte[] imageBytes = cacheTileFuser.toImageBytes();
 
-            TileResponse tileResponse =
-                    TileResponseByByte.of()
-                            .setBytes(imageBytes)
-                            .setLastModified(System.currentTimeMillis())
-                            .setSuccess(true)
-                            .setMimeType(fromFormat)
-                            .setDataSource("fuser")
-                            .setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
-                            .setGridEpsgStr("EPSG:" + requestGridSrid);
-            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-
+            return TileResponseByByte.of()
+                    .setBytesAndUpdateSize(imageBytes)
+                    .setLastModified(System.currentTimeMillis())
+                    .setSuccess(true)
+                    .setMimeType(fromFormat)
+                    .setDataSource("fuser")
+                    .setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
+                    .setGridEpsgStr("EPSG:" + requestGridSrid);
         } catch (Exception e) {
-            String errorMsg =
-                    StrUtil.format("生成瓦片失败: layerName={}, z={}, x={}, y={}", layerName, z, x, y);
-            log.error(errorMsg, e);
-
-            String fullErrorMsg = errorMsg + "，异常信息：" + e.getMessage();
-            TileResponse error =
-                    TileResponse.error(fullErrorMsg)
-                            .setDataSource("fuser")
-                            .setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
-                            .setGridEpsgStr("EPSG:" + requestGridSrid);
-            ;
-            GirTileResponseUtil.buildFromTileResponse(error, response);
+            return buildErrorTileResponse(layerName, z, x, y, requestGridSrid, e);
         }
+    }
+
+    private TileResponse buildErrorTileResponse(
+            String layerName, Integer z, Integer x, Integer y, int requestGridSrid, Exception e) {
+        String errorMsg =
+                StrUtil.format("生成瓦片失败: layerName={}, z={}, x={}, y={}", layerName, z, x, y);
+        log.error(errorMsg, e);
+        return TileResponse.error(errorMsg + "，异常信息：" + e.getMessage())
+                .setDataSource("fuser")
+                .setCoordinate(TileZxyApo.of().setZ(z).setX(x).setY(y))
+                .setGridEpsgStr("EPSG:" + requestGridSrid);
+    }
+
+    private void writeTileResponse(TileResponse tileResponse) {
+        HttpServletResponse response = GirHttpServletHelper.getResponse();
+        GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
     }
 
     // ==================== 缓存管理方法 ====================
@@ -335,5 +498,102 @@ public class TileServiceTran {
      */
     public BoundingBox buildBoundingBox(BoxReferencedEnvelope box) {
         return new BoundingBox(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
+    }
+
+    private static String urlEncode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 is not supported", e);
+        }
+    }
+
+    private static class ParsedTileRequest {
+        private final String operation;
+        private final String layerName;
+        private final Integer z;
+        private final Integer x;
+        private final Integer y;
+        private final String outputFormat;
+        private final boolean deleteCache;
+
+        private ParsedTileRequest(
+                String operation,
+                String layerName,
+                Integer z,
+                Integer x,
+                Integer y,
+                String outputFormat,
+                boolean deleteCache) {
+            this.operation = operation;
+            this.layerName = layerName;
+            this.z = z;
+            this.x = x;
+            this.y = y;
+            this.outputFormat = outputFormat;
+            this.deleteCache = deleteCache;
+        }
+
+        private static ParsedTileRequest parse(String requestUri) throws Exception {
+            if (StrUtil.isBlank(requestUri)) {
+                return null;
+            }
+            URI uri = new URI(requestUri.trim());
+            String rawPath = uri.getRawPath();
+            if (rawPath == null) {
+                return null;
+            }
+            String[] parts = rawPath.split("/");
+            for (int i = 0; i + 5 < parts.length; i++) {
+                if (!URI_PATH_PREFIX.equals(parts[i])) {
+                    continue;
+                }
+                String operation = parts[i + 1];
+                if (!GOOGLE_TO_4326_OPERATION.equals(operation)
+                        && !GRID4490_TO_3857_OPERATION.equals(operation)) {
+                    return null;
+                }
+                String layerName = URLUtil.decode(parts[i + 2]);
+                if (StrUtil.isBlank(layerName)) {
+                    return null;
+                }
+                Integer z = parseCoordinate(parts[i + 3]);
+                Integer x = parseCoordinate(parts[i + 4]);
+                Integer y = parseCoordinate(parts[i + 5]);
+                Map<String, String> query = parseQuery(uri.getRawQuery());
+                String outputFormat = query.get("format");
+                return new ParsedTileRequest(
+                        operation,
+                        layerName,
+                        z,
+                        x,
+                        y,
+                        StrUtil.isBlank(outputFormat) ? DEFAULT_OUTPUT_FORMAT : outputFormat,
+                        Boolean.parseBoolean(query.get("deleteCache")));
+            }
+            return null;
+        }
+
+        private static Integer parseCoordinate(String value) {
+            int coordinate = Integer.parseInt(value);
+            if (coordinate < 0) {
+                throw new IllegalArgumentException("Tile coordinate must not be negative");
+            }
+            return coordinate;
+        }
+
+        private static Map<String, String> parseQuery(String rawQuery) {
+            Map<String, String> result = new HashMap<>();
+            if (StrUtil.isBlank(rawQuery)) {
+                return result;
+            }
+            for (String pair : rawQuery.split("&")) {
+                int separator = pair.indexOf('=');
+                String key = separator < 0 ? pair : pair.substring(0, separator);
+                String value = separator < 0 ? "" : pair.substring(separator + 1);
+                result.put(URLUtil.decode(key), URLUtil.decode(value));
+            }
+            return result;
+        }
     }
 }

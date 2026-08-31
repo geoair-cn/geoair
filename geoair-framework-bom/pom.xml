@@ -6,15 +6,16 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-framework-bom</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-framework-bom</name>
-  <description>用于工程模块的依赖定义</description>
+  <description>GeoAir 对外统一 BOM，聚合第三方与 GeoAir 组件版本约束</description>
 
   <url>https://github.com/geoair-cn/geoair</url>
 
@@ -28,20 +29,11 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
   </developers>
-
-  <!--    <dependencies>-->
-  <!--        <dependency>-->
-  <!--           <groupId>cn.geoair.devkit</groupId>-->
-  <!--            <artifactId>geoair-base-parent</artifactId>-->
-  <!--            <version>${geoair.version}</version>-->
-  <!--            <type>pom</type>-->
-  <!--        </dependency>-->
-  <!--    </dependencies>-->
 
   <modules>
     <module>geoair-api-parent</module>
@@ -55,13 +47,6 @@
     <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-
-  <properties>
-    <!--        <geoair.version>J8.1.5</geoair.version>-->
-    <!--        <geoair.comp.version>J8.1.5</geoair.comp.version>-->
-
-    <skipTests>true</skipTests>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -78,7 +63,6 @@
   <build>
     <pluginManagement>
       <plugins>
-
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>

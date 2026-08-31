@@ -16,7 +16,7 @@ public class GirEnumApplyer implements GiModelFieldApplyer {
         if (type == "select") {
             GaModelField mf = tar.getAnnotation(GaModelField.class);
             if (mf == null) {
-                throw new RuntimeException("枚举映射找不到对应的 gtcModelField注解");
+                throw new RuntimeException("枚举映射找不到对应的 GaModelField注解");
             }
             Class<? extends Enum<?>> emCls = mf.em();
 

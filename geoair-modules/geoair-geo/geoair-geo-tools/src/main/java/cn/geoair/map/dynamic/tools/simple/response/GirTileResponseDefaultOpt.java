@@ -77,7 +77,11 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             setSharpeningHeaders(response, sharpeningResult);
         }
 
-        response.setContentLengthLong(tileResponse.getContentLength());
+        Long contentLength = tileResponse.getContentLength();
+        // 输入流响应在未知长度时不应伪造 Content-Length，让 Servlet 容器使用流式传输。
+        if (contentLength != null && contentLength >= 0) {
+            response.setContentLengthLong(contentLength);
+        }
         response.setStatus(GutilObject.isNotEmpty(httpCode) ? httpCode : HttpServletResponse.SC_OK);
 
         // 如果有自定义缓存头，额外设置
@@ -365,6 +369,10 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             } catch (Exception e) {
             }
         }
+        if (httpCode == 204) {
+            response.setStatus(httpCode);
+            return;
+        }
         String errorMessage = tileResponse.getErrorMessage();
         if (GutilObject.isEmpty(errorMessage) && GutilObject.isNotEmpty(coordinate)) {
             errorMessage = StrUtil.format("无法找到瓦片  {}", coordinate.getZxyString());
@@ -374,7 +382,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         GirServletUtil.toResponse(
                 response,
                 json.getBytes(StandardCharsets.UTF_8),
-                "application/json,charset=utf-8",
+                "application/json;charset=utf-8",
                 httpCode);
     }
 

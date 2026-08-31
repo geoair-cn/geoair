@@ -26,6 +26,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,9 +70,13 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter
         TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
         String tempDirAbsolutePath =
                 TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-        String inLocalPathBuilder = tempDirAbsolutePath + File.separator + fileName;
-        String inLocalPath = inLocalPathBuilder.trim();
-        File localTileFile = new File(inLocalPath);
+        Path rootPath = Paths.get(tempDirAbsolutePath).toAbsolutePath().normalize();
+        Path localPath = rootPath.resolve(fileName).normalize();
+        if (!localPath.startsWith(rootPath)) {
+            throw new IOException("瓦片路径越出临时目录");
+        }
+        File localTileFile = localPath.toFile();
+        String inLocalPath = localTileFile.getAbsolutePath();
         boolean localStatu = localTileFile.exists();
         if (!localStatu) {
             localStatu = byPreCache(layerConfigContext, fileName, inLocalPath);

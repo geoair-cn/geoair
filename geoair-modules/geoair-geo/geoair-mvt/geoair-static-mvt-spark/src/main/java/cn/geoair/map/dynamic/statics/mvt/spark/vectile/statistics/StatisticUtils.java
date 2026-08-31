@@ -5,9 +5,9 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.*;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
@@ -413,8 +413,7 @@ public class StatisticUtils {
                         System.currentTimeMillis(),
                         jsonStr);
         Dataset<Row> df = sparkSession.createDataFrame(Collections.singletonList(row), schema);
-        Map<String, String> pgParams = VectorTileCommonUtils.buildPgWriteParams(parameter);
-
+        DataSourceConfig outputSource = parameter.getOutputSource();
         // 带重试的写入逻辑
         Exception lastException = null;
         for (int i = 0; i < retryTimes; i++) {
@@ -425,11 +424,11 @@ public class StatisticUtils {
 
                 df.write()
                         .format("jdbc")
-                        .option("url", pgParams.get("url"))
+                        .option("url", outputSource.getJdbcUrl())
                         .option("dbtable", StrUtil.wrap(staticTableName, "\""))
-                        .option("user", pgParams.get("user"))
-                        .option("password", pgParams.get("password"))
-                        .option("batchsize", pgParams.getOrDefault("batchSize", "1000"))
+                        .option("user", outputSource.getUsername())
+                        .option("password", outputSource.getPassword())
+                        .option("batchsize", "50")
                         .option("rewriteBatchedStatements", "true")
                         .mode("append")
                         .save();

@@ -18,6 +18,9 @@ public class GirImageMime extends BaseMimeType {
     public static final GirImageMime jpeg =
             new GirImageMime("image/jpeg", "jpeg", "jpeg", "image/jpeg") {};
 
+    public static final GirImageMime webp =
+            new GirImageMime("image/webp", "webp", "webp", "image/webp") {};
+
     public static final GirImageMime gif = new GirImageMime("image/gif", "gif", "gif", "image/gif");
 
     public static final GirImageMime tiff =

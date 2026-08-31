@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geo-tools</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-geo-tools</name>
 
@@ -34,7 +34,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -45,25 +45,6 @@
     <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <servlet-api.version>4.0.1</servlet-api.version>
-    <geotools.version>28.6.1</geotools.version>
-    <proj4j.version>1.3.0</proj4j.version>
-    <lombok.version>1.18.30</lombok.version>
-    <net.postgis.version>2025.1.1</net.postgis.version>
-    <org.postgis.version>1.3.3</org.postgis.version>
-    <ojdbc.version>21.5.0.0</ojdbc.version>
-    <version.lib.ojdbc>${ojdbc.version}</version.lib.ojdbc>
-    <!--    <version.lib.ojdbc>21.5.0.0</version.lib.ojdbc>-->
-    <sdoutl.version>23.26</sdoutl.version>
-    <fastjson1x.version>2.0.61</fastjson1x.version>
-    <jts.version>1.19.0</jts.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
@@ -183,6 +164,12 @@
     <!--      <artifactId>sdoutl</artifactId>-->
     <!--      <version>23.26</version>-->
     <!--    </dependency>-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

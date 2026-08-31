@@ -123,7 +123,7 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         }
         if (value instanceof String) {
             try {
-                value = JSONObject.parseObject(key); // 判断是否为geojson字符串
+                value = JSONObject.parseObject((String) value); // 判断是否为geojson字符串
             } catch (Exception e) {
                 try {
                     jtsGeom =
@@ -156,6 +156,8 @@ public interface OptNullGeomAndBasicTypeFromObjectGetter
         } else if (GirOracleTran.isOracleSpatialAvailable()
                 && GirOracleSpatialTran.isSdoGeometry(value)) {
             return GirOracleSpatialTran.sdoGeometryToJtsGeom(value);
+        } else if (GirDMTran.isDmDriverAvailable() && GirDMSpatialTran.isDmdbStruct(value)) {
+            return GirDMSpatialTran.dmStructToJtsGeom(value);
         }
         return jtsGeom;
     }

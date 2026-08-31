@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-db-service</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service-spring-boot-starter</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-db-service-spring-boot-starter</name>
 
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -38,15 +38,6 @@
     <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <liquibase.version>4.9.1</liquibase.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>

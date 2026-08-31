@@ -1,8 +1,13 @@
 package cn.geoair.comp.dynamic.ds.utils;
 
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
+import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
+
 /**
- * 创建人: 张逢吉 创建时间: 2025/9/30 09:28 描述: 将JDBC URL拆分为各个组件。 从类似以下格式的 JDBC URI 中提取组件： String url =
- * "jdbc:derby://localhost:1527/netld;collation=TERRITORY_BASED:PRIMARY"; 在各自的公共变量中。
+ * JDBC URL 旧版拆分器。
+ *
+ * @deprecated 请使用 {@link cn.geoair.comp.jdbc.url.JdbcUrlCodec}；该类仅为旧调用方保留。
  */
 @Deprecated
 public class JdbcUrlSplitter {
@@ -10,34 +15,21 @@ public class JdbcUrlSplitter {
     public String driverName, host, port, database, params;
 
     public JdbcUrlSplitter(String jdbcUrl) {
-        int pos, pos1, pos2;
-        String connUri;
+        JdbcUrl parsed = GirJdbcUrlCodecs.defaultCodec().parse(jdbcUrl);
+        driverName = parsed.getDriverName();
+        database = parsed.getDatabaseName();
+        JdbcEndpoint endpoint = parsed.getPrimaryEndpoint();
+        host = endpoint == null ? null : endpoint.getHost();
+        port =
+                endpoint == null || endpoint.getPort() == null
+                        ? null
+                        : String.valueOf(endpoint.getPort());
 
-        if (jdbcUrl == null
-                || !jdbcUrl.startsWith("jdbc:")
-                || (pos1 = jdbcUrl.indexOf(':', 5)) == -1)
-            throw new IllegalArgumentException("Invalid JDBC url.");
-
-        driverName = jdbcUrl.substring(5, pos1);
-        if ((pos2 = jdbcUrl.indexOf(';', pos1)) == -1) {
-            connUri = jdbcUrl.substring(pos1 + 1);
-        } else {
-            connUri = jdbcUrl.substring(pos1 + 1, pos2);
-            params = jdbcUrl.substring(pos2 + 1);
-        }
-
-        if (connUri.startsWith("//")) {
-            if ((pos = connUri.indexOf('/', 2)) != -1) {
-                host = connUri.substring(2, pos);
-                database = connUri.substring(pos + 1);
-
-                if ((pos = host.indexOf(':')) != -1) {
-                    port = host.substring(pos + 1);
-                    host = host.substring(0, pos);
-                }
-            }
-        } else {
-            database = connUri;
-        }
+        String normalized = GirJdbcUrlCodecs.defaultCodec().format(parsed);
+        String core = parsed.getCoreUrl();
+        params =
+                normalized.length() > core.length()
+                        ? normalized.substring(core.length() + 1)
+                        : null;
     }
 }

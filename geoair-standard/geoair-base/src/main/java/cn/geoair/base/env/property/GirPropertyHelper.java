@@ -7,6 +7,12 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirPropertyHelper {
 
+    private static volatile GiPropertier propertier;
+
+    public static void setPropertier(GiPropertier propertier) {
+        GirPropertyHelper.propertier = propertier;
+    }
+
     // /*
     // static {
     // MethodHand.implFromClass( GirPropertyHelper.class);
@@ -15,6 +21,10 @@ public class GirPropertyHelper {
 
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.env.SpringEnvironment4Gir")
     public static GiPropertier getPropertier() {
+        GiPropertier provider = propertier;
+        if (provider != null) {
+            return provider;
+        }
         return (GiPropertier) GkMethodHand.invokeSelf();
     }
 

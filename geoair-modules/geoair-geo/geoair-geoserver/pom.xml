@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geoserver</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-geoserver</name>
   <description>geoair-geoserver的springBootStart集成模块</description>
@@ -26,7 +26,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -39,12 +39,6 @@
   </scm>
 
   <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <geotools.version>28.6.1</geotools.version>
-    <geoserver.version>2.22.6</geoserver.version>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 

@@ -6,13 +6,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-common-dependencies</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-common-dependencies</name>
   <description>geoair other module 其他第三方组件，无法归类的组件</description>
@@ -29,7 +29,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -41,15 +41,6 @@
     <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <commons.lang3.version>3.12.0</commons.lang3.version>
-    <commons.text.version>1.15.0</commons.text.version>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -173,7 +164,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
+        <version>${commons.io.version}</version>
       </dependency>
 
       <dependency>
@@ -256,7 +247,7 @@
       <dependency>
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-java-sdk-s3</artifactId>
-        <version>1.12.625</version>
+        <version>${aws-java-sdk-s3.version}</version>
 
       </dependency>
 

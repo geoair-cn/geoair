@@ -25,6 +25,9 @@ public class TileTaskConfig {
     private Geometry geometry4326;
     private GirImageMime format;
     private TaskType taskType;
+    /** 当前层级允许同时处理的瓦片数。 */
+    @Builder.Default
+    private int maxConsumerThreads = Math.max(1, Runtime.getRuntime().availableProcessors());
     // 可选参数（原始网格检查需要）
     private String originalCacheName;
 

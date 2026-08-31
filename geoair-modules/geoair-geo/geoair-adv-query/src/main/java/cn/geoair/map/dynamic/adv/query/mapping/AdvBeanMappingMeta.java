@@ -1,7 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+import cn.geoair.map.dynamic.adv.anno.GirAdvTypeHandler;
 import cn.geoair.map.dynamic.adv.anno.GirTransient;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
 import cn.hutool.core.bean.BeanDesc;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.PropDesc;
@@ -237,6 +239,9 @@ public class AdvBeanMappingMeta {
         private final boolean ignored;
         private final boolean id;
 
+        @SuppressWarnings("rawtypes")
+        private final AdvTypeHandler advTypeHandler;
+
         private AdvBeanPropertyMeta(
                 Class<?> beanClass,
                 Field field,
@@ -244,7 +249,8 @@ public class AdvBeanMappingMeta {
                 String explicitColumnName,
                 Class<?> propertyType,
                 boolean ignored,
-                boolean id) {
+                boolean id,
+                @SuppressWarnings("rawtypes") AdvTypeHandler advTypeHandler) {
             this.beanClass = beanClass;
             this.field = field;
             this.propertyName = propertyName;
@@ -252,6 +258,7 @@ public class AdvBeanMappingMeta {
             this.propertyType = propertyType;
             this.ignored = ignored;
             this.id = id;
+            this.advTypeHandler = advTypeHandler;
         }
 
         public static AdvBeanPropertyMeta of(Class<?> beanClass, Field field) {
@@ -265,6 +272,24 @@ public class AdvBeanMappingMeta {
             if (gaModelField != null && gaModelField.isID()) {
                 id = true;
             }
+            AdvTypeHandler<?> advTypeHandler = null;
+            GirAdvTypeHandler handlerAnno = field.getAnnotation(GirAdvTypeHandler.class);
+            if (handlerAnno != null) {
+                Class<? extends AdvTypeHandler<?>> handlerClass = handlerAnno.value();
+                try {
+                    advTypeHandler = handlerClass.getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException(
+                            "实例化类型处理器失败: "
+                                    + handlerClass.getName()
+                                    + " (字段: "
+                                    + beanClass.getName()
+                                    + "."
+                                    + propertyName
+                                    + ")",
+                            e);
+                }
+            }
             return new AdvBeanPropertyMeta(
                     beanClass,
                     field,
@@ -272,7 +297,8 @@ public class AdvBeanMappingMeta {
                     explicitColumnName,
                     field.getType(),
                     ignored,
-                    id);
+                    id,
+                    advTypeHandler);
         }
 
         public Class<?> getBeanClass() {
@@ -297,6 +323,11 @@ public class AdvBeanMappingMeta {
 
         public boolean isId() {
             return id;
+        }
+
+        @SuppressWarnings("rawtypes")
+        public AdvTypeHandler getAdvTypeHandler() {
+            return advTypeHandler;
         }
 
         public String resolveColumnName(boolean toUnderlineCase) {

@@ -237,7 +237,7 @@ public class GirGroupSource extends AbstractDataSource {
 
     /** 轮询策略 */
     protected DataSource roundRobinSelect() {
-        int index = roundRobinCounter.getAndIncrement() % dataSources.size();
+        int index = Math.abs(roundRobinCounter.getAndIncrement() % dataSources.size());
         return dataSources.get(index);
     }
 

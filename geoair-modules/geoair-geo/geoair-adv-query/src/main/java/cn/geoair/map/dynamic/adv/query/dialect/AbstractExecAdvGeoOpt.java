@@ -81,12 +81,30 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
             String geomFieldName, String qualifiedTableName, int srid);
 
     @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        // 默认兜底实现：keyword 为空退化为获取全部，非空则在 Java 层面过滤
+        // 各数据库方言可重写以在 SQL 层面实现 LIKE，性能更优
+        List<String> allLayerNames = eGetAllGeoLayerName();
+        if (StrUtil.isEmpty(layerNameKeyword) || CollectionUtil.isEmpty(allLayerNames)) {
+            return allLayerNames;
+        }
+        List<String> matchedNames = new ArrayList<>();
+        String lowerKeyword = layerNameKeyword.toLowerCase();
+        for (String layerName : allLayerNames) {
+            if (layerName.toLowerCase().contains(lowerKeyword)) {
+                matchedNames.add(layerName);
+            }
+        }
+        return matchedNames;
+    }
+
+    @Override
     public DataFieldsApo dGetColumnsByTable(String tableName) {
         validateTableName(tableName);
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsByTable(tableName);
         try {
             Map<String, AdvEnumsTypeGeom> typeMaps =
-                    eGetGeoTypeByTable(tableName, dataFieldsApo.getGeomFieldNameList());
+                    eGetGeoTypeByTable(tableName, dataFieldsApo.geomFieldNames());
             return fillGeomType(dataFieldsApo, typeMaps);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -212,15 +230,14 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         DataFieldsApo dataFieldsApo = dGetColumnsByTable(tableName);
-        return dataFieldsApo.getGeomFieldNameList();
+        return dataFieldsApo.geomFieldNames();
     }
 
     @Override
     public List<String> eGetGeomColumnNameListBySql(String sqlView) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(sqlView);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        return dataFieldsApo.getFieldNameList();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
+        return dataFieldsApo.fieldNames();
     }
 
     @Override
@@ -238,9 +255,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<String> eGetGeomColumnNameListBySql(String dynamicSql, GirSqlParam sqlParam) {
         List<FieldBySchemaApo> fields = eGetGeomColumnListBySql(dynamicSql, sqlParam);
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
-        return dataFieldsApo.getFieldNameList();
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
+        return dataFieldsApo.fieldNames();
     }
 
     @Override
@@ -252,7 +268,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListByTable(String tableName) {
         DataFieldsApo dataFieldsApo = dGetColumnsByTable(tableName);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override
@@ -264,7 +280,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(String sqlView) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(sqlView);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override
@@ -276,7 +292,7 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
     @Override
     public List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, GirSqlParam sqlParam) {
         DataFieldsApo dataFieldsApo = getAdvDDLOpt().dGetColumnsBySQL(dynamicSql, sqlParam);
-        return dataFieldsApo.getGeomFields();
+        return dataFieldsApo.geomFields();
     }
 
     @Override
@@ -520,8 +536,13 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                                 dialectTableNameProcessor.tbGetTempAliasTableName());
 
         Integer srid = eGetSrid(tableNameOrSqlView, geomFieldName);
+        Integer bboxSrid = srid;
 
-        String sql = getGetExtentSql(geomFieldName, qualifiedTableName, srid);
+        if (srid == 0) {
+            log.info("{}的{}字段获取到的srid为0，为了不影响获取边界，临时指定为 4326", tableNameOrSqlView, geomFieldName);
+            bboxSrid = 4326;
+        }
+        String sql = getGetExtentSql(geomFieldName, qualifiedTableName, bboxSrid);
         sql = dialectTableNameProcessor.tbRemoveSqlSpaces(sql);
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql);
 

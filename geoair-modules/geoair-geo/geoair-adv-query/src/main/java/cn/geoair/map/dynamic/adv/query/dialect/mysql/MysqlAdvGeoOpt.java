@@ -81,11 +81,35 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String sql =
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
-                        + "AND TABLE_SCHEMA = ? "
+                        + "AND TABLE_SCHEMA = #{schema} "
                         + "GROUP BY TABLE_NAME;";
 
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("schema", dataSourceGetter.getSchemaName());
+
+        List<GirAdvOneRow> result = baseOpt.bSelectList(sql, paramMap);
+        List<String> layerNames = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(result)) {
+            result.forEach(row -> layerNames.add(row.getStr("TABLE_NAME")));
+        }
+        return layerNames;
+    }
+
+    @Override
+    public List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword) {
+        if (StrUtil.isEmpty(layerNameKeyword)) {
+            return eGetAllGeoLayerName();
+        }
+        String sql =
+                "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                        + "WHERE DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon') "
+                        + "AND TABLE_SCHEMA = #{schema} "
+                        + "AND TABLE_NAME LIKE CONCAT('%', #{keyword}, '%') "
+                        + "GROUP BY TABLE_NAME;";
+
+        SqlParamMap paramMap = new SqlParamMap();
+        paramMap.put("schema", dataSourceGetter.getSchemaName());
+        paramMap.put("keyword", layerNameKeyword);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql, paramMap);
         List<String> layerNames = new ArrayList<>();
@@ -113,11 +137,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             // MySQL: ST_GeometryType返回几何类型（如POINT, POLYGON）
             fieldsSql
                     .append("ST_GeometryType(")
-                    .append(field)
+                    .append(dialectTableNameProcessor.tbQuoteFieldName(field))
                     .append(") AS ")
                     .append(field)
                     .append("_type");
-            whereSql.append(field).append(" IS NOT NULL");
+            whereSql.append(dialectTableNameProcessor.tbQuoteFieldName(field))
+                    .append(" IS NOT NULL");
             if (i != geomFieldNames.size() - 1) {
                 fieldsSql.append(", ");
                 whereSql.append(" OR ");
@@ -160,11 +185,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String field = geomFieldNames.get(i);
             fieldsSql
                     .append("ST_GeometryType(")
-                    .append(field)
+                    .append(dialectTableNameProcessor.tbQuoteFieldName(field))
                     .append(") AS ")
                     .append(field)
                     .append("_type");
-            whereSql.append(field).append(" IS NOT NULL");
+            whereSql.append(dialectTableNameProcessor.tbQuoteFieldName(field))
+                    .append(" IS NOT NULL");
             if (i != geomFieldNames.size() - 1) {
                 fieldsSql.append(", ");
                 whereSql.append(" OR ");
@@ -198,10 +224,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
         String sql =
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE TABLE_NAME = ? "
-                        + "AND TABLE_SCHEMA = ? "
+                        + "WHERE TABLE_NAME = #{tableName} "
+                        + "AND TABLE_SCHEMA = #{schemaName} "
                         + "AND DATA_TYPE IN ('geometry','point','linestring','polygon','multipoint','multilinestring','multipolygon');";
-
         SqlParamMap paramMap = new SqlParamMap();
         paramMap.put("tableName", dialectTableNameProcessor.tbGetTableNameNotSchema(tableName));
         paramMap.put("schemaName", schemaName);
@@ -280,12 +305,13 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         // MySQL: ST_SRID获取空间参考系ID
         String sql =
                 StrUtil.format(
-                        "SELECT ST_SRID({}) AS srid FROM {} LIMIT 1;",
-                        geomFieldName,
-                        qualifiedName);
+                        "SELECT ST_SRID({}) AS srid FROM {} where {} is not null  LIMIT 1;",
+                        dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
+                        qualifiedName,
+                        dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
 
         GirAdvOneRow row = baseOpt.bSelectOne(sql);
-        return row != null ? row.getInt("srid") : 0;
+        return row != null ? row.getInt("srid", 0) : 0;
     }
 
     @Override
@@ -307,8 +333,12 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         StringBuilder where = new StringBuilder("WHERE ");
         for (int i = 0; i < geomFieldNames.size(); i++) {
             String field = geomFieldNames.get(i);
-            sridSelect.append(StrUtil.format("IFNULL(ST_SRID({}), -1) AS {}_srid", field, field));
-            where.append(field).append(" IS NOT NULL");
+            sridSelect.append(
+                    StrUtil.format(
+                            "IFNULL(ST_SRID({}), -1) AS {}_srid",
+                            dialectTableNameProcessor.tbQuoteFieldName(field),
+                            field));
+            where.append(dialectTableNameProcessor.tbQuoteFieldName(field)).append(" IS NOT NULL");
             if (i != geomFieldNames.size() - 1) {
                 sridSelect.append(", ");
                 where.append(" OR ");
@@ -354,7 +384,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.format(
                         "ALTER TABLE {} ADD COLUMN {} {} SRID {};",
                         qualifiedTableName,
-                        geomFieldName,
+                        dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                         geomType.getCode().toUpperCase(),
                         srid);
         ddlOpt.dExecuteDDL(sql, tableName, "添加MySQL空间字段[" + geomFieldName + "]");
@@ -381,7 +411,10 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String sql =
-                StrUtil.format("ALTER TABLE {} DROP COLUMN {};", qualifiedTableName, geomFieldName);
+                StrUtil.format(
+                        "ALTER TABLE {} DROP COLUMN {};",
+                        qualifiedTableName,
+                        dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
         ddlOpt.dExecuteDDL(sql, tableName, "删除MySQL空间字段[" + geomFieldName + "]");
     }
 
@@ -413,7 +446,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format(
                             "ALTER TABLE {} ADD COLUMN {} {} SRID 0;",
                             qualifiedTableName,
-                            tempGeomField,
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                             geomType.getCode().toUpperCase());
             ddlOpt.dExecuteDDL(createTempSql, tableName, "新建MySQL临时空间字段[" + tempGeomField + "]");
 
@@ -422,8 +455,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format(
                             "UPDATE {} SET {} = ST_Transform(ST_SetSRID({}, {}), {});",
                             qualifiedTableName,
-                            tempGeomField,
-                            geomFieldName,
+                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                             oldSrid,
                             targetSrid);
             ddlOpt.dExecuteDDL(copySql, tableName, "拷贝并转换SRID");
@@ -433,18 +466,19 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format(
                             "ALTER TABLE {} MODIFY COLUMN {} {} SRID {};",
                             qualifiedTableName,
-                            tempGeomField,
+                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
                             geomType.getCode().toUpperCase(),
                             targetSrid);
             ddlOpt.dExecuteDDL(alterSridSql, tableName, "修改临时字段SRID为" + targetSrid);
 
+            String geomFileNameBack = geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8);
             // 4. 重命名原字段
             String renameOldSql =
                     StrUtil.format(
                             "ALTER TABLE {} RENAME COLUMN {} TO {};",
                             qualifiedTableName,
-                            geomFieldName,
-                            geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8));
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFileNameBack));
             ddlOpt.dExecuteDDL(renameOldSql, tableName, "重命名原空间字段");
 
             // 5. 重命名临时字段
@@ -452,8 +486,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format(
                             "ALTER TABLE {} RENAME COLUMN {} TO {};",
                             qualifiedTableName,
-                            tempGeomField,
-                            geomFieldName);
+                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
             ddlOpt.dExecuteDDL(renameTempSql, tableName, "重命名临时字段为原字段名");
 
             // 6. 删除旧字段
@@ -461,7 +495,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                     StrUtil.format(
                             "ALTER TABLE {} DROP COLUMN {};",
                             qualifiedTableName,
-                            geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8));
+                            dialectTableNameProcessor.tbQuoteFieldName(geomFileNameBack));
             ddlOpt.dExecuteDDL(dropOldSql, tableName, "删除旧空间字段");
         } catch (Exception e) {
             throw new RuntimeException("MySQL SRID转换失败", e);
@@ -524,9 +558,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName, String geomFieldName, String geometry, int srid) {
         // MySQL: ST_Intersects + ST_GeomFromText
         return StrUtil.format(
-                "SELECT * FROM {} WHERE ST_Intersects({}, ST_GeomFromText('{}', {}));",
+                "SELECT * FROM {} WHERE ST_Intersects({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
-                geomFieldName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                 geometry,
                 srid);
     }
@@ -536,9 +570,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName, String geomFieldName, String bboxWkt, int srid) {
         // MySQL: ST_Within
         return StrUtil.format(
-                "SELECT * FROM {} WHERE ST_Within({}, ST_GeomFromText('{}', {}));",
+                "SELECT * FROM {} WHERE ST_Within({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
-                geomFieldName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                 bboxWkt,
                 srid);
     }
@@ -552,8 +586,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String qualifiedTableName) {
         // MySQL: ST_Distance (注意：MySQL 8.0+支持ST_Distance，5.7需用ST_Distance_Sphere)
         return StrUtil.format(
-                "SELECT *, ST_Distance({}, ST_GeomFromText('{}', {})) AS {} FROM {};",
-                geomFieldName,
+                "SELECT *, ST_Distance({}, ST_GeomFromText('{}', {},'axis-order=long-lat')) AS {} FROM {};",
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                 geometry,
                 srid,
                 distanceAlias,
@@ -566,7 +600,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         // MySQL: ST_Centroid
         return StrUtil.format(
                 "SELECT *, ST_Centroid({}) AS {} FROM {};",
-                geomFieldName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
                 centerAlias,
                 qualifiedTableName);
     }
@@ -583,34 +617,118 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "UPDATE {} SET {} = ST_MakeValid({}) WHERE NOT ST_IsValid({});",
                 qualifiedTableName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName);
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
     }
 
     @Override
-    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
-        // MySQL: ST_Extent返回MIN/MAX坐标，需拆分
-        return StrUtil.format(
-                "SELECT "
-                        + "ST_XMin(ST_Extent({})) AS minx, "
-                        + "ST_YMin(ST_Extent({})) AS miny, "
-                        + "ST_XMax(ST_Extent({})) AS maxx, "
-                        + "ST_YMax(ST_Extent({})) AS maxy, "
-                        + "ST_XMin(ST_Transform(ST_Extent({}), 4326)) AS minx_gs, "
-                        + "ST_YMin(ST_Transform(ST_Extent({}), 4326)) AS miny_gs, "
-                        + "ST_XMax(ST_Transform(ST_Extent({}), 4326)) AS maxx_gs, "
-                        + "ST_YMax(ST_Transform(ST_Extent({}), 4326)) AS maxy_gs "
-                        + "FROM {};",
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                geomFieldName,
-                qualifiedTableName);
+    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int bboxSrid) {
+        String quoteFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        String swappedGeom =
+                String.format(
+                        "ST_GeomFromWKB(ST_AsWKB(%s, 'axis-order=long-lat'))", quoteFieldName);
+
+        // 提取几何坐标的表达式（兼容所有类型）- 使用交换后的几何
+        String xExpr =
+                String.format(
+                        "CASE "
+                                + "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(%s) "
+                                + "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_PointN(%s, 1)) "
+                                + "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) "
+                                + "    ELSE NULL "
+                                + "END",
+                        quoteFieldName,
+                        swappedGeom,
+                        quoteFieldName,
+                        swappedGeom,
+                        quoteFieldName,
+                        swappedGeom);
+
+        String yExpr =
+                String.format(
+                        "CASE "
+                                + "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(%s) "
+                                + "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_PointN(%s, 1)) "
+                                + "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) "
+                                + "    ELSE NULL "
+                                + "END",
+                        quoteFieldName,
+                        swappedGeom,
+                        quoteFieldName,
+                        swappedGeom,
+                        quoteFieldName,
+                        swappedGeom);
+
+        // 基础查询（long-lat 轴顺序）
+        String baseSql =
+                String.format(
+                        "SELECT "
+                                + "MIN(%s) AS minx, "
+                                + "MIN(%s) AS miny, "
+                                + "MAX(%s) AS maxx, "
+                                + "MAX(%s) AS maxy "
+                                + "FROM %s WHERE %s IS NOT NULL",
+                        xExpr, yExpr, xExpr, yExpr, qualifiedTableName, quoteFieldName);
+
+        // 如果需要坐标转换（从其他坐标系转到 4326）
+        if (bboxSrid != 4326) {
+            // 先设置 SRID，再转换到 4326，最后交换轴顺序确保 X=经度
+            String swappedGeomTransform =
+                    String.format(
+                            "ST_GeomFromWKB(ST_AsWKB(ST_Transform(ST_SRID(%s, %d), 4326), 'axis-order=long-lat'))",
+                            quoteFieldName, bboxSrid);
+
+            String xExprTransform =
+                    String.format(
+                            "CASE "
+                                    + "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_X(%s) "
+                                    + "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_X(ST_PointN(%s, 1)) "
+                                    + "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_X(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) "
+                                    + "    ELSE NULL "
+                                    + "END",
+                            quoteFieldName,
+                            swappedGeomTransform,
+                            quoteFieldName,
+                            swappedGeomTransform,
+                            quoteFieldName,
+                            swappedGeomTransform);
+
+            String yExprTransform =
+                    String.format(
+                            "CASE "
+                                    + "    WHEN ST_GeometryType(%s) IN ('POINT', 'MULTIPOINT') THEN ST_Y(%s) "
+                                    + "    WHEN ST_GeometryType(%s) IN ('LINESTRING', 'MULTILINESTRING') THEN ST_Y(ST_PointN(%s, 1)) "
+                                    + "    WHEN ST_GeometryType(%s) IN ('POLYGON', 'MULTIPOLYGON') THEN ST_Y(ST_PointN(ST_ExteriorRing(ST_GeometryN(%s, 1)), 1)) "
+                                    + "    ELSE NULL "
+                                    + "END",
+                            quoteFieldName,
+                            swappedGeomTransform,
+                            quoteFieldName,
+                            swappedGeomTransform,
+                            quoteFieldName,
+                            swappedGeomTransform);
+
+            String transformSql =
+                    String.format(
+                            "SELECT "
+                                    + "MIN(%s) AS minx_gs, "
+                                    + "MIN(%s) AS miny_gs, "
+                                    + "MAX(%s) AS maxx_gs, "
+                                    + "MAX(%s) AS maxy_gs "
+                                    + "FROM %s WHERE %s IS NOT NULL",
+                            xExprTransform,
+                            yExprTransform,
+                            xExprTransform,
+                            yExprTransform,
+                            qualifiedTableName,
+                            quoteFieldName);
+
+            return String.format(
+                    "SELECT t1.*, t2.* FROM (%s) t1 CROSS JOIN (%s) t2", baseSql, transformSql);
+        }
+
+        return baseSql;
     }
 
     @Override
@@ -628,7 +746,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String field = geomFieldNames.get(i);
             fieldsSql
                     .append("ST_GeometryType(")
-                    .append(field)
+                    .append(dialectTableNameProcessor.tbQuoteFieldName(field))
                     .append(") AS ")
                     .append(field)
                     .append("_type");

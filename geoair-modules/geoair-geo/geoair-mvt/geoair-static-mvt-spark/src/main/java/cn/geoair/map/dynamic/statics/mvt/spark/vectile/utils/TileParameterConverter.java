@@ -29,9 +29,9 @@ public class TileParameterConverter {
         // 初始化开关参数映射
         SWITCH_PARAM_MAPPING.put("extendZoomsIfStillDropping", "--extend-zooms-if-still-dropping");
         SWITCH_PARAM_MAPPING.put(
-                "enableFeatureLimitIs", "--feature-limit"); // DTO中false对应--no-feature-limit
+                "featureLimitEnabled", "--feature-limit"); // DTO中false对应--no-feature-limit
         SWITCH_PARAM_MAPPING.put(
-                "enableFeatureSizeLimit", "--tile-size-limit"); // DTO中false对应--no-tile-size-limit
+                "featureSizeLimitEnabled", "--tile-size-limit"); // DTO中false对应--no-tile-size-limit
         SWITCH_PARAM_MAPPING.put("dropDensestAsNeeded", "--drop-densest-as-needed");
         SWITCH_PARAM_MAPPING.put("coalesceDensestAsNeeded", "--coalesce-densest-as-needed");
 
@@ -60,10 +60,10 @@ public class TileParameterConverter {
 
         // 初始化反向映射（命令行参数 -> DTO字段）
         REVERSE_MAPPING.put("--extend-zooms-if-still-dropping", "extendZoomsIfStillDropping");
-        REVERSE_MAPPING.put("--no-feature-limit", "enableFeatureLimitIs");
-        REVERSE_MAPPING.put("--feature-limit", "enableFeatureLimitIs");
-        REVERSE_MAPPING.put("--no-tile-size-limit", "enableFeatureSizeLimit");
-        REVERSE_MAPPING.put("--tile-size-limit", "enableFeatureSizeLimit");
+        REVERSE_MAPPING.put("--no-feature-limit", "featureLimitEnabled");
+        REVERSE_MAPPING.put("--feature-limit", "featureLimitEnabled");
+        REVERSE_MAPPING.put("--no-tile-size-limit", "featureSizeLimitEnabled");
+        REVERSE_MAPPING.put("--tile-size-limit", "featureSizeLimitEnabled");
         REVERSE_MAPPING.put("--drop-densest-as-needed", "dropDensestAsNeeded");
         REVERSE_MAPPING.put("--coalesce-densest-as-needed", "coalesceDensestAsNeeded");
         REVERSE_MAPPING.put("-Z", "minZoom");
@@ -107,13 +107,13 @@ public class TileParameterConverter {
         Set<String> switchParams = new HashSet<>(DEFAULT_SWITCH_PARAMS);
 
         // 要素数限制
-        if (parameter.isEnableFeatureLimitIs()) {
+        if (parameter.isFeatureLimitEnabled()) {
             switchParams.remove("--no-feature-limit");
             switchParams.add("--feature-limit");
         }
 
         // 瓦片大小限制
-        if (parameter.isEnableFeatureSizeLimit()) {
+        if (parameter.isFeatureSizeLimitEnabled()) {
             switchParams.remove("--no-tile-size-limit");
             switchParams.add("--tile-size-limit");
         }
@@ -311,9 +311,9 @@ public class TileParameterConverter {
         if (param.equals("--extend-zooms-if-still-dropping")) {
             // parameter.setExtendZoomsIfStillDropping(true);
         } else if (param.equals("--no-feature-limit") || param.equals("--feature-limit")) {
-            parameter.setEnableFeatureLimitIs(param.equals("--feature-limit"));
+            parameter.setFeatureLimitEnabled(param.equals("--feature-limit"));
         } else if (param.equals("--no-tile-size-limit") || param.equals("--tile-size-limit")) {
-            parameter.setEnableFeatureSizeLimit(param.equals("--tile-size-limit"));
+            parameter.setFeatureSizeLimitEnabled(param.equals("--tile-size-limit"));
         } else if (param.equals("--drop-densest-as-needed")) {
             parameter.setDropDensestAsNeeded(true);
         } else if (param.equals("--coalesce-densest-as-needed")) {

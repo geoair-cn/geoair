@@ -24,7 +24,7 @@ public interface GeoFileReader extends Closeable {
     SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
 
     // 读取一行
-    GirAdvOneRow readOneRow(ExceptionConsumer exceptionConsumer);
+    GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer);
 
     Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer);
 

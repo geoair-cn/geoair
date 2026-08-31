@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../geoair-base-parent</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-modules</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-modules</name>
 
@@ -29,7 +29,7 @@
   <developers>
     <developer>
       <name>zhangfengji</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -38,12 +38,13 @@
   <modules>
     <module>geoair-apidoc</module>
     <module>geoair-code-generator</module>
+    <module>geoair-jdbc-url</module>
     <module>geoair-geo</module>
     <module>geoair-dynamic-ds</module>
     <module>geoair-db-service</module>
     <module>geoair-message-jts-jackson</module>
     <module>geoair-message-jts-mybatis</module>
-    <module>geoair-official-site</module>
+    <!--    <module>geoair-official-site</module>-->
 
   </modules>
 
@@ -102,6 +103,12 @@
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-db-service-spring-boot-starter</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-jdbc-url</artifactId>
         <version>${geoair.version}</version>
       </dependency>
 

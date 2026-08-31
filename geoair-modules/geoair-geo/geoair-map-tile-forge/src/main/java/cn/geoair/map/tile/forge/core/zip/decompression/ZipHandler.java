@@ -9,6 +9,7 @@ public class ZipHandler implements DecompressionHandler {
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
+        DecompressionLimits.validateExpectedSize(expectedSize);
         Inflater inflater = new Inflater(true);
         inflater.setInput(compressedData);
 

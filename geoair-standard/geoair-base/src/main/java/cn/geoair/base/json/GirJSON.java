@@ -13,6 +13,18 @@ import java.lang.reflect.Type;
  */
 public interface GirJSON extends Cloneable, Serializable /* , Map<String, Object> */ {
 
+    class JsonProviderHolder {
+        private static volatile JsonProvider provider;
+    }
+
+    interface JsonProvider {
+        GirJSON toJson(Object json);
+    }
+
+    static void setProvider(JsonProvider provider) {
+        JsonProviderHolder.provider = provider;
+    }
+
     /**
      * json字符串转 gtcJSON对象
      *
@@ -21,6 +33,10 @@ public interface GirJSON extends Cloneable, Serializable /* , Map<String, Object
      */
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.json.Json4Gir")
     public static GirJSON toJson(Object json) {
+        JsonProvider provider = JsonProviderHolder.provider;
+        if (provider != null) {
+            return provider.toJson(json);
+        }
         Object o = GkMethodHand.invokeSelf(json);
         return (GirJSON) o;
     }

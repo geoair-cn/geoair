@@ -1,21 +1,20 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PgConnectInfoSimple;
-import java.util.Map;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import javax.sql.DataSource;
 
 /**
- * @author ：张俊
- * @date ：Created in 2026/6/18 17:11
- * @description： 默认的数据源获取器
+ * 默认的 DataSource 创建实现：通过 JDBC DriverManager 创建连接。
+ *
+ * @author 张俊
+ * @date 2026/6/18
  */
 public class DefaultDataSourceGetterFunction implements DataSourceGetterFunction {
 
     @Override
-    public DataSource apply(PgConnectInfoSimple pgConnectInfoSimple) {
-        Map<String, String> params = pgConnectInfoSimple.toParams();
+    public DataSource apply(DataSourceConfig config) {
         return new DriverManagerDataSource(
-                params.get("url"), params.get("user"), params.get("password"));
+                config.getJdbcUrl(), config.getUsername(), config.getPassword());
     }
 }

@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework-bom</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-api-parent</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-api-parent</name>
   <description>geoair api parent</description>
@@ -28,7 +28,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -41,11 +41,6 @@
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
 
-  <properties>
-    <skipTests>true</skipTests>
-    <geoair.version>J8.1.5</geoair.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -57,15 +52,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <dependencies>
-    <!--        <dependency>-->
-    <!--           <groupId>cn.geoair.devkit</groupId>-->
-    <!--            <artifactId>geoair-project-parent</artifactId>-->
-    <!--            <version>${geoair.version}</version>-->
-    <!--            <type>pom</type>-->
-    <!--        </dependency>-->
-  </dependencies>
 
   <build>
 

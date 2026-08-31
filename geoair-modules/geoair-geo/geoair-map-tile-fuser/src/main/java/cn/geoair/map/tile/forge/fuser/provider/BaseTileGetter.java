@@ -44,8 +44,7 @@ public abstract class BaseTileGetter implements LayerTileGetter {
 
     @Override
     public GridSubset getSrcGridSubset() {
-        Integer gridSrid = layerInfo.getGridSrid();
-        if (gridSrid.equals(3857) || gridSrid.equals(900913)) {
+        if (layerInfo.isWebMercatorGrid()) {
             return GridInitUtils.getWorldGrid3857();
         } else {
             return GridInitUtils.getTdtGrid4490();

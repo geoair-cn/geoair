@@ -28,7 +28,7 @@ public class ShpToPg {
     public static void main(String[] args) throws IOException {
         ShpLinkInfo linkInfo =
                 new ShpLinkInfo()
-                        .setShpFilePath("H:\\项目文件\\黑龙江\\党政机关\\党政机关.shp")
+                        .setShpFilePath("E:\\gis测试数据\\测试数据\\shp\\新疆高速数据\\高速.shp")
                         .setCharset("UTF-8");
         ShpGeoFileReader fileReader = new ShpGeoFileReader();
         fileReader.setLinkInfo(linkInfo);
@@ -36,7 +36,7 @@ public class ShpToPg {
         PostgisLinkInfo postgisWriterLinkInfo =
                 new PostgisWriterLinkInfo()
                         .setTableName("shp_pg_test_" + IdUtil.getSnowflakeNextIdStr())
-                        .setJdbcUrl("jdbc:postgresql://192.168.0.110:5432/demo")
+                        .setJdbcUrl("jdbc:postgresql://192.168.0.110:5432/kashi_dth")
                         .setUsername("postgres")
                         .setPassword("tcsd2019")
                         .setSchema("public");
@@ -47,7 +47,7 @@ public class ShpToPg {
         postgisWriter.setWriteConfig(writeConfig);
         TranContext context =
                 new TranContext()
-                        .setBatchLogThreshold(500)
+                        .setBatchSize(500)
                         .setSkipErrorRecord(true)
                         .setTimeout(60 * 60 * 1000)
                         // 预处理：校验表是否存在
@@ -126,7 +126,7 @@ public class ShpToPg {
         // 5. 处理结果
         if (result.getStatus() == TranStatus.SUCCESS) {
             log.info(
-                    "转换成功！总条数：{}，成功率：{:.2f}%，耗时：{}ms",
+                    "转换成功！总条数：{}，成功率：{}%，耗时：{}ms",
                     result.getTotalCount(), result.getSuccessRate(), result.getElapsedTime());
         } else {
             log.error("转换失败！错误信息：{}，异常列表：{}", result.getErrorMsg(), result.getExceptions());

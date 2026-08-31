@@ -7,12 +7,22 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 
 public class GirEnvironmentHelper {
 
+    private static volatile GiEnvironmenter environmentProvider;
+
+    public static void setEnvironmenter(GiEnvironmenter environmentProvider) {
+        GirEnvironmentHelper.environmentProvider = environmentProvider;
+    }
+
     /*
      * static { MethodHand.implFromClass( GirEnvironmentHelper.class); }
      */
 
     @GaMethodHandDefine(expectClassName = "cn.geoair.spi.env.SpringEnvironment4Gir")
     public static GiEnvironmenter getEnvironmenter() {
+        GiEnvironmenter provider = environmentProvider;
+        if (provider != null) {
+            return provider;
+        }
         Object o = GkMethodHand.invokeSelf();
         return (GiEnvironmenter) o;
     }

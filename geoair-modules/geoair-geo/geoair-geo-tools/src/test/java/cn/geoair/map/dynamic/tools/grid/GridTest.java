@@ -4,6 +4,7 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileLevelMetadata;
+import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import java.util.List;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -23,7 +24,7 @@ public class GridTest {
         List<TileLevelMetadata> tileLevelMetadataList =
                 GirAdvTools.getTileGrid4326Opt().getTileLevelMetadataList(0, 20, 256, 96);
         tileLevelMetadataList.forEach(System.out::println);
-        String s = GirAdvTools.getTileGrid4326Opt().xyzToWkt(4, 12, 2, 4326);
+        String s = GirAdvTools.getTileGrid4326Opt().xyzToWkt(4, 12, 2, TileYAxis.XYZ, 4326);
         System.out.println(s);
     }
 

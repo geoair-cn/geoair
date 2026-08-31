@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.oracle.base;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.oracle.OracleDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -11,8 +12,9 @@ import java.util.stream.Collectors;
 /** PostgreSQL更新操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
 public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public OracleAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(configAdvQueryGetter);
+    public OracleAdvBaseUpdateOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+        super(configAdvQueryGetter, registry);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = OracleDialectTableNameUtil.getInstance();
     }
@@ -27,9 +29,7 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
      */
     @Override
     protected String buildUpsertFieldClause(String field) {
-        // Oracle MERGE 语法：目标表字段 = 源表字段
-        // 源表使用 VALUES() 函数获取插入的值
-        return StrUtil.format("{} = VALUES({})", field, field);
+        return StrUtil.format("target.{} = source.{}", field, field);
     }
 
     /**
@@ -47,33 +47,30 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
             String placeholders,
             String conflictFields,
             String updateClause) {
-        // 拆分字段
         String[] fieldArray = fields.split(",");
-        String[] placeholderArray = placeholders.split(",");
 
-        // 构建 USING 子句（使用 DUAL 表）
+        // USING 子句
         StringBuilder usingBuilder = new StringBuilder("SELECT ");
         for (int i = 0; i < fieldArray.length; i++) {
-            if (i > 0) {
-                usingBuilder.append(", ");
-            }
+            if (i > 0) usingBuilder.append(", ");
             usingBuilder.append("? AS ").append(fieldArray[i].trim());
         }
+        usingBuilder.append(" FROM DUAL");
         String usingClause = usingBuilder.toString();
 
-        // 构建 ON 条件
+        // INSERT 引用 source 列，不复用 ? 占位符
+        String insertValues =
+                java.util.Arrays.stream(fieldArray)
+                        .map(f -> "source." + f.trim())
+                        .collect(Collectors.joining(", "));
+
+        // ON 条件
         String[] conflictFieldArray = conflictFields.split(",");
         String onCondition =
                 java.util.Arrays.stream(conflictFieldArray)
-                        .map(
-                                field ->
-                                        StrUtil.format(
-                                                "target.{} = source.{}",
-                                                field.trim(),
-                                                field.trim()))
+                        .map(f -> StrUtil.format("target.{} = source.{}", f.trim(), f.trim()))
                         .collect(Collectors.joining(" AND "));
 
-        // 构建完整的 MERGE 语句
         return StrUtil.format(
                 "MERGE INTO {} target USING ({}) source ON ({}) "
                         + "WHEN MATCHED THEN UPDATE SET {} "
@@ -83,7 +80,7 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                 onCondition,
                 updateClause,
                 fields,
-                placeholders);
+                insertValues);
     }
 
     /**
@@ -93,17 +90,29 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
      */
     public String buildBatchUpdateWithForall(
             String tableName, String idKey, Set<String> updateFields, int batchSize) {
+        String quotedIdKey = dialectTableNameProcessor.tbQuoteFieldName(idKey);
         // 构建 FORALL 批量更新语句
         String setClause =
                 updateFields
                         .stream()
-                        .map(field -> StrUtil.format("{} = {}_new.{}", field, tableName, field))
+                        .map(
+                                field -> {
+                                    String quotedField =
+                                            dialectTableNameProcessor.tbQuoteFieldName(field);
+                                    return StrUtil.format(
+                                            "{} = {}_new.{}", quotedField, tableName, quotedField);
+                                })
                         .collect(Collectors.joining(", "));
 
         String fieldList =
                 updateFields
                         .stream()
-                        .map(field -> StrUtil.format("{}_new.{}", tableName, field))
+                        .map(
+                                field -> {
+                                    String quotedField =
+                                            dialectTableNameProcessor.tbQuoteFieldName(field);
+                                    return StrUtil.format("{}_new.{}", tableName, quotedField);
+                                })
                         .collect(Collectors.joining(", "));
 
         return StrUtil.format(
@@ -114,6 +123,6 @@ public class OracleAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
                         + "  FORALL i IN 1..? \n"
                         + "    UPDATE {} SET {} WHERE {} = l_data(i).{};\n"
                         + "END;",
-                tableName, tableName, tableName, tableName, setClause, idKey, idKey);
+                tableName, tableName, tableName, tableName, setClause, quotedIdKey, quotedIdKey);
     }
 }

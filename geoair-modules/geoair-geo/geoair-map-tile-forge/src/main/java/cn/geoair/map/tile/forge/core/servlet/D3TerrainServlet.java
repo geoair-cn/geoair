@@ -2,17 +2,15 @@ package cn.geoair.map.tile.forge.core.servlet;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.dynamic.tools.simple.GirTileResponseUtil;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.TileRequest;
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
-import java.io.IOException;
+import cn.hutool.core.util.URLUtil;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class D3TerrainServlet extends D3TilesServlet {
 
@@ -22,63 +20,97 @@ public class D3TerrainServlet extends D3TilesServlet {
         super(mapTileService);
     }
 
-    Pattern pattern =
-            Pattern.compile(
-                    "/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        String requestURI =
-                request
-                        .getRequestURI(); // 示例：/geospatial-api/3dTilesService/12345/myPrefix/tileset.json
-        Matcher matcher = pattern.matcher(requestURI);
-        String fileId = null;
-        String fileName = null;
-        String serviceName = null;
-        String z = null;
-        String x = null;
-        String y = null;
-        String format = null;
-        if (matcher.find()) {
-            fileId = matcher.group(1); // 提取FileId
-            fileName = matcher.group(2); // 提取文件名称
-            serviceName = matcher.group(3); // 提取服务名称
-            String pathPart = matcher.group(4); // 提取第3段及以后的部分
-            if (pathPart.contains("/")) {
-                String[] zxyParts = pathPart.split("/");
-                if (zxyParts.length >= 3) {
-                    z = zxyParts[0]; // 提取z（1）
-                    x = zxyParts[1]; // 提取x（2）
-                    y = zxyParts[2].split("\\.")[0]; // 提取y（3）
-                    format = zxyParts[2].split("\\.")[1]; // 提取y（3）
-                }
-            } else {
-                z = pathPart; // 提取文件名（layer.json）
-            }
-        }
-        GirLayerConfigContext layerConfigContext = null;
-        try {
-            layerConfigContext = getGirLayerConfigContext(fileId, fileName, serviceName);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
-            return;
-        }
-
-        layerConfigContext.setFormat(format);
-        try {
-            TileRequest layerTile = mapTileService.getLayerTile(layerConfigContext, z, y, x);
-            TileResponse tileResponse = layerTile.toTileResponse();
-            GirTileResponseUtil.buildFromTileResponse(tileResponse, response);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            GirTileResponseUtil.buildFromException(e, response);
-        }
+    public Pattern getPattern() {
+        return Pattern.compile(
+                "/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        doGet(req, resp);
+    public TileResponse getTileResponse(String requestUri, String requestHost) {
+        if (requestUri == null || requestUri.trim().isEmpty()) {
+            return TileResponse.error("Request URI must not be blank");
+        }
+        String requestPath = URLUtil.decode(getRequestPath(requestUri));
+        // 解析请求URI
+        TileParseResult parseResult = parseRequest(requestPath);
+        if (parseResult == null) {
+            log.warn("无法解析请求URI: {}", requestUri);
+            return TileResponse.error("Invalid request URI: " + requestUri);
+        }
+        if (!isSafeTerrainRequest(parseResult)) {
+            log.warn("地形瓦片请求包含非法坐标或路径: {}", requestUri);
+            return TileResponse.error("Invalid terrain tile path");
+        }
+        parseResult.setRequestURI(requestUri);
+        try {
+            GirLayerConfigContext layerConfigContext =
+                    getGirLayerConfigContext(
+                            parseResult.getFileId(),
+                            parseResult.getFileName(),
+                            parseResult.getServiceName());
+            layerConfigContext.setFormat(parseResult.getFormat());
+            TileRequest layerTile =
+                    mapTileService.getLayerTile(
+                            layerConfigContext,
+                            parseResult.getZ(),
+                            parseResult.getY(),
+                            parseResult.getX());
+            return createTileResponse(layerTile, parseResult, requestUri);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return TileResponse.error(e.getMessage());
+        }
+    }
+
+    public GirLayerConfigContext getGirLayerConfigContext(
+            String fileId, String fileName, String layerName) {
+        GirLayerConfigContext config =
+                GirLayerConfigContextHelper.getInstance()
+                        .getGirLayerConfigContext(
+                                GirMapTileType.TERRAIN_3D, layerName, fileId, fileName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+        return config;
+    }
+
+    /**
+     * 解析请求URI
+     *
+     * @param requestURI 请求URI
+     * @return TileParseResult 对象，解析失败返回null
+     */
+    public TileParseResult parseRequest(String requestURI) {
+        Matcher matcher = getPattern().matcher(requestURI);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        TileParseResult result =
+                TileParseResult.of()
+                        .setRequestURI(requestURI)
+                        .setFileId(matcher.group(1)) // FileId
+                        .setFileName(matcher.group(2)) // 文件名称
+                        .setServiceName(matcher.group(3)) // 服务名称
+                        .setFullPath(matcher.group(4)); // 第3段及以后的部分
+
+        String pathPart = matcher.group(4);
+
+        if (pathPart.contains("/")) {
+            String[] zxyParts = pathPart.split("/");
+            if (zxyParts.length >= 3) {
+                String[] yAndFormat = zxyParts[2].split("\\.");
+
+                result.setZ(zxyParts[0])
+                        .setX(zxyParts[1])
+                        .setY(yAndFormat.length > 0 ? yAndFormat[0] : null)
+                        .setFormat(yAndFormat.length > 1 ? yAndFormat[1] : null);
+            } else {
+                log.warn("瓦片路径格式不正确，期望 z/x/y.format，实际: {}", pathPart);
+            }
+        } else {
+            // 处理 layer.json 或其他文件
+            result.setZ(pathPart);
+        }
+
+        return result;
     }
 }

@@ -12,10 +12,11 @@ import java.sql.SQLException;
 public class AdvBeanHandler<T> implements RsHandler<T> {
 
     private final Class<T> beanType;
-    private final AdvBeanMapper beanMapper = new AdvBeanMapper();
+    private final AdvBeanMapper beanMapper;
 
-    public AdvBeanHandler(Class<T> beanType) {
+    public AdvBeanHandler(Class<T> beanType, AdvBeanMapper beanMapper) {
         this.beanType = beanType;
+        this.beanMapper = beanMapper;
     }
 
     @Override

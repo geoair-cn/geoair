@@ -1,11 +1,17 @@
 package cn.geoair.map.dynamic.tools.convert;
 
+import cn.geoair.base.log.GiLogger;
+import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.util.GutilObject;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
 import oracle.spatial.util.ByteOrder;
 import oracle.spatial.util.WKB;
 import oracle.sql.STRUCT;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.io.ByteOrderValues;
 import org.locationtech.jts.io.WKBWriter;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.WKTWriter;
@@ -20,6 +26,7 @@ import org.locationtech.jts.io.WKTWriter;
  * @author zhangjun
  */
 public class GirOracleSpatialTran {
+    static GiLogger logger = GirLoggerFactory.getLogger();
 
     /**
      * 判断值是否为 Oracle Spatial 几何数据
@@ -28,6 +35,7 @@ public class GirOracleSpatialTran {
      * @return true=是几何数据，false=不是
      */
     public static boolean isSdoGeometry(Object value) {
+
         return GirOracleTran.isSdoGeometryType(value);
     }
 
@@ -66,10 +74,24 @@ public class GirOracleSpatialTran {
         }
 
         try {
+            STRUCT struct = (STRUCT) value;
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
-            byte[] bytes = wkb.fromSTRUCT((STRUCT) value);
-            return GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
+            byte[] bytes = wkb.fromSTRUCT(struct);
+            Object[] attributes = struct.getAttributes();
+            Geometry geometry =
+                    GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(bytes);
+            try {
+                Object attribute = attributes[1];
+                if (GutilObject.isNotEmpty(attribute)) {
+                    BigDecimal srid = (BigDecimal) attribute;
+                    geometry.setSRID(srid.intValue());
+                }
+            } catch (Exception e) {
+
+            }
+            return geometry;
         } catch (Exception e) {
+            logger.error(e);
             return null;
         }
     }
@@ -84,21 +106,38 @@ public class GirOracleSpatialTran {
      * @return Oracle STRUCT 对象，转换失败返回 null
      */
     public static STRUCT jtsGeomToSdoGeometry(Geometry geometry, java.sql.Connection connection) {
+        return jtsGeomToSdoGeometry(
+                geometry, connection, geometry != null ? geometry.getSRID() : 0);
+    }
+
+    /** 将 JTS Geometry 转换为 Oracle SDO_GEOMETRY STRUCT，含 SRID。 */
+    public static STRUCT jtsGeomToSdoGeometry(Geometry geometry, Connection connection, int srid) {
         if (geometry == null || connection == null) {
             return null;
         }
-
         try {
-            // 将 JTS Geometry 转换为 WKB 字节数组
-            WKBWriter writer = new WKBWriter();
+            if (srid > 0) geometry.setSRID(srid);
+            WKBWriter writer = new WKBWriter(2, ByteOrderValues.BIG_ENDIAN);
             byte[] wkbBytes = writer.write(geometry);
 
-            // 使用 Oracle WKB 工具类转换为 STRUCT
             WKB wkb = new WKB(ByteOrder.BIG_ENDIAN);
-            return wkb.toSTRUCT(wkbBytes, connection);
+            STRUCT sdoStruct = wkb.toSTRUCT(wkbBytes, connection);
+
+            // 通过 STRUCT 的 setObject 或 getAttributes 修改 SRID
+            // 注意：这种方式需要知道 STRUCT 的内部字段顺序
+            Object[] attrs = sdoStruct.getAttributes();
+            attrs[1] = srid; // 第1个字段是 SDO_SRID
+            return new STRUCT(sdoStruct.getDescriptor(), connection, attrs);
+
         } catch (Exception e) {
+            logger.error("JTS to SDO_GEOMETRY conversion failed", e);
             return null;
         }
+    }
+
+    public static Object jtsGeomToSdoGeometryObj(
+            Geometry geometry, java.sql.Connection connection) {
+        return jtsGeomToSdoGeometry(geometry, connection);
     }
 
     /**

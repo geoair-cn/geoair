@@ -3,7 +3,11 @@ package cn.geoair.map.dynamic.tools.array;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -17,14 +21,28 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
 
-    ToolsConfig advToolsConfig;
+    /** 按 ToolsConfig 对象身份复用数组转换器，保持与其他工具入口一致。 */
+    private static final Map<ToolsConfig, GirGeom2ArrayUtils> CONFIGURED_INSTANCES =
+            Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirGeom2ArrayUtils>());
+
+    private final ToolsConfig advToolsConfig;
 
     public GirGeom2ArrayUtils(ToolsConfig advToolsConfig) {
-        this.advToolsConfig = advToolsConfig;
+        this.advToolsConfig = advToolsConfig == null ? new ToolsConfig() : advToolsConfig;
     }
 
     public static GirGeom2ArrayUtils getInstance(ToolsConfig advToolsConfig) {
-        return new GirGeom2ArrayUtils(advToolsConfig);
+        if (advToolsConfig == null) {
+            return getInstance();
+        }
+        synchronized (CONFIGURED_INSTANCES) {
+            GirGeom2ArrayUtils arrayUtils = CONFIGURED_INSTANCES.get(advToolsConfig);
+            if (arrayUtils == null) {
+                arrayUtils = new GirGeom2ArrayUtils(advToolsConfig);
+                CONFIGURED_INSTANCES.put(advToolsConfig, arrayUtils);
+            }
+            return arrayUtils;
+        }
     }
 
     /**
@@ -113,25 +131,22 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public Point pointByDouble(double x, double y) {
+        validateFinite(x, "x");
+        validateFinite(y, "y");
         return advToolsConfig.getGeometryFactory().createPoint(new Coordinate(x, y));
     }
 
     @Override
     public Point pointByString(String x, String y) {
-        // 1. 空值校验
         if (x == null || y == null) {
-            return null;
+            throw new IllegalArgumentException("x和y不能为空");
         }
         try {
-            // 2. 字符串转 double
             double longitude = Double.parseDouble(x.trim());
             double latitude = Double.parseDouble(y.trim());
-
-            // 3. 调用上面的 double 方法创建点
             return pointByDouble(longitude, latitude);
         } catch (NumberFormatException e) {
-            // 格式错误返回 null（或抛出异常，看业务需求）
-            return null;
+            throw new IllegalArgumentException("x和y必须为有效数字", e);
         }
     }
 
@@ -180,9 +195,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         // 默认值处理
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
 
-        // 空值处理：空数组返回空Point
         if (ArrayUtil.isEmpty(coords)) {
-            return advToolsConfig.getGeometryFactory().createPoint();
+            throw new IllegalArgumentException("坐标数组不能为空，Point需要一维二维坐标 [x,y]");
         }
 
         // 快速转换（跳过数值校验，仅维度简单判断）
@@ -198,26 +212,22 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public Point doubleListToPoint(List<Double> coords) {
-        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
-        return doubleArrayToPoint(doubles);
+        return doubleArrayToPoint(toPointArray(coords));
     }
 
     @Override
     public Point doubleListToPoint(List<Double> coords, CoordOrder order) {
-        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
-        return doubleArrayToPoint(doubles, order);
+        return doubleArrayToPoint(toPointArray(coords), order);
     }
 
     @Override
     public Point doubleListToPoint(List<Double> coords, CoordOrder order, GeometryFactory factory) {
-        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
-        return doubleArrayToPoint(doubles, order, factory);
+        return doubleArrayToPoint(toPointArray(coords), order, factory);
     }
 
     @Override
     public Point doubleListToPointFast(List<Double> coords, CoordOrder order) {
-        double[] doubles = coords.stream().mapToDouble(Double::doubleValue).toArray();
-        return doubleArrayToPointFast(doubles, order);
+        return doubleArrayToPointFast(toPointArray(coords), order);
     }
 
     @Override
@@ -265,6 +275,9 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         if (ArrayUtil.isEmpty(coords)) {
             return actualFactory.createLineString();
         }
+        if (coords.length < 2) {
+            throw new IllegalArgumentException("LineString至少需要两个坐标点");
+        }
         // 校验每个坐标点的合法性（必须是二维）
         Coordinate[] jtsCoords = new Coordinate[coords.length];
         for (int i = 0; i < coords.length; i++) {
@@ -299,10 +312,16 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         if (ArrayUtil.isEmpty(coords)) {
             return advToolsConfig.getGeometryFactory().createLineString();
         }
-        // 快速转换（跳过数值校验）
+        if (coords.length < 2) {
+            throw new IllegalArgumentException("LineString至少需要两个坐标点");
+        }
+        // 快速转换仅跳过数值校验，仍保留数组结构校验。
         Coordinate[] jtsCoords = new Coordinate[coords.length];
         for (int i = 0; i < coords.length; i++) {
             double[] point = coords[i];
+            if (ArrayUtil.isEmpty(point) || point.length != 2) {
+                throw new IllegalArgumentException("第" + i + "个坐标点必须是二维数组");
+            }
             double x = CoordOrder.X_FIRST == actualOrder ? point[0] : point[1];
             double y = CoordOrder.X_FIRST == actualOrder ? point[1] : point[0];
             jtsCoords[i] = new Coordinate(x, y);
@@ -312,26 +331,121 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public LineString doubleListToLineString(List<double[]> coords) {
-        double[][] coordsArray = coords.toArray(new double[0][]);
-        return doubleArrayToLineString(coordsArray, CoordOrder.X_FIRST);
+        return doubleArrayToLineString(toLineArray(coords), CoordOrder.X_FIRST);
     }
 
     @Override
     public LineString doubleListToLineString(List<double[]> coords, CoordOrder order) {
-        double[][] coordsArray = coords.toArray(new double[0][]);
-        return doubleArrayToLineString(coordsArray, order);
+        return doubleArrayToLineString(toLineArray(coords), order);
     }
 
     @Override
     public LineString doubleListToLineString(
             List<double[]> coords, CoordOrder order, GeometryFactory factory) {
-        double[][] coordsArray = coords.toArray(new double[0][]);
-        return doubleArrayToLineString(coordsArray, order, factory);
+        return doubleArrayToLineString(toLineArray(coords), order, factory);
     }
 
     @Override
     public LineString doubleListToLineStringFast(List<double[]> coords, CoordOrder order) {
-        double[][] coordsArray = coords.toArray(new double[0][]);
-        return doubleArrayToLineStringFast(coordsArray, order);
+        return doubleArrayToLineStringFast(toLineArray(coords), order);
+    }
+
+    @Override
+    public Polygon doubleArrayToPolygon(double[][] shell) {
+        return doubleArrayToPolygon(
+                shell, null, CoordOrder.X_FIRST, advToolsConfig.getGeometryFactory());
+    }
+
+    @Override
+    public Polygon doubleArrayToPolygon(
+            double[][] shell, CoordOrder order, GeometryFactory factory) {
+        return doubleArrayToPolygon(shell, null, order, factory);
+    }
+
+    @Override
+    public Polygon doubleArrayToPolygon(
+            double[][] shell, List<double[][]> holes, CoordOrder order, GeometryFactory factory) {
+        CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
+        GeometryFactory actualFactory =
+                ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
+        LinearRing shellRing =
+                actualFactory.createLinearRing(toRingCoordinates(shell, actualOrder, "外环"));
+        LinearRing[] holeRings;
+        if (holes == null || holes.isEmpty()) {
+            holeRings = new LinearRing[0];
+        } else {
+            holeRings = new LinearRing[holes.size()];
+            for (int i = 0; i < holes.size(); i++) {
+                holeRings[i] =
+                        actualFactory.createLinearRing(
+                                toRingCoordinates(holes.get(i), actualOrder, "第" + i + "个洞"));
+            }
+        }
+        return actualFactory.createPolygon(shellRing, holeRings);
+    }
+
+    @Override
+    public double[][][] polygonToDoubleArrays(Polygon polygon, CoordOrder order) {
+        if (ObjectUtil.isNull(polygon) || polygon.isEmpty()) {
+            return null;
+        }
+        CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
+        double[][][] rings = new double[polygon.getNumInteriorRing() + 1][][];
+        rings[0] = lineStringToDoubleArray(polygon.getExteriorRing(), actualOrder);
+        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+            rings[i + 1] = lineStringToDoubleArray(polygon.getInteriorRingN(i), actualOrder);
+        }
+        return rings;
+    }
+
+    /** 将坐标列表转换为 Point 所需的二维数组，并统一空值语义。 */
+    private double[] toPointArray(List<Double> coords) {
+        if (coords == null
+                || coords.size() != 2
+                || coords.get(0) == null
+                || coords.get(1) == null) {
+            throw new IllegalArgumentException("坐标列表必须包含两个非空数值");
+        }
+        return new double[] {coords.get(0), coords.get(1)};
+    }
+
+    /** 将线坐标列表转换为数组；坐标结构和数值由后续转换方法校验。 */
+    private double[][] toLineArray(List<double[]> coords) {
+        if (coords == null) {
+            throw new IllegalArgumentException("坐标集合不能为空");
+        }
+        return coords.toArray(new double[0][]);
+    }
+
+    /** 将一个面环转换为闭合 Coordinate 序列。 */
+    private Coordinate[] toRingCoordinates(double[][] coords, CoordOrder order, String ringName) {
+        if (ArrayUtil.isEmpty(coords) || coords.length < 3) {
+            throw new IllegalArgumentException(ringName + "至少需要三个坐标点");
+        }
+        Coordinate[] result = new Coordinate[coords.length];
+        for (int i = 0; i < coords.length; i++) {
+            double[] point = coords[i];
+            if (ArrayUtil.isEmpty(point) || point.length != 2) {
+                throw new IllegalArgumentException(ringName + "第" + i + "个坐标点必须是二维数组");
+            }
+            validateFinite(point[0], ringName + "第" + i + "个坐标的第一个值");
+            validateFinite(point[1], ringName + "第" + i + "个坐标的第二个值");
+            result[i] =
+                    CoordOrder.X_FIRST == order
+                            ? new Coordinate(point[0], point[1])
+                            : new Coordinate(point[1], point[0]);
+        }
+        if (!result[0].equals2D(result[result.length - 1])) {
+            result = Arrays.copyOf(result, result.length + 1);
+            result[result.length - 1] = new Coordinate(result[0]);
+        }
+        return result;
+    }
+
+    /** 校验坐标值为有限数。 */
+    private void validateFinite(double value, String fieldName) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            throw new IllegalArgumentException(fieldName + "必须为有限数值");
+        }
     }
 }

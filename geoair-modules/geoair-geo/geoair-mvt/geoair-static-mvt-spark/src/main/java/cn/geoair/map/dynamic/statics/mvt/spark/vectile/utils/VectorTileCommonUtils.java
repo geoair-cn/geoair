@@ -6,7 +6,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfTileParameter;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.bean.BeanUtil;
@@ -176,7 +177,7 @@ public class VectorTileCommonUtils {
             List<GirAdvOneRow> mergedList, TileSliceParameter parameter) {
         List<GirAdvOneRow> limitList = mergedList;
         // 要素数量限制逻辑
-        if (parameter.isEnableFeatureLimitIs() && parameter.getFeatureLimit() != null) {
+        if (parameter.isFeatureLimitEnabled() && parameter.getFeatureLimit() != null) {
             int limit = parameter.getFeatureLimit();
 
             if (limitList.size() > limit) {
@@ -238,15 +239,6 @@ public class VectorTileCommonUtils {
 
         return AdvMvtDensityUtils.doValidateAndOptimizeTileSize(
                 tileId, rawPbf, features, envelope, zoom, pbfTileParameter);
-    }
-
-    /** 通用PG写入参数构建 */
-    public static Map<String, String> buildPgWriteParams(TileSliceParameter parameter) {
-        PgConnectInfoWithTable pgInfo = parameter.getOutPutConnectWithTable();
-        Map<String, String> params = pgInfo.toParams();
-        params.put("batchSize", "50");
-        params.put("tableName", pgInfo.getTableName());
-        return params;
     }
 
     public static PbfTileParameter formToPbfTileParameter(TileSliceParameter tileSliceParameter) {

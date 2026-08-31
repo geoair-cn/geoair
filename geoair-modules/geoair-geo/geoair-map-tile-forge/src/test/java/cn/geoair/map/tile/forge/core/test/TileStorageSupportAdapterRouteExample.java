@@ -38,7 +38,7 @@ public class TileStorageSupportAdapterRouteExample {
                     @Override
                     public Long getLayerPerCacheBatchSize(
                             GirLayerConfigContext layerConfigContext) {
-                        return 0L;
+                        return 0l;
                     }
                 };
 

@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J8.1.5</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-dependencies</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-spring-dependencies</name>
   <description>geoair spring 相关的依赖声明</description>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -39,16 +39,6 @@
     <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
   </scm>
-
-  <properties>
-    <java.version>8</java.version>
-    <geoair.version>J8.1.5</geoair.version>
-    <redisson.version>3.18.0</redisson.version>
-    <spring-boot.version>2.7.18</spring-boot.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <tomcat.version>9.0.115</tomcat.version>
-  </properties>
 
   <dependencyManagement>
     <dependencies>

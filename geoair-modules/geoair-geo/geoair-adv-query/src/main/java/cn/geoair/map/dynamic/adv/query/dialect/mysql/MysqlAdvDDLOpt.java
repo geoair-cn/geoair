@@ -1,6 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.dialect.mysql;
 
+import cn.geoair.base.Gir;
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
+import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -13,6 +15,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.dialect.DialectName;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,6 +31,11 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public DialectTableNameProcessor getDialectTableNameProcessor() {
         return MysqlDialectTableNameUtil.getInstance();
+    }
+
+    @Override
+    protected DialectName getDialectName() {
+        return DialectName.MYSQL;
     }
 
     // ========== 表操作差异化实现 ==========
@@ -109,10 +117,14 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
 
         List<FieldBySchemaApo> fields = getAdvBaseOpt().bSelectObjList(sql, FieldBySchemaApo.class);
-        fields.forEach(f -> f.setOriginalColumnName(f.getColumnName()));
+        fields.forEach(
+                f -> {
+                    f.setDialectName(getDialectName());
+                    f.setOriginalColumnName(f.getColumnName());
+                    f.determineGeometryFieldIs();
+                });
 
-        DataFieldsApo dataFieldsApo = new DataFieldsApo();
-        dataFieldsApo.setDataFieldList(fields);
+        DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
     }
 
@@ -124,6 +136,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 StrUtil.isEmpty(newField.getColumnName())
                         ? oldColumnName
                         : newField.getColumnName();
+        String quotedFinalColumnName = dialectTableNameProcessor.tbQuoteFieldName(finalColumnName);
 
         // MySQL专属：修改字段语法（ALTER COLUMN → MODIFY COLUMN）
         StringBuilder alterDef = new StringBuilder();
@@ -131,23 +144,23 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 StrUtil.format(
                         "ALTER TABLE {} MODIFY COLUMN {} {}",
                         qualifiedTableName,
-                        finalColumnName,
+                        quotedFinalColumnName,
                         newField.getUdtName()));
 
         // 处理长度/精度
-        if (StrUtil.isNotEmpty(newField.getCharacterMaximumLength())
+        if (newField.getCharacterMaximumLength() != null
                 && (newField.getUdtName().contains("char")
                         || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
-        } else if (StrUtil.isNotEmpty(newField.getNumericPrecision())
-                && StrUtil.isNotEmpty(newField.getNumericPrecisionRadix())
+        } else if (newField.getNumericPrecision() != null
+                && newField.getNumericScale() != null
                 && (newField.getUdtName().contains("numeric")
                         || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
                             newField.getNumericPrecision(),
-                            newField.getNumericPrecisionRadix()));
+                            newField.getNumericScale()));
         }
 
         // 处理非空
@@ -171,7 +184,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                             "ALTER TABLE {} RENAME COLUMN {} TO {};",
                             qualifiedTableName,
                             oldColumnName,
-                            finalColumnName));
+                            quotedFinalColumnName));
         }
 
         sqlBuilder.append(alterDef).append(";");
@@ -268,6 +281,8 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
 
+        String quotedPkColumnName = dialectTableNameProcessor.tbQuoteFieldName(pkColumnName);
+
         try {
             // ========== 分支1：字符串类型主键 ==========
             if (PrimaryKeyType.STRING.equals(pkType)) {
@@ -279,7 +294,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} VARCHAR({})  ",
                                 qualifiedTableName,
-                                pkColumnName,
+                                quotedPkColumnName,
                                 pkColumnLength);
                 dExecuteDDL(addColumnSql, tableName, "新增字符串主键列[" + pkColumnName + "]");
 
@@ -297,7 +312,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "UPDATE {} SET {} = CONCAT({}, (@row_num := @row_num + 1))",
                                 qualifiedTableName,
-                                pkColumnName,
+                                quotedPkColumnName,
                                 valuePrefix);
                 dExecuteDDL(updateSql, tableName, "填充字符串主键值[" + pkColumnName + "]");
 
@@ -314,7 +329,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} INT NOT NULL AUTO_INCREMENT PRIMARY KEY",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增整数自增主键列[" + pkColumnName + "]");
             }
 
@@ -325,7 +340,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增长整数自增主键列[" + pkColumnName + "]");
             }
 
@@ -336,7 +351,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} INT  ",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增普通整数列[" + pkColumnName + "]");
 
                 // 步骤2：填充连续唯一值（MySQL @变量方式）
@@ -346,7 +361,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "UPDATE {} SET {} = (@row_num := @row_num + 1)",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(updateSql, tableName, "填充普通整数主键值[" + pkColumnName + "]");
 
                 // 步骤3：添加主键约束
@@ -362,7 +377,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "ALTER TABLE {} ADD COLUMN {} BIGINT  ",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(addColumnSql, tableName, "新增普通长整数列[" + pkColumnName + "]");
 
                 // 步骤2：填充连续唯一值
@@ -372,7 +387,7 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.format(
                                 "UPDATE {} SET {} = (@row_num := @row_num + 1)",
                                 qualifiedTableName,
-                                pkColumnName);
+                                quotedPkColumnName);
                 dExecuteDDL(updateSql, tableName, "填充普通长整数主键值[" + pkColumnName + "]");
 
                 // 步骤3：添加主键约束
@@ -390,12 +405,13 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public String buildAddPrimaryKeySql(
             String qualifiedTableName, String constraintName, String columns) {
+        String quotedColumns = dialectTableNameProcessor.tbQuoteFieldName(columns);
         // MySQL专属：添加主键（约束名可选）
         return StrUtil.format(
                 "ALTER TABLE {} ADD CONSTRAINT {} PRIMARY KEY ({})",
                 qualifiedTableName,
                 constraintName,
-                columns);
+                quotedColumns);
     }
 
     @Override
@@ -449,8 +465,16 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public String dGetCurrentSchema() {
         String sql = "SELECT DATABASE() as ds ";
+        AdvQueryGlobalConfig config = getConfig();
+        boolean enableQueryLog = config.isEnableQueryLog();
+        if (enableQueryLog) {
+            config.setEnableQueryLog(false); //  如果不关闭，就会死循环
+        }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
-        return girAdvOneRow.getStr("ds");
+        config.setEnableQueryLog(enableQueryLog);
+        String schema = girAdvOneRow.getStr("ds");
+        Gir.log.info("从数据库获取到的schema为：【{}】", schema);
+        return schema;
     }
 
     @Override
@@ -626,14 +650,13 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (columnTypeName.contains("char")
                 || columnTypeName.contains("varchar")
                 || columnTypeName.contains("text")) {
-            field.setCharacterMaximumLength(
-                    String.valueOf(metaData.getColumnDisplaySize(columnIndex)));
+            field.setCharacterMaximumLength(metaData.getColumnDisplaySize(columnIndex));
         } else if (columnTypeName.contains("int")
                 || columnTypeName.contains("decimal")
                 || columnTypeName.contains("float")
                 || columnTypeName.contains("double")) {
-            field.setNumericPrecision(String.valueOf(metaData.getPrecision(columnIndex)));
-            field.setNumericPrecisionRadix(String.valueOf(metaData.getScale(columnIndex)));
+            field.setNumericPrecision(metaData.getPrecision(columnIndex));
+            field.setNumericScale(metaData.getScale(columnIndex));
         }
     }
 

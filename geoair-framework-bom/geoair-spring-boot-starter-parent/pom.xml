@@ -11,7 +11,7 @@
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-boot-starter-parent</artifactId>
-  <version>J8.1.5</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-spring-boot-starter-parent</name>
   <description>geoair的springboot starter</description>
@@ -27,7 +27,7 @@
   <developers>
     <developer>
       <name>张逢吉</name>
-      <email>zhangjun7570@qq.com</email>
+      <email>zfj20250104@qq.com</email>
       <organization>geoair</organization>
       <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
     </developer>
@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J8.1.5</geoair.version>
+    <geoair.version>J8.1.6</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
     <tomcat.version>9.0.115</tomcat.version>
     <spring-boot.version>2.7.18</spring-boot.version>

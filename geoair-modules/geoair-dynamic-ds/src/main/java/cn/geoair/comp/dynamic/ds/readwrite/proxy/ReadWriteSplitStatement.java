@@ -13,11 +13,11 @@ import java.sql.*;
  */
 public class ReadWriteSplitStatement implements Statement {
 
-    private final ReadWriteSplitConnection connection;
-    private Statement currentStatement;
-    private int resultSetType;
-    private int resultSetConcurrency;
-    private int resultSetHoldability;
+    protected final ReadWriteSplitConnection connection;
+    protected Statement currentStatement;
+    protected int resultSetType = ResultSet.TYPE_FORWARD_ONLY;
+    protected int resultSetConcurrency = ResultSet.CONCUR_READ_ONLY;
+    protected int resultSetHoldability = ResultSet.HOLD_CURSORS_OVER_COMMIT;
 
     public ReadWriteSplitStatement(ReadWriteSplitConnection connection) {
         this.connection = connection;
@@ -228,11 +228,8 @@ public class ReadWriteSplitStatement implements Statement {
 
     @Override
     public void addBatch(String sql) throws SQLException {
-        // 批量操作，使用主库
-        Connection realConn = connection.getConnection(sql);
-        Statement stmt = realConn.createStatement();
-        stmt.addBatch(sql);
-        currentStatement = stmt;
+        // 批量操作必须使用主库
+        getRealStatement(sql).addBatch(sql);
         connection.markTransactionStart(true);
     }
 

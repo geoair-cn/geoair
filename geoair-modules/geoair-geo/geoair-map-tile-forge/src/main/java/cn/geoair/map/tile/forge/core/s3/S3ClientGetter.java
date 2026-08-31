@@ -12,6 +12,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;
 
@@ -113,12 +115,37 @@ public class S3ClientGetter {
             String bucketName, String remoteFilePath, String localTempDirPath) {
         try {
             String normalizedRemotePath = remoteFilePath.replace('\\', '/');
-            File localFile = Paths.get(localTempDirPath, normalizedRemotePath).toFile();
+            validateRemoteObjectPath(normalizedRemotePath);
+            Path rootPath = Paths.get(localTempDirPath).toAbsolutePath().normalize();
+            Path localPath = rootPath.resolve(normalizedRemotePath).normalize();
+            if (!localPath.startsWith(rootPath)) {
+                throw new IllegalArgumentException("S3对象路径不能越出本地临时目录: " + remoteFilePath);
+            }
+            downloadFromS3ToFileIfNeeded(bucketName, normalizedRemotePath, localPath.toFile());
+        } catch (Exception e) {
+            log.error("从S3下载文件失败: bucket={}, key={}", bucketName, remoteFilePath, e);
+            throw new RuntimeException("从S3下载文件失败: " + remoteFilePath, e);
+        }
+    }
 
+    /** 下载对象到明确指定的本地文件路径，适用于调用方已构造好瓦片文件路径的场景。 */
+    public void downloadFromS3ToFileIfNeeded(
+            String bucketName, String remoteFilePath, File localFile) {
+        try {
+            String normalizedRemotePath = remoteFilePath.replace('\\', '/');
+            validateRemoteObjectPath(normalizedRemotePath);
             if (!FileUtil.exist(localFile)) {
+                Path parentPath = localFile.toPath().toAbsolutePath().normalize().getParent();
+                if (parentPath != null) {
+                    Files.createDirectories(parentPath);
+                }
                 AmazonS3 s3Client = getClient();
                 S3Object object = s3Client.getObject(bucketName, normalizedRemotePath);
-                FileUtil.writeFromStream(object.getObjectContent(), localFile);
+                try {
+                    FileUtil.writeFromStream(object.getObjectContent(), localFile);
+                } finally {
+                    object.close();
+                }
                 log.info(
                         "从S3下载文件成功: bucket={}, key={}, local={}",
                         bucketName,
@@ -128,6 +155,13 @@ public class S3ClientGetter {
         } catch (Exception e) {
             log.error("从S3下载文件失败: bucket={}, key={}", bucketName, remoteFilePath, e);
             throw new RuntimeException("从S3下载文件失败: " + remoteFilePath, e);
+        }
+    }
+
+    private void validateRemoteObjectPath(String remoteFilePath) {
+        Path path = Paths.get(remoteFilePath).normalize();
+        if (path.isAbsolute() || path.startsWith("..")) {
+            throw new IllegalArgumentException("S3对象路径非法: " + remoteFilePath);
         }
     }
 }

@@ -3,6 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.dm.base;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmDialectTableNameUtil;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
 import java.util.function.Supplier;
 
@@ -13,8 +14,9 @@ import java.util.function.Supplier;
  */
 public class DmAdvBaseSelectOpt extends AbstractExecAdvBaseSelectOpt {
 
-    public DmAdvBaseSelectOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
-        super(configAdvQueryGetter);
+    public DmAdvBaseSelectOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+        super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = DmDialectTableNameUtil.getInstance();
     }
 

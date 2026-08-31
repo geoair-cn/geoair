@@ -1,5 +1,6 @@
 package cn.geoair.sdk.body;
 
+import cn.geoair.sdk.GirSdkException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -31,9 +32,9 @@ public class StringRequestBody implements GiRequestBody {
     @Override
     public void write(OutputStream out) {
         try {
-            out.write(bodyString.getBytes(charsetName));
+            out.write((bodyString == null ? "" : bodyString).getBytes(charsetName));
         } catch (IOException e) {
-            // todo 异常处理
+            throw new GirSdkException("SDK请求体写出失败", e);
         }
     }
 

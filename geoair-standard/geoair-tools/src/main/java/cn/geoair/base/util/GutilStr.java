@@ -6,9 +6,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -158,7 +160,7 @@ public class GutilStr {
     /** 字符串常量：空 JSON <code>"{}"</code> */
     public static final String EMPTY_JSON = "{}";
 
-    // ------------------------------------------------------------------------ Blank
+    // ------------------------------------------------------------------------ 空白
 
     /**
      * 字符串是否为空白，空白的定义如下：
@@ -197,9 +199,6 @@ public class GutilStr {
         int length;
 
         if ((str == null) || ((length = str.length()) == 0)) {
-            return true;
-        }
-        if (("null".equals(str)) || "undefined".equals(str)) {
             return true;
         }
 
@@ -353,7 +352,7 @@ public class GutilStr {
         return true;
     }
 
-    // ------------------------------------------------------------------------ Empty
+    // ------------------------------------------------------------------------ 空
 
     /**
      * 字符串是否为空，空的定义如下：
@@ -709,7 +708,7 @@ public class GutilStr {
         return NULL.equals(strString) || "undefined".equals(strString);
     }
 
-    // ------------------------------------------------------------------------ Trim
+    // ------------------------------------------------------------------------ 去除首尾空白
 
     /**
      * 除去字符串头尾部的空白，如果字符串是<code>null</code>，依然返回<code>null</code>。
@@ -736,18 +735,21 @@ public class GutilStr {
      * 给定字符串数组全部做去首尾空格
      *
      * @param strs 字符串数组
+     * @return 去除首尾空白后的新字符串数组，原数组不会被修改；若入参为{@code null}，返回{@code null}
      */
-    public static void trim(String[] strs) {
+    public static String[] trim(String[] strs) {
         if (null == strs) {
-            return;
+            return null;
         }
+        final String[] result = new String[strs.length];
         String str;
         for (int i = 0; i < strs.length; i++) {
             str = strs[i];
             if (null != str) {
-                strs[i] = str.trim();
+                result[i] = trim(str);
             }
         }
+        return result;
     }
 
     /**
@@ -920,7 +922,9 @@ public class GutilStr {
 
         boolean isStartWith;
         if (ignoreCase) {
-            isStartWith = str.toString().toLowerCase().startsWith(prefix.toString().toLowerCase());
+            // 使用regionMatches忽略大小写比较，避免toLowerCase产生的额外对象开销与Unicode大小写映射问题
+            isStartWith =
+                    str.toString().regionMatches(true, 0, prefix.toString(), 0, prefix.length());
         } else {
             isStartWith = str.toString().startsWith(prefix.toString());
         }
@@ -1015,7 +1019,14 @@ public class GutilStr {
         }
 
         if (isIgnoreCase) {
-            return str.toString().toLowerCase().endsWith(suffix.toString().toLowerCase());
+            // 使用regionMatches忽略大小写比较，避免toLowerCase产生的额外对象开销与Unicode大小写映射问题
+            return str.toString()
+                    .regionMatches(
+                            true,
+                            str.length() - suffix.length(),
+                            suffix.toString(),
+                            0,
+                            suffix.length());
         } else {
             return str.toString().endsWith(suffix.toString());
         }
@@ -1142,6 +1153,10 @@ public class GutilStr {
             return null;
         }
         for (CharSequence checkStr : testStrs) {
+            // 跳过数组中的null元素，避免空指针异常
+            if (null == checkStr) {
+                continue;
+            }
             if (str.toString().contains(checkStr)) {
                 return checkStr.toString();
             }
@@ -1150,7 +1165,8 @@ public class GutilStr {
     }
 
     /**
-     * 是否包含特定字符，忽略大小写，如果给定两个参数都为<code>null</code>，返回true
+     * 是否包含特定字符，忽略大小写，如果给定两个参数都为<code>null</code>，返回true；<br>
+     * 如果被检测字符串为<code>null</code>而测试字符串不为<code>null</code>，或测试字符串为<code>null</code>，返回false
      *
      * @param str 被检测字符串
      * @param testStr 被测试是否包含的字符串
@@ -1158,10 +1174,24 @@ public class GutilStr {
      */
     public static boolean containsIgnoreCase(CharSequence str, CharSequence testStr) {
         if (null == str) {
-            // 如果被监测字符串和
             return null == testStr;
         }
-        return str.toString().toLowerCase().contains(testStr.toString().toLowerCase());
+        if (null == testStr) {
+            return false;
+        }
+        final String str2 = str.toString();
+        final String testStr2 = testStr.toString();
+        if (testStr2.isEmpty()) {
+            return true;
+        }
+        // 使用regionMatches忽略大小写比较，避免toLowerCase产生的额外对象开销与Unicode大小写映射问题
+        final int limit = str2.length() - testStr2.length();
+        for (int i = 0; i <= limit; i++) {
+            if (str2.regionMatches(true, i, testStr2, 0, testStr2.length())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1191,6 +1221,10 @@ public class GutilStr {
             return null;
         }
         for (CharSequence testStr : testStrs) {
+            // 跳过数组中的null元素，避免空指针异常
+            if (null == testStr) {
+                continue;
+            }
             if (containsIgnoreCase(str, testStr)) {
                 return testStr.toString();
             }
@@ -1212,6 +1246,9 @@ public class GutilStr {
      * @return 如果是set或get方法名，返回field， 否则null
      */
     public static String getGeneralField(CharSequence getOrSetMethodName) {
+        if (null == getOrSetMethodName) {
+            return null;
+        }
         final String getOrSetMethodNameStr = getOrSetMethodName.toString();
         if (getOrSetMethodNameStr.startsWith("get") || getOrSetMethodNameStr.startsWith("set")) {
             return removePreAndLowerFirst(getOrSetMethodName, 3);
@@ -1310,10 +1347,11 @@ public class GutilStr {
      *
      * @param str 被处理的字符串
      * @param preLength 去掉的长度
-     * @return 处理后的字符串，不符合规范返回null
+     * @return 处理后的字符串，若{@code str}为null、{@code preLength}为负数或剩余部分为空（即 {@code str.length() <=
+     *     preLength}），不符合规范返回null
      */
     public static String removePreAndLowerFirst(CharSequence str, int preLength) {
-        if (str == null) {
+        if (str == null || preLength < 0) {
             return null;
         }
         if (str.length() > preLength) {
@@ -1323,7 +1361,7 @@ public class GutilStr {
             }
             return String.valueOf(first);
         } else {
-            return str.toString();
+            return null;
         }
     }
 
@@ -1604,18 +1642,18 @@ public class GutilStr {
     }
 
     // ------------------------------------------------------------------------------
-    // Split
+    // 切割
 
     /**
      * 改进JDK subString<br>
      * index从0开始计算，最后一个字符为-1<br>
      * 如果from和to位置一样，返回 "" <br>
      * 如果from或to为负数，则按照length从后向前数位置，如果绝对值大于字符串长度，则from归到0，to归到length<br>
-     * 如果经过修正的index中from大于to，则互换from和to example: <br>
+     * 如果经过修正的index中from大于to，则互换from和to，示例如下： <br>
      * abcdefgh 2 3 =》 c <br>
      * abcdefgh 2 -3 =》 cde <br>
      *
-     * @param str String
+     * @param str 字符串
      * @param fromIndexInclude 开始的index（包括）
      * @param toIndexExclude 结束的index（不包括）
      * @return 字串
@@ -1658,20 +1696,28 @@ public class GutilStr {
     }
 
     /**
-     * 通过CodePoint截取字符串，可以截断Emoji
+     * 通过码点（CodePoint）截取字符串，可以正确截断 Emoji 等增补字符<br>
+     * 起始位置小于 0 时钳制为 0，结束位置超过字符串码点总数时钳制为总数，不做越界抛错
      *
-     * @param str String
-     * @param fromIndex 开始的index（包括）
-     * @param toIndex 结束的index（不包括）
-     * @return 字串
+     * @param str 字符串
+     * @param fromIndex 开始的码点位置（包括）
+     * @param toIndex 结束的码点位置（不包括）
+     * @return 截取后的字符串
      */
     public static String subByCodePoint(CharSequence str, int fromIndex, int toIndex) {
         if (isEmpty(str)) {
             return str(str);
         }
 
-        if (fromIndex < 0 || fromIndex > toIndex) {
-            throw new IllegalArgumentException();
+        final int codePointCount = str.toString().codePointCount(0, str.length());
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        }
+        if (toIndex > codePointCount) {
+            toIndex = codePointCount;
+        }
+        if (fromIndex > toIndex) {
+            fromIndex = toIndex;
         }
 
         if (fromIndex == toIndex) {
@@ -1704,10 +1750,11 @@ public class GutilStr {
      *
      * @param string 字符串
      * @param fromIndex 切割开始的位置（包括）
-     * @return 切割后后剩余的后半部分字符串
+     * @return 切割后后剩余的后半部分字符串；若为{@code null}返回{@code null}，若为空串返回{@code ""}， 与{@link
+     *     #subPre(CharSequence, int)}保持一致
      */
     public static String subSuf(CharSequence string, int fromIndex) {
-        if (isEmpty(string)) {
+        if (null == string) {
             return null;
         }
         return sub(string, fromIndex, string.length());
@@ -1836,12 +1883,12 @@ public class GutilStr {
     /**
      * 截取分隔字符串之后的字符串，不包括分隔字符串<br>
      * 如果给定的字符串为空串（null或""），返回原字符串<br>
-     * 如果分隔字符串为空串（null或""），则返回空串，如果分隔字符串未找到，返回空串，举例如下：
+     * 如果分隔字符串为null，返回原字符串；如果分隔字符串为空串""，则返回原字符串，如果分隔字符串未找到，返回空串，举例如下：
      *
      * <pre>
      *  gtcStrUtil.subAfter(null, *, false)      = null
      *  gtcStrUtil.subAfter("", *, false)        = ""
-     *  gtcStrUtil.subAfter(*, null, false)      = ""
+     *  gtcStrUtil.subAfter("abc", null, false)  = "abc"
      *  gtcStrUtil.subAfter("abc", "a", false)   = "bc"
      *  gtcStrUtil.subAfter("abcba", "b", false) = "cba"
      *  gtcStrUtil.subAfter("abc", "c", false)   = ""
@@ -1857,11 +1904,8 @@ public class GutilStr {
      */
     public static String subAfter(
             CharSequence string, CharSequence separator, boolean isLastSeparator) {
-        if (isEmpty(string)) {
-            return null == string ? null : EMPTY;
-        }
-        if (separator == null) {
-            return EMPTY;
+        if (isEmpty(string) || separator == null) {
+            return null == string ? null : string.toString();
         }
         final String str = string.toString();
         final String sep = separator.toString();
@@ -1979,7 +2023,7 @@ public class GutilStr {
      * @return 是否包围，空串不包围
      */
     public static boolean isSurround(CharSequence str, CharSequence prefix, CharSequence suffix) {
-        if (GutilStr.isBlank(str)) {
+        if (GutilStr.isBlank(str) || null == prefix || null == suffix) {
             return false;
         }
         if (str.length() < (prefix.length() + suffix.length())) {
@@ -2081,6 +2125,10 @@ public class GutilStr {
             return GutilStr.EMPTY;
         }
         final int strLen = str.length();
+        if (0 == strLen) {
+            // 空串无法重复，直接返回空串，避免取模除零
+            return GutilStr.EMPTY;
+        }
         if (strLen == padLen) {
             return str.toString();
         } else if (strLen > padLen) {
@@ -2312,10 +2360,17 @@ public class GutilStr {
             if (null == value && ignoreNull) {
                 continue;
             }
+            if (null == value) {
+                // 不忽略null值时，按javadoc约定将null值替换为空串
+                value = EMPTY;
+            }
             template2 = replace(template2, "{" + entry.getKey() + "}", value);
         }
         return template2;
     }
+
+    /** 字符集名称与字符集对象的缓存，避免重复调用 {@link Charset#forName(String)} */
+    private static final Map<String, Charset> CHARSET_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 编码字符串<br>
@@ -2336,7 +2391,26 @@ public class GutilStr {
      * @return 编码后的字节码
      */
     public static byte[] bytes(CharSequence str, String charset) {
-        return bytes(str, isBlank(charset) ? Charset.defaultCharset() : Charset.forName(charset));
+        return bytes(str, charsetOf(charset));
+    }
+
+    /**
+     * 根据字符集名称获取字符集对象，结果带缓存<br>
+     * 字符集名称为空时返回系统默认字符集
+     *
+     * @param charset 字符集名称
+     * @return 字符集对象
+     */
+    private static Charset charsetOf(String charset) {
+        if (isBlank(charset)) {
+            return Charset.defaultCharset();
+        }
+        Charset cs = CHARSET_CACHE.get(charset);
+        if (null == cs) {
+            cs = Charset.forName(charset);
+            CHARSET_CACHE.put(charset, cs);
+        }
+        return cs;
     }
 
     /**
@@ -2366,11 +2440,13 @@ public class GutilStr {
      * </pre>
      *
      * @param obj 对象
-     * @param charsetName 字符集
+     * @param charsetName 字符集，如果为null或空白，则回退使用系统默认字符集
      * @return 字符串
      */
     public static String str(Object obj, String charsetName) {
-        return str(obj, Charset.forName(charsetName));
+        return str(
+                obj,
+                isBlank(charsetName) ? Charset.defaultCharset() : Charset.forName(charsetName));
     }
 
     /**
@@ -2435,7 +2511,8 @@ public class GutilStr {
     }
 
     /**
-     * 将Byte数组转为字符串
+     * 将Byte数组转为字符串<br>
+     * 注意：数组中的{@code null}元素按字节值{@code 0}处理（原实现编码为0xFF会破坏解码结果）
      *
      * @param bytes byte数组
      * @param charset 字符集
@@ -2446,7 +2523,8 @@ public class GutilStr {
     }
 
     /**
-     * 解码字节码
+     * 解码字节码<br>
+     * 注意：数组中的{@code null}元素按字节值{@code 0}处理
      *
      * @param data 字符串
      * @param charset 字符集，如果此字段为空，则解码的结果取决于平台
@@ -2461,7 +2539,7 @@ public class GutilStr {
         Byte dataByte;
         for (int i = 0; i < data.length; i++) {
             dataByte = data[i];
-            bytes[i] = (null == dataByte) ? -1 : dataByte;
+            bytes[i] = (null == dataByte) ? 0 : dataByte;
         }
 
         return str(bytes, charset);
@@ -2471,7 +2549,7 @@ public class GutilStr {
      * 将编码的byteBuffer数据转换为字符串
      *
      * @param data 数据
-     * @param charset 字符集，如果为空使用当前系统字符集
+     * @param charset 字符集，如果为null或空白使用当前系统字符集
      * @return 字符串
      */
     public static String str(ByteBuffer data, String charset) {
@@ -2479,17 +2557,21 @@ public class GutilStr {
             return null;
         }
 
-        return str(data, Charset.forName(charset));
+        return str(data, isBlank(charset) ? Charset.defaultCharset() : Charset.forName(charset));
     }
 
     /**
-     * 将编码的byteBuffer数据转换为字符串
+     * 将编码的byteBuffer数据转换为字符串<br>
+     * 注意：该方法会消费（读取）传入的{@link ByteBuffer}，调用后其position将移动到末尾
      *
-     * @param data 数据
+     * @param data 数据，如果为{@code null}，返回{@code null}
      * @param charset 字符集，如果为空使用当前系统字符集
      * @return 字符串
      */
     public static String str(ByteBuffer data, Charset charset) {
+        if (null == data) {
+            return null;
+        }
         if (null == charset) {
             charset = Charset.defaultCharset();
         }
@@ -2507,10 +2589,12 @@ public class GutilStr {
     }
 
     /**
-     * 调用对象的toString方法，null会返回“null”
+     * 调用对象的toString方法，null会返回字符串 {@code "null"}<br>
+     * 注意：本方法与 {@link #str(CharSequence)} 及 {@link #str(Object, Charset)} 的差异在于： 本方法对 {@code null}
+     * 入参返回字符串 {@code "null"}，而 str 系列方法对 {@code null} 返回 {@code null}
      *
      * @param obj 对象
-     * @return 字符串
+     * @return 字符串，对象为 {@code null} 时返回 {@code "null"}
      * @since 4.1.3
      */
     public static String toString(Object obj) {
@@ -2540,6 +2624,14 @@ public class GutilStr {
         return GutilArray.join(objs, conjunction);
     }
 
+    /**
+     * 以 conjunction 为分隔符将多个对象转换为字符串
+     *
+     * @param list 列表
+     * @param conjunction 分隔符
+     * @return 连接后的字符串
+     * @see GutilArray#join(Object, CharSequence)
+     */
     public static String join(List<?> list, CharSequence conjunction) {
         return GutilArray.join(list.toArray(), conjunction);
     }
@@ -2646,10 +2738,10 @@ public class GutilStr {
             len += str.length();
         }
         if (isNotEmpty(prefix)) {
-            len += str.length();
+            len += prefix.length();
         }
         if (isNotEmpty(suffix)) {
-            len += str.length();
+            len += suffix.length();
         }
         StringBuilder sb = new StringBuilder(len);
         if (isNotEmpty(prefix) && false == startWith(str, prefix)) {
@@ -2706,7 +2798,12 @@ public class GutilStr {
      */
     public static String unWrap(CharSequence str, String prefix, String suffix) {
         if (isWrap(str, prefix, suffix)) {
-            return sub(str, prefix.length(), str.length() - suffix.length());
+            final int end = str.length() - suffix.length();
+            if (end < prefix.length()) {
+                // 前缀与后缀重叠，字符串整体均属于包装字符，返回空串
+                return EMPTY;
+            }
+            return sub(str, prefix.length(), end);
         }
         return str.toString();
     }
@@ -2789,7 +2886,7 @@ public class GutilStr {
      * @return 是否被包装
      */
     public static boolean isWrap(CharSequence str, char prefixChar, char suffixChar) {
-        if (null == str) {
+        if (null == str || 0 == str.length()) {
             return false;
         }
 
@@ -3112,7 +3209,8 @@ public class GutilStr {
     }
 
     /**
-     * 将给定字符串，变成 "xxx...xxx" 形式的字符串
+     * 将给定字符串，变成 "xxx...xxx" 形式的字符串<br>
+     * 最大长度小于等于 0 时返回空串；最大长度小于等于 3（无法容纳省略号）时直接截取头部
      *
      * @param str 字符串
      * @param maxLength 最大长度
@@ -3121,6 +3219,13 @@ public class GutilStr {
     public static String brief(CharSequence str, int maxLength) {
         if (null == str) {
             return null;
+        }
+        if (maxLength <= 0) {
+            return EMPTY;
+        }
+        if (maxLength <= 3) {
+            // 长度过小，无法容纳省略号，直接截取头部
+            return str.toString().substring(0, Math.min(str.length(), maxLength));
         }
         if (str.length() <= maxLength) {
             return str.toString();
@@ -3353,7 +3458,8 @@ public class GutilStr {
     }
 
     /**
-     * 指定范围内查找字符串，忽略大小写
+     * 指定范围内查找字符串，忽略大小写<br>
+     * 被查找字符串为 {@code null} 时返回 -1
      *
      * @param str 字符串
      * @param searchStr 需要查找位置的字符串
@@ -3361,7 +3467,7 @@ public class GutilStr {
      * @since 3.2.1
      */
     public static int lastIndexOfIgnoreCase(final CharSequence str, final CharSequence searchStr) {
-        return lastIndexOfIgnoreCase(str, searchStr, str.length());
+        return lastIndexOfIgnoreCase(str, searchStr, null == str ? 0 : str.length());
     }
 
     /**
@@ -3625,6 +3731,9 @@ public class GutilStr {
      * @since 3.1.2
      */
     public static String fill(String str, char filledChar, int len, boolean isPre) {
+        if (null == str) {
+            return null;
+        }
         final int strLen = str.length();
         if (strLen > len) {
             return str;
@@ -3675,6 +3784,9 @@ public class GutilStr {
             CharSequence str, int startInclude, int endExclude, char replacedChar) {
         if (isEmpty(str)) {
             return str(str);
+        }
+        if (startInclude < 0) {
+            throw new IllegalArgumentException("startInclude must be >= 0");
         }
         final int strLength = str.length();
         if (startInclude > strLength) {
@@ -3877,6 +3989,10 @@ public class GutilStr {
      * @since 4.5.2
      */
     public static int byteLength(CharSequence cs, Charset charset) {
+        if (null == charset) {
+            // 字符集为空时回退为系统默认字符集
+            charset = Charset.defaultCharset();
+        }
         return cs == null ? 0 : cs.toString().getBytes(charset).length;
     }
 
@@ -3913,50 +4029,104 @@ public class GutilStr {
         return new String(buffer);
     }
 
-    // spring
+    // Spring 风格字符串工具方法
     // --------------------------------------------------------------------------------------------------------------------------
 
+    /** 文件夹分隔符（Unix 风格） */
     private static final String FOLDER_SEPARATOR = "/";
 
+    /** 文件夹分隔符（Windows 风格） */
     private static final String WINDOWS_FOLDER_SEPARATOR = "\\";
 
+    /** 上级路径标识 */
     private static final String TOP_PATH = "..";
 
+    /** 当前路径标识 */
     private static final String CURRENT_PATH = ".";
 
+    /** 文件扩展名分隔符 */
     private static final char EXTENSION_SEPARATOR = '.';
 
     // ---------------------------------------------------------------------
-    // self
+    // 自定义方法
     // ---------------------------------------------------------------------
 
-    private static Pattern intPattern = Pattern.compile("^[-\\+]?[\\d]*$");
+    /** 整数校验正则：可选的符号位 + 至少一位数字 */
+    private static final Pattern intPattern = Pattern.compile("^[+\\-]?\\d+$");
 
+    /**
+     * 判断给定字符串是否为整数（支持正负号）<br>
+     * 字符串为 {@code null} 时返回 false
+     *
+     * @param str 被检测的字符串
+     * @return 是否为整数
+     */
     public static boolean isInteger(String str) {
-        return intPattern.matcher(str).matches();
+        return null != str && intPattern.matcher(str).matches();
     }
 
+    /**
+     * 将列表中的元素以分隔符拼接为字符串，数字不加引号，其余元素按 isSqm 加单引号或双引号<br>
+     * 元素为 {@code null} 时跳过；原始类型数组元素会先转为包装类型数组再拼接
+     *
+     * @param keys 列表
+     * @param split 分隔符
+     * @param isSqm 是否使用单引号，false 时使用双引号
+     * @return 拼接后的字符串
+     */
     public static String join(List<?> keys, String split, boolean isSqm) {
         return join(keys.toArray(), split, isSqm);
     }
 
+    /**
+     * 将数组中的元素以分隔符拼接为字符串，数字不加引号，其余元素按 isSqm 加单引号或双引号<br>
+     * 元素为 {@code null} 时跳过；原始类型数组元素会先转为包装类型数组再拼接，避免输出类似 {@code [J@1a2b3c} 的对象地址
+     *
+     * @param keys 数组
+     * @param split 分隔符
+     * @param isSqm 是否使用单引号，false 时使用双引号
+     * @return 拼接后的字符串
+     */
     public static String join(Object[] keys, String split, boolean isSqm) {
+        if (null == keys) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
         int len = keys.length;
-        boolean isNum = false;
+        boolean isFirst = true;
         for (int i = 0; i < len; i++) {
             Object item = keys[i];
-            isNum = item instanceof Number;
+            if (null == item) {
+                // 跳过 null 元素
+                continue;
+            }
+            if (GutilObject.isArray(item)) {
+                // 原始类型数组直接 toString 会输出 "[J@哈希值"，先转为包装类型数组
+                item = GutilObject.toObjectArray(item);
+            }
+            final boolean isNum = item instanceof Number;
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                sb.append(split);
+            }
             sb.append(isNum ? "" : (isSqm ? "'" : "\""))
                     .append(item.toString())
                     .append(isNum ? "" : (isSqm ? "'" : "\""));
-            if (i < len - 1) {
-                sb.append(split);
-            }
         }
         return sb.toString();
     }
 
+    /**
+     * 以分隔符拼接多个元素，数字不加引号，其余元素按 isSqm 加单引号或双引号<br>
+     * 注意：本方法与 {@link #join(Object[], String, boolean)} 的参数顺序不同——本方法第一个参数为 分隔符 split，最后一个参数为待拼接的元素
+     * keys
+     *
+     * @param split 分隔符
+     * @param isSqm 是否使用单引号，false 时使用双引号
+     * @param keys 待拼接的元素
+     * @return 拼接后的字符串
+     */
     public static String join(String split, boolean isSqm, Object... keys) {
         return join(keys, split, isSqm);
     }
@@ -3969,7 +4139,7 @@ public class GutilStr {
     }
 
     // ---------------------------------------------------------------------
-    // General convenience methods for working with Strings
+    // 字符串通用便捷方法
     // ---------------------------------------------------------------------
 
     /**
@@ -4114,10 +4284,10 @@ public class GutilStr {
     }
 
     /**
-     * Trim leading and trailing whitespace from the given {@code String}.
+     * 去除给定字符串首尾的空白字符
      *
-     * @param str the {@code String} to check
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @return 去除首尾空白后的字符串
      * @see java.lang.Character#isWhitespace
      */
     public static String trimWhitespace(String str) {
@@ -4140,11 +4310,10 @@ public class GutilStr {
     }
 
     /**
-     * Trim <i>all</i> whitespace from the given {@code String}: leading, trailing, and in between
-     * characters.
+     * 去除给定字符串中的所有空白字符：包括首部、尾部及字符之间的空白
      *
-     * @param str the {@code String} to check
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @return 去除所有空白后的字符串
      * @see java.lang.Character#isWhitespace
      */
     public static String trimAllWhitespace(String str) {
@@ -4164,10 +4333,10 @@ public class GutilStr {
     }
 
     /**
-     * Trim leading whitespace from the given {@code String}.
+     * 去除给定字符串首部的空白字符
      *
-     * @param str the {@code String} to check
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @return 去除首部空白后的字符串
      * @see java.lang.Character#isWhitespace
      */
     public static String trimLeadingWhitespace(String str) {
@@ -4175,18 +4344,20 @@ public class GutilStr {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str);
-        while (sb.length() > 0 && Character.isWhitespace(sb.charAt(0))) {
-            sb.deleteCharAt(0);
+        // 先定位首个非空白字符的位置，再一次性截取，避免逐字符删除导致的 O(n^2)
+        int beginIndex = 0;
+        int strLen = str.length();
+        while (beginIndex < strLen && Character.isWhitespace(str.charAt(beginIndex))) {
+            beginIndex++;
         }
-        return sb.toString();
+        return beginIndex == 0 ? str : str.substring(beginIndex);
     }
 
     /**
-     * Trim trailing whitespace from the given {@code String}.
+     * 去除给定字符串尾部的空白字符
      *
-     * @param str the {@code String} to check
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @return 去除尾部空白后的字符串
      * @see java.lang.Character#isWhitespace
      */
     public static String trimTrailingWhitespace(String str) {
@@ -4194,49 +4365,53 @@ public class GutilStr {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str);
-        while (sb.length() > 0 && Character.isWhitespace(sb.charAt(sb.length() - 1))) {
-            sb.deleteCharAt(sb.length() - 1);
+        // 先定位末尾最后一个非空白字符的位置，再一次性截取，避免逐字符删除导致的 O(n^2)
+        int endIndex = str.length() - 1;
+        while (endIndex >= 0 && Character.isWhitespace(str.charAt(endIndex))) {
+            endIndex--;
         }
-        return sb.toString();
+        return endIndex == str.length() - 1 ? str : str.substring(0, endIndex + 1);
     }
 
     /**
-     * Trim all occurrences of the supplied leading character from the given {@code String}.
+     * 去除给定字符串首部出现的所有指定字符
      *
-     * @param str the {@code String} to check
-     * @param leadingCharacter the leading character to be trimmed
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @param leadingCharacter 要去除的首部字符
+     * @return 去除首部指定字符后的字符串
      */
     public static String trimLeadingCharacter(String str, char leadingCharacter) {
         if (!hasLength(str)) {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str);
-        while (sb.length() > 0 && sb.charAt(0) == leadingCharacter) {
-            sb.deleteCharAt(0);
+        // 用 indexOf 定位首个非指定字符的位置，再一次性截取，避免逐字符删除导致的 O(n^2)
+        int beginIndex = 0;
+        int strLen = str.length();
+        while (beginIndex < strLen && str.charAt(beginIndex) == leadingCharacter) {
+            beginIndex++;
         }
-        return sb.toString();
+        return beginIndex == 0 ? str : str.substring(beginIndex);
     }
 
     /**
-     * Trim all occurrences of the supplied trailing character from the given {@code String}.
+     * 去除给定字符串尾部出现的所有指定字符
      *
-     * @param str the {@code String} to check
-     * @param trailingCharacter the trailing character to be trimmed
-     * @return the trimmed {@code String}
+     * @param str 要处理的字符串
+     * @param trailingCharacter 要去除的尾部字符
+     * @return 去除尾部指定字符后的字符串
      */
     public static String trimTrailingCharacter(String str, char trailingCharacter) {
         if (!hasLength(str)) {
             return str;
         }
 
-        StringBuilder sb = new StringBuilder(str);
-        while (sb.length() > 0 && sb.charAt(sb.length() - 1) == trailingCharacter) {
-            sb.deleteCharAt(sb.length() - 1);
+        // 先定位末尾最后一个非指定字符的位置，再一次性截取，避免逐字符删除导致的 O(n^2)
+        int endIndex = str.length() - 1;
+        while (endIndex >= 0 && str.charAt(endIndex) == trailingCharacter) {
+            endIndex--;
         }
-        return sb.toString();
+        return endIndex == str.length() - 1 ? str : str.substring(0, endIndex + 1);
     }
 
     /**
@@ -4269,13 +4444,18 @@ public class GutilStr {
     }
 
     /**
-     * Test whether the given string matches the given substring at the given index.
+     * 判断给定字符串在指定位置是否与给定子串匹配<br>
+     * 字符串为 {@code null}、索引为负数或子串超出范围时返回 false
      *
-     * @param str the original string (or StringBuilder)
-     * @param index the index in the original string to start matching against
-     * @param substring the substring to match at the given index
+     * @param str 原始字符串（或 StringBuilder）
+     * @param index 原始字符串中开始匹配的索引
+     * @param substring 需要匹配的子串
+     * @return 是否匹配
      */
     public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
+        if (null == str || index < 0) {
+            return false;
+        }
         if (index + substring.length() > str.length()) {
             return false;
         }
@@ -4381,7 +4561,7 @@ public class GutilStr {
     }
 
     // ---------------------------------------------------------------------
-    // Convenience methods for working with formatted Strings
+    // 格式化字符串的便捷方法
     // ---------------------------------------------------------------------
 
     /** 字符串加 单引号 */
@@ -4402,23 +4582,28 @@ public class GutilStr {
     }
 
     /**
-     * Unqualify a string qualified by a '.' dot character. For example, "this.name.is.qualified",
-     * returns "qualified".
+     * 去掉以点（'.'）分隔的限定名，例如 "this.name.is.qualified" 返回 "qualified"<br>
+     * 字符串为 {@code null} 时返回 {@code null}
      *
-     * @param qualifiedName the qualified name
+     * @param qualifiedName 限定名
+     * @return 去掉限定后的名称
      */
     public static String unqualify(String qualifiedName) {
         return unqualify(qualifiedName, '.');
     }
 
     /**
-     * Unqualify a string qualified by a separator character. For example, "this:name:is:qualified"
-     * returns "qualified" if using a ':' separator.
+     * 去掉以指定分隔符分隔的限定名，例如使用 ':' 分隔时，"this:name:is:qualified" 返回 "qualified"<br>
+     * 字符串为 {@code null} 时返回 {@code null}
      *
-     * @param qualifiedName the qualified name
-     * @param separator the separator
+     * @param qualifiedName 限定名
+     * @param separator 分隔符
+     * @return 去掉限定后的名称
      */
     public static String unqualify(String qualifiedName, char separator) {
+        if (null == qualifiedName) {
+            return null;
+        }
         return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
     }
 
@@ -4466,27 +4651,30 @@ public class GutilStr {
     }
 
     /**
-     * Extract the filename from the given Java resource path, e.g. {@code "mypath/myfile.txt" ->
-     * "myfile.txt"}.
+     * 从给定的 Java 资源路径中提取文件名，例如 {@code "mypath/myfile.txt" -> "myfile.txt"}<br>
+     * 同时识别 "/" 与 "\" 两种路径分隔符；路径为 {@code null} 时返回 {@code null}
      *
-     * @param path the file path (may be {@code null})
-     * @return the extracted filename, or {@code null} if none
+     * @param path 文件路径（可能为 {@code null}）
+     * @return 提取出的文件名，未找到时返回 {@code null}
      */
     public static String getFilename(String path) {
         if (path == null) {
             return null;
         }
 
-        int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+        int separatorIndex =
+                Math.max(
+                        path.lastIndexOf(FOLDER_SEPARATOR),
+                        path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
         return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
     }
 
     /**
-     * Extract the filename extension from the given Java resource path, e.g. "mypath/myfile.txt" ->
-     * "txt".
+     * 从给定的 Java 资源路径中提取文件扩展名，例如 "mypath/myfile.txt" -> "txt"<br>
+     * 同时识别 "/" 与 "\" 两种路径分隔符；路径为 {@code null} 时返回 {@code null}
      *
-     * @param path the file path (may be {@code null})
-     * @return the extracted filename extension, or {@code null} if none
+     * @param path 文件路径（可能为 {@code null}）
+     * @return 提取出的文件扩展名，未找到时返回 {@code null}
      */
     public static String getFilenameExtension(String path) {
         if (path == null) {
@@ -4498,7 +4686,10 @@ public class GutilStr {
             return null;
         }
 
-        int folderIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+        int folderIndex =
+                Math.max(
+                        path.lastIndexOf(FOLDER_SEPARATOR),
+                        path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
         if (folderIndex > extIndex) {
             return null;
         }
@@ -4507,13 +4698,16 @@ public class GutilStr {
     }
 
     /**
-     * Strip the filename extension from the given Java resource path, e.g. "mypath/myfile.txt" ->
-     * "mypath/myfile".
+     * 去除给定 Java 资源路径的文件扩展名，例如 "mypath/myfile.txt" -> "mypath/myfile"<br>
+     * 路径为 {@code null} 时返回 {@code null}
      *
-     * @param path the file path
-     * @return the path with stripped filename extension
+     * @param path 文件路径
+     * @return 去除文件扩展名后的路径
      */
     public static String stripFilenameExtension(String path) {
+        if (null == path) {
+            return null;
+        }
         int extIndex = path.lastIndexOf(EXTENSION_SEPARATOR);
         if (extIndex == -1) {
             return path;
@@ -4630,21 +4824,20 @@ public class GutilStr {
     }
 
     /**
-     * Decode the given encoded URI component value. Based on the following rules:
+     * 解码给定的 URI 编码字符串，遵循以下规则：
      *
      * <ul>
-     *   <li>Alphanumeric characters {@code "a"} through {@code "z"}, {@code "A"} through {@code
-     *       "Z"}, and {@code "0"} through {@code "9"} stay the same.
-     *   <li>Special characters {@code "-"}, {@code "_"}, {@code "."}, and {@code "*"} stay the
-     *       same.
-     *   <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation of the
-     *       character.
+     *   <li>字母数字字符 {@code "a"} 到 {@code "z"}、{@code "A"} 到 {@code "Z"} 以及 {@code "0"} 到 {@code "9"}
+     *       保持不变。
+     *   <li>特殊字符 {@code "-"}、{@code "_"}、{@code "."} 和 {@code "*"} 保持不变。
+     *   <li>序列 "{@code %<i>xy</i>}" 被解释为该字符的十六进制表示。
+     *   <li>非 ASCII 字符（如中文）按 UTF-8 编码写入字节，避免只保留低 8 位导致乱码。
      * </ul>
      *
-     * @param source the encoded String
-     * @param charset the character set
-     * @return the decoded value
-     * @throws IllegalArgumentException when the given source contains invalid encoded sequences
+     * @param source 已编码的字符串
+     * @param charset 字符集
+     * @return 解码后的字符串
+     * @throws IllegalArgumentException 当给定字符串包含无效的编码序列时抛出
      * @since 5.0
      * @see java.net.URLDecoder#decode(String, String)
      */
@@ -4676,6 +4869,12 @@ public class GutilStr {
                     throw new IllegalArgumentException(
                             "Invalid encoded sequence \"" + source.substring(i) + "\"");
                 }
+            } else if (ch > 0xFF) {
+                // 非 ASCII 字符（如中文）按 UTF-8 编码写入完整字节，避免只保留低 8 位导致乱码
+                byte[] utf8Bytes =
+                        new String(Character.toChars(ch)).getBytes(StandardCharsets.UTF_8);
+                bos.write(utf8Bytes, 0, utf8Bytes.length);
+                changed = true;
             } else {
                 bos.write(ch);
             }
@@ -4787,7 +4986,7 @@ public class GutilStr {
     }
 
     // ---------------------------------------------------------------------
-    // Convenience methods for working with String arrays
+    // 字符串数组的便捷方法
     // ---------------------------------------------------------------------
 
     /**
@@ -5081,16 +5280,15 @@ public class GutilStr {
     }
 
     /**
-     * Take a {@code String} that is a delimited list and convert it into a {@code String} array.
+     * 将给定的分隔列表字符串转换为字符串数组<br>
+     * 空 token（如尾部分隔符产生的空元素）会被过滤
      *
-     * <p>A single {@code delimiter} may consist of more than one character, but it will still be
-     * considered as a single delimiter string, rather than as bunch of potential delimiter
-     * characters, in contrast to {@link #tokenizeToStringArray}.
+     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔 字符，这一点与 {@link
+     * #tokenizeToStringArray} 不同。
      *
-     * @param str the input {@code String} (potentially {@code null} or empty)
-     * @param delimiter the delimiter between elements (this is a single delimiter, rather than a
-     *     bunch individual delimiter characters)
-     * @return an array of the tokens in the list
+     * @param str 输入的字符串（可能为 {@code null} 或空）
+     * @param delimiter 元素之间的分隔符（是单个分隔字符串，而非一组单独的分隔字符）
+     * @return 列表中的 token 数组
      * @see #tokenizeToStringArray
      */
     public static String[] delimitedListToStringArray(String str, String delimiter) {
@@ -5098,18 +5296,16 @@ public class GutilStr {
     }
 
     /**
-     * Take a {@code String} that is a delimited list and convert it into a {@code String} array.
+     * 将给定的分隔列表字符串转换为字符串数组<br>
+     * 空 token（如尾部分隔符产生的空元素）会被过滤
      *
-     * <p>A single {@code delimiter} may consist of more than one character, but it will still be
-     * considered as a single delimiter string, rather than as bunch of potential delimiter
-     * characters, in contrast to {@link #tokenizeToStringArray}.
+     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔 字符，这一点与 {@link
+     * #tokenizeToStringArray} 不同。
      *
-     * @param str the input {@code String} (potentially {@code null} or empty)
-     * @param delimiter the delimiter between elements (this is a single delimiter, rather than a
-     *     bunch individual delimiter characters)
-     * @param charsToDelete a set of characters to delete; useful for deleting unwanted line breaks:
-     *     e.g. "\r\n\f" will delete all new lines and line feeds in a {@code String}
-     * @return an array of the tokens in the list
+     * @param str 输入的字符串（可能为 {@code null} 或空）
+     * @param delimiter 元素之间的分隔符（是单个分隔字符串，而非一组单独的分隔字符）
+     * @param charsToDelete 需要删除的一组字符；可用于删除不需要的换行符，例如 {@code "\r\n\f"} 会删除 字符串中的所有换行和换页符
+     * @return 列表中的 token 数组
      * @see #tokenizeToStringArray
      */
     public static String[] delimitedListToStringArray(
@@ -5131,12 +5327,19 @@ public class GutilStr {
             int pos = 0;
             int delPos;
             while ((delPos = str.indexOf(delimiter, pos)) != -1) {
-                result.add(deleteAny(str.substring(pos, delPos), charsToDelete));
+                String token = deleteAny(str.substring(pos, delPos), charsToDelete);
+                if (token.length() > 0) {
+                    // 过滤空 token
+                    result.add(token);
+                }
                 pos = delPos + delimiter.length();
             }
             if (str.length() > 0 && pos <= str.length()) {
-                // Add rest of String, but not in case of empty input.
-                result.add(deleteAny(str.substring(pos), charsToDelete));
+                // 追加剩余部分（空输入时不追加；尾部空元素按语义过滤）
+                String token = deleteAny(str.substring(pos), charsToDelete);
+                if (token.length() > 0) {
+                    result.add(token);
+                }
             }
         }
         return toStringArray(result);

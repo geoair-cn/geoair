@@ -7,6 +7,22 @@ import java.util.UUID;
 
 public class GirIdGenerator {
 
+    private static volatile IdGeneratorProvider idGeneratorProvider;
+
+    public interface IdGeneratorProvider {
+        String randomUUID();
+
+        String simpleUUID();
+
+        long timestampId();
+
+        String timestampId36();
+    }
+
+    public static void setIdGeneratorProvider(IdGeneratorProvider idGeneratorProvider) {
+        GirIdGenerator.idGeneratorProvider = idGeneratorProvider;
+    }
+
     static {
         GkMethodHand.implFromClass(GirIdGenerator.class);
     }
@@ -18,6 +34,10 @@ public class GirIdGenerator {
      */
     @GaMethodHandDefine()
     public static String randomUUID() {
+        IdGeneratorProvider provider = idGeneratorProvider;
+        if (provider != null) {
+            return provider.randomUUID();
+        }
         return (String) GkMethodHand.invokeSelf();
     }
 
@@ -36,6 +56,10 @@ public class GirIdGenerator {
      */
     @GaMethodHandDefine()
     public static String simpleUUID() {
+        IdGeneratorProvider provider = idGeneratorProvider;
+        if (provider != null) {
+            return provider.simpleUUID();
+        }
         return (String) GkMethodHand.invokeSelf();
     }
 
@@ -54,6 +78,10 @@ public class GirIdGenerator {
      */
     @GaMethodHandDefine()
     public static long timestampId() {
+        IdGeneratorProvider provider = idGeneratorProvider;
+        if (provider != null) {
+            return provider.timestampId();
+        }
         return (long) GkMethodHand.invokeSelf();
     }
 
@@ -64,6 +92,10 @@ public class GirIdGenerator {
      */
     @GaMethodHandDefine()
     public static String timestampId36() {
+        IdGeneratorProvider provider = idGeneratorProvider;
+        if (provider != null) {
+            return provider.timestampId36();
+        }
         return (String) GkMethodHand.invokeSelf();
     }
 

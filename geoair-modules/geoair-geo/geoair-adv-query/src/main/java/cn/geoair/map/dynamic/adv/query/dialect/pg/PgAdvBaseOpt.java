@@ -11,6 +11,8 @@ import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.pg.base.PgAdvBaseUpdateOpt;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+import cn.hutool.db.dialect.DialectName;
 import java.util.function.Supplier;
 
 /**
@@ -23,17 +25,22 @@ import java.util.function.Supplier;
  */
 public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
+    private final AdvTypeHandlerRegistry typeHandlerRegistry;
+
     public PgAdvBaseOpt(
             IDataSourceGetter dataSourceGetter,
             Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.POSTGRESQL, configAdvQueryGetter.get().getTypeHandlers());
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */
     @Override
     public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt(this::getConfig);
+            advBaseAccessPxyOpt = new PgAdvBaseAccessOpt(this::getConfig, typeHandlerRegistry);
             advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseAccessPxyOpt;
@@ -43,7 +50,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt(this::getConfig);
+            advBaseSelectPxyOpt = new PgAdvBaseSelectOpt(this::getConfig, typeHandlerRegistry);
             advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseSelectPxyOpt;
@@ -53,7 +60,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt(this::getConfig);
+            advBaseUpdatePxyOpt = new PgAdvBaseUpdateOpt(this::getConfig, typeHandlerRegistry);
             advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseUpdatePxyOpt;
@@ -63,7 +70,7 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     @Override
     public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt(this::getConfig);
+            advBaseDeletePxyOpt = new PgAdvBaseDeleteOpt(this::getConfig, typeHandlerRegistry);
             advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseDeletePxyOpt;

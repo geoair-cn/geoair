@@ -1,20 +1,19 @@
 package cn.geoair.sdk;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GirSdkProfileConfig {
 
-    private static Map<ProfileEnum, HashMap<String, String>> configMap =
-            new ConcurrentHashMap<ProfileEnum, HashMap<String, String>>();
+    private static final Map<ProfileEnum, Map<String, String>> configMap =
+            new ConcurrentHashMap<ProfileEnum, Map<String, String>>();
 
     public static String getConfig(ProfileEnum profile, String busType) {
         return getConfig(profile, busType, null);
     }
 
     public static String getConfig(ProfileEnum profile, String busType, String defaultValue) {
-        HashMap<String, String> map = configMap.get(profile);
+        Map<String, String> map = configMap.get(profile);
         if (map != null) {
             String res = map.get(busType);
             if (res == null) {
@@ -26,12 +25,10 @@ public class GirSdkProfileConfig {
     }
 
     public static void setConfig(ProfileEnum profile, String busType, String value) {
-        HashMap<String, String> map = configMap.get(profile);
-        if (map == null) {
-            map = new HashMap<String, String>();
-            configMap.put(profile, map);
-        }
-        if (map.containsKey(busType)) {
+        Map<String, String> map =
+                configMap.computeIfAbsent(profile, key -> new ConcurrentHashMap<String, String>());
+        String oldValue = map.putIfAbsent(busType, value);
+        if (oldValue != null) {
             throw new GirSdkException(
                     "重复的属性注册:profile="
                             + profile.name()
@@ -40,7 +37,6 @@ public class GirSdkProfileConfig {
                             + ",value="
                             + value);
         }
-        map.put(busType, value);
     }
 
     public static final String BusType_clientId = "_clientId";
@@ -82,7 +78,7 @@ public class GirSdkProfileConfig {
         /** 获取当前切面 */
         private static final ThreadLocal<ProfileEnum> PROFILE_THREAD_LOCAL = new ThreadLocal<>();
 
-        private static ProfileEnum profile = ProfileEnum.DEV;
+        private static volatile ProfileEnum profile = ProfileEnum.DEV;
 
         public static void set(ProfileEnum profile) {
 
