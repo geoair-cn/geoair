@@ -12,7 +12,7 @@
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-jdbc-url</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J17-dev-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>geoair-jdbc-url</name>
     <description>geoair JDBC URL 解析、重写与构建组件</description>
