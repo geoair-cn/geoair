@@ -3,6 +3,7 @@ package cn.geoair.orm.mybatis.impls;
 import cn.geoair.base.data.model.GiModelable;
 import cn.geoair.base.gpa.dao.GiDao;
 import cn.geoair.base.gpa.entity.GiEntityable;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

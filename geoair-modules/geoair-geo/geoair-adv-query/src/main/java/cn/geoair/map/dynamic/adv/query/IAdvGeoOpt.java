@@ -10,15 +10,13 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 空间处理相关操作接口 约定：所有的方法都以 e开头 (本来设计用g开头，但是后面发现get方法的g开头存在了太多，导致了干扰)
- */
+/** 空间处理相关操作接口 约定：所有的方法都以 e开头 (本来设计用g开头，但是后面发现get方法的g开头存在了太多，导致了干扰) */
 public interface IAdvGeoOpt extends IAdvConfigOpt {
 
     /**
      * 查询一行数据
      *
-     * @param sql             查询的sql
+     * @param sql 查询的sql
      * @param advEnumsGeomOpt 对于空间字段的处理
      * @return
      */
@@ -27,9 +25,9 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 查询一行数据
      *
-     * @param sql             查询的sql
+     * @param sql 查询的sql
      * @param advEnumsGeomOpt 对于空间字段的处理
-     * @param geomFieldName   空间字段名称
+     * @param geomFieldName 空间字段名称
      * @return
      */
     GirAdvOneRow eSelectOne(String sql, AdvEnumsGeomOpt advEnumsGeomOpt, String geomFieldName);
@@ -37,8 +35,8 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 查询一行数据
      *
-     * @param sql               查询的sql
-     * @param advEnumsGeomOpt   对于空间字段的处理
+     * @param sql 查询的sql
+     * @param advEnumsGeomOpt 对于空间字段的处理
      * @param geomFieldNameList 空间字段名称
      * @return
      */
@@ -48,7 +46,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 查询一个列表
      *
-     * @param sql             查询的sql
+     * @param sql 查询的sql
      * @param advEnumsGeomOpt 对于空间字段的处理
      * @return
      */
@@ -57,9 +55,9 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 查询一个列表
      *
-     * @param sql             查询的sql
+     * @param sql 查询的sql
      * @param advEnumsGeomOpt 对于空间字段的处理
-     * @param geomFieldName   空间字段名称
+     * @param geomFieldName 空间字段名称
      * @return
      */
     List<GirAdvOneRow> eSelectList(
@@ -68,8 +66,8 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 查询一个列表
      *
-     * @param sql               查询的sql
-     * @param advEnumsGeomOpt   对于空间字段的处理
+     * @param sql 查询的sql
+     * @param advEnumsGeomOpt 对于空间字段的处理
      * @param geomFieldNameList 空间字段名称
      * @return
      */
@@ -93,7 +91,6 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      */
     List<String> eGetGeoLayerNameByKeyword(String layerNameKeyword);
 
-
     /**
      * 获取指定表的空间字段类型
      *
@@ -105,7 +102,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 获取指定表的空间字段类型
      *
-     * @param tableName     表名称，支持带schema的格式（如"schema.table"）
+     * @param tableName 表名称，支持带schema的格式（如"schema.table"）
      * @param geomFieldName 空间字段名称
      * @return 空间类型枚举（如点、线、面等），若表不包含空间字段则返回null
      */
@@ -114,7 +111,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 获取指定表的空间字段类型
      *
-     * @param tableName      表名称，支持带schema的格式（如"schema.table"）
+     * @param tableName 表名称，支持带schema的格式（如"schema.table"）
      * @param geomFieldNames 空间字段名称列表
      * @return 空间类型枚举（如点、线、面等），若表不包含空间字段则返回null
      */
@@ -131,7 +128,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 获取SQL视图结果中包含的空间字段类型
      *
-     * @param sqlView       用于生成视图的SQL语句
+     * @param sqlView 用于生成视图的SQL语句
      * @param geomFieldName 空间字段名称
      * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
      */
@@ -140,12 +137,11 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 获取SQL视图结果中包含的空间字段类型
      *
-     * @param sqlView        用于生成视图的SQL语句
+     * @param sqlView 用于生成视图的SQL语句
      * @param geomFieldNames 空间字段名称列表
      * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
      */
     Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySql(String sqlView, List<String> geomFieldNames);
-
 
     /**
      * 获取SQL视图结果中包含的空间字段类型
@@ -159,7 +155,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取SQL视图结果中包含的空间字段类型
      *
      * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
-     * @param geomFieldName      空间字段名称
+     * @param geomFieldName 空间字段名称
      * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
      */
     AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, String geomFieldName);
@@ -168,11 +164,11 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取SQL视图结果中包含的空间字段类型
      *
      * @param sqlViewOrTableName 用于生成视图的SQL语句或者表名
-     * @param geomFieldNames     空间字段名称列表
+     * @param geomFieldNames 空间字段名称列表
      * @return 空间类型枚举（如点、线、面等），若视图不包含空间字段则返回null
      */
-    Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, List<String> geomFieldNames);
-
+    Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(
+            String sqlViewOrTableName, List<String> geomFieldNames);
 
     /**
      * 判断指定表是否包含空间字段
@@ -189,7 +185,6 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * @return 包含空间字段返回true，否则返回false
      */
     boolean eIsGeomBySql(String sqlView);
-
 
     boolean eIsGeomBySqlOrTable(String sqlViewOrTableName);
 
@@ -240,7 +235,6 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * @return 空间字段名称，若视图不包含空间字段则返回null
      */
     List<String> eGetGeomColumnNameListBySql(String sqlView);
-
 
     /**
      * 获取SQL视图结果中的空间字段名称
@@ -293,10 +287,10 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 添加空间字段
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param geomType      空间类型
-     * @param srid          空间参考系ID (如4326)
+     * @param geomType 空间类型
+     * @param srid 空间参考系ID (如4326)
      */
     void eAddGeomColumn(
             String tableName, String geomFieldName, AdvEnumsTypeGeom geomType, int srid);
@@ -304,7 +298,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 删除空间字段
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
      */
     void eDropGeomColumn(String tableName, String geomFieldName);
@@ -319,16 +313,16 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 转换空间字段的坐标参考系
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param targetSrid    目标坐标系SRID
+     * @param targetSrid 目标坐标系SRID
      */
     void eTransformSrid(String tableName, String geomFieldName, int targetSrid);
 
     /**
      * 转换空间字段的坐标参考系
      *
-     * @param tableName  表名
+     * @param tableName 表名
      * @param targetSrid 目标坐标系SRID
      */
     void eTransformSrid(String tableName, int targetSrid);
@@ -337,7 +331,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取空间字段的坐标参考系
      *
      * @param tableNameOrSqlView 表名
-     * @param geomFieldName      空间字段名
+     * @param geomFieldName 空间字段名
      * @return SRID值
      */
     Integer eGetSrid(String tableNameOrSqlView, String geomFieldName);
@@ -354,7 +348,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取指定表的空间字段类型
      *
      * @param tableNameOrSqlView 表名
-     * @param geomFieldNames     空间字段名称列表
+     * @param geomFieldNames 空间字段名称列表
      * @return 空间类型枚举（如点、线、面等），若表不包含空间字段则返回null
      */
     Map<String, Integer> eGetSrid(String tableNameOrSqlView, List<String> geomFieldNames);
@@ -362,9 +356,9 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 创建空间索引
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param indexName     索引名称
+     * @param indexName 索引名称
      */
     void eCreateSpatialIndex(String tableName, String geomFieldName, String indexName);
 
@@ -387,10 +381,10 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 执行空间查询：判断两个几何体是否相交
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param geometry      用于查询的几何体WKT字符串
-     * @param srid          几何体的SRID
+     * @param geometry 用于查询的几何体WKT字符串
+     * @param srid 几何体的SRID
      * @return 查询结果
      */
     List<GirAdvOneRow> eQueryIntersects(
@@ -400,8 +394,8 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 执行空间查询：判断两个几何体是否相交
      *
      * @param tableName 表名
-     * @param geometry  用于查询的几何体WKT字符串
-     * @param srid      几何体的SRID
+     * @param geometry 用于查询的几何体WKT字符串
+     * @param srid 几何体的SRID
      * @return 查询结果
      */
     List<GirAdvOneRow> eQueryIntersects(String tableName, String geometry, int srid);
@@ -409,10 +403,10 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 执行空间查询：判断几何体是否在指定范围内
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param bbox          边界框 [minx, miny, maxx, maxy]
-     * @param srid          边界框的SRID
+     * @param bbox 边界框 [minx, miny, maxx, maxy]
+     * @param srid 边界框的SRID
      * @return 查询结果
      */
     List<GirAdvOneRow> eQueryWithinBBox(
@@ -422,8 +416,8 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 执行空间查询：判断几何体是否在指定范围内
      *
      * @param tableName 表名
-     * @param bbox      边界框 [minx, miny, maxx, maxy]
-     * @param srid      边界框的SRID
+     * @param bbox 边界框 [minx, miny, maxx, maxy]
+     * @param srid 边界框的SRID
      * @return 查询结果
      */
     List<GirAdvOneRow> eQueryWithinBBox(String tableName, double[] bbox, int srid);
@@ -431,10 +425,10 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 计算两个几何体之间的距离
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
-     * @param geometry      用于计算的几何体WKT字符串
-     * @param srid          几何体的SRID
+     * @param geometry 用于计算的几何体WKT字符串
+     * @param srid 几何体的SRID
      * @param distanceAlias 距离字段别名
      * @return 包含距离的查询结果
      */
@@ -452,8 +446,8 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取几何体的中心点
      *
      * @param tableNameOrSqlView 表名
-     * @param geomFieldName      空间字段名
-     * @param centerAlias        中心点字段别名
+     * @param geomFieldName 空间字段名
+     * @param centerAlias 中心点字段别名
      * @return 包含中心点的查询结果
      */
     List<GirAdvOneRow> eGetCentroid(
@@ -463,7 +457,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取几何体的中心点
      *
      * @param tableNameOrSqlView 表名
-     * @param centerAlias        中心点字段别名
+     * @param centerAlias 中心点字段别名
      * @return 包含中心点的查询结果
      */
     List<GirAdvOneRow> eGetCentroid(String tableNameOrSqlView, String centerAlias);
@@ -471,7 +465,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 验证几何体是否有效
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
      * @return 无效的几何体ID列表
      */
@@ -482,7 +476,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
     /**
      * 修复无效的几何体
      *
-     * @param tableName     表名
+     * @param tableName 表名
      * @param geomFieldName 空间字段名
      * @return 修复的记录数
      */
@@ -494,7 +488,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      * 获取表中所有几何体的边界范围
      *
      * @param tableNameOrSqlView 表名
-     * @param geomFieldName      空间字段名
+     * @param geomFieldName 空间字段名
      * @return 边界范围 [minx, miny, maxx, maxy]
      */
     BBoxApo eGetExtent(String tableNameOrSqlView, String geomFieldName);

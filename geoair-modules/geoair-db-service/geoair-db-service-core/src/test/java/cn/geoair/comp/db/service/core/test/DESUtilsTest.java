@@ -1,14 +1,14 @@
-//package cn.geoair.comp.db.service.core.test;
+// package cn.geoair.comp.db.service.core.test;
 //
-//import static org.junit.Assert.*;
+// import static org.junit.Assert.*;
 //
-//import cn.geoair.comp.db.service.core.basic.util.DESUtils;
-//import org.junit.Test;
+// import cn.geoair.comp.db.service.core.basic.util.DESUtils;
+// import org.junit.Test;
 //
-///**
+/// **
 // * {@link DESUtils} 的单元测试。
 // */
-//public class DESUtilsTest {
+// public class DESUtilsTest {
 //
 //    @Test
 //    public void testEncryptDecrypt() throws Exception {
@@ -32,4 +32,4 @@
 //        assertNotNull(encrypted);
 //        assertEquals("", DESUtils.decrypt(encrypted));
 //    }
-//}
+// }

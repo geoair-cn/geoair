@@ -16,6 +16,8 @@
  */
 package cn.geoair.map.dynamic.file.geojson.geotools;
 
+import static org.geotools.data.geojson.GeoJSONWriter.DEFAULT_TIME_ZONE;
+
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.geotools.util.logging.Logging;
 
@@ -31,8 +33,6 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static org.geotools.data.geojson.GeoJSONWriter.DEFAULT_TIME_ZONE;
 
 /**
  * A date parser that tries different formats for single dates, but not as loose as {@link

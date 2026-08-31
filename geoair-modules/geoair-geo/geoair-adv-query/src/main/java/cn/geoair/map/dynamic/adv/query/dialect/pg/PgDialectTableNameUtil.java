@@ -3,9 +3,7 @@ package cn.geoair.map.dynamic.adv.query.dialect.pg;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecDialectTableUtil;
 import cn.hutool.core.util.StrUtil;
 
-/**
- * PostgreSQL方言表名处理器 仅实现PG专属的差异化逻辑，复用父类所有通用逻辑
- */
+/** PostgreSQL方言表名处理器 仅实现PG专属的差异化逻辑，复用父类所有通用逻辑 */
 public class PgDialectTableNameUtil extends AbstractExecDialectTableUtil {
 
     // 单例实例

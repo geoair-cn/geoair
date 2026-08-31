@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-dependencies</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-spring-dependencies</name>
   <description>geoair spring 相关的依赖声明</description>
@@ -64,8 +64,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-
 
       <dependency>
         <groupId>com.alibaba.cloud</groupId>

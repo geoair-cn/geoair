@@ -6,9 +6,10 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 
+import org.geotools.api.feature.simple.SimpleFeatureType;
+
 import java.io.Closeable;
 import java.util.Iterator;
-import org.geotools.api.feature.simple.SimpleFeatureType;
 
 /**
  * @author ：张逢吉

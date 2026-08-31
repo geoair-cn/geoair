@@ -5,13 +5,16 @@ import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.web.util.GiWebContextProvider;
 import cn.geoair.web.util.GirHttpServletHelper;
-import java.lang.ref.WeakReference;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.lang.ref.WeakReference;
 
 public class SpringWebContextBridge {
 
@@ -39,19 +42,17 @@ public class SpringWebContextBridge {
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getRequest",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getRequest",
+            type = ImplType.expectfirst)
     public static HttpServletRequest getRequest() {
         return currentRequest();
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getResponse",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getResponse",
+            type = ImplType.expectfirst)
     public static HttpServletResponse getResponse() {
         return currentResponse();
     }
@@ -60,10 +61,9 @@ public class SpringWebContextBridge {
             new WeakReference<ServletContext>(null);
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getServletContext",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getServletContext",
+            type = ImplType.expectfirst)
     public static ServletContext getServletContext() {
         return currentServletContext();
     }

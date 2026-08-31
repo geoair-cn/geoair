@@ -3,13 +3,15 @@ package cn.geoair.map.dynamic.adv.mybatis.tag;
 import cn.geoair.map.dynamic.adv.mybatis.node.IfSqlNode;
 import cn.geoair.map.dynamic.adv.mybatis.node.MixedSqlNode;
 import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
-import java.util.List;
+
 import org.dom4j.Element;
+
+import java.util.List;
 
 /**
  * {@code <if>} 标签处理器。
- * <p>
- * 从 XML 元素中提取 {@code test} 属性，递归解析子元素，构建 {@link IfSqlNode}。
+ *
+ * <p>从 XML 元素中提取 {@code test} 属性，递归解析子元素，构建 {@link IfSqlNode}。
  *
  * @author zhangjun
  */

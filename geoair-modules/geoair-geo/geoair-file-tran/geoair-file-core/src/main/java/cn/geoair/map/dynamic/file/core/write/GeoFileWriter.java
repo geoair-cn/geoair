@@ -5,11 +5,10 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 
-import java.io.Closeable;
 import org.geotools.api.feature.simple.SimpleFeatureType;
+
+import java.io.Closeable;
 import java.util.List;
-
-
 
 /**
  * @author ：张逢吉

@@ -6,9 +6,8 @@ import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 /**
  * JDBC URL 的统一解析、构造及语义化重写入口。
  *
- * <p>调用方通过本接口处理 JDBC URL，不应自行按 {@code ?}、{@code ;} 或字符串下标拆分连接串。
- * 具体语法由 {@link JdbcUrlDialect} 实现；无法识别的驱动会返回 {@link DatabaseType#UNKNOWN}
- * 的不透明 URL，以避免重写操作破坏驱动私有格式。</p>
+ * <p>调用方通过本接口处理 JDBC URL，不应自行按 {@code ?}、{@code ;} 或字符串下标拆分连接串。 具体语法由 {@link JdbcUrlDialect}
+ * 实现；无法识别的驱动会返回 {@link DatabaseType#UNKNOWN} 的不透明 URL，以避免重写操作破坏驱动私有格式。
  *
  * @author 张逢吉
  */
@@ -17,7 +16,7 @@ public interface JdbcUrlCodec {
     /**
      * 将 JDBC URL 解析为结构化对象。
      *
-     * <p>已注册方言会提取端点、数据库名与参数；未知驱动保留原始 URL，不会猜测其内部结构。</p>
+     * <p>已注册方言会提取端点、数据库名与参数；未知驱动保留原始 URL，不会猜测其内部结构。
      *
      * @param jdbcUrl 原始 JDBC URL，必须以 {@code jdbc:} 开头
      * @return 解析后的不可变 JDBC URL 对象
@@ -28,8 +27,8 @@ public interface JdbcUrlCodec {
     /**
      * 按指定数据库类型构建一个不含业务参数的 JDBC URL。
      *
-     * <p>数据库类型决定 URL 主体格式，例如 PostgreSQL 使用路径数据库名，SQL Server 使用
-     * {@code databaseName} 分号参数。需要追加普通驱动参数时请使用 {@link #withProperty}。</p>
+     * <p>数据库类型决定 URL 主体格式，例如 PostgreSQL 使用路径数据库名，SQL Server 使用 {@code databaseName}
+     * 分号参数。需要追加普通驱动参数时请使用 {@link #withProperty}。
      *
      * @param databaseType 数据库类型，必须已注册对应方言
      * @param host 数据库主机；本地文件型数据库可为 null
@@ -43,8 +42,7 @@ public interface JdbcUrlCodec {
     /**
      * 将结构化 JDBC URL 渲染为连接字符串。
      *
-     * <p>参数按照原有顺序输出，并使用该 URL 的参数风格：查询参数使用 {@code ?/&}，
-     * SQL Server 和 H2 等使用 {@code ;}。</p>
+     * <p>参数按照原有顺序输出，并使用该 URL 的参数风格：查询参数使用 {@code ?/&}， SQL Server 和 H2 等使用 {@code ;}。
      *
      * @param jdbcUrl 需要渲染的 JDBC URL 对象
      * @return JDBC 连接字符串
@@ -55,7 +53,7 @@ public interface JdbcUrlCodec {
     /**
      * 新增或替换一个普通驱动参数。
      *
-     * <p>该方法不修改传入对象，而是返回新对象；同名参数会合并为一个，保留第一次出现的位置。</p>
+     * <p>该方法不修改传入对象，而是返回新对象；同名参数会合并为一个，保留第一次出现的位置。
      *
      * @param jdbcUrl 原始结构化 JDBC URL
      * @param name 参数名
@@ -76,8 +74,8 @@ public interface JdbcUrlCodec {
     /**
      * 使用数据库方言定义的参数名重写当前 schema。
      *
-     * <p>例如 PostgreSQL 使用 {@code currentSchema}、Oracle 使用 {@code defaultSchema}、
-     * SQL Server 使用 {@code schemaName}、H2 使用 {@code schema}。不支持该语义的驱动会拒绝操作。</p>
+     * <p>例如 PostgreSQL 使用 {@code currentSchema}、Oracle 使用 {@code defaultSchema}、 SQL Server 使用
+     * {@code schemaName}、H2 使用 {@code schema}。不支持该语义的驱动会拒绝操作。
      *
      * @param jdbcUrl 原始 JDBC URL
      * @param schema 要设置的 schema；为空时原样返回 URL

@@ -4,9 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * 压缩条目的资源限制，避免异常归档文件耗尽 JVM 内存。
- */
+/** 压缩条目的资源限制，避免异常归档文件耗尽 JVM 内存。 */
 public final class DecompressionLimits {
 
     /** 单个压缩条目的最大压缩大小，默认 128 MiB。 */
@@ -15,8 +13,7 @@ public final class DecompressionLimits {
     /** 单个解压条目的最大大小，默认 256 MiB。 */
     private static volatile long maxDecompressedEntrySize = 256L * 1024L * 1024L;
 
-    private DecompressionLimits() {
-    }
+    private DecompressionLimits() {}
 
     public static void validateCompressedSize(long size) throws IOException {
         if (size < 0 || size > maxCompressedEntrySize) {
@@ -34,9 +31,7 @@ public final class DecompressionLimits {
         return maxCompressedEntrySize;
     }
 
-    /**
-     * 设置单个压缩条目的最大压缩大小，单位为字节。
-     */
+    /** 设置单个压缩条目的最大压缩大小，单位为字节。 */
     public static void setMaxCompressedEntrySize(long maxCompressedEntrySize) {
         validateLimit(maxCompressedEntrySize, "最大压缩条目大小");
         DecompressionLimits.maxCompressedEntrySize = maxCompressedEntrySize;
@@ -46,9 +41,7 @@ public final class DecompressionLimits {
         return maxDecompressedEntrySize;
     }
 
-    /**
-     * 设置单个解压条目的最大大小，单位为字节。
-     */
+    /** 设置单个解压条目的最大大小，单位为字节。 */
     public static void setMaxDecompressedEntrySize(long maxDecompressedEntrySize) {
         validateLimit(maxDecompressedEntrySize, "最大解压条目大小");
         DecompressionLimits.maxDecompressedEntrySize = maxDecompressedEntrySize;

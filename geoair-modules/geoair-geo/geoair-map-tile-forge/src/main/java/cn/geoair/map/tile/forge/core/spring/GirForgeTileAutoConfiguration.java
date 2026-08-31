@@ -7,19 +7,19 @@ import cn.geoair.map.tile.forge.core.config.SpringProviderConfig;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 @EnableConfigurationProperties({SpringProviderConfig.class, TileTempPathConfig.class})
 public class GirForgeTileAutoConfiguration {
 
-    private static final GiLogger log = GirLoggerFactory.getLogger(GirForgeTileAutoConfiguration.class);
-
+    private static final GiLogger log =
+            GirLoggerFactory.getLogger(GirForgeTileAutoConfiguration.class);
 
     private final ObjectProvider<GirLayerConfigContextHelper> contextHelperProvider;
 
@@ -34,15 +34,16 @@ public class GirForgeTileAutoConfiguration {
         GirLayerConfigContextHelper contextHelper = contextHelperProvider.getIfAvailable();
 
         if (contextHelper == null) {
-            String errorMsg = String.join("\n",
-                    "========================================",
-                    "【GirForge 启动失败】",
-                    "依赖 Bean GirLayerConfigContextHelper 未找到！",
-                    "========================================",
-                    "解决方案：",
-                    "1. 客户端手动实现 GirLayerConfigContextHelper 该接口",
-                    "========================================"
-            );
+            String errorMsg =
+                    String.join(
+                            "\n",
+                            "========================================",
+                            "【GirForge 启动失败】",
+                            "依赖 Bean GirLayerConfigContextHelper 未找到！",
+                            "========================================",
+                            "解决方案：",
+                            "1. 客户端手动实现 GirLayerConfigContextHelper 该接口",
+                            "========================================");
             log.error(errorMsg);
             throw new IllegalStateException(errorMsg);
         }
@@ -57,10 +58,8 @@ public class GirForgeTileAutoConfiguration {
 
         if (contextHelper == null) {
             throw new IllegalStateException(
-                    "GirLayerConfigContextHelper Bean 不存在，无法创建 GirMapTileService"
-            );
+                    "GirLayerConfigContextHelper Bean 不存在，无法创建 GirMapTileService");
         }
-
 
         return new GirMapTileService(contextHelper, adapter);
     }

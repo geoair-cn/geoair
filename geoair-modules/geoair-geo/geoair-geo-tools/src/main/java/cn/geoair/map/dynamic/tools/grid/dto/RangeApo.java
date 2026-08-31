@@ -1,14 +1,14 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
 import lombok.Data;
+
 import org.locationtech.jts.geom.Envelope;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/12/14 18:28 @description： 瓦片索引范围。
- *
- * <p>四个索引均为闭区间：{@code [minX, maxX] × [minY, maxY]}。因此使用本对象
- * 枚举瓦片时，最大 X/Y 必须参与遍历。该约定与既有融合、预缓存和瓦片列表链路一致。</p>
+ *     <p>四个索引均为闭区间：{@code [minX, maxX] × [minY, maxY]}。因此使用本对象 枚举瓦片时，最大 X/Y
+ *     必须参与遍历。该约定与既有融合、预缓存和瓦片列表链路一致。
  */
 @Data
 public class RangeApo {
@@ -83,6 +83,4 @@ public class RangeApo {
     public Envelope getEnvelope() {
         return envelope;
     }
-
-
 }

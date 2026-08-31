@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-jts-all</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
 
   <packaging>jar</packaging>
   <name>geoair-jts-all</name>
@@ -179,7 +179,6 @@
       <version>${geotools.version}</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-wmts</artifactId>
@@ -241,12 +240,11 @@
       <version>${geotools.version}</version>
     </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>org.geotools</groupId>-->
-<!--      <artifactId>gt-geobuf</artifactId>-->
-<!--      <version>${geotools.version}</version>-->
-<!--    </dependency>-->
-
+    <!--    <dependency>-->
+    <!--      <groupId>org.geotools</groupId>-->
+    <!--      <artifactId>gt-geobuf</artifactId>-->
+    <!--      <version>${geotools.version}</version>-->
+    <!--    </dependency>-->
 
     <dependency>
       <groupId>org.geotools</groupId>
@@ -297,7 +295,5 @@
     </dependency>
 
   </dependencies>
-
-
 
 </project>

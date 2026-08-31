@@ -6,13 +6,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-base-parent</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../geoair-base-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-standard</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-standard</name>
 
@@ -55,7 +55,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.6</geoair.version>
     <skipTests>true</skipTests>
   </properties>
 
@@ -137,8 +137,6 @@
     </dependencies>
   </dependencyManagement>
   <dependencies></dependencies>
-  <build>
-
-  </build>
+  <build></build>
 
 </project>

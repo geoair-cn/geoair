@@ -8,6 +8,11 @@ import cn.hutool.core.bean.BeanDesc;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.util.StrUtil;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,9 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
 /**
  * @author ：张逢吉
@@ -159,7 +161,8 @@ public class AdvBeanMappingMeta {
             registerLookup(propertyMeta.getPropertyName(), propertyMeta);
             registerLookup(propertyMeta.resolveColumnName(false), propertyMeta);
             registerLookup(StrUtil.toUnderlineCase(propertyMeta.getPropertyName()), propertyMeta);
-            registerLookup(StrUtil.toUnderlineCase(propertyMeta.resolveColumnName(false)), propertyMeta);
+            registerLookup(
+                    StrUtil.toUnderlineCase(propertyMeta.resolveColumnName(false)), propertyMeta);
             if (propertyMeta.isId()) {
                 idProperties.add(propertyMeta);
             }
@@ -175,7 +178,8 @@ public class AdvBeanMappingMeta {
         normalizedLookup.put(normalize(cleaned), meta);
     }
 
-    private boolean matchesIgnore(AdvBeanPropertyMeta property, Collection<String> ignoreFieldNames) {
+    private boolean matchesIgnore(
+            AdvBeanPropertyMeta property, Collection<String> ignoreFieldNames) {
         for (String ignore : ignoreFieldNames) {
             if (ignore == null) {
                 continue;
@@ -236,6 +240,7 @@ public class AdvBeanMappingMeta {
         private final Class<?> propertyType;
         private final boolean ignored;
         private final boolean id;
+
         @SuppressWarnings("rawtypes")
         private final AdvTypeHandler advTypeHandler;
 
@@ -261,8 +266,9 @@ public class AdvBeanMappingMeta {
         public static AdvBeanPropertyMeta of(Class<?> beanClass, Field field) {
             String propertyName = field.getName();
             String explicitColumnName = resolveExplicitColumnName(field);
-            boolean ignored = field.getAnnotation(GirTransient.class) != null
-                    || field.getAnnotation(Transient.class) != null;
+            boolean ignored =
+                    field.getAnnotation(GirTransient.class) != null
+                            || field.getAnnotation(Transient.class) != null;
             boolean id = field.getAnnotation(Id.class) != null;
             GaModelField gaModelField = field.getAnnotation(GaModelField.class);
             if (gaModelField != null && gaModelField.isID()) {
@@ -276,12 +282,25 @@ public class AdvBeanMappingMeta {
                     advTypeHandler = handlerClass.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     throw new RuntimeException(
-                            "实例化类型处理器失败: " + handlerClass.getName()
-                                    + " (字段: " + beanClass.getName() + "." + propertyName + ")", e);
+                            "实例化类型处理器失败: "
+                                    + handlerClass.getName()
+                                    + " (字段: "
+                                    + beanClass.getName()
+                                    + "."
+                                    + propertyName
+                                    + ")",
+                            e);
                 }
             }
             return new AdvBeanPropertyMeta(
-                    beanClass, field, propertyName, explicitColumnName, field.getType(), ignored, id, advTypeHandler);
+                    beanClass,
+                    field,
+                    propertyName,
+                    explicitColumnName,
+                    field.getType(),
+                    ignored,
+                    id,
+                    advTypeHandler);
         }
 
         public Class<?> getBeanClass() {

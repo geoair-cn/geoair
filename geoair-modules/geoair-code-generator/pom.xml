@@ -5,13 +5,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-code-generator</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-code-generator</name>
 
@@ -37,7 +37,7 @@
 
   <modules>
     <module>geoair-code-gen-module</module>
-<!--    <module>geoair-code-gen-demo</module>-->
+    <!--    <module>geoair-code-gen-demo</module>-->
   </modules>
 
   <scm>
@@ -55,8 +55,8 @@
         <version>${velocity.version}</version>
         <exclusions>
           <exclusion>
-            <artifactId>commons-collections</artifactId>
             <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -86,15 +86,15 @@
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>0.9.0</version>
             <extensions>false</extensions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
             <executions>
               <execution>
                 <id>injected-central-publishing</id>
                 <phase>none</phase>
               </execution>
             </executions>
-            <configuration>
-              <publishingServerId>skip</publishingServerId>
-            </configuration>
           </plugin>
         </plugins>
       </build>

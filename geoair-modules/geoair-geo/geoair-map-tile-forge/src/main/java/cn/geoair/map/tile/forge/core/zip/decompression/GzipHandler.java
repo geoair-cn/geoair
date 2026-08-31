@@ -1,22 +1,18 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
-/**
- * GZIP解压适配器
- */
+/** GZIP解压适配器 */
 public class GzipHandler implements DecompressionHandler {
-
-
 
     @Override
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
         DecompressionLimits.validateExpectedSize(expectedSize);
         byte[] uncompressed;
-        try (GZIPInputStream inputStream = new GZIPInputStream(new ByteArrayInputStream(compressedData))) {
+        try (GZIPInputStream inputStream =
+                new GZIPInputStream(new ByteArrayInputStream(compressedData))) {
             uncompressed = DecompressionLimits.readAllLimited(inputStream);
         }
         // 校验大小（可选）

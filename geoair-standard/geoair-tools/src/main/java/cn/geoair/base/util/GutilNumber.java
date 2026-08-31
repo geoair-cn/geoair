@@ -26,9 +26,7 @@ public abstract class GutilNumber {
 
     private static final BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
 
-    /**
-     * 标准数字类型（均为不可变类型）：Byte、Short、Integer、Long、BigInteger、Float、Double、BigDecimal。
-     */
+    /** 标准数字类型（均为不可变类型）：Byte、Short、Integer、Long、BigInteger、Float、Double、BigDecimal。 */
     public static final Set<Class<?>> STANDARD_NUMBER_TYPES;
 
     static {
@@ -160,8 +158,7 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 将给定的 {@code text} 解析为给定目标类的 {@link Number} 实例，使用对应的 {@code decode} /
-     * {@code valueOf} 方法。
+     * 将给定的 {@code text} 解析为给定目标类的 {@link Number} 实例，使用对应的 {@code decode} / {@code valueOf} 方法。
      *
      * <p>在尝试解析数字之前，会去除输入 {@code String} 中的所有空白字符（首部、尾部和字符之间）。
      *
@@ -219,8 +216,8 @@ public abstract class GutilNumber {
      *
      * @param text 要转换的文本
      * @param targetClass 解析的目标类
-     * @param numberFormat 用于解析的 {@code NumberFormat}（如果为 {@code null}，
-     *     本方法回退到 {@link #parseNumber(String, Class)}）
+     * @param numberFormat 用于解析的 {@code NumberFormat}（如果为 {@code null}， 本方法回退到 {@link
+     *     #parseNumber(String, Class)}）
      * @return 解析后的数字
      * @throws IllegalArgumentException 如果不支持目标类（即不是 JDK 内置的标准 Number 子类）
      * @see java.text.NumberFormat#parse
@@ -236,7 +233,8 @@ public abstract class GutilNumber {
             NumberFormat parseFormat = numberFormat;
             if (numberFormat instanceof DecimalFormat) {
                 // 拷贝一份再操作，避免修改调用方传入的DecimalFormat
-                DecimalFormat decimalFormat = (DecimalFormat) ((DecimalFormat) numberFormat).clone();
+                DecimalFormat decimalFormat =
+                        (DecimalFormat) ((DecimalFormat) numberFormat).clone();
                 if (BigDecimal.class == targetClass && !decimalFormat.isParseBigDecimal()) {
                     decimalFormat.setParseBigDecimal(true);
                 }
@@ -254,8 +252,7 @@ public abstract class GutilNumber {
     }
 
     /**
-     * 判断给定的 {@code value} 字符串是否表示十六进制数字，即需要传入 {@code Integer.decode}
-     * 而不是 {@code Integer.valueOf} 等。
+     * 判断给定的 {@code value} 字符串是否表示十六进制数字，即需要传入 {@code Integer.decode} 而不是 {@code Integer.valueOf} 等。
      */
     private static boolean isHexNumber(String value) {
         int index = (value.startsWith("-") ? 1 : 0);
@@ -1600,8 +1597,7 @@ public abstract class GutilNumber {
         GutilAssert.isTrue(size >= 0, "Size must be >= 0!");
         long range = (long) end - begin;
         if (range < size) {
-            throw new IllegalArgumentException(
-                    "Size is larger than range between begin and end!");
+            throw new IllegalArgumentException("Size is larger than range between begin and end!");
         }
         if (range > Integer.MAX_VALUE) {
             throw new IllegalArgumentException(
@@ -1686,8 +1682,7 @@ public abstract class GutilNumber {
         }
         long range = (long) end - begin;
         if (range < size) {
-            throw new IllegalArgumentException(
-                    "Size is larger than range between begin and end!");
+            throw new IllegalArgumentException("Size is larger than range between begin and end!");
         }
         if (range > Integer.MAX_VALUE) {
             throw new IllegalArgumentException(

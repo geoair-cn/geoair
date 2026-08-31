@@ -4,15 +4,16 @@ import cn.hutool.core.util.StrUtil;
 
 /**
  * 数据库类型的统一元数据接口，描述一个数据库字段类型的完整语义。
- * <p>
- * 本接口是类型体系的核心契约，为 SQL DDL 生成、字段类型判断、Java 类型映射提供统一基础。
- * 主要实现者：
+ *
+ * <p>本接口是类型体系的核心契约，为 SQL DDL 生成、字段类型判断、Java 类型映射提供统一基础。 主要实现者：
+ *
  * <ul>
- *   <li>{@link DefaultJavaType} — Java 类型枚举，描述 Java 侧的类型语义</li>
- *   <li>{@link DataBaseFieldType} — 继承本接口，增加数据库特定的 UDT 名称映射能力</li>
+ *   <li>{@link DefaultJavaType} — Java 类型枚举，描述 Java 侧的类型语义
+ *   <li>{@link DataBaseFieldType} — 继承本接口，增加数据库特定的 UDT 名称映射能力
  * </ul>
  *
  * <h3>类型分类体系</h3>
+ *
  * <pre>
  * CategoryGroupEnum (大分组: STRING / NUMBER / DATETIME / ...)
  *   └── CategoryEnum (二级分组: CHAR / TEXT / INT / FLOAT / DATE / TIMESTAMP / ...)
@@ -77,8 +78,8 @@ public interface TypeMetadata {
 
     /**
      * 获取该类型对应的 Java 类。
-     * <p>
-     * 例如：VARCHAR → String.class，NUMERIC → BigDecimal.class，GEOMETRY → byte[].class
+     *
+     * <p>例如：VARCHAR → String.class，NUMERIC → BigDecimal.class，GEOMETRY → byte[].class
      *
      * @return 对应的 Java 类
      */
@@ -95,54 +96,50 @@ public interface TypeMetadata {
 
     /**
      * 类型的运行时配置，封装 SQL DDL 生成所需的元信息。
-     * <p>
-     * 主要包含两部分：
+     *
+     * <p>主要包含两部分：
+     *
      * <ul>
-     *   <li><b>忽略策略</b> — ignoreLength/ignorePrecision/ignoreScale，决定 SQL 生成时是否输出长度/精度/小数位参数</li>
-     *   <li><b>列引用</b> — lengthRefers/precisionRefers/scaleRefers，从数据库元数据读取时对应的实际列名</li>
+     *   <li><b>忽略策略</b> — ignoreLength/ignorePrecision/ignoreScale，决定 SQL 生成时是否输出长度/精度/小数位参数
+     *   <li><b>列引用</b> — lengthRefers/precisionRefers/scaleRefers，从数据库元数据读取时对应的实际列名
      * </ul>
      *
      * <p>通常通过 {@link CategoryEnum#config()} 获取实例，而非直接构造。
      */
     class Config {
 
-        /**
-         * SQL 数据类型，用于比较数据类型是否相同。不提供则根据NAME生成
-         */
+        /** SQL 数据类型，用于比较数据类型是否相同。不提供则根据NAME生成 */
         private String meta;
 
-        /**
-         * SQL生成公式，如 INTERVAL DAY({p}) TO HOUR。不提供则根据NAME生成
-         */
+        /** SQL生成公式，如 INTERVAL DAY({p}) TO HOUR。不提供则根据NAME生成 */
         private String formula;
 
-        /**
-         * 是否忽略长度：-1未设置(继承上级)，0不忽略，1忽略，2视情况，3精度和小数位互依赖
-         */
+        /** 是否忽略长度：-1未设置(继承上级)，0不忽略，1忽略，2视情况，3精度和小数位互依赖 */
         private int ignoreLength = -1;
+
         private int ignorePrecision = -1;
         private int ignoreScale = -1;
 
-        /**
-         * 从元数据读取时，字符类型长度对应的列。多列以,分隔
-         */
+        /** 从元数据读取时，字符类型长度对应的列。多列以,分隔 */
         private String[] lengthRefers;
 
-        /**
-         * 从元数据读取时，数字类型长度对应的列
-         */
+        /** 从元数据读取时，数字类型长度对应的列 */
         private String[] precisionRefers;
 
-        /**
-         * 从元数据读取时，小数位对应的列
-         */
+        /** 从元数据读取时，小数位对应的列 */
         private String[] scaleRefers;
 
-        public Config() {
-        }
+        public Config() {}
 
-        public Config(String meta, String formula, String lengthRefer, String precisionRefer,
-                      String scaleRefer, int ignoreLength, int ignorePrecision, int ignoreScale) {
+        public Config(
+                String meta,
+                String formula,
+                String lengthRefer,
+                String precisionRefer,
+                String scaleRefer,
+                int ignoreLength,
+                int ignorePrecision,
+                int ignoreScale) {
             setMeta(meta);
             setFormula(formula);
             setLengthRefer(lengthRefer);
@@ -153,8 +150,13 @@ public interface TypeMetadata {
             this.ignoreScale = ignoreScale;
         }
 
-        public Config(String lengthRefer, String precisionRefer, String scaleRefer,
-                      int ignoreLength, int ignorePrecision, int ignoreScale) {
+        public Config(
+                String lengthRefer,
+                String precisionRefer,
+                String scaleRefer,
+                int ignoreLength,
+                int ignorePrecision,
+                int ignoreScale) {
             setLengthRefer(lengthRefer);
             setScaleRefer(scaleRefer);
             setPrecisionRefer(precisionRefer);
@@ -225,7 +227,9 @@ public interface TypeMetadata {
         }
 
         public String getPrecisionRefer() {
-            return (null != precisionRefers && precisionRefers.length > 0) ? precisionRefers[0] : null;
+            return (null != precisionRefers && precisionRefers.length > 0)
+                    ? precisionRefers[0]
+                    : null;
         }
 
         public Config setPrecisionRefers(String[] precisionRefers) {
@@ -234,7 +238,8 @@ public interface TypeMetadata {
         }
 
         public Config setPrecisionRefer(String precisionRefer) {
-            this.precisionRefers = StrUtil.isNotEmpty(precisionRefer) ? precisionRefer.split(",") : null;
+            this.precisionRefers =
+                    StrUtil.isNotEmpty(precisionRefer) ? precisionRefer.split(",") : null;
             return this;
         }
 

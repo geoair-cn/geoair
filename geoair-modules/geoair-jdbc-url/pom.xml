@@ -1,62 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-modules</artifactId>
-        <version>J17-dev-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+  <parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-jdbc-url</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>geoair-jdbc-url</name>
-    <description>geoair JDBC URL 解析、重写与构建组件</description>
+    <artifactId>geoair-modules</artifactId>
+    <version>J17.1.6</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-jdbc-url</artifactId>
+  <version>J17.1.6</version>
+  <packaging>jar</packaging>
+  <name>geoair-jdbc-url</name>
+  <description>geoair JDBC URL 解析、重写与构建组件</description>
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zfj20250104@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/geoair-cn/geoair</url>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>zfj20250104@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/geoair-cn/geoair</url>
-    </scm>
-    <dependencies>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>${hutool.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit-jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

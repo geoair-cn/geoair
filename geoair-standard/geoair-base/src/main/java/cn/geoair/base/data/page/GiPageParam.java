@@ -41,9 +41,7 @@ public interface GiPageParam extends Serializable {
      */
     boolean isPageNumStartZero();
 
-    /**
-     * 设置分页是否从0开始
-     */
+    /** 设置分页是否从0开始 */
     GiPageParam setPageNumStartZero(boolean pageNumStartZero);
 
     /**
@@ -64,7 +62,7 @@ public interface GiPageParam extends Serializable {
      * 设置分页参数
      *
      * @param pageSize 每页记录数
-     * @param pageNum  页码
+     * @param pageNum 页码
      * @param startRow 游标开始行号
      * @return 分页参数对象
      */
@@ -73,13 +71,14 @@ public interface GiPageParam extends Serializable {
     /**
      * 设置分页参数
      *
-     * @param pageSize         每页记录数
-     * @param pageNum          页码
-     * @param startRow         游标开始行号
+     * @param pageSize 每页记录数
+     * @param pageNum 页码
+     * @param startRow 游标开始行号
      * @param pageNumStartZero 获取分页是不是从0开始
      * @return 分页参数对象
      */
-    GirPageParam putParam(Integer pageSize, Integer pageNum, Long startRow, boolean pageNumStartZero);
+    GirPageParam putParam(
+            Integer pageSize, Integer pageNum, Long startRow, boolean pageNumStartZero);
 
     /**
      * 设置排序条件
@@ -110,7 +109,7 @@ public interface GiPageParam extends Serializable {
      * 初始化一个GiPageParam对象。
      *
      * @param pageSize 每页记录数
-     * @param pageNum  页码
+     * @param pageNum 页码
      * @param startRow 游标开始行号
      * @return GiPageParam实例
      */

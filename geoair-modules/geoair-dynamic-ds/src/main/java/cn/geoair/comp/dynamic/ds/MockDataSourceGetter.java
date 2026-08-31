@@ -5,9 +5,10 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.function.Supplier;
+
+import javax.sql.DataSource;
 
 /**
  * @author ：zhangjun
@@ -21,26 +22,17 @@ public class MockDataSourceGetter implements IDsDataSourceOpt {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
+    @Override
+    public void initByDataSourceApo(DataSourceApo dataSourceApo) {}
 
     @Override
-    public void initByDataSourceApo(DataSourceApo dataSourceApo) {
-
-    }
+    public void initByDataSource(DataSource dataSource) {}
 
     @Override
-    public void initByDataSource(DataSource dataSource) {
-
-    }
+    public void initByDataSource(DataSource dataSource, String dataSourceName) {}
 
     @Override
-    public void initByDataSource(DataSource dataSource, String dataSourceName) {
-
-    }
-
-    @Override
-    public void initByConnection(Connection connection) {
-
-    }
+    public void initByConnection(Connection connection) {}
 
     @Override
     public String getSchemaName() {
@@ -53,20 +45,15 @@ public class MockDataSourceGetter implements IDsDataSourceOpt {
     }
 
     @Override
-    public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {
-
-    }
+    public void setSchemaNameGetterFunction(Supplier<String> schemaNameGetterFunction) {}
 
     @Override
-    public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
-
-    }
+    public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {}
 
     @Override
     public String getDataSourceId() {
         return "";
     }
-
 
     @Override
     public DataSourceApo getDataSourceApo() {
@@ -77,6 +64,4 @@ public class MockDataSourceGetter implements IDsDataSourceOpt {
     public DataSource getDataSource() {
         return null;
     }
-
-
 }

@@ -2,9 +2,7 @@ package cn.geoair.base.test;
 
 import cn.geoair.base.data.result.support.GirResult;
 
-/**
- * GirResult 示例
- */
+/** GirResult 示例 */
 public class GirResultExample {
 
     public static void main(String[] args) {

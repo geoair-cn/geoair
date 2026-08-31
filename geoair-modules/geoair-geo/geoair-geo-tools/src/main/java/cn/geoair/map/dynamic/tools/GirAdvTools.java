@@ -14,16 +14,13 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 /**
  * 地理空间工具的静态快捷入口。
  *
- * <p>所有方法均委托给 {@link GirGeoTools#defaultInstance()}，因此只能使用默认配置。
- * 需要自定义 {@link ToolsConfig}（例如 GeometryFactory、瓦片尺寸或 DPI）时，应直接使用
- * {@link GirGeoTools#getInstance(ToolsConfig)}，而不是本类。</p>
+ * <p>所有方法均委托给 {@link GirGeoTools#defaultInstance()}，因此只能使用默认配置。 需要自定义 {@link ToolsConfig}（例如
+ * GeometryFactory、瓦片尺寸或 DPI）时，应直接使用 {@link GirGeoTools#getInstance(ToolsConfig)}，而不是本类。
  *
  * @author 张逢吉
  * @date 2024/12/05
  */
-
 public class GirAdvTools {
-
 
     /**
      * 获取几何对象转数组操作接口

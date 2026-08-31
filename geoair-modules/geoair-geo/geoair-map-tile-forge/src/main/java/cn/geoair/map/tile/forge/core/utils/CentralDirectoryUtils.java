@@ -14,18 +14,18 @@ import java.util.List;
  */
 public class CentralDirectoryUtils {
 
-
-    public static void doInsert(List<TileCentralDirectoryModel> batchList, LayerPerFileDao layerPerFileDao) {
+    public static void doInsert(
+            List<TileCentralDirectoryModel> batchList, LayerPerFileDao layerPerFileDao) {
         List<TileCentralDirectoryModel> insertList = new ArrayList<>(batchList);
-        ForgeExecutorUtils.getExecutor().submit(() -> {
-            try {
-                layerPerFileDao.batchInsert(insertList);
-                insertList.clear();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        ForgeExecutorUtils.getExecutor()
+                .submit(
+                        () -> {
+                            try {
+                                layerPerFileDao.batchInsert(insertList);
+                                insertList.clear();
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
     }
-
-
 }

@@ -2,6 +2,7 @@ package cn.geoair.comp.jdbc.url.enums;
 
 import cn.hutool.db.dialect.DialectName;
 import cn.hutool.db.dialect.DriverNamePool;
+
 import lombok.Getter;
 
 /**
@@ -25,8 +26,10 @@ public enum DatabaseType {
 
     /** Hutool 数据库方言；旧版 Hutool 未包含的类型可能为 null。 */
     private final DialectName dialectName;
+
     /** Hutool 定义的 JDBC 驱动类名。 */
     private final String driverClassName;
+
     /** JDBC URL 中 jdbc: 之后的驱动协议名。 */
     private final String jdbcDriverName;
 

@@ -20,6 +20,7 @@ import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
+
 import lombok.Getter;
 
 import java.util.Collections;
@@ -29,10 +30,9 @@ import java.util.Map;
 /**
  * 地理空间工具的配置化入口。
  *
- * <p>一个 {@link ToolsConfig} 对象对应一个入口实例及其格式转换、SRID 转换等共享组件。
- * {@link #getInstance(ToolsConfig)} 按配置对象的<strong>引用身份</strong>缓存，而不是按配置字段值比较；
- * 因此需要复用缓存时，应复用同一个 {@code ToolsConfig} 实例。未传配置时使用
- * {@link #defaultInstance()} 的默认配置。</p>
+ * <p>一个 {@link ToolsConfig} 对象对应一个入口实例及其格式转换、SRID 转换等共享组件。 {@link #getInstance(ToolsConfig)}
+ * 按配置对象的<strong>引用身份</strong>缓存，而不是按配置字段值比较； 因此需要复用缓存时，应复用同一个 {@code ToolsConfig} 实例。未传配置时使用 {@link
+ * #defaultInstance()} 的默认配置。
  *
  * @author 张逢吉
  */
@@ -51,7 +51,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     private final GirGeoFormatOpt formatOpt;
     private final GirGeoMeasureOpt measureOpt;
     private final GirSridConvertOpt sridOpt;
-
 
     /**
      * 使用指定配置创建工具入口。
@@ -114,7 +113,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     public static GirGeoTools me() {
         return defaultInstance();
     }
-
 
     @Override
     public GirGeom2ArrayOpt getGeom2ArrayOpt() {

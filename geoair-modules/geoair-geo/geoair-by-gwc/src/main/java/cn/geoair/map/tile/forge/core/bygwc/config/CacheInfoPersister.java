@@ -1,9 +1,8 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
-
 
 import cn.geoair.map.tile.forge.core.bygwc.core.GeoWebCacheXStream;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+
 import com.thoughtworks.xstream.XStream;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ public class CacheInfoPersister {
 
     /**
      * 获取CacheInfoPersister实例
+     *
      * @return CacheInfoPersister实例
      */
     public static CacheInfoPersister getInstance() {
@@ -25,6 +25,7 @@ public class CacheInfoPersister {
 
     /**
      * 从XML字符串加载CacheInfo对象
+     *
      * @param reader 包含CacheInfo XML数据的字符串
      * @return 解析后的CacheInfo对象
      */
@@ -38,6 +39,7 @@ public class CacheInfoPersister {
 
     /**
      * 获取并配置XStream实例，用于XML序列化和反序列化
+     *
      * @return 配置好的XStream实例
      */
     XStream getConfiguredXStream() {
@@ -45,7 +47,7 @@ public class CacheInfoPersister {
         XStream xs = new GeoWebCacheXStream();
 
         // 允许所有属于GWC包下的类进行反序列化
-        xs.allowTypesByWildcard(new String[]{"cn.geoair.map.tile.forge.bygwc.**"});
+        xs.allowTypesByWildcard(new String[] {"cn.geoair.map.tile.forge.bygwc.**"});
 
         // 设置XStream模式为不使用引用
         xs.setMode(XStream.NO_REFERENCES);
@@ -93,6 +95,7 @@ public class CacheInfoPersister {
 
     /**
      * 解析图层边界XML文件
+     *
      * @param layerBoundsFile 包含边界信息的XML字符串
      * @return 解析后的BoundingBox对象
      */

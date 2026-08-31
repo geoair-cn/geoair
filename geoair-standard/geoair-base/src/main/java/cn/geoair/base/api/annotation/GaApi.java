@@ -1,6 +1,7 @@
 package cn.geoair.base.api.annotation;
 
 import cn.geoair.base.def.annotation.GaParameter;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

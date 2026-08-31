@@ -45,6 +45,7 @@ public class GirCacheMap<K, V> implements Map<K, V> {
         hashMap = new ConcurrentHashMap<K, V>();
         timeMap = new ConcurrentHashMap<K, Long>();
     }
+
     /*
      * public CacheMap(Map<? extends K, ? extends V> m) { hashMap = new
      * ConcurrentHashMap<K,V>(m); timeMap = new ConcurrentHashMap<K,Long>(); }
@@ -183,6 +184,7 @@ public class GirCacheMap<K, V> implements Map<K, V> {
         }
         return len;
     }
+
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     /**

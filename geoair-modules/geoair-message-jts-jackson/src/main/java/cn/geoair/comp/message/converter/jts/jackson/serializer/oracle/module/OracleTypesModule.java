@@ -1,7 +1,9 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module;
 
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.*;
+
 import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import oracle.sql.BLOB;
 import oracle.sql.CLOB;
 import oracle.sql.NCLOB;

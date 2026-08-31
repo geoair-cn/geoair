@@ -1,11 +1,13 @@
 package cn.geoair.comp.dynamic.ds.utils;
 
 import com.alibaba.druid.pool.DruidDataSource;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.sql.DataSource;
 import java.util.function.Consumer;
+
+import javax.sql.DataSource;
 
 @Data
 @Accessors(chain = true)
@@ -30,16 +32,15 @@ public class DataSourceDruidFastCreate {
     private Boolean poolPreparedStatements = true;
     private Integer maxPoolPreparedStatementPerConnectionSize = 20;
 
-    private Integer removeAbandonedTimeout = 60 * 10;      // 连接泄漏回收超时（秒）
-    private Boolean removeAbandoned = true;      // 连接泄漏回收超时（秒）
-    private Integer connectionErrorRetryAttempts = 3;  // 连接错误重试次数
-    private String validationQuery;                    // 验证查询SQL
-    private Integer numTestsPerEvictionRun = -1;       // 每次检测的连接数
-    private Boolean readOnly;   // 是否只读数据源
+    private Integer removeAbandonedTimeout = 60 * 10; // 连接泄漏回收超时（秒）
+    private Boolean removeAbandoned = true; // 连接泄漏回收超时（秒）
+    private Integer connectionErrorRetryAttempts = 3; // 连接错误重试次数
+    private String validationQuery; // 验证查询SQL
+    private Integer numTestsPerEvictionRun = -1; // 每次检测的连接数
+    private Boolean readOnly; // 是否只读数据源
 
-    private Consumer<DruidDataSource> configurator = t -> {
+    private Consumer<DruidDataSource> configurator = t -> {};
 
-    };
     ;
 
     // ==================== 静态工厂方法 ====================
@@ -47,7 +48,7 @@ public class DataSourceDruidFastCreate {
     /**
      * 快速创建数据源（仅使用必需参数）
      *
-     * @param url      数据库连接URL
+     * @param url 数据库连接URL
      * @param username 用户名
      * @param password 密码
      * @return Druid 数据源
@@ -64,6 +65,7 @@ public class DataSourceDruidFastCreate {
      * 使用 Consumer 配置模式创建数据源
      *
      * <p>使用示例：
+     *
      * <pre>
      * DataSource ds = DataSourceDruidFastCreate.create(builder -> builder
      *     .setUrl("jdbc:mysql://localhost:3306/test")
@@ -87,6 +89,7 @@ public class DataSourceDruidFastCreate {
      * 创建 Druid 数据源（支持自定义配置扩展）
      *
      * <p>使用示例：
+     *
      * <pre>
      * DataSource ds = DataSourceDruidFastCreate.create(
      *     "jdbc:mysql://localhost:3306/test",
@@ -100,18 +103,22 @@ public class DataSourceDruidFastCreate {
      * );
      * </pre>
      *
-     * @param url        数据库连接URL
-     * @param username   用户名
-     * @param password   密码
+     * @param url 数据库连接URL
+     * @param username 用户名
+     * @param password 密码
      * @param configurer 额外配置函数
      * @return Druid 数据源
      */
-    public static DataSource create(String url, String username, String password,
-                                    Consumer<DataSourceDruidFastCreate> configurer) {
-        DataSourceDruidFastCreate builder = new DataSourceDruidFastCreate()
-                .setUrl(url)
-                .setUsername(username)
-                .setPassword(password);
+    public static DataSource create(
+            String url,
+            String username,
+            String password,
+            Consumer<DataSourceDruidFastCreate> configurer) {
+        DataSourceDruidFastCreate builder =
+                new DataSourceDruidFastCreate()
+                        .setUrl(url)
+                        .setUsername(username)
+                        .setPassword(password);
         if (configurer != null) {
             configurer.accept(builder);
         }
@@ -121,7 +128,7 @@ public class DataSourceDruidFastCreate {
     /**
      * 快速创建数据源并返回 DruidDataSource 对象（支持更详细的配置）
      *
-     * @param url      数据库连接URL
+     * @param url 数据库连接URL
      * @param username 用户名
      * @param password 密码
      * @return DruidDataSource 对象
@@ -140,9 +147,7 @@ public class DataSourceDruidFastCreate {
         return (DruidDataSource) create(configurer);
     }
 
-    /**
-     * 创建 Druid 数据源
-     */
+    /** 创建 Druid 数据源 */
     public DataSource toDataSource() {
         // 参数校验
         if (url == null || url.trim().isEmpty()) {
@@ -197,7 +202,8 @@ public class DataSourceDruidFastCreate {
             dataSource.setQueryTimeout(queryTimeout);
         }
         if (maxPoolPreparedStatementPerConnectionSize != null) {
-            dataSource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
+            dataSource.setMaxPoolPreparedStatementPerConnectionSize(
+                    maxPoolPreparedStatementPerConnectionSize);
         }
         if (removeAbandonedTimeout != null) {
             dataSource.setRemoveAbandonedTimeout(removeAbandonedTimeout);

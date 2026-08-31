@@ -14,7 +14,8 @@ import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 /**
  * 地理空间工具包的统一入口契约。
  *
- * <p>实现类负责按 {@link ToolsConfig} 提供各类工具；接口本身不定义全局单例语义。</p>
+ * <p>实现类负责按 {@link ToolsConfig} 提供各类工具；接口本身不定义全局单例语义。
+ *
  * @author 张逢吉
  * @date 2024/12/05
  */
@@ -44,7 +45,7 @@ public interface GirGeoToolsInterface {
     /**
      * 获取 WGS84 等轴瓦片转换工具。
      *
-     * <p>该网格沿用既有的 Google/XYZ 顶部原点 Y 轴约定。</p>
+     * <p>该网格沿用既有的 Google/XYZ 顶部原点 Y 轴约定。
      *
      * @return EPSG:4326 等轴网格工具
      */
@@ -53,8 +54,8 @@ public interface GirGeoToolsInterface {
     /**
      * 获取 WGS84 非等轴瓦片转换工具。
      *
-     * <p>该网格在 z=3 时为 8 列 × 4 行；Y 轴方向仍默认 Google/XYZ 顶部原点。
-     * 如需 TMS 行号，应通过 {@code TileYAxis} 相关 API 显式转换。</p>
+     * <p>该网格在 z=3 时为 8 列 × 4 行；Y 轴方向仍默认 Google/XYZ 顶部原点。 如需 TMS 行号，应通过 {@code TileYAxis} 相关 API
+     * 显式转换。
      *
      * @return EPSG:4326 非等轴网格工具
      */
@@ -99,9 +100,8 @@ public interface GirGeoToolsInterface {
      * 创建分页执行器。
      *
      * @param pageConditionDef 分页查询、消费与异常处理定义
-     * @param <T>              单条记录类型
+     * @param <T> 单条记录类型
      * @return 新建的分页执行器；每次调用均返回独立执行器
      */
     <T> PageActuator<T> getPageActuatorOpt(PageConditionDef<T> pageConditionDef);
-
 }

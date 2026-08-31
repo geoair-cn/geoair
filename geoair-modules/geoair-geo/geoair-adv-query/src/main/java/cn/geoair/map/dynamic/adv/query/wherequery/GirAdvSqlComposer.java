@@ -8,13 +8,15 @@ import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.enums.AdvLogicOperatorEnums;
 import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 import cn.hutool.core.util.StrUtil;
+
 import lombok.Getter;
 
 import java.util.*;
 
 /**
  * SQL生成工具类
- * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理</p>
+ *
+ * <p>根据QueryRequest生成完整的SQL语句，支持数据库方言处理
  *
  * @author zhangjun
  */
@@ -23,14 +25,13 @@ public class GirAdvSqlComposer {
     private final DialectTableNameProcessor dialectProcessor;
     private final IDsDataSourceOpt dataSourceOpt;
 
-    public GirAdvSqlComposer(DialectTableNameProcessor dialectProcessor, IDsDataSourceOpt dataSourceOpt) {
+    public GirAdvSqlComposer(
+            DialectTableNameProcessor dialectProcessor, IDsDataSourceOpt dataSourceOpt) {
         this.dialectProcessor = dialectProcessor;
         this.dataSourceOpt = dataSourceOpt;
     }
 
-    /**
-     * 生成查询SQL
-     */
+    /** 生成查询SQL */
     public SqlBuildResult buildSelectSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             return buildCustomSql(param);
@@ -39,9 +40,7 @@ public class GirAdvSqlComposer {
         }
     }
 
-    /**
-     * 生成分页查询SQL
-     */
+    /** 生成分页查询SQL */
     public SqlBuildResult buildPageSql(GirAdvQueryRequest param) {
         SqlBuildResult result = buildSelectSql(param);
         if (param.hasPagination()) {
@@ -59,13 +58,13 @@ public class GirAdvSqlComposer {
         return result;
     }
 
-    /**
-     * 生成统计总数SQL
-     */
+    /** 生成统计总数SQL */
     public SqlBuildResult buildCountSql(GirAdvQueryRequest param) {
         if (param.isCustomSqlMode()) {
             String customSql = param.getCustomSql();
-            String countSql = dialectProcessor.tbBuildAsTable("SELECT COUNT(*) FROM (" + customSql + ")", "t");
+            String countSql =
+                    dialectProcessor.tbBuildAsTable(
+                            "SELECT COUNT(*) FROM (" + customSql + ")", "t");
             return new SqlBuildResult(countSql, new ArrayList<>());
         } else {
             // 如果有GROUP BY，需要统计分组后的记录数
@@ -81,16 +80,18 @@ public class GirAdvSqlComposer {
             boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
             if (b) {
                 String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
-                String aliasTable = StrUtil.format(format, param.getTableOrSqlView(), dialectProcessor.tbGetTempAliasTableName());
+                String aliasTable =
+                        StrUtil.format(
+                                format,
+                                param.getTableOrSqlView(),
+                                dialectProcessor.tbGetTempAliasTableName());
                 sql.append(aliasTable);
             } else {
-                String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                        dataSourceOpt,
-                        param.getTableOrSqlView()
-                );
+                String tableName =
+                        dialectProcessor.tbGetTableNameWithSchema(
+                                dataSourceOpt, param.getTableOrSqlView());
                 sql.append(tableName);
             }
-
 
             GirAdvWhereFilter where = param.getWhereOption();
             if (where != null && where.hasExpression()) {
@@ -104,10 +105,7 @@ public class GirAdvSqlComposer {
         }
     }
 
-    /**
-     * 生成带GROUP BY的统计总数SQL
-     * 统计分组后的记录数（即分组数量）
-     */
+    /** 生成带GROUP BY的统计总数SQL 统计分组后的记录数（即分组数量） */
     private SqlBuildResult buildGroupByCountSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
@@ -121,16 +119,17 @@ public class GirAdvSqlComposer {
         boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
         if (b) {
             String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
-            String aliasTableName = GutilObject.isEmpty(param.getSqlViewTableNameAlias()) ?
-                    dialectProcessor.tbGetTempAliasTableName() : param.getSqlViewTableNameAlias();
+            String aliasTableName =
+                    GutilObject.isEmpty(param.getSqlViewTableNameAlias())
+                            ? dialectProcessor.tbGetTempAliasTableName()
+                            : param.getSqlViewTableNameAlias();
             String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
             String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
             sql.append(aliasTable);
         } else {
-            String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceOpt,
-                    param.getTableOrSqlView()
-            );
+            String tableName =
+                    dialectProcessor.tbGetTableNameWithSchema(
+                            dataSourceOpt, param.getTableOrSqlView());
             sql.append(tableName);
         }
 
@@ -170,9 +169,7 @@ public class GirAdvSqlComposer {
         return new SqlBuildResult(sql.toString(), params);
     }
 
-    /**
-     * 构建对象模式SQL
-     */
+    /** 构建对象模式SQL */
     private SqlBuildResult buildObjectModeSql(GirAdvQueryRequest param) {
         StringBuilder sql = new StringBuilder();
         List<Object> params = new ArrayList<>();
@@ -195,16 +192,17 @@ public class GirAdvSqlComposer {
         boolean b = dialectProcessor.tbTableIsSqlView(param.getTableOrSqlView());
         if (b) {
             String format = dialectProcessor.tbBuildAsTable(" ( {} ) ", "{}");
-            String aliasTableName = GutilObject.isEmpty(param.getSqlViewTableNameAlias()) ?
-                    dialectProcessor.tbGetTempAliasTableName() : param.getSqlViewTableNameAlias();
+            String aliasTableName =
+                    GutilObject.isEmpty(param.getSqlViewTableNameAlias())
+                            ? dialectProcessor.tbGetTempAliasTableName()
+                            : param.getSqlViewTableNameAlias();
             String sqlView = dialectProcessor.tbRemoveSqlSpaces(param.getTableOrSqlView());
             String aliasTable = StrUtil.format(format, sqlView, aliasTableName);
             sql.append(aliasTable);
         } else {
-            String tableName = dialectProcessor.tbGetTableNameWithSchema(
-                    dataSourceOpt,
-                    param.getTableOrSqlView()
-            );
+            String tableName =
+                    dialectProcessor.tbGetTableNameWithSchema(
+                            dataSourceOpt, param.getTableOrSqlView());
             sql.append(tableName);
         }
 
@@ -250,7 +248,8 @@ public class GirAdvSqlComposer {
 
     /**
      * 构建 SELECT 字段列表
-     * <p>正确处理普通字段、表达式字段、GROUP BY 字段的关系</p>
+     *
+     * <p>正确处理普通字段、表达式字段、GROUP BY 字段的关系
      */
     private List<String> buildSelectFields(GirAdvQueryRequest param) {
         List<String> selectFields = new ArrayList<>();
@@ -283,7 +282,8 @@ public class GirAdvSqlComposer {
 
     /**
      * 对字段或表达式进行引用处理
-     * <p>如果是表达式则原样返回，如果是普通字段则添加引号</p>
+     *
+     * <p>如果是表达式则原样返回，如果是普通字段则添加引号
      */
     private String quoteFieldOrExpression(String field) {
         if (field == null || field.isEmpty()) {
@@ -295,9 +295,7 @@ public class GirAdvSqlComposer {
         return dialectProcessor.tbQuoteFieldName(field);
     }
 
-    /**
-     * 判断是否为SQL表达式
-     */
+    /** 判断是否为SQL表达式 */
     private boolean isSqlExpression(String field) {
         if (field == null || field.isEmpty()) {
             return false;
@@ -315,21 +313,34 @@ public class GirAdvSqlComposer {
         // 函数调用模式：字母开头+括号
         if (trimmed.matches("^[A-Za-z_][A-Za-z0-9_]*\\(.*\\)$")) {
             String funcName = trimmed.substring(0, trimmed.indexOf('(')).toUpperCase();
-            Set<String> sqlFunctions = new HashSet<>(Arrays.asList(
-                    "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR",
-                    "LENGTH", "NOW", "DATE", "YEAR", "MONTH", "DAY", "TRIM",
-                    "COALESCE", "NULLIF", "CAST", "CONVERT"
-            ));
+            Set<String> sqlFunctions =
+                    new HashSet<>(
+                            Arrays.asList(
+                                    "COUNT",
+                                    "SUM",
+                                    "AVG",
+                                    "MAX",
+                                    "MIN",
+                                    "CONCAT",
+                                    "SUBSTR",
+                                    "LENGTH",
+                                    "NOW",
+                                    "DATE",
+                                    "YEAR",
+                                    "MONTH",
+                                    "DAY",
+                                    "TRIM",
+                                    "COALESCE",
+                                    "NULLIF",
+                                    "CAST",
+                                    "CONVERT"));
             return sqlFunctions.contains(funcName);
         }
 
         return false;
     }
 
-
-    /**
-     * 构建自定义SQL模式
-     */
+    /** 构建自定义SQL模式 */
     private SqlBuildResult buildCustomSql(GirAdvQueryRequest param) {
         String sql = param.getCustomSql();
         List<Object> params = new ArrayList<>();
@@ -352,16 +363,13 @@ public class GirAdvSqlComposer {
         return new SqlBuildResult(sql, params);
     }
 
-
     public String buildWhereSql(GirAdvWhereFilter where, List<Object> params) {
         return buildWhereClause(where.getExpression(), params);
-
     }
 
-    /**
-     * 构建WHERE子句
-     */
-    public String buildWhereClause(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+    /** 构建WHERE子句 */
+    public String buildWhereClause(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
         if (expr == null) {
             return "";
         }
@@ -404,9 +412,11 @@ public class GirAdvSqlComposer {
 
     /**
      * 构建叶子条件
-     * <p>支持普通字段和SQL表达式两种模式</p>
+     *
+     * <p>支持普通字段和SQL表达式两种模式
      */
-    private String buildLeafCondition(GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
+    private String buildLeafCondition(
+            GirAdvWhereFilter.ConditionExpression expr, List<Object> params) {
         // 获取列名或表达式
         String column = expr.getColumn();
         AdvOperatorEnums operator = expr.getOperator();
@@ -467,9 +477,7 @@ public class GirAdvSqlComposer {
         return columnPart + " " + operator.getSqlValue() + " ?";
     }
 
-    /**
-     * 格式化LIKE值
-     */
+    /** 格式化LIKE值 */
     public static String formatLikeValue(AdvOperatorEnums operator, String value) {
         if (value == null) {
             return null;
@@ -525,9 +533,7 @@ public class GirAdvSqlComposer {
         }
     }
 
-    /**
-     * 构建ORDER BY子句
-     */
+    /** 构建ORDER BY子句 */
     private String buildOrderByClause(List<OrderApo> orders) {
         if (orders == null || orders.isEmpty()) {
             return "";
@@ -547,9 +553,7 @@ public class GirAdvSqlComposer {
         return String.join(", ", orderItems);
     }
 
-    /**
-     * SQL构建结果
-     */
+    /** SQL构建结果 */
     @Getter
     public static class SqlBuildResult {
         private final String sql;

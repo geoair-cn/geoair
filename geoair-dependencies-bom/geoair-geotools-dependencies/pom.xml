@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geotools-dependencies</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-geotools-dependencies</name>
   <description>geotools 的依赖声明</description>
@@ -178,21 +178,21 @@
         <version>${geotools.version}</version>
       </dependency>
 
-<!--      <dependency>-->
-<!--        <groupId>org.geotools</groupId>-->
-<!--        <artifactId>gt-geobuf</artifactId>-->
-<!--        <version>${geotools.version}</version>-->
-<!--      </dependency>-->
+      <!--      <dependency>-->
+      <!--        <groupId>org.geotools</groupId>-->
+      <!--        <artifactId>gt-geobuf</artifactId>-->
+      <!--        <version>${geotools.version}</version>-->
+      <!--      </dependency>-->
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-flatgeobuf</artifactId>
         <version>${geotools.version}</version>
       </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-s3-geotiff</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-s3-geotiff</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
         <artifactId>gt-http</artifactId>
@@ -408,7 +408,5 @@
 
     </dependencies>
   </dependencyManagement>
-
-
 
 </project>

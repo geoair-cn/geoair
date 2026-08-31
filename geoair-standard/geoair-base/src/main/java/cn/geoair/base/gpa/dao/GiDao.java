@@ -3,6 +3,7 @@ package cn.geoair.base.gpa.dao;
 import cn.geoair.base.bean.GirBeanHelper;
 import cn.geoair.base.data.model.GiModelable;
 import cn.geoair.base.util.GutilClass;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

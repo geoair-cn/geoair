@@ -1,25 +1,28 @@
 /**
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * <p>You should have received a copy of the GNU Lesser General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * <p>You should have received a copy of the GNU Lesser General Public License along with this
+ * program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Nicola Lagomarsini, GeoSolutions S.A.S., Copyright 2014
  */
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
 import ar.com.hjg.pngj.FilterType;
+
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
+
 import it.geosolutions.imageio.plugins.png.PNGWriter;
+
 import org.geotools.image.ImageWorker;
 import org.geotools.util.logging.Logging;
-
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -31,22 +34,28 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Subclass of the {@link ImageEncoderImpl} class optimized for the PNG format. It uses a new PNGEncoder which provides
- * better performances.
+ * Subclass of the {@link ImageEncoderImpl} class optimized for the PNG format. It uses a new
+ * PNGEncoder which provides better performances.
  */
 public class PNGImageEncoder extends ImageEncoderImpl {
     /** Filter type associated string */
     private static final String FILTER_TYPE = "filterType";
+
     /** Logger used */
     private static final Logger LOGGER = Logging.getLogger(PNGImageEncoder.class.getName());
+
     /** Supported mime types */
     private static List<String> supportedMimeTypes;
+
     /** Boolean used for disabling the png encoding */
     private boolean disablePNG;
+
     /** Boolean indicating if the aggressive output stream is supported */
     private final boolean isAggressiveSupported;
+
     /** Default quality value */
     private static final float DEFAULT_QUALITY = 1;
+
     /** Quality value */
     private final float quality;
 
@@ -83,7 +92,9 @@ public class PNGImageEncoder extends ImageEncoderImpl {
     }
 
     @Override
-    @SuppressWarnings("PMD.CloseResource") // the caller is in charge of destination's life cycle if its a stream
+    @SuppressWarnings(
+            "PMD.CloseResource") // the caller is in charge of destination's life cycle if its a
+    // stream
     public void encode(
             RenderedImage image,
             Object destination,
@@ -108,10 +119,11 @@ public class PNGImageEncoder extends ImageEncoderImpl {
                 if (destination instanceof OutputStream outputStream) {
                     boolean isScanlinePresent = writer.isScanlineSupported(image);
                     if (!isScanlinePresent) {
-                        image = new ImageWorker(image)
-                                .rescaleToBytes()
-                                .forceComponentColorModel()
-                                .getRenderedImage();
+                        image =
+                                new ImageWorker(image)
+                                        .rescaleToBytes()
+                                        .forceComponentColorModel()
+                                        .getRenderedImage();
                     }
                     Object filterObj = null;
                     if (map != null) {
@@ -134,7 +146,8 @@ public class PNGImageEncoder extends ImageEncoderImpl {
                     // Image writing
                     writer.writePNG(finalImage, stream, quality, filter);
                 } else {
-                    throw new IllegalArgumentException("Only an OutputStream can be provided to the PNGEncoder");
+                    throw new IllegalArgumentException(
+                            "Only an OutputStream can be provided to the PNGEncoder");
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -156,6 +169,7 @@ public class PNGImageEncoder extends ImageEncoderImpl {
             }
         }
     }
+
     /** Boolean indicating if the new PNG encoder is disabled */
     public boolean isDisablePNG() {
         return disablePNG;

@@ -9,12 +9,8 @@ import cn.geoair.map.dynamic.adv.query.DialectTableNameProcessor;
 import cn.geoair.map.dynamic.adv.query.IAdvBaseOpt;
 import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.*;
-import cn.geoair.comp.dynamic.ds.base.supplier.GirSysSupplierGetter;
-
-import cn.geoair.map.dynamic.adv.query.supplier.GirDataBaseNameGetter;
-import cn.geoair.map.dynamic.adv.query.supplier.GirSchemaNameGetter;
-import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.utils.AdvLogSql;
+import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.utils.AdvSqlParser;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.unit.DataSizeUtil;
@@ -28,9 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现
- */
+/** 数据库DDL操作抽象父类 封装所有数据库通用的DDL逻辑，差异化语法由子类实现 */
 public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     // 注入数据源获取器
@@ -49,8 +43,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         this.dataSourceGetter = dataSourceGetter;
         this.baseOpt = baseOpt;
         this.dialectTableNameProcessor = getDialectTableNameProcessor();
-//        this.dataSourceGetter.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
-//        this.dataSourceGetter.setDatabaseNameGetterFunction(new GirDataBaseNameGetter(this));
+        //        this.dataSourceGetter.setSchemaNameGetterFunction(new GirSchemaNameGetter(this));
+        //        this.dataSourceGetter.setDatabaseNameGetterFunction(new
+        // GirDataBaseNameGetter(this));
     }
 
     public IAdvBaseOpt getAdvBaseOpt() {
@@ -62,9 +57,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         return getAdvBaseOpt().getConfig();
     }
 
-    /**
-     * 创建表名处理器（子类实现：绑定PG/MySQL版本）
-     */
+    /** 创建表名处理器（子类实现：绑定PG/MySQL版本） */
     protected abstract DialectTableNameProcessor getDialectTableNameProcessor();
 
     /** 获取当前数据库方言类型 */
@@ -88,13 +81,16 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
         if (dataSync) {
             // 复制表结构及数据
-            String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
+            String createSql =
+                    buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
             dExecuteDDL(createSql, dstTableName, "复制表结构");
-            String copySql = buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
+            String copySql =
+                    buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
             dExecuteDDL(copySql, dstTableName, "复制数据");
         } else {
             // 仅复制表结构
-            String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
+            String createSql =
+                    buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
             dExecuteDDL(createSql, dstTableName, "复制表结构");
         }
     }
@@ -124,7 +120,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             throw new IllegalArgumentException("表名不能为空");
         }
         String qualifiedTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameWithSchema);
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameWithSchema);
         String sql = buildTruncateTableSql(qualifiedTableName);
         dExecuteDDL(sql, tableNameWithSchema, "清空表数据");
     }
@@ -135,7 +132,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             throw new IllegalArgumentException("表名不能为空");
         }
         String qualifiedTableName =
-                dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableNameWithSchema);
+                dialectTableNameProcessor.tbGetTableNameWithSchema(
+                        dataSourceGetter, tableNameWithSchema);
         String sql = buildDropTableSql(qualifiedTableName);
         dExecuteDDL(sql, tableNameWithSchema, "删除表");
     }
@@ -154,12 +152,16 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         String oldQualifiedName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, oldTableName);
         String newQualifiedName =
-                dialectTableNameProcessor.tbGetTableNameNotSchema(newTableName);  //  RENAME TO 不支持带模式名称
+                dialectTableNameProcessor.tbGetTableNameNotSchema(
+                        newTableName); //  RENAME TO 不支持带模式名称
 
         newQualifiedName = dialectTableNameProcessor.tbQuoteTableName(newQualifiedName);
 
         String sql = buildRenameTableSql(oldQualifiedName, newQualifiedName);
-        dExecuteDDL(sql, oldTableName, StrUtil.format(" 将表{}重命名为{} ", oldQualifiedName, newQualifiedName));
+        dExecuteDDL(
+                sql,
+                oldTableName,
+                StrUtil.format(" 将表{}重命名为{} ", oldQualifiedName, newQualifiedName));
     }
 
     // ========== 通用逻辑：字段操作 ==========
@@ -176,11 +178,16 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                 existingFields.getDataFieldList().stream()
                         .anyMatch(f -> oldColumnName.equals(f.getColumnName()));
         if (!oldFieldExists) {
-            throw new RuntimeException(StrUtil.format("表[{}]中原字段[{}]不存在，无法修改", tableName, oldColumnName));
+            throw new RuntimeException(
+                    StrUtil.format("表[{}]中原字段[{}]不存在，无法修改", tableName, oldColumnName));
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildAlterColumnSql(qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(oldColumnName), newField);
+        String sql =
+                buildAlterColumnSql(
+                        qualifiedTableName,
+                        dialectTableNameProcessor.tbQuoteFieldName(oldColumnName),
+                        newField);
         dExecuteDDL(sql, tableName, "修改字段[" + oldColumnName + "→" + newField.getColumnName() + "]");
     }
 
@@ -206,7 +213,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = buildDropColumnSql(qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(columnName));
+        String sql =
+                buildDropColumnSql(
+                        qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(columnName));
         dExecuteDDL(sql, tableName, "删除字段[" + columnName + "]");
     }
 
@@ -228,7 +237,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        columnNames = columnNames.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
+        columnNames =
+                columnNames.stream()
+                        .map(dialectTableNameProcessor::tbQuoteFieldName)
+                        .collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
 
         String sql = buildAddPrimaryKeySql(qualifiedTableName, pkConstraintName, columns);
@@ -296,8 +308,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     public void dCreateIndex(
             String tableName, String indexName, List<String> columnNames, boolean isUnique) {
         if (StrUtil.isEmpty(tableName)
-            || StrUtil.isEmpty(indexName)
-            || ObjectUtil.isEmpty(columnNames)) {
+                || StrUtil.isEmpty(indexName)
+                || ObjectUtil.isEmpty(columnNames)) {
             throw new IllegalArgumentException("表名、索引名和列名列表不能为空");
         }
         if (!dIsTableExists(tableName)) {
@@ -309,7 +321,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        columnNames = columnNames.stream().map(dialectTableNameProcessor::tbQuoteFieldName).collect(Collectors.toList());
+        columnNames =
+                columnNames.stream()
+                        .map(dialectTableNameProcessor::tbQuoteFieldName)
+                        .collect(Collectors.toList());
         String columns = String.join(", ", columnNames);
         String sql = buildCreateIndexSql(qualifiedTableName, indexName, columns, isUnique);
         dExecuteDDL(sql, tableName, "创建" + (isUnique ? "唯一" : "") + "索引[" + indexName + "]");
@@ -393,7 +408,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         DataFieldsApo metadataFromSql = getMetadataFromSql(fieldQuerySql, tableFields, null);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "dGetColumnsBySQL", fieldQuerySql, cost);
+        AdvLogSql.of(dataSourceGetter, getConfig())
+                .logExecuteSql(this.getClass(), "dGetColumnsBySQL", fieldQuerySql, cost);
         return metadataFromSql;
     }
 
@@ -415,18 +431,18 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         String fieldQuerySql = buildMetadataQuerySql(dynamicSql);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        DataFieldsApo metadataFromSqlWithParam = getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
+        DataFieldsApo metadataFromSqlWithParam =
+                getMetadataFromSqlWithParam(fieldQuerySql, sqlParam, tableFields);
         stopWatch.stop();
         long cost = stopWatch.getLastTaskTimeMillis();
-        AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), "dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
+        AdvLogSql.of(dataSourceGetter, getConfig())
+                .logExecuteSql(this.getClass(), "dGetColumnsBySQL(带参数)", fieldQuerySql, cost);
         return metadataFromSqlWithParam;
     }
 
     // ========== 通用工具方法（DDL执行模板 + 耗时统计） ==========
 
-    /**
-     * 通用DDL执行方法（无参数）
-     */
+    /** 通用DDL执行方法（无参数） */
     public int dExecuteDDL(String sql, String tableName, String operation) {
         Connection connection = null;
         Statement statement = null;
@@ -444,10 +460,12 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             connection.commit();
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), operation, sql, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(this.getClass(), operation, sql, cost, result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), operation, sql, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), operation, sql, e);
             rollbackConnection(connection, operation, tableName);
             log.error("{}失败，表名: {}, SQL: {}, 错误: {}", operation, tableName, sql, e.getMessage(), e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
@@ -458,13 +476,12 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         return result;
     }
 
-    /**
-     * 通用DDL执行方法（带参数）
-     */
+    /** 通用DDL执行方法（带参数） */
     @Override
     public int dExecuteDDL(
             String dynamicSql, SqlParamMap sqlParam, String tableName, String operation) {
-        SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
+        SqlMeta sqlMeta =
+                GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParam, dialectTableNameProcessor);
         String execSql = sqlMeta.getSql();
         List<Object> jdbcParams = sqlMeta.getJdbcParamValues();
 
@@ -488,9 +505,11 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
         } catch (SQLException e) {
-            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), operation, execSql, jdbcParams, e);
+            AdvLogSql.of(dataSourceGetter, getConfig())
+                    .logExecuteError(this.getClass(), operation, execSql, jdbcParams, e);
             rollbackConnection(connection, operation, tableName);
             log.error(
                     "{}失败，表名: {}, SQL: {}, 错误: {}",
@@ -549,7 +568,9 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                     }
                 } else {
                     SqlParamMap sqlParamMap = (SqlParamMap) sqlParam;
-                    SqlMeta sqlMeta = GirAdvSqlUtils.parseSqlWithParam(dynamicSql, sqlParamMap, dialectTableNameProcessor);
+                    SqlMeta sqlMeta =
+                            GirAdvSqlUtils.parseSqlWithParam(
+                                    dynamicSql, sqlParamMap, dialectTableNameProcessor);
                     statement = connection.prepareStatement(sqlMeta.getSql());
                     for (int i = 1; i <= sqlMeta.getJdbcParamValues().size(); i++) {
                         statement.setObject(i, sqlMeta.getJdbcParamValues().get(i - 1));
@@ -613,17 +634,22 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     protected abstract String buildRenameTableSql(String oldQualifiedName, String newQualifiedName);
 
-    protected abstract String buildAlterColumnSql(String qualifiedTableName, String oldColumnName, FieldBySchemaApo newField);
+    protected abstract String buildAlterColumnSql(
+            String qualifiedTableName, String oldColumnName, FieldBySchemaApo newField);
 
     protected abstract String buildDropColumnSql(String qualifiedTableName, String columnName);
 
-    protected abstract boolean checkConstraintExists(String tableName, String constraintName, String constraintType);
+    protected abstract boolean checkConstraintExists(
+            String tableName, String constraintName, String constraintType);
 
-    protected abstract String buildAddPrimaryKeySql(String qualifiedTableName, String constraintName, String columns);
+    protected abstract String buildAddPrimaryKeySql(
+            String qualifiedTableName, String constraintName, String columns);
 
-    protected abstract String buildDropPrimaryKeySql(String qualifiedTableName, String constraintName);
+    protected abstract String buildDropPrimaryKeySql(
+            String qualifiedTableName, String constraintName);
 
-    protected abstract String buildCreateIndexSql(String qualifiedTableName, String indexName, String columns, boolean isUnique);
+    protected abstract String buildCreateIndexSql(
+            String qualifiedTableName, String indexName, String columns, boolean isUnique);
 
     protected abstract String buildDropIndexSql(String tableName, String indexName);
 
@@ -635,12 +661,15 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
 
     protected abstract String buildMetadataQuerySql(String sqlView);
 
-    protected abstract String getBaseColumnName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+    protected abstract String getBaseColumnName(ResultSetMetaData metaData, int columnIndex)
+            throws SQLException;
 
-    protected abstract String getColumnTypeName(ResultSetMetaData metaData, int columnIndex) throws SQLException;
+    protected abstract String getColumnTypeName(ResultSetMetaData metaData, int columnIndex)
+            throws SQLException;
 
-    protected abstract void setFieldLengthInfo(ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field) throws SQLException;
-
+    protected abstract void setFieldLengthInfo(
+            ResultSetMetaData metaData, int columnIndex, FieldBySchemaApo field)
+            throws SQLException;
 
     /**
      * 构建复制表结构及数据的SQL（根据源表名）
@@ -649,7 +678,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * @param srcTableName 源表名（已包含schema）
      * @return 复制表结构及数据的SQL
      */
-    protected abstract String buildCreateTableFromTableSql(String dstTableName, String srcTableName);
+    protected abstract String buildCreateTableFromTableSql(
+            String dstTableName, String srcTableName);
 
     /**
      * 构建仅复制表结构的SQL（根据源表名）
@@ -664,7 +694,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 根据自定义SQL构建创建表并插入数据的SQL
      *
      * @param dstTableName 目标表名（已包含schema）
-     * @param sql          源数据查询SQL
+     * @param sql 源数据查询SQL
      * @return 创建表并插入数据的SQL
      */
     protected abstract String buildCreateTableFromSqlSql(String dstTableName, String sql);
@@ -673,11 +703,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
      * 根据自定义SQL构建仅创建表结构（不插入数据）的SQL
      *
      * @param dstTableName 目标表名（已包含schema）
-     * @param sql          源数据查询SQL
+     * @param sql 源数据查询SQL
      * @return 仅创建表结构的SQL
      */
     protected abstract String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql);
-
 
     @Override
     public void dCreateTable(String tableName, List<FieldBySchemaApo> fields, String primaryKey) {
@@ -688,6 +717,4 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     public void dAddColumn(String tableName, FieldBySchemaApo field) {
         throw new RuntimeException("暂时没有实现");
     }
-
-
 }

@@ -4,13 +4,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-geo</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-geo</name>
   <description>空间处理相关的模块</description>
@@ -39,11 +39,11 @@
     <module>geoair-file-tran</module>
     <module>geoair-geo-tools</module>
     <module>geoair-jts-all</module>
-<!--    <module>geoair-geoserver</module>-->
+    <!--    <module>geoair-geoserver</module>-->
     <module>geoair-map-tile-forge</module>
     <module>geoair-map-tile-fuser</module>
     <module>geoair-by-gwc</module>
-<!--    <module>geoair-geo-demo</module>-->
+    <!--    <module>geoair-geo-demo</module>-->
   </modules>
 
   <scm>
@@ -53,7 +53,7 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.6</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -96,11 +96,11 @@
         <version>${geoair.version}</version>
       </dependency>
 
-<!--      <dependency>-->
-<!--        <groupId>cn.geoair.devkit</groupId>-->
-<!--        <artifactId>geoair-geoserver</artifactId>-->
-<!--        <version>${geoair.version}</version>-->
-<!--      </dependency>-->
+      <!--      <dependency>-->
+      <!--        <groupId>cn.geoair.devkit</groupId>-->
+      <!--        <artifactId>geoair-geoserver</artifactId>-->
+      <!--        <version>${geoair.version}</version>-->
+      <!--      </dependency>-->
 
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
@@ -176,6 +176,5 @@
       <url>https://repo.osgeo.org/repository/release/</url>
     </pluginRepository>
   </pluginRepositories>
-
 
 </project>

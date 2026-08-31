@@ -1,19 +1,19 @@
-//package cn.geoair.orm.spi.support;
+// package cn.geoair.orm.spi.support;
 //
-//import cn.geoair.base.data.tuples.GkPair;
-//import cn.geoair.base.json.GirJSON;
-//import cn.geoair.orm.spi.entity.GirEntityColumn;
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Set;
+// import cn.geoair.base.data.tuples.GkPair;
+// import cn.geoair.base.json.GirJSON;
+// import cn.geoair.orm.spi.entity.GirEntityColumn;
+// import java.util.ArrayList;
+// import java.util.HashMap;
+// import java.util.List;
+// import java.util.Map;
+// import java.util.Set;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2022/7/1 9:33 @description： Example 简单解析器
 // */
-//public class GirSimpleExampleParser {
+// public class GirSimpleExampleParser {
 //
 //    /**
 //     * 根据Example查询总数
@@ -171,4 +171,4 @@
 //        }
 //        return sql.toString();
 //    }
-//}
+// }

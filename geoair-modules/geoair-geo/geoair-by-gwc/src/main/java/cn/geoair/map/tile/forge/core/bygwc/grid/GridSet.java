@@ -14,15 +14,13 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
-
 import cn.hutool.core.builder.HashCodeBuilder;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 /** A grid set configuration */
-public class GridSet   {
+public class GridSet {
 
     private String name;
 
@@ -82,12 +80,16 @@ public class GridSet   {
         this.resolutionsPreserved = g.resolutionsPreserved;
     }
 
-    /** @return the originalExtent */
+    /**
+     * @return the originalExtent
+     */
     public BoundingBox getOriginalExtent() {
         return originalExtent;
     }
 
-    /** @param originalExtent the originalExtent to set */
+    /**
+     * @param originalExtent the originalExtent to set
+     */
     void setOriginalExtent(BoundingBox originalExtent) {
         this.originalExtent = originalExtent;
     }
@@ -248,7 +250,6 @@ public class GridSet   {
         return closestRectangle(bestLevel, rectangleBounds);
     }
 
-
     /**
      * 查找最接近给定矩形范围的瓦片矩形区域
      *
@@ -256,7 +257,6 @@ public class GridSet   {
      * @param rectangeBounds 需要匹配的矩形范围
      * @return 长整型数组，表示瓦片坐标系中的瓦片矩形区域: {minx, miny, maxx, maxy, level}
      */
-
     protected long[] closestRectangle(int level, BoundingBox rectangeBounds) {
         Grid grid = getGrid(level);
 
@@ -407,7 +407,9 @@ public class GridSet   {
         gridLevels[zLevel] = grid;
     }
 
-    /** @param gridLevels the gridLevels to set */
+    /**
+     * @param gridLevels the gridLevels to set
+     */
     void setGridLevels(Grid[] gridLevels) {
         this.gridLevels = gridLevels;
     }
@@ -425,52 +427,72 @@ public class GridSet   {
         return tileOrigin;
     }
 
-    /** @return the yCoordinateFirst */
+    /**
+     * @return the yCoordinateFirst
+     */
     public boolean isyCoordinateFirst() {
         return yCoordinateFirst;
     }
 
-    /** @param yCoordinateFirst the yCoordinateFirst to set */
+    /**
+     * @param yCoordinateFirst the yCoordinateFirst to set
+     */
     void setyCoordinateFirst(boolean yCoordinateFirst) {
         this.yCoordinateFirst = yCoordinateFirst;
     }
 
-    /** @return the scaleWarning */
+    /**
+     * @return the scaleWarning
+     */
     public boolean isScaleWarning() {
         return scaleWarning;
     }
 
-    /** @param scaleWarning the scaleWarning to set */
+    /**
+     * @param scaleWarning the scaleWarning to set
+     */
     void setScaleWarning(boolean scaleWarning) {
         this.scaleWarning = scaleWarning;
     }
 
-    /** @return the metersPerUnit */
+    /**
+     * @return the metersPerUnit
+     */
     public double getMetersPerUnit() {
         return metersPerUnit;
     }
 
-    /** @param metersPerUnit the metersPerUnit to set */
+    /**
+     * @param metersPerUnit the metersPerUnit to set
+     */
     void setMetersPerUnit(double metersPerUnit) {
         this.metersPerUnit = metersPerUnit;
     }
 
-    /** @return the pixelSize */
+    /**
+     * @return the pixelSize
+     */
     public double getPixelSize() {
         return pixelSize;
     }
 
-    /** @param pixelSize the pixelSize to set */
+    /**
+     * @param pixelSize the pixelSize to set
+     */
     void setPixelSize(double pixelSize) {
         this.pixelSize = pixelSize;
     }
 
-    /** @return the name */
+    /**
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
-    /** @param name the name to set */
+    /**
+     * @param name the name to set
+     */
     void setName(String name) {
         this.name = name;
     }
@@ -483,32 +505,44 @@ public class GridSet   {
         this.description = description;
     }
 
-    /** @return the srs */
+    /**
+     * @return the srs
+     */
     public SRS getSrs() {
         return srs;
     }
 
-    /** @param srs the srs to set */
+    /**
+     * @param srs the srs to set
+     */
     void setSrs(SRS srs) {
         this.srs = srs;
     }
 
-    /** @return the tileWidth */
+    /**
+     * @return the tileWidth
+     */
     public int getTileWidth() {
         return tileWidth;
     }
 
-    /** @param tileWidth the tileWidth to set */
+    /**
+     * @param tileWidth the tileWidth to set
+     */
     void setTileWidth(int tileWidth) {
         this.tileWidth = tileWidth;
     }
 
-    /** @return the tileHeight */
+    /**
+     * @return the tileHeight
+     */
     public int getTileHeight() {
         return tileHeight;
     }
 
-    /** @param tileHeight the tileHeight to set */
+    /**
+     * @param tileHeight the tileHeight to set
+     */
     void setTileHeight(int tileHeight) {
         this.tileHeight = tileHeight;
     }
@@ -547,6 +581,4 @@ public class GridSet   {
         }
         return false;
     }
-
-
 }

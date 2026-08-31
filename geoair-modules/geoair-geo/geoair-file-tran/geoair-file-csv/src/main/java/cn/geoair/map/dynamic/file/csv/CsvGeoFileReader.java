@@ -7,20 +7,20 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.locationtech.jts.geom.Geometry;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.locationtech.jts.geom.Geometry;
-
 
 public class CsvGeoFileReader implements GeoFileReader {
 
@@ -54,15 +54,19 @@ public class CsvGeoFileReader implements GeoFileReader {
     private void initReader() {
         try {
             close();
-            reader = new BufferedReader(
-                    new InputStreamReader(
-                            new FileInputStream(linkInfo.getCsvFilePath()), Charset.forName(linkInfo.getCharset())));
+            reader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    new FileInputStream(linkInfo.getCsvFilePath()),
+                                    Charset.forName(linkInfo.getCharset())));
             if (linkInfo.isHasHeader()) {
                 String headerLine = reader.readLine();
                 if (headerLine == null) {
                     throw new GeoFileReadException("CSV 文件为空");
                 }
-                headers = CsvSchemaSupport.resolveHeaders(CsvSchemaSupport.parseLine(headerLine, linkInfo.getDelimiter()));
+                headers =
+                        CsvSchemaSupport.resolveHeaders(
+                                CsvSchemaSupport.parseLine(headerLine, linkInfo.getDelimiter()));
             }
             if (headers.isEmpty()) {
                 throw new GeoFileReadException("CSV 未提供表头，无法构建结构");
@@ -94,7 +98,9 @@ public class CsvGeoFileReader implements GeoFileReader {
                 String value = i < values.size() ? values.get(i) : null;
                 row.put(header, value);
             }
-            Geometry geometry = CsvGeometrySupport.readGeometry(linkInfo, headers, values.toArray(new String[0]));
+            Geometry geometry =
+                    CsvGeometrySupport.readGeometry(
+                            linkInfo, headers, values.toArray(new String[0]));
             if (geometry != null) {
                 row.put(linkInfo.getGeometryColumnName(), geometry);
             }
@@ -160,7 +166,8 @@ public class CsvGeoFileReader implements GeoFileReader {
     }
 
     @Override
-    public GirPager<GirAdvOneRow> readRowPage(GirPageParam girPageParam, ExceptionConsumer exceptionConsumer) {
+    public GirPager<GirAdvOneRow> readRowPage(
+            GirPageParam girPageParam, ExceptionConsumer exceptionConsumer) {
         GirPager<GirAdvOneRow> pager = new GirPager<>();
         try {
             if (girPageParam == null) {
@@ -187,7 +194,9 @@ public class CsvGeoFileReader implements GeoFileReader {
                 for (int i = 0; i < headers.size(); i++) {
                     row.put(headers.get(i), i < values.size() ? values.get(i) : null);
                 }
-                Geometry geometry = CsvGeometrySupport.readGeometry(linkInfo, headers, values.toArray(new String[0]));
+                Geometry geometry =
+                        CsvGeometrySupport.readGeometry(
+                                linkInfo, headers, values.toArray(new String[0]));
                 if (geometry != null) {
                     row.put(linkInfo.getGeometryColumnName(), geometry);
                 }
@@ -217,9 +226,11 @@ public class CsvGeoFileReader implements GeoFileReader {
             if (reader != null) {
                 reader.close();
             }
-            reader = new BufferedReader(
-                    new InputStreamReader(
-                            new FileInputStream(linkInfo.getCsvFilePath()), Charset.forName(linkInfo.getCharset())));
+            reader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    new FileInputStream(linkInfo.getCsvFilePath()),
+                                    Charset.forName(linkInfo.getCharset())));
             if (linkInfo.isHasHeader()) {
                 reader.readLine();
             }

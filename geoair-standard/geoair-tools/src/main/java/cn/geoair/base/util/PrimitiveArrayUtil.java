@@ -499,7 +499,8 @@ public class PrimitiveArrayUtil {
         }
 
         // 方向与起止位置不一致时自动交换，step>0升序、step<0降序
-        if ((step > 0 && includedStart > excludedEnd) || (step < 0 && includedStart < excludedEnd)) {
+        if ((step > 0 && includedStart > excludedEnd)
+                || (step < 0 && includedStart < excludedEnd)) {
             int tmp = includedStart;
             includedStart = excludedEnd;
             excludedEnd = tmp;

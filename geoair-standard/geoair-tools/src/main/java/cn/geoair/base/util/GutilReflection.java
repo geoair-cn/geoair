@@ -1,6 +1,7 @@
 package cn.geoair.base.util;
 
 import cn.geoair.base.def.GkFilter;
+
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,8 +11,7 @@ import java.util.function.Predicate;
 public abstract class GutilReflection {
 
     /**
-     * 预置的{@link MethodFilter}，匹配所有非桥接、非合成的、且不是声明在
-     * {@code java.lang.Object}上的方法。
+     * 预置的{@link MethodFilter}，匹配所有非桥接、非合成的、且不是声明在 {@code java.lang.Object}上的方法。
      *
      * @since 3.0.5
      */
@@ -59,8 +59,8 @@ public abstract class GutilReflection {
      *
      * <p>仅在目标方法不预期抛出受检异常，或访问方法/字段出错时调用。
      *
-     * <p>如果{@link InvocationTargetException}的根因是运行时异常或错误，则直接抛出该根因；
-     * 否则抛出带有相应信息的{@link IllegalStateException}或{@link UndeclaredThrowableException}。
+     * <p>如果{@link InvocationTargetException}的根因是运行时异常或错误，则直接抛出该根因； 否则抛出带有相应信息的{@link
+     * IllegalStateException}或{@link UndeclaredThrowableException}。
      *
      * @param ex 待处理的反射异常
      */
@@ -95,8 +95,8 @@ public abstract class GutilReflection {
      * 重新抛出给定的{@link Throwable}，该异常通常是{@link InvocationTargetException}的
      * <em>目标异常</em>。仅在目标方法不预期抛出受检异常时调用。
      *
-     * <p>若异常可转换为{@link RuntimeException}或{@link Error}则直接抛出；
-     * 否则抛出{@link UndeclaredThrowableException}。
+     * <p>若异常可转换为{@link RuntimeException}或{@link Error}则直接抛出； 否则抛出{@link
+     * UndeclaredThrowableException}。
      *
      * @param ex 待重新抛出的异常
      * @throws RuntimeException 重新抛出的异常
@@ -115,8 +115,7 @@ public abstract class GutilReflection {
      * 重新抛出给定的{@link Throwable}，该异常通常是{@link InvocationTargetException}的
      * <em>目标异常</em>。仅在目标方法不预期抛出受检异常时调用。
      *
-     * <p>若异常可转换为{@link Exception}或{@link Error}则直接抛出；
-     * 否则抛出{@link UndeclaredThrowableException}。
+     * <p>若异常可转换为{@link Exception}或{@link Error}则直接抛出； 否则抛出{@link UndeclaredThrowableException}。
      *
      * @param ex 待重新抛出的异常
      * @throws Exception 重新抛出的异常（受检异常情况下）
@@ -151,8 +150,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 使给定的构造方法可访问，仅在必要时显式调用{@code setAccessible(true)}，
-     * 以避免与JVM安全管理器（如果启用）产生不必要的冲突。
+     * 使给定的构造方法可访问，仅在必要时显式调用{@code setAccessible(true)}， 以避免与JVM安全管理器（如果启用）产生不必要的冲突。
      *
      * @param ctor 需要设置为可访问的构造方法
      * @see java.lang.reflect.Constructor#setAccessible
@@ -349,8 +347,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 获取叶子类及其所有父类上的去重声明方法集合。叶子类方法排在最前，在沿继承链遍历时，
-     * 与已收录方法签名相同的方法会被过滤掉。
+     * 获取叶子类及其所有父类上的去重声明方法集合。叶子类方法排在最前，在沿继承链遍历时， 与已收录方法签名相同的方法会被过滤掉。
      *
      * @param leafClass 待检查的类
      * @throws IllegalStateException 如果内省失败
@@ -360,8 +357,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 获取叶子类及其所有父类上的去重声明方法集合。叶子类方法排在最前，在沿继承链遍历时，
-     * 与已收录方法签名相同的方法会被过滤掉。
+     * 获取叶子类及其所有父类上的去重声明方法集合。叶子类方法排在最前，在沿继承链遍历时， 与已收录方法签名相同的方法会被过滤掉。
      *
      * @param leafClass 待检查的类
      * @param mf 决定收录哪些方法的过滤器
@@ -405,8 +401,8 @@ public abstract class GutilReflection {
     }
 
     /**
-     * {@link Class#getDeclaredMethods()}的变体，使用本地缓存以避免JVM安全管理器检查和重复创建
-     * Method实例。此外，它还会包含本地实现接口上的Java 8默认方法，因为它们在效果上等同于声明方法。
+     * {@link Class#getDeclaredMethods()}的变体，使用本地缓存以避免JVM安全管理器检查和重复创建 Method实例。此外，它还会包含本地实现接口上的Java
+     * 8默认方法，因为它们在效果上等同于声明方法。
      *
      * @param clazz 待检查的类
      * @return 缓存的方法数组
@@ -534,8 +530,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 使给定的方法可访问，仅在必要时显式调用{@code setAccessible(true)}，以避免与JVM安全管理器
-     * （如果启用）产生不必要的冲突。
+     * 使给定的方法可访问，仅在必要时显式调用{@code setAccessible(true)}，以避免与JVM安全管理器 （如果启用）产生不必要的冲突。
      *
      * @param method 需要设置为可访问的方法
      * @see java.lang.reflect.Method#setAccessible
@@ -552,8 +547,7 @@ public abstract class GutilReflection {
     // 字段处理
 
     /**
-     * 尝试在指定{@link Class}上按指定{@code name}查找{@link Field field}。
-     * 会沿继承链向上搜索直到{@link Object}。
+     * 尝试在指定{@link Class}上按指定{@code name}查找{@link Field field}。 会沿继承链向上搜索直到{@link Object}。
      *
      * @param clazz 待检查的类
      * @param name 字段名
@@ -636,8 +630,8 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 获取指定{@link Field field对象}表示的字段在指定{@link Object target对象}上的值。
-     * 按照{@link Field#get(Object)}语义，如果底层字段是原始类型，返回值会自动装箱。
+     * 获取指定{@link Field field对象}表示的字段在指定{@link Object target对象}上的值。 按照{@link
+     * Field#get(Object)}语义，如果底层字段是原始类型，返回值会自动装箱。
      *
      * <p>抛出的异常通过调用{@link #handleReflectionException(Exception)}处理。
      *
@@ -742,8 +736,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 在源对象和目标对象之间复制所有字段（包括继承字段），要求两者是同一个类或子类关系。
-     * 设计用于具有公共无参构造函数的对象。
+     * 在源对象和目标对象之间复制所有字段（包括继承字段），要求两者是同一个类或子类关系。 设计用于具有公共无参构造函数的对象。
      *
      * @throws IllegalStateException 如果内省失败
      */
@@ -781,8 +774,7 @@ public abstract class GutilReflection {
     }
 
     /**
-     * 使给定的字段可访问，仅在必要时显式调用{@code setAccessible(true)}，以避免与JVM安全管理器
-     * （如果启用）产生不必要的冲突。
+     * 使给定的字段可访问，仅在必要时显式调用{@code setAccessible(true)}，以避免与JVM安全管理器 （如果启用）产生不必要的冲突。
      *
      * @param field 需要设置为可访问的字段
      * @see java.lang.reflect.Field#setAccessible
@@ -1706,9 +1698,8 @@ public abstract class GutilReflection {
     /**
      * 设置方法为可访问（私有方法可以被外部调用）
      *
-     * <p>在 JDK 9+ 模块系统下，如果目标对象所属模块未对调用方开放（模块强封装），
-     * {@code setAccessible(true)} 会抛出运行时异常（如 {@code InaccessibleObjectException}），
-     * 此方法会将此类异常包装为 {@link IllegalStateException} 抛出。
+     * <p>在 JDK 9+ 模块系统下，如果目标对象所属模块未对调用方开放（模块强封装）， {@code setAccessible(true)} 会抛出运行时异常（如 {@code
+     * InaccessibleObjectException}）， 此方法会将此类异常包装为 {@link IllegalStateException} 抛出。
      *
      * @param <T> AccessibleObject的子类，比如Class、Method、Field等
      * @param accessibleObject 可设置访问权限的对象，比如Class、Method、Field等

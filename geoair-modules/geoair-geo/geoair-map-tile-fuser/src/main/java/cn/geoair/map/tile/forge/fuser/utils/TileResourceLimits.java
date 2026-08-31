@@ -3,8 +3,7 @@ package cn.geoair.map.tile.forge.fuser.utils;
 /**
  * 瓦片资源的安全上限。
  *
- * <p>网络响应、缓存文件和图片解码都会使用这些值。应用可在初始化阶段调用 setter 调整，
- * 不建议在并发请求期间修改。</p>
+ * <p>网络响应、缓存文件和图片解码都会使用这些值。应用可在初始化阶段调用 setter 调整， 不建议在并发请求期间修改。
  */
 public final class TileResourceLimits {
 
@@ -13,8 +12,7 @@ public final class TileResourceLimits {
     private static volatile int maxImageHeight = 4096;
     private static volatile long maxImagePixels = 4L * 1024 * 1024;
 
-    private TileResourceLimits() {
-    }
+    private TileResourceLimits() {}
 
     public static int getMaxTileBytes() {
         return maxTileBytes;
@@ -61,7 +59,8 @@ public final class TileResourceLimits {
     }
 
     static void validateImageDimensions(int width, int height) {
-        if (width <= 0 || height <= 0
+        if (width <= 0
+                || height <= 0
                 || width > maxImageWidth
                 || height > maxImageHeight
                 || (long) width * height > maxImagePixels) {

@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.map.dynamic.adv.query.enums.AdvSchemaTableTypeOpt;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 

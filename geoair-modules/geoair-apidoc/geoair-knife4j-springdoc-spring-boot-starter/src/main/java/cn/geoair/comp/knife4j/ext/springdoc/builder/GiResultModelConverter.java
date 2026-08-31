@@ -2,17 +2,19 @@ package cn.geoair.comp.knife4j.ext.springdoc.builder;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.result.GiResult;
-
 import cn.geoair.web.data.result.GirWebResult;
+
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.oas.models.media.*;
+
+import org.springframework.core.annotation.AnnotationUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Iterator;
-import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * 解析GirWebResult<T>泛型响应的自定义Model转换器（纯原生反射，无第三方依赖）
@@ -20,7 +22,6 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author Administrator
  * @version $Id: $Id
  */
-
 public class GiResultModelConverter implements ModelConverter {
 
     /** {@inheritDoc} */

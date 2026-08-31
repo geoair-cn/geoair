@@ -9,41 +9,39 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.web.mime.GiMimeType;
 
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * PostgreSQL 瓦片缓存实现
- * <p>
- * 每个图层独立一张表，表名格式: tile_cache_fuser_{layerName}
- * 缓存的结果，全部转换成wmts原点
- * </p>
+ *
+ * <p>每个图层独立一张表，表名格式: tile_cache_fuser_{layerName} 缓存的结果，全部转换成wmts原点
  *
  * @author 张逢吉
  * @date Created in 2026/06/22
  * @description 基于 PostgreSQL 的瓦片缓存实现
  */
-
 public class PostgresTileCache implements TileCache {
     private static GiLogger log = GirLoggerFactory.getLogger();
     private final DataSource dataSource;
     private final boolean enabled;
     private final String tablePrefix;
-    private final ConcurrentHashMap<String, TableCacheHolder> layerCaches = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, TableCacheHolder> layerCaches =
+            new ConcurrentHashMap<>();
 
     // 表结构
     private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS %s (" +
-                    "  z INTEGER NOT NULL," +
-                    "  x INTEGER NOT NULL," +
-                    "  y INTEGER NOT NULL," +
-                    "  tile_data BYTEA NOT NULL," +
-                    "  format VARCHAR(50)," +
-                    "  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    "  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    "  PRIMARY KEY (z, x, y)" +
-                    ")";
+            "CREATE TABLE IF NOT EXISTS %s ("
+                    + "  z INTEGER NOT NULL,"
+                    + "  x INTEGER NOT NULL,"
+                    + "  y INTEGER NOT NULL,"
+                    + "  tile_data BYTEA NOT NULL,"
+                    + "  format VARCHAR(50),"
+                    + "  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + "  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + "  PRIMARY KEY (z, x, y)"
+                    + ")";
 
     // 索引
     private static final String CREATE_INDEX_ZOOM_SQL =
@@ -65,7 +63,7 @@ public class PostgresTileCache implements TileCache {
      * 构造函数
      *
      * @param dataSource 数据源
-     * @param enabled    是否启用缓存
+     * @param enabled 是否启用缓存
      */
     public PostgresTileCache(DataSource dataSource, boolean enabled) {
         this(dataSource, "tile_cache_fuser_", enabled);
@@ -74,9 +72,9 @@ public class PostgresTileCache implements TileCache {
     /**
      * 构造函数
      *
-     * @param dataSource  数据源
+     * @param dataSource 数据源
      * @param tablePrefix 表前缀
-     * @param enabled     是否启用缓存
+     * @param enabled 是否启用缓存
      */
     public PostgresTileCache(DataSource dataSource, String tablePrefix, boolean enabled) {
         this.dataSource = dataSource;
@@ -85,9 +83,7 @@ public class PostgresTileCache implements TileCache {
         log.info("PostgreSQL 瓦片缓存初始化完成，表前缀: {}", tablePrefix);
     }
 
-    /**
-     * 获取图层对应的表名
-     */
+    /** 获取图层对应的表名 */
     private String getTableName(String layerName) {
         // 过滤非法字符，保证表名安全
         String safeName = layerName.replaceAll("[^a-zA-Z0-9_]", "_");
@@ -98,25 +94,28 @@ public class PostgresTileCache implements TileCache {
         return tablePrefix + safeName;
     }
 
-
-    /**
-     * 获取或创建图层的缓存持有者
-     */
+    /** 获取或创建图层的缓存持有者 */
     private TableCacheHolder getOrCreateHolder(String layerName) {
         if (!enabled) {
             return null;
         }
 
-        return layerCaches.computeIfAbsent(layerName, k -> {
-            try {
-                String tableName = getTableName(k);
-                boolean needReverse = FuserCacheUtils.fileCheckIsNeedReverseY(k);
-                return new TableCacheHolder(dataSource, tableName, needReverse, FuserCacheUtils.getCacheGridSrid(k));
-            } catch (Exception e) {
-                log.error("创建图层缓存失败: {}", layerName, e);
-                return null;
-            }
-        });
+        return layerCaches.computeIfAbsent(
+                layerName,
+                k -> {
+                    try {
+                        String tableName = getTableName(k);
+                        boolean needReverse = FuserCacheUtils.fileCheckIsNeedReverseY(k);
+                        return new TableCacheHolder(
+                                dataSource,
+                                tableName,
+                                needReverse,
+                                FuserCacheUtils.getCacheGridSrid(k));
+                    } catch (Exception e) {
+                        log.error("创建图层缓存失败: {}", layerName, e);
+                        return null;
+                    }
+                });
     }
 
     @Override
@@ -133,8 +132,13 @@ public class PostgresTileCache implements TileCache {
         long startTime = System.currentTimeMillis();
         byte[] data = holder.get(z, x, y);
         if (data != null && log.isDebugEnabled()) {
-            log.debug("PostgreSQL 缓存命中: {} ({},{},{}) 耗时: {}ms",
-                    layerName, z, x, y, System.currentTimeMillis() - startTime);
+            log.debug(
+                    "PostgreSQL 缓存命中: {} ({},{},{}) 耗时: {}ms",
+                    layerName,
+                    z,
+                    x,
+                    y,
+                    System.currentTimeMillis() - startTime);
         }
         return data;
     }
@@ -152,8 +156,8 @@ public class PostgresTileCache implements TileCache {
 
         boolean result = holder.put(z, x, y, data, format.getFormat());
         if (result && log.isDebugEnabled()) {
-            log.debug("PostgreSQL 缓存保存: {} ({},{},{}) 大小: {} bytes",
-                    layerName, z, x, y, data.length);
+            log.debug(
+                    "PostgreSQL 缓存保存: {} ({},{},{}) 大小: {} bytes", layerName, z, x, y, data.length);
         }
         return result;
     }
@@ -240,9 +244,7 @@ public class PostgresTileCache implements TileCache {
         return enabled;
     }
 
-    /**
-     * 获取指定图层的瓦片数量
-     */
+    /** 获取指定图层的瓦片数量 */
     public long getTileCount(String layerName) {
         TableCacheHolder holder = layerCaches.get(layerName);
         if (holder == null) {
@@ -251,9 +253,7 @@ public class PostgresTileCache implements TileCache {
         return holder.getTileCount();
     }
 
-    /**
-     * 获取指定图层指定层级的瓦片数量
-     */
+    /** 获取指定图层指定层级的瓦片数量 */
     public long getTileCountByZoom(String layerName, int zoom) {
         TableCacheHolder holder = layerCaches.get(layerName);
         if (holder == null) {
@@ -264,19 +264,17 @@ public class PostgresTileCache implements TileCache {
 
     // ==================== 内部类 ====================
 
-    /**
-     * 单个图层的缓存持有者
-     */
-
+    /** 单个图层的缓存持有者 */
     private static class TableCacheHolder {
-        private static GiLogger log = GirLoggerFactory.getLogger( );
+        private static GiLogger log = GirLoggerFactory.getLogger();
         private final IAdvExecutor iAdvExecutor;
         private final String tableName;
         private final boolean needReverseY;
         private final int gridSrid;
         private volatile boolean initialized = false;
 
-        public TableCacheHolder(DataSource dataSource, String tableName, boolean needReverseY, int gridSrid) {
+        public TableCacheHolder(
+                DataSource dataSource, String tableName, boolean needReverseY, int gridSrid) {
             this.iAdvExecutor = GirAdvQuery.getIAdvExecutor(dataSource);
             this.tableName = tableName;
             this.needReverseY = needReverseY;
@@ -297,28 +295,33 @@ public class PostgresTileCache implements TileCache {
                 String idxZoomSql = String.format(CREATE_INDEX_ZOOM_SQL, tableName, tableName);
                 iAdvExecutor.dExecuteDDL(idxZoomSql, tableName, "创建索引");
 
-                String idxUpdateSql = String.format(CREATE_INDEX_UPDATE_TIME_SQL, tableName, tableName);
+                String idxUpdateSql =
+                        String.format(CREATE_INDEX_UPDATE_TIME_SQL, tableName, tableName);
                 iAdvExecutor.dExecuteDDL(idxUpdateSql, tableName, "创建索引");
             }
             initialized = true;
             log.debug("PostgreSQL 缓存表初始化完成: {}, needReverseY: {}", tableName, needReverseY);
         }
 
-
         public byte[] get(int z, int x, int y) {
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
-            GirAdvOneRow girAdvOneRow = iAdvExecutor.bSelectOne(
-                    "SELECT tile_data FROM " + tableName + " WHERE z = ? AND x = ? AND y = ?",
-                    SqlParamList.of(z, x, storeY));
+            GirAdvOneRow girAdvOneRow =
+                    iAdvExecutor.bSelectOne(
+                            "SELECT tile_data FROM "
+                                    + tableName
+                                    + " WHERE z = ? AND x = ? AND y = ?",
+                            SqlParamList.of(z, x, storeY));
             return girAdvOneRow.getPrimitiveByteArray("tile_data");
         }
 
         public boolean put(int z, int x, int y, byte[] data, String format) {
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
 
-            String sql = "INSERT INTO " + tableName +
-                    " (z, x, y, tile_data, format, update_time) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) " +
-                    "ON CONFLICT (z, x, y) DO UPDATE SET tile_data = EXCLUDED.tile_data, format = EXCLUDED.format, update_time = CURRENT_TIMESTAMP";
+            String sql =
+                    "INSERT INTO "
+                            + tableName
+                            + " (z, x, y, tile_data, format, update_time) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) "
+                            + "ON CONFLICT (z, x, y) DO UPDATE SET tile_data = EXCLUDED.tile_data, format = EXCLUDED.format, update_time = CURRENT_TIMESTAMP";
 
             return iAdvExecutor.bInsertBySql(sql, SqlParamList.of(z, x, storeY, data, format)) > 0;
         }
@@ -347,7 +350,10 @@ public class PostgresTileCache implements TileCache {
 
         public boolean exists(int z, int x, int y) {
             int storeY = FuserCacheUtils.getStoreY(z, y, needReverseY, gridSrid);
-            String sql = "SELECT count(1) as count FROM " + tableName + " WHERE z = ? AND x = ? AND y = ?";
+            String sql =
+                    "SELECT count(1) as count FROM "
+                            + tableName
+                            + " WHERE z = ? AND x = ? AND y = ?";
             GirAdvOneRow dvOneRow = iAdvExecutor.bSelectOne(sql, SqlParamList.of(z, x, storeY));
             Long count = dvOneRow.getLong("count");
             return count != null && count > 0;
@@ -375,6 +381,5 @@ public class PostgresTileCache implements TileCache {
             iAdvExecutor.dDropTable(tableName);
             initialized = false;
         }
-
     }
 }

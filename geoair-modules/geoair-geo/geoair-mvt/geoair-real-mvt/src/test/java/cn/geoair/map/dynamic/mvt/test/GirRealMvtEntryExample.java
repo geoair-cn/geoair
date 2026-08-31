@@ -22,8 +22,7 @@ public class GirRealMvtEntryExample {
         requestParams.setKeepFieldAll(true);
 
         ParamCheckResult result = helper.checkTileRequestParams(requestParams, "road_layer");
-        ITileExecutor executor =
-                TileExecutorFactory.getInstance(requestParams, "road_layer");
+        ITileExecutor executor = TileExecutorFactory.getInstance(requestParams, "road_layer");
         TileGlobalConfig config = executor.getTileGlobalConfig();
 
         System.out.println("param check = " + result.isSuccess());

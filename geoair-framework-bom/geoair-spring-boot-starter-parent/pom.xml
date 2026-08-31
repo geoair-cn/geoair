@@ -11,7 +11,7 @@
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-spring-boot-starter-parent</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-spring-boot-starter-parent</name>
   <description>geoair的springboot starter</description>
@@ -41,7 +41,7 @@
   </scm>
 
   <properties>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.6</geoair.version>
     <spring-javaformat.version>0.0.28</spring-javaformat.version>
     <tomcat.version>10.1.55</tomcat.version>
     <spring-boot.version>3.5.16</spring-boot.version>
@@ -71,9 +71,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <dependencies>
-
-  </dependencies>
+  <dependencies></dependencies>
 
   <build>
     <pluginManagement>
@@ -84,26 +82,26 @@
           <groupId>org.jetbrains.kotlin</groupId>
           <artifactId>kotlin-maven-plugin</artifactId>
           <version>${kotlin.version}</version>
-          <executions>
-            <execution>
-              <id>compile</id>
-              <phase>compile</phase>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>test-compile</id>
-              <phase>test-compile</phase>
-              <goals>
-                <goal>test-compile</goal>
-              </goals>
-            </execution>
-          </executions>
           <configuration>
             <jvmTarget>${java.version}</jvmTarget>
             <javaParameters>true</javaParameters>
           </configuration>
+          <executions>
+            <execution>
+              <id>compile</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <phase>compile</phase>
+            </execution>
+            <execution>
+              <id>test-compile</id>
+              <goals>
+                <goal>test-compile</goal>
+              </goals>
+              <phase>test-compile</phase>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -123,6 +121,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>${maven-failsafe-plugin.version}</version>
+          <configuration>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          </configuration>
           <executions>
             <execution>
               <goals>
@@ -131,9 +132,6 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -181,6 +179,9 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring-boot.version}</version>
+          <configuration>
+            <mainClass>${start-class}</mainClass>
+          </configuration>
           <executions>
             <execution>
               <id>repackage</id>
@@ -189,20 +190,38 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <mainClass>${start-class}</mainClass>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>${maven-shade-plugin.version}</version>
+          <configuration>
+            <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+            <createDependencyReducedPom>true</createDependencyReducedPom>
+            <filters>
+              <filter>
+                <artifact>*:*</artifact>
+                <excludes>
+                  <exclude>META-INF/*.SF</exclude>
+                  <exclude>META-INF/*.DSA</exclude>
+                  <exclude>META-INF/*.RSA</exclude>
+                </excludes>
+              </filter>
+            </filters>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+              <version>${spring-boot.version}</version>
+            </dependency>
+          </dependencies>
           <executions>
             <execution>
-              <phase>package</phase>
               <goals>
                 <goal>shade</goal>
               </goals>
+              <phase>package</phase>
               <configuration>
                 <transformers>
                   <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -222,27 +241,6 @@
               </configuration>
             </execution>
           </executions>
-          <dependencies>
-            <dependency>
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-maven-plugin</artifactId>
-              <version>${spring-boot.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-            <createDependencyReducedPom>true</createDependencyReducedPom>
-            <filters>
-              <filter>
-                <artifact>*:*</artifact>
-                <excludes>
-                  <exclude>META-INF/*.SF</exclude>
-                  <exclude>META-INF/*.DSA</exclude>
-                  <exclude>META-INF/*.RSA</exclude>
-                </excludes>
-              </filter>
-            </filters>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -250,6 +248,16 @@
   <profiles>
     <profile>
       <id>central</id>
+      <distributionManagement>
+        <repository>
+          <id>ossrh</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </repository>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+      </distributionManagement>
       <build>
         <!--发布到中央SNAPSHOT仓库插件-->
         <plugins>
@@ -260,10 +268,10 @@
             <executions>
               <execution>
                 <id>sign-artifacts</id>
-                <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
                 </goals>
+                <phase>verify</phase>
               </execution>
             </executions>
           </plugin>
@@ -278,16 +286,6 @@
           </plugin>
         </plugins>
       </build>
-      <distributionManagement>
-        <repository>
-          <id>ossrh</id>
-          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-        </repository>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
-      </distributionManagement>
     </profile>
     <profile>
       <id>code-style</id>
@@ -296,7 +294,13 @@
           <plugin>
             <groupId>com.spotify.fmt</groupId>
             <artifactId>fmt-maven-plugin</artifactId>
-           <version>${fmt-maven-plugin.version}</version>
+            <version>${fmt-maven-plugin.version}</version>
+            <configuration>
+              <verbose>false</verbose>
+              <filesNamePattern>.*\.java</filesNamePattern>
+              <skip>false</skip>
+              <style>aosp</style>
+            </configuration>
             <executions>
               <execution>
                 <goals>
@@ -304,47 +308,33 @@
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <verbose>false</verbose>
-              <filesNamePattern>.*\.java</filesNamePattern>
-              <skip>false</skip>
-              <style>aosp</style>
-            </configuration>
           </plugin>
-<!--          <plugin>-->
-<!--            <groupId>net.revelc.code</groupId>-->
-<!--            <artifactId>impsort-maven-plugin</artifactId>-->
-<!--            <version>1.6.0</version>-->
-<!--            <executions>-->
-<!--              <execution>-->
-<!--                <id>sort-imports</id>-->
-<!--                <goals>-->
-<!--                  <goal>sort</goal>-->
-<!--                  &lt;!&ndash; runs at process-sources phase by default &ndash;&gt;-->
-<!--                </goals>-->
-<!--              </execution>-->
-<!--            </executions>-->
-<!--            <configuration>-->
-<!--              <groups>*</groups>-->
-<!--              &lt;!&ndash; 静态导入也统一规则 &ndash;&gt;-->
-<!--              <staticGroups>*</staticGroups>-->
-<!--              &lt;!&ndash; 保留：自动删除没用的 import &ndash;&gt;-->
-<!--              <removeUnused>true</removeUnused>-->
+          <!--          <plugin>-->
+          <!--            <groupId>net.revelc.code</groupId>-->
+          <!--            <artifactId>impsort-maven-plugin</artifactId>-->
+          <!--            <version>1.6.0</version>-->
+          <!--            <executions>-->
+          <!--              <execution>-->
+          <!--                <id>sort-imports</id>-->
+          <!--                <goals>-->
+          <!--                  <goal>sort</goal>-->
+          <!--                  &lt;!&ndash; runs at process-sources phase by default &ndash;&gt;-->
+          <!--                </goals>-->
+          <!--              </execution>-->
+          <!--            </executions>-->
+          <!--            <configuration>-->
+          <!--              <groups>*</groups>-->
+          <!--              &lt;!&ndash; 静态导入也统一规则 &ndash;&gt;-->
+          <!--              <staticGroups>*</staticGroups>-->
+          <!--              &lt;!&ndash; 保留：自动删除没用的 import &ndash;&gt;-->
+          <!--              <removeUnused>true</removeUnused>-->
 
-<!--            </configuration>-->
-<!--          </plugin>-->
+          <!--            </configuration>-->
+          <!--          </plugin>-->
           <plugin>
             <groupId>com.github.ekryd.sortpom</groupId>
             <artifactId>sortpom-maven-plugin</artifactId>
             <version>4.0.0</version>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sort</goal>
-                </goals>
-              </execution>
-            </executions>
             <configuration>
               <skip>false</skip>
               <keepBlankLines>true</keepBlankLines>
@@ -354,6 +344,14 @@
               <verifyFail>stop</verifyFail>
               <verifyFailOn>strict</verifyFailOn>
             </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>sort</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -366,6 +364,12 @@
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-maven-plugin</artifactId>
             <version>4.9.8.2</version>
+            <configuration>
+              <encoding>UTF-8</encoding>
+              <failOnError>false</failOnError>
+              <!-- 发现bug是否让构建失败 -->
+              <includeTests>false</includeTests>
+            </configuration>
             <!-- Java8 最后稳定版 -->
             <executions>
               <execution>
@@ -375,17 +379,16 @@
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <encoding>UTF-8</encoding>
-              <failOnError>false</failOnError>
-              <!-- 发现bug是否让构建失败 -->
-              <includeTests>false</includeTests>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.gaul</groupId>
             <artifactId>modernizer-maven-plugin</artifactId>
             <version>3.3.0</version>
+            <configuration>
+              <javaVersion>17</javaVersion>
+              <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
+              <failOnViolations>false</failOnViolations>
+            </configuration>
             <!-- Java8 稳定版 -->
             <executions>
               <execution>
@@ -395,11 +398,6 @@
                 </goals>
               </execution>
             </executions>
-            <configuration>
-              <javaVersion>17</javaVersion>
-              <!-- 发现问题是否让构建失败（企业一般设为false，只提醒） -->
-              <failOnViolations>false</failOnViolations>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -430,15 +428,6 @@
           <plugin>
             <groupId>pl.project13.maven</groupId>
             <artifactId>git-commit-id-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>get-the-git-infos</id>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>revision</goal>
-                </goals>
-              </execution>
-            </executions>
             <configuration>
               <generateGitPropertiesFile>true</generateGitPropertiesFile>
               <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
@@ -462,6 +451,15 @@
               <verbose>false</verbose>
               <skipPoms>true</skipPoms>
             </configuration>
+            <executions>
+              <execution>
+                <id>get-the-git-infos</id>
+                <goals>
+                  <goal>revision</goal>
+                </goals>
+                <phase>initialize</phase>
+              </execution>
+            </executions>
           </plugin>
 
         </plugins>

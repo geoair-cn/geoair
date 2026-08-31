@@ -76,7 +76,7 @@ geoair-modules/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-knife4j-springdoc-spring-boot-starter</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
 </dependency>
 ```
 
@@ -295,7 +295,7 @@ JTS `Geometry` 对象的 MyBatis TypeHandler：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <type>pom</type>
 </dependency>
 
@@ -303,7 +303,7 @@ JTS `Geometry` 对象的 MyBatis TypeHandler：
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo-tools</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
 </dependency>
 ```
 

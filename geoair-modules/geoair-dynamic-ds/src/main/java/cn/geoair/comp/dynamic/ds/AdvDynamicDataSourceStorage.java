@@ -8,34 +8,38 @@ import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import lombok.Setter;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.sql.DataSource;
 
 /**
  * 动态数据源的存储器实现类，全局单例。
  *
- * <p>负责动态数据源的完整生命周期管理：</p>
+ * <p>负责动态数据源的完整生命周期管理：
+ *
  * <ul>
- *   <li>通过 {@code dataSourceId} 查找、创建、缓存 {@link AdvDataSourceWrapper}</li>
- *   <li>通过 {@link IAdvDataSourceHelper} 从外部存储（数据库/配置中心）加载数据源配置</li>
- *   <li>通过 {@link IAdvDataSourceInitHelper} 将配置转为实际的 DataSource 对象</li>
- *   <li>JVM 关闭时自动清空缓存并释放所有连接（注册了 ShutdownHook）</li>
+ *   <li>通过 {@code dataSourceId} 查找、创建、缓存 {@link AdvDataSourceWrapper}
+ *   <li>通过 {@link IAdvDataSourceHelper} 从外部存储（数据库/配置中心）加载数据源配置
+ *   <li>通过 {@link IAdvDataSourceInitHelper} 将配置转为实际的 DataSource 对象
+ *   <li>JVM 关闭时自动清空缓存并释放所有连接（注册了 ShutdownHook）
  * </ul>
  *
- * <p>使用示例：</p>
+ * <p>使用示例：
+ *
  * <pre>{@code
- *   // 获取全局实例
- *   DynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();
+ * // 获取全局实例
+ * DynamicDataSourceManager manager = AdvDynamicDataSourceStorage.getInstance();
  *
- *   // 按 ID 获取或创建数据源
- *   AdvDataSourceWrapper ds = manager.getOrCreateDataSource("master");
+ * // 按 ID 获取或创建数据源
+ * AdvDataSourceWrapper ds = manager.getOrCreateDataSource("master");
  *
- *   // 手动注册数据源
- *   manager.registerDataSource("extra", someDataSource);
+ * // 手动注册数据源
+ * manager.registerDataSource("extra", someDataSource);
  * }</pre>
  */
 public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
@@ -47,17 +51,17 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
 
     /**
      * 数据源配置的查找助手，负责根据 dataSourceId 获取对应的 {@link DataSourceApo} 配置对象。
-     * <p>可通过 setter 手动注入，若不注入则自动从 Spring 容器获取。</p>
+     *
+     * <p>可通过 setter 手动注入，若不注入则自动从 Spring 容器获取。
      */
-    @Setter
-    private IAdvDataSourceHelper iAdvDataSourceHelper;
+    @Setter private IAdvDataSourceHelper iAdvDataSourceHelper;
 
     /**
      * 数据源的初始化助手，负责将 {@link DataSourceApo} 配置对象转换为实际的 {@link DataSource}。
-     * <p>可通过 setter 手动注入，若不注入则自动从 Spring 容器获取。</p>
+     *
+     * <p>可通过 setter 手动注入，若不注入则自动从 Spring 容器获取。
      */
-    @Setter
-    private IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
+    @Setter private IAdvDataSourceInitHelper iAdvDataSourceInitHelper;
 
     /**
      * 获取全局唯一的存储器实例（线程安全）。
@@ -78,8 +82,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 获取全局唯一的存储器实例，并注入数据源配置查找助手。
      *
-     * <p>相比 {@link #getInstance()} 增加了 helper 注入能力，
-     * 避免在非 Spring 环境下因自动查找 Bean 而抛异常。</p>
+     * <p>相比 {@link #getInstance()} 增加了 helper 注入能力， 避免在非 Spring 环境下因自动查找 Bean 而抛异常。
      *
      * @param iAdvDataSourceHelper 数据源配置查找助手
      * @return 单例实例
@@ -97,9 +100,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return dataSourceManager;
     }
 
-    /**
-     * 设置数据源初始化助手（便捷方法，等价于 setter）。
-     */
+    /** 设置数据源初始化助手（便捷方法，等价于 setter）。 */
     public void setAdvDataSourceInitHelper(IAdvDataSourceInitHelper helper) {
         this.iAdvDataSourceInitHelper = helper;
     }
@@ -107,8 +108,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 获取数据源配置查找助手。
      *
-     * <p>优先使用已注入的实例（通过 setter 或 {@link #getInstance(IAdvDataSourceHelper)}）；
-     * 若未注入，则尝试从 Spring 容器中自动获取。</p>
+     * <p>优先使用已注入的实例（通过 setter 或 {@link #getInstance(IAdvDataSourceHelper)}）； 若未注入，则尝试从 Spring
+     * 容器中自动获取。
      *
      * @return 数据源配置查找助手
      * @throws RuntimeException 当未注入且 Spring 容器中找不到实现类时抛出
@@ -122,7 +123,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
                     } catch (Exception e) {
                         throw new RuntimeException(
                                 "未注入 IAdvDataSourceHelper 且 Spring 容器中找不到实现类，"
-                                + "请通过 getInstance(IAdvDataSourceHelper) 或 setter 手动注入", e);
+                                        + "请通过 getInstance(IAdvDataSourceHelper) 或 setter 手动注入",
+                                e);
                     }
                 }
             }
@@ -133,7 +135,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 获取数据源初始化助手。
      *
-     * <p>优先使用已注入的实例（通过 setter）；若未注入，则尝试从 Spring 容器中自动获取。</p>
+     * <p>优先使用已注入的实例（通过 setter）；若未注入，则尝试从 Spring 容器中自动获取。
      *
      * @return 数据源初始化助手
      * @throws RuntimeException 当未注入且 Spring 容器中找不到实现类时抛出
@@ -143,11 +145,13 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
             synchronized (this) {
                 if (iAdvDataSourceInitHelper == null) {
                     try {
-                        iAdvDataSourceInitHelper = Gir.beans.getBean(IAdvDataSourceInitHelper.class);
+                        iAdvDataSourceInitHelper =
+                                Gir.beans.getBean(IAdvDataSourceInitHelper.class);
                     } catch (Exception e) {
                         throw new RuntimeException(
                                 "未注入 IAdvDataSourceInitHelper 且 Spring 容器中找不到实现类，"
-                                + "请通过 setAdvDataSourceInitHelper() 手动注入", e);
+                                        + "请通过 setAdvDataSourceInitHelper() 手动注入",
+                                e);
                     }
                 }
             }
@@ -155,9 +159,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return iAdvDataSourceInitHelper;
     }
 
-    /**
-     * 私有构造，注册 JVM 关闭钩子以释放所有数据源连接。
-     */
+    /** 私有构造，注册 JVM 关闭钩子以释放所有数据源连接。 */
     private AdvDynamicDataSourceStorage() {
         GutilShutdownHook.getInstance().registerTask(this::cleanCache);
     }
@@ -165,10 +167,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /** 数据源缓存映射（线程安全）。key: dataSourceId, value: 包装后的数据源 */
     private final Map<String, AdvDataSourceWrapper> dataSourceMap = new ConcurrentHashMap<>();
 
-    /**
-     * 清空所有数据源缓存并关闭连接。
-     * 通常由 JVM ShutdownHook 自动调用，也可手动调用释放资源。
-     */
+    /** 清空所有数据源缓存并关闭连接。 通常由 JVM ShutdownHook 自动调用，也可手动调用释放资源。 */
     @Override
     public void cleanCache() {
         log.info("执行清空数据源缓存并释放数据库链接操作！");
@@ -191,7 +190,8 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     }
 
     /**
-     * @deprecated 命名具有误导性（"get" 暗示只读但实际会触发创建），请使用 {@link #getOrCreateDataSource(String)} 或 {@link #getDataSourceById(String)}
+     * @deprecated 命名具有误导性（"get" 暗示只读但实际会触发创建），请使用 {@link #getOrCreateDataSource(String)} 或 {@link
+     *     #getDataSourceById(String)}
      */
     @Override
     @Deprecated
@@ -199,9 +199,7 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
         return getDataSourceById(dataSourceId);
     }
 
-    /**
-     * 按 ID 查找数据源，不存在则返回 {@code null}（只读，不会触发创建）。
-     */
+    /** 按 ID 查找数据源，不存在则返回 {@code null}（只读，不会触发创建）。 */
     @Override
     public AdvDataSourceWrapper getDataSourceById(String dataSourceId) {
         if (containsDataSource(dataSourceId)) {
@@ -213,11 +211,12 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 按 ID 查找数据源，不存在则触发创建。
      *
-     * <p>创建流程：</p>
+     * <p>创建流程：
+     *
      * <ol>
-     *   <li>通过 {@link IAdvDataSourceHelper#getDataSourceApoById(String)} 获取配置</li>
-     *   <li>通过 {@link IAdvDataSourceInitHelper#getDbDataSourceByApo(DataSourceApo)} 创建物理数据源</li>
-     *   <li>包装为 {@link AdvDataSourceWrapper} 并缓存</li>
+     *   <li>通过 {@link IAdvDataSourceHelper#getDataSourceApoById(String)} 获取配置
+     *   <li>通过 {@link IAdvDataSourceInitHelper#getDbDataSourceByApo(DataSourceApo)} 创建物理数据源
+     *   <li>包装为 {@link AdvDataSourceWrapper} 并缓存
      * </ol>
      *
      * @param dataSourceId 数据源标识
@@ -237,8 +236,10 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
                 return doubleCheck;
             }
             try {
-                DataSourceApo dataSourceApoById = getAdvDataSourceHelper().getDataSourceApoById(dataSourceId);
-                AdvDataSourceWrapper dataSourceByDataSourceApo = getDataSourceByDataSourceApo(dataSourceApoById);
+                DataSourceApo dataSourceApoById =
+                        getAdvDataSourceHelper().getDataSourceApoById(dataSourceId);
+                AdvDataSourceWrapper dataSourceByDataSourceApo =
+                        getDataSourceByDataSourceApo(dataSourceApoById);
                 dataSourceMap.put(dataSourceId, dataSourceByDataSourceApo);
                 return dataSourceByDataSourceApo;
             } catch (Exception e) {
@@ -261,10 +262,10 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
     /**
      * 手动注册一个已创建好的数据源到管理器。
      *
-     * <p>如果相同 ID 的数据源已存在，不会覆盖（幂等操作）。</p>
+     * <p>如果相同 ID 的数据源已存在，不会覆盖（幂等操作）。
      *
      * @param dataSourceId 数据源标识
-     * @param dataSource   数据源对象
+     * @param dataSource 数据源对象
      */
     @Override
     public void registerDataSource(String dataSourceId, DataSource dataSource) {
@@ -281,14 +282,15 @@ public class AdvDynamicDataSourceStorage implements DynamicDataSourceManager {
      * 根据配置对象创建并包装数据源。
      *
      * <p>实际创建工作委托给 {@link IAdvDataSourceInitHelper#getDbDataSourceByApo(DataSourceApo)}，
-     * 本方法只负责将结果包装为 {@link AdvDataSourceWrapper}。</p>
+     * 本方法只负责将结果包装为 {@link AdvDataSourceWrapper}。
      *
      * @param dataSourceApo 数据源配置对象
      * @return 包装后的数据源
      */
     @Override
     public AdvDataSourceWrapper getDataSourceByDataSourceApo(DataSourceApo dataSourceApo) {
-        return AdvDataSourceWrapper.wrap(getAdvDataSourceInitHelper().getDbDataSourceByApo(dataSourceApo));
+        return AdvDataSourceWrapper.wrap(
+                getAdvDataSourceInitHelper().getDbDataSourceByApo(dataSourceApo));
     }
 
     /**

@@ -5,7 +5,6 @@ package cn.geoair.map.tile.forge.fuser.precache;
  * @date ：Created in 2026/6/27 13:47
  * @description： 任务类型枚举
  */
-
 public enum TaskType {
     PRE_CACHE("预缓存", "PreCache"),
     CHECK_REPAIR("检查修复", "Check"),

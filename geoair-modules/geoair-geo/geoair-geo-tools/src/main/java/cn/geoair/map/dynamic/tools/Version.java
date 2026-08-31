@@ -3,11 +3,12 @@ package cn.geoair.map.dynamic.tools;
 import cn.geoair.base.Gir;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.Set;
 
 public class Version {
 
-    private static final String VERSION = "J17-dev-SNAPSHOT";
+    private static final String VERSION = "J17.1.6";
 
     public static String getVersion() {
         return VERSION;

@@ -24,11 +24,13 @@ public class MysqlAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
-    public MysqlAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public MysqlAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.MYSQL,
-                configAdvQueryGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.MYSQL, configAdvQueryGetter.get().getTypeHandlers());
     }
 
     @Override

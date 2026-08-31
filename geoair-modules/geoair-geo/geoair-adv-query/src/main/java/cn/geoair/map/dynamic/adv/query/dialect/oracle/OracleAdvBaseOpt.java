@@ -26,11 +26,13 @@ public class OracleAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
-    public OracleAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public OracleAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.ORACLE,
-                configAdvQueryGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.ORACLE, configAdvQueryGetter.get().getTypeHandlers());
     }
 
     @Override

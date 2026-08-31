@@ -13,14 +13,8 @@ import cn.geoair.base.lang.invoke.GkMethodHand;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilClass;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.extra.spring.SpringUtil;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -35,13 +29,22 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 /**
  * 由spring提供bean容器
  *
  * @author Ray
  */
 @Component
-public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextAware, BeanFactoryPostProcessor,InitializingBean {
+public class SpringContextBean4Gir
+        implements GiBeanFactory,
+                ApplicationContextAware,
+                BeanFactoryPostProcessor,
+                InitializingBean {
 
     static {
         GkMethodHand.implFromClass(SpringContextBean4Gir.class);
@@ -52,8 +55,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     @GaMethodHandImpl(
             implClass = GirBeanHelper.class,
             implMethod = "getProvider",
-            type = ImplType.expectfirst
-    )
+            type = ImplType.expectfirst)
     private static GiBeanFactory getProvider() {
         return SpringBeanProviderResolver.getProvider();
     }
@@ -61,6 +63,7 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     private static ApplicationContext springContext;
 
     private static GiBeanFactory beanProvider;
+
     /**
      * "@PostConstruct"注解标记的类中，由于ApplicationContext还未加载，导致空指针
      * 因此实现BeanFactoryPostProcessor注入ConfigurableListableBeanFactory实现bean的操作
@@ -72,7 +75,8 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+            throws BeansException {
         beanProvider = this;
         GirBeanHelper.setProvider(this);
         SpringBeanProviderResolver.setProvider(this);
@@ -276,15 +280,17 @@ public class SpringContextBean4Gir implements GiBeanFactory, ApplicationContextA
         }
     }
 
-
     public static ListableBeanFactory getBeanFactory() {
         final ListableBeanFactory factory = null == beanFactory ? springContext : beanFactory;
         if (null == factory) {
-            throw new UtilException("No ConfigurableListableBeanFactory or ApplicationContext injected, maybe not in the Spring environment?");
+            throw new UtilException(
+                    "No ConfigurableListableBeanFactory or ApplicationContext injected, maybe not in the Spring environment?");
         }
         return factory;
     }
-    public static ConfigurableListableBeanFactory getConfigurableBeanFactory() throws UtilException {
+
+    public static ConfigurableListableBeanFactory getConfigurableBeanFactory()
+            throws UtilException {
         final ConfigurableListableBeanFactory factory;
         if (null != beanFactory) {
             factory = beanFactory;

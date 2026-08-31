@@ -4,11 +4,8 @@ import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import lombok.Getter;
- 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,13 +16,12 @@ import java.util.stream.LongStream;
 /**
  * 可配置的分页查询执行器。
  *
- * <p>执行器为一次性对象：首次调用 {@link #getFinalDataList()} 会触发 {@link #execute()}，
- * 后续调用不会再次查询。是否并行执行页面、是否收集结果由 {@link PageConfig} 控制。</p>
+ * <p>执行器为一次性对象：首次调用 {@link #getFinalDataList()} 会触发 {@link #execute()}， 后续调用不会再次查询。是否并行执行页面、是否收集结果由
+ * {@link PageConfig} 控制。
  *
  * @param <T> 单条记录类型
  * @author 张逢吉
  */
- 
 public class PageActuator<T> {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final PageConditionDef<T> pageConditionDef;
@@ -49,7 +45,7 @@ public class PageActuator<T> {
      * 创建新的分页执行器。
      *
      * @param pageConditionDef 分页查询与消费定义
-     * @param <T>              单条记录类型
+     * @param <T> 单条记录类型
      * @return 独立的分页执行器
      * @throws NullPointerException 分页定义为空时抛出
      */
@@ -82,7 +78,10 @@ public class PageActuator<T> {
         pageConditionDef.setPageConfig(pageConfig);
 
         // 1. 基础参数校验
-        Long totalCount = pageConditionDef.getTotalRecordCount() == null ? pageConfig.getTotalCount() : pageConditionDef.getTotalRecordCount();
+        Long totalCount =
+                pageConditionDef.getTotalRecordCount() == null
+                        ? pageConfig.getTotalCount()
+                        : pageConditionDef.getTotalRecordCount();
         if (totalCount == null || totalCount <= 0) {
             Gir.log.info("无数据需处理，直接返回");
             return this;
@@ -121,17 +120,17 @@ public class PageActuator<T> {
                 } else {
                     actualTotalPages = maxPageNo;
                 }
-
             }
         }
         AtomicLong count = new AtomicLong(0);
-        Consumer<T> wapperConsumer = new Consumer<T>() {
-            @Override
-            public void accept(T t) {
-                count.incrementAndGet();
-                pageConditionDef.getEachRecordConsumer().accept(t);
-            }
-        };
+        Consumer<T> wapperConsumer =
+                new Consumer<T>() {
+                    @Override
+                    public void accept(T t) {
+                        count.incrementAndGet();
+                        pageConditionDef.getEachRecordConsumer().accept(t);
+                    }
+                };
 
         boolean isParallelConsume = pageConfig.isParallelConsumeRecordIs();
 
@@ -143,7 +142,8 @@ public class PageActuator<T> {
             // 模式2：串行消费（主线程逐页查询+逐页消费，无全量堆积）
             serialConsumeByPage(actualPageSize, actualTotalPages, wapperConsumer);
         }
-        pageConditionDef.onComplete(finalDataList, actualPageSize, actualTotalPages, count.get(), totalCount);
+        pageConditionDef.onComplete(
+                finalDataList, actualPageSize, actualTotalPages, count.get(), totalCount);
         return this;
     }
 
@@ -218,27 +218,28 @@ public class PageActuator<T> {
     }
 
     public static void main(String[] args) {
-        GirAdvTools.getPageActuatorOpt(new PageConditionDef<Object>() {
-            @Override
-            public Long getTotalRecordCount() {
-                return 11L;
-            }
+        GirAdvTools.getPageActuatorOpt(
+                        new PageConditionDef<Object>() {
+                            @Override
+                            public Long getTotalRecordCount() {
+                                return 11L;
+                            }
 
-            @Override
-            public void setPageConfig(PageConfig pageConfig) {
-                pageConfig.setMaxPageNo(20L);
-            }
+                            @Override
+                            public void setPageConfig(PageConfig pageConfig) {
+                                pageConfig.setMaxPageNo(20L);
+                            }
 
-            @Override
-            public List<Object> getPageRecords(Integer pageNo, Integer pageSize) {
-                System.out.println(pageNo + "----" + pageSize);
-                List<Object> pageRecords = new ArrayList<>();
-                for (Integer i = 0; i < pageSize; i++) {
-                    pageRecords.add(new Object());
-                }
-                return pageRecords;
-            }
-        }).execute();
+                            @Override
+                            public List<Object> getPageRecords(Integer pageNo, Integer pageSize) {
+                                System.out.println(pageNo + "----" + pageSize);
+                                List<Object> pageRecords = new ArrayList<>();
+                                for (Integer i = 0; i < pageSize; i++) {
+                                    pageRecords.add(new Object());
+                                }
+                                return pageRecords;
+                            }
+                        })
+                .execute();
     }
-
 }

@@ -23,16 +23,12 @@ import cn.geoair.map.tile.forge.fuser.provider.impl.grid4490.Grid4490WebTileGett
 public class TileGetterFactory {
     private static GiLogger log = GirLoggerFactory.getLogger();
 
-    /**
-     * 根据配置创建瓦片获取器（带缓存）
-     */
+    /** 根据配置创建瓦片获取器（带缓存） */
     public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo) {
         return create(pxyLayerInfo, null);
     }
 
-    /**
-     * 根据配置创建瓦片获取器（带缓存）
-     */
+    /** 根据配置创建瓦片获取器（带缓存） */
     public static LayerTileGetter create(String layerName) {
         PxyLayerInfo pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
         return create(pxyLayerInfo, null);
@@ -42,7 +38,7 @@ public class TileGetterFactory {
      * 根据配置创建瓦片获取器（带缓存）
      *
      * @param pxyLayerInfo 配置信息
-     * @param tileCache    自定义缓存（可选）
+     * @param tileCache 自定义缓存（可选）
      */
     public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache) {
         String layerName = pxyLayerInfo.getLayerName();
@@ -50,10 +46,12 @@ public class TileGetterFactory {
         return create(pxyLayerInfo, tileCache, layerCachePreFix);
     }
 
-    public static LayerTileGetter create(PxyLayerInfo pxyLayerInfo, TileCache tileCache, String layerCachePreFix) {
+    public static LayerTileGetter create(
+            PxyLayerInfo pxyLayerInfo, TileCache tileCache, String layerCachePreFix) {
         LayerTileGetter realGetter = createRealGetter(pxyLayerInfo);
-        boolean enableCache = "true".equalsIgnoreCase(pxyLayerInfo.getEnableCache())
-                              || "1".equals(pxyLayerInfo.getEnableCache());
+        boolean enableCache =
+                "true".equalsIgnoreCase(pxyLayerInfo.getEnableCache())
+                        || "1".equals(pxyLayerInfo.getEnableCache());
         if (!enableCache) {
             return realGetter;
         }
@@ -65,9 +63,7 @@ public class TileGetterFactory {
         return create(pxyLayerInfo, tileCache);
     }
 
-    /**
-     * 创建真实的获取器（不带缓存）
-     */
+    /** 创建真实的获取器（不带缓存） */
     private static LayerTileGetter createRealGetter(PxyLayerInfo pxyLayerInfo) {
         SrcType srcType = pxyLayerInfo.getSrcTypeEnums();
         if (srcType.isCustom()) {

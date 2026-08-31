@@ -2,6 +2,7 @@ package cn.geoair.base.gpa.entity;
 
 import cn.geoair.base.data.model.GiVisualModelable;
 import cn.geoair.base.gpa.dao.GiVisualSelectDao;
+
 import java.io.Serializable;
 
 public interface GiEntityVisuable<PK extends Serializable>

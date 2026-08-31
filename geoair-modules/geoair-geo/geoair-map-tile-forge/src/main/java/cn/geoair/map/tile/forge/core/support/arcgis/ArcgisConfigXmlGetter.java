@@ -19,10 +19,9 @@ public interface ArcgisConfigXmlGetter {
      */
     String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception;
 
-    /**
-     * 获取瓦片的 capabilities 文件
-     */
+    /** 获取瓦片的 capabilities 文件 */
     String getCapabilities(GirLayerConfigContext layerConfigContext) throws Exception;
+
     /**
      * 获取描述边界的文件描述
      *
@@ -32,8 +31,6 @@ public interface ArcgisConfigXmlGetter {
      */
     String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception;
 
-    /**
-     * 获取瓦片的缓存信息
-     */
+    /** 获取瓦片的缓存信息 */
     CacheInfo getCacheInfo(GirLayerConfigContext layerConfigContext) throws Exception;
 }

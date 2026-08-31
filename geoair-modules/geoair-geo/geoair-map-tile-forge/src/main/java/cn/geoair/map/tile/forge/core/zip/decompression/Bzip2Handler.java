@@ -5,9 +5,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-/**
- * BZIP2压缩解压适配器（ZIP规范 method=12）
- */
+/** BZIP2压缩解压适配器（ZIP规范 method=12） */
 public class Bzip2Handler implements DecompressionHandler {
 
     private static final int BUFFER_SIZE = 8192;
@@ -16,7 +14,7 @@ public class Bzip2Handler implements DecompressionHandler {
     public byte[] decompress(byte[] compressedData, long expectedSize) throws IOException {
         DecompressionLimits.validateExpectedSize(expectedSize);
         try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
-             BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais)) {
+                BZip2CompressorInputStream bzis = new BZip2CompressorInputStream(bais)) {
 
             byte[] result = DecompressionLimits.readAllLimited(bzis);
             if (expectedSize > 0 && result.length != expectedSize) {

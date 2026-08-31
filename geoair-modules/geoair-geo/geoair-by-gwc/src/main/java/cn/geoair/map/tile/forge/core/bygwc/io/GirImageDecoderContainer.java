@@ -1,6 +1,4 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io;
-
 
 import cn.geoair.map.tile.forge.core.bygwc.io.codec.ImageDecoder;
 
@@ -15,13 +13,10 @@ import java.util.Map;
  * call the decode() method and internally it uses the reader associated to the input mimetype.
  */
 public class GirImageDecoderContainer {
-    /**
-     * Collection of all the ImageDecoder interface implementation
-     */
+    /** Collection of all the ImageDecoder interface implementation */
     private Collection<ImageDecoder> decoders;
-    /**
-     * Map of all the decoders for mimetype
-     */
+
+    /** Map of all the decoders for mimetype */
     private Map<String, ImageDecoder> mapDecoders;
 
     public GirImageDecoderContainer(List<ImageDecoder> decoders) {

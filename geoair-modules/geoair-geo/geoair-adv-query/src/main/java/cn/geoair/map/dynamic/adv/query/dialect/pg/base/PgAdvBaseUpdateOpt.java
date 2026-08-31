@@ -11,7 +11,8 @@ import java.util.function.Supplier;
 /** PostgreSQL更新操作实现类 仅实现PG专属的差异化语法，复用父类所有通用逻辑 */
 public class PgAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public PgAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public PgAdvBaseUpdateOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();

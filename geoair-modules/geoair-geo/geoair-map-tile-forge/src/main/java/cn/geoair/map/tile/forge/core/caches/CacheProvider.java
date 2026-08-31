@@ -72,7 +72,6 @@ public interface CacheProvider {
      */
     <T> T get(Object key, Callable<T> valueLoader);
 
-
     byte[] getByte(Object key);
 
     /**
@@ -89,6 +88,7 @@ public interface CacheProvider {
      * @param key
      */
     void evict(Object key);
+
     /**
      * 清除掉某个前缀的缓存
      *

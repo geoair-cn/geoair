@@ -1,9 +1,9 @@
 package cn.geoair.sdk;
 
-import java.lang.reflect.Type;
-
 import cn.geoair.base.Gir;
 import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
+
+import java.lang.reflect.Type;
 
 final class GirSdkResponseParser {
 

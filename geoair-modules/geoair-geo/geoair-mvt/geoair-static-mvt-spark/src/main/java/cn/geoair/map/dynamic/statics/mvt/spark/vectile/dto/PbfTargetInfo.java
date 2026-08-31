@@ -1,9 +1,11 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto;
 
 import cn.geoair.map.dynamic.mvt.tools.model.PPbfType;
-import java.io.Serializable;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * @author ：张逢吉
@@ -22,9 +24,7 @@ public class PbfTargetInfo implements Serializable {
     // 是否保存要素列表
     private boolean saveFeatureList = false;
 
-    /**
-     * 创建一个新的默认 PbfTargetInfo 实例（线程安全：每次返回独立对象）。
-     */
+    /** 创建一个新的默认 PbfTargetInfo 实例（线程安全：每次返回独立对象）。 */
     public static PbfTargetInfo newInstance() {
         return new PbfTargetInfo()
                 .setSaveFeatureList(false)

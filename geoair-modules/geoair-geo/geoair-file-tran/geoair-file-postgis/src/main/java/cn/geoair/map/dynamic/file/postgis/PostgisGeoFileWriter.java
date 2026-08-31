@@ -10,19 +10,12 @@ import cn.geoair.map.dynamic.adv.GirAdvQuery;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileWriteException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.StopWatch;
 
@@ -35,6 +28,10 @@ import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.locationtech.jts.geom.Geometry;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -53,7 +50,6 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
     private SimpleFeatureType featureType;
 
     private int batchSize;
-
 
     @Override
     public void setLinkInfo(LinkInfo linkInfo) {
@@ -105,7 +101,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
 
             String localPart = geometryDescriptor.getName().getLocalPart();
             iAdvExecutor.eDropGeomColumn(linkInfo.getTableName(), localPart);
-            iAdvExecutor.eAddGeomColumn(linkInfo.getTableName(), localPart, enumsTypeGeom, writeConfig.getOutPutSrid());
+            iAdvExecutor.eAddGeomColumn(
+                    linkInfo.getTableName(), localPart, enumsTypeGeom, writeConfig.getOutPutSrid());
 
             logger.info("自动创建 PostGIS 表 " + linkInfo.getTableName() + " 成功");
         } catch (Exception e) {
@@ -123,16 +120,18 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                 return this;
             }
             tranRows(girAdvOneRow);
-            iAdvExecutor.bInsertIgnore(girAdvOneRow,
-                    s -> s.setConflictKeys(ListUtil.of("fid"))
-                            .setTableName(linkInfo.getTableName()).setToUnderlineCase(false));
+            iAdvExecutor.bInsertIgnore(
+                    girAdvOneRow,
+                    s ->
+                            s.setConflictKeys(ListUtil.of("fid"))
+                                    .setTableName(linkInfo.getTableName())
+                                    .setToUnderlineCase(false));
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileWriteException("写入 PostGIS 单行数据失败", e);
         }
         return this;
     }
-
 
     private void tranRows(GirAdvOneRow girAdvOneRow) {
         for (Map.Entry<String, Object> entry : girAdvOneRow.entrySet()) {
@@ -142,7 +141,8 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
                 Geometry geom = (Geometry) value;
                 int srid = geom.getSRID();
                 Geometry convert =
-                        GirGeoTools.defaultInstance().getSridOpt()
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
                                 .convert(geom, srid, writeConfig.getOutPutSrid());
                 if (convert == null) {
                     Gir.log.info("转换失败");
@@ -160,23 +160,32 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
         for (GirAdvOneRow row : rows) {
             tranRows(row);
         }
-        iAdvExecutor.bInsertIgnoreBatch(rows,
-                s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid")).setToUnderlineCase(false)
-                        .setTableName(linkInfo.getTableName()));
+        iAdvExecutor.bInsertIgnoreBatch(
+                rows,
+                s ->
+                        s.setBatchSize(batchSize)
+                                .setConflictKeys(ListUtil.of("fid"))
+                                .setToUnderlineCase(false)
+                                .setTableName(linkInfo.getTableName()));
         stopWatch.stop();
         logger.info("批量写入 {} 条要素成功，耗时：{}秒", rows.size(), stopWatch.getTotalTimeSeconds());
 
         return this;
     }
 
-
     private void initPostgisDataStore() {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put(PostgisNGDataStoreFactory.DBTYPE.key, "postgis");
-            params.put(PostgisNGDataStoreFactory.HOST.key, extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.HOST.key,
+                    extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.PORT.key,
+                    extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.DATABASE.key,
+                    extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
             DataSourceDruidFastCreate fastCreate = new DataSourceDruidFastCreate();
@@ -188,7 +197,6 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             dataSource = fastCreate.toDataSource();
             params.put(PostgisNGDataStoreFactory.DATASOURCE.key, dataSource);
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
-
 
             this.postgisDataStore = DataStoreFinder.getDataStore(params);
 

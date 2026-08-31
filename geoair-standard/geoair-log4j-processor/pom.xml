@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-log4j-processor</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-log4j-processor</name>
   <description>GirLog4j 注解处理器，编译期自动注入日志字段</description>
@@ -79,13 +79,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>
-            --add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
+          <argLine>--add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
             --add-opens jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
             --add-opens jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
             --add-opens jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-            --add-opens jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
-          </argLine>
+            --add-opens jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</argLine>
         </configuration>
       </plugin>
       <plugin>

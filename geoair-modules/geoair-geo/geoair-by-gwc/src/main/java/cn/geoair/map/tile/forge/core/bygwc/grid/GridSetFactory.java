@@ -18,15 +18,10 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.hutool.core.lang.Assert;
 
-
 public class GridSetFactory {
     private static GiLogger log = GirLoggerFactory.getLogger(GridSetFactory.class);
 
-    /**
-     * Default pixel size in meters, producing a default of 90.7 DPI
-     *
-
-     */
+    /** Default pixel size in meters, producing a default of 90.7 DPI */
     public static final double DEFAULT_PIXEL_SIZE_METER = 0.00028;
 
     public static int DEFAULT_LEVELS = 22;

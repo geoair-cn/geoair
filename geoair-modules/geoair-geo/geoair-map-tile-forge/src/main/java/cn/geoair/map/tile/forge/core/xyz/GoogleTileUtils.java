@@ -2,10 +2,7 @@ package cn.geoair.map.tile.forge.core.xyz;
 
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 
-/**
- * 谷歌TMS瓦片XYZ坐标与BBOX转换工具
- * 支持Web Mercator投影（EPSG:3857）
- */
+/** 谷歌TMS瓦片XYZ坐标与BBOX转换工具 支持Web Mercator投影（EPSG:3857） */
 public class GoogleTileUtils {
 
     // Web Mercator投影的世界范围
@@ -15,6 +12,7 @@ public class GoogleTileUtils {
 
     /**
      * 根据XYZ瓦片坐标计算对应的BBOX
+     *
      * @param x 瓦片X坐标
      * @param y 瓦片Y坐标
      * @param zoom 缩放级别
@@ -38,6 +36,7 @@ public class GoogleTileUtils {
 
     /**
      * 根据最大XYZ计算整个瓦片集的边界范围
+     *
      * @param maxX 最大X坐标
      * @param maxY 最大Y坐标
      * @param maxZoom 最大缩放级别
@@ -61,6 +60,7 @@ public class GoogleTileUtils {
 
     /**
      * 将Web Mercator坐标转换为经纬度（WGS84）
+     *
      * @param bbox Web Mercator投影的BBOX
      * @return WGS84经纬度的BBOX
      */
@@ -73,31 +73,26 @@ public class GoogleTileUtils {
         return new BoundingBox(minLon, minLat, maxLon, maxLat);
     }
 
-    /**
-     * Web Mercator X坐标转经度
-     */
+    /** Web Mercator X坐标转经度 */
     private static double mercatorXToLon(double x) {
         return (x / WORLD_MAX) * 180.0;
     }
 
-    /**
-     * Web Mercator Y坐标转纬度
-     */
+    /** Web Mercator Y坐标转纬度 */
     private static double mercatorYToLat(double y) {
         double lat = (y / WORLD_MAX) * 180.0;
         lat = 180.0 / Math.PI * (2.0 * Math.atan(Math.exp(lat * Math.PI / 180.0)) - Math.PI / 2.0);
         return lat;
     }
 
-    /**
-     * 获取指定缩放级别的瓦片总数
-     */
+    /** 获取指定缩放级别的瓦片总数 */
     public static int getTileCount(int zoom) {
         return (int) Math.pow(2, zoom);
     }
 
     /**
      * 获取指定缩放级别的分辨率（米/像素）
+     *
      * @param zoom 缩放级别
      * @param tileSize 瓦片像素尺寸（通常为256）
      * @return 分辨率（米/像素）
@@ -106,9 +101,7 @@ public class GoogleTileUtils {
         return WORLD_SIZE / (getTileCount(zoom) * tileSize);
     }
 
-    /**
-     * 示例用法
-     */
+    /** 示例用法 */
     public static void main(String[] args) {
         // 示例：计算最大瓦片(10, 10, 5)的边界
         int maxX = 10;

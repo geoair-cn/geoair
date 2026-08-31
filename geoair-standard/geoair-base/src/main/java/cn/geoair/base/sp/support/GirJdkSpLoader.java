@@ -3,6 +3,7 @@ package cn.geoair.base.sp.support;
 import cn.geoair.base.bean.GirNoUniqueBeanException;
 import cn.geoair.base.sp.annotation.GkSP;
 import cn.geoair.base.util.GutilGenericType;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;

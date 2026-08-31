@@ -28,10 +28,9 @@ public class GirEnvironmentHelper {
     }
 
     @GaMethodHandImpl(
-        implClass = GirEnvironmentHelper.class,
-        implMethod = "getEnvironmenter",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirEnvironmentHelper.class,
+            implMethod = "getEnvironmenter",
+            type = GaMethodHandImpl.ImplType.comity)
     protected GiEnvironmenter _getEnvironmenter() {
         return new GirSystemEnvironmentOffice().getOperater();
     }

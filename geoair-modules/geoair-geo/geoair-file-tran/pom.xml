@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-geo</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-file-tran</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
 
   <packaging>pom</packaging>
   <name>geoair-file-tran</name>
@@ -40,7 +40,7 @@
     <module>geoair-file-geojson</module>
     <module>geoair-file-postgis</module>
     <module>geoair-file-shp</module>
-<!--    <module>geoair-file-test</module>-->
+    <!--    <module>geoair-file-test</module>-->
   </modules>
 
   <scm>
@@ -50,7 +50,7 @@
   </scm>
   <properties>
     <java.version>17</java.version>
-    <geoair.version>J17-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J17.1.6</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -81,10 +81,7 @@
   </dependencyManagement>
 
   <build>
-    <plugins>
-
-
-    </plugins>
+    <plugins></plugins>
   </build>
 
   <profiles>
@@ -102,21 +99,20 @@
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>0.9.0</version>
             <extensions>false</extensions>
+            <configuration>
+              <publishingServerId>skip</publishingServerId>
+            </configuration>
             <executions>
               <execution>
                 <id>injected-central-publishing</id>
                 <phase>none</phase>
               </execution>
             </executions>
-            <configuration>
-              <publishingServerId>skip</publishingServerId>
-            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
 
   </profiles>
-
 
 </project>

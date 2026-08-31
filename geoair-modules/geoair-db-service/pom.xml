@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-db-service</name>
 
@@ -133,7 +133,7 @@
       </dependency>
 
       <dependency>
-       <groupId>com.oracle.database.jdbc</groupId>
+        <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc17</artifactId>
         <version>${ojdbc.version}</version>
       </dependency>
@@ -188,7 +188,7 @@
         <artifactId>commons-lang3</artifactId>
         <version>${commons.lang3.version}</version>
       </dependency>
-         <dependency>
+      <dependency>
         <groupId>jakarta.persistence</groupId>
         <artifactId>jakarta.persistence-api</artifactId>
         <version>${jakarta-persistence.version}</version>
@@ -204,10 +204,7 @@
   </dependencyManagement>
 
   <build>
-    <plugins>
-
-
-    </plugins>
+    <plugins></plugins>
   </build>
 
 </project>

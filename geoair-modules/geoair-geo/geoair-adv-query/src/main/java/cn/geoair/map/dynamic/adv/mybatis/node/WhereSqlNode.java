@@ -5,10 +5,11 @@ import java.util.List;
 
 /**
  * WHERE 子句节点，继承自 {@link TrimSqlNode}。
- * <p>
- * 自动处理 SQL 首部多余的 AND/OR 关键字，并在内容非空时添加 "WHERE " 前缀。
+ *
+ * <p>自动处理 SQL 首部多余的 AND/OR 关键字，并在内容非空时添加 "WHERE " 前缀。
  *
  * <p>示例：
+ *
  * <pre>
  *   &lt;where&gt;
  *     &lt;if test="name != null"&gt;AND name = #{name}&lt;/if&gt;
@@ -22,12 +23,10 @@ import java.util.List;
  */
 public class WhereSqlNode extends TrimSqlNode {
 
-    private static final List<String> PREFIXES_TO_OVERRIDE = Arrays.asList(
-            "AND ", "AND\r", "AND\t", "AND\n",
-            "OR ", "OR\r", "OR\t", "OR\n",
-            "and ", "and\r", "and\t", "and\n",
-            "or ", "or\r", "or\t", "or\n"
-    );
+    private static final List<String> PREFIXES_TO_OVERRIDE =
+            Arrays.asList(
+                    "AND ", "AND\r", "AND\t", "AND\n", "OR ", "OR\r", "OR\t", "OR\n", "and ",
+                    "and\r", "and\t", "and\n", "or ", "or\r", "or\t", "or\n");
 
     public WhereSqlNode(SqlNode contents) {
         super(contents, "WHERE ", null, PREFIXES_TO_OVERRIDE, null);

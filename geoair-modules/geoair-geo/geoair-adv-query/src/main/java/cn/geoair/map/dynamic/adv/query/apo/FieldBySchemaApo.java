@@ -4,8 +4,10 @@ import cn.geoair.base.Gir;
 import cn.geoair.map.dynamic.adv.dbmeta.*;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.hutool.db.dialect.DialectName;
-import java.io.Serializable;
+
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 数据库表字段元数据实体
@@ -77,7 +79,6 @@ public class FieldBySchemaApo implements Serializable {
         return geometryFieldIs;
     }
 
-
     /** 根据 udtName 和 dialectName，通过类型系统判断并设置是否为几何字段 */
     public boolean determineGeometryFieldIs() {
         if (udtName == null) {
@@ -91,10 +92,11 @@ public class FieldBySchemaApo implements Serializable {
             // 兜底：类型系统未匹配到（如 PG JDBC 驱动降级为 PgObject），
             // 用原始 udtName 做模式匹配
             String lower = udtName.toLowerCase();
-            geometryFieldIs = lower.contains("geometry")
-                    || lower.contains("geography")
-                    || lower.contains("pgobject")
-                    || lower.contains("sdo_geometry");
+            geometryFieldIs =
+                    lower.contains("geometry")
+                            || lower.contains("geography")
+                            || lower.contains("pgobject")
+                            || lower.contains("sdo_geometry");
         }
         return geometryFieldIs;
     }
@@ -130,7 +132,9 @@ public class FieldBySchemaApo implements Serializable {
         return dbType.supportClass().getSimpleName();
     }
 
-    /** @deprecated 请使用 getDbType() 代替 */
+    /**
+     * @deprecated 请使用 getDbType() 代替
+     */
     @Deprecated
     public PostgreSqlType getPostgreSqlType() {
         if (udtName == null) return null;

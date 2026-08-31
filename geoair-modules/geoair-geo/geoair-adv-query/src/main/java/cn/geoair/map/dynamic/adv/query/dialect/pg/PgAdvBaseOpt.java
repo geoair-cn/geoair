@@ -28,11 +28,13 @@ public class PgAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
-    public PgAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public PgAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.POSTGRESQL,
-                configAdvQueryGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.POSTGRESQL, configAdvQueryGetter.get().getTypeHandlers());
     }
 
     /** 获取插入操作代理对象（懒加载+数据源注入） */

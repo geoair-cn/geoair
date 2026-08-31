@@ -5,12 +5,13 @@ import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import org.locationtech.jts.geom.Envelope;
 
 /**
  * MySQL Spatial 矢量瓦片执行器
- * <p>
- * 使用 MySQL 空间函数：ST_GeomFromText、ST_Intersects、ST_AsBinary、TO_BASE64 等
+ *
+ * <p>使用 MySQL 空间函数：ST_GeomFromText、ST_Intersects、ST_AsBinary、TO_BASE64 等
  */
 public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
 
@@ -28,22 +29,29 @@ public class MysqlVectorTileExecutor extends AbstractVectorTileExecutor {
         double ymax = dataExtentBufferEnvelope.getMaxY();
         return StrUtil.format(
                 "ST_GeomFromText('POLYGON(({} {}, {} {}, {} {}, {} {}, {} {}))', {},'axis-order=long-lat')",
-                xmin, ymin, xmin, ymax, xmax, ymax, xmax, ymin, xmin, ymin, sourceDataSrid);
+                xmin,
+                ymin,
+                xmin,
+                ymax,
+                xmax,
+                ymax,
+                xmax,
+                ymin,
+                xmin,
+                ymin,
+                sourceDataSrid);
     }
 
     @Override
     protected String getGeomExportExpr(String tableAlias, String geomFieldName) {
-        return StrUtil.format("TO_BASE64(ST_AsBinary({}.{},'axis-order=long-lat'))",
-                tableAlias, geomFieldName);
+        return StrUtil.format(
+                "TO_BASE64(ST_AsBinary({}.{},'axis-order=long-lat'))", tableAlias, geomFieldName);
     }
 
     @Override
     protected String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias) {
-        return StrUtil.format("ST_Intersects({}, {}.{})",
-                geomFieldExpr, withQueryAlias, geomBox);
+        return StrUtil.format("ST_Intersects({}, {}.{})", geomFieldExpr, withQueryAlias, geomBox);
     }
-
-
 
     @Override
     protected String getGeomFieldWithSrid(String tableAlias, String geomFieldName, String srid) {

@@ -25,72 +25,78 @@ public class ArcgisTileUtils {
     private static final String CONF_XML = "Conf.xml";
     private static final String CONF_CDI = "conf.cdi";
 
-
-    public static String getConfigXmlByZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws Exception {
+    public static String getConfigXmlByZip(
+            GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler)
+            throws Exception {
         return getConfigFromZip(layerConfigContext, iCompressionHandler, CONF_XML);
     }
 
-    public static String getConfigCdiByZip(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws Exception {
+    public static String getConfigCdiByZip(
+            GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler)
+            throws Exception {
         return getConfigFromZip(layerConfigContext, iCompressionHandler, CONF_CDI);
     }
 
-    public static String getConfigXmlByS3(GirLayerConfigContext layerConfigContext) throws Exception {
+    public static String getConfigXmlByS3(GirLayerConfigContext layerConfigContext)
+            throws Exception {
         return getConfigFromS3(layerConfigContext, CONF_XML);
     }
 
-    public static String getConfigCdiByS3(GirLayerConfigContext layerConfigContext) throws Exception {
+    public static String getConfigCdiByS3(GirLayerConfigContext layerConfigContext)
+            throws Exception {
         return getConfigFromS3(layerConfigContext, CONF_CDI);
     }
 
-    public static String getConfigXmlByLocal(GirLayerConfigContext layerConfigContext) throws Exception {
+    public static String getConfigXmlByLocal(GirLayerConfigContext layerConfigContext)
+            throws Exception {
         return getConfigFromLocal(layerConfigContext, CONF_XML);
     }
 
-    public static String getConfigCdiByLocal(GirLayerConfigContext layerConfigContext) throws Exception {
+    public static String getConfigCdiByLocal(GirLayerConfigContext layerConfigContext)
+            throws Exception {
         return getConfigFromLocal(layerConfigContext, CONF_CDI);
     }
 
     // ==================== 统一的核心处理方法 ====================
 
-    /**
-     * 从ZIP中获取配置文件内容
-     */
-    private static String getConfigFromZip(GirLayerConfigContext layerConfigContext,
-                                           ICompressionHandler iCompressionHandler,
-                                           String confFileName) throws Exception {
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
+    /** 从ZIP中获取配置文件内容 */
+    private static String getConfigFromZip(
+            GirLayerConfigContext layerConfigContext,
+            ICompressionHandler iCompressionHandler,
+            String confFileName)
+            throws Exception {
+        String tempDirAbsolutePath =
+                TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
         File tempConfFile = FileUtil.file(tempDirAbsolutePath, confFileName);
 
         // 如果临时目录中不存在配置文件，则从zip中解压
         if (!FileUtil.exist(tempConfFile)) {
-            extractConfigFromZip(layerConfigContext, tempDirAbsolutePath, confFileName, iCompressionHandler);
+            extractConfigFromZip(
+                    layerConfigContext, tempDirAbsolutePath, confFileName, iCompressionHandler);
         }
 
         return readFileContent(tempConfFile);
     }
 
-    /**
-     * 从S3中获取配置文件内容
-     */
-    private static String getConfigFromS3(GirLayerConfigContext layerConfigContext, String confFileName) {
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
+    /** 从S3中获取配置文件内容 */
+    private static String getConfigFromS3(
+            GirLayerConfigContext layerConfigContext, String confFileName) {
+        String tempDirAbsolutePath =
+                TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
         String s3FilePath = layerConfigContext.getTilePathPrefix() + "/" + confFileName;
 
         // 从S3下载配置文件
-        S3ClientGetter.getInstance().downloadFromS3IfNeeded(
-                layerConfigContext.getObjectKey(),
-                s3FilePath,
-                tempDirAbsolutePath
-        );
+        S3ClientGetter.getInstance()
+                .downloadFromS3IfNeeded(
+                        layerConfigContext.getObjectKey(), s3FilePath, tempDirAbsolutePath);
 
         File tempConfFile = FileUtil.file(tempDirAbsolutePath, confFileName);
         return readFileContent(tempConfFile);
     }
 
-    /**
-     * 从本地文件系统中获取配置文件内容
-     */
-    private static String getConfigFromLocal(GirLayerConfigContext layerConfigContext, String confFileName) {
+    /** 从本地文件系统中获取配置文件内容 */
+    private static String getConfigFromLocal(
+            GirLayerConfigContext layerConfigContext, String confFileName) {
         String rootPath = layerConfigContext.getObjectKey();
         File file = FileUtil.file(rootPath);
         String absolutePath = file.getParentFile().getAbsolutePath();
@@ -101,13 +107,13 @@ public class ArcgisTileUtils {
 
     // ==================== ZIP解压相关私有方法 ====================
 
-    /**
-     * 从ZIP中提取配置文件到临时目录
-     */
-    private static void extractConfigFromZip(GirLayerConfigContext layerConfigContext,
-                                             String tempDirAbsolutePath,
-                                             String confFileName,
-                                             ICompressionHandler iCompressionHandler) throws IOException {
+    /** 从ZIP中提取配置文件到临时目录 */
+    private static void extractConfigFromZip(
+            GirLayerConfigContext layerConfigContext,
+            String tempDirAbsolutePath,
+            String confFileName,
+            ICompressionHandler iCompressionHandler)
+            throws IOException {
         GirLayerConfigContextHelper helper = GirLayerConfigContextHelper.getInstance();
 
         try (LayerPerFileDao layerPerFileDao = helper.getLayerPerFileDao(layerConfigContext)) {
@@ -115,44 +121,51 @@ public class ArcgisTileUtils {
 
             // 优先从缓存中获取，如果缓存未命中则从ZIP中获取
             if (cacheEnabled) {
-                boolean extractedFromCache = extractFromCache(layerPerFileDao, layerConfigContext,
-                        tempDirAbsolutePath, confFileName, iCompressionHandler);
+                boolean extractedFromCache =
+                        extractFromCache(
+                                layerPerFileDao,
+                                layerConfigContext,
+                                tempDirAbsolutePath,
+                                confFileName,
+                                iCompressionHandler);
                 if (extractedFromCache) {
                     return;
                 }
             }
 
             // 从ZIP中直接提取
-            extractFromZipDirectly(layerConfigContext, tempDirAbsolutePath, confFileName, iCompressionHandler);
+            extractFromZipDirectly(
+                    layerConfigContext, tempDirAbsolutePath, confFileName, iCompressionHandler);
         } catch (Exception e) {
             throw new RuntimeException("提取配置文件失败: " + confFileName, e);
         }
     }
 
-    /**
-     * 从缓存中提取配置文件
-     */
-    private static boolean extractFromCache(LayerPerFileDao layerPerFileDao,
-                                            GirLayerConfigContext layerConfigContext,
-                                            String tempDirAbsolutePath,
-                                            String confFileName,
-                                            ICompressionHandler iCompressionHandler) throws IOException, SQLException {
+    /** 从缓存中提取配置文件 */
+    private static boolean extractFromCache(
+            LayerPerFileDao layerPerFileDao,
+            GirLayerConfigContext layerConfigContext,
+            String tempDirAbsolutePath,
+            String confFileName,
+            ICompressionHandler iCompressionHandler)
+            throws IOException, SQLException {
         TileCentralDirectoryModel entry = layerPerFileDao.findByFileName(confFileName);
         if (entry != null) {
             String targetPath = tempDirAbsolutePath + File.separator + confFileName;
-            iCompressionHandler.readAndDecompressEntryToLocal(entry, layerConfigContext.getObjectKey(), targetPath);
+            iCompressionHandler.readAndDecompressEntryToLocal(
+                    entry, layerConfigContext.getObjectKey(), targetPath);
             return true;
         }
         return false;
     }
 
-    /**
-     * 直接从ZIP中提取配置文件
-     */
-    private static void extractFromZipDirectly(GirLayerConfigContext layerConfigContext,
-                                               String tempDirAbsolutePath,
-                                               String confFileName,
-                                               ICompressionHandler iCompressionHandler) throws IOException {
+    /** 直接从ZIP中提取配置文件 */
+    private static void extractFromZipDirectly(
+            GirLayerConfigContext layerConfigContext,
+            String tempDirAbsolutePath,
+            String confFileName,
+            ICompressionHandler iCompressionHandler)
+            throws IOException {
         String objectKey = layerConfigContext.getObjectKey();
         CentralDirectoryModel entry = findEntryInZip(iCompressionHandler, objectKey, confFileName);
 
@@ -164,38 +177,34 @@ public class ArcgisTileUtils {
         iCompressionHandler.readAndDecompressEntryToLocal(entry, objectKey, targetPath);
     }
 
-    /**
-     * 在ZIP中查找指定的配置文件条目
-     */
-    private static CentralDirectoryModel findEntryInZip(ICompressionHandler iCompressionHandler,
-                                                        String objectKey,
-                                                        String confFileName) throws IOException {
+    /** 在ZIP中查找指定的配置文件条目 */
+    private static CentralDirectoryModel findEntryInZip(
+            ICompressionHandler iCompressionHandler, String objectKey, String confFileName)
+            throws IOException {
         final CentralDirectoryModel[] foundEntry = {null};
         final String lowerCaseFileName = confFileName.toLowerCase();
 
-        iCompressionHandler.scanAllEntries(objectKey, (centralDirectoryEntry, allCount, currentCount) -> {
-            if (!centralDirectoryEntry.isDirectoryIs()) {
-                String name = centralDirectoryEntry.getName();
-                if (name.toLowerCase().contains(lowerCaseFileName)) {
-                    foundEntry[0] = centralDirectoryEntry;
-                    return false; // 找到后停止扫描
-                }
-            }
-            return true;
-        });
+        iCompressionHandler.scanAllEntries(
+                objectKey,
+                (centralDirectoryEntry, allCount, currentCount) -> {
+                    if (!centralDirectoryEntry.isDirectoryIs()) {
+                        String name = centralDirectoryEntry.getName();
+                        if (name.toLowerCase().contains(lowerCaseFileName)) {
+                            foundEntry[0] = centralDirectoryEntry;
+                            return false; // 找到后停止扫描
+                        }
+                    }
+                    return true;
+                });
 
         return foundEntry[0];
     }
 
-
-    /**
-     * 读取文件内容，如果文件不存在则返回null
-     */
+    /** 读取文件内容，如果文件不存在则返回null */
     private static String readFileContent(File file) {
         if (FileUtil.exist(file)) {
             return FileUtil.readUtf8String(file);
         }
         return null;
     }
-
 }

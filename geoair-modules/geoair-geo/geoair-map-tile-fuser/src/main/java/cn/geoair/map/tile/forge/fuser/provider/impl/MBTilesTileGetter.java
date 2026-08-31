@@ -7,11 +7,11 @@ import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
-import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
+
 import com.alibaba.druid.pool.DruidDataSource;
- 
 
 /**
  * MBTiles 瓦片获取器（从 MBTiles 数据库读取瓦片）
@@ -19,7 +19,6 @@ import com.alibaba.druid.pool.DruidDataSource;
  * @author 张俊
  * @date Created in 2026/06/23
  */
- 
 public class MBTilesTileGetter extends BaseTileGetter {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final String mbtilesFilePath;
@@ -42,12 +41,13 @@ public class MBTilesTileGetter extends BaseTileGetter {
         }
 
         // 创建数据源（只读模式）
-        this.dataSource = MbtilesUtils.createDataSource(
-                this.mbtilesFilePath,
-                true,   // 只读
-                10,     // 最大连接数
-                2       // 最小空闲连接数
-        );
+        this.dataSource =
+                MbtilesUtils.createDataSource(
+                        this.mbtilesFilePath,
+                        true, // 只读
+                        10, // 最大连接数
+                        2 // 最小空闲连接数
+                        );
 
         // 初始化数据库
         initDatabase();
@@ -94,29 +94,36 @@ public class MBTilesTileGetter extends BaseTileGetter {
             log.debug("MBTiles 文件不存在: {}", mbtilesFilePath);
             return null;
         }
-        int storeY = FuserCacheUtils.getStoreY(z, y,
-                getLayerInfo().getTileRowOriginEnums().isTopLeft(), FuserCacheUtils.getCacheGridSrid(getLayerInfo()));
+        int storeY =
+                FuserCacheUtils.getStoreY(
+                        z,
+                        y,
+                        getLayerInfo().getTileRowOriginEnums().isTopLeft(),
+                        FuserCacheUtils.getCacheGridSrid(getLayerInfo()));
         long startTime = System.currentTimeMillis();
         MbtilesInfo tile = MbtilesUtils.getTile(dataSource, z, x, storeY);
         byte[] imageBytes = tile.getTileData();
         if (imageBytes != null && imageBytes.length > 0) {
             long elapsed = System.currentTimeMillis() - startTime;
-            log.debug("从 MBTiles 读取瓦片成功: {} ({},{},{}) 大小: {} bytes, 耗时: {}ms",
-                    mbtilesFilePath, z, x, y, imageBytes.length, elapsed);
+            log.debug(
+                    "从 MBTiles 读取瓦片成功: {} ({},{},{}) 大小: {} bytes, 耗时: {}ms",
+                    mbtilesFilePath,
+                    z,
+                    x,
+                    y,
+                    imageBytes.length,
+                    elapsed);
             return new ByteArrayResource(imageBytes);
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("MBTiles 中未找到瓦片: {} ({},{},{}) storeY={}",
-                    mbtilesFilePath, z, x, y, storeY);
+            log.debug("MBTiles 中未找到瓦片: {} ({},{},{}) storeY={}", mbtilesFilePath, z, x, y, storeY);
         }
         return null;
     }
-
 
     public void close() {
         MbtilesUtils.closeDataSource(dataSource);
         log.info("MBTiles 数据源已关闭: {}", mbtilesFilePath);
     }
-
 }

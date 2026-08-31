@@ -29,10 +29,9 @@ public class GirConvertHelper {
     }
 
     @GaMethodHandImpl(
-        implClass = GirConvertHelper.class,
-        implMethod = "getProvider",
-        type = GaMethodHandImpl.ImplType.comity
-    )
+            implClass = GirConvertHelper.class,
+            implMethod = "getProvider",
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiConverterProvider _getProvider() {
         return new GirConverterImpl();
     }

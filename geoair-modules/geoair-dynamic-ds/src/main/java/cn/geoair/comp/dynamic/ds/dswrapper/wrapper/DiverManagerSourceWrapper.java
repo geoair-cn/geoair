@@ -46,6 +46,4 @@ public class DiverManagerSourceWrapper extends GirAbstractDataSourceWrapper {
     public Integer getActiveCount() {
         return null;
     }
-
-
 }

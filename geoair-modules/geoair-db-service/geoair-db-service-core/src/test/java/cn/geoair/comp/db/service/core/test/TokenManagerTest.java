@@ -1,14 +1,14 @@
-//package cn.geoair.comp.db.service.core.test;
+// package cn.geoair.comp.db.service.core.test;
 //
-//import static org.junit.Assert.*;
+// import static org.junit.Assert.*;
 //
-//import cn.geoair.comp.db.service.core.utils.TokenManager;
-//import org.junit.Test;
+// import cn.geoair.comp.db.service.core.utils.TokenManager;
+// import org.junit.Test;
 //
-///**
+/// **
 // * {@link TokenManager} 的单元测试。
 // */
-//public class TokenManagerTest {
+// public class TokenManagerTest {
 //
 //    @Test
 //    public void testGenerateAndValidate() {
@@ -50,4 +50,4 @@
 //    public void testGenerateWithNullPassword() {
 //        TokenManager.generateToken("admin", null);
 //    }
-//}
+// }

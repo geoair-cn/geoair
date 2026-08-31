@@ -1,16 +1,18 @@
 package cn.geoair.map.dynamic.tools.simple.response;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import org.junit.Assert;
-import org.junit.Test;
 
 /** {@link TileResponseByInputStream} 的流长度与缓存语义测试。 */
 public class TileResponseByInputStreamTest {
 
     @Test
-    public void shouldNotTreatAvailableAsContentLengthAndShouldCacheConsumedStream() throws IOException {
+    public void shouldNotTreatAvailableAsContentLengthAndShouldCacheConsumedStream()
+            throws IOException {
         byte[] content = new byte[] {1, 2, 3};
         ZeroAvailableInputStream inputStream = new ZeroAvailableInputStream(content);
         TileResponseByInputStream response = TileResponseByInputStream.success(inputStream, null);
@@ -29,8 +31,9 @@ public class TileResponseByInputStreamTest {
 
     @Test
     public void shouldKeepExplicitContentLengthWhenProvided() {
-        TileResponseByInputStream response = TileResponseByInputStream.success(
-                new ByteArrayInputStream(new byte[] {1, 2, 3}), null, 3L);
+        TileResponseByInputStream response =
+                TileResponseByInputStream.success(
+                        new ByteArrayInputStream(new byte[] {1, 2, 3}), null, 3L);
 
         Assert.assertEquals(Long.valueOf(3L), response.getContentLength());
     }

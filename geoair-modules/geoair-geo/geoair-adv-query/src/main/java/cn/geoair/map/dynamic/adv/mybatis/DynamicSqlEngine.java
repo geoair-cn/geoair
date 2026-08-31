@@ -5,25 +5,28 @@ import cn.geoair.map.dynamic.adv.mybatis.node.SqlNode;
 import cn.geoair.map.dynamic.adv.mybatis.tag.XmlParser;
 import cn.geoair.map.dynamic.adv.mybatis.token.TokenHandler;
 import cn.geoair.map.dynamic.adv.mybatis.token.TokenParser;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * 动态 SQL 引擎，将 MyBatis 风格的动态 SQL 模板解析为最终的 SQL 文本和 JDBC 参数。
- * <p>
- * 支持的动态 SQL 语法：
+ *
+ * <p>支持的动态 SQL 语法：
+ *
  * <ul>
- *   <li>{@code <if test="...">} — 条件判断</li>
- *   <li>{@code <foreach collection="..." ...>} — 循环展开</li>
- *   <li>{@code <where>} — WHERE 子句自动修剪</li>
- *   <li>{@code <set>} — SET 子句自动修剪</li>
- *   <li>{@code <trim prefix="..." ...>} — 自定义修剪</li>
- *   <li>{@code ${expression}} — 常量替换（直接拼接，<b>注意 SQL 注入风险</b>）</li>
- *   <li>{@code #{expression}} — 参数占位符（替换为 {@code ?}，参数值收集到列表中）</li>
+ *   <li>{@code <if test="...">} — 条件判断
+ *   <li>{@code <foreach collection="..." ...>} — 循环展开
+ *   <li>{@code <where>} — WHERE 子句自动修剪
+ *   <li>{@code <set>} — SET 子句自动修剪
+ *   <li>{@code <trim prefix="..." ...>} — 自定义修剪
+ *   <li>{@code ${expression}} — 常量替换（直接拼接，<b>注意 SQL 注入风险</b>）
+ *   <li>{@code #{expression}} — 参数占位符（替换为 {@code ?}，参数值收集到列表中）
  * </ul>
  *
  * <p>使用示例：
+ *
  * <pre>
  * DynamicSqlEngine engine = SqlEngineUtil.getEngine();
  * String template = "SELECT * FROM user WHERE 1=1"
@@ -47,7 +50,7 @@ public class DynamicSqlEngine {
     /**
      * 解析动态 SQL 模板，生成最终 SQL 和 JDBC 参数。
      *
-     * @param text   SQL 模板文本（不含外层 XML 根标签，引擎会自动包裹 {@code <root>...</root>}）
+     * @param text SQL 模板文本（不含外层 XML 根标签，引擎会自动包裹 {@code <root>...</root>}）
      * @param params 参数上下文（变量名 → 值的映射），用于 OGNL 表达式求值
      * @return 解析结果，包含最终 SQL 和参数值列表
      */
@@ -62,8 +65,8 @@ public class DynamicSqlEngine {
 
     /**
      * 静态分析 SQL 模板，提取所有引用的参数名（不执行条件判断）。
-     * <p>
-     * 用于提前获知模板依赖哪些参数，例如用于参数校验或元数据查询。
+     *
+     * <p>用于提前获知模板依赖哪些参数，例如用于参数校验或元数据查询。
      *
      * @param text SQL 模板文本
      * @return 参数名集合
@@ -84,9 +87,7 @@ public class DynamicSqlEngine {
         return extractParameterNames(text);
     }
 
-    /**
-     * 从缓存获取或解析 XML 为 SqlNode 树。
-     */
+    /** 从缓存获取或解析 XML 为 SqlNode 树。 */
     private SqlNode parseXml2SqlNode(String text) {
         SqlNode node = cache.get(text);
         if (node == null) {
@@ -96,21 +97,24 @@ public class DynamicSqlEngine {
         return node;
     }
 
-    /**
-     * 将 SQL 中的 #{expression} 替换为 ? 占位符，并将表达式求值结果收集到参数列表。
-     */
+    /** 将 SQL 中的 #{expression} 替换为 ? 占位符，并将表达式求值结果收集到参数列表。 */
     private void replaceHashPlaceholders(Context context) {
-        TokenParser tokenParser = new TokenParser("#{", "}", new TokenHandler() {
-            @Override
-            public String handleToken(String content) {
-                Object value = context.getOgnlValue(content);
-                if (value == null) {
-                    throw new RuntimeException("could not found value : " + content);
-                }
-                context.addParameter(value);
-                return "?";
-            }
-        });
+        TokenParser tokenParser =
+                new TokenParser(
+                        "#{",
+                        "}",
+                        new TokenHandler() {
+                            @Override
+                            public String handleToken(String content) {
+                                Object value = context.getOgnlValue(content);
+                                if (value == null) {
+                                    throw new RuntimeException(
+                                            "could not found value : " + content);
+                                }
+                                context.addParameter(value);
+                                return "?";
+                            }
+                        });
         context.setSql(tokenParser.parse(context.getSql()));
     }
 }

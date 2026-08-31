@@ -3,23 +3,23 @@ package cn.geoair.comp.jdbc.url.impl;
 import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
 import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.geoair.comp.jdbc.url.beans.JdbcUrlProperty;
+
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.Data;
 
 /**
  * 方言实现共享的 URL 片段、端点及参数区解析工具。
  *
- * <p>该类仅服务于本模块内部。各方言只负责自身语法，公共字符串处理集中在这里，
- * 避免 PostgreSQL、SQL Server 等实现再次产生分裂的参数规则。</p>
+ * <p>该类仅服务于本模块内部。各方言只负责自身语法，公共字符串处理集中在这里， 避免 PostgreSQL、SQL Server 等实现再次产生分裂的参数规则。
  *
  * @author 张逢吉
  */
 final class JdbcUrlDialectSupport {
 
-    private JdbcUrlDialectSupport() {
-    }
+    private JdbcUrlDialectSupport() {}
 
     static boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
@@ -48,8 +48,11 @@ final class JdbcUrlDialectSupport {
                 continue;
             }
             int equals = item.indexOf('=');
-            properties.add(equals < 0 ? new JdbcUrlProperty(item, null, false)
-                    : new JdbcUrlProperty(item.substring(0, equals), item.substring(equals + 1), true));
+            properties.add(
+                    equals < 0
+                            ? new JdbcUrlProperty(item, null, false)
+                            : new JdbcUrlProperty(
+                                    item.substring(0, equals), item.substring(equals + 1), true));
         }
         return new ParsedTail(url.substring(0, splitIndex), properties, style);
     }
@@ -89,8 +92,10 @@ final class JdbcUrlDialectSupport {
     static final class ParsedTail {
         /** 不包含参数区的 JDBC URL 主体。 */
         final String coreUrl;
+
         /** 按原始顺序解析出的参数列表。 */
         final List<JdbcUrlProperty> properties;
+
         /** 此参数区使用的分隔风格。 */
         final JdbcUrl.PropertyStyle style;
 

@@ -142,8 +142,7 @@ public abstract class GutilObject {
      * 解包可能为 {@link java.util.Optional} 的给定对象。
      *
      * @param obj 候选对象
-     * @return {@code Optional} 内部持有的值；{@code Optional} 为空时返回 {@code null}；
-     *     否则原样返回给定对象
+     * @return {@code Optional} 内部持有的值；{@code Optional} 为空时返回 {@code null}； 否则原样返回给定对象
      * @since 5.0
      */
     public static Object unwrapOptional(Object obj) {
@@ -220,8 +219,8 @@ public abstract class GutilObject {
      * @param enumValues 所有枚举常量的数组，通常按 {@code Enum.values()} 获取
      * @param constant 要获取枚举值的常量名
      * @return 匹配的枚举常量；{@code enumValues} 为 {@code null} 或未找到给定常量时返回 {@code null}
-     * @throws IllegalArgumentException 如果在给定枚举数组中未找到给定常量。可先用
-     *     {@link #containsConstant(Enum[], String)} 作为守卫以避免该异常。
+     * @throws IllegalArgumentException 如果在给定枚举数组中未找到给定常量。可先用 {@link #containsConstant(Enum[],
+     *     String)} 作为守卫以避免该异常。
      */
     public static <E extends Enum<?>> E caseInsensitiveValueOf(E[] enumValues, String constant) {
         if (enumValues == null) {
@@ -308,8 +307,7 @@ public abstract class GutilObject {
     // ---------------------------------------------------------------------
 
     /**
-     * 判断给定对象是否相等：两者均为 {@code null} 时返回 {@code true}，仅一方为 {@code null} 时返回
-     * {@code false}。
+     * 判断给定对象是否相等：两者均为 {@code null} 时返回 {@code true}，仅一方为 {@code null} 时返回 {@code false}。
      *
      * <p>使用 {@code Arrays.equals} 比较数组，即基于数组元素而非数组引用进行相等性判断。
      *
@@ -376,9 +374,8 @@ public abstract class GutilObject {
     }
 
     /**
-     * 返回给定对象的哈希码，通常为 {@code Object#hashCode()} 的值。如果对象是数组，
-     * 本方法将委托给本类中针对数组的任一 {@code nullSafeHashCode} 方法。如果对象为
-     * {@code null}，本方法返回 0。
+     * 返回给定对象的哈希码，通常为 {@code Object#hashCode()} 的值。如果对象是数组， 本方法将委托给本类中针对数组的任一 {@code
+     * nullSafeHashCode} 方法。如果对象为 {@code null}，本方法返回 0。
      *
      * @see Object#hashCode()
      * @see # SafeHashCode(Object[])
@@ -427,9 +424,7 @@ public abstract class GutilObject {
         return obj.hashCode();
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(Object[] array) {
         if (array == null) {
             return 0;
@@ -441,9 +436,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(boolean[] array) {
         if (array == null) {
             return 0;
@@ -455,9 +448,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(byte[] array) {
         if (array == null) {
             return 0;
@@ -469,9 +460,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(char[] array) {
         if (array == null) {
             return 0;
@@ -483,9 +472,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(double[] array) {
         if (array == null) {
             return 0;
@@ -497,9 +484,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(float[] array) {
         if (array == null) {
             return 0;
@@ -511,9 +496,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(int[] array) {
         if (array == null) {
             return 0;
@@ -525,9 +508,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(long[] array) {
         if (array == null) {
             return 0;
@@ -539,9 +520,7 @@ public abstract class GutilObject {
         return hash;
     }
 
-    /**
-     * 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。
-     */
+    /** 根据指定数组的内容返回哈希码。如果 {@code array} 为 {@code null}，本方法返回 0。 */
     public static int nullSafeHashCode(short[] array) {
         if (array == null) {
             return 0;
@@ -623,8 +602,7 @@ public abstract class GutilObject {
     /**
      * 如果 {@code obj} 不为 {@code null}，返回基于内容的字符串表示；否则返回空字符串。
      *
-     * <p>与 {@link #SafeToString(Object)} 不同之处在于：对于 {@code null} 值，本方法返回空字符串
-     * 而非 "null"。
+     * <p>与 {@link #SafeToString(Object)} 不同之处在于：对于 {@code null} 值，本方法返回空字符串 而非 "null"。
      *
      * @param obj 要构建显示字符串的对象
      * @return {@code obj} 的显示字符串表示
@@ -698,8 +676,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -728,8 +706,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -759,8 +737,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -789,8 +767,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -819,8 +797,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -850,8 +828,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -881,8 +859,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -911,8 +889,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -941,8 +919,8 @@ public abstract class GutilObject {
     /**
      * 返回指定数组内容的字符串表示。
      *
-     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以
-     * {@code ", "}（逗号加空格）分隔。如果 {@code array} 为 {@code null}，返回 {@code "null"}。
+     * <p>字符串表示由数组元素列表组成，外层用花括号（{@code "{}"}）包围。相邻元素以 {@code ", "}（逗号加空格）分隔。如果 {@code array} 为
+     * {@code null}，返回 {@code "null"}。
      *
      * @param array 要构建字符串表示的数组
      * @return {@code array} 的字符串表示
@@ -989,8 +967,8 @@ public abstract class GutilObject {
      * <ol>
      *   <li>obj1 == null &amp;&amp; obj2 == null
      *   <li>obj1.equals(obj2)
-     *   <li>任一对象为BigDecimal时，按数值比较（{@code compareTo}结果为0即相等，忽略精度，如0.00 == 0）；
-     *       另一侧为{@link Number}时按数值转换后比较，否则视为不相等
+     *   <li>任一对象为BigDecimal时，按数值比较（{@code compareTo}结果为0即相等，忽略精度，如0.00 == 0）； 另一侧为{@link
+     *       Number}时按数值转换后比较，否则视为不相等
      *   <li>两侧均为数组时，按元素内容深度比较（委托 {@link #nullSafeEquals(Object, Object)}）
      * </ol>
      *
@@ -1011,7 +989,10 @@ public abstract class GutilObject {
             }
             return false;
         }
-        if (obj1 != null && obj2 != null && obj1.getClass().isArray() && obj2.getClass().isArray()) {
+        if (obj1 != null
+                && obj2 != null
+                && obj1.getClass().isArray()
+                && obj2.getClass().isArray()) {
             return arrayEquals(obj1, obj2);
         }
         return Objects.equals(obj1, obj2);
@@ -1044,8 +1025,7 @@ public abstract class GutilObject {
      * @param obj 被计算长度的对象
      * @return 长度，不支持的类型的返回 -1
      * @apiNote 当对象为 {@link Iterator} 或 {@link Enumeration} 时，必须遍历才能计数，因此本方法会<b>消费（耗尽）</b>
-     *     传入的迭代器/枚举：调用后该迭代器/枚举已无剩余元素，不可复用。如有复用需求请先拷贝或改用
-     *     {@link Collection#size()}。
+     *     传入的迭代器/枚举：调用后该迭代器/枚举已无剩余元素，不可复用。如有复用需求请先拷贝或改用 {@link Collection#size()}。
      */
     public static int length(Object obj) {
         if (obj == null) {
@@ -1102,9 +1082,8 @@ public abstract class GutilObject {
      * @param obj 对象
      * @param element 元素
      * @return 是否包含
-     * @apiNote 当对象为 {@link Map} 时，本方法判断的是<b>值</b>（{@code containsValue}）而非键；
-     *     当对象为 {@link Iterator} 或 {@link Enumeration} 时，本方法会<b>消费（耗尽）</b>传入的迭代器/枚举，
-     *     调用后其剩余元素不可再取。
+     * @apiNote 当对象为 {@link Map} 时，本方法判断的是<b>值</b>（{@code containsValue}）而非键； 当对象为 {@link Iterator}
+     *     或 {@link Enumeration} 时，本方法会<b>消费（耗尽）</b>传入的迭代器/枚举， 调用后其剩余元素不可再取。
      */
     public static boolean contains(Object obj, Object element) {
         if (obj == null) {
@@ -1157,8 +1136,8 @@ public abstract class GutilObject {
 
     /**
      * 检查对象是否为null<br>
-     * 判断标准为 {@code obj == null}。注意：不再调用 {@code equals(null)} 判断，
-     * 因为对equals非null安全的类（如{@code List}、{@code Map}）会抛出NPE。
+     * 判断标准为 {@code obj == null}。注意：不再调用 {@code equals(null)} 判断， 因为对equals非null安全的类（如{@code
+     * List}、{@code Map}）会抛出NPE。
      *
      * @param obj 对象
      * @return 是否为null
@@ -1237,8 +1216,7 @@ public abstract class GutilObject {
      * 如果给定对象为{@code null} 返回默认值, 如果不为null 返回自定义handle处理后的返回值
      *
      * @param source Object 类型对象
-     * @param handle 自定义的处理方法，可以为{@code null}；为{@code null}时视为未提供处理逻辑，
-     *     直接返回{@code defaultValue}
+     * @param handle 自定义的处理方法，可以为{@code null}；为{@code null}时视为未提供处理逻辑， 直接返回{@code defaultValue}
      * @param defaultValue 默认为空的返回值
      * @param <T> 被检查对象为{@code null}返回默认值，否则返回自定义handle处理后的返回值
      * @return 处理后的返回值
@@ -1256,8 +1234,7 @@ public abstract class GutilObject {
      * 如果给定对象为{@code null}或者""返回默认值, 否则返回自定义handle处理后的返回值
      *
      * @param str String 类型
-     * @param handle 自定义的处理方法，可以为{@code null}；为{@code null}时视为未提供处理逻辑，
-     *     直接返回{@code defaultValue}
+     * @param handle 自定义的处理方法，可以为{@code null}；为{@code null}时视为未提供处理逻辑， 直接返回{@code defaultValue}
      * @param defaultValue 默认为空的返回值
      * @param <T> 被检查对象为{@code null}或者 ""返回默认值，否则返回自定义handle处理后的返回值
      * @return 处理后的返回值

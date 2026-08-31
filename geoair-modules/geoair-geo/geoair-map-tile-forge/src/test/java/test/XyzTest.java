@@ -14,13 +14,14 @@ import cn.geoair.map.tile.forge.core.zip.LogProgressConsumer;
  */
 public class XyzTest {
     public static void main(String[] args) {
-        GirLayerConfigContext
-                context = new GirLayerConfigContext();
-        context.setDataId("XYZ").setMapTileType(GirMapTileType.XYZ).setStorageType(GirStorageType.LOCAL_ZIP).setObjectKey("E:\\gis测试数据\\测试数据\\二维地形\\terrarium4326xyz.zip");
-        TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
+        GirLayerConfigContext context = new GirLayerConfigContext();
+        context.setDataId("XYZ")
+                .setMapTileType(GirMapTileType.XYZ)
+                .setStorageType(GirStorageType.LOCAL_ZIP)
+                .setObjectKey("E:\\gis测试数据\\测试数据\\二维地形\\terrarium4326xyz.zip");
+        TileStorageSupportAdapter adapter =
+                new TileStorageSupportAdapter(new TestGirLayerConfigContextHelper());
         ITileStorageSupport support = adapter.getSupport(context);
         support.preCacheTiles(context, new LogProgressConsumer());
-
     }
-
 }

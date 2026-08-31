@@ -12,10 +12,9 @@ import java.util.Map;
  * @date ：Created in 2026/7/16 12:42
  * @description： 集成快速创建方法的LinkedHashMap<String, Object>
  */
-public class GirFastStrObjMap<V> extends LinkedHashMap<String, V> implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable {
-    /**
-     * 创建一个空的 GirFastStrObjMap
-     */
+public class GirFastStrObjMap<V> extends LinkedHashMap<String, V>
+        implements OptNullGeomAndBasicTypeFromObjectGetter, Serializable {
+    /** 创建一个空的 GirFastStrObjMap */
     public static <V> GirFastStrObjMap<V> of() {
         return new GirFastStrObjMap<>();
     }
@@ -23,11 +22,12 @@ public class GirFastStrObjMap<V> extends LinkedHashMap<String, V> implements Opt
     /**
      * 通过bean创建 GirFastStrObjMap
      *
-     * @param bean              bean对象
+     * @param bean bean对象
      * @param isToUnderlineCase 是否转换为下划线模式
-     * @param ignoreNullValue   是否忽略值为空的字段
+     * @param ignoreNullValue 是否忽略值为空的字段
      */
-    public static GirFastStrObjMap<Object> ofBean(Object bean, boolean isToUnderlineCase, boolean ignoreNullValue) {
+    public static GirFastStrObjMap<Object> ofBean(
+            Object bean, boolean isToUnderlineCase, boolean ignoreNullValue) {
         GirFastStrObjMap<Object> map = new GirFastStrObjMap<>();
         BeanUtil.beanToMap(bean, map, isToUnderlineCase, ignoreNullValue);
         return map;
@@ -56,5 +56,4 @@ public class GirFastStrObjMap<V> extends LinkedHashMap<String, V> implements Opt
         }
         return o;
     }
-
 }

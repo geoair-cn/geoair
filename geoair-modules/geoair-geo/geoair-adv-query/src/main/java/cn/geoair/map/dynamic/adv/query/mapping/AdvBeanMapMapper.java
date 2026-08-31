@@ -13,11 +13,11 @@ import java.util.Map;
 /**
  * Map → Bean 映射器（与 {@link AdvBeanMapper} 对称，后者是 ResultSet → Bean）。
  *
- * <p>使用 TypeHandler 体系进行类型转换，Geometry / 日期 / 枚举等复杂类型能正确映射。</p>
+ * <p>使用 TypeHandler 体系进行类型转换，Geometry / 日期 / 枚举等复杂类型能正确映射。
  *
  * <pre>{@code
- *   AdvBeanMapMapper mapper = new AdvBeanMapMapper(typeHandlerRegistry);
- *   List<User> users = mapper.mapList(rowList, User.class);
+ * AdvBeanMapMapper mapper = new AdvBeanMapMapper(typeHandlerRegistry);
+ * List<User> users = mapper.mapList(rowList, User.class);
  * }</pre>
  *
  * @author zhangjun
@@ -62,24 +62,39 @@ public class AdvBeanMapMapper {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private <T> void writeProperty(T bean, Class<T> beanType, AdvBeanMappingMeta mappingMeta,
-                                   String columnLabel, Object rawValue) {
-        AdvBeanPropertyMeta propertyMeta = mappingMeta.resolvePropertyByColumnOrProperty(columnLabel);
+    private <T> void writeProperty(
+            T bean,
+            Class<T> beanType,
+            AdvBeanMappingMeta mappingMeta,
+            String columnLabel,
+            Object rawValue) {
+        AdvBeanPropertyMeta propertyMeta =
+                mappingMeta.resolvePropertyByColumnOrProperty(columnLabel);
         if (propertyMeta == null || propertyMeta.isIgnored()) {
             return;
         }
         AdvTypeHandler fieldHandler = propertyMeta.getAdvTypeHandler();
         Object convertedValue;
         if (fieldHandler != null) {
-            convertedValue = fieldHandler.convertForRead(
-                    rawValue, propertyMeta.getPropertyType(),
-                    AdvTypeHandlerContext.of(beanType, propertyMeta.getPropertyName(),
-                            columnLabel, propertyMeta.getPropertyType()));
+            convertedValue =
+                    fieldHandler.convertForRead(
+                            rawValue,
+                            propertyMeta.getPropertyType(),
+                            AdvTypeHandlerContext.of(
+                                    beanType,
+                                    propertyMeta.getPropertyName(),
+                                    columnLabel,
+                                    propertyMeta.getPropertyType()));
         } else {
-            convertedValue = typeHandlerRegistry.convertForRead(
-                    rawValue, propertyMeta.getPropertyType(),
-                    AdvTypeHandlerContext.of(beanType, propertyMeta.getPropertyName(),
-                            columnLabel, propertyMeta.getPropertyType()));
+            convertedValue =
+                    typeHandlerRegistry.convertForRead(
+                            rawValue,
+                            propertyMeta.getPropertyType(),
+                            AdvTypeHandlerContext.of(
+                                    beanType,
+                                    propertyMeta.getPropertyName(),
+                                    columnLabel,
+                                    propertyMeta.getPropertyType()));
         }
         propertyMeta.writeValue(bean, convertedValue);
     }

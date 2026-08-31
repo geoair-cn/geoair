@@ -12,16 +12,12 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ParamCheckResult {
 
-
     private boolean success;
     private String message;
-
 
     public static ParamCheckResult of(final boolean success) {
         ParamCheckResult publishEventResult = new ParamCheckResult();
         publishEventResult.setSuccess(success);
         return publishEventResult;
     }
-
-
 }

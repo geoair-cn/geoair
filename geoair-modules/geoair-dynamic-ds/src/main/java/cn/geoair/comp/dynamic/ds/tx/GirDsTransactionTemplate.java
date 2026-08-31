@@ -3,16 +3,15 @@ package cn.geoair.comp.dynamic.ds.tx;
 import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.comp.dynamic.ds.tx.enums.Propagation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.Savepoint;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 
-/**
- * 事务操作实现
- */
+/** 事务操作实现 */
 public class GirDsTransactionTemplate implements IDsTransactionTemplate {
 
     private static final Logger log = LoggerFactory.getLogger(GirDsTransactionTemplate.class);
@@ -25,13 +24,15 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         this.transactionConnectionHolder = GirDsDefaultJdbcTxHolder.getInstance();
     }
 
-    public GirDsTransactionTemplate(IDsConnectionOpt connectionOpt, IDsTransactionConnectionHolder jdbcTxHolder) {
+    public GirDsTransactionTemplate(
+            IDsConnectionOpt connectionOpt, IDsTransactionConnectionHolder jdbcTxHolder) {
         this.connectionOpt = connectionOpt;
         this.transactionConnectionHolder = jdbcTxHolder;
     }
 
     @Override
-    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+    public void setTransactionConnectionHolder(
+            IDsTransactionConnectionHolder transactionConnectionHolder) {
         this.transactionConnectionHolder = transactionConnectionHolder;
     }
 
@@ -85,16 +86,16 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         return new GirDsJdbcTxBuilder(this);
     }
 
-    /**
-     * 统一核心事务入口
-     */
+    /** 统一核心事务入口 */
     @SuppressWarnings("unchecked")
-    <T, P> T doTx(Propagation propagation,
-                  IsolationLevel level,
-                  boolean readOnly,
-                  Class<? extends Throwable>[] rollFor,
-                  Class<? extends Throwable>[] noRollFor,
-                  Object execObj, P param) {
+    <T, P> T doTx(
+            Propagation propagation,
+            IsolationLevel level,
+            boolean readOnly,
+            Class<? extends Throwable>[] rollFor,
+            Class<? extends Throwable>[] noRollFor,
+            Object execObj,
+            P param) {
 
         Connection suspendConn = null;
         Connection currConn = null;
@@ -126,13 +127,15 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
                 case NOT_SUPPORTED:
                 case NEVER:
                     // 这些分支不需要开启新事务，直接执行
-                    if (propagation == Propagation.MANDATORY && !transactionConnectionHolder.isInTx()) {
+                    if (propagation == Propagation.MANDATORY
+                            && !transactionConnectionHolder.isInTx()) {
                         throw new GirDsJdbcTxException("MANDATORY传播：当前无可用事务，禁止执行");
                     }
                     if (propagation == Propagation.NEVER && transactionConnectionHolder.isInTx()) {
                         throw new GirDsJdbcTxException("NEVER传播：禁止在事务内部执行");
                     }
-                    if (propagation == Propagation.NOT_SUPPORTED && transactionConnectionHolder.isInTx()) {
+                    if (propagation == Propagation.NOT_SUPPORTED
+                            && transactionConnectionHolder.isInTx()) {
                         suspendConn = transactionConnectionHolder.pop();
                     }
                     return exec(execObj, param);
@@ -249,9 +252,7 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         }
     }
 
-    /**
-     * 统一执行 Runnable / Supplier / TxAction / TxFunc
-     */
+    /** 统一执行 Runnable / Supplier / TxAction / TxFunc */
     @SuppressWarnings({"unchecked", "rawtypes"})
     private <T, P> T exec(Object execObj, P param) {
         if (execObj instanceof TxActionNp) {
@@ -268,12 +269,11 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         throw new GirDsJdbcTxException("不支持的执行对象类型：" + execObj.getClass());
     }
 
-    /**
-     * 回滚判定规则
-     */
-    private boolean shouldRollback(Throwable e,
-                                   Class<? extends Throwable>[] rollFor,
-                                   Class<? extends Throwable>[] noRollFor) {
+    /** 回滚判定规则 */
+    private boolean shouldRollback(
+            Throwable e,
+            Class<? extends Throwable>[] rollFor,
+            Class<? extends Throwable>[] noRollFor) {
         // noRollFor 优先（这些异常不回滚）
         if (noRollFor != null) {
             for (Class<?> clz : noRollFor) {
@@ -294,9 +294,7 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         return e instanceof RuntimeException || e instanceof Error;
     }
 
-    /**
-     * 获取数据库连接（优先从当前事务获取）
-     */
+    /** 获取数据库连接（优先从当前事务获取） */
     public Connection getCurrentConnection() throws SQLException {
         Connection txConn = transactionConnectionHolder.get();
         if (txConn != null && !txConn.isClosed()) {
@@ -305,9 +303,7 @@ public class GirDsTransactionTemplate implements IDsTransactionTemplate {
         return connectionOpt.getConnection();
     }
 
-    /**
-     * 关闭连接（非事务中才真正关闭）
-     */
+    /** 关闭连接（非事务中才真正关闭） */
     public void connectionClose(Connection connection) {
         boolean inTx = transactionConnectionHolder.isInTx();
         if (inTx) {

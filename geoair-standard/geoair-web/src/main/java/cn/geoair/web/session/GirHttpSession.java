@@ -1,13 +1,14 @@
 package cn.geoair.web.session;
 
 import cn.geoair.web.util.GirHttpServletHelper;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpSession;
-
 
 @SuppressWarnings("deprecation")
 public abstract class GirHttpSession implements HttpSession, Serializable {
@@ -147,14 +148,10 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
         return 0;
     }
 
-
-
     @Override
     public Enumeration<String> getAttributeNames() {
         return null;
     }
-
-
 
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -169,14 +166,11 @@ public abstract class GirHttpSession implements HttpSession, Serializable {
         return attributes.get(name);
     }
 
-
     @Override
     public void removeAttribute(String name) {
         attributes.remove(name);
         this.freshCache();
     }
-
-
 
     @Override
     public void invalidate() {

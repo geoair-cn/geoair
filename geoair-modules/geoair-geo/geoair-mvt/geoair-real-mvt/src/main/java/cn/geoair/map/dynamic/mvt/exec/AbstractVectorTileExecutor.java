@@ -12,7 +12,6 @@ import cn.geoair.map.dynamic.mvt.dto.TileGlobalConfig;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.AdvMvtDensityUtils;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
@@ -22,22 +21,21 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBReader;
-import org.locationtech.jts.io.WKTReader;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 矢量瓦片查询抽象基类
- * <p>
- * 封装了瓦片查询的公共逻辑（SQL执行、分页、密度合并、几何变换），
- * 子类只需实现各数据库方言的 SQL 生成方法。
+ *
+ * <p>封装了瓦片查询的公共逻辑（SQL执行、分页、密度合并、几何变换）， 子类只需实现各数据库方言的 SQL 生成方法。
  */
 public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
     public static GiLogger log = GirLoggerFactory.getLogger();
@@ -101,26 +99,16 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
         return tileGlobalConfig;
     }
 
-    /**
-     * 获取缓冲区边界框 SQL 表达式（数据库方言相关）
-     */
+    /** 获取缓冲区边界框 SQL 表达式（数据库方言相关） */
     protected abstract String getBufferBboxSqlFunction(TileExecParams tileExecParams);
 
-    /**
-     * 获取几何字段的导出表达式（统一返回 Base64(WKB) 或 WKT）
-     */
+    /** 获取几何字段的导出表达式（统一返回 Base64(WKB) 或 WKT） */
     protected abstract String getGeomExportExpr(String tableAlias, String geomFieldName);
 
-    /**
-     * 获取空间相交判断的 WHERE 条件表达式
-     */
+    /** 获取空间相交判断的 WHERE 条件表达式 */
     protected abstract String getIntersectsWhereExpr(String geomFieldExpr, String withQueryAlias);
 
-
-
-    /**
-     * 对 SRID 为 0 时的特殊处理表达式（PostGIS 需 SetSRID，Oracle 不需）
-     */
+    /** 对 SRID 为 0 时的特殊处理表达式（PostGIS 需 SetSRID，Oracle 不需） */
     protected String getGeomFieldWithSrid(String tableAlias, String geomFieldName, String srid) {
         if (ObjectUtil.equals(srid, "0")) {
             return tableAlias + "." + geomFieldName;
@@ -140,13 +128,16 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
         if (isSqlView) {
             String tbRemoveSqlSpaces = iAdvExecutor.tbRemoveSqlSpaces(tbNameOrSql);
             // Oracle 子查询后面不能用 AS，oracleDialectTableNameUtil 里面处理了
-            finalTbName = iAdvExecutor.tbBuildAsTable(
-                    StrUtil.format("({})", tbRemoveSqlSpaces), tableAlias);
+            finalTbName =
+                    iAdvExecutor.tbBuildAsTable(
+                            StrUtil.format("({})", tbRemoveSqlSpaces), tableAlias);
         } else {
             String tbGetTableNameWithSchema =
                     iAdvExecutor.tbGetTableNameWithSchema(tbNameOrSql, schema);
-            finalTbName = iAdvExecutor.tbBuildAsTable(
-                    StrUtil.format("( select * from  {})", tbGetTableNameWithSchema), tableAlias);
+            finalTbName =
+                    iAdvExecutor.tbBuildAsTable(
+                            StrUtil.format("( select * from  {})", tbGetTableNameWithSchema),
+                            tableAlias);
         }
         // 校验必要参数
         Envelope dataExtent = tileExecParams.getDataExtent();
@@ -212,7 +203,7 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
                 .append(geomField)
                 .append(" IS NOT NULL  ");
 
-            excuteSQL = withSQL.toString() + "\n" + rootSql;
+        excuteSQL = withSQL.toString() + "\n" + rootSql;
         return excuteSQL;
     }
 
@@ -295,8 +286,7 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
         List<GirAdvOneRow> transList = girAdvOneRows;
         if (needTransform) {
             transList =
-                    girAdvOneRows
-                            .stream()
+                    girAdvOneRows.stream()
                             .peek(this::featuresTransform)
                             .collect(Collectors.toList());
         }
@@ -328,7 +318,10 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
             WKBReader wkbReader = new WKBReader();
             geometry = wkbReader.read(decode);
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry =
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .convert(geometry, sourceDataSrid, gridSrid);
             }
             Geometry finalGeometry = geometry;
             if (geometry != null) {
@@ -360,57 +353,57 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
         Long maxPageSize = tileExecutorConfig.getMaxPageSize();
 
         PageActuator<GirAdvOneRow> pageActuatorOpt =
-                GirGeoTools.defaultInstance().getPageActuatorOpt(
-                        new PageConditionDef<GirAdvOneRow>() {
+                GirGeoTools.defaultInstance()
+                        .getPageActuatorOpt(
+                                new PageConditionDef<GirAdvOneRow>() {
 
-                            @Override
-                            public Long getTotalRecordCount() {
-                                return totalCount;
-                            }
+                                    @Override
+                                    public Long getTotalRecordCount() {
+                                        return totalCount;
+                                    }
 
-                            @Override
-                            public void setPageConfig(PageConfig pageConfig) {
-                                pageConfig.setMaxPageNo(maxPageNumber);
-                                pageConfig.setPageSize(maxPageSize);
-                                pageConfig.setPageNumStartByZero(false);
-                                pageConfig.setParallelConsumeRecordIs(true);
-                                pageConfig.setParallelExecPageIs(true);
-                                pageConfig.setSaveResultListIs(true);
-                            }
+                                    @Override
+                                    public void setPageConfig(PageConfig pageConfig) {
+                                        pageConfig.setMaxPageNo(maxPageNumber);
+                                        pageConfig.setPageSize(maxPageSize);
+                                        pageConfig.setPageNumStartByZero(false);
+                                        pageConfig.setParallelConsumeRecordIs(true);
+                                        pageConfig.setParallelExecPageIs(true);
+                                        pageConfig.setSaveResultListIs(true);
+                                    }
 
-                            @Override
-                            public boolean handlePageException(
-                                    Integer pageNo, Integer pageSize, Exception e) {
-                                log.warn(
-                                        "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
-                                        pageNo,
-                                        pageSize,
-                                        e.getMessage());
-                                return true;
-                            }
+                                    @Override
+                                    public boolean handlePageException(
+                                            Integer pageNo, Integer pageSize, Exception e) {
+                                        log.warn(
+                                                "分页查询异常：页码[{}]，页大小[{}]，异常信息：{}",
+                                                pageNo,
+                                                pageSize,
+                                                e.getMessage());
+                                        return true;
+                                    }
 
-                            @Override
-                            public List<GirAdvOneRow> getPageRecords(
-                                    Integer pageNo, Integer pageSize) {
-                                String orderSql =
-                                        iAdvExecutor.pBuildSqlWithOrder(
-                                                excuteSQL,
-                                                ListUtil.of(
-                                                        OrderApo.create(
-                                                                orderFileIdName,
-                                                                AdvEnumsOrder.升序)));
-                                String pageSQL =
-                                        iAdvExecutor.pBuildPageSql(
-                                                orderSql, pageSize, pageNo, false);
-                                List<GirAdvOneRow> girAdvOneRows =
-                                        iAdvExecutor.bSelectList(pageSQL);
-                                return girAdvOneRows
-                                        .stream()
-                                        .parallel()
-                                        .peek(featuresTransform)
-                                        .collect(Collectors.toList());
-                            }
-                        });
+                                    @Override
+                                    public List<GirAdvOneRow> getPageRecords(
+                                            Integer pageNo, Integer pageSize) {
+                                        String orderSql =
+                                                iAdvExecutor.pBuildSqlWithOrder(
+                                                        excuteSQL,
+                                                        ListUtil.of(
+                                                                OrderApo.create(
+                                                                        orderFileIdName,
+                                                                        AdvEnumsOrder.升序)));
+                                        String pageSQL =
+                                                iAdvExecutor.pBuildPageSql(
+                                                        orderSql, pageSize, pageNo, false);
+                                        List<GirAdvOneRow> girAdvOneRows =
+                                                iAdvExecutor.bSelectList(pageSQL);
+                                        return girAdvOneRows.stream()
+                                                .parallel()
+                                                .peek(featuresTransform)
+                                                .collect(Collectors.toList());
+                                    }
+                                });
         pageActuatorOpt.execute();
 
         return pageActuatorOpt.getFinalDataList();

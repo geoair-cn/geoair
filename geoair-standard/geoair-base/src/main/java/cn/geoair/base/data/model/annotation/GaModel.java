@@ -14,25 +14,23 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface GaModel {
 
-      static final String NULL = "";
+    static final String NULL = "";
 
     @Deprecated
-      String name() default NULL;
+    String name() default NULL;
 
-    /**
-     * 名称 ,如果是PO对象，这个字段描述的就是数据库表的名称
-     */
-      String tableName() default NULL;
+    /** 名称 ,如果是PO对象，这个字段描述的就是数据库表的名称 */
+    String tableName() default NULL;
 
-      String text() default NULL; // 文本
+    String text() default NULL; // 文本
 
-      String alias() default NULL; // 别名
+    String alias() default NULL; // 别名
 
-      String describe() default NULL; // 一段描述，大白话
+    String describe() default NULL; // 一段描述，大白话
 
-      Class<? extends GiModelApplyer>[] applyer() default {};
+    Class<? extends GiModelApplyer>[] applyer() default {};
 
-      int tag() default 0;
+    int tag() default 0;
 
-      GaParameter[] cfg() default {}; // 参数
+    GaParameter[] cfg() default {}; // 参数
 }

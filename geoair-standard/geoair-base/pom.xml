@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-standard</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-base</artifactId>
-  <version>J17-dev-SNAPSHOT</version>
+  <version>J17.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-base</name>
   <description>标准库</description>
@@ -47,22 +47,19 @@
       <artifactId>geoair-tools</artifactId>
       <version>${geoair.version}</version>
     </dependency>
-      <!-- GirLog4j 注解处理器：编译期自动注入日志字段，能力随依赖传递给所有依赖 geoair-base 的模块 -->
-      <dependency>
-          <groupId>cn.geoair.devkit</groupId>
-          <artifactId>geoair-log4j-processor</artifactId>
-          <version>${geoair.version}</version>
-      </dependency>
+    <!-- GirLog4j 注解处理器：编译期自动注入日志字段，能力随依赖传递给所有依赖 geoair-base 的模块 -->
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-log4j-processor</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
       <version>${jakarta-annotation.version}</version>
     </dependency>
 
-
   </dependencies>
 
-  <build>
-
-  </build>
+  <build></build>
 </project>

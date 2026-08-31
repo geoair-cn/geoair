@@ -10,50 +10,58 @@ import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 
 import java.util.Optional;
 
-/**
- * TileStorageSupportAdapter 路由示例
- */
+/** TileStorageSupportAdapter 路由示例 */
 public class TileStorageSupportAdapterRouteExample {
 
     public static void main(String[] args) {
-        GirLayerConfigContextHelper helper = new GirLayerConfigContextHelper() {
-            @Override
-            public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
-                return Optional.empty();
-            }
+        GirLayerConfigContextHelper helper =
+                new GirLayerConfigContextHelper() {
+                    @Override
+                    public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public Optional<GirLayerConfigContext> getGirLayerConfigContext(GirMapTileType mapTileType, String layerName, String dataId, String fileName) {
-                return Optional.empty();
-            }
+                    @Override
+                    public Optional<GirLayerConfigContext> getGirLayerConfigContext(
+                            GirMapTileType mapTileType,
+                            String layerName,
+                            String dataId,
+                            String fileName) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public LayerPerFileDao getLayerPerFileDao(GirLayerConfigContext layerConfigContext) {
-                return null;
-            }
+                    @Override
+                    public LayerPerFileDao getLayerPerFileDao(
+                            GirLayerConfigContext layerConfigContext) {
+                        return null;
+                    }
 
-            @Override
-            public Long getLayerPerCacheBatchSize(GirLayerConfigContext layerConfigContext) {
-                return 0l;
-            }
-        };
+                    @Override
+                    public Long getLayerPerCacheBatchSize(
+                            GirLayerConfigContext layerConfigContext) {
+                        return 0l;
+                    }
+                };
 
         TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(helper);
 
-        GirLayerConfigContext localZipXyz = new GirLayerConfigContext()
-            .setDataId("xyz_layer")
-            .setStorageType(GirStorageType.LOCAL_ZIP)
-            .setMapTileType(GirMapTileType.XYZ);
+        GirLayerConfigContext localZipXyz =
+                new GirLayerConfigContext()
+                        .setDataId("xyz_layer")
+                        .setStorageType(GirStorageType.LOCAL_ZIP)
+                        .setMapTileType(GirMapTileType.XYZ);
 
-        GirLayerConfigContext localUnzippedCompact = new GirLayerConfigContext()
-            .setDataId("compact_layer")
-            .setStorageType(GirStorageType.LOCAL_UNZIPPED)
-            .setMapTileType(GirMapTileType.COMPACT_V2);
+        GirLayerConfigContext localUnzippedCompact =
+                new GirLayerConfigContext()
+                        .setDataId("compact_layer")
+                        .setStorageType(GirStorageType.LOCAL_UNZIPPED)
+                        .setMapTileType(GirMapTileType.COMPACT_V2);
 
-        GirLayerConfigContext s3ZipTerrain = new GirLayerConfigContext()
-            .setDataId("terrain_layer")
-            .setStorageType(GirStorageType.S3_ZIP)
-            .setMapTileType(GirMapTileType.TERRAIN_3D);
+        GirLayerConfigContext s3ZipTerrain =
+                new GirLayerConfigContext()
+                        .setDataId("terrain_layer")
+                        .setStorageType(GirStorageType.S3_ZIP)
+                        .setMapTileType(GirMapTileType.TERRAIN_3D);
 
         ITileStorageSupport support1 = adapter.getSupport(localZipXyz);
         ITileStorageSupport support2 = adapter.getSupport(localUnzippedCompact);

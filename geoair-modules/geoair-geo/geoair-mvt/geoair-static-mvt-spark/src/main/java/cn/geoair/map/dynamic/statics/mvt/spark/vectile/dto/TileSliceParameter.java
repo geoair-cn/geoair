@@ -8,8 +8,13 @@ import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.URLUtil;
+
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,15 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
 /**
  * 矢量瓦片切片参数。
- * <p>
- * 包含数据读取策略、输入/输出数据源配置、瓦片级别参数、要素优化策略等。
- * 序列化为 JSON 后通过 Base32 编码在 Spark 任务间传递。
+ *
+ * <p>包含数据读取策略、输入/输出数据源配置、瓦片级别参数、要素优化策略等。 序列化为 JSON 后通过 Base32 编码在 Spark 任务间传递。
  *
  * @author 张逢吉
  * @date 2025/12/29
@@ -160,9 +160,7 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 工具方法 =====================
 
-    /**
-     * 解析 tileSizeLimit 为字节数。
-     */
+    /** 解析 tileSizeLimit 为字节数。 */
     public Long getTileSizeLimitByte() {
         if (tileSizeLimit == null) {
             return null;
@@ -170,9 +168,7 @@ public class TileSliceParameter implements Serializable {
         return DataSizeUtil.parse(tileSizeLimit);
     }
 
-    /**
-     * 深拷贝当前参数对象。
-     */
+    /** 深拷贝当前参数对象。 */
     public TileSliceParameter copy() {
         TileSliceParameter copy = new TileSliceParameter();
         BeanUtil.copyProperties(this, copy);
@@ -181,9 +177,7 @@ public class TileSliceParameter implements Serializable {
 
     // ===================== 序列化 =====================
 
-    /**
-     * 从 Base32 编码的 JSON 字符串反序列化。
-     */
+    /** 从 Base32 编码的 JSON 字符串反序列化。 */
     public static TileSliceParameter fromBase32(String baseString) {
         try {
             String encoded = URLUtil.decode(baseString);
@@ -195,9 +189,7 @@ public class TileSliceParameter implements Serializable {
         }
     }
 
-    /**
-     * 序列化为 Base32 编码的 JSON 字符串（移除 null 值以压缩体积）。
-     */
+    /** 序列化为 Base32 编码的 JSON 字符串（移除 null 值以压缩体积）。 */
     public String toBase32() {
         String jsonStr = JSON.toJSONString(this);
         JSONObject jsonObject = JSON.parseObject(jsonStr);

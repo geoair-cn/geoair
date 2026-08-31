@@ -8,22 +8,19 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
+
 import lombok.Getter;
 
-
 /**
- * 谷歌切片方案的获取器基础类
- * 不再继承CachedTileGetter，只提供基础配置
+ * 谷歌切片方案的获取器基础类 不再继承CachedTileGetter，只提供基础配置
  *
  * @author 张俊
  * @date Created in 2026/5/9 14:10
  */
-
 public abstract class BaseTileGetter implements LayerTileGetter {
 
     private static GiLogger log = GirLoggerFactory.getLogger();
-    @Getter
-    private final PxyLayerInfo layerInfo;
+    @Getter private final PxyLayerInfo layerInfo;
 
     public BaseTileGetter(PxyLayerInfo layerInfo) {
         this.layerInfo = layerInfo;

@@ -16,11 +16,10 @@ import java.sql.Connection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+
 import javax.sql.DataSource;
 
-/**
- * 真实的数据源管理器实现
- */
+/** 真实的数据源管理器实现 */
 public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
@@ -42,10 +41,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
 
     protected String dataSourceId = null;
 
-
-    public RealDataSourceOpt() {
-
-    }
+    public RealDataSourceOpt() {}
 
     @Override
     public String getSchemaName() {
@@ -54,15 +50,12 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             return schemaName;
         }
 
-
-
-        if (schemaNameGetterFunction != null && !(schemaNameGetterFunction instanceof GirSysSupplierGetter)) {
-            String userGetter = schemaNameGetterFunction.get();   // 用户指定的getter 优先级最高
+        if (schemaNameGetterFunction != null
+                && !(schemaNameGetterFunction instanceof GirSysSupplierGetter)) {
+            String userGetter = schemaNameGetterFunction.get(); // 用户指定的getter 优先级最高
             schemaName = GutilObject.isEmpty(userGetter) ? "" : userGetter;
             return schemaName;
         }
-
-
 
         // 尝试从缓存中获取
         if (GutilObject.isNotEmpty(dataSourceName) && schemaNameMap.containsKey(dataSourceName)) {
@@ -88,7 +81,6 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             return schemaName;
         }
         return "";
-
     }
 
     @Override
@@ -96,7 +88,8 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         if (databaseName != null) {
             return databaseName;
         }
-        if (databaseNameGetterFunction != null && !(databaseNameGetterFunction instanceof GirSysSupplierGetter)) {
+        if (databaseNameGetterFunction != null
+                && !(databaseNameGetterFunction instanceof GirSysSupplierGetter)) {
             String userGetter = databaseNameGetterFunction.get();
             databaseName = GutilObject.isEmpty(userGetter) ? "" : userGetter;
             return databaseName;
@@ -129,8 +122,6 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         if (schemaNameGetterFunction != null) {
             this.schemaNameGetterFunction = schemaNameGetterFunction;
         }
-
-
     }
 
     public void setDatabaseNameGetterFunction(Supplier<String> databaseNameGetterFunction) {
@@ -154,7 +145,8 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         schemaName = dataSourceApo.getSchemaName();
         databaseName = dataSourceApo.getDbName();
         if (AdvDynamicDataSourceStorage.getInstance().containsDataSource(dataSourceId)) {
-            dataSource = AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
+            dataSource =
+                    AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
         } else {
             dataSource =
                     AdvDynamicDataSourceStorage.getInstance()
@@ -177,7 +169,7 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
             }
         }
         this.dataSource = dataSource;
-        this.dataSourceId = dataSourceName;  //这里不应该这样
+        this.dataSourceId = dataSourceName; // 这里不应该这样
         this.dataSourceApo = null;
         if (GutilObject.isNotEmpty(dataSourceName)) {
             this.dataSourceName = dataSourceName;
@@ -190,12 +182,10 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         initByDataSource(simpleDataSource);
     }
 
-
     @Override
     public DataSource getDataSource() {
         return dataSource;
     }
-
 
     @Override
     public DataSourceApo getDataSourceApo() {
@@ -206,5 +196,4 @@ public class RealDataSourceOpt implements IDsDataSourceOpt {
         BeanUtil.copyProperties(dataSourceApo, apo);
         return apo;
     }
-
 }

@@ -1,7 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.enums;
 
-import java.io.Serializable;
 import org.geotools.geometry.jts.Geometries;
+
+import java.io.Serializable;
 
 /**
  * 结果集中对于空间类型的操作方式

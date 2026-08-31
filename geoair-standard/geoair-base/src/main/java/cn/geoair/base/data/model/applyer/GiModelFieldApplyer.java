@@ -1,6 +1,7 @@
 package cn.geoair.base.data.model.applyer;
 
 import cn.geoair.base.def.annotation.GaParameter;
+
 import java.lang.reflect.Field;
 
 public interface GiModelFieldApplyer {

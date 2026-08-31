@@ -95,7 +95,7 @@ geoair-core/
 <dependency>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-core</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.6</version>
 </dependency>
 ```
 
@@ -154,7 +154,7 @@ log.error("This is an error message");
 
 ## 版本历史
 
-- J17-dev-SNAPSHOT：当前开发版本
+- J17.1.6：当前开发版本
 
 ## 许可证
 

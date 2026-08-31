@@ -3,58 +3,56 @@ package cn.geoair.base.log;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class MessageFormatter {
+public final class MessageFormatter {
     static final char DELIM_START = '{';
     static final char DELIM_STOP = '}';
     static final String DELIM_STR = "{}";
     private static final char ESCAPE_CHAR = '\\';
 
     /**
-     * Performs single argument substitution for the 'messagePattern' passed as
-     * parameter.
-     * <p>
-     * For example,
+     * Performs single argument substitution for the 'messagePattern' passed as parameter.
+     *
+     * <p>For example,
      *
      * <pre>
      * MessageFormatter.format(&quot;Hi {}.&quot;, &quot;there&quot;);
      * </pre>
-     * <p>
-     * will return the string "Hi there.".
+     *
+     * <p>will return the string "Hi there.".
+     *
      * <p>
      *
      * @param messagePattern The message pattern which will be parsed and formatted
-     * @param arg            The argument to be substituted in place of the formatting anchor
+     * @param arg The argument to be substituted in place of the formatting anchor
      * @return The formatted message
      */
-    final public static FormattingTuple format(String messagePattern, Object arg) {
-        return arrayFormat(messagePattern, new Object[]{arg});
+    public static final FormattingTuple format(String messagePattern, Object arg) {
+        return arrayFormat(messagePattern, new Object[] {arg});
     }
 
     /**
-     * Performs a two argument substitution for the 'messagePattern' passed as
-     * parameter.
-     * <p>
-     * For example,
+     * Performs a two argument substitution for the 'messagePattern' passed as parameter.
+     *
+     * <p>For example,
      *
      * <pre>
      * MessageFormatter.format(&quot;Hi {}. My name is {}.&quot;, &quot;Alice&quot;, &quot;Bob&quot;);
      * </pre>
-     * <p>
-     * will return the string "Hi Alice. My name is Bob.".
+     *
+     * <p>will return the string "Hi Alice. My name is Bob.".
      *
      * @param messagePattern The message pattern which will be parsed and formatted
-     * @param arg1           The argument to be substituted in place of the first formatting
-     *                       anchor
-     * @param arg2           The argument to be substituted in place of the second formatting
-     *                       anchor
+     * @param arg1 The argument to be substituted in place of the first formatting anchor
+     * @param arg2 The argument to be substituted in place of the second formatting anchor
      * @return The formatted message
      */
-    final public static FormattingTuple format(final String messagePattern, Object arg1, Object arg2) {
-        return arrayFormat(messagePattern, new Object[]{arg1, arg2});
+    public static final FormattingTuple format(
+            final String messagePattern, Object arg1, Object arg2) {
+        return arrayFormat(messagePattern, new Object[] {arg1, arg2});
     }
 
-
-    final public static FormattingTuple arrayFormat(final String messagePattern, final Object[] argArray) {
+    public static final FormattingTuple arrayFormat(
+            final String messagePattern, final Object[] argArray) {
         Throwable throwableCandidate = MessageFormatter.getThrowableCandidate(argArray);
         Object[] args = argArray;
         if (throwableCandidate != null) {
@@ -63,7 +61,8 @@ final public class MessageFormatter {
         return arrayFormat(messagePattern, args, throwableCandidate);
     }
 
-    final public static FormattingTuple arrayFormat(final String messagePattern, final Object[] argArray, Throwable throwable) {
+    public static final FormattingTuple arrayFormat(
+            final String messagePattern, final Object[] argArray, Throwable throwable) {
 
         if (messagePattern == null) {
             return new FormattingTuple(null, argArray, throwable);
@@ -120,7 +119,7 @@ final public class MessageFormatter {
         return new FormattingTuple(sbuf.toString(), argArray, throwable);
     }
 
-    final static boolean isEscapedDelimeter(String messagePattern, int delimeterStartIndex) {
+    static final boolean isEscapedDelimeter(String messagePattern, int delimeterStartIndex) {
 
         if (delimeterStartIndex == 0) {
             return false;
@@ -133,8 +132,9 @@ final public class MessageFormatter {
         }
     }
 
-    final static boolean isDoubleEscaped(String messagePattern, int delimeterStartIndex) {
-        if (delimeterStartIndex >= 2 && messagePattern.charAt(delimeterStartIndex - 2) == ESCAPE_CHAR) {
+    static final boolean isDoubleEscaped(String messagePattern, int delimeterStartIndex) {
+        if (delimeterStartIndex >= 2
+                && messagePattern.charAt(delimeterStartIndex - 2) == ESCAPE_CHAR) {
             return true;
         } else {
             return false;
@@ -142,7 +142,8 @@ final public class MessageFormatter {
     }
 
     // special treatment of array values was suggested by 'lizongbo'
-    private static void deeplyAppendParameter(StringBuilder sbuf, Object o, Map<Object[], Object> seenMap) {
+    private static void deeplyAppendParameter(
+            StringBuilder sbuf, Object o, Map<Object[], Object> seenMap) {
         if (o == null) {
             sbuf.append("null");
             return;
@@ -179,21 +180,25 @@ final public class MessageFormatter {
             String oAsString = o.toString();
             sbuf.append(oAsString);
         } catch (Throwable t) {
-            GirConsoleLog.forName("MessageFormatter").error("SLF4J: Failed toString() invocation on an object of type [" + o.getClass().getName() + "]", t);
+            GirConsoleLog.forName("MessageFormatter")
+                    .error(
+                            "SLF4J: Failed toString() invocation on an object of type ["
+                                    + o.getClass().getName()
+                                    + "]",
+                            t);
             sbuf.append("[FAILED toString()]");
         }
-
     }
 
-    private static void objectArrayAppend(StringBuilder sbuf, Object[] a, Map<Object[], Object> seenMap) {
+    private static void objectArrayAppend(
+            StringBuilder sbuf, Object[] a, Map<Object[], Object> seenMap) {
         sbuf.append('[');
         if (!seenMap.containsKey(a)) {
             seenMap.put(a, null);
             final int len = a.length;
             for (int i = 0; i < len; i++) {
                 deeplyAppendParameter(sbuf, a[i], seenMap);
-                if (i != len - 1)
-                    sbuf.append(", ");
+                if (i != len - 1) sbuf.append(", ");
             }
             // allow repeats in siblings
             seenMap.remove(a);
@@ -208,8 +213,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -219,8 +223,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -230,8 +233,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -241,8 +243,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -252,8 +253,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -263,8 +263,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -274,8 +273,7 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
@@ -285,18 +283,19 @@ final public class MessageFormatter {
         final int len = a.length;
         for (int i = 0; i < len; i++) {
             sbuf.append(a[i]);
-            if (i != len - 1)
-                sbuf.append(", ");
+            if (i != len - 1) sbuf.append(", ");
         }
         sbuf.append(']');
     }
 
     /**
-     * Helper method to determine if an {@link Object} array contains a {@link Throwable} as last element
+     * Helper method to determine if an {@link Object} array contains a {@link Throwable} as last
+     * element
      *
-     * @param argArray The arguments off which we want to know if it contains a {@link Throwable} as last element
-     * @return if the last {@link Object} in argArray is a {@link Throwable} this method will return it,
-     * otherwise it returns null
+     * @param argArray The arguments off which we want to know if it contains a {@link Throwable} as
+     *     last element
+     * @return if the last {@link Object} in argArray is a {@link Throwable} this method will return
+     *     it, otherwise it returns null
      */
     public static Throwable getThrowableCandidate(final Object[] argArray) {
         if (argArray == null || argArray.length == 0) {
@@ -332,5 +331,4 @@ final public class MessageFormatter {
 
         return trimmed;
     }
-
 }

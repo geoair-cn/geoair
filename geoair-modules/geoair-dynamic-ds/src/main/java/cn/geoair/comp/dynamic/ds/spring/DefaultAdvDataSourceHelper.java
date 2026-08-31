@@ -4,8 +4,8 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.IAdvDataSourceHelper;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
-import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.hutool.extra.spring.SpringUtil;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -15,14 +15,13 @@ import org.springframework.util.StringUtils;
  * @author ：张逢吉
  * @date ：Created in 15:34 @description： spring默认的数据源获取器
  */
-
 public class DefaultAdvDataSourceHelper implements IAdvDataSourceHelper {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     @Override
     public DataSourceApo getDataSourceApoById(String dataSourceId) {
         return getDataSourceApoBySpring();
     }
-
 
     /**
      * 从Spring容器中获取DataSourceProperties并转换为DataSourceApo

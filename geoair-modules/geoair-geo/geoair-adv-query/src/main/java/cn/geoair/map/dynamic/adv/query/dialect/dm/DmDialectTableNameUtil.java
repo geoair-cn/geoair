@@ -56,7 +56,9 @@ public class DmDialectTableNameUtil extends AbstractExecDialectTableUtil {
         long startRow = offset;
         return StrUtil.format(
                 "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= {}) WHERE rn > {}",
-                noPageSql, endRow, startRow);
+                noPageSql,
+                endRow,
+                startRow);
     }
 
     @Override

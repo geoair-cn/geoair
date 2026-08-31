@@ -5,9 +5,9 @@ import java.util.List;
 
 /**
  * 动态 SQL 引擎的解析结果，包含最终的 SQL 文本和对应的 JDBC 参数值列表。
- * <p>
- * SQL 中的 {@code #{}} 已被替换为 {@code ?} 占位符，{@code jdbcParamValues} 按顺序保存每个
- * 占位符对应的参数值，可直接用于 {@link java.sql.PreparedStatement}。
+ *
+ * <p>SQL 中的 {@code #{}} 已被替换为 {@code ?} 占位符，{@code jdbcParamValues} 按顺序保存每个 占位符对应的参数值，可直接用于 {@link
+ * java.sql.PreparedStatement}。
  *
  * @author zhangjun
  */

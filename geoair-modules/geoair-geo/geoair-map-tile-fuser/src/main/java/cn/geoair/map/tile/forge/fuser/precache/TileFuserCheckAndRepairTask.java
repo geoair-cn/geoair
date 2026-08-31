@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.web.mime.GirImageMime;
+
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.concurrent.CountDownLatch;
@@ -16,38 +16,59 @@ public class TileFuserCheckAndRepairTask implements Runnable {
 
     private final TileTaskExecutor executor;
 
-    public TileFuserCheckAndRepairTask(String layerName, int zoom, Geometry geometry4326,
-                                        CountDownLatch latch, AtomicLong totalCount,
-                                        AtomicLong checkedCount, AtomicLong repairedCount,
-                                        AtomicLong failCount, GirImageMime format) {
-        this(layerName, zoom, geometry4326, latch, totalCount, checkedCount, repairedCount, failCount, format,
+    public TileFuserCheckAndRepairTask(
+            String layerName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong checkedCount,
+            AtomicLong repairedCount,
+            AtomicLong failCount,
+            GirImageMime format) {
+        this(
+                layerName,
+                zoom,
+                geometry4326,
+                latch,
+                totalCount,
+                checkedCount,
+                repairedCount,
+                failCount,
+                format,
                 Math.max(1, Runtime.getRuntime().availableProcessors()));
     }
 
-    public TileFuserCheckAndRepairTask(String layerName, int zoom, Geometry geometry4326,
-                                        CountDownLatch latch, AtomicLong totalCount,
-                                        AtomicLong checkedCount, AtomicLong repairedCount,
-                                        AtomicLong failCount, GirImageMime format, int maxConsumerThreads) {
-        TileTaskConfig config = TileTaskConfig.forCheckAndRepair(layerName, zoom, geometry4326, format)
-                .setLatch(latch)
-                .setTotalCount(totalCount)
-                .setCheckedCount(checkedCount)
-                .setRepairedCount(repairedCount)
-                .setFailCount(failCount)
-                .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
+    public TileFuserCheckAndRepairTask(
+            String layerName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong checkedCount,
+            AtomicLong repairedCount,
+            AtomicLong failCount,
+            GirImageMime format,
+            int maxConsumerThreads) {
+        TileTaskConfig config =
+                TileTaskConfig.forCheckAndRepair(layerName, zoom, geometry4326, format)
+                        .setLatch(latch)
+                        .setTotalCount(totalCount)
+                        .setCheckedCount(checkedCount)
+                        .setRepairedCount(repairedCount)
+                        .setFailCount(failCount)
+                        .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
         this.executor = TileTaskExecutor.forCheckAndRepair(config);
     }
 
-    /**
-     * 便捷创建方法
-     */
-    public static TileFuserCheckAndRepairTask of(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
-        return new TileFuserCheckAndRepairTask(layerName, zoom, geometry4326, null, null, null, null, null, format);
+    /** 便捷创建方法 */
+    public static TileFuserCheckAndRepairTask of(
+            String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
+        return new TileFuserCheckAndRepairTask(
+                layerName, zoom, geometry4326, null, null, null, null, null, format);
     }
 
-    /**
-     * 链式构建
-     */
+    /** 链式构建 */
     public static Builder builder() {
         return new Builder();
     }
@@ -114,7 +135,16 @@ public class TileFuserCheckAndRepairTask implements Runnable {
         }
 
         public TileFuserCheckAndRepairTask build() {
-            return new TileFuserCheckAndRepairTask(layerName, zoom, geometry4326, latch, totalCount, checkedCount, repairedCount, failCount, format);
+            return new TileFuserCheckAndRepairTask(
+                    layerName,
+                    zoom,
+                    geometry4326,
+                    latch,
+                    totalCount,
+                    checkedCount,
+                    repairedCount,
+                    failCount,
+                    format);
         }
     }
 }

@@ -3,11 +3,10 @@ package cn.geoair.map.dynamic.adv.mybatis;
 import static org.junit.Assert.*;
 
 import cn.geoair.map.dynamic.adv.mybatis.util.RegexUtil;
+
 import org.junit.Test;
 
-/**
- * {@link RegexUtil} 的单元测试。
- */
+/** {@link RegexUtil} 的单元测试。 */
 public class RegexUtilTest {
 
     @Test

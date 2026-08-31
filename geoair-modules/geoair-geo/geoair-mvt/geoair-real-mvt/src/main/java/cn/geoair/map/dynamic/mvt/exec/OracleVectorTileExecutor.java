@@ -6,24 +6,21 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 import cn.geoair.map.dynamic.mvt.tools.param.TileExecParams;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKBReader;
-import org.locationtech.jts.io.WKTReader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Oracle Spatial 矢量瓦片执行器
+ *
+ * <p>Oracle 使用完全自包含的 SQL：SDO_GEOMETRY 包围盒直接写在 SELECT 中，
+ *
  * <p>
- * Oracle 使用完全自包含的 SQL：SDO_GEOMETRY 包围盒直接写在 SELECT 中，
-
- * <p>
-
  */
 public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
 
@@ -42,19 +39,24 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
         String finalTbName;
         if (isSqlView) {
             String tbRemoveSqlSpaces = iAdvExecutor.tbRemoveSqlSpaces(tbNameOrSql);
-            finalTbName = iAdvExecutor.tbBuildAsTable(
-                    StrUtil.format("({})", tbRemoveSqlSpaces), tableAlias);
+            finalTbName =
+                    iAdvExecutor.tbBuildAsTable(
+                            StrUtil.format("({})", tbRemoveSqlSpaces), tableAlias);
         } else {
             String tbGetTableNameWithSchema =
                     iAdvExecutor.tbGetTableNameWithSchema(tbNameOrSql, schema);
-            finalTbName = iAdvExecutor.tbBuildAsTable(
-                    StrUtil.format("( select * from  {})", tbGetTableNameWithSchema), tableAlias);
+            finalTbName =
+                    iAdvExecutor.tbBuildAsTable(
+                            StrUtil.format("( select * from  {})", tbGetTableNameWithSchema),
+                            tableAlias);
         }
 
         // 校验必要参数
         Envelope dataExtent = tileExecParams.getDataExtent();
-        if (dataExtent == null || requestParams.getSrid() == null
-            || requestParams.getGeomFieldName() == null || requestParams.getDsId() == null) {
+        if (dataExtent == null
+                || requestParams.getSrid() == null
+                || requestParams.getGeomFieldName() == null
+                || requestParams.getDsId() == null) {
             log.error("缺少必要参数，无法查询瓦片数据，当前参数：{}", requestParams.toString());
             return null;
         }
@@ -65,20 +67,28 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
 
         // Oracle 不用 WITH CTE，直接把 SDO_GEOMETRY 构造为内联子查询
         Envelope bufEnv = tileExecParams.getDataExtentBufferEnvelope();
-        String bboxExpr = StrUtil.format(
-                "SDO_GEOMETRY(2003, {}, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY({},{},{},{}))",
-                sourceDataSrid,
-                bufEnv.getMinX(), bufEnv.getMinY(), bufEnv.getMaxX(), bufEnv.getMaxY());
+        String bboxExpr =
+                StrUtil.format(
+                        "SDO_GEOMETRY(2003, {}, NULL, SDO_ELEM_INFO_ARRAY(1,1003,3), SDO_ORDINATE_ARRAY({},{},{},{}))",
+                        sourceDataSrid,
+                        bufEnv.getMinX(),
+                        bufEnv.getMinY(),
+                        bufEnv.getMaxX(),
+                        bufEnv.getMaxY());
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
         if (ObjectUtil.isEmpty(keepFieldList) && !requestParams.isKeepFieldAll()) {
             sql.append(StrUtil.format("{}.{}", tableAlias, geomFieldName))
-                    .append(" as ").append(GEOM_FIELD_ALIAS_IN_SQL);
+                    .append(" as ")
+                    .append(GEOM_FIELD_ALIAS_IN_SQL);
         } else if (requestParams.isKeepFieldAll()) {
-            sql.append(tableAlias).append(".*")
-                    .append(", ").append(StrUtil.format("{}.{}", tableAlias, geomFieldName))
-                    .append(" as ").append(GEOM_FIELD_ALIAS_IN_SQL);
+            sql.append(tableAlias)
+                    .append(".*")
+                    .append(", ")
+                    .append(StrUtil.format("{}.{}", tableAlias, geomFieldName))
+                    .append(" as ")
+                    .append(GEOM_FIELD_ALIAS_IN_SQL);
         } else {
             List<String> aliasFields = new ArrayList<>();
             for (String field : keepFieldList) {
@@ -87,14 +97,22 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
                 }
             }
             sql.append(String.join(", ", aliasFields))
-                    .append(", ").append(StrUtil.format("{}.{}", tableAlias, geomFieldName))
-                    .append(" as ").append(GEOM_FIELD_ALIAS_IN_SQL);
+                    .append(", ")
+                    .append(StrUtil.format("{}.{}", tableAlias, geomFieldName))
+                    .append(" as ")
+                    .append(GEOM_FIELD_ALIAS_IN_SQL);
         }
 
-        sql.append(" FROM ").append(finalTbName)
-                .append(" WHERE SDO_RELATE(").append(geomField).append(", ").append(bboxExpr)
+        sql.append(" FROM ")
+                .append(finalTbName)
+                .append(" WHERE SDO_RELATE(")
+                .append(geomField)
+                .append(", ")
+                .append(bboxExpr)
                 .append(", 'MASK=ANYINTERACT') = 'TRUE'")
-                .append(" AND ").append(geomField).append(" IS NOT NULL");
+                .append(" AND ")
+                .append(geomField)
+                .append(" IS NOT NULL");
 
         return sql.toString();
     }
@@ -117,7 +135,6 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
         return "";
     }
 
-
     public void featuresTransform(GirAdvOneRow oneRow) {
         try {
             String upperCase = GEOM_FIELD_ALIAS_IN_SQL.toUpperCase();
@@ -129,7 +146,10 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
             }
             Geometry geometry = oneRow.getGeometry(upperCase);
             if (!ObjectUtil.equals(gridSrid, sourceDataSrid)) {
-                geometry = GirGeoTools.defaultInstance().getSridOpt().convert(geometry, sourceDataSrid, gridSrid);
+                geometry =
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .convert(geometry, sourceDataSrid, gridSrid);
             }
             Geometry finalGeometry = geometry;
             if (geometry != null) {
@@ -150,5 +170,4 @@ public class OracleVectorTileExecutor extends AbstractVectorTileExecutor {
             throw new RuntimeException("几何转换错误");
         }
     }
-
 }

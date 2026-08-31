@@ -32,16 +32,13 @@ public class GirPager<T> implements GiPager<T> {
 
     private Class<T> typeClass;
 
-    public GirPager() {
-    }
+    public GirPager() {}
 
     public GirPager(Class<T> cls) {
         typeClass = cls;
     }
 
-    /**
-     * 带页码起始方式的构造方法
-     */
+    /** 带页码起始方式的构造方法 */
     public GirPager(Class<T> cls, boolean pageNumStartZero) {
         typeClass = cls;
         this.pageNumStartZero = pageNumStartZero;
@@ -79,19 +76,16 @@ public class GirPager<T> implements GiPager<T> {
         return this;
     }
 
-    /**
-     * 重载方法：支持直接传入分页参数和页码起始方式
-     */
+    /** 重载方法：支持直接传入分页参数和页码起始方式 */
     @Override
-    public GirPager<T> put(Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero) {
+    public GirPager<T> put(
+            Iterable<T> list, long total, GiPageParam pageParam, boolean pageNumStartZero) {
         put(list, total, pageParam);
         this.pageNumStartZero = pageNumStartZero;
         return this;
     }
 
-    /**
-     * 计算总页数
-     */
+    /** 计算总页数 */
     public int getTotalPages() {
         if (pageSize <= 0) {
             return 0;
@@ -99,9 +93,7 @@ public class GirPager<T> implements GiPager<T> {
         return (int) Math.ceil((double) total / pageSize);
     }
 
-    /**
-     * 判断是否有下一页
-     */
+    /** 判断是否有下一页 */
     public boolean hasNext() {
         if (pageSize <= 0) {
             return false;
@@ -110,9 +102,7 @@ public class GirPager<T> implements GiPager<T> {
         return currentEnd < total;
     }
 
-    /**
-     * 判断是否有上一页
-     */
+    /** 判断是否有上一页 */
     public boolean hasPrevious() {
         if (pageNumStartZero) {
             return pageNum > 0;
@@ -121,9 +111,7 @@ public class GirPager<T> implements GiPager<T> {
         }
     }
 
-    /**
-     * 获取下一页页码
-     */
+    /** 获取下一页页码 */
     public int getNextPageNum() {
         if (pageNumStartZero) {
             return pageNum + 1;
@@ -132,9 +120,7 @@ public class GirPager<T> implements GiPager<T> {
         }
     }
 
-    /**
-     * 获取上一页页码
-     */
+    /** 获取上一页页码 */
     public int getPreviousPageNum() {
         if (pageNumStartZero) {
             return Math.max(0, pageNum - 1);
