@@ -155,8 +155,6 @@
         <version>1.5</version>
       </dependency>
 
-
-
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
@@ -180,7 +178,6 @@
         <artifactId>commons-lang3</artifactId>
         <version>${commons.lang3.version}</version>
       </dependency>
-
 
       <dependency>
         <groupId>dom4j</groupId>

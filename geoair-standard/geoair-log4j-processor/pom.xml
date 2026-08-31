@@ -68,6 +68,22 @@
 
   </dependencies>
 
+  <build>
+    <pluginManagement>
+      <plugins></plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- 处理器模块自身不需要注解处理，避免 javac 在编译期间尝试加载尚未生成的 provider 类 -->
+          <proc>none</proc>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>jdk8-tools</id>
@@ -86,21 +102,5 @@
       </dependencies>
     </profile>
   </profiles>
-
-  <build>
-    <pluginManagement>
-      <plugins></plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <!-- 处理器模块自身不需要注解处理，避免 javac 在编译期间尝试加载尚未生成的 provider 类 -->
-          <proc>none</proc>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

@@ -1,6 +1,5 @@
 package cn.geoair.base.log;
 
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

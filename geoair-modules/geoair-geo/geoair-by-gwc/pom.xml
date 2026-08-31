@@ -1,139 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geo</artifactId>
-        <version>J8.1.6</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-by-gwc</artifactId>
+    <artifactId>geoair-geo</artifactId>
     <version>J8.1.6</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-by-gwc</artifactId>
+  <version>J8.1.6</version>
 
-    <packaging>jar</packaging>
-    <name>geoair-by-gwc</name>
+  <packaging>jar</packaging>
+  <name>geoair-by-gwc</name>
 
-    <description>从geowebcache里面复制而来的部分代码</description>
+  <description>从geowebcache里面复制而来的部分代码</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zfj20250104@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <dependencies>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>zfj20250104@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-core</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-web</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <!--        <dependency>-->
+    <!--            <groupId>com.google.guava</groupId>-->
+    <!--            <artifactId>guava</artifactId>-->
+    <!--            <version>${guava.version}</version>-->
+    <!--            <optional>true</optional>-->
+    <!--        </dependency>-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <optional>true</optional>
+    </dependency>
 
-    <scm>
-        <connection>https://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-    </scm>
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>${xstream.version}</version>
+    </dependency>
 
-    <dependencies>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_core</artifactId>
+      <version>${jai.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-core</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-web</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.google.guava</groupId>-->
-<!--            <artifactId>guava</artifactId>-->
-<!--            <version>${guava.version}</version>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <optional>true</optional>
-        </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_codec</artifactId>
+      <version>${jai.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>${xstream.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <version>${jai.imageio.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_core</artifactId>
-            <version>${jai.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>it.geosolutions.jaiext.utilities</groupId>
+      <artifactId>jt-utilities</artifactId>
+      <version>${jaiext.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jts-core</artifactId>
+          <groupId>org.locationtech.jts</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_codec</artifactId>
-            <version>${jai.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>it.geosolutions.jaiext.colorindexer</groupId>
+      <artifactId>jt-colorindexer</artifactId>
+      <version>${jaiext.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jts-core</artifactId>
+          <groupId>org.locationtech.jts</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_imageio</artifactId>
-            <version>${jai.imageio.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>it.geosolutions.imageio-ext</groupId>
+      <artifactId>imageio-ext-png</artifactId>
+      <version>${imageio.ext.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>it.geosolutions.jaiext.utilities</groupId>
-            <artifactId>jt-utilities</artifactId>
-            <version>${jaiext.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jts-core</artifactId>
-                    <groupId>org.locationtech.jts</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <dependency>
+      <groupId>it.geosolutions.imageio-ext</groupId>
+      <artifactId>imageio-ext-streams</artifactId>
+      <version>${imageio.ext.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+  </dependencies>
 
-        <dependency>
-            <groupId>it.geosolutions.jaiext.colorindexer</groupId>
-            <artifactId>jt-colorindexer</artifactId>
-            <version>${jaiext.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jts-core</artifactId>
-                    <groupId>org.locationtech.jts</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+  <build>
 
-        <dependency>
-            <groupId>it.geosolutions.imageio-ext</groupId>
-            <artifactId>imageio-ext-png</artifactId>
-            <version>${imageio.ext.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>it.geosolutions.imageio-ext</groupId>
-            <artifactId>imageio-ext-streams</artifactId>
-            <version>${imageio.ext.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-coverage</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-    </dependencies>
-
-    <build>
-
-    </build>
+  </build>
 
 </project>

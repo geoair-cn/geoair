@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-modules</artifactId>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-modules</artifactId>
     <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -43,24 +43,12 @@
   </scm>
 
   <dependencies>
-<!--    <dependency>-->
-<!--      <groupId>com.graphhopper.external</groupId>-->
-<!--      <artifactId>jackson-datatype-jts</artifactId>-->
-<!--      <version>2.14</version>-->
-<!--      <exclusions>-->
-<!--        <exclusion>-->
-<!--          <artifactId>jackson-databind</artifactId>-->
-<!--          <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--        </exclusion>-->
-<!--      </exclusions>-->
-<!--    </dependency>-->
 
     <dependency>
       <groupId>org.locationtech.spatial4j</groupId>
       <artifactId>spatial4j</artifactId>
       <version>0.8</version>
     </dependency>
-
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -86,7 +74,6 @@
       <version>${org.postgis.version}</version>
       <optional>true</optional>
     </dependency>
-
 
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
@@ -128,7 +115,4 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins></plugins>
-  </build>
 </project>

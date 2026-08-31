@@ -1,119 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>cn.geoair.devkit</groupId>
-        <artifactId>geoair-geo</artifactId>
-        <version>J8.1.6</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-map-tile-fuser</artifactId>
+    <artifactId>geoair-geo</artifactId>
     <version>J8.1.6</version>
-    <name>geoair-map-tile-fuser</name>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-map-tile-fuser</artifactId>
+  <version>J8.1.6</version>
 
-    <packaging>jar</packaging>
+  <packaging>jar</packaging>
+  <name>geoair-map-tile-fuser</name>
 
-    <description>3857服务与4490服务互转解决方案</description>
+  <description>3857服务与4490服务互转解决方案</description>
 
+  <url>https://github.com/geoair-cn/geoair</url>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zfj20250104@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
     <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
+  <dependencies>
 
-    <developers>
-        <developer>
-            <name>zhangfengji</name>
-            <email>zfj20250104@qq.com</email>
-            <organization>geoair</organization>
-            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
-        </developer>
-    </developers>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-web</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-    <scm>
-        <connection>https://github.com/geoair-cn/geoair.git</connection>
-        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
-        <url>https://github.com/geoair-cn/geoair</url>
-    </scm>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-by-gwc</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-    <dependencies>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-geo-tools</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-web</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-adv-query</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-by-gwc</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.version.datatype}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-geo-tools</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${servlet-api.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.geoair.devkit</groupId>
-            <artifactId>geoair-adv-query</artifactId>
-            <version>${geoair.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>jai_imageio</artifactId>
+      <version>${jai.imageio.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>${hutool.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version.datatype}</version>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>${httpclient.version}</version>
+    </dependency>
 
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${sqlite-jdbc.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_imageio</artifactId>
-            <version>${jai.imageio.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
-
-
-
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlite-jdbc.version}</version>
-        </dependency>
-
-    </dependencies>
+  </dependencies>
 
 </project>

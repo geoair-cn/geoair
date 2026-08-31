@@ -133,7 +133,7 @@
       </dependency>
 
       <dependency>
-       <groupId>com.oracle.database.jdbc</groupId>
+        <groupId>com.oracle.database.jdbc</groupId>
         <artifactId>ojdbc8</artifactId>
         <version>${ojdbc.version}</version>
       </dependency>
@@ -205,7 +205,6 @@
 
   <build>
     <plugins>
-
 
     </plugins>
   </build>

@@ -37,11 +37,8 @@ public class XYZServlet extends D3TilesServlet {
             return TileResponse.error("Request URI must not be blank");
         }
         String requestURI = URLUtil.decode(requestUri);
-        Matcher matcher =
-                pattern.matcher(
-                        getRequestPath(
-                                requestURI)); ///
-                                              // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
+        Matcher matcher = pattern.matcher(getRequestPath(requestURI)); // /
+        // xyzTileService/rest/v2/1993285204737159169/0-10/preview/3/6/2
         String fileId = null;
         String type = null;
         String fileName = null;
