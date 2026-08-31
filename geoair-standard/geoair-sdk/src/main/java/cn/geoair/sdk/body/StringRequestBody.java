@@ -1,11 +1,10 @@
 package cn.geoair.sdk.body;
 
+import cn.geoair.sdk.GirSdkException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
-import cn.geoair.sdk.GirSdkException;
 
 /**
  * @author ：张俊

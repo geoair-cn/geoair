@@ -1,53 +1,39 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io.codec;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLogger;
 import cn.geoair.map.tile.forge.core.bygwc.io.FileResource;
-
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
 import it.geosolutions.imageio.stream.input.ImageInputStreamAdapter;
-
-
-import javax.imageio.ImageReader;
-import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageReader;
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
 
 /**
  * Class implementing the ImageDecoder interface, the user should only create a new bean for
  * instantiating a new decoder object.
  */
 public class ImageDecoderImpl implements ImageDecoder {
-    /**
-     * Logger used
-     */
+    /** Logger used */
     private static final GiLogger LOGGER = GirLogger.getLoger(ImageEncoderImpl.class);
 
-    /**
-     * Default string used for exceptions
-     */
+    /** Default string used for exceptions */
     public static final String OPERATION_NOT_SUPPORTED = "Operation not supported";
 
-    /**
-     * Boolean indicating is aggressive inputstream is supported
-     */
+    /** Boolean indicating is aggressive inputstream is supported */
     private final boolean isAggressiveInputStreamSupported;
-    /**
-     * Supported Mimetypes
-     */
+    /** Supported Mimetypes */
     private final List<String> supportedMimeTypes;
-    /**
-     * ImageReaderSpi object used
-     */
+    /** ImageReaderSpi object used */
     private ImageReaderSpi spi;
 
     /**
@@ -84,9 +70,9 @@ public class ImageDecoderImpl implements ImageDecoder {
      * Decodes the selected image with the defined output object. The user can set the aggressive
      * outputStream if supported.
      *
-     * @param source                            Source object to read
+     * @param source Source object to read
      * @param aggressiveInputStreamOptimization Parameter used if aggressive outputStream
-     *                                          optimization must be used.
+     *     optimization must be used.
      */
     public BufferedImage decode(
             Object source, boolean aggressiveInputStreamOptimization, Map<String, Object> map)
@@ -155,9 +141,7 @@ public class ImageDecoderImpl implements ImageDecoder {
         return null;
     }
 
-    /**
-     * Returns the ImageSpiReader associated to
-     */
+    /** Returns the ImageSpiReader associated to */
     ImageReaderSpi getReaderSpi() {
         return spi;
     }
@@ -175,7 +159,7 @@ public class ImageDecoderImpl implements ImageDecoder {
      * Indicates if optimization on InputStream can be used
      *
      * @return isAggressiveInputStreamSupported Boolean indicating if the selected decoder supports
-     * an aggressive input stream optimization
+     *     an aggressive input stream optimization
      */
     public boolean isAggressiveInputStreamSupported() {
         return isAggressiveInputStreamSupported;

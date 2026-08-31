@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import cn.geoair.comp.db.service.core.basic.util.DESUtils;
 import org.junit.Test;
 
-/**
- * {@link DESUtils} 的单元测试。
- */
+/** {@link DESUtils} 的单元测试。 */
 public class DESUtilsTest {
 
     @Test

@@ -19,8 +19,8 @@ public class SparkJavaTileLocalApp {
         runByTileSliceParameter(tileSliceParameter);
     }
 
-    public static void runByTileSliceParameter(TileSliceParameter tileSliceParameter) throws Exception {
-
+    public static void runByTileSliceParameter(TileSliceParameter tileSliceParameter)
+            throws Exception {
 
         SparkSession spark =
                 SparkSession.builder()
@@ -33,12 +33,10 @@ public class SparkJavaTileLocalApp {
                                 "cn.geoair.map.dynamic.statics.mvt.spark.listener.SparkSQLListener") // 自定义监听器
                         .getOrCreate();
 
-        SparkVectorTileGenerator sparkVectorTileGenerator =
-                new SparkVectorTileGenerator(spark);
+        SparkVectorTileGenerator sparkVectorTileGenerator = new SparkVectorTileGenerator(spark);
 
         sparkVectorTileGenerator.doGenerate(tileSliceParameter);
 
         spark.stop();
     }
-
 }

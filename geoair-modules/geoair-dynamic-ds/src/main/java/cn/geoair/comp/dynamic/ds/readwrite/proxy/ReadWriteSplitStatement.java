@@ -3,18 +3,15 @@ package cn.geoair.comp.dynamic.ds.readwrite.proxy;
 import cn.geoair.comp.dynamic.ds.readwrite.enums.SQLType;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.geoair.comp.dynamic.ds.readwrite.utils.SQLParserUtil;
-
 import java.sql.*;
 
 /**
- * 读写分离 Statement 代理
- * 职责：拦截 SQL 执行，动态路由到主库或从库
+ * 读写分离 Statement 代理 职责：拦截 SQL 执行，动态路由到主库或从库
  *
  * @author 张俊
  * @date Created in 2026/5/28
  */
 public class ReadWriteSplitStatement implements Statement {
-
 
     protected final ReadWriteSplitConnection connection;
     protected Statement currentStatement;
@@ -26,23 +23,25 @@ public class ReadWriteSplitStatement implements Statement {
         this.connection = connection;
     }
 
-    public ReadWriteSplitStatement(ReadWriteSplitConnection connection, int resultSetType, int resultSetConcurrency) {
+    public ReadWriteSplitStatement(
+            ReadWriteSplitConnection connection, int resultSetType, int resultSetConcurrency) {
         this(connection);
         this.resultSetType = resultSetType;
         this.resultSetConcurrency = resultSetConcurrency;
     }
 
-    public ReadWriteSplitStatement(ReadWriteSplitConnection connection, int resultSetType,
-                                   int resultSetConcurrency, int resultSetHoldability) {
+    public ReadWriteSplitStatement(
+            ReadWriteSplitConnection connection,
+            int resultSetType,
+            int resultSetConcurrency,
+            int resultSetHoldability) {
         this(connection);
         this.resultSetType = resultSetType;
         this.resultSetConcurrency = resultSetConcurrency;
         this.resultSetHoldability = resultSetHoldability;
     }
 
-    /**
-     * 获取真实的 Statement
-     */
+    /** 获取真实的 Statement */
     private Statement getRealStatement(String sql) throws SQLException {
         Connection realConn = connection.getConnection(sql);
 
@@ -52,7 +51,9 @@ public class ReadWriteSplitStatement implements Statement {
 
         if (currentStatement == null) {
             if (resultSetHoldability > 0) {
-                currentStatement = realConn.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+                currentStatement =
+                        realConn.createStatement(
+                                resultSetType, resultSetConcurrency, resultSetHoldability);
             } else if (resultSetType > 0) {
                 currentStatement = realConn.createStatement(resultSetType, resultSetConcurrency);
             } else {
@@ -78,7 +79,6 @@ public class ReadWriteSplitStatement implements Statement {
             currentStatement = null;
         }
     }
-
 
     @Override
     public ResultSet executeQuery(String sql) throws SQLException {
@@ -199,7 +199,9 @@ public class ReadWriteSplitStatement implements Statement {
 
     @Override
     public int getFetchDirection() throws SQLException {
-        return currentStatement != null ? currentStatement.getFetchDirection() : ResultSet.FETCH_FORWARD;
+        return currentStatement != null
+                ? currentStatement.getFetchDirection()
+                : ResultSet.FETCH_FORWARD;
     }
 
     @Override
@@ -350,6 +352,7 @@ public class ReadWriteSplitStatement implements Statement {
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return iface.isInstance(this) || (currentStatement != null && currentStatement.isWrapperFor(iface));
+        return iface.isInstance(this)
+                || (currentStatement != null && currentStatement.isWrapperFor(iface));
     }
 }

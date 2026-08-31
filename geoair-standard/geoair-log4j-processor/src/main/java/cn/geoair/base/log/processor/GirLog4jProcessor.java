@@ -1,7 +1,10 @@
 package cn.geoair.base.log.processor;
 
 import cn.geoair.base.log.GirLog4j;
-
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -9,28 +12,23 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * {@link GirLog4j} 注解处理器，在编译期向被标注的类中自动注入日志字段。
- * <p>
- * 实现原理与 Lombok 一致：在 javac 的注解处理阶段，通过 {@code com.sun.tools.javac} 内部 API
+ *
+ * <p>实现原理与 Lombok 一致：在 javac 的注解处理阶段，通过 {@code com.sun.tools.javac} 内部 API
  * 直接修改被标注类的语法树（AST），追加如下字段：
  *
  * <pre>
  * private static GiLogger log = GirLoggerFactory.getLogger(当前类.class);
  * </pre>
  *
- * <p>为避免编译期对 {@code tools.jar} 的依赖，内部 API 全部通过反射调用（不 import 任何
- * {@code com.sun.tools.javac} 类），从而在 JDK 8 ~ JDK 17 上均可用；
- * JDK 16+ 因模块强封装，运行 javac 时需添加
- * {@code --add-opens jdk.compiler/com.sun.tools.javac.*=ALL-UNNAMED}，失败时本处理器会输出明确的编译错误提示。
+ * <p>为避免编译期对 {@code tools.jar} 的依赖，内部 API 全部通过反射调用（不 import 任何 {@code com.sun.tools.javac} 类），从而在
+ * JDK 8 ~ JDK 17 上均可用； JDK 16+ 因模块强封装，运行 javac 时需添加 {@code --add-opens
+ * jdk.compiler/com.sun.tools.javac.*=ALL-UNNAMED}，失败时本处理器会输出明确的编译错误提示。
  *
  * @author geoair
- * @since J8-dev-SNAPSHOT
+ * @since J8.1.6
  * @see GirLog4j
  */
 public class GirLog4jProcessor extends AbstractProcessor {
@@ -40,7 +38,8 @@ public class GirLog4jProcessor extends AbstractProcessor {
     /** 日志工厂全限定名 */
     private static final String GIR_LOGGER_FACTORY = "cn.geoair.base.log.GirLoggerFactory";
 
-    private static final String JPE_CLASS = "com.sun.tools.javac.processing.JavacProcessingEnvironment";
+    private static final String JPE_CLASS =
+            "com.sun.tools.javac.processing.JavacProcessingEnvironment";
     private static final String TREE_MAKER_CLASS = "com.sun.tools.javac.tree.TreeMaker";
     private static final String NAMES_CLASS = "com.sun.tools.javac.util.Names";
     private static final String CONTEXT_CLASS = "com.sun.tools.javac.util.Context";
@@ -76,9 +75,14 @@ public class GirLog4jProcessor extends AbstractProcessor {
             try {
                 injectLogField((TypeElement) element);
             } catch (Throwable e) {
-                error(element, "自动注入日志字段失败: " + e.getClass().getSimpleName() + ": " + e.getMessage()
-                        + "。可手动添加字段替代；若错误与模块访问有关，请为 javac 添加 --add-opens"
-                        + " jdk.compiler/com.sun.tools.javac.*=ALL-UNNAMED");
+                error(
+                        element,
+                        "自动注入日志字段失败: "
+                                + e.getClass().getSimpleName()
+                                + ": "
+                                + e.getMessage()
+                                + "。可手动添加字段替代；若错误与模块访问有关，请为 javac 添加 --add-opens"
+                                + " jdk.compiler/com.sun.tools.javac.*=ALL-UNNAMED");
             }
         }
         return false;
@@ -94,7 +98,8 @@ public class GirLog4jProcessor extends AbstractProcessor {
         String fieldName = annotation.fieldName();
 
         for (Element enclosed : typeElement.getEnclosedElements()) {
-            if (enclosed.getKind() == ElementKind.FIELD && enclosed.getSimpleName().contentEquals(fieldName)) {
+            if (enclosed.getKind() == ElementKind.FIELD
+                    && enclosed.getSimpleName().contentEquals(fieldName)) {
                 return;
             }
         }
@@ -126,21 +131,19 @@ public class GirLog4jProcessor extends AbstractProcessor {
         defsField.set(classDecl, invoke(defs, "append", varDef));
     }
 
-    /**
-     * 构造形如 {@code getLogger(...)} 的方法调用树。
-     */
-    private static Object makeApply(Object treeMaker, Object names, String factoryFqn, String methodName, Object arg)
+    /** 构造形如 {@code getLogger(...)} 的方法调用树。 */
+    private static Object makeApply(
+            Object treeMaker, Object names, String factoryFqn, String methodName, Object arg)
             throws Exception {
         Object factoryExpr = chainDots(treeMaker, names, factoryFqn);
-        Object methodExpr = invoke(treeMaker, "Select", factoryExpr, invoke(names, "fromString", methodName));
+        Object methodExpr =
+                invoke(treeMaker, "Select", factoryExpr, invoke(names, "fromString", methodName));
         Object nil = invokeStatic(UTIL_LIST_CLASS, "nil");
         Object argList = invoke(nil, "append", arg);
         return invoke(treeMaker, "Apply", nil, methodExpr, argList);
     }
 
-    /**
-     * 按点分全限定名构造 {@code Select} 链（如 {@code cn.geoair.base.log.GiLogger}）。
-     */
+    /** 按点分全限定名构造 {@code Select} 链（如 {@code cn.geoair.base.log.GiLogger}）。 */
     private static Object chainDots(Object treeMaker, Object names, String fqn) throws Exception {
         String[] parts = fqn.split("\\.");
         Object expr = invoke(treeMaker, "Ident", invoke(names, "fromString", parts[0]));
@@ -150,50 +153,42 @@ public class GirLog4jProcessor extends AbstractProcessor {
         return expr;
     }
 
-    /**
-     * 获取被标注类对应的语法树节点（JCClassDecl）。
-     */
+    /** 获取被标注类对应的语法树节点（JCClassDecl）。 */
     private Object getTree(TypeElement typeElement) throws Exception {
         Object javacElements = processingEnv.getElementUtils();
         return invoke(javacElements, "getTree", (Element) typeElement);
     }
 
-    /**
-     * 从注解处理环境中获取 javac 的 Context。
-     */
+    /** 从注解处理环境中获取 javac 的 Context。 */
     private static Object context(ProcessingEnvironment processingEnv) throws Exception {
         return invoke(processingEnv, "getContext");
     }
 
-    /**
-     * 获取 javac 内部标记常量（Flags.PRIVATE / STATIC / FINAL）。
-     */
+    /** 获取 javac 内部标记常量（Flags.PRIVATE / STATIC / FINAL）。 */
     private static long flag(String name) throws Exception {
         return Class.forName(FLAGS_CLASS).getField(name).getInt(null);
     }
 
-    /**
-     * 反射调用静态工厂方法：Class.instance(Context)。
-     */
-    private static Object instance(String className, String methodName, Object arg) throws Exception {
+    /** 反射调用静态工厂方法：Class.instance(Context)。 */
+    private static Object instance(String className, String methodName, Object arg)
+            throws Exception {
         return invokeStatic(className, methodName, arg);
     }
 
-    private static Object invokeStatic(String className, String methodName, Object... args) throws Exception {
+    private static Object invokeStatic(String className, String methodName, Object... args)
+            throws Exception {
         return findMethod(Class.forName(className), methodName, args).invoke(null, args);
     }
 
-    /**
-     * 反射调用实例方法，按方法名 + 参数个数 + 参数类型兼容匹配重载。
-     */
-    private static Object invoke(Object target, String methodName, Object... args) throws Exception {
+    /** 反射调用实例方法，按方法名 + 参数个数 + 参数类型兼容匹配重载。 */
+    private static Object invoke(Object target, String methodName, Object... args)
+            throws Exception {
         return findMethod(target.getClass(), methodName, args).invoke(target, args);
     }
 
-    /**
-     * 按方法名、参数个数、参数运行时类型查找最匹配的方法（兼容基本类型拆箱）。
-     */
-    private static Method findMethod(Class<?> clazz, String name, Object... args) throws NoSuchMethodException {
+    /** 按方法名、参数个数、参数运行时类型查找最匹配的方法（兼容基本类型拆箱）。 */
+    private static Method findMethod(Class<?> clazz, String name, Object... args)
+            throws NoSuchMethodException {
         for (Method method : clazz.getMethods()) {
             if (!method.getName().equals(name) || method.getParameterCount() != args.length) {
                 continue;
@@ -213,9 +208,7 @@ public class GirLog4jProcessor extends AbstractProcessor {
         throw new NoSuchMethodException(clazz.getName() + "#" + name + "(" + args.length + " 个参数)");
     }
 
-    /**
-     * 参数类型是否兼容，基本类型按包装类拆箱匹配。
-     */
+    /** 参数类型是否兼容，基本类型按包装类拆箱匹配。 */
     private static boolean matches(Class<?> paramType, Class<?> argType) {
         if (paramType.isPrimitive()) {
             return (paramType == int.class && argType == Integer.class)
@@ -230,10 +223,10 @@ public class GirLog4jProcessor extends AbstractProcessor {
         return paramType.isAssignableFrom(argType);
     }
 
-    /**
-     * 输出编译错误。
-     */
+    /** 输出编译错误。 */
     private void error(Element element, String message) {
-        processingEnv.getMessager().printMessage(javax.tools.Diagnostic.Kind.ERROR, message, element);
+        processingEnv
+                .getMessager()
+                .printMessage(javax.tools.Diagnostic.Kind.ERROR, message, element);
     }
 }

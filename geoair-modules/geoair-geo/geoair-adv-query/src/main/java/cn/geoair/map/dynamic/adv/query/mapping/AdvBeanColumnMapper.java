@@ -1,11 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.mapping;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropertyMeta;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +32,14 @@ public class AdvBeanColumnMapper {
         }
         AdvBeanMappingMeta mappingMeta = AdvBeanMappingMeta.of(bean.getClass());
         if (mappingMeta.isMapType()) {
-            fillFromMap(rowData, (Map<?, ?>) bean, bean.getClass(), toUnderlineCase, ignoreNullValue, ignoreEmptyString, ignoreFieldNames);
+            fillFromMap(
+                    rowData,
+                    (Map<?, ?>) bean,
+                    bean.getClass(),
+                    toUnderlineCase,
+                    ignoreNullValue,
+                    ignoreEmptyString,
+                    ignoreFieldNames);
             return rowData;
         }
         for (AdvBeanPropertyMeta property : mappingMeta.getWritableProperties(ignoreFieldNames)) {
@@ -54,13 +58,14 @@ public class AdvBeanColumnMapper {
         return rowData;
     }
 
-    private void fillFromMap(Map<String, Object> rowData,
-                             Map<?, ?> source,
-                             Class<?> beanType,
-                             boolean toUnderlineCase,
-                             boolean ignoreNullValue,
-                             boolean ignoreEmptyString,
-                             List<String> ignoreFieldNames) {
+    private void fillFromMap(
+            Map<String, Object> rowData,
+            Map<?, ?> source,
+            Class<?> beanType,
+            boolean toUnderlineCase,
+            boolean ignoreNullValue,
+            boolean ignoreEmptyString,
+            List<String> ignoreFieldNames) {
         if (source == null || source.isEmpty()) {
             return;
         }
@@ -79,7 +84,8 @@ public class AdvBeanColumnMapper {
             if (ignoreEmptyString && value instanceof String && ((String) value).trim().isEmpty()) {
                 continue;
             }
-            String columnName = toUnderlineCase ? StrUtil.toUnderlineCase(propertyName) : propertyName;
+            String columnName =
+                    toUnderlineCase ? StrUtil.toUnderlineCase(propertyName) : propertyName;
             // 不在此处预转换：保留原始类型以便 buildPlaceholders 感知自定义占位符
             // 最终的 JDBC 转换由 PreparedStatementBinder 在执行时完成
             rowData.put(columnName, value);

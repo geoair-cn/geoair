@@ -3,9 +3,8 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 /**
  * 瓦片 Y 行号的原点约定。
  *
- * <p>本枚举只描述 Y 轴方向，不描述瓦片服务协议、坐标参考系或缓存格式：
- * {@link #XYZ} 的 {@code y=0} 位于网格顶部，{@link #TMS} 的 {@code y=0}
- * 位于网格底部。</p>
+ * <p>本枚举只描述 Y 轴方向，不描述瓦片服务协议、坐标参考系或缓存格式： {@link #XYZ} 的 {@code y=0} 位于网格顶部，{@link #TMS} 的 {@code
+ * y=0} 位于网格底部。
  *
  * @author 张逢吉
  */
@@ -20,9 +19,9 @@ public enum TileYAxis {
     /**
      * 将当前约定下的 Y 行号转换为目标约定。
      *
-     * @param y            当前 Y 行号
+     * @param y 当前 Y 行号
      * @param tileRowCount 当前层级的总行数，必须来自实际网格定义
-     * @param target       目标 Y 轴约定
+     * @param target 目标 Y 轴约定
      * @return 目标约定下的 Y 行号
      */
     public int convertY(int y, int tileRowCount, TileYAxis target) {
@@ -38,8 +37,7 @@ public enum TileYAxis {
     /**
      * 将瓦片边界线的 Y 索引转换为目标约定。
      *
-     * <p>与 {@link #convertY(int, int, TileYAxis)} 不同，边界索引允许取到
-     * {@code tileRowCount}，用于计算瓦片上、下边界坐标。</p>
+     * <p>与 {@link #convertY(int, int, TileYAxis)} 不同，边界索引允许取到 {@code tileRowCount}，用于计算瓦片上、下边界坐标。
      */
     public int convertBoundaryY(int y, int tileRowCount, TileYAxis target) {
         if (target == null) {

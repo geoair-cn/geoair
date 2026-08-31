@@ -19,35 +19,53 @@ public class GeoMeasureDemo {
         String polygonWkt =
                 "POLYGON((116.40 39.90,116.41 39.90,116.41 39.91,116.40 39.91,116.40 39.90))";
         Geometry polygon = geoTools.getFormatOpt().wktToJtsGeometry(polygonWkt, false);
-        double area = measureUtils.calculateArea(
-                polygon, 4326, MeasureUnitEnum.MU, MeasureMethodEnum.UTM);
+        double area =
+                measureUtils.calculateArea(
+                        polygon, 4326, MeasureUnitEnum.MU, MeasureMethodEnum.UTM);
         Gir.log.info("多边形面积（亩）：" + area);
 
         // 2. 坐标数组由调用方构造为 JTS Geometry 后再计算。
-        LineString line = geometryFactory.createLineString(new Coordinate[]{
-                new Coordinate(116.40, 39.90),
-                new Coordinate(116.50, 39.90),
-                new Coordinate(116.50, 40.00)});
-        double length = measureUtils.calculateLength(
-                line, 4326, MeasureUnitEnum.KILOMETER, MeasureMethodEnum.UTM);
+        LineString line =
+                geometryFactory.createLineString(
+                        new Coordinate[] {
+                            new Coordinate(116.40, 39.90),
+                            new Coordinate(116.50, 39.90),
+                            new Coordinate(116.50, 40.00)
+                        });
+        double length =
+                measureUtils.calculateLength(
+                        line, 4326, MeasureUnitEnum.KILOMETER, MeasureMethodEnum.UTM);
         Gir.log.info("线长度（千米）：" + length);
 
         // 3. 两点距离计算（WGS84坐标系，输出单位：米）
         Point pointGeometry1 = geometryFactory.createPoint(new Coordinate(116.403874, 39.914885));
         Point pointGeometry2 = geometryFactory.createPoint(new Coordinate(116.413874, 39.924885));
 
-        Gir.log.info("两点距离（米）：" + measureUtils.calculatePointToPointDistance(
-                pointGeometry1, pointGeometry2, 4326, MeasureUnitEnum.METER, MeasureMethodEnum.GEODETIC));
-        Gir.log.info("两点距离（千米）：" + measureUtils.calculatePointToPointDistance(
-                pointGeometry1, pointGeometry2, 4326, MeasureUnitEnum.KILOMETER, MeasureMethodEnum.GEODETIC));
+        Gir.log.info(
+                "两点距离（米）："
+                        + measureUtils.calculatePointToPointDistance(
+                                pointGeometry1,
+                                pointGeometry2,
+                                4326,
+                                MeasureUnitEnum.METER,
+                                MeasureMethodEnum.GEODETIC));
+        Gir.log.info(
+                "两点距离（千米）："
+                        + measureUtils.calculatePointToPointDistance(
+                                pointGeometry1,
+                                pointGeometry2,
+                                4326,
+                                MeasureUnitEnum.KILOMETER,
+                                MeasureMethodEnum.GEODETIC));
 
         // 4. 点到线最近距离
-        double minDistance = measureUtils.calculateGeometryToGeometryMinDistance(
-                geometryFactory.createPoint(new Coordinate(116.405, 39.905)),
-                line,
-                4326,
-                MeasureUnitEnum.METER,
-                MeasureMethodEnum.UTM);
+        double minDistance =
+                measureUtils.calculateGeometryToGeometryMinDistance(
+                        geometryFactory.createPoint(new Coordinate(116.405, 39.905)),
+                        line,
+                        4326,
+                        MeasureUnitEnum.METER,
+                        MeasureMethodEnum.UTM);
         Gir.log.info("点到线最近距离（米）：" + minDistance);
     }
 }

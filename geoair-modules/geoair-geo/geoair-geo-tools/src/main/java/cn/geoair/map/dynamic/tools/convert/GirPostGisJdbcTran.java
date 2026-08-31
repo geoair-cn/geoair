@@ -12,8 +12,6 @@ import org.postgresql.util.PGobject;
  */
 public class GirPostGisJdbcTran {
 
-
-
     public static boolean isPGobject(Object value) {
         if (value instanceof PGobject) { // PGobject 是 PGgeometry的父类
             return true;
@@ -29,11 +27,17 @@ public class GirPostGisJdbcTran {
              * 驱动在 onemap_tile_builder 下找不到对应的类型定义， 就无法将其识别为 PgGeom， 只能降级为通用的 PgObject 类型。
              */
             PGobject pObject = (PGobject) value;
-            if(value.getClass().getSimpleName().contains("geometry")){
-                jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().wktToJtsGeometry(StrUtil.toString(pObject), true);
+            if (value.getClass().getSimpleName().contains("geometry")) {
+                jtsGeom =
+                        GirGeoTools.defaultInstance()
+                                .getFormatOpt()
+                                .wktToJtsGeometry(StrUtil.toString(pObject), true);
             }
-            if(GutilObject.isEmpty(jtsGeom)){
-                jtsGeom =  GirGeoTools.defaultInstance().getFormatOpt().wkbToJtsGeometry(StrUtil.toString(pObject), true);
+            if (GutilObject.isEmpty(jtsGeom)) {
+                jtsGeom =
+                        GirGeoTools.defaultInstance()
+                                .getFormatOpt()
+                                .wkbToJtsGeometry(StrUtil.toString(pObject), true);
             }
         }
         return jtsGeom;

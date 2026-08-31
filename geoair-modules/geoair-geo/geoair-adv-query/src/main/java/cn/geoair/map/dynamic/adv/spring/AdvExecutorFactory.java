@@ -5,18 +5,14 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-
 /** 高级查询执行器工厂，根据数据源类型自动创建对应执行器 */
-
 public class AdvExecutorFactory {
     public static GiLogger log = GirLoggerFactory.getLogger();
-
 
     public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
         return getAdvExecutorByDataSource(dataSource, null);
@@ -33,11 +29,11 @@ public class AdvExecutorFactory {
     /**
      * 根据方言名称直接创建执行器（跳过 JDBC 连接探测，性能更高）
      *
-     * <p>适用于调用方已经明确知道数据库类型的场景，避免 {@link #getAdvExecutorByDataSource(DataSource)}
-     * 中通过 {@code DatabaseMetaData.getDatabaseProductName()} 探测数据库类型带来的额外连接开销。</p>
+     * <p>适用于调用方已经明确知道数据库类型的场景，避免 {@link #getAdvExecutorByDataSource(DataSource)} 中通过 {@code
+     * DatabaseMetaData.getDatabaseProductName()} 探测数据库类型带来的额外连接开销。
      *
-     * @param dialectName    数据库方言
-     * @param dataSource     数据源对象
+     * @param dialectName 数据库方言
+     * @param dataSource 数据源对象
      * @param dataSourceName 数据源名称（可为 null）
      * @return 匹配的 IAdvExecutor 实现类
      */
@@ -50,9 +46,7 @@ public class AdvExecutorFactory {
         return createByDialect(dialectName, dataSource, dataSourceName);
     }
 
-    /**
-     * 根据方言创建对应的 Executor 实例（所有创建路径的统一出口）
-     */
+    /** 根据方言创建对应的 Executor 实例（所有创建路径的统一出口） */
     private static IAdvExecutor createByDialect(
             DialectName dialect, DataSource dataSource, String dataSourceName) {
         switch (dialect) {
@@ -91,7 +85,9 @@ public class AdvExecutorFactory {
                 return DialectName.POSTGRESQL;
             } else if (dbProductName.contains("ORACLE")) {
                 return DialectName.ORACLE;
-            } else if (dbProductName.contains("DAMENG") || dbProductName.equals("DM") || dbProductName.contains("DM DBMS")) {
+            } else if (dbProductName.contains("DAMENG")
+                    || dbProductName.equals("DM")
+                    || dbProductName.contains("DM DBMS")) {
                 return DialectName.DM;
             } else {
                 throw new UnsupportedOperationException("无法识别的数据库类型：" + dbProductName);

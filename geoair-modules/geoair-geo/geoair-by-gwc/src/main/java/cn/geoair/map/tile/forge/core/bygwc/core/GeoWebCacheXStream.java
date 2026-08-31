@@ -1,16 +1,15 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.core;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.*;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.ConverterRegistry;
-import com.thoughtworks.xstream.converters.*;
 import com.thoughtworks.xstream.converters.basic.*;
 import com.thoughtworks.xstream.converters.basic.FloatConverter;
 import com.thoughtworks.xstream.converters.basic.IntConverter;
-import com.thoughtworks.xstream.converters.collections.ArrayConverter;
 import com.thoughtworks.xstream.converters.collections.*;
+import com.thoughtworks.xstream.converters.collections.ArrayConverter;
 import com.thoughtworks.xstream.converters.extended.*;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
@@ -21,7 +20,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.security.NoTypePermission;
 import com.thoughtworks.xstream.security.PrimitiveTypePermission;
-
 import java.lang.reflect.Constructor;
 
 /**
@@ -31,9 +29,7 @@ import java.lang.reflect.Constructor;
  */
 public class GeoWebCacheXStream extends XStream {
 
-    /**
-     * 默认构造函数
-     */
+    /** 默认构造函数 */
     public GeoWebCacheXStream() {
         super();
         init();
@@ -140,7 +136,8 @@ public class GeoWebCacheXStream extends XStream {
      * @param mapper 映射器
      * @param converterLookup 转换器查找
      * @param converterRegistry 转换器注册表
-     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver, ClassLoaderReference, Mapper, ConverterLookup, ConverterRegistry)} 替代
+     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver,
+     *     ClassLoaderReference, Mapper, ConverterLookup, ConverterRegistry)} 替代
      */
     @Deprecated
     public GeoWebCacheXStream(
@@ -161,7 +158,8 @@ public class GeoWebCacheXStream extends XStream {
      * @param driver 驱动程序
      * @param classLoader 类加载器
      * @param mapper 映射器
-     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver, ClassLoaderReference, Mapper)} 替代
+     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver,
+     *     ClassLoaderReference, Mapper)} 替代
      */
     @Deprecated
     public GeoWebCacheXStream(
@@ -179,7 +177,8 @@ public class GeoWebCacheXStream extends XStream {
      * @param reflectionProvider 反射提供者
      * @param driver 驱动程序
      * @param classLoader 类加载器
-     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver, ClassLoaderReference)} 替代
+     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver,
+     *     ClassLoaderReference)} 替代
      */
     @Deprecated
     public GeoWebCacheXStream(
@@ -196,7 +195,8 @@ public class GeoWebCacheXStream extends XStream {
      * @param reflectionProvider 反射提供者
      * @param mapper 映射器
      * @param driver 驱动程序
-     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver, ClassLoaderReference, Mapper)} 替代
+     * @deprecated 使用 {@link #GeoWebCacheXStream(ReflectionProvider, HierarchicalStreamDriver,
+     *     ClassLoaderReference, Mapper)} 替代
      */
     @Deprecated
     public GeoWebCacheXStream(
@@ -217,9 +217,7 @@ public class GeoWebCacheXStream extends XStream {
         }
     }
 
-    /**
-     * 初始化方法，设置安全策略和忽略未知元素
-     */
+    /** 初始化方法，设置安全策略和忽略未知元素 */
     private void init() {
         // 忽略未知字段，这允许加载具有已弃用和现在已删除元素的旧配置
         ignoreUnknownElements();
@@ -255,17 +253,16 @@ public class GeoWebCacheXStream extends XStream {
                     java.util.concurrent.ConcurrentHashMap.class,
                 });
 
-//        String whitelistProp = GeoWebCacheExtensions.getProperty("GEOWEBCACHE_XSTREAM_WHITELIST");
-//        if (whitelistProp != null) {
-//            String[] wildcards = whitelistProp.split("\\s+|(\\s*;\\s*)");
-//            this.allowTypesByWildcard(wildcards);
-//        }
+        //        String whitelistProp =
+        // GeoWebCacheExtensions.getProperty("GEOWEBCACHE_XSTREAM_WHITELIST");
+        //        if (whitelistProp != null) {
+        //            String[] wildcards = whitelistProp.split("\\s+|(\\s*;\\s*)");
+        //            this.allowTypesByWildcard(wildcards);
+        //        }
     }
 
     /**
-     * 此方法是基类方法的克隆，在可能的情况下保持转换器的相同顺序，
-     * 但修改了一些对Java核心类执行非法反射访问的转换器，
-     * 用不执行此类访问的替代品替换它们，或者如果我们不使用它们就简单地移除
+     * 此方法是基类方法的克隆，在可能的情况下保持转换器的相同顺序， 但修改了一些对Java核心类执行非法反射访问的转换器， 用不执行此类访问的替代品替换它们，或者如果我们不使用它们就简单地移除
      */
     @Override
     protected void setupConverters() {

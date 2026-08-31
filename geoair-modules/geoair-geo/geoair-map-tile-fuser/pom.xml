@@ -5,12 +5,12 @@
     <parent>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-geo</artifactId>
-        <version>J8-dev-SNAPSHOT</version>
+        <version>J8.1.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-map-tile-fuser</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <name>geoair-map-tile-fuser</name>
 
     <packaging>jar</packaging>

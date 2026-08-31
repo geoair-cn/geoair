@@ -20,11 +20,14 @@ public class AdvPreparedStatementBinder {
         this.typeHandlerRegistry = typeHandlerRegistry;
     }
 
-    public void bind(PreparedStatement preparedStatement, int index, Object value) throws SQLException {
-        Object jdbcValue = typeHandlerRegistry.convertForWrite(
-                value,
-                value == null ? Object.class : value.getClass(),
-                AdvTypeHandlerContext.withConnection(preparedStatement.getConnection(), null));
+    public void bind(PreparedStatement preparedStatement, int index, Object value)
+            throws SQLException {
+        Object jdbcValue =
+                typeHandlerRegistry.convertForWrite(
+                        value,
+                        value == null ? Object.class : value.getClass(),
+                        AdvTypeHandlerContext.withConnection(
+                                preparedStatement.getConnection(), null));
         if (jdbcValue instanceof String) {
             preparedStatement.setString(index, (String) jdbcValue);
         } else {
@@ -32,15 +35,14 @@ public class AdvPreparedStatementBinder {
         }
     }
 
-    public void bindAll(PreparedStatement preparedStatement, List<Object> values) throws SQLException {
+    public void bindAll(PreparedStatement preparedStatement, List<Object> values)
+            throws SQLException {
         for (int i = 0; i < values.size(); i++) {
             bind(preparedStatement, i + 1, values.get(i));
         }
     }
 
-    /**
-     * 获取值的 SQL 占位符表达式（委托给 Registry）。
-     */
+    /** 获取值的 SQL 占位符表达式（委托给 Registry）。 */
     public SqlPlaceholder getSqlPlaceholder(Object value) {
         return typeHandlerRegistry.getSqlPlaceholder(value);
     }

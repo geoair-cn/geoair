@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
-
 import cn.hutool.core.util.BooleanUtil;
 
 /**
@@ -11,8 +10,6 @@ import cn.hutool.core.util.BooleanUtil;
  * @description： 布尔类型处理器
  */
 public class BooleanAdvTypeHandler extends AdvBaseTypeHandler<Boolean> {
-
-
 
     @Override
     public boolean supports(Class<?> javaType, Object value) {

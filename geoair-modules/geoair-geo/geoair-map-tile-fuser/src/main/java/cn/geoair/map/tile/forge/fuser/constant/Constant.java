@@ -8,5 +8,4 @@ package cn.geoair.map.tile.forge.fuser.constant;
 public class Constant {
 
     public static final String _original_grid_name_suffix = "_original_grid";
-
 }

@@ -1,8 +1,6 @@
 package cn.geoair.base.log;
 
 
-import cn.geoair.base.lang.caller.GkCallerUtil;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,7 +13,6 @@ public abstract class GirLogWrapper implements GiLogger {
 
     // Logger缓存（key=类名，value=对应Logger实例）
     private final Map<String, GiLogger> loggerCache = new ConcurrentHashMap<>();
-
 
     /**
      * 带缓存的动态Logger获取，并提取调用位置信息
@@ -30,7 +27,6 @@ public abstract class GirLogWrapper implements GiLogger {
         String callerClassName = callerElement.getClassName();
         int lineNumber = callerElement.getLineNumber();
         String fileName = callerElement.getFileName();
-
 
         // 从缓存获取或创建Logger
         GiLogger logger = loggerCache.computeIfAbsent(callerClassName, GirLoggerFactory::getLogger);
@@ -85,11 +81,12 @@ public abstract class GirLogWrapper implements GiLogger {
     /**
      * 记录日志的抽象方法，由子类实现具体的日志记录逻辑
      *
-     * @param level      日志级别
-     * @param message    日志消息
+     * @param level 日志级别
+     * @param message 日志消息
      * @param loggerInfo Logger信息（包含调用位置等）
      */
-    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLog(
+            GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
         if (level.equals(GemLogLevel.TRACE)) {
             loggerInfo.logger.trace(message, arguments);
         }
@@ -113,12 +110,17 @@ public abstract class GirLogWrapper implements GiLogger {
     /**
      * 记录带异常的日志的抽象方法，由子类实现具体的日志记录逻辑
      *
-     * @param level      日志级别
-     * @param message    日志消息
-     * @param t          异常信息
+     * @param level 日志级别
+     * @param message 日志消息
+     * @param t 异常信息
      * @param loggerInfo Logger信息（包含调用位置等）
      */
-    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLogWithThrowable(
+            GemLogLevel level,
+            String message,
+            Throwable t,
+            LoggerInfo loggerInfo,
+            Object... arguments) {
         if (level.equals(GemLogLevel.TRACE)) {
             loggerInfo.logger.trace(t, message, arguments);
         }
@@ -144,7 +146,6 @@ public abstract class GirLogWrapper implements GiLogger {
         return getTargetLoggerInfo().logger.isTraceEnabled();
     }
 
-
     @Override
     public void trace(String format, Object... arguments) {
         LoggerInfo info = getTargetLoggerInfo();
@@ -163,12 +164,10 @@ public abstract class GirLogWrapper implements GiLogger {
         recordLogWithThrowable(GemLogLevel.TRACE, format, t, info, arguments);
     }
 
-
     @Override
     public boolean isDebugEnabled() {
         return getTargetLoggerInfo().logger.isDebugEnabled();
     }
-
 
     @Override
     public void debug(String format, Object... arguments) {
@@ -188,12 +187,10 @@ public abstract class GirLogWrapper implements GiLogger {
         recordLogWithThrowable(GemLogLevel.DEBUG, format, t, info, arguments);
     }
 
-
     @Override
     public boolean isInfoEnabled() {
         return getTargetLoggerInfo().logger.isInfoEnabled();
     }
-
 
     @Override
     public void info(String format, Object... arguments) {
@@ -213,12 +210,10 @@ public abstract class GirLogWrapper implements GiLogger {
         recordLogWithThrowable(GemLogLevel.INFO, format, t, info, arguments);
     }
 
-
     @Override
     public boolean isWarnEnabled() {
         return getTargetLoggerInfo().logger.isWarnEnabled();
     }
-
 
     @Override
     public void warn(String format, Object... arguments) {
@@ -237,7 +232,6 @@ public abstract class GirLogWrapper implements GiLogger {
         LoggerInfo info = getTargetLoggerInfo();
         recordLogWithThrowable(GemLogLevel.WARN, format, t, info, arguments);
     }
-
 
     @Override
     public boolean isFatalEnabled() {
@@ -267,7 +261,6 @@ public abstract class GirLogWrapper implements GiLogger {
     public boolean isErrorEnabled() {
         return getTargetLoggerInfo().logger.isErrorEnabled();
     }
-
 
     @Override
     public void error(String format, Object... arguments) {

@@ -1,7 +1,4 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
-
-
 
 import java.util.List;
 
@@ -38,45 +35,32 @@ import java.util.List;
  *
  * @author Gabriel Roldan
  */
-public class TileCacheInfo  implements   java.io.Serializable {
+public class TileCacheInfo implements java.io.Serializable {
 
-    /**
-     * 空间参考系统
-     */
+    /** 空间参考系统 */
     private SpatialReference spatialReference;
 
-    /**
-     * 瓦片原点坐标
-     */
+    /** 瓦片原点坐标 */
     private TileOrigin tileOrigin;
 
-    /**
-     * 瓦片列数
-     */
+    /** 瓦片列数 */
     private int tileCols;
 
-    /**
-     * 瓦片行数
-     */
+    /** 瓦片行数 */
     private int tileRows;
 
-    /**
-     * 每英寸点数(Dots Per Inch)
-     */
+    /** 每英寸点数(Dots Per Inch) */
     private int DPI;
 
-    /**
-     * 精确每英寸点数(Dots Per Inch)
-     */
+    /** 精确每英寸点数(Dots Per Inch) */
     private int PreciseDPI;
 
-    /**
-     * 详细层次(LOD)信息列表
-     */
+    /** 详细层次(LOD)信息列表 */
     private List<LODInfo> lodInfos;
 
     /**
      * 获取空间参考系统
+     *
      * @return 空间参考系统
      */
     public SpatialReference getSpatialReference() {
@@ -85,6 +69,7 @@ public class TileCacheInfo  implements   java.io.Serializable {
 
     /**
      * 获取瓦片原点坐标
+     *
      * @return 瓦片原点坐标
      */
     public TileOrigin getTileOrigin() {
@@ -93,6 +78,7 @@ public class TileCacheInfo  implements   java.io.Serializable {
 
     /**
      * 获取瓦片列数
+     *
      * @return 瓦片列数
      */
     public int getTileCols() {
@@ -101,6 +87,7 @@ public class TileCacheInfo  implements   java.io.Serializable {
 
     /**
      * 获取瓦片行数
+     *
      * @return 瓦片行数
      */
     public int getTileRows() {
@@ -109,6 +96,7 @@ public class TileCacheInfo  implements   java.io.Serializable {
 
     /**
      * 获取每英寸点数
+     *
      * @return 每英寸点数
      */
     public int getDPI() {
@@ -122,12 +110,12 @@ public class TileCacheInfo  implements   java.io.Serializable {
 
     /**
      * 获取详细层次信息列表
+     *
      * @return 详细层次信息列表
      */
     public List<LODInfo> getLodInfos() {
         return lodInfos;
     }
-
 
     public void setSpatialReference(SpatialReference spatialReference) {
         this.spatialReference = spatialReference;

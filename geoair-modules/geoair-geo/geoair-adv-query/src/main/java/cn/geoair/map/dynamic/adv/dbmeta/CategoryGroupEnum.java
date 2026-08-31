@@ -4,9 +4,8 @@ import cn.geoair.base.data.GiVisualValuable;
 
 /**
  * 字段类型的大分组，按语义聚合为一级分类。
- * <p>
- * 每个 {@link CategoryEnum} 属于一个 CategoryGroupEnum。
- * 用于快速判断字段属于哪一大类（如判断是否为数值型、日期型等）。
+ *
+ * <p>每个 {@link CategoryEnum} 属于一个 CategoryGroupEnum。 用于快速判断字段属于哪一大类（如判断是否为数值型、日期型等）。
  *
  * @author zhangjun
  * @date 2026/8/14

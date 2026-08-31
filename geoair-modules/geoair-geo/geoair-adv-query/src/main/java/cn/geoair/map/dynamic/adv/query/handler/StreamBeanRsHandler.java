@@ -19,7 +19,8 @@ public class StreamBeanRsHandler<T> implements RsHandler<Integer> {
 
     private final AdvBeanMapper beanMapper;
 
-    public StreamBeanRsHandler(Consumer<T> rowConsumer, Class<T> elementBeanType, AdvBeanMapper beanMapper) {
+    public StreamBeanRsHandler(
+            Consumer<T> rowConsumer, Class<T> elementBeanType, AdvBeanMapper beanMapper) {
         this.rowConsumer = rowConsumer;
         this.elementBeanType = elementBeanType;
         this.beanMapper = beanMapper;

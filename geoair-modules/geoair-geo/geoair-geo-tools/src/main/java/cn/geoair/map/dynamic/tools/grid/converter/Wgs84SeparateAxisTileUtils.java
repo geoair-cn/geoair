@@ -3,18 +3,15 @@ package cn.geoair.map.dynamic.tools.grid.converter;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-
 import java.util.Objects;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 
 /**
  * WGS84（4326）非等轴瓦片转换实现类。
  *
- * <p>网格在同一层级的经纬度行列数不同：经度方向为 {@code 2^z} 列，纬度方向为
- * {@code max(1, 2^(z-1))} 行。例如 z=3 时为 8 列 × 4 行。纬度跨度始终按实际行数
- * 计算，确保瓦片完整覆盖 [-90°, 90°]。</p>
+ * <p>网格在同一层级的经纬度行列数不同：经度方向为 {@code 2^z} 列，纬度方向为 {@code max(1, 2^(z-1))} 行。例如 z=3 时为 8 列 × 4
+ * 行。纬度跨度始终按实际行数 计算，确保瓦片完整覆盖 [-90°, 90°]。
  */
 public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
 
@@ -129,7 +126,7 @@ public class Wgs84SeparateAxisTileUtils extends AbstractWgs84TileConverter {
         tileYmin = clamp(tileYmin, 0, maxTileYIndex);
         tileYmax = clamp(tileYmax, 0, maxTileYIndex);
 
-        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax,z);
+        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
     }
 
     // ========== 瓦片坐标转换（非等轴逻辑） ==========

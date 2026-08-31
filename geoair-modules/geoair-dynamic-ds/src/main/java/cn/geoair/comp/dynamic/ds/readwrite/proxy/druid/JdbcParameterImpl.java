@@ -22,9 +22,10 @@ public final class JdbcParameterImpl implements JdbcParameter {
     private final Object value;
     private final long length;
     private final Calendar calendar;
-    private   int scaleOrLength = -1;
+    private int scaleOrLength = -1;
 
-    public JdbcParameterImpl(int sqlType, Object value, long length, Calendar calendar, int scaleOrLength) {
+    public JdbcParameterImpl(
+            int sqlType, Object value, long length, Calendar calendar, int scaleOrLength) {
         this.sqlType = sqlType;
         this.value = value;
         this.length = length;

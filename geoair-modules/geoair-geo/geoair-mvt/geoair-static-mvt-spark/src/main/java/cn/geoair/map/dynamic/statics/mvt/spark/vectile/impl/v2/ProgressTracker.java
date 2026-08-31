@@ -2,6 +2,10 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2;
 
 import cn.geoair.base.percent.GiProgressReporter;
 import cn.hutool.core.io.unit.DataSizeUtil;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.spark.scheduler.SparkListener;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerStageSubmitted;
@@ -9,16 +13,11 @@ import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * 基于 SparkListener 的分布式进度跟踪器。
- * <p>
- * 通过 {@link ProgressSparkListener} 在 driver 侧捕获 Stage/Task 事件，
- * 结合 {@link LongAccumulator} 汇总 executor 侧的瓦片写入数据。
+ *
+ * <p>通过 {@link ProgressSparkListener} 在 driver 侧捕获 Stage/Task 事件， 结合 {@link LongAccumulator} 汇总
+ * executor 侧的瓦片写入数据。
  *
  * @author generated
  */
@@ -42,7 +41,8 @@ public class ProgressTracker implements Serializable {
     // ===================== SparkListener（transient，仅 driver 侧使用，不参与闭包序列化）=====================
     private ProgressSparkListener listener;
 
-    private ProgressTracker(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
+    private ProgressTracker(
+            SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
         this.startTime = System.currentTimeMillis();
         this.totalStages = totalStages;
 
@@ -59,7 +59,8 @@ public class ProgressTracker implements Serializable {
         return new ProgressTracker(sparkSession, totalStages, null);
     }
 
-    public static ProgressTracker init(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
+    public static ProgressTracker init(
+            SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
         return new ProgressTracker(sparkSession, totalStages, percentReporter);
     }
 
@@ -78,8 +79,10 @@ public class ProgressTracker implements Serializable {
         long elapsed = System.currentTimeMillis() - startTime;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("[阶段 %d/%d] ▓▓▓▓▓▓▓▓▓▓ 100%% | %-10s | 耗时: %s",
-                idx + 1, totalStages, name, formatDuration(elapsed)));
+        sb.append(
+                String.format(
+                        "[阶段 %d/%d] ▓▓▓▓▓▓▓▓▓▓ 100%% | %-10s | 耗时: %s",
+                        idx + 1, totalStages, name, formatDuration(elapsed)));
 
         for (String info : extraInfo) {
             sb.append(" | ").append(info);
@@ -141,7 +144,9 @@ public class ProgressTracker implements Serializable {
         long seconds = millis / 1000;
         long minutes = seconds / 60;
         seconds = seconds % 60;
-        return minutes > 0 ? String.format("%dm %ds", minutes, seconds) : String.format("%ds", seconds);
+        return minutes > 0
+                ? String.format("%dm %ds", minutes, seconds)
+                : String.format("%ds", seconds);
     }
 
     private static String renderBar(double progress) {
@@ -184,10 +189,12 @@ public class ProgressTracker implements Serializable {
             StageTracker tracker = stageTrackers.get(stageId);
             if (tracker == null) return;
             long elapsed = System.currentTimeMillis() - tracker.startTime;
-            System.out.printf("[Stage %d] ▓▓▓▓▓▓▓▓▓▓ 100%% | %-10s | 任务: %d/%d | 耗时: %s%n",
+            System.out.printf(
+                    "[Stage %d] ▓▓▓▓▓▓▓▓▓▓ 100%% | %-10s | 任务: %d/%d | 耗时: %s%n",
                     stageId,
                     tracker.customName.isEmpty() ? "Stage-" + stageId : tracker.customName,
-                    tracker.completedTasks.get(), tracker.totalTasks,
+                    tracker.completedTasks.get(),
+                    tracker.totalTasks,
                     formatDuration(elapsed));
         }
 
@@ -198,18 +205,22 @@ public class ProgressTracker implements Serializable {
             StageTracker tracker = stageTrackers.get(taskEnd.stageId());
             if (tracker == null) return;
             int completed = tracker.completedTasks.incrementAndGet();
-            if(percentReporter!=null) {
-                percentReporter.report((long)tracker.totalTasks,(long)completed);
+            if (percentReporter != null) {
+                percentReporter.report((long) tracker.totalTasks, (long) completed);
             }
             if (completed % printInterval == 0 && completed < tracker.totalTasks) {
                 double progress = (double) completed / tracker.totalTasks;
                 long elapsed = System.currentTimeMillis() - tracker.startTime;
-                System.out.printf("[Stage %d] %s %3d%% | %-10s | 任务: %d/%d | 耗时: %s%n",
+                System.out.printf(
+                        "[Stage %d] %s %3d%% | %-10s | 任务: %d/%d | 耗时: %s%n",
                         taskEnd.stageId(),
                         renderBar(progress),
                         (int) (progress * 100),
-                        tracker.customName.isEmpty() ? "Stage-" + taskEnd.stageId() : tracker.customName,
-                        completed, tracker.totalTasks,
+                        tracker.customName.isEmpty()
+                                ? "Stage-" + taskEnd.stageId()
+                                : tracker.customName,
+                        completed,
+                        tracker.totalTasks,
                         formatDuration(elapsed));
             }
         }

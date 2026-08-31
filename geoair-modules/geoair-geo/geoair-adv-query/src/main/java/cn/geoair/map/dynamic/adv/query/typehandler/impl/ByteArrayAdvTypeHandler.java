@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
-
 import java.util.Base64;
 
 /**

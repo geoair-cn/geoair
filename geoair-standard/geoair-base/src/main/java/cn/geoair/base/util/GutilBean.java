@@ -14,7 +14,8 @@ public class GutilBean {
     private static volatile BeanCopyProvider beanCopyProvider;
 
     public interface BeanCopyProvider {
-        void copyProperties(Object source, Object target, Class<?> editable, String... ignoreProperties)
+        void copyProperties(
+                Object source, Object target, Class<?> editable, String... ignoreProperties)
                 throws GirBeanException;
     }
 
@@ -37,10 +38,9 @@ public class GutilBean {
     }
 
     @GaMethodHandDefine(
-        id = "cn.geoair.base.util.GutilBean.copyProperties",
-        expectClassName = "org.springframework.beans.BeanUtils",
-        expectMethodName = "copyProperties"
-    )
+            id = "cn.geoair.base.util.GutilBean.copyProperties",
+            expectClassName = "org.springframework.beans.BeanUtils",
+            expectMethodName = "copyProperties")
     public static void copyProperties(
             Object source, Object target, Class<?> editable, String... ignoreProperties)
             throws GirBeanException {

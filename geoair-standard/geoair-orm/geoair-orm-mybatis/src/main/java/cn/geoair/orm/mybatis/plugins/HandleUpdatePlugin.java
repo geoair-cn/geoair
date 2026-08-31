@@ -15,14 +15,12 @@ import org.apache.ibatis.plugin.Signature;
 import org.springframework.stereotype.Component;
 
 @Intercepts(
-    value = {
-        @Signature(
-            type = Executor.class,
-            method = "update",
-            args = {MappedStatement.class, Object.class}
-        )
-    }
-)
+        value = {
+            @Signature(
+                    type = Executor.class,
+                    method = "update",
+                    args = {MappedStatement.class, Object.class})
+        })
 @Component
 public class HandleUpdatePlugin implements Interceptor {
 

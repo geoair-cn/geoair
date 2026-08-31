@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
@@ -26,9 +25,15 @@ public class TileUtils {
             long level, Geometry geometry, int outGridSrid) {
         RangeApo rangeApo = null;
         if (outGridSrid == 3857) {
-            rangeApo = GirGeoTools.defaultInstance().getTileGrid3857Opt().tileRangeByGeom(((int) level), geometry);
+            rangeApo =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid3857Opt()
+                            .tileRangeByGeom(((int) level), geometry);
         } else {
-            rangeApo = GirGeoTools.defaultInstance().getTileGrid4326Opt().tileRangeByGeom(((int) level), geometry);
+            rangeApo =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid4326Opt()
+                            .tileRangeByGeom(((int) level), geometry);
         }
         return new Tuple4<>(
                 rangeApo.getMinX(), rangeApo.getMaxX(), rangeApo.getMinY(), rangeApo.getMaxY());
@@ -37,9 +42,15 @@ public class TileUtils {
     public static Envelope getTileEnvelope(int level, int x, int y, int sourceGrid) {
         ReferencedEnvelope referencedEnvelope = null;
         if (sourceGrid == 3857) {
-            referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(level, x, y, TileYAxis.XYZ, 3857);
+            referencedEnvelope =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid3857Opt()
+                            .xyzToTileBox(level, x, y, TileYAxis.XYZ, 3857);
         } else {
-            referencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(level, x, y, TileYAxis.XYZ, 4326);
+            referencedEnvelope =
+                    GirGeoTools.defaultInstance()
+                            .getTileGrid4326Opt()
+                            .xyzToTileBox(level, x, y, TileYAxis.XYZ, 4326);
         }
         return referencedEnvelope;
     }

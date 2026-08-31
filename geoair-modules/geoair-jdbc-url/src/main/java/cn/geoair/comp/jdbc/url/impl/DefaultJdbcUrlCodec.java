@@ -1,11 +1,11 @@
 package cn.geoair.comp.jdbc.url.impl;
 
-import cn.geoair.comp.jdbc.url.enums.DatabaseType;
-import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
-import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.geoair.comp.jdbc.url.JdbcUrlCodec;
 import cn.geoair.comp.jdbc.url.JdbcUrlDialect;
+import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
+import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.geoair.comp.jdbc.url.beans.JdbcUrlProperty;
+import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * JDBC URL 的默认编解码器。
  *
- * <p>URL 解析通过独立的 {@link JdbcUrlDialect} 实现完成。未知驱动仅作为不透明 URL 返回，
- * 不会尝试重组其私有语法；这样可防止改 schema 等操作意外破坏原有连接串。</p>
+ * <p>URL 解析通过独立的 {@link JdbcUrlDialect} 实现完成。未知驱动仅作为不透明 URL 返回， 不会尝试重组其私有语法；这样可防止改 schema
+ * 等操作意外破坏原有连接串。
  *
  * @author 张逢吉
  */
@@ -28,16 +28,18 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
 
     /** 创建包含项目内置数据库方言的编解码器。 */
     public DefaultJdbcUrlCodec() {
-        this(Arrays.<JdbcUrlDialect>asList(
-                new NetworkJdbcUrlDialect(DatabaseType.POSTGRESQL, "postgresql", "currentSchema"),
-                new NetworkJdbcUrlDialect(DatabaseType.MYSQL, "mysql", null),
-                new NetworkJdbcUrlDialect(DatabaseType.DM, "dm", null),
-                new SapHanaJdbcUrlDialect(),
-                new OracleJdbcUrlDialect(),
-                new SqlServerJdbcUrlDialect(),
-                new LocalJdbcUrlDialect(DatabaseType.H2, "h2", "schema"),
-                new LocalJdbcUrlDialect(DatabaseType.SQLITE, "sqlite", null),
-                new PhoenixJdbcUrlDialect()));
+        this(
+                Arrays.<JdbcUrlDialect>asList(
+                        new NetworkJdbcUrlDialect(
+                                DatabaseType.POSTGRESQL, "postgresql", "currentSchema"),
+                        new NetworkJdbcUrlDialect(DatabaseType.MYSQL, "mysql", null),
+                        new NetworkJdbcUrlDialect(DatabaseType.DM, "dm", null),
+                        new SapHanaJdbcUrlDialect(),
+                        new OracleJdbcUrlDialect(),
+                        new SqlServerJdbcUrlDialect(),
+                        new LocalJdbcUrlDialect(DatabaseType.H2, "h2", "schema"),
+                        new LocalJdbcUrlDialect(DatabaseType.SQLITE, "sqlite", null),
+                        new PhoenixJdbcUrlDialect()));
     }
 
     /**
@@ -75,7 +77,8 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
     }
 
     @Override
-    public JdbcUrl create(DatabaseType databaseType, String host, Integer port, String databaseName) {
+    public JdbcUrl create(
+            DatabaseType databaseType, String host, Integer port, String databaseName) {
         JdbcUrlDialect dialect = findDialect(databaseType);
         if (dialect == null) {
             throw new IllegalArgumentException("不支持构建 JDBC URL 的数据库类型：" + databaseType);
@@ -83,9 +86,7 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
         return dialect.create(host, port, databaseName);
     }
 
-    /**
-     * 按当前 URL 的参数风格进行渲染：查询参数使用 {@code ?/&}，SQL Server/H2 使用 {@code ;}。
-     */
+    /** 按当前 URL 的参数风格进行渲染：查询参数使用 {@code ?/&}，SQL Server/H2 使用 {@code ;}。 */
     @Override
     public String format(JdbcUrl jdbcUrl) {
         StringBuilder result = new StringBuilder(jdbcUrl.getCoreUrl());
@@ -111,9 +112,14 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
         if (JdbcUrlDialectSupport.isBlank(name)) {
             throw new IllegalArgumentException("JDBC URL 参数名不能为空");
         }
-        return replaceProperty(jdbcUrl, name, value, true,
+        return replaceProperty(
+                jdbcUrl,
+                name,
+                value,
+                true,
                 jdbcUrl.getPropertyStyle() == JdbcUrl.PropertyStyle.NONE
-                        ? defaultPropertyStyle(jdbcUrl) : jdbcUrl.getPropertyStyle());
+                        ? defaultPropertyStyle(jdbcUrl)
+                        : jdbcUrl.getPropertyStyle());
     }
 
     @Override
@@ -121,9 +127,7 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
         return parse(jdbcUrl).getCoreUrl();
     }
 
-    /**
-     * 按对应数据库方言重写当前 schema 参数。没有 schema 参数语义的数据库会明确拒绝该操作。
-     */
+    /** 按对应数据库方言重写当前 schema 参数。没有 schema 参数语义的数据库会明确拒绝该操作。 */
     @Override
     public String rewriteSchema(String jdbcUrl, String schema) {
         if (JdbcUrlDialectSupport.isBlank(schema)) {
@@ -133,11 +137,18 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
         JdbcUrlDialect dialect = findDialect(parsed.getDatabaseType());
         String schemaProperty = dialect == null ? null : dialect.getSchemaPropertyName();
         if (schemaProperty == null) {
-            throw new UnsupportedOperationException("JDBC URL 不支持当前 schema 参数：" + parsed.getDatabaseType());
+            throw new UnsupportedOperationException(
+                    "JDBC URL 不支持当前 schema 参数：" + parsed.getDatabaseType());
         }
-        JdbcUrl rewritten = replaceProperty(parsed, schemaProperty, encode(schema), true,
-                parsed.getPropertyStyle() == JdbcUrl.PropertyStyle.NONE
-                        ? defaultPropertyStyle(parsed) : parsed.getPropertyStyle());
+        JdbcUrl rewritten =
+                replaceProperty(
+                        parsed,
+                        schemaProperty,
+                        encode(schema),
+                        true,
+                        parsed.getPropertyStyle() == JdbcUrl.PropertyStyle.NONE
+                                ? defaultPropertyStyle(parsed)
+                                : parsed.getPropertyStyle());
         return format(rewritten);
     }
 
@@ -152,8 +163,12 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
         return value == null ? null : decode(value);
     }
 
-    private JdbcUrl replaceProperty(JdbcUrl jdbcUrl, String name, String value, boolean hasEquals,
-                                    JdbcUrl.PropertyStyle propertyStyle) {
+    private JdbcUrl replaceProperty(
+            JdbcUrl jdbcUrl,
+            String name,
+            String value,
+            boolean hasEquals,
+            JdbcUrl.PropertyStyle propertyStyle) {
         List<JdbcUrlProperty> properties = new ArrayList<JdbcUrlProperty>();
         boolean replaced = false;
         for (JdbcUrlProperty property : jdbcUrl.getProperties()) {
@@ -174,8 +189,10 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
     }
 
     private JdbcUrl.PropertyStyle defaultPropertyStyle(JdbcUrl jdbcUrl) {
-        return jdbcUrl.getDatabaseType() == DatabaseType.SQLSERVER || jdbcUrl.getDatabaseType() == DatabaseType.H2
-                ? JdbcUrl.PropertyStyle.SEMICOLON : JdbcUrl.PropertyStyle.QUERY;
+        return jdbcUrl.getDatabaseType() == DatabaseType.SQLSERVER
+                        || jdbcUrl.getDatabaseType() == DatabaseType.H2
+                ? JdbcUrl.PropertyStyle.SEMICOLON
+                : JdbcUrl.PropertyStyle.QUERY;
     }
 
     private JdbcUrlDialect findDialect(DatabaseType databaseType) {
@@ -190,13 +207,21 @@ public class DefaultJdbcUrlCodec implements JdbcUrlCodec {
     private static JdbcUrl opaque(String jdbcUrl) {
         int end = jdbcUrl.indexOf(':', 5);
         String driverName = end < 0 ? "" : jdbcUrl.substring(5, end);
-        return new JdbcUrl(jdbcUrl, DatabaseType.UNKNOWN, driverName, null, jdbcUrl,
-                Collections.<JdbcEndpoint>emptyList(), null, JdbcUrl.PropertyStyle.NONE,
+        return new JdbcUrl(
+                jdbcUrl,
+                DatabaseType.UNKNOWN,
+                driverName,
+                null,
+                jdbcUrl,
+                Collections.<JdbcEndpoint>emptyList(),
+                null,
+                JdbcUrl.PropertyStyle.NONE,
                 Collections.<JdbcUrlProperty>emptyList());
     }
 
     private static void requireJdbcUrl(String jdbcUrl) {
-        if (JdbcUrlDialectSupport.isBlank(jdbcUrl) || !jdbcUrl.regionMatches(true, 0, "jdbc:", 0, 5)) {
+        if (JdbcUrlDialectSupport.isBlank(jdbcUrl)
+                || !jdbcUrl.regionMatches(true, 0, "jdbc:", 0, 5)) {
             throw new IllegalArgumentException("无效的 JDBC URL：必须以 jdbc: 开头");
         }
     }

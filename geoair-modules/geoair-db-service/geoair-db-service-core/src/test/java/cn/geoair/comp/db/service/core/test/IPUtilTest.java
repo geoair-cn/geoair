@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import cn.geoair.comp.db.service.core.basic.util.IPUtil;
 import org.junit.Test;
 
-/**
- * {@link IPUtil} 的单元测试。
- */
+/** {@link IPUtil} 的单元测试。 */
 public class IPUtilTest {
 
     @Test

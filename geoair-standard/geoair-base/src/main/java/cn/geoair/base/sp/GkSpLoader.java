@@ -24,10 +24,11 @@ public interface GkSpLoader {
      * 根据接口类型和实例名加载实现类实例
      *
      * <p>在多个实现类中通过name确定唯一实例：
+     *
      * <ul>
-     *   <li>Spring容器：通过bean name获取</li>
-     *   <li>JDK SPI：通过实现类的Class简单名称匹配</li>
-     *   <li>PlaceHolder：通过配置的Class简单名称匹配</li>
+     *   <li>Spring容器：通过bean name获取
+     *   <li>JDK SPI：通过实现类的Class简单名称匹配
+     *   <li>PlaceHolder：通过配置的Class简单名称匹配
      * </ul>
      *
      * @param <T> 泛型类型
@@ -49,5 +50,4 @@ public interface GkSpLoader {
      * @return 所有匹配的实现类实例列表
      */
     public <T> List<T> loadAll(Class<T> cls, Type[] types);
-
 }

@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
-
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -21,21 +20,20 @@ import java.util.Date;
  */
 public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
 
-
     @Override
     public boolean supports(Class<?> javaType, Object value) {
         if (javaType == null) {
             return false;
         }
         return javaType == Date.class
-               || javaType == java.sql.Date.class
-               || javaType == Time.class
-               || javaType == Timestamp.class
-               || javaType == LocalDate.class
-               || javaType == LocalTime.class
-               || javaType == LocalDateTime.class
-               || javaType == OffsetDateTime.class
-               || javaType == Instant.class;
+                || javaType == java.sql.Date.class
+                || javaType == Time.class
+                || javaType == Timestamp.class
+                || javaType == LocalDate.class
+                || javaType == LocalTime.class
+                || javaType == LocalDateTime.class
+                || javaType == OffsetDateTime.class
+                || javaType == Instant.class;
     }
 
     @Override
@@ -83,9 +81,7 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
     @Override
     protected Object convertNonNullForWrite(
             Object value, Class<?> javaType, AdvTypeHandlerContext context) {
-        if (value instanceof java.sql.Date
-            || value instanceof Time
-            || value instanceof Timestamp) {
+        if (value instanceof java.sql.Date || value instanceof Time || value instanceof Timestamp) {
             return value;
         }
         if (value instanceof Date) {
@@ -132,7 +128,8 @@ public class TemporalAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         }
         if (value instanceof LocalTime) {
             LocalTime localTime = (LocalTime) value;
-            return Date.from(localTime.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
+            return Date.from(
+                    localTime.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
         }
         if (value instanceof OffsetDateTime) {
             return Date.from(((OffsetDateTime) value).toInstant());

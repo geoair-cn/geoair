@@ -3,8 +3,8 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 /**
  * 语义明确的瓦片索引范围。
  *
- * <p>本类型的四个边界均为闭区间，即 {@code [minX, maxX] × [minY, maxY]}。
- * 它用于需要携带 Y 轴约定的新代码；{@link RangeApo} 也统一为相同的闭区间约定。</p>
+ * <p>本类型的四个边界均为闭区间，即 {@code [minX, maxX] × [minY, maxY]}。 它用于需要携带 Y 轴约定的新代码；{@link RangeApo}
+ * 也统一为相同的闭区间约定。
  *
  * @author 张逢吉
  */
@@ -49,8 +49,7 @@ public final class TileRange {
     }
 
     /** 创建带有明确 Y 轴约定的闭区间瓦片范围。 */
-    public static TileRange closed(
-            int z, int minX, int maxX, int minY, int maxY, TileYAxis yAxis) {
+    public static TileRange closed(int z, int minX, int maxX, int minY, int maxY, TileYAxis yAxis) {
         return new TileRange(z, minX, maxX, minY, maxY, yAxis);
     }
 

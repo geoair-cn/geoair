@@ -6,13 +6,13 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-framework-bom</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-framework-bom</name>
   <description>GeoAir 对外统一 BOM，聚合第三方与 GeoAir 组件版本约束</description>

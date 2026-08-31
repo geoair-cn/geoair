@@ -1,47 +1,36 @@
 package cn.geoair.comp.dynamic.ds.readwrite;
 
 import cn.geoair.comp.dynamic.ds.AdvDynamicDataSourceStorage;
-import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.dswrapper.AdvDataSourceWrapper;
+import cn.geoair.comp.dynamic.ds.readwrite.enums.LoadStrategyType;
 import cn.geoair.comp.dynamic.ds.readwrite.log.RdLog;
 import cn.hutool.core.util.RandomUtil;
-
-import javax.sql.DataSource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import javax.sql.DataSource;
 
 /**
- * 数据源组代理（基于数据源ID）
- * 使用 Builder 模式，在 build 时再初始化
+ * 数据源组代理（基于数据源ID） 使用 Builder 模式，在 build 时再初始化
  *
  * @author 张俊
  * @date Created in 2025/1/2 18:31
  */
 public class GirGroupByIdDataSource extends GirGroupSource {
 
-
-    /**
-     * 该组下对应的数据源Id列表
-     */
+    /** 该组下对应的数据源Id列表 */
     private List<String> dataSourceIds;
 
-    /**
-     * 权重配置（数据源Id -> weight）
-     */
+    /** 权重配置（数据源Id -> weight） */
     protected Map<String, Integer> weightMap = new ConcurrentHashMap<>();
 
-    /**
-     * 当数据源初始化的时候，进行调用这个消费者对外进行回调
-     */
-    BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer = (dataSourceId, dataSourceWrapper) -> {
-    };
+    /** 当数据源初始化的时候，进行调用这个消费者对外进行回调 */
+    BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer =
+            (dataSourceId, dataSourceWrapper) -> {};
 
     // ==================== 私有构造方法 ====================
 
-    /**
-     * 私有构造方法，通过 Builder 创建
-     */
+    /** 私有构造方法，通过 Builder 创建 */
     protected GirGroupByIdDataSource(Builder builder) {
         super(builder.groupName, new ArrayList<>(), builder.strategyType);
         this.dataSourceIds = new ArrayList<>(builder.dataSourceIds);
@@ -61,19 +50,20 @@ public class GirGroupByIdDataSource extends GirGroupSource {
             }
         }
 
-
         refreshDataSourcesFromIds();
 
-        RdLog.getInstance().debug("初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
-                groupName, dataSourceIds.size(), strategyType.getDescription(), totalWeight);
+        RdLog.getInstance()
+                .debug(
+                        "初始化数据源组代理 [{}], 数据源数量: {}, 负载策略: {}, 总权重: {}",
+                        groupName,
+                        dataSourceIds.size(),
+                        strategyType.getDescription(),
+                        totalWeight);
     }
-
 
     // ==================== 私有方法 ====================
 
-    /**
-     * 从数据源ID列表刷新 DataSource 列表
-     */
+    /** 从数据源ID列表刷新 DataSource 列表 */
     private void refreshDataSourcesFromIds() {
         List<DataSource> newDataSources = new ArrayList<>();
         for (String dsId : dataSourceIds) {
@@ -87,9 +77,7 @@ public class GirGroupByIdDataSource extends GirGroupSource {
 
     // ==================== 实例方法 ====================
 
-    /**
-     * 设置权重（通过数据源ID）
-     */
+    /** 设置权重（通过数据源ID） */
     public GirGroupByIdDataSource setWeightById(String dataSourceId, int weight) {
         if (weight <= 0) {
             throw new IllegalArgumentException("权重必须大于0");
@@ -104,35 +92,32 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         return this;
     }
 
-    /**
-     * 获取数据源ID的权重
-     */
+    /** 获取数据源ID的权重 */
     public int getWeightById(String dataSourceId) {
         return weightMap.getOrDefault(dataSourceId, 1);
     }
 
-    /**
-     * 添加数据源（通过ID）
-     */
+    /** 添加数据源（通过ID） */
     public GirGroupByIdDataSource addDataSourceById(String dataSourceId) {
         return addDataSourceById(dataSourceId, 1);
     }
 
-    /**
-     * 添加数据源并指定权重（通过ID）
-     */
+    /** 添加数据源并指定权重（通过ID） */
     public GirGroupByIdDataSource addDataSourceById(String dataSourceId, int weight) {
         this.dataSourceIds.add(dataSourceId);
         // 添加延迟加载包装器
         this.dataSources.add(new LazyDataSourceWrapper(dataSourceId, dataSourceWrapperConsumer));
         setWeightById(dataSourceId, weight);
-        RdLog.getInstance().debug("Group [{}] 添加数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+        RdLog.getInstance()
+                .debug(
+                        "Group [{}] 添加数据源, dsId: {}, 当前数量: {}",
+                        groupName,
+                        dataSourceId,
+                        dataSources.size());
         return this;
     }
 
-    /**
-     * 移除数据源（通过ID）
-     */
+    /** 移除数据源（通过ID） */
     public boolean removeDataSourceById(String dataSourceId) {
         boolean removed = this.dataSourceIds.remove(dataSourceId);
         if (removed) {
@@ -151,30 +136,29 @@ public class GirGroupByIdDataSource extends GirGroupSource {
                 dataSources.remove(toRemove);
             }
             weightMap.remove(dataSourceId);
-            RdLog.getInstance().debug("Group [{}] 移除数据源, dsId: {}, 当前数量: {}", groupName, dataSourceId, dataSources.size());
+            RdLog.getInstance()
+                    .debug(
+                            "Group [{}] 移除数据源, dsId: {}, 当前数量: {}",
+                            groupName,
+                            dataSourceId,
+                            dataSources.size());
         }
         return removed;
     }
 
     // ==================== 查询方法 ====================
 
-    /**
-     * 获取当前数据源ID列表
-     */
+    /** 获取当前数据源ID列表 */
     public List<String> getDataSourceIds() {
         return java.util.Collections.unmodifiableList(dataSourceIds);
     }
 
-    /**
-     * 获取数据源ID对应的实际数据源
-     */
+    /** 获取数据源ID对应的实际数据源 */
     public AdvDataSourceWrapper getDataSourceById(String dataSourceId) {
         return AdvDynamicDataSourceStorage.getInstance().getOrCreateDataSource(dataSourceId);
     }
 
-    /**
-     * 获取某个数据源的URL（用于调试）
-     */
+    /** 获取某个数据源的URL（用于调试） */
     public String getUrl() {
         DataSource ds = selectDataSource();
         if (ds instanceof LazyDataSourceWrapper) {
@@ -208,7 +192,6 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         return dataSources.get(0);
     }
 
-
     // ==================== Builder ====================
 
     public static GirGroupByIdDataSource.Builder builderById() {
@@ -220,68 +203,52 @@ public class GirGroupByIdDataSource extends GirGroupSource {
         private List<String> dataSourceIds = new ArrayList<>();
         private Map<String, Integer> weights = new HashMap<>();
         private LoadStrategyType strategyType = LoadStrategyType.RANDOM;
-        BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer = (dataSourceId, dataSourceWrapper) -> {
-        };
+        BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer =
+                (dataSourceId, dataSourceWrapper) -> {};
 
-        /**
-         * 设置组名
-         */
+        /** 设置组名 */
         public Builder groupName(String groupName) {
             this.groupName = groupName;
             return this;
         }
 
-        /**
-         * 添加数据源ID
-         */
+        /** 添加数据源ID */
         public Builder addDataSourceId(String dataSourceId) {
             this.dataSourceIds.add(dataSourceId);
             return this;
         }
 
-        /**
-         * 批量添加数据源ID
-         */
+        /** 批量添加数据源ID */
         public Builder dataSourceIds(List<String> dataSourceIds) {
             this.dataSourceIds.addAll(dataSourceIds);
             return this;
         }
 
-        /**
-         * 批量添加数据源ID（可变参数）
-         */
+        /** 批量添加数据源ID（可变参数） */
         public Builder dataSourceIds(String... dataSourceIds) {
             this.dataSourceIds.addAll(Arrays.asList(dataSourceIds));
             return this;
         }
 
-        /**
-         * 设置权重（单个）
-         */
+        /** 设置权重（单个） */
         public Builder weight(String dataSourceId, int weight) {
             this.weights.put(dataSourceId, weight);
             return this;
         }
 
-        /**
-         * 设置权重（批量）
-         */
+        /** 设置权重（批量） */
         public Builder weights(Map<String, Integer> weights) {
             this.weights.putAll(weights);
             return this;
         }
 
-        /**
-         * 设置负载策略
-         */
+        /** 设置负载策略 */
         public Builder strategy(LoadStrategyType strategyType) {
             this.strategyType = strategyType;
             return this;
         }
 
-        /**
-         * 设置负载策略（通过名称）
-         */
+        /** 设置负载策略（通过名称） */
         public Builder strategy(String strategyName) {
             LoadStrategyType strategy = LoadStrategyType.fromCode(strategyName);
             if (strategy != null) {
@@ -290,14 +257,13 @@ public class GirGroupByIdDataSource extends GirGroupSource {
             return this;
         }
 
-        public Builder consumer(BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer) {
+        public Builder consumer(
+                BiConsumer<String, AdvDataSourceWrapper> dataSourceWrapperConsumer) {
             this.dataSourceWrapperConsumer = dataSourceWrapperConsumer;
             return this;
         }
 
-        /**
-         * 构建 GirGroupByIdDataSource
-         */
+        /** 构建 GirGroupByIdDataSource */
         public GirGroupByIdDataSource build() {
             if (groupName == null || groupName.trim().isEmpty()) {
                 throw new IllegalStateException("groupName 不能为空");

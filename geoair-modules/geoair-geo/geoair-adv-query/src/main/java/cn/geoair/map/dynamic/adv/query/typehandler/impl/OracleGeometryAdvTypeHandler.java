@@ -6,8 +6,6 @@ import cn.geoair.map.dynamic.tools.convert.GirOracleSpatialTran;
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
 import org.locationtech.jts.geom.Geometry;
 
-import java.sql.Struct;
-
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/8/11
@@ -25,16 +23,18 @@ public class OracleGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
     @Override
     protected Object writeGeometry(Geometry value) {
-        String wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
+        String wkt =
+                GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
         return wkt;
     }
 
     @Override
     protected Object convertNonNullForWrite(
             Geometry value, Class<?> javaType, AdvTypeHandlerContext context) {
-        if (GirOracleTran.isOracleSpatialAvailable() && context != null && context.getConnection() != null) {
+        if (GirOracleTran.isOracleSpatialAvailable()
+                && context != null
+                && context.getConnection() != null) {
             return GirOracleSpatialTran.jtsGeomToSdoGeometryObj(value, context.getConnection());
-
         }
         return super.convertNonNullForWrite(value, javaType, context);
     }

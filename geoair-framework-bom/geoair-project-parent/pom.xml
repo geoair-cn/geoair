@@ -6,12 +6,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework-bom</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-project-parent</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-project-parent</name>
   <description>geoair project parent</description>

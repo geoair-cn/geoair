@@ -3,12 +3,10 @@ package cn.geoair.map.dynamic.tools.grid.dto;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.converter.AbstractWgs84TileConverter;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.Set;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 
 /** TileRange 闭区间语义测试。 */
@@ -17,8 +15,10 @@ public class TileRangeTest {
     @Test
     public void shouldTreatRangeApoMaximumAsClosedForGeometryAndTileList() {
         GirTileConverterOpt tileConverter = GirGeoTools.defaultInstance().getTileGrid3857Opt();
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(
-                tileConverter.xyzToTileBox(3, 2, 4, 3857));
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(tileConverter.xyzToTileBox(3, 2, 4, 3857));
 
         RangeApo range = tileConverter.tileRangeByGeom(3, geometry);
         Set<TileZxyApo> tiles = tileConverter.zxyListByGeom(geometry, 3857, 3);
@@ -37,18 +37,27 @@ public class TileRangeTest {
 
         Assert.assertEquals(7, tileConverter.convertY(3, 0, TileYAxis.TMS, TileYAxis.XYZ));
         Assert.assertEquals(0, tileConverter.convertY(3, 7, TileYAxis.XYZ, TileYAxis.TMS));
-        Assert.assertEquals(tileConverter.reverseY(7, 3),
+        Assert.assertEquals(
+                tileConverter.reverseY(7, 3),
                 tileConverter.convertY(3, 7, TileYAxis.XYZ, TileYAxis.TMS));
-        Assert.assertEquals(tileConverter.xyzToTileBox(3, 2, 7, 3857).getMinY(),
-                tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMinY(), 0D);
-        Assert.assertEquals(tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMinY(),
-                tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMinY(), 0D);
-        Assert.assertEquals(tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMaxY(),
-                tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMaxY(), 0D);
-        GirTileConverterOpt separateAxisConverter = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
+        Assert.assertEquals(
+                tileConverter.xyzToTileBox(3, 2, 7, 3857).getMinY(),
+                tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMinY(),
+                0D);
+        Assert.assertEquals(
+                tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMinY(),
+                tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMinY(),
+                0D);
+        Assert.assertEquals(
+                tileConverter.xyzToTileBox(3, 2, 7, TileYAxis.XYZ, 3857).getMaxY(),
+                tileConverter.xyzToTileBox(3, 2, 0, TileYAxis.TMS, 3857).getMaxY(),
+                0D);
+        GirTileConverterOpt separateAxisConverter =
+                GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
         Assert.assertEquals(1, separateAxisConverter.getTileLevelMetadata(0).getNumTilesHigh());
         Assert.assertEquals(0, separateAxisConverter.convertY(0, 0, TileYAxis.XYZ, TileYAxis.TMS));
-        Assert.assertEquals(separateAxisConverter.reverseY(30, 8),
+        Assert.assertEquals(
+                separateAxisConverter.reverseY(30, 8),
                 separateAxisConverter.convertY(8, 30, TileYAxis.XYZ, TileYAxis.TMS));
     }
 
@@ -59,8 +68,9 @@ public class TileRangeTest {
         TileRange tileRange = TileRange.closed(3, 2, 2, 7, 7, TileYAxis.XYZ);
 
         BoxReferencedEnvelope actual = tileConverter.boundsFromTileRange(tileRange, 3857);
-        BoxReferencedEnvelope fromTiles = tileConverter.boundsFromTileZxyApos(
-                Collections.singleton(new TileZxyApo(3, 2, 7)), 3857);
+        BoxReferencedEnvelope fromTiles =
+                tileConverter.boundsFromTileZxyApos(
+                        Collections.singleton(new TileZxyApo(3, 2, 7)), 3857);
 
         Assert.assertEquals(expected.getMinX(), actual.getMinX(), 0D);
         Assert.assertEquals(expected.getMaxX(), actual.getMaxX(), 0D);
@@ -74,14 +84,19 @@ public class TileRangeTest {
 
     @Test
     public void shouldUseFourLatitudeRowsForSeparateAxisAtZoomThree() {
-        GirTileConverterOpt tileConverter = GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
+        GirTileConverterOpt tileConverter =
+                GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt();
 
         Assert.assertEquals(4, tileConverter.getTileLevelMetadata(3).getNumTilesHigh());
         Assert.assertEquals(45D, tileConverter.xyzToTileBox(3, 0, 0, 4326).getMinY(), 0D);
         Assert.assertEquals(-90D, tileConverter.xyzToTileBox(3, 0, 3, 4326).getMinY(), 0D);
         Assert.assertEquals(-90D, tileConverter.tileYToCoordinateY(4, 3), 0D);
-        Assert.assertEquals(3, tileConverter.tileRangeByBox(
-                3, new org.locationtech.jts.geom.Envelope(-180D, 180D, -90D, 90D)).getMaxY());
+        Assert.assertEquals(
+                3,
+                tileConverter
+                        .tileRangeByBox(
+                                3, new org.locationtech.jts.geom.Envelope(-180D, 180D, -90D, 90D))
+                        .getMaxY());
     }
 
     @Test
@@ -92,10 +107,14 @@ public class TileRangeTest {
         Assert.assertEquals(4, separate.getTileRowCount(3));
         Assert.assertEquals(4, equal.getTileRowCount(3));
         for (int y = 0; y < 4; y++) {
-            Assert.assertEquals(y, separate.convertSeparateAxisYToEqualAxisY(
-                    y, 3, AbstractWgs84TileConverter.RoundingType.FLOOR));
-            Assert.assertEquals(y, equal.convertEqualAxisYToSeparateAxisY(
-                    y, 3, AbstractWgs84TileConverter.RoundingType.CEIL));
+            Assert.assertEquals(
+                    y,
+                    separate.convertSeparateAxisYToEqualAxisY(
+                            y, 3, AbstractWgs84TileConverter.RoundingType.FLOOR));
+            Assert.assertEquals(
+                    y,
+                    equal.convertEqualAxisYToSeparateAxisY(
+                            y, 3, AbstractWgs84TileConverter.RoundingType.CEIL));
         }
 
         try {

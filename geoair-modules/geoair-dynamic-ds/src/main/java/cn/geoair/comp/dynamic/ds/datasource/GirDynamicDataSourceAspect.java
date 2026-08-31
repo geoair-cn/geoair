@@ -1,12 +1,11 @@
 package cn.geoair.comp.dynamic.ds.datasource;
 
 import cn.geoair.base.bean.GirBeanHelper;
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.comp.dynamic.ds.GirDsAspectDoAroundApiHelper;
- 
+import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,13 +13,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 
-import java.lang.reflect.Method;
-
 /**
  * @author ：张俊
  * @date ：Created in 2024/12/31 15:45 @description：
  */
- 
 @Aspect
 @Order(-1)
 public class GirDynamicDataSourceAspect {
@@ -35,29 +31,21 @@ public class GirDynamicDataSourceAspect {
     // @Pointcut("execution(public * com.gtc.gishubteam.*.servface..*.*(..))")
     // 设置 DataSource 注解的切点表达式
 
-    /**
-     * 配置切点：匹配方法上带有GtcDsDataSource注解的方法
-     */
-//    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource)")
-//    public void methodPointcut() {
-//    }
-    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource) || @annotation(cn.geoair.comp.dynamic.ds.datasource.GirDataSourceChange)")
-    public void methodPointcut() {
-    }
+    /** 配置切点：匹配方法上带有GtcDsDataSource注解的方法 */
+    //    @Pointcut("@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource)")
+    //    public void methodPointcut() {
+    //    }
+    @Pointcut(
+            "@annotation(cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource) || @annotation(cn.geoair.comp.dynamic.ds.datasource.GirDataSourceChange)")
+    public void methodPointcut() {}
 
-    /**
-     * 配置切点：匹配类上带有GtcDsDataSource注解的类中的所有方法
-     */
+    /** 配置切点：匹配类上带有GtcDsDataSource注解的类中的所有方法 */
     @Pointcut("within(@cn.geoair.comp.dynamic.ds.datasource.GirDsDataSource *)")
-    public void classPointcut() {
-    }
+    public void classPointcut() {}
 
-    /**
-     * 组合切点：匹配方法级别或类级别的注解
-     */
+    /** 组合切点：匹配方法级别或类级别的注解 */
     @Pointcut("methodPointcut() || classPointcut()")
-    public void dataSourcePointcut() {
-    }
+    public void dataSourcePointcut() {}
 
     /**
      * 环绕通知：处理数据源切换逻辑
@@ -72,11 +60,10 @@ public class GirDynamicDataSourceAspect {
             try {
                 gtcDsAspectDoAroundApi =
                         GirBeanHelper.getProvider().getBean(GirDsAspectDoAroundApiHelper.class);
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error(e.getMessage());
                 throw new RuntimeException("无法找到 GirDsAspectDoAroundApi 对应的实现，请调用方进行手动实现");
             }
-
         }
         Method method = null;
         try {

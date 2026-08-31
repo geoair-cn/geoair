@@ -8,13 +8,10 @@ import lombok.Getter;
  * @date ：Created in 2026/6/15 11:01
  * @description：
  */
-/**
- * @deprecated 使用 {@link TileRowOrigin} 表示行号原点；WMTS 是协议，不应作为坐标原点名称。
- */
+/** @deprecated 使用 {@link TileRowOrigin} 表示行号原点；WMTS 是协议，不应作为坐标原点名称。 */
 @Deprecated
 @Getter
-public enum OriginType  implements GiVisualValuable<String> {
-
+public enum OriginType implements GiVisualValuable<String> {
     TMS("tms"),
     Google("wmts");
 
@@ -24,9 +21,7 @@ public enum OriginType  implements GiVisualValuable<String> {
         this.mode = mode;
     }
 
-    /**
-     * 根据mode值获取枚举
-     */
+    /** 根据mode值获取枚举 */
     public static OriginType fromMode(String mode) {
         for (OriginType type : OriginType.values()) {
             if (type.mode.equals(mode)) {
@@ -36,16 +31,12 @@ public enum OriginType  implements GiVisualValuable<String> {
         return Google;
     }
 
-    /**
-     * 判断是否为网络类型
-     */
+    /** 判断是否为网络类型 */
     public boolean isGoogle() {
         return this == Google;
     }
 
-    /**
-     * 判断是否为本地类型
-     */
+    /** 判断是否为本地类型 */
     public boolean isTMS() {
         return this == TMS;
     }

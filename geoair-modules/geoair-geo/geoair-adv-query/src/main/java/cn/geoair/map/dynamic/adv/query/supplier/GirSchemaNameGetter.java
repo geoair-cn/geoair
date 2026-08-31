@@ -17,7 +17,6 @@ public class GirSchemaNameGetter implements GirSysSupplierGetter {
         this.iAdvDDLOpt = iAdvDDLOpt;
     }
 
-
     @Override
     public String get() {
         return iAdvDDLOpt.dGetCurrentSchema();

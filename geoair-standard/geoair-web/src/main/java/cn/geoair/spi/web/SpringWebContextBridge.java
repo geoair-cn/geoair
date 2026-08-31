@@ -39,19 +39,17 @@ public class SpringWebContextBridge {
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getRequest",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getRequest",
+            type = ImplType.expectfirst)
     public static HttpServletRequest getRequest() {
         return currentRequest();
     }
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getResponse",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getResponse",
+            type = ImplType.expectfirst)
     public static HttpServletResponse getResponse() {
         return currentResponse();
     }
@@ -60,10 +58,9 @@ public class SpringWebContextBridge {
             new WeakReference<ServletContext>(null);
 
     @GaMethodHandImpl(
-        implClass = GirHttpServletHelper.class,
-        implMethod = "getServletContext",
-        type = ImplType.expectfirst
-    )
+            implClass = GirHttpServletHelper.class,
+            implMethod = "getServletContext",
+            type = ImplType.expectfirst)
     public static ServletContext getServletContext() {
         return currentServletContext();
     }

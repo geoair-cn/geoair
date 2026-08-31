@@ -1050,8 +1050,7 @@ public class GutilArray extends PrimitiveArrayUtil {
 
     /**
      * 获取子数组<br>
-     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}，
-     * 不保留原数组的组件类型
+     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}， 不保留原数组的组件类型
      *
      * @param array 数组
      * @param start 开始位置（包括）
@@ -1065,8 +1064,7 @@ public class GutilArray extends PrimitiveArrayUtil {
 
     /**
      * 获取子数组<br>
-     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}，
-     * 不保留原数组的组件类型
+     * 注意：与 {@link #sub(Object[], int, int)} 不同，此方法始终返回 {@code Object[]}， 不保留原数组的组件类型
      *
      * @param array 数组
      * @param start 开始位置（包括）
@@ -1582,8 +1580,7 @@ public class GutilArray extends PrimitiveArrayUtil {
         final int len = length(array);
         if (index1 < 0 || index2 < 0 || index1 >= len || index2 >= len) {
             throw new IndexOutOfBoundsException(
-                    GutilStr.format(
-                            "索引越界：index1={}, index2={}, 数组长度={}", index1, index2, len));
+                    GutilStr.format("索引越界：index1={}, index2={}, 数组长度={}", index1, index2, len));
         }
         Object tmp = get(array, index1);
         Array.set(array, index1, Array.get(array, index2));

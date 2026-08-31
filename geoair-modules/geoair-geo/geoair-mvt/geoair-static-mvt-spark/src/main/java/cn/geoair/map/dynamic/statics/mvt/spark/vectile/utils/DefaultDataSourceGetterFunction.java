@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
 
 import cn.geoair.comp.dynamic.ds.simple.DriverManagerDataSource;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
-
 import javax.sql.DataSource;
 
 /**
@@ -16,8 +15,6 @@ public class DefaultDataSourceGetterFunction implements DataSourceGetterFunction
     @Override
     public DataSource apply(DataSourceConfig config) {
         return new DriverManagerDataSource(
-                config.getJdbcUrl(),
-                config.getUsername(),
-                config.getPassword());
+                config.getJdbcUrl(), config.getUsername(), config.getPassword());
     }
 }

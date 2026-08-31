@@ -5,8 +5,8 @@ import java.util.Set;
 
 /**
  * 条件节点，对应 {@code <if test="...">} 标签。
- * <p>
- * 执行时通过 OGNL 求值 {@code test} 属性，结果为 true 时执行子节点内容。
+ *
+ * <p>执行时通过 OGNL 求值 {@code test} 属性，结果为 true 时执行子节点内容。
  *
  * @author zhangjun
  */
@@ -20,9 +20,7 @@ public class IfSqlNode implements SqlNode {
         this.contents = contents;
     }
 
-    /**
-     * 求值 test 表达式，为 true 时执行子节点。
-     */
+    /** 求值 test 表达式，为 true 时执行子节点。 */
     @Override
     public void apply(Context context) {
         Boolean value = context.getOgnlBooleanValue(test);
@@ -32,9 +30,7 @@ public class IfSqlNode implements SqlNode {
         }
     }
 
-    /**
-     * 无论 test 结果如何，始终提取子节点的参数名（静态分析不执行条件判断）。
-     */
+    /** 无论 test 结果如何，始终提取子节点的参数名（静态分析不执行条件判断）。 */
     @Override
     public void applyParameter(Set<String> set) {
         contents.applyParameter(set);

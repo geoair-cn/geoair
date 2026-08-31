@@ -4,8 +4,9 @@ package cn.geoair.base.util;
  * 进度计算与进度条展示的纯工具类<br>
  * 支持 int、long、float、double、Number 等多种数值类型<br>
  * 本类全部方法均为无状态静态方法，不保存任何成员变量，线程安全，可被并发调用。
- * <p>
- * 方法族语义区别：<br>
+ *
+ * <p>方法族语义区别：<br>
+ *
  * <pre>
  * 1. getUpdatePercent*（纯计算）：仅将"当前完成量 / 总量"换算为百分比，结果钳制在 0~100，
  *    不涉及步长与发布节奏；
@@ -23,11 +24,11 @@ public class GutilPercent {
 
     /**
      * 计算下一次需要发布的进度值（带步长节流）。
-     * <p>
-     * 纯函数，不保存任何状态：调用方需自行保存并传入上次已发布的进度，
-     * 返回值即"本次需要发布的进度"；返回 -1.0 表示未跨过步长、无需发布。
-     * <p>
-     * 参数范围约束与负数输入行为：<br>
+     *
+     * <p>纯函数，不保存任何状态：调用方需自行保存并传入上次已发布的进度， 返回值即"本次需要发布的进度"；返回 -1.0 表示未跨过步长、无需发布。
+     *
+     * <p>参数范围约束与负数输入行为：<br>
+     *
      * <pre>
      * 1. total 必须 &gt; 0，否则直接返回 -1.0；
      * 2. current 为负数时按 0 处理（钳制下限），超过 total 时按 total 处理（钳制上限）；
@@ -37,13 +38,14 @@ public class GutilPercent {
      * 5. 返回 -1.0 的语义：total 非法（&lt;= 0），或本次进度未跨过步长、无需发布。
      * </pre>
      *
-     * @param current     当前完成量（负数按 0 处理）
-     * @param total       总量（须 > 0，否则返回 -1.0）
-     * @param step        步长（百分比），<= 0 表示每次变化都发布
+     * @param current 当前完成量（负数按 0 处理）
+     * @param total 总量（须 > 0，否则返回 -1.0）
+     * @param step 步长（百分比），<= 0 表示每次变化都发布
      * @param lastPercent 上次已发布的进度（0 ~ 100）
      * @return 需要发布的进度（保留两位小数，钳制在 0~100），或 -1.0 表示无需发布
      */
-    public static double getNextPercent(double current, double total, double step, double lastPercent) {
+    public static double getNextPercent(
+            double current, double total, double step, double lastPercent) {
         if (total <= 0) {
             return -1.0;
         }
@@ -74,7 +76,7 @@ public class GutilPercent {
      * 计算进度百分比（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0.0）
+     * @param total 总量（须 > 0，否则返回 0.0）
      * @return 进度百分比（保留两位小数，钳制在 0~100）
      */
     public static double getUpdatePercentDouble(int current, int total) {
@@ -89,7 +91,7 @@ public class GutilPercent {
      * 计算进度百分比（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0.0）
+     * @param total 总量（须 > 0，否则返回 0.0）
      * @return 进度百分比（保留两位小数，钳制在 0~100）
      */
     public static double getUpdatePercentDouble(long current, long total) {
@@ -104,7 +106,7 @@ public class GutilPercent {
      * 计算进度百分比（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0.0）
+     * @param total 总量（须 > 0，否则返回 0.0）
      * @return 进度百分比（保留两位小数，钳制在 0~100）
      */
     public static double getUpdatePercentDouble(float current, float total) {
@@ -119,7 +121,7 @@ public class GutilPercent {
      * 计算进度百分比（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0.0）
+     * @param total 总量（须 > 0，否则返回 0.0）
      * @return 进度百分比（保留两位小数，钳制在 0~100）
      */
     public static double getUpdatePercentDouble(double current, double total) {
@@ -134,7 +136,7 @@ public class GutilPercent {
      * 计算进度百分比（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理，null 按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0.0，null 返回 0.0）
+     * @param total 总量（须 > 0，否则返回 0.0，null 返回 0.0）
      * @return 进度百分比（保留两位小数，钳制在 0~100）
      */
     public static double getUpdatePercentDouble(Number current, Number total) {
@@ -164,7 +166,7 @@ public class GutilPercent {
      * 获取进度条字符串（自定义宽度）
      *
      * @param percent 进度百分比（负数按 0 处理，大于 100 按 100 处理）
-     * @param width   进度条宽度（&lt;= 0 时按默认宽度 50 处理）
+     * @param width 进度条宽度（&lt;= 0 时按默认宽度 50 处理）
      * @return 进度条字符串
      */
     public static String getProgressBar(double percent, int width) {
@@ -199,7 +201,7 @@ public class GutilPercent {
      * 获取完整进度显示（进度条 + 百分比，自定义宽度）
      *
      * @param percent 进度百分比（负数按 0 处理，大于 100 按 100 处理）
-     * @param width   进度条宽度（&lt;= 0 时按默认宽度 50 处理）
+     * @param width 进度条宽度（&lt;= 0 时按默认宽度 50 处理）
      * @return 进度条与百分比拼接的字符串
      */
     public static String getProgressDisplay(double percent, int width) {
@@ -210,7 +212,7 @@ public class GutilPercent {
      * 计算进度百分比并取整（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0）
+     * @param total 总量（须 > 0，否则返回 0）
      * @return 进度百分比整数（钳制在 0~100）
      */
     public static int getUpdatePercentInt(int current, int total) {
@@ -224,7 +226,7 @@ public class GutilPercent {
      * 计算进度百分比并取整（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0）
+     * @param total 总量（须 > 0，否则返回 0）
      * @return 进度百分比整数（钳制在 0~100）
      */
     public static int getUpdatePercentInt(long current, long total) {
@@ -238,7 +240,7 @@ public class GutilPercent {
      * 计算进度百分比并取整（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0）
+     * @param total 总量（须 > 0，否则返回 0）
      * @return 进度百分比整数（钳制在 0~100）
      */
     public static int getUpdatePercentInt(float current, float total) {
@@ -252,7 +254,7 @@ public class GutilPercent {
      * 计算进度百分比并取整（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0）
+     * @param total 总量（须 > 0，否则返回 0）
      * @return 进度百分比整数（钳制在 0~100）
      */
     public static int getUpdatePercentInt(double current, double total) {
@@ -266,7 +268,7 @@ public class GutilPercent {
      * 计算进度百分比并取整（纯计算，无步长节流，节流版本见 {@link #getNextPercent(double, double, double, double)}）
      *
      * @param current 当前完成量（负数按 0 处理，null 按 0 处理）
-     * @param total   总量（须 > 0，否则返回 0，null 返回 0）
+     * @param total 总量（须 > 0，否则返回 0，null 返回 0）
      * @return 进度百分比整数（钳制在 0~100）
      */
     public static int getUpdatePercentInt(Number current, Number total) {
@@ -295,7 +297,7 @@ public class GutilPercent {
      * 获取进度条字符串（自定义宽度）
      *
      * @param percent 进度百分比（负数按 0 处理，大于 100 按 100 处理）
-     * @param width   进度条宽度（&lt;= 0 时按默认宽度 50 处理）
+     * @param width 进度条宽度（&lt;= 0 时按默认宽度 50 处理）
      * @return 进度条字符串
      */
     public static String getProgressBar(int percent, int width) {
@@ -330,7 +332,7 @@ public class GutilPercent {
      * 获取完整进度显示（进度条 + 百分比，自定义宽度）
      *
      * @param percent 进度百分比（负数按 0 处理，大于 100 按 100 处理）
-     * @param width   进度条宽度（&lt;= 0 时按默认宽度 50 处理）
+     * @param width 进度条宽度（&lt;= 0 时按默认宽度 50 处理）
      * @return 进度条与百分比拼接的字符串
      */
     public static String getProgressDisplay(int percent, int width) {

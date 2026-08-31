@@ -1,10 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.apo;
 
 import cn.geoair.base.Gir;
-
-import java.io.Serializable;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.io.Serializable;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -28,15 +26,18 @@ public class BBoxApo implements Serializable {
             this.miny = this.envelope.getMinY();
         }
 
-
         if (bboxArrayGs == null || bboxArrayGs.length != 4) {
             Gir.log.info("Error: bboxArrayGs is null or length != 4");
             initBboxArrayGsFromEnvelope();
-        } else if (bboxArrayGs[0] == 0 && bboxArrayGs[1] == 0 &&
-                   bboxArrayGs[2] == 0 && bboxArrayGs[3] == 0) {
+        } else if (bboxArrayGs[0] == 0
+                && bboxArrayGs[1] == 0
+                && bboxArrayGs[2] == 0
+                && bboxArrayGs[3] == 0) {
             initBboxArrayGsFromEnvelope();
-        } else if (Double.isNaN(bboxArrayGs[0]) || Double.isNaN(bboxArrayGs[1]) ||
-                   Double.isNaN(bboxArrayGs[2]) || Double.isNaN(bboxArrayGs[3])) {
+        } else if (Double.isNaN(bboxArrayGs[0])
+                || Double.isNaN(bboxArrayGs[1])
+                || Double.isNaN(bboxArrayGs[2])
+                || Double.isNaN(bboxArrayGs[3])) {
             initBboxArrayGsFromEnvelope();
         } else {
             // 情况3：正常的 bboxArrayGs 数据
@@ -52,15 +53,16 @@ public class BBoxApo implements Serializable {
 
     private void initBboxArrayGsFromEnvelope() {
         if (this.thisSrid != 0) {
-            Envelope convert = GirGeoTools.defaultInstance().getSridOpt().convert(this.envelope, thisSrid, 4326);
+            Envelope convert =
+                    GirGeoTools.defaultInstance()
+                            .getSridOpt()
+                            .convert(this.envelope, thisSrid, 4326);
             this.envelopeGs = convert;
             this.maxxGs = this.envelopeGs.getMaxX();
             this.maxyGs = this.envelopeGs.getMaxY();
             this.minxGs = this.envelopeGs.getMinX();
             this.minyGs = this.envelopeGs.getMinY();
-            this.bboxArrayGs = new double[]{
-                    this.minxGs, this.minyGs, this.maxxGs, this.maxyGs
-            };
+            this.bboxArrayGs = new double[] {this.minxGs, this.minyGs, this.maxxGs, this.maxyGs};
         } else {
             // 如果 thisSrid 为 0，直接使用原 envelope 数据
             this.envelopeGs = new Envelope(this.envelope);
@@ -68,35 +70,23 @@ public class BBoxApo implements Serializable {
             this.maxyGs = this.envelopeGs.getMaxY();
             this.minxGs = this.envelopeGs.getMinX();
             this.minyGs = this.envelopeGs.getMinY();
-            this.bboxArrayGs = new double[]{
-                    this.minxGs, this.minyGs, this.maxxGs, this.maxyGs
-            };
+            this.bboxArrayGs = new double[] {this.minxGs, this.minyGs, this.maxxGs, this.maxyGs};
         }
     }
 
-    /**
-     * 当前的边界的坐标
-     */
+    /** 当前的边界的坐标 */
     int thisSrid;
 
-    /**
-     * 边界数组
-     */
+    /** 边界数组 */
     double[] bboxArray;
 
-    /**
-     * 边界数组4326坐标
-     */
+    /** 边界数组4326坐标 */
     double[] bboxArrayGs;
 
-    /**
-     * geotools的边界
-     */
+    /** geotools的边界 */
     Envelope envelope;
 
-    /**
-     * geotools的边界4326坐标
-     */
+    /** geotools的边界4326坐标 */
     Envelope envelopeGs;
 
     private double minx;

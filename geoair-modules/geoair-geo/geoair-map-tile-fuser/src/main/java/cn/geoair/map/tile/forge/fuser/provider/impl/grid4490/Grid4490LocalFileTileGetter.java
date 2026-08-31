@@ -4,14 +4,12 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
-import cn.geoair.web.mime.GiMimeType;
-import cn.hutool.core.io.FileUtil;
-
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
-
+import cn.geoair.web.mime.GiMimeType;
+import cn.hutool.core.io.FileUtil;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -21,25 +19,24 @@ import java.io.File;
  * @author 张俊
  * @date Created in 2026/5/9 14:10
  */
-
 public class Grid4490LocalFileTileGetter extends BaseTileGetter {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     private final String filePathTemplate;
-
 
     public Grid4490LocalFileTileGetter(PxyLayerInfo layerInfo) {
         super(layerInfo);
         this.filePathTemplate = layerInfo.getPath();
-
     }
 
     @Override
     public Resource getTileResource(int z, int x, int y) {
 
         y = FuserCacheUtils.getSourceY(getLayerInfo(), z, y);
-        String filePath = filePathTemplate.replace("{z}", String.valueOf(z))
-                .replace("{x}", String.valueOf(x))
-                .replace("{y}", String.valueOf(y));
+        String filePath =
+                filePathTemplate
+                        .replace("{z}", String.valueOf(z))
+                        .replace("{x}", String.valueOf(x))
+                        .replace("{y}", String.valueOf(y));
 
         File file = FileUtil.file(filePath);
         log.debug("尝试获取瓦片文件: {}", file.getAbsolutePath());

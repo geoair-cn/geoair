@@ -19,8 +19,11 @@ public class DmAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     protected IAdvSimplePageOpt simplePagePreOpt;
     protected IAdvGeoPreOpt iAdvGeoPreOpt;
 
-    public DmAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
-                               IAdvSimplePageOpt dmAdvSimplePageOpt, IAdvGeoPreOpt iAdvGeoPreOpt) {
+    public DmAdvWhereSelectOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvSimplePageOpt dmAdvSimplePageOpt,
+            IAdvGeoPreOpt iAdvGeoPreOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.simplePagePreOpt = dmAdvSimplePageOpt;

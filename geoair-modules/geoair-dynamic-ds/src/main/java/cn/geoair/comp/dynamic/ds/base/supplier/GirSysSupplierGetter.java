@@ -1,6 +1,5 @@
 package cn.geoair.comp.dynamic.ds.base.supplier;
 
-
 import java.util.function.Supplier;
 
 /**
@@ -8,7 +7,4 @@ import java.util.function.Supplier;
  * @date ：Created in 2026/8/7 16:59
  * @description：
  */
-public interface GirSysSupplierGetter extends Supplier<String> {
-
-
-}
+public interface GirSysSupplierGetter extends Supplier<String> {}

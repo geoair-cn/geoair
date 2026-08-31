@@ -7,14 +7,11 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
- 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
- 
 public class S3CompressionHandler extends AbstractZipCompressionHandler {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -26,11 +23,17 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
         }
     }
 
-
     @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException {
+    public List<byte[]> readFileByChunks(
+            String source, long startOffset, long totalSize, int chunkSize) throws IOException {
         if (chunkSize <= 0 || totalSize <= 0 || startOffset < 0) {
-            throw new IllegalArgumentException("无效的参数：chunkSize=" + chunkSize + ", totalSize=" + totalSize + ", startOffset=" + startOffset);
+            throw new IllegalArgumentException(
+                    "无效的参数：chunkSize="
+                            + chunkSize
+                            + ", totalSize="
+                            + totalSize
+                            + ", startOffset="
+                            + startOffset);
         }
 
         List<byte[]> chunks = new ArrayList<>();
@@ -54,12 +57,13 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
             throw new IllegalArgumentException("无效的范围：start=" + start + ", end=" + end);
         }
 
-        GetObjectRequest request = new GetObjectRequest(s3ClientGetter.getDefaultBucket(), source)
-                .withRange(start, end);
+        GetObjectRequest request =
+                new GetObjectRequest(s3ClientGetter.getDefaultBucket(), source)
+                        .withRange(start, end);
 
         try (S3Object s3Object = s3ClientGetter.getClient().getObject(request);
-             S3ObjectInputStream in = s3Object.getObjectContent();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                S3ObjectInputStream in = s3Object.getObjectContent();
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
@@ -73,12 +77,13 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
     @Override
     public long getFileSize(String source) {
         try {
-            return s3ClientGetter.getClient().getObjectMetadata(s3ClientGetter.getDefaultBucket(), source).getContentLength();
+            return s3ClientGetter
+                    .getClient()
+                    .getObjectMetadata(s3ClientGetter.getDefaultBucket(), source)
+                    .getContentLength();
         } catch (Exception e) {
             log.error("获取S3文件大小失败，source:{}", source, e);
             throw new RuntimeException("获取S3文件大小失败", e);
         }
     }
-
-
 }

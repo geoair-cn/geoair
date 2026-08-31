@@ -11,7 +11,6 @@ import cn.geoair.base.data.model.annotation.GaModelField;
  */
 @GaModel(text = "逻辑删除状态")
 public enum DelIsEnum implements GiVisualValuable<String> {
-
     NO("NO", "未删除"),
     YES("YES", "已删除"),
     ;

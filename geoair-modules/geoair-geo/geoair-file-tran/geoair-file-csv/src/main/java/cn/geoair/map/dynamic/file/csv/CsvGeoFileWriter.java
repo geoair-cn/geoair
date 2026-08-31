@@ -42,15 +42,18 @@ public class CsvGeoFileWriter implements GeoFileWriter {
     }
 
     @Override
-    public GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
+    public GeoFileWriter writeHeader(
+            SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
         try {
             if (headerWritten) {
                 return this;
             }
             headers = CsvSchemaSupport.resolveWriterHeaders(featureType, linkInfo);
-            writer = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(linkInfo.getCsvFilePath()), Charset.forName(linkInfo.getCharset())));
+            writer =
+                    new BufferedWriter(
+                            new OutputStreamWriter(
+                                    new FileOutputStream(linkInfo.getCsvFilePath()),
+                                    Charset.forName(linkInfo.getCharset())));
             writer.write(join(headers));
             writer.newLine();
             headerWritten = true;
@@ -62,7 +65,8 @@ public class CsvGeoFileWriter implements GeoFileWriter {
     }
 
     @Override
-    public GeoFileWriter writeOneRow(GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer) {
+    public GeoFileWriter writeOneRow(
+            GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer) {
         try {
             if (!headerWritten || writer == null) {
                 throw new IllegalStateException("请先调用 writeHeader");
@@ -79,16 +83,26 @@ public class CsvGeoFileWriter implements GeoFileWriter {
             for (String header : headers) {
                 if (linkInfo.getGeometryMode() == CsvGeometryMode.LON_LAT) {
                     if (header.equals(linkInfo.getLongitudeColumnName())) {
-                        values.add(escape(CsvGeometrySupport.writeGeometryValue(linkInfo, geometry, true)));
+                        values.add(
+                                escape(
+                                        CsvGeometrySupport.writeGeometryValue(
+                                                linkInfo, geometry, true)));
                         continue;
                     }
                     if (header.equals(linkInfo.getLatitudeColumnName())) {
-                        values.add(escape(CsvGeometrySupport.writeGeometryValue(linkInfo, geometry, false)));
+                        values.add(
+                                escape(
+                                        CsvGeometrySupport.writeGeometryValue(
+                                                linkInfo, geometry, false)));
                         continue;
                     }
                 }
-                if (linkInfo.getGeometryMode() == CsvGeometryMode.WKT && header.equals(linkInfo.getWktColumnName())) {
-                    values.add(escape(CsvGeometrySupport.writeGeometryValue(linkInfo, geometry, true)));
+                if (linkInfo.getGeometryMode() == CsvGeometryMode.WKT
+                        && header.equals(linkInfo.getWktColumnName())) {
+                    values.add(
+                            escape(
+                                    CsvGeometrySupport.writeGeometryValue(
+                                            linkInfo, geometry, true)));
                     continue;
                 }
                 Object value = girAdvOneRow.get(header);
@@ -134,7 +148,11 @@ public class CsvGeoFileWriter implements GeoFileWriter {
         if (value == null) {
             return "";
         }
-        boolean needQuote = value.indexOf(linkInfo.getDelimiter()) >= 0 || value.contains("\"") || value.contains("\n") || value.contains("\r");
+        boolean needQuote =
+                value.indexOf(linkInfo.getDelimiter()) >= 0
+                        || value.contains("\"")
+                        || value.contains("\n")
+                        || value.contains("\r");
         String escaped = value.replace("\"", "\"\"");
         return needQuote ? "\"" + escaped + "\"" : escaped;
     }

@@ -45,9 +45,7 @@ public class GutilDate {
      */
     public static final long MILLIS_PER_DAY = 24 * MILLIS_PER_HOUR;
 
-    /**
-     * 半个月，用于表示日期位于月份的上半月还是下半月。
-     */
+    /** 半个月，用于表示日期位于月份的上半月还是下半月。 */
     public static final int SEMI_MONTH = 1001;
 
     private static final int[][] fields = {
@@ -93,8 +91,7 @@ public class GutilDate {
     private static final int MODIFY_CEILING = 2;
 
     /**
-     * <code>GutilDate</code> 实例不应在标准编程中构造，应作为静态工具类使用，例如
-     * <code>GutilDate.parse(str)</code>。
+     * <code>GutilDate</code> 实例不应在标准编程中构造，应作为静态工具类使用，例如 <code>GutilDate.parse(str)</code>。
      *
      * <p>构造函数设为 public 以支持需要 JavaBean 实例的工具。
      */
@@ -106,8 +103,8 @@ public class GutilDate {
     /**
      * 判断两个日期对象是否在同一天（忽略时间部分）。
      *
-     * <p>例如 2002-03-28 13:45 与 2002-03-28 06:01 返回 true；2002-03-28 13:45 与
-     * 2002-03-12 13:45 返回 false。
+     * <p>例如 2002-03-28 13:45 与 2002-03-28 06:01 返回 true；2002-03-28 13:45 与 2002-03-12 13:45 返回
+     * false。
      *
      * <p>在 JVM 默认时区（{@link TimeZone#getDefault()}）下比较。
      *
@@ -131,8 +128,8 @@ public class GutilDate {
     /**
      * 判断两个日历对象是否在同一天（忽略时间部分）。
      *
-     * <p>例如 2002-03-28 13:45 与 2002-03-28 06:01 返回 true；2002-03-28 13:45 与
-     * 2002-03-12 13:45 返回 false。
+     * <p>例如 2002-03-28 13:45 与 2002-03-28 06:01 返回 true；2002-03-28 13:45 与 2002-03-12 13:45 返回
+     * false。
      *
      * <p>比较的是两个日历各自时区下的本地日期，时区不同的日历仍可能判为同一天。
      *
@@ -218,13 +215,12 @@ public class GutilDate {
     /**
      * 解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用宽松（lenient）模式，允许类似 "February 942, 1996"
-     * 的日期。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用宽松（lenient）模式，允许类似 "February 942, 1996" 的日期。
      *
-     * <p><b>时区语义：</b>本方法使用 JVM 默认时区（{@link TimeZone#getDefault()}）解析，而
-     * {@link #formatUTC(long, String)} 使用 UTC 格式化，两者并非互为逆运算。若需与 formatUTC 往返
-     * 一致，请使用 {@link #parseDate(String, String[], TimeZone)} 并显式传入 {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>本方法使用 JVM 默认时区（{@link TimeZone#getDefault()}）解析，而 {@link #formatUTC(long,
+     * String)} 使用 UTC 格式化，两者并非互为逆运算。若需与 formatUTC 往返 一致，请使用 {@link #parseDate(String, String[],
+     * TimeZone)} 并显式传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
@@ -241,12 +237,11 @@ public class GutilDate {
     /**
      * 解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用宽松（lenient）模式。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用宽松（lenient）模式。
      *
-     * <p><b>时区语义：</b>按指定的时区解析；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入
-     * {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区解析；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
@@ -266,18 +261,16 @@ public class GutilDate {
     /**
      * 解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用宽松（lenient）模式。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用宽松（lenient）模式。
      *
-     * <p><b>时区语义：</b>按指定的时区与语言环境解析；若 {@code timeZone} 为 null，则使用 JVM 默认
-     * 时区（{@link TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入
-     * {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区与语言环境解析；若 {@code timeZone} 为 null，则使用 JVM 默认 时区（{@link
+     * TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
      * @param timeZone 解析使用的时区，可以为 null（null 表示 JVM 默认时区）
-     * @param locale 解析使用的语言环境，可以为 null（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 解析使用的语言环境，可以为 null（null 表示 JVM 默认语言环境）； 当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 解析得到的日期
      * @throws IllegalArgumentException 如果日期字符串或模式数组为 null
      * @throws ParseException 如果没有（或没有任何）日期模式适合
@@ -294,14 +287,12 @@ public class GutilDate {
     /**
      * 严格解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996"
-     * 或 "2 月 30 日" 之类的非法日期。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996" 或 "2 月 30 日" 之类的非法日期。
      *
-     * <p><b>时区语义：</b>本方法使用 JVM 默认时区（{@link TimeZone#getDefault()}）解析，而
-     * {@link #formatUTC(long, String)} 使用 UTC 格式化，两者并非互为逆运算。若需与 formatUTC 往返
-     * 一致，请使用 {@link #parseDateStrictly(String, String[], TimeZone)} 并显式传入
-     * {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>本方法使用 JVM 默认时区（{@link TimeZone#getDefault()}）解析，而 {@link #formatUTC(long,
+     * String)} 使用 UTC 格式化，两者并非互为逆运算。若需与 formatUTC 往返 一致，请使用 {@link #parseDateStrictly(String,
+     * String[], TimeZone)} 并显式传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
@@ -318,13 +309,11 @@ public class GutilDate {
     /**
      * 严格解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996"
-     * 或 "2 月 30 日" 之类的非法日期。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996" 或 "2 月 30 日" 之类的非法日期。
      *
-     * <p><b>时区语义：</b>按指定的时区解析；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入
-     * {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区解析；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
@@ -344,19 +333,16 @@ public class GutilDate {
     /**
      * 严格解析日期字符串，依次尝试多个解析模式。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996"
-     * 或 "2 月 30 日" 之类的非法日期。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link
+     * ParseException}。解析采用严格（非宽松）模式，不允许类似 "February 942, 1996" 或 "2 月 30 日" 之类的非法日期。
      *
-     * <p><b>时区语义：</b>按指定的时区与语言环境解析；若 {@code timeZone} 为 null，则使用 JVM 默认
-     * 时区（{@link TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入
-     * {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区与语言环境解析；若 {@code timeZone} 为 null，则使用 JVM 默认 时区（{@link
+     * TimeZone#getDefault()}）。与 {@link #formatUTC(long, String)} 往返一致时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
      * @param timeZone 解析使用的时区，可以为 null（null 表示 JVM 默认时区）
-     * @param locale 解析使用的语言环境，可以为 null（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 解析使用的语言环境，可以为 null（null 表示 JVM 默认语言环境）； 当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 解析得到的日期
      * @throws IllegalArgumentException 如果日期字符串或模式数组为 null
      * @throws ParseException 如果没有（或没有任何）日期模式适合
@@ -372,9 +358,8 @@ public class GutilDate {
     /**
      * 解析日期字符串的内部实现。
      *
-     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法
-     * 匹配，抛出 {@link ParseException}。若 {@code timeZone} 或 {@code locale} 为 null，则分别使用
-     * JVM 默认时区与默认语言环境。
+     * <p>按顺序尝试每个解析模式，只有当整个输入字符串都被成功解析时才算解析成功；若所有模式均无法 匹配，抛出 {@link ParseException}。若 {@code
+     * timeZone} 或 {@code locale} 为 null，则分别使用 JVM 默认时区与默认语言环境。
      *
      * @param str 待解析的日期字符串，不可为 null
      * @param parsePatterns 日期格式模式数组，参见 SimpleDateFormat，不可为 null
@@ -653,8 +638,7 @@ public class GutilDate {
      * @param date 原日期，不可为 null
      * @param amount 要设置的日值
      * @return 设置后的新日期对象
-     * @throws IllegalArgumentException 如果日期为 null，或设置后的日期非法
-     *     （如把 2 月设置为 30 日、平年设置为 2 月 29 日等）
+     * @throws IllegalArgumentException 如果日期为 null，或设置后的日期非法 （如把 2 月设置为 30 日、平年设置为 2 月 29 日等）
      * @since 2.4
      */
     public static Date setDays(Date date, int amount) {
@@ -729,11 +713,9 @@ public class GutilDate {
     /**
      * 将日期对象按指定日历字段设置为指定值并返回新的日期对象，原日期对象保持不变。
      *
-     * <p>本方法使用非宽松（lenient=false）日历：当设置后的日期非法时抛出
-     * {@link IllegalArgumentException}，而不是像宽松日历那样自动进位。
-     * 例如把 2 月设置为 30 日、平年设置为 2 月 29 日、月末设置为不存在的日期（如 2 月 31 日）都会
-     * 抛出异常，不会滚动到下一个月份。闰年（如 2000 年、2024 年）中 2 月 29 日是合法日期，请按
-     * 实际年份判断边界。
+     * <p>本方法使用非宽松（lenient=false）日历：当设置后的日期非法时抛出 {@link IllegalArgumentException}，而不是像宽松日历那样自动进位。
+     * 例如把 2 月设置为 30 日、平年设置为 2 月 29 日、月末设置为不存在的日期（如 2 月 31 日）都会 抛出异常，不会滚动到下一个月份。闰年（如 2000 年、2024 年）中
+     * 2 月 29 日是合法日期，请按 实际年份判断边界。
      *
      * <p>在默认时区（{@link TimeZone#getDefault()}）下进行计算。
      *
@@ -780,11 +762,11 @@ public class GutilDate {
     /**
      * 对日期执行四舍五入，保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
-     * <p>对于实行夏令时切换的时区，按 {@link Calendar#HOUR_OF_DAY} 取整时可能产生非整点结果，
-     * 详见 {@link Calendar#add(int, int)} 的说明。
+     * <p>对于实行夏令时切换的时区，按 {@link Calendar#HOUR_OF_DAY} 取整时可能产生非整点结果， 详见 {@link Calendar#add(int,
+     * int)} 的说明。
      *
      * <p>在默认时区（{@link TimeZone#getDefault()}）下进行计算。
      *
@@ -807,8 +789,8 @@ public class GutilDate {
     /**
      * 对日历执行四舍五入，保留指定字段作为最高有效字段，返回一个新的日历对象，原对象保持不变。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
      * <p>对于实行夏令时切换的时区，按 {@link Calendar#HOUR_OF_DAY} 取整时可能产生非整点结果。
      *
@@ -832,8 +814,8 @@ public class GutilDate {
     /**
      * 对日期或日历执行四舍五入，保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
      * @param date 要处理的日期，类型为 {@link Date} 或 {@link Calendar}
      * @param field 来自 {@link Calendar} 的字段或 {@link #SEMI_MONTH}
@@ -859,8 +841,8 @@ public class GutilDate {
     /**
      * 对日期执行截断，保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000；
-     * 若字段为 MONTH，则返回 2002-03-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000； 若字段为 MONTH，则返回
+     * 2002-03-01 00:00:00.000。
      *
      * <p>在默认时区（{@link TimeZone#getDefault()}）下进行计算。
      *
@@ -883,8 +865,8 @@ public class GutilDate {
     /**
      * 对日历执行截断，保留指定字段作为最高有效字段，返回一个新的日历对象，原对象保持不变。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000；
-     * 若字段为 MONTH，则返回 2002-03-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000； 若字段为 MONTH，则返回
+     * 2002-03-01 00:00:00.000。
      *
      * <p>计算时保留原日历对象的时区。
      *
@@ -906,8 +888,8 @@ public class GutilDate {
     /**
      * 对日期或日历执行截断，保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000；
-     * 若字段为 MONTH，则返回 2002-03-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 13:00:00.000； 若字段为 MONTH，则返回
+     * 2002-03-01 00:00:00.000。
      *
      * @param date 要处理的日期，类型为 {@link Date} 或 {@link Calendar}
      * @param field 来自 {@link Calendar} 的字段或 {@link #SEMI_MONTH}
@@ -933,8 +915,8 @@ public class GutilDate {
     /**
      * 对日期执行向上取整（ceiling），保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
      * <p>在默认时区（{@link TimeZone#getDefault()}）下进行计算。
      *
@@ -956,11 +938,10 @@ public class GutilDate {
     }
 
     /**
-     * 对日历执行向上取整（ceiling），保留指定字段作为最高有效字段，返回一个新的日历对象，原对象
-     * 保持不变。
+     * 对日历执行向上取整（ceiling），保留指定字段作为最高有效字段，返回一个新的日历对象，原对象 保持不变。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
      * <p>计算时保留原日历对象的时区。
      *
@@ -983,8 +964,8 @@ public class GutilDate {
     /**
      * 对日期或日历执行向上取整（ceiling），保留指定字段作为最高有效字段。
      *
-     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000；
-     * 若字段为 MONTH，则返回 2002-04-01 00:00:00.000。
+     * <p>例如 2002-03-28 13:45:01.231，若字段为 HOUR，则返回 2002-03-28 14:00:00.000； 若字段为 MONTH，则返回
+     * 2002-04-01 00:00:00.000。
      *
      * @param date 要处理的日期，类型为 {@link Date} 或 {@link Calendar}
      * @param field 来自 {@link Calendar} 的字段或 {@link #SEMI_MONTH}
@@ -1158,19 +1139,18 @@ public class GutilDate {
     /**
      * 构造按日期范围迭代每一天的迭代器，范围由焦点日期与范围样式定义。
      *
-     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从
-     * 2002-06-30（星期日）开始，到 2002-08-03（星期六）结束，每个中间日期返回一个
-     * {@link Calendar} 实例。
+     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从 2002-06-30（星期日）开始，到
+     * 2002-08-03（星期六）结束，每个中间日期返回一个 {@link Calendar} 实例。
      *
      * <p>迭代器通过 {@link Calendar#add(int, int)} 推进日期。
      *
      * <p>在默认时区（{@link TimeZone#getDefault()}）下进行计算。
      *
      * @param focus 焦点日期，不可为 null
-     * @param rangeStyle 范围样式常量，必须是 {@link GutilDate#RANGE_MONTH_SUNDAY}、
-     *     {@link GutilDate#RANGE_MONTH_MONDAY}、{@link GutilDate#RANGE_WEEK_SUNDAY}、
-     *     {@link GutilDate#RANGE_WEEK_MONDAY}、{@link GutilDate#RANGE_WEEK_RELATIVE} 或
-     *     {@link GutilDate#RANGE_WEEK_CENTER} 之一
+     * @param rangeStyle 范围样式常量，必须是 {@link GutilDate#RANGE_MONTH_SUNDAY}、 {@link
+     *     GutilDate#RANGE_MONTH_MONDAY}、{@link GutilDate#RANGE_WEEK_SUNDAY}、 {@link
+     *     GutilDate#RANGE_WEEK_MONDAY}、{@link GutilDate#RANGE_WEEK_RELATIVE} 或 {@link
+     *     GutilDate#RANGE_WEEK_CENTER} 之一
      * @return 日期迭代器，总是返回 {@link Calendar} 实例
      * @throws IllegalArgumentException 如果焦点日期为 null 或范围样式非法
      */
@@ -1186,17 +1166,16 @@ public class GutilDate {
     /**
      * 构造按日期范围迭代每一天的迭代器，范围由焦点日历与范围样式定义。
      *
-     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从
-     * 2002-06-30（星期日）开始，到 2002-08-03（星期六）结束，每个中间日期返回一个
-     * {@link Calendar} 实例。
+     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从 2002-06-30（星期日）开始，到
+     * 2002-08-03（星期六）结束，每个中间日期返回一个 {@link Calendar} 实例。
      *
      * <p>迭代器通过 {@link Calendar#add(int, int)} 推进日期，并保留焦点日历的时区。
      *
      * @param focus 焦点日历
-     * @param rangeStyle 范围样式常量，必须是 {@link GutilDate#RANGE_MONTH_SUNDAY}、
-     *     {@link GutilDate#RANGE_MONTH_MONDAY}、{@link GutilDate#RANGE_WEEK_SUNDAY}、
-     *     {@link GutilDate#RANGE_WEEK_MONDAY}、{@link GutilDate#RANGE_WEEK_RELATIVE} 或
-     *     {@link GutilDate#RANGE_WEEK_CENTER} 之一
+     * @param rangeStyle 范围样式常量，必须是 {@link GutilDate#RANGE_MONTH_SUNDAY}、 {@link
+     *     GutilDate#RANGE_MONTH_MONDAY}、{@link GutilDate#RANGE_WEEK_SUNDAY}、 {@link
+     *     GutilDate#RANGE_WEEK_MONDAY}、{@link GutilDate#RANGE_WEEK_RELATIVE} 或 {@link
+     *     GutilDate#RANGE_WEEK_CENTER} 之一
      * @return 日期迭代器
      * @throws IllegalArgumentException 如果焦点日历为 null 或范围样式非法
      */
@@ -1274,12 +1253,10 @@ public class GutilDate {
     }
 
     /**
-     * 构造按日期范围迭代每一天的迭代器，范围由焦点日期（{@link Date} 或 {@link Calendar}）与范围
-     * 样式定义。
+     * 构造按日期范围迭代每一天的迭代器，范围由焦点日期（{@link Date} 或 {@link Calendar}）与范围 样式定义。
      *
-     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从
-     * 2002-06-30（星期日）开始，到 2002-08-03（星期六）结束，每个中间日期返回一个
-     * {@link Calendar} 实例。
+     * <p>例如传入 2002-07-04（星期四）与 {@link #RANGE_MONTH_SUNDAY}，返回的迭代器从 2002-06-30（星期日）开始，到
+     * 2002-08-03（星期六）结束，每个中间日期返回一个 {@link Calendar} 实例。
      *
      * @param focus 要处理的焦点日期，类型为 {@link Date} 或 {@link Calendar}
      * @param rangeStyle 范围样式常量，参见 {@link #iterator(Calendar, int)} 的说明
@@ -1303,14 +1280,12 @@ public class GutilDate {
     /**
      * 返回日期在指定片段内的毫秒数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日期的毫秒数只会返回当前秒内的毫秒数（结果为 0-999）。本方法可获取任意片段的
-     * 毫秒数。例如计算今天已过去的毫秒数时，fragment 为 {@link Calendar#DATE} 或
-     * {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时、分钟和秒的毫秒之和。
+     * <p>查询任意日期的毫秒数只会返回当前秒内的毫秒数（结果为 0-999）。本方法可获取任意片段的 毫秒数。例如计算今天已过去的毫秒数时，fragment 为 {@link
+     * Calendar#DATE} 或 {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时、分钟和秒的毫秒之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 SECOND 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 SECOND 的片段返回 0。
      *
      * <ul>
      *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.SECOND，返回 538
@@ -1334,20 +1309,16 @@ public class GutilDate {
     /**
      * 返回日期在指定片段内的秒数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日期的秒数只会返回当前分钟内的秒数（结果为 0-59）。本方法可获取任意片段的秒数。
-     * 例如计算今天已过去的秒数时，fragment 为 {@link Calendar#DATE} 或
-     * {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时和分钟的秒之和。
+     * <p>查询任意日期的秒数只会返回当前分钟内的秒数（结果为 0-59）。本方法可获取任意片段的秒数。 例如计算今天已过去的秒数时，fragment 为 {@link
+     * Calendar#DATE} 或 {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时和分钟的秒之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 SECOND 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 SECOND 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10
-     *       （等价于已废弃的 date.getSeconds()）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10
-     *       （等价于已废弃的 date.getSeconds()）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10 （等价于已废弃的 date.getSeconds()）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10 （等价于已废弃的 date.getSeconds()）
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 26110（7*3600 + 15*60 + 10）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
      * </ul>
@@ -1367,20 +1338,18 @@ public class GutilDate {
     /**
      * 返回日期在指定片段内的分钟数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日期的分钟数只会返回当前小时内的分钟数（结果为 0-59）。本方法可获取任意片段的
-     * 分钟数。例如计算本月已过去的分钟数时，fragment 为 {@link Calendar#MONTH}，结果为过去所有
-     * 天和小时的分钟之和。
+     * <p>查询任意日期的分钟数只会返回当前小时内的分钟数（结果为 0-59）。本方法可获取任意片段的 分钟数。例如计算本月已过去的分钟数时，fragment 为 {@link
+     * Calendar#MONTH}，结果为过去所有 天和小时的分钟之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 MINUTE 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 MINUTE 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15
-     *       （等价于已废弃的 date.getMinutes()）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15
-     *       （等价于已废弃的 date.getMinutes()）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15 （等价于已废弃的
+     *       date.getMinutes()）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15 （等价于已废弃的
+     *       date.getMinutes()）
      *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MONTH，返回 15
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MONTH，返回 435（7*60 + 15）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
@@ -1401,19 +1370,16 @@ public class GutilDate {
     /**
      * 返回日期在指定片段内的小时数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日期的小时数只会返回当前天内的小时数（结果为 0-23）。本方法可获取任意片段的小时数。
-     * 例如计算本月已过去的小时数时，fragment 为 {@link Calendar#MONTH}，结果为过去所有天的小时之和。
+     * <p>查询任意日期的小时数只会返回当前天内的小时数（结果为 0-23）。本方法可获取任意片段的小时数。 例如计算本月已过去的小时数时，fragment 为 {@link
+     * Calendar#MONTH}，结果为过去所有天的小时之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 HOUR 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 HOUR 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7
-     *       （等价于已废弃的 date.getHours()）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7
-     *       （等价于已废弃的 date.getHours()）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7 （等价于已废弃的 date.getHours()）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7 （等价于已废弃的 date.getHours()）
      *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MONTH，返回 7
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MONTH，返回 127（5*24 + 7）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
@@ -1434,19 +1400,16 @@ public class GutilDate {
     /**
      * 返回日期在指定片段内的天数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日期的天数只会返回当前月内的天数（结果为 1-31）。本方法可获取任意片段的天数。
-     * 例如计算今年已过去的天数时，fragment 为 {@link Calendar#YEAR}，结果为过去所有月的天数之和。
+     * <p>查询任意日期的天数只会返回当前月内的天数（结果为 1-31）。本方法可获取任意片段的天数。 例如计算今年已过去的天数时，fragment 为 {@link
+     * Calendar#YEAR}，结果为过去所有月的天数之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 DAY 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 DAY 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-28，fragment 为 Calendar.MONTH，返回 28
-     *       （等价于已废弃的 date.getDay()）
-     *   <li>2008-02-28，fragment 为 Calendar.MONTH，返回 28
-     *       （等价于已废弃的 date.getDay()）
+     *   <li>2008-01-28，fragment 为 Calendar.MONTH，返回 28 （等价于已废弃的 date.getDay()）
+     *   <li>2008-02-28，fragment 为 Calendar.MONTH，返回 28 （等价于已废弃的 date.getDay()）
      *   <li>2008-01-28，fragment 为 Calendar.YEAR，返回 28
      *   <li>2008-02-28，fragment 为 Calendar.YEAR，返回 59
      *   <li>2008-01-28，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
@@ -1467,20 +1430,18 @@ public class GutilDate {
     /**
      * 返回日历在指定片段内的毫秒数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日历的毫秒数只会返回当前秒内的毫秒数（结果为 0-999）。本方法可获取任意片段的
-     * 毫秒数。例如计算今天已过去的毫秒数时，fragment 为 {@link Calendar#DATE} 或
-     * {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时、分钟和秒的毫秒之和。
+     * <p>查询任意日历的毫秒数只会返回当前秒内的毫秒数（结果为 0-999）。本方法可获取任意片段的 毫秒数。例如计算今天已过去的毫秒数时，fragment 为 {@link
+     * Calendar#DATE} 或 {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时、分钟和秒的毫秒之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 SECOND 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 SECOND 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.SECOND，返回 538
-     *       （等价于 calendar.get(Calendar.MILLISECOND)）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.SECOND，返回 538
-     *       （等价于 calendar.get(Calendar.MILLISECOND)）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.SECOND，返回 538 （等价于
+     *       calendar.get(Calendar.MILLISECOND)）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.SECOND，返回 538 （等价于
+     *       calendar.get(Calendar.MILLISECOND)）
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10538（10*1000 + 538）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
      * </ul>
@@ -1500,20 +1461,18 @@ public class GutilDate {
     /**
      * 返回日历在指定片段内的秒数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日历的秒数只会返回当前分钟内的秒数（结果为 0-59）。本方法可获取任意片段的秒数。
-     * 例如计算今天已过去的秒数时，fragment 为 {@link Calendar#DATE} 或
-     * {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时和分钟的秒之和。
+     * <p>查询任意日历的秒数只会返回当前分钟内的秒数（结果为 0-59）。本方法可获取任意片段的秒数。 例如计算今天已过去的秒数时，fragment 为 {@link
+     * Calendar#DATE} 或 {@link Calendar#DAY_OF_YEAR}，结果为过去所有小时和分钟的秒之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 SECOND 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 SECOND 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10
-     *       （等价于 calendar.get(Calendar.SECOND)）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10
-     *       （等价于 calendar.get(Calendar.SECOND)）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10 （等价于
+     *       calendar.get(Calendar.SECOND)）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MINUTE，返回 10 （等价于
+     *       calendar.get(Calendar.SECOND)）
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 26110（7*3600 + 15*60 + 10）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
      * </ul>
@@ -1533,20 +1492,18 @@ public class GutilDate {
     /**
      * 返回日历在指定片段内的分钟数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日历的分钟数只会返回当前小时内的分钟数（结果为 0-59）。本方法可获取任意片段的
-     * 分钟数。例如计算本月已过去的分钟数时，fragment 为 {@link Calendar#MONTH}，结果为过去所有
-     * 天和小时的分钟之和。
+     * <p>查询任意日历的分钟数只会返回当前小时内的分钟数（结果为 0-59）。本方法可获取任意片段的 分钟数。例如计算本月已过去的分钟数时，fragment 为 {@link
+     * Calendar#MONTH}，结果为过去所有 天和小时的分钟之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 MINUTE 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 MINUTE 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15
-     *       （等价于 calendar.get(Calendar.MINUTE)）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15
-     *       （等价于 calendar.get(Calendar.MINUTE)）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15 （等价于
+     *       calendar.get(Calendar.MINUTE)）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.HOUR_OF_DAY，返回 15 （等价于
+     *       calendar.get(Calendar.MINUTE)）
      *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MONTH，返回 15
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MONTH，返回 435（7*60 + 15）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
@@ -1567,19 +1524,18 @@ public class GutilDate {
     /**
      * 返回日历在指定片段内的小时数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日历的小时数只会返回当前天内的小时数（结果为 0-23）。本方法可获取任意片段的小时数。
-     * 例如计算本月已过去的小时数时，fragment 为 {@link Calendar#MONTH}，结果为过去所有天的小时之和。
+     * <p>查询任意日历的小时数只会返回当前天内的小时数（结果为 0-23）。本方法可获取任意片段的小时数。 例如计算本月已过去的小时数时，fragment 为 {@link
+     * Calendar#MONTH}，结果为过去所有天的小时之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 HOUR 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 HOUR 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7
-     *       （等价于 calendar.get(Calendar.HOUR_OF_DAY)）
-     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7
-     *       （等价于 calendar.get(Calendar.HOUR_OF_DAY)）
+     *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7 （等价于
+     *       calendar.get(Calendar.HOUR_OF_DAY)）
+     *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.DAY_OF_YEAR，返回 7 （等价于
+     *       calendar.get(Calendar.HOUR_OF_DAY)）
      *   <li>2008-01-01 07:15:10.538，fragment 为 Calendar.MONTH，返回 7
      *   <li>2008-01-06 07:15:10.538，fragment 为 Calendar.MONTH，返回 127（5*24 + 7）
      *   <li>2008-01-16 07:15:10.538，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
@@ -1600,23 +1556,18 @@ public class GutilDate {
     /**
      * 返回日历在指定片段内的天数，所有大于该片段的日期字段将被忽略。
      *
-     * <p>查询任意日历的天数只会返回当前月内的天数（结果为 1-31）。本方法可获取任意片段的天数。
-     * 例如计算今年已过去的天数时，fragment 为 {@link Calendar#YEAR}，结果为过去所有月的天数之和。
+     * <p>查询任意日历的天数只会返回当前月内的天数（结果为 1-31）。本方法可获取任意片段的天数。 例如计算今年已过去的天数时，fragment 为 {@link
+     * Calendar#YEAR}，结果为过去所有月的天数之和。
      *
-     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、
-     * {@link Calendar#DAY_OF_YEAR} 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、
-     * {@link Calendar#MINUTE}、{@link Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。
-     * 小于等于 DAY 的片段返回 0。
+     * <p>合法的 fragment 为：{@link Calendar#YEAR}、{@link Calendar#MONTH}、 {@link Calendar#DAY_OF_YEAR}
+     * 与 {@link Calendar#DATE}、{@link Calendar#HOUR_OF_DAY}、 {@link Calendar#MINUTE}、{@link
+     * Calendar#SECOND} 与 {@link Calendar#MILLISECOND}。 小于等于 DAY 的片段返回 0。
      *
      * <ul>
-     *   <li>2008-01-28，fragment 为 Calendar.MONTH，返回 28
-     *       （等价于 calendar.get(Calendar.DAY_OF_MONTH)）
-     *   <li>2008-02-28，fragment 为 Calendar.MONTH，返回 28
-     *       （等价于 calendar.get(Calendar.DAY_OF_MONTH)）
-     *   <li>2008-01-28，fragment 为 Calendar.YEAR，返回 28
-     *       （等价于 calendar.get(Calendar.DAY_OF_YEAR)）
-     *   <li>2008-02-28，fragment 为 Calendar.YEAR，返回 59
-     *       （等价于 calendar.get(Calendar.DAY_OF_YEAR)）
+     *   <li>2008-01-28，fragment 为 Calendar.MONTH，返回 28 （等价于 calendar.get(Calendar.DAY_OF_MONTH)）
+     *   <li>2008-02-28，fragment 为 Calendar.MONTH，返回 28 （等价于 calendar.get(Calendar.DAY_OF_MONTH)）
+     *   <li>2008-01-28，fragment 为 Calendar.YEAR，返回 28 （等价于 calendar.get(Calendar.DAY_OF_YEAR)）
+     *   <li>2008-02-28，fragment 为 Calendar.YEAR，返回 59 （等价于 calendar.get(Calendar.DAY_OF_YEAR)）
      *   <li>2008-01-28，fragment 为 Calendar.MILLISECOND，返回 0（毫秒无法再细分）
      * </ul>
      *
@@ -1867,9 +1818,8 @@ public class GutilDate {
     /**
      * ISO8601 格式的日期时间格式化器（不带时区）。使用模式 <tt>yyyy-MM-dd'T'HH:mm:ss</tt>。
      *
-     * <p>该常量为公共 API，供需要 ISO 日期时间文本（如接口报文、日志字段）的场景复用。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）；
-     * 若需 UTC 输出请使用 {@link #ISO_DATETIME_TIME_ZONE_FORMAT} 或自行指定时区。
+     * <p>该常量为公共 API，供需要 ISO 日期时间文本（如接口报文、日志字段）的场景复用。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）； 若需 UTC 输出请使用 {@link #ISO_DATETIME_TIME_ZONE_FORMAT} 或自行指定时区。
      */
     public static final GuFastDateFormat ISO_DATETIME_FORMAT =
             GuFastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss");
@@ -1877,8 +1827,8 @@ public class GutilDate {
     /**
      * ISO8601 格式的日期时间格式化器（带时区）。使用模式 <tt>yyyy-MM-dd'T'HH:mm:ssZZ</tt>。
      *
-     * <p>该常量为公共 API，供需要带时区偏移的 ISO 日期时间文本（如 HTTP/JSON 时间戳）的场景复用。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该常量为公共 API，供需要带时区偏移的 ISO 日期时间文本（如 HTTP/JSON 时间戳）的场景复用。 <b>时区语义：</b>未指定时区，格式化时使用 JVM
+     * 默认时区（{@link TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat ISO_DATETIME_TIME_ZONE_FORMAT =
             GuFastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssZZ");
@@ -1886,8 +1836,8 @@ public class GutilDate {
     /**
      * ISO8601 格式的日期格式化器（不带时区）。使用模式 <tt>yyyy-MM-dd</tt>。
      *
-     * <p>该常量为公共 API，供需要 ISO 日期文本（如按天分桶的键）的场景复用。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该常量为公共 API，供需要 ISO 日期文本（如按天分桶的键）的场景复用。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat ISO_DATE_FORMAT =
             GuFastDateFormat.getInstance("yyyy-MM-dd");
@@ -1895,8 +1845,8 @@ public class GutilDate {
     /**
      * ISO8601 风格的日期格式化器（带时区）。使用模式 <tt>yyyy-MM-ddZZ</tt>。
      *
-     * <p>该模式不符合正式的 ISO8601 规范（标准不允许只有时区而没有时间）。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该模式不符合正式的 ISO8601 规范（标准不允许只有时区而没有时间）。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat ISO_DATE_TIME_ZONE_FORMAT =
             GuFastDateFormat.getInstance("yyyy-MM-ddZZ");
@@ -1920,8 +1870,8 @@ public class GutilDate {
     /**
      * ISO8601 风格的时间格式化器（不带时区）。使用模式 <tt>HH:mm:ss</tt>。
      *
-     * <p>该模式不符合正式的 ISO8601 规范（标准要求时间带 'T' 前缀）。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该模式不符合正式的 ISO8601 规范（标准要求时间带 'T' 前缀）。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat ISO_TIME_NO_T_FORMAT =
             GuFastDateFormat.getInstance("HH:mm:ss");
@@ -1929,18 +1879,17 @@ public class GutilDate {
     /**
      * ISO8601 风格的时间格式化器（带时区）。使用模式 <tt>HH:mm:ssZZ</tt>。
      *
-     * <p>该模式不符合正式的 ISO8601 规范（标准要求时间带 'T' 前缀）。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该模式不符合正式的 ISO8601 规范（标准要求时间带 'T' 前缀）。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat ISO_TIME_NO_T_TIME_ZONE_FORMAT =
             GuFastDateFormat.getInstance("HH:mm:ssZZ");
 
     /**
-     * SMTP（以及其它类似协议）日期头格式化器。使用模式 <tt>EEE, dd MMM yyyy HH:mm:ss Z</tt>，
-     * 语言环境为 {@link Locale#US}。
+     * SMTP（以及其它类似协议）日期头格式化器。使用模式 <tt>EEE, dd MMM yyyy HH:mm:ss Z</tt>， 语言环境为 {@link Locale#US}。
      *
-     * <p>该常量为公共 API，供邮件协议头等需要英文星期/月份缩写的场景复用。
-     * <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link TimeZone#getDefault()}）。
+     * <p>该常量为公共 API，供邮件协议头等需要英文星期/月份缩写的场景复用。 <b>时区语义：</b>未指定时区，格式化时使用 JVM 默认时区（{@link
+     * TimeZone#getDefault()}）。
      */
     public static final GuFastDateFormat SMTP_DATETIME_FORMAT =
             GuFastDateFormat.getInstance("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
@@ -1948,9 +1897,8 @@ public class GutilDate {
     /**
      * 按指定模式格式化毫秒时间戳，使用 UTC 时区。
      *
-     * <p><b>时区语义：</b>固定使用 UTC（{@link #UTC_TIME_ZONE}），不随 JVM 默认时区变化；
-     * 与 {@link #parseDate(String, String[], TimeZone)}（传入 {@link #UTC_TIME_ZONE}）可构成
-     * 往返一致。
+     * <p><b>时区语义：</b>固定使用 UTC（{@link #UTC_TIME_ZONE}），不随 JVM 默认时区变化； 与 {@link #parseDate(String,
+     * String[], TimeZone)}（传入 {@link #UTC_TIME_ZONE}）可构成 往返一致。
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
@@ -1964,9 +1912,8 @@ public class GutilDate {
     /**
      * 按指定模式格式化日期，使用 UTC 时区。
      *
-     * <p><b>时区语义：</b>固定使用 UTC（{@link #UTC_TIME_ZONE}），不随 JVM 默认时区变化；
-     * 与 {@link #parseDate(String, String[], TimeZone)}（传入 {@link #UTC_TIME_ZONE}）可构成
-     * 往返一致。
+     * <p><b>时区语义：</b>固定使用 UTC（{@link #UTC_TIME_ZONE}），不随 JVM 默认时区变化； 与 {@link #parseDate(String,
+     * String[], TimeZone)}（传入 {@link #UTC_TIME_ZONE}）可构成 往返一致。
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式
@@ -1984,8 +1931,8 @@ public class GutilDate {
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
-     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）； 当模式包含
+     *     "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 格式化后的日期字符串
      * @throws IllegalArgumentException 如果模式为 null 或非法
      */
@@ -2000,8 +1947,8 @@ public class GutilDate {
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式
-     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）； 当模式包含
+     *     "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 格式化后的日期字符串
      * @throws IllegalArgumentException 如果日期为 null，或模式为 null/非法
      */
@@ -2012,8 +1959,8 @@ public class GutilDate {
     /**
      * 按指定模式格式化毫秒时间戳。
      *
-     * <p><b>时区语义：</b>使用 JVM 默认时区（{@link TimeZone#getDefault()}）与默认语言环境；
-     * 需要 UTC 时请使用 {@link #formatUTC(long, String)}。
+     * <p><b>时区语义：</b>使用 JVM 默认时区（{@link TimeZone#getDefault()}）与默认语言环境； 需要 UTC 时请使用 {@link
+     * #formatUTC(long, String)}。
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
@@ -2027,8 +1974,8 @@ public class GutilDate {
     /**
      * 按指定模式格式化日期。
      *
-     * <p><b>时区语义：</b>使用 JVM 默认时区（{@link TimeZone#getDefault()}）与默认语言环境；
-     * 需要 UTC 时请使用 {@link #formatUTC(Date, String)}。
+     * <p><b>时区语义：</b>使用 JVM 默认时区（{@link TimeZone#getDefault()}）与默认语言环境； 需要 UTC 时请使用 {@link
+     * #formatUTC(Date, String)}。
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式
@@ -2058,8 +2005,8 @@ public class GutilDate {
     /**
      * 按指定模式与指定时区格式化毫秒时间戳。
      *
-     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
@@ -2074,8 +2021,8 @@ public class GutilDate {
     /**
      * 按指定模式与指定时区格式化日期。
      *
-     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式
@@ -2111,8 +2058,8 @@ public class GutilDate {
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
-     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）； 当模式包含
+     *     "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 格式化后的日期字符串
      * @throws IllegalArgumentException 如果模式为 null 或非法
      */
@@ -2127,8 +2074,8 @@ public class GutilDate {
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式
-     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）；
-     *     当模式包含 "MMM"（月份缩写）等文本元素时建议显式指定
+     * @param locale 使用的语言环境，可以为 <code>null</code>（null 表示 JVM 默认语言环境）； 当模式包含
+     *     "MMM"（月份缩写）等文本元素时建议显式指定
      * @return 格式化后的日期字符串
      * @throws IllegalArgumentException 如果日期为 null，或模式为 null/非法
      */
@@ -2156,8 +2103,8 @@ public class GutilDate {
     /**
      * 按指定模式、时区与语言环境格式化毫秒时间戳。
      *
-     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
      *
      * @param millis 以毫秒表示的要格式化的时间
      * @param pattern 格式化模式
@@ -2173,12 +2120,11 @@ public class GutilDate {
     /**
      * 按指定模式、时区与语言环境格式化日期。
      *
-     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区
-     * （{@link TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
+     * <p><b>时区语义：</b>按指定的时区格式化；若 {@code timeZone} 为 null，则使用 JVM 默认时区 （{@link
+     * TimeZone#getDefault()}）。需要 UTC 时请传入 {@link #UTC_TIME_ZONE}。
      *
      * <p><b>性能说明：</b>本方法通过 {@link GuFastDateFormat#getInstance(String, TimeZone, Locale)}
-     * 获取格式化器，该方法是 synchronized 的，但内部按（模式、时区、语言环境）缓存实例，重复调用
-     * 相同参数时命中缓存，无需重复解析模式。
+     * 获取格式化器，该方法是 synchronized 的，但内部按（模式、时区、语言环境）缓存实例，重复调用 相同参数时命中缓存，无需重复解析模式。
      *
      * @param date 要格式化的日期，不可为 null
      * @param pattern 格式化模式，不可为 null
@@ -2205,8 +2151,7 @@ public class GutilDate {
      * <p><b>时区语义：</b>若 {@code timeZone} 非 null，则优先使用该时区；否则保留日历自身的时区。
      *
      * <p><b>性能说明：</b>本方法通过 {@link GuFastDateFormat#getInstance(String, TimeZone, Locale)}
-     * 获取格式化器，该方法是 synchronized 的，但内部按（模式、时区、语言环境）缓存实例，重复调用
-     * 相同参数时命中缓存，无需重复解析模式。
+     * 获取格式化器，该方法是 synchronized 的，但内部按（模式、时区、语言环境）缓存实例，重复调用 相同参数时命中缓存，无需重复解析模式。
      *
      * @param calendar 要格式化的日历，不可为 null
      * @param pattern 格式化模式，不可为 null

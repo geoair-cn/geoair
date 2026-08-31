@@ -64,7 +64,9 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
 
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .getCRS(writeConfig.getOutPutSrid());
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder typeBuilder =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
@@ -87,7 +89,8 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             GirAdvOneRow girAdvOneRow, ExceptionConsumer exceptionConsumer) {
         try {
             if (!headerWritten || featureType == null) {
-                throw new IllegalStateException("请先调用 writeHeader(SimpleFeatureType, ExceptionConsumer) 初始化表头");
+                throw new IllegalStateException(
+                        "请先调用 writeHeader(SimpleFeatureType, ExceptionConsumer) 初始化表头");
             }
             if (girAdvOneRow == null || girAdvOneRow.isEmpty()) {
                 return this;
@@ -117,7 +120,9 @@ public class GeoJsonGeoFileWriter implements GeoFileWriter {
             GeoJSONWriter geoJsonWriter = new GeoJSONWriter(fos);
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem crs =
-                        GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .getCRS(writeConfig.getOutPutSrid());
                 try {
                     GutilReflection.setFieldValue(geoJsonWriter, "outCRS", crs);
                 } catch (Exception reflectionException) {

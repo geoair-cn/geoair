@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 
-/**
- * {@link OgnlUtil} 的单元测试。
- */
+/** {@link OgnlUtil} 的单元测试。 */
 public class OgnlUtilTest {
 
     @Test
@@ -92,7 +90,7 @@ public class OgnlUtilTest {
     @Test
     public void testGetIterable_array() {
         Map<String, Object> root = new HashMap<>();
-        root.put("arr", new int[]{1, 2, 3});
+        root.put("arr", new int[] {1, 2, 3});
 
         Iterable<?> result = OgnlUtil.getIterable("arr", root);
         int count = 0;

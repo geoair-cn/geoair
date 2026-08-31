@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 import cn.geoair.comp.db.service.core.utils.TokenManager;
 import org.junit.Test;
 
-/**
- * {@link TokenManager} 的单元测试。
- */
+/** {@link TokenManager} 的单元测试。 */
 public class TokenManagerTest {
 
     @Test

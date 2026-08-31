@@ -6,12 +6,13 @@ import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
-
 public class TileBoundsTest {
 
     public static void main(String[] args) {
         // 测试用例1：你原用例（内蒙古一带，矩形）
-        testCase("POLYGON((107.18924385362766 40.01587053579636,107.18865838440078 45.075679489623326,109.38964179001998 45.07550027237384,109.39029580617311 40.01569977930946,107.18924385362766 40.01587053579636))", 7);
+        testCase(
+                "POLYGON((107.18924385362766 40.01587053579636,107.18865838440078 45.075679489623326,109.38964179001998 45.07550027237384,109.39029580617311 40.01569977930946,107.18924385362766 40.01587053579636))",
+                7);
 
         // 测试用例2：北京小范围
         testCase("POLYGON((116.3 39.8,116.3 40.1,116.6 40.1,116.6 39.8,116.3 39.8))", 10);
@@ -28,6 +29,7 @@ public class TileBoundsTest {
 
     /**
      * 通用测试方法
+     *
      * @param wkt 4326的WKT
      * @param zoom 瓦片层级
      */
@@ -46,14 +48,16 @@ public class TileBoundsTest {
             System.out.println("原始外包矩形(4326): " + box1.getWktString(4326));
 
             // 3. 按瓦片网格计算外包矩形
-            RangeApo rangeApo = GirAdvTools.getTileGrid3857Opt().tileRangeByBox(zoom, envelope3857, 3857);
-            BoxReferencedEnvelope box2 = GirAdvTools.getTileGrid3857Opt().boundsFromRangeApo(rangeApo, 4326);
+            RangeApo rangeApo =
+                    GirAdvTools.getTileGrid3857Opt().tileRangeByBox(zoom, envelope3857, 3857);
+            BoxReferencedEnvelope box2 =
+                    GirAdvTools.getTileGrid3857Opt().boundsFromRangeApo(rangeApo, 4326);
             System.out.println("瓦片网格外包矩形(4326): " + box2.getWktString(4326));
 
             // 4. 包含关系判断
             boolean contains = box2.getJtsEnvelope().contains(box1.getJtsEnvelope());
 
-            System.out.println(box1.getWktString(4326)+";"+box2.getWktString(4326));
+            System.out.println(box1.getWktString(4326) + ";" + box2.getWktString(4326));
 
             System.out.println("瓦片包围是否包含原始范围: " + contains);
 

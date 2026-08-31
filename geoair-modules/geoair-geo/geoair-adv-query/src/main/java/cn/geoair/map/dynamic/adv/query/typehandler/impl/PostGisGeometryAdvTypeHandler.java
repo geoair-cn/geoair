@@ -38,7 +38,8 @@ public class PostGisGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
     @Override
     protected Object writeGeometry(Geometry value) {
-        String wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
+        String wkt =
+                GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
         if (wkt == null) {
             return null;
         }

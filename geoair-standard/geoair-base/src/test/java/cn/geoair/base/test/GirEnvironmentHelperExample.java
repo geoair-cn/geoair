@@ -3,9 +3,7 @@ package cn.geoair.base.test;
 import cn.geoair.base.env.GiEnvironmenter;
 import cn.geoair.base.env.GirEnvironmentHelper;
 
-/**
- * GirEnvironmentHelper 入口示例
- */
+/** GirEnvironmentHelper 入口示例 */
 public class GirEnvironmentHelperExample {
 
     public static void main(String[] args) {

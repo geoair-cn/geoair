@@ -5,9 +5,7 @@ import cn.geoair.comp.code.generator.multi.config.OrmType;
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
 import cn.hutool.core.date.DateUtil;
-
 import java.util.*;
-
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
@@ -47,13 +45,9 @@ public class VelocityUtils {
         velocityContext.put(
                 "ormPackge",
                 globalConfig.getOrmType().equals(OrmType.MYBATISPLUS) ? "mp" : "mapper");
-        velocityContext.put(
-                "mutiIs",
-                globalConfig.getMutiIs());
+        velocityContext.put("mutiIs", globalConfig.getMutiIs());
 
-        velocityContext.put(
-                "controllerModuleName",
-                globalConfig.getControllerModuleName());
+        velocityContext.put("controllerModuleName", globalConfig.getControllerModuleName());
 
         velocityContext.put(
                 "functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
@@ -122,9 +116,7 @@ public class VelocityUtils {
         return templates;
     }
 
-    /**
-     * 添加基础模板（抽离方法，提升可读性）
-     */
+    /** 添加基础模板（抽离方法，提升可读性） */
     private static void addBaseTemplates(List<String> templates, GirGeneratorConfig globalConfig) {
         if (globalConfig.getOrmType().equals(OrmType.MYBATISPLUS)) {
             templates.add("vm/java/model/rx-po-mplus.java.vm");
@@ -197,9 +189,7 @@ public class VelocityUtils {
         return StringUtils.join(dicts, ", ");
     }
 
-    /**
-     * 初始化vm方法
-     */
+    /** 初始化vm方法 */
     public static void initVelocity() {
         Properties p = new Properties();
         try {

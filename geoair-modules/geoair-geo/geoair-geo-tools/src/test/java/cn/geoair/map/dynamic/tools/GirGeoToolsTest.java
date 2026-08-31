@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.tools;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.geoair.map.dynamic.tools.measure.GirGeoMeasureUtils;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
 /** GirGeoTools 按配置复用与 CRS 异常语义测试。 */
 public class GirGeoToolsTest {

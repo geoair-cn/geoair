@@ -1,12 +1,10 @@
 package cn.geoair.base.log.processor;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -14,62 +12,67 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import org.junit.Test;
 
 /**
  * {@link GirLog4jProcessor} 编译期验证测试。
- * <p>
- * 通过 javax.tools 编程式编译带 {@code @GirLog4j} 的临时源码，验证：
- * 字段注入、已有字段跳过、topic 模式、非法标注报错。
+ *
+ * <p>通过 javax.tools 编程式编译带 {@code @GirLog4j} 的临时源码，验证： 字段注入、已有字段跳过、topic 模式、非法标注报错。
  */
 public class GirLog4jProcessorTest {
 
-    private static final String DEMO_LOG = "package com.geoair.test;\n"
-            + "import cn.geoair.base.log.GirLog4j;\n"
-            + "@GirLog4j\n"
-            + "public class DemoLog {\n"
-            + "    public void say() {\n"
-            + "        log.info(\"hello {}\", 1);\n"
-            + "        log.error(\"boom\");\n"
-            + "    }\n"
-            + "}\n";
+    private static final String DEMO_LOG =
+            "package com.geoair.test;\n"
+                    + "import cn.geoair.base.log.GirLog4j;\n"
+                    + "@GirLog4j\n"
+                    + "public class DemoLog {\n"
+                    + "    public void say() {\n"
+                    + "        log.info(\"hello {}\", 1);\n"
+                    + "        log.error(\"boom\");\n"
+                    + "    }\n"
+                    + "}\n";
 
-    private static final String DEMO_SKIP = "package com.geoair.test;\n"
-            + "import cn.geoair.base.log.GirLog4j;\n"
-            + "import cn.geoair.base.log.GiLogger;\n"
-            + "import cn.geoair.base.log.GirLoggerFactory;\n"
-            + "@GirLog4j\n"
-            + "public class DemoSkip {\n"
-            + "    private static GiLogger log = GirLoggerFactory.getLogger(DemoSkip.class);\n"
-            + "}\n";
+    private static final String DEMO_SKIP =
+            "package com.geoair.test;\n"
+                    + "import cn.geoair.base.log.GirLog4j;\n"
+                    + "import cn.geoair.base.log.GiLogger;\n"
+                    + "import cn.geoair.base.log.GirLoggerFactory;\n"
+                    + "@GirLog4j\n"
+                    + "public class DemoSkip {\n"
+                    + "    private static GiLogger log = GirLoggerFactory.getLogger(DemoSkip.class);\n"
+                    + "}\n";
 
-    private static final String DEMO_TOPIC = "package com.geoair.test;\n"
-            + "import cn.geoair.base.log.GirLog4j;\n"
-            + "@GirLog4j(topic = \"myTopic\", useFinal = true, fieldName = \"logger\")\n"
-            + "public class DemoTopic {\n"
-            + "    public void say() {\n"
-            + "        logger.warn(\"topic log\");\n"
-            + "    }\n"
-            + "}\n";
+    private static final String DEMO_TOPIC =
+            "package com.geoair.test;\n"
+                    + "import cn.geoair.base.log.GirLog4j;\n"
+                    + "@GirLog4j(topic = \"myTopic\", useFinal = true, fieldName = \"logger\")\n"
+                    + "public class DemoTopic {\n"
+                    + "    public void say() {\n"
+                    + "        logger.warn(\"topic log\");\n"
+                    + "    }\n"
+                    + "}\n";
 
-    private static final String DEMO_INTERFACE = "package com.geoair.test;\n"
-            + "import cn.geoair.base.log.GirLog4j;\n"
-            + "@GirLog4j\n"
-            + "public interface DemoInterface {\n"
-            + "}\n";
+    private static final String DEMO_INTERFACE =
+            "package com.geoair.test;\n"
+                    + "import cn.geoair.base.log.GirLog4j;\n"
+                    + "@GirLog4j\n"
+                    + "public interface DemoInterface {\n"
+                    + "}\n";
 
     @Test
     public void testInjectLogField() throws Exception {
         File classesDir = compile("com.geoair.test.DemoLog", DEMO_LOG);
-        URLClassLoader loader = new URLClassLoader(new URL[] {classesDir.toURI().toURL()},
-                GirLog4jProcessorTest.class.getClassLoader());
+        URLClassLoader loader =
+                new URLClassLoader(
+                        new URL[] {classesDir.toURI().toURL()},
+                        GirLog4jProcessorTest.class.getClassLoader());
         Class<?> clazz = Class.forName("com.geoair.test.DemoLog", false, loader);
         Field field = clazz.getDeclaredField("log");
         assertEquals("字段必须为静态", true, Modifier.isStatic(field.getModifiers()));
@@ -83,8 +86,10 @@ public class GirLog4jProcessorTest {
     @Test
     public void testExistingFieldSkipped() throws Exception {
         File classesDir = compile("com.geoair.test.DemoSkip", DEMO_SKIP);
-        URLClassLoader loader = new URLClassLoader(new URL[] {classesDir.toURI().toURL()},
-                GirLog4jProcessorTest.class.getClassLoader());
+        URLClassLoader loader =
+                new URLClassLoader(
+                        new URL[] {classesDir.toURI().toURL()},
+                        GirLog4jProcessorTest.class.getClassLoader());
         Class<?> clazz = Class.forName("com.geoair.test.DemoSkip", false, loader);
         Field[] fields = clazz.getDeclaredFields();
         int logCount = 0;
@@ -100,8 +105,10 @@ public class GirLog4jProcessorTest {
     @Test
     public void testTopicAndCustomField() throws Exception {
         File classesDir = compile("com.geoair.test.DemoTopic", DEMO_TOPIC);
-        URLClassLoader loader = new URLClassLoader(new URL[] {classesDir.toURI().toURL()},
-                GirLog4jProcessorTest.class.getClassLoader());
+        URLClassLoader loader =
+                new URLClassLoader(
+                        new URL[] {classesDir.toURI().toURL()},
+                        GirLog4jProcessorTest.class.getClassLoader());
         Class<?> clazz = Class.forName("com.geoair.test.DemoTopic", false, loader);
         Field field = clazz.getDeclaredField("logger");
         assertEquals("自定义字段名生效", "logger", field.getName());
@@ -113,13 +120,10 @@ public class GirLog4jProcessorTest {
     public void testInterfaceRejected() throws Exception {
         CompileResult result = tryCompile("com.geoair.test.DemoInterface", DEMO_INTERFACE);
         assertFalse("接口上标注 @GirLog4j 应编译失败", result.success);
-        assertTrue("应输出中文错误提示: " + result.messages,
-                result.messages.contains("只能标注在类上"));
+        assertTrue("应输出中文错误提示: " + result.messages, result.messages.contains("只能标注在类上"));
     }
 
-    /**
-     * 编译结果。
-     */
+    /** 编译结果。 */
     private static class CompileResult {
         final boolean success;
         final String messages;
@@ -132,9 +136,7 @@ public class GirLog4jProcessorTest {
         }
     }
 
-    /**
-     * 编程式编译指定源码，断言编译成功并返回输出目录。
-     */
+    /** 编程式编译指定源码，断言编译成功并返回输出目录。 */
     private static File compile(String className, String source) throws Exception {
         CompileResult result = tryCompile(className, source);
         assertTrue("编译失败:\n" + result.messages, result.success);
@@ -147,17 +149,26 @@ public class GirLog4jProcessorTest {
         srcFile.getParentFile().mkdirs();
         Files.write(srcFile.toPath(), source.getBytes(StandardCharsets.UTF_8));
 
-        JavaCompiler compiler = (JavaCompiler) Class.forName("com.sun.tools.javac.api.JavacTool").newInstance();
+        JavaCompiler compiler =
+                (JavaCompiler) Class.forName("com.sun.tools.javac.api.JavacTool").newInstance();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
-                StandardCharsets.UTF_8);
+        StandardJavaFileManager fileManager =
+                compiler.getStandardFileManager(diagnostics, null, StandardCharsets.UTF_8);
         File classesDir = new File(dir, "classes");
         classesDir.mkdirs();
-        List<String> options = Arrays.asList(
-                "-classpath", System.getProperty("java.class.path"),
-                "-d", classesDir.getAbsolutePath());
-        boolean success = compiler.getTask(null, fileManager, diagnostics, options, null,
-                fileManager.getJavaFileObjects(srcFile)).call();
+        List<String> options =
+                Arrays.asList(
+                        "-classpath", System.getProperty("java.class.path"),
+                        "-d", classesDir.getAbsolutePath());
+        boolean success =
+                compiler.getTask(
+                                null,
+                                fileManager,
+                                diagnostics,
+                                options,
+                                null,
+                                fileManager.getJavaFileObjects(srcFile))
+                        .call();
         StringBuilder sb = new StringBuilder();
         for (Diagnostic<? extends JavaFileObject> d : diagnostics.getDiagnostics()) {
             sb.append(d.getKind()).append(": ").append(d.getMessage(null)).append("\n");

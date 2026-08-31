@@ -5,12 +5,14 @@ import java.util.*;
 
 /**
  * 动态 SQL 生成的运行时上下文，贯穿整个 SQL 解析过程。
- * <p>
- * 职责：
+ *
+ * <p>职责：
+ *
  * <ul>
- *   <li><b>SQL 拼接</b> — 通过 {@link #appendSql(String)} 逐步构建最终 SQL</li>
- *   <li><b>参数收集</b> — 通过 {@link #addParameter(Object)} 收集 {@code #{}} 对应的 JDBC 参数值</li>
- *   <li><b>表达式求值</b> — 通过 {@link #getOgnlValue(String)} 和 {@link #getOgnlBooleanValue(String)} 对 OGNL 表达式求值</li>
+ *   <li><b>SQL 拼接</b> — 通过 {@link #appendSql(String)} 逐步构建最终 SQL
+ *   <li><b>参数收集</b> — 通过 {@link #addParameter(Object)} 收集 {@code #{}} 对应的 JDBC 参数值
+ *   <li><b>表达式求值</b> — 通过 {@link #getOgnlValue(String)} 和 {@link #getOgnlBooleanValue(String)} 对
+ *       OGNL 表达式求值
  * </ul>
  *
  * @author zhangjun

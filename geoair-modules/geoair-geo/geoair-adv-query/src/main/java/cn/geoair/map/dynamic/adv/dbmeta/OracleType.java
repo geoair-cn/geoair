@@ -2,9 +2,7 @@ package cn.geoair.map.dynamic.adv.dbmeta;
 
 import java.util.*;
 
-/**
- * Oracle 数据类型与Java类型映射枚举
- */
+/** Oracle 数据类型与Java类型映射枚举 */
 public enum OracleType implements DataBaseFieldType {
 
     // 字符串类
@@ -22,19 +20,32 @@ public enum OracleType implements DataBaseFieldType {
     NUMBER("number", "NUMBER", DefaultJavaType.JAVA_NUMERIC, CategoryEnum.FLOAT),
     FLOAT("float", "FLOAT", DefaultJavaType.JAVA_FLOAT, CategoryEnum.FLOAT),
     BINARY_FLOAT("binary_float", "BINARY_FLOAT", DefaultJavaType.JAVA_FLOAT, CategoryEnum.FLOAT),
-    BINARY_DOUBLE("binary_double", "BINARY_DOUBLE", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
+    BINARY_DOUBLE(
+            "binary_double", "BINARY_DOUBLE", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
 
     // 日期时间类
     DATE("date", "DATE", DefaultJavaType.JAVA_DATE, CategoryEnum.DATE),
     TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_SQL_TIMESTAMP, CategoryEnum.TIMESTAMP),
-    TIMESTAMP_WITH_TIME_ZONE("timestamp with time zone", "TIMESTAMP WITH TIME ZONE",
-            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
-    TIMESTAMP_WITH_LOCAL_TIME_ZONE("timestamp with local time zone", "TIMESTAMP WITH LOCAL TIME ZONE",
-            DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
-    INTERVAL_YEAR_TO_MONTH("interval year to month", "INTERVAL YEAR TO MONTH",
-            DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
-    INTERVAL_DAY_TO_SECOND("interval day to second", "INTERVAL DAY TO SECOND",
-            DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
+    TIMESTAMP_WITH_TIME_ZONE(
+            "timestamp with time zone",
+            "TIMESTAMP WITH TIME ZONE",
+            DefaultJavaType.JAVA_OFFSET_DATE_TIME,
+            CategoryEnum.TIMESTAMP),
+    TIMESTAMP_WITH_LOCAL_TIME_ZONE(
+            "timestamp with local time zone",
+            "TIMESTAMP WITH LOCAL TIME ZONE",
+            DefaultJavaType.JAVA_OFFSET_DATE_TIME,
+            CategoryEnum.TIMESTAMP),
+    INTERVAL_YEAR_TO_MONTH(
+            "interval year to month",
+            "INTERVAL YEAR TO MONTH",
+            DefaultJavaType.JAVA_INTERVAL,
+            CategoryEnum.INTERVAL),
+    INTERVAL_DAY_TO_SECOND(
+            "interval day to second",
+            "INTERVAL DAY TO SECOND",
+            DefaultJavaType.JAVA_INTERVAL,
+            CategoryEnum.INTERVAL),
 
     // 二进制类
     BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CategoryEnum.BLOB),
@@ -46,8 +57,13 @@ public enum OracleType implements DataBaseFieldType {
     XMLTYPE("xmltype", "XMLTYPE", DefaultJavaType.JAVA_STRING, CategoryEnum.TEXT),
 
     // 空间类型（多个变体名都指向同一个逻辑类型）
-    SDO_GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "sdo_geometry", "SDO_GEOMETRY", "MDSYS.SDO_GEOMETRY", "mdsys.sdo_geometry");
+    SDO_GEOMETRY(
+            DefaultJavaType.JAVA_GEOMETRY,
+            CategoryEnum.GEOMETRY,
+            "sdo_geometry",
+            "SDO_GEOMETRY",
+            "MDSYS.SDO_GEOMETRY",
+            "mdsys.sdo_geometry");
 
     private final List<String> udtNames;
     private final String standardName;
@@ -64,19 +80,16 @@ public enum OracleType implements DataBaseFieldType {
         }
     }
 
-    /**
-     * 单一 udtName 的构造器
-     */
-    OracleType(String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
+    /** 单一 udtName 的构造器 */
+    OracleType(
+            String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
         this.category = category;
     }
 
-    /**
-     * 多个 udtName 变体的构造器
-     */
+    /** 多个 udtName 变体的构造器 */
     OracleType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();

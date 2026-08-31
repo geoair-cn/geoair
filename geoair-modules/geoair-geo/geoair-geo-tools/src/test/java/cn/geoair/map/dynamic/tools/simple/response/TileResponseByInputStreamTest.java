@@ -10,7 +10,8 @@ import org.junit.Test;
 public class TileResponseByInputStreamTest {
 
     @Test
-    public void shouldNotTreatAvailableAsContentLengthAndShouldCacheConsumedStream() throws IOException {
+    public void shouldNotTreatAvailableAsContentLengthAndShouldCacheConsumedStream()
+            throws IOException {
         byte[] content = new byte[] {1, 2, 3};
         ZeroAvailableInputStream inputStream = new ZeroAvailableInputStream(content);
         TileResponseByInputStream response = TileResponseByInputStream.success(inputStream, null);
@@ -29,8 +30,9 @@ public class TileResponseByInputStreamTest {
 
     @Test
     public void shouldKeepExplicitContentLengthWhenProvided() {
-        TileResponseByInputStream response = TileResponseByInputStream.success(
-                new ByteArrayInputStream(new byte[] {1, 2, 3}), null, 3L);
+        TileResponseByInputStream response =
+                TileResponseByInputStream.success(
+                        new ByteArrayInputStream(new byte[] {1, 2, 3}), null, 3L);
 
         Assert.assertEquals(Long.valueOf(3L), response.getContentLength());
     }

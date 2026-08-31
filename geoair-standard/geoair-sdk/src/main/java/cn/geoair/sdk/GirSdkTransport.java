@@ -1,5 +1,7 @@
 package cn.geoair.sdk;
 
+import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
+import cn.geoair.sdk.body.GiRequestBody;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -9,9 +11,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
-import cn.geoair.sdk.body.GiRequestBody;
 
 final class GirSdkTransport {
 
@@ -45,7 +44,8 @@ final class GirSdkTransport {
         }
 
         if (conn.getResponseCode() != 200) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), charsetName));
+            BufferedReader br =
+                    new BufferedReader(new InputStreamReader(conn.getErrorStream(), charsetName));
             try {
                 GirSdkUtil.parseError(readBody(br));
             } finally {
@@ -54,7 +54,8 @@ final class GirSdkTransport {
             }
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), charsetName));
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(conn.getInputStream(), charsetName));
         try {
             String resString = readBody(br);
             GirSdkUtil.logTransportResult(timeStamp, "POST", resString);
@@ -65,15 +66,15 @@ final class GirSdkTransport {
         }
     }
 
-    static String get(String urlStr, Map<String, Object> data, Charset charsetName) throws Exception {
+    static String get(String urlStr, Map<String, Object> data, Charset charsetName)
+            throws Exception {
 
         String newUrl = urlStr;
 
         Long timeStamp = Long.valueOf(System.currentTimeMillis());
         if (data == null || data.isEmpty()) {
             newUrl = appendUrl(newUrl, "_", timeStamp.toString(), false, charsetName);
-        }
-        else {
+        } else {
             Map<String, Object> queryData = new LinkedHashMap<>(data);
             queryData.put("_", timeStamp);
             newUrl = appendUrl(urlStr, queryData, true, charsetName);
@@ -89,7 +90,8 @@ final class GirSdkTransport {
         conn.connect();
 
         if (conn.getResponseCode() != 200) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), charsetName));
+            BufferedReader br =
+                    new BufferedReader(new InputStreamReader(conn.getErrorStream(), charsetName));
             try {
                 GirSdkUtil.parseError(readBody(br));
             } finally {
@@ -98,7 +100,8 @@ final class GirSdkTransport {
             }
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), charsetName));
+        BufferedReader br =
+                new BufferedReader(new InputStreamReader(conn.getInputStream(), charsetName));
         try {
             String resString = readBody(br);
             GirSdkUtil.logTransportResult(timeStamp, "GET", resString);
@@ -109,28 +112,34 @@ final class GirSdkTransport {
         }
     }
 
-    static String appendUrl(String url, Map<String, Object> data, boolean encodeValue, Charset charsetName)
+    static String appendUrl(
+            String url, Map<String, Object> data, boolean encodeValue, Charset charsetName)
             throws Exception {
         if (data == null || data.isEmpty()) {
             return url;
         }
         if (url.contains("?")) {
             return url + "&" + mapToUrl(data, encodeValue, charsetName);
-        }
-        else {
+        } else {
             return url + "?" + mapToUrl(data, encodeValue, charsetName);
         }
     }
 
-    static String appendUrl(String url, String key, String value, boolean encodeValue, Charset charsetName)
+    static String appendUrl(
+            String url, String key, String value, boolean encodeValue, Charset charsetName)
             throws Exception {
         if (value != null) {
             if (url.indexOf("?") >= 0) {
-                return url + "&" + key + "="
+                return url
+                        + "&"
+                        + key
+                        + "="
                         + (encodeValue ? URLEncoder.encode(value, charsetName.name()) : value);
-            }
-            else {
-                return url + "?" + key + "="
+            } else {
+                return url
+                        + "?"
+                        + key
+                        + "="
                         + (encodeValue ? URLEncoder.encode(value, charsetName.name()) : value);
             }
         }
@@ -148,8 +157,10 @@ final class GirSdkTransport {
             value = data.get(key);
             if (value != null) {
                 param.append(key).append("=");
-                param.append(encodeValue ? URLEncoder.encode(data.get(key).toString(), charsetName.name())
-                        : value.toString());
+                param.append(
+                        encodeValue
+                                ? URLEncoder.encode(data.get(key).toString(), charsetName.name())
+                                : value.toString());
                 param.append("&");
             }
         }

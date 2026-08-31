@@ -1,8 +1,8 @@
 package cn.geoair.map.dynamic.adv.query.dialect;
 
 import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
-import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.tx.*;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
 import cn.geoair.map.dynamic.adv.query.*;
@@ -20,7 +20,6 @@ import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.queryr.QueryRequestBuilder;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,20 +65,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         this.initByDataSource(dataSource, dataSourceName);
     }
 
-    public AbstractPxyAdvExecutor() {
-    }
+    public AbstractPxyAdvExecutor() {}
 
     public AbstractPxyAdvExecutor(Connection connection) {
         this.initByConnection(connection);
     }
 
-    /**
-     * 初始化所有功能模块代理对象
-     */
-    public void initProxyObjects() {
-
-    }
-
+    /** 初始化所有功能模块代理对象 */
+    public void initProxyObjects() {}
 
     // ==================== 数据源初始化与资源管理 ====================
     @Override
@@ -158,7 +151,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return this.getDataSourceGetter().getDataSource();
     }
 
-
     @Override
     public void connectionClose(Connection connection) {
         this.getDataSourceGetter().connectionClose(connection);
@@ -215,7 +207,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+    public void setTransactionConnectionHolder(
+            IDsTransactionConnectionHolder transactionConnectionHolder) {
         this.getDataSourceGetter().setTransactionConnectionHolder(transactionConnectionHolder);
     }
 
@@ -286,12 +279,17 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
+    public Integer bInsertBatch(
+            String tableName, List<String> headers, List<Map<String, Object>> rowsData) {
         return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData);
     }
 
     @Override
-    public Integer bInsertBatch(String tableName, List<String> headers, List<Map<String, Object>> rowsData, int batchSize) {
+    public Integer bInsertBatch(
+            String tableName,
+            List<String> headers,
+            List<Map<String, Object>> rowsData,
+            int batchSize) {
         return getAdvBaseOpt().bInsertBatch(tableName, headers, rowsData, batchSize);
     }
 
@@ -306,7 +304,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseOpt().bInsertBatch(entities, strategyConsumer);
     }
 
@@ -316,12 +315,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, AccessStrategy strategy) {
         return getAdvBaseOpt().bInsertBatch(tableName, entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertBatch(String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertBatch(
+            String tableName, Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseOpt().bInsertBatch(tableName, entities, strategyConsumer);
     }
 
@@ -331,7 +332,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertIgnore(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bInsertIgnore(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseOpt().bInsertIgnore(tableName, rowData, conflictKeys);
     }
 
@@ -366,7 +368,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bInsertIgnoreBatch(String tableName, Set<String> headers, List<Map<String, Object>> rowsData, List<String> conflictKeys) {
+    public Integer bInsertIgnoreBatch(
+            String tableName,
+            Set<String> headers,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys) {
         return getAdvBaseOpt().bInsertIgnoreBatch(tableName, headers, rowsData, conflictKeys);
     }
 
@@ -381,7 +387,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseOpt().bInsertIgnoreBatch(entities, strategyConsumer);
     }
 
@@ -391,12 +398,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, AccessStrategy strategy) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, AccessStrategy strategy) {
         return getAdvBaseOpt().bInsertSelectiveIgnoreBatch(entities, strategy);
     }
 
     @Override
-    public <T> Integer bInsertSelectiveIgnoreBatch(Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
+    public <T> Integer bInsertSelectiveIgnoreBatch(
+            Collection<T> entities, Consumer<AccessStrategy> strategyConsumer) {
         return getAdvBaseOpt().bInsertSelectiveIgnoreBatch(entities, strategyConsumer);
     }
 
@@ -463,7 +472,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void bDeleteBatchByPK(Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
+    public <T> void bDeleteBatchByPK(
+            Collection<T> entities, Consumer<DeleteStrategy> strategyConsumer) {
         getAdvBaseOpt().bDeleteBatchByPK(entities, strategyConsumer);
     }
 
@@ -478,12 +488,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseOpt().bDeleteByWhere(strategy, whereFilter);
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            DeleteStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bDeleteByWhere(strategy, consumer);
     }
 
@@ -493,12 +505,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(Consumer<DeleteStrategy> strategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            Consumer<DeleteStrategy> strategyConsumer,
+            Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bDeleteByWhere(strategyConsumer, consumer);
     }
 
     @Override
-    public <T> Integer bDeleteByWhere(String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bDeleteByWhere(
+            String tableName, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bDeleteByWhere(tableName, consumer);
     }
 
@@ -605,7 +620,6 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         getAdvBaseOpt().bSelectObjListStream(dynamicSql, sqlParam, clazz, rowConsumer);
     }
 
-
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseOpt().bSelectOne(sqlStatement, sqlParamList);
@@ -617,12 +631,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, SqlParamList sqlParamList, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseOpt().bSelectListStream(sqlStatement, sqlParamList, rowConsumer);
     }
 
     @Override
-    public List<List<Object>> bSelectListToValueList(String sqlStatement, SqlParamList sqlParamList) {
+    public List<List<Object>> bSelectListToValueList(
+            String sqlStatement, SqlParamList sqlParamList) {
         return getAdvBaseOpt().bSelectListToValueList(sqlStatement, sqlParamList);
     }
 
@@ -642,16 +658,21 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, SqlParamList sqlParamList, Class<E> clazz) {
         return getAdvBaseOpt().bSelectObjList(sqlStatement, sqlParamList, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, SqlParamList sqlParamList, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjListStream(
+            String sqlStatement,
+            SqlParamList sqlParamList,
+            Class<E> clazz,
+            Consumer<E> rowConsumer) {
         getAdvBaseOpt().bSelectObjListStream(sqlStatement, sqlParamList, clazz, rowConsumer);
     }
 
-    //=================================================
+    // =================================================
 
     @Override
     public GirAdvOneRow bSelectOne(String sqlStatement, GirSqlParam girSqlParam) {
@@ -664,7 +685,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bSelectListStream(String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
+    public void bSelectListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Consumer<GirAdvOneRow> rowConsumer) {
         getAdvBaseOpt().bSelectListStream(sqlStatement, girSqlParam, rowConsumer);
     }
 
@@ -689,18 +711,18 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <E> List<E> bSelectObjList(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
+    public <E> List<E> bSelectObjList(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz) {
         return getAdvBaseOpt().bSelectObjList(sqlStatement, girSqlParam, clazz);
     }
 
     @Override
-    public <E> void bSelectObjListStream(String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void bSelectObjListStream(
+            String sqlStatement, GirSqlParam girSqlParam, Class<E> clazz, Consumer<E> rowConsumer) {
         getAdvBaseOpt().bSelectObjListStream(sqlStatement, girSqlParam, clazz, rowConsumer);
     }
 
-
     // ==================== 基础更新操作（代理调用PgAdvBaseOpt） ====================
-
 
     @Override
     public Integer bUpdateBySql(String sqlStatement) {
@@ -723,7 +745,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpdateByPK(String tableName, String idKey, Object id, Map<String, Object> rowData) {
+    public Integer bUpdateByPK(
+            String tableName, String idKey, Object id, Map<String, Object> rowData) {
         return getAdvBaseOpt().bUpdateByPK(tableName, idKey, id, rowData);
     }
 
@@ -758,12 +781,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData) {
+    public void bUpdateBatchByPK(
+            String tableName, String idKey, List<Map<String, Object>> rowsData) {
         getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData);
     }
 
     @Override
-    public void bUpdateBatchByPK(String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
+    public void bUpdateBatchByPK(
+            String tableName, String idKey, List<Map<String, Object>> rowsData, int batchSize) {
         getAdvBaseOpt().bUpdateBatchByPK(tableName, idKey, rowsData, batchSize);
     }
 
@@ -778,12 +803,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void bUpdateBatchByPK(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpdateBatchByPK(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseOpt().bUpdateBatchByPK(entities, strategyConsumer);
     }
 
     @Override
-    public <T> void bUpdateBatchByPKSelective(String tableName, String idKey, Collection<T> entities) {
+    public <T> void bUpdateBatchByPKSelective(
+            String tableName, String idKey, Collection<T> entities) {
         getAdvBaseOpt().bUpdateBatchByPKSelective(tableName, idKey, entities);
     }
 
@@ -793,22 +820,26 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void bUpdateBatchByPKSelective(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpdateBatchByPKSelective(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseOpt().bUpdateBatchByPKSelective(entities, strategyConsumer);
     }
 
     @Override
-    public Integer bUpdateByMap(String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
+    public Integer bUpdateByMap(
+            String tableName, Map<String, Object> rowData, Map<String, Object> whereMap) {
         return getAdvBaseOpt().bUpdateByMap(tableName, rowData, whereMap);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, UpdateStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            T entity, UpdateStrategy strategy, GirAdvWhereLambdaFilter<T> whereFilter) {
         return getAdvBaseOpt().bUpdateByWhere(entity, strategy, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, UpdateStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            T entity, UpdateStrategy strategy, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bUpdateByWhere(entity, strategy, consumer);
     }
 
@@ -818,27 +849,34 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(T entity, Consumer<UpdateStrategy> strategyConsumer, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            T entity,
+            Consumer<UpdateStrategy> strategyConsumer,
+            Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bUpdateByWhere(entity, strategyConsumer, consumer);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, T entity, Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
         return getAdvBaseOpt().bUpdateByWhere(tableName, entity, consumer);
     }
 
     @Override
-    public <T> Integer bUpdateByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseOpt().bUpdateByWhere(tableName, rowData, whereFilter);
     }
 
     @Override
-    public <T> Integer bUpdateSelectiveByWhere(String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
+    public <T> Integer bUpdateSelectiveByWhere(
+            String tableName, Map<String, Object> rowData, GirAdvWhereFilter whereFilter) {
         return getAdvBaseOpt().bUpdateSelectiveByWhere(tableName, rowData, whereFilter);
     }
 
     @Override
-    public Integer bUpsert(String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
+    public Integer bUpsert(
+            String tableName, Map<String, Object> rowData, List<String> conflictKeys) {
         return getAdvBaseOpt().bUpsert(tableName, rowData, conflictKeys);
     }
 
@@ -873,7 +911,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Integer bUpsertBatch(String tableName, List<Map<String, Object>> rowsData, List<String> conflictKeys, int batchSize) {
+    public Integer bUpsertBatch(
+            String tableName,
+            List<Map<String, Object>> rowsData,
+            List<String> conflictKeys,
+            int batchSize) {
         return getAdvBaseOpt().bUpsertBatch(tableName, rowsData, conflictKeys, batchSize);
     }
 
@@ -888,7 +930,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void bUpsertBatch(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpsertBatch(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseOpt().bUpsertBatch(entities, strategyConsumer);
     }
 
@@ -903,7 +946,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void bUpsertBatchSelective(Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
+    public <T> void bUpsertBatchSelective(
+            Collection<T> entities, Consumer<UpdateStrategy> strategyConsumer) {
         getAdvBaseOpt().bUpsertBatchSelective(entities, strategyConsumer);
     }
 
@@ -1062,8 +1106,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             PrimaryKeyType pkType,
             Integer pkColumnLength,
             String pkValuePrefix) {
-        getAdvDDLOpt().dAddPrimaryKey(
-                tableName, pkColumnName, constraintName, pkType, pkColumnLength, pkValuePrefix);
+        getAdvDDLOpt()
+                .dAddPrimaryKey(
+                        tableName,
+                        pkColumnName,
+                        constraintName,
+                        pkType,
+                        pkColumnLength,
+                        pkValuePrefix);
     }
 
     @Override
@@ -1073,8 +1123,9 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pkColumnLength,
             String constraintName,
             String pkValuePrefix) {
-        getAdvDDLOpt().dAddStringPrimaryKey(
-                tableName, pkColumnName, pkColumnLength, constraintName, pkValuePrefix);
+        getAdvDDLOpt()
+                .dAddStringPrimaryKey(
+                        tableName, pkColumnName, pkColumnLength, constraintName, pkValuePrefix);
     }
 
     @Override
@@ -1225,12 +1276,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, List<String> geomFieldNames) {
+    public Map<String, AdvEnumsTypeGeom> eGetGeoTypeBySqlOrTable(
+            String sqlViewOrTableName, List<String> geomFieldNames) {
         return getGeoOpt().eGetGeoTypeBySqlOrTable(sqlViewOrTableName, geomFieldNames);
     }
 
     @Override
-    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(String sqlViewOrTableName, String geomFieldName) {
+    public AdvEnumsTypeGeom eGetGeoTypeBySqlOrTable(
+            String sqlViewOrTableName, String geomFieldName) {
         return getGeoOpt().eGetGeoTypeBySqlOrTable(sqlViewOrTableName, geomFieldName);
     }
 
@@ -1394,8 +1447,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             String geometry,
             int srid,
             String distanceAlias) {
-        return getGeoOpt().eCalculateDistance(
-                tableName, geomFieldName, geometry, srid, distanceAlias);
+        return getGeoOpt()
+                .eCalculateDistance(tableName, geomFieldName, geometry, srid, distanceAlias);
     }
 
     @Override
@@ -1476,14 +1529,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSql,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
@@ -1510,8 +1564,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
     }
 
     @Override
@@ -1522,8 +1576,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSql,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
@@ -1549,8 +1609,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
     }
 
     @Override
@@ -1561,8 +1621,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, orders);
     }
 
     @Override
@@ -1572,8 +1632,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
     }
 
     @Override
@@ -1584,22 +1644,32 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSql, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo, orders);
     }
 
     @Override
-    public PageApo<GirAdvOneRow> pPage(String noPageSqlStatement,
-                                       GirSqlParam sqlParam,
-                                       int pageNum,
-                                       int pageSize,
-                                       boolean pageNumStartZero,
-                                       AdvEnumsGeomOpt advEnumsGeomOpt,
-                                       boolean hasFieldsInfo,
-                                       List<OrderApo> orders,
-                                       AdvEnumsKeyTran advEnumsKeyTran) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt, hasFieldsInfo, orders, advEnumsKeyTran);
+    public PageApo<GirAdvOneRow> pPage(
+            String noPageSqlStatement,
+            GirSqlParam sqlParam,
+            int pageNum,
+            int pageSize,
+            boolean pageNumStartZero,
+            AdvEnumsGeomOpt advEnumsGeomOpt,
+            boolean hasFieldsInfo,
+            List<OrderApo> orders,
+            AdvEnumsKeyTran advEnumsKeyTran) {
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders,
+                        advEnumsKeyTran);
     }
 
     @Override
@@ -1613,13 +1683,12 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
         return getDialectTableNameProcessor().tbGetTableNameWithSchema(dsDataSourceOpt, tableName);
     }
 
-
     @Override
     public String tbGetTableNameWithSchema(
             IDsDataSourceOpt dsDataSourceOpt, String tableName, String schemaName) {
         // 代理调用：带指定Schema的完整表名拼接
-        return getDialectTableNameProcessor().tbGetTableNameWithSchema(
-                dsDataSourceOpt, tableName, schemaName);
+        return getDialectTableNameProcessor()
+                .tbGetTableNameWithSchema(dsDataSourceOpt, tableName, schemaName);
     }
 
     @Override
@@ -1707,8 +1776,10 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public String tbBuildPageSql(String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
-        return getDialectTableNameProcessor().tbBuildPageSql(noPageSql, pageNum, pageSize, pageNumStartZero);
+    public String tbBuildPageSql(
+            String noPageSql, int pageNum, int pageSize, boolean pageNumStartZero) {
+        return getDialectTableNameProcessor()
+                .tbBuildPageSql(noPageSql, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
@@ -1802,8 +1873,7 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public List<FieldBySchemaApo> eGetGeomColumnListBySql(
-            String dynamicSql, GirSqlParam sqlParam) {
+    public List<FieldBySchemaApo> eGetGeomColumnListBySql(String dynamicSql, GirSqlParam sqlParam) {
         return getGeoOpt().eGetGeomColumnListBySql(dynamicSql, sqlParam);
     }
 
@@ -1827,15 +1897,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
@@ -1851,8 +1922,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageNum,
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt);
     }
 
     @Override
@@ -1873,8 +1944,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        hasFieldsInfo);
     }
 
     @Override
@@ -1886,14 +1963,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
@@ -1903,8 +1981,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageNum,
             int pageSize,
             boolean pageNumStartZero) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero);
     }
 
     @Override
@@ -1915,8 +1993,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
+        return getSimplePageOpt()
+                .pPage(noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, orders);
     }
 
     @Override
@@ -1927,8 +2005,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, pageNumStartZero, advEnumsGeomOpt);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt);
     }
 
     @Override
@@ -1940,14 +2024,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             boolean pageNumStartZero,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                pageNumStartZero,
-                advEnumsGeomOpt,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        pageNumStartZero,
+                        advEnumsGeomOpt,
+                        orders);
     }
 
     @Override
@@ -1958,8 +2043,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             int pageSize,
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement, sqlParam, pageNum, pageSize, advEnumsGeomOpt, hasFieldsInfo);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo);
     }
 
     @Override
@@ -1971,14 +2062,15 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
             AdvEnumsGeomOpt advEnumsGeomOpt,
             boolean hasFieldsInfo,
             List<OrderApo> orders) {
-        return getSimplePageOpt().pPage(
-                noPageSqlStatement,
-                sqlParam,
-                pageNum,
-                pageSize,
-                advEnumsGeomOpt,
-                hasFieldsInfo,
-                orders);
+        return getSimplePageOpt()
+                .pPage(
+                        noPageSqlStatement,
+                        sqlParam,
+                        pageNum,
+                        pageSize,
+                        advEnumsGeomOpt,
+                        hasFieldsInfo,
+                        orders);
     }
 
     @Override
@@ -1992,7 +2084,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> GirAdvOneRow wSelectOne(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> GirAdvOneRow wSelectOne(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectOne(entityClass, consumer);
     }
 
@@ -2007,7 +2100,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> List<GirAdvOneRow> wSelectList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<GirAdvOneRow> wSelectList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectList(entityClass, consumer);
     }
 
@@ -2022,7 +2116,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> PageApo<GirAdvOneRow> wSelectPage(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> PageApo<GirAdvOneRow> wSelectPage(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectPage(entityClass, consumer);
     }
 
@@ -2032,12 +2127,16 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> void wSelectStream(Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+    public <T> void wSelectStream(
+            Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
         getWhereSelectOpt().wSelectStream(consumer, rowConsumer);
     }
 
     @Override
-    public <T> void wSelectStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<GirAdvOneRow> rowConsumer) {
+    public <T> void wSelectStream(
+            Class<T> entityClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<GirAdvOneRow> rowConsumer) {
         getWhereSelectOpt().wSelectStream(entityClass, consumer, rowConsumer);
     }
 
@@ -2052,7 +2151,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Number wSelectCount(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> Number wSelectCount(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectCount(entityClass, consumer);
     }
 
@@ -2062,12 +2162,14 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> List<List<Object>> wSelectListToValueList(Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<List<Object>> wSelectListToValueList(
+            Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectListToValueList(consumer);
     }
 
     @Override
-    public <T> List<List<Object>> wSelectListToValueList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<List<Object>> wSelectListToValueList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectListToValueList(entityClass, consumer);
     }
 
@@ -2082,7 +2184,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> Number wSelectNumber(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> Number wSelectNumber(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectNumber(entityClass, consumer);
     }
 
@@ -2097,7 +2200,8 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T, R> R wSelectObjOne(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T, R> R wSelectObjOne(
+            Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectObjOne(entityClass, resultClass, consumer);
     }
 
@@ -2107,27 +2211,37 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
-    public <T> List<T> wSelectObjList(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T> List<T> wSelectObjList(
+            Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectObjList(entityClass, consumer);
     }
 
     @Override
-    public <T, R> List<R> wSelectObjList(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
+    public <T, R> List<R> wSelectObjList(
+            Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer) {
         return getWhereSelectOpt().wSelectObjList(entityClass, resultClass, consumer);
     }
 
     @Override
-    public <E> void wSelectObjStream(GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
+    public <E> void wSelectObjStream(
+            GirAdvQueryRequest query, Class<E> clazz, Consumer<E> rowConsumer) {
         getWhereSelectOpt().wSelectObjStream(query, clazz, rowConsumer);
     }
 
     @Override
-    public <T> void wSelectObjStream(Class<T> entityClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<T> rowConsumer) {
+    public <T> void wSelectObjStream(
+            Class<T> entityClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<T> rowConsumer) {
         getWhereSelectOpt().wSelectObjStream(entityClass, consumer, rowConsumer);
     }
 
     @Override
-    public <T, R> void wSelectObjStream(Class<T> entityClass, Class<R> resultClass, Consumer<QueryRequestBuilder<T>> consumer, Consumer<R> rowConsumer) {
+    public <T, R> void wSelectObjStream(
+            Class<T> entityClass,
+            Class<R> resultClass,
+            Consumer<QueryRequestBuilder<T>> consumer,
+            Consumer<R> rowConsumer) {
         getWhereSelectOpt().wSelectObjStream(entityClass, resultClass, consumer, rowConsumer);
     }
 }

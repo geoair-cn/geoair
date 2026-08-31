@@ -72,7 +72,6 @@ public interface CacheProvider {
      */
     <T> T get(Object key, Callable<T> valueLoader);
 
-
     byte[] getByte(Object key);
 
     /**

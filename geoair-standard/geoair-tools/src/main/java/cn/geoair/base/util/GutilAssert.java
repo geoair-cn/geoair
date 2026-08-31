@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 /**
  * 断言工具，来自于 spring Assert
  *
- * <p>所有参数/值校验断言失败时抛出{@link IllegalArgumentException}，仅 {@link #state} 系列方法抛出
- * {@link IllegalStateException}（用于状态不变量校验，而非参数校验）。
+ * <p>所有参数/值校验断言失败时抛出{@link IllegalArgumentException}，仅 {@link #state} 系列方法抛出 {@link
+ * IllegalStateException}（用于状态不变量校验，而非参数校验）。
  *
  * @author
  */
@@ -87,8 +87,7 @@ public abstract class GutilAssert {
     }
 
     /**
-     * 断言两个对象相等，使用 {@link GutilObject#equal(Object, Object)}（含
-     * BigDecimal数值比较与数组内容深度比较）。
+     * 断言两个对象相等，使用 {@link GutilObject#equal(Object, Object)}（含 BigDecimal数值比较与数组内容深度比较）。
      *
      * @param object1 对象1
      * @param object2 对象2
@@ -437,8 +436,7 @@ public abstract class GutilAssert {
      *
      * @param type 要检查的目标类型
      * @param obj 要检查的对象
-     * @param messageSupplier 断言失败时使用的异常消息提供者。详情参见
-     *     {@link #isInstanceOf(Class, Object, String)}。
+     * @param messageSupplier 断言失败时使用的异常消息提供者。详情参见 {@link #isInstanceOf(Class, Object, String)}。
      * @throws IllegalArgumentException 如果对象不是指定类型的实例
      * @since 5.0
      */
@@ -472,8 +470,7 @@ public abstract class GutilAssert {
      * @param superType 要检查的父类型
      * @param subType 要检查的子类型
      * @param message 附加在异常消息前提供更多上下文的消息。如果它为空或以 ":"、";"、","、"." 结尾，
-     *     则会在其后追加完整的异常消息；如果它以空格结尾，则追加违规子类型的名称；其他情况下，
-     *     追加 ":" 加空格及违规子类型的名称。
+     *     则会在其后追加完整的异常消息；如果它以空格结尾，则追加违规子类型的名称；其他情况下， 追加 ":" 加空格及违规子类型的名称。
      * @throws IllegalArgumentException 如果类型之间不可赋值
      */
     public static void isAssignable(Class<?> superType, Class<?> subType, String message) {
@@ -492,8 +489,7 @@ public abstract class GutilAssert {
      *
      * @param superType 要检查的父类型
      * @param subType 要检查的子类型
-     * @param messageSupplier 断言失败时使用的异常消息提供者。详情参见
-     *     {@link #isAssignable(Class, Class, String)}。
+     * @param messageSupplier 断言失败时使用的异常消息提供者。详情参见 {@link #isAssignable(Class, Class, String)}。
      * @throws IllegalArgumentException 如果类型之间不可赋值
      * @since 5.0
      */

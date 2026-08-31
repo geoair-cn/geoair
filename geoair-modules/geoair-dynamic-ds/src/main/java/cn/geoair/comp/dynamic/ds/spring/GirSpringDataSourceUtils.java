@@ -1,13 +1,12 @@
 package cn.geoair.comp.dynamic.ds.spring;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
+import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
 import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
-import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
+import java.util.Date;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.util.StringUtils;
-
-import java.util.Date;
 
 /**
  * @author ：张俊
@@ -15,7 +14,6 @@ import java.util.Date;
  * @description： Spring的DataSourceProperties 转换成 DataSourceApo
  */
 public class GirSpringDataSourceUtils {
-
 
     /**
      * 将Spring Boot的DataSourceProperties转换为自定义的DataSourceApo
@@ -30,7 +28,6 @@ public class GirSpringDataSourceUtils {
 
         DataSourceApo apo = new DataSourceApo();
 
-
         // 设置驱动类名
         if (StringUtils.hasText(properties.getDriverClassName())) {
             apo.setDriver(properties.getDriverClassName());
@@ -40,14 +37,13 @@ public class GirSpringDataSourceUtils {
         apo.setDbName(jdbcUrl.getDatabaseName());
         JdbcEndpoint endpoint = jdbcUrl.getPrimaryEndpoint();
         if (endpoint != null && endpoint.getPort() != null) {
-            apo.setPort(endpoint.getPort());   // 端口是可以为空的，具体的数据源会去补充默认端口
+            apo.setPort(endpoint.getPort()); // 端口是可以为空的，具体的数据源会去补充默认端口
         }
         apo.setSchemaName(GirJdbcUrlCodecs.defaultCodec().getSchema(properties.getUrl()));
         apo.setAddress(endpoint == null ? null : endpoint.getHost());
         // 设置用户名和密码
         apo.setUsername(properties.getUsername());
         apo.setPassword(properties.getPassword());
-
 
         // 设置时间戳
         Date now = new Date();

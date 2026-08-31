@@ -2,13 +2,10 @@ package cn.geoair.map.tile.forge.core.zip.model;
 
 import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
 import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
+import javax.persistence.Transient;
 import lombok.Data;
 
-import javax.persistence.Transient;
-
-/**
- * ZIP 中央目录中的单个文件条目
- */
+/** ZIP 中央目录中的单个文件条目 */
 @Data
 public class CentralDirectoryModel {
     // 本地文件头的起始偏移量
@@ -31,12 +28,16 @@ public class CentralDirectoryModel {
     // 是否文件夹
     private boolean directoryIs;
 
-    public CentralDirectoryModel() {
+    public CentralDirectoryModel() {}
 
-    }
-
-    public CentralDirectoryModel(long localHeaderOffset, Long dataOffset, long compressionMethod,
-                                 long compressedSize, long uncompressedSize, String name, int entrySize) {
+    public CentralDirectoryModel(
+            long localHeaderOffset,
+            Long dataOffset,
+            long compressionMethod,
+            long compressedSize,
+            long uncompressedSize,
+            String name,
+            int entrySize) {
         this.localHeaderOffset = localHeaderOffset;
         this.dataOffset = dataOffset;
         this.compressionMethod = compressionMethod;
@@ -52,9 +53,8 @@ public class CentralDirectoryModel {
         GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
         DecompressionHandler handler = type.getHandler();
         if (handler == null) {
-            throw  new RuntimeException("Unknown compression method: " + methodCode);
+            throw new RuntimeException("Unknown compression method: " + methodCode);
         }
         return handler;
     }
-
 }

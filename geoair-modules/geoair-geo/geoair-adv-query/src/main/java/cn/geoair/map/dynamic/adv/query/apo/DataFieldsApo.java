@@ -13,13 +13,12 @@ import lombok.Data;
 /**
  * 数据库表的字段集合封装。
  *
- * <p>通过构造函数传入字段列表，自动按"主键在前 → 其他字段 → 空间字段在后"排序。
- * 所有读方法返回的都是安全的副本，不会暴露内部可变状态。</p>
+ * <p>通过构造函数传入字段列表，自动按"主键在前 → 其他字段 → 空间字段在后"排序。 所有读方法返回的都是安全的副本，不会暴露内部可变状态。
  *
  * <pre>{@code
- *   DataFieldsApo fields = new DataFieldsApo(fieldList);
- *   String geomName = fields.firstGeomFieldName();
- *   List<String> names = fields.fieldNames(false); // 排除几何字段
+ * DataFieldsApo fields = new DataFieldsApo(fieldList);
+ * String geomName = fields.firstGeomFieldName();
+ * List<String> names = fields.fieldNames(false); // 排除几何字段
  * }</pre>
  *
  * @author yulei
@@ -45,64 +44,60 @@ public class DataFieldsApo implements Serializable {
 
     // ==================== 排序规则 ====================
 
-    /**
-     * 按"主键在前 → 其他字段 → 空间字段在后"排序。
-     * 构造函数默认执行，一般无需手动调用。
-     */
+    /** 按"主键在前 → 其他字段 → 空间字段在后"排序。 构造函数默认执行，一般无需手动调用。 */
     public void applyDefaultSort() {
         if (ObjectUtil.isEmpty(dataFieldList)) return;
-        ListUtil.sort(dataFieldList, (f1, f2) -> {
-            boolean isPk1 = f1.isPrimaryKeyIs();
-            boolean isPk2 = f2.isPrimaryKeyIs();
-            if (isPk1 && !isPk2) return -1;
-            if (!isPk1 && isPk2) return 1;
+        ListUtil.sort(
+                dataFieldList,
+                (f1, f2) -> {
+                    boolean isPk1 = f1.isPrimaryKeyIs();
+                    boolean isPk2 = f2.isPrimaryKeyIs();
+                    if (isPk1 && !isPk2) return -1;
+                    if (!isPk1 && isPk2) return 1;
 
-            boolean isGeo1 = f1.isGeometryFieldIs();
-            boolean isGeo2 = f2.isGeometryFieldIs();
-            if (!isGeo1 && isGeo2) return -1;
-            if (isGeo1 && !isGeo2) return 1;
+                    boolean isGeo1 = f1.isGeometryFieldIs();
+                    boolean isGeo2 = f2.isGeometryFieldIs();
+                    if (!isGeo1 && isGeo2) return -1;
+                    if (isGeo1 && !isGeo2) return 1;
 
-            return 0;
-        });
+                    return 0;
+                });
     }
 
-    /**
-     * 按数据库列的自然顺序（{@code ordinalPosition}）排序。
-     * 没有 {@code ordinalPosition} 值的字段排在最后。
-     */
+    /** 按数据库列的自然顺序（{@code ordinalPosition}）排序。 没有 {@code ordinalPosition} 值的字段排在最后。 */
     public void applyOrdinalSort() {
         if (ObjectUtil.isEmpty(dataFieldList)) return;
-        dataFieldList.sort(Comparator.comparing(
-                FieldBySchemaApo::getOrdinalPosition,
-                Comparator.nullsLast(Comparator.naturalOrder())));
+        dataFieldList.sort(
+                Comparator.comparing(
+                        FieldBySchemaApo::getOrdinalPosition,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
     }
 
     /**
-     * 返回一个按数据库列自然顺序排序的新实例。
-     * 原实例不受影响，新实例中的字段是深拷贝。
+     * 返回一个按数据库列自然顺序排序的新实例。 原实例不受影响，新实例中的字段是深拷贝。
      *
      * <pre>{@code
-     *   // 获取按表列序排列的字段名
-     *   List<String> orderedNames = fields.inOrdinalOrder().fieldNames();
+     * // 获取按表列序排列的字段名
+     * List<String> orderedNames = fields.inOrdinalOrder().fieldNames();
      * }</pre>
      */
     public DataFieldsApo inOrdinalOrder() {
         DataFieldsApo copy = new DataFieldsApo();
-        copy.dataFieldList = dataFieldList.stream()
-                .map(DataFieldsApo::copy)
-                .sorted(Comparator.comparing(
-                        FieldBySchemaApo::getOrdinalPosition,
-                        Comparator.nullsLast(Comparator.naturalOrder())))
-                .collect(Collectors.toList());
+        copy.dataFieldList =
+                dataFieldList
+                        .stream()
+                        .map(DataFieldsApo::copy)
+                        .sorted(
+                                Comparator.comparing(
+                                        FieldBySchemaApo::getOrdinalPosition,
+                                        Comparator.nullsLast(Comparator.naturalOrder())))
+                        .collect(Collectors.toList());
         return copy;
     }
 
     // ==================== 查询方法 ====================
 
-    /**
-     * 返回字段列表（直接引用，调用方可排序但不能增删元素）。
-     * 如需过滤请用 {@link #filterFields(boolean)}。
-     */
+    /** 返回字段列表（直接引用，调用方可排序但不能增删元素）。 如需过滤请用 {@link #filterFields(boolean)}。 */
     public List<FieldBySchemaApo> getDataFieldList() {
         return dataFieldList;
     }
@@ -113,7 +108,8 @@ public class DataFieldsApo implements Serializable {
      * @param includeGeom true 保留空间字段，false 排除空间字段
      */
     public List<FieldBySchemaApo> filterFields(boolean includeGeom) {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(f -> includeGeom || !f.isGeometryFieldIs())
                 .map(DataFieldsApo::copy)
                 .collect(Collectors.toList());
@@ -126,22 +122,20 @@ public class DataFieldsApo implements Serializable {
      * @return 匹配字段的深拷贝，未找到返回 {@code Optional.empty()}
      */
     public Optional<FieldBySchemaApo> findField(Predicate<FieldBySchemaApo> predicate) {
-        return dataFieldList.stream()
-                .filter(predicate)
-                .map(DataFieldsApo::copy)
-                .findFirst();
+        return dataFieldList.stream().filter(predicate).map(DataFieldsApo::copy).findFirst();
     }
 
     /**
      * 遍历字段并映射为自定义结果。
      *
-     * @param mapper     映射函数
+     * @param mapper 映射函数
      * @param includeGeom true 保留空间字段，false 排除
-     * @param <R>        返回值类型
+     * @param <R> 返回值类型
      * @return 映射结果列表
      */
     public <R> List<R> mapFields(Function<FieldBySchemaApo, R> mapper, boolean includeGeom) {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(f -> includeGeom || !f.isGeometryFieldIs())
                 .map(mapper)
                 .collect(Collectors.toList());
@@ -162,14 +156,13 @@ public class DataFieldsApo implements Serializable {
     /** 从指定字段列表中提取列名（纯工具方法） */
     public static List<String> columnNamesOf(List<FieldBySchemaApo> fields) {
         if (ObjectUtil.isEmpty(fields)) return Collections.emptyList();
-        return fields.stream()
-                .map(FieldBySchemaApo::getColumnName)
-                .collect(Collectors.toList());
+        return fields.stream().map(FieldBySchemaApo::getColumnName).collect(Collectors.toList());
     }
 
     /** 获取所有主键字段（深拷贝） */
     public List<FieldBySchemaApo> primaryKeyFields() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isPrimaryKeyIs)
                 .map(DataFieldsApo::copy)
                 .collect(Collectors.toList());
@@ -177,7 +170,8 @@ public class DataFieldsApo implements Serializable {
 
     /** 获取所有主键字段名 */
     public List<String> primaryKeyFieldNames() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isPrimaryKeyIs)
                 .map(FieldBySchemaApo::getColumnName)
                 .collect(Collectors.toList());
@@ -187,7 +181,8 @@ public class DataFieldsApo implements Serializable {
 
     /** 获取第一个空间字段（深拷贝） */
     public Optional<FieldBySchemaApo> firstGeomField() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isGeometryFieldIs)
                 .map(DataFieldsApo::copy)
                 .findFirst();
@@ -195,7 +190,8 @@ public class DataFieldsApo implements Serializable {
 
     /** 获取所有空间字段（深拷贝） */
     public List<FieldBySchemaApo> geomFields() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isGeometryFieldIs)
                 .map(DataFieldsApo::copy)
                 .collect(Collectors.toList());
@@ -203,14 +199,13 @@ public class DataFieldsApo implements Serializable {
 
     /** 获取第一个空间字段的列名 */
     public String firstGeomFieldName() {
-        return firstGeomField()
-                .map(FieldBySchemaApo::getColumnName)
-                .orElse(null);
+        return firstGeomField().map(FieldBySchemaApo::getColumnName).orElse(null);
     }
 
     /** 获取所有空间字段的列名 */
     public List<String> geomFieldNames() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isGeometryFieldIs)
                 .map(FieldBySchemaApo::getColumnName)
                 .collect(Collectors.toList());
@@ -218,7 +213,8 @@ public class DataFieldsApo implements Serializable {
 
     /** 获取几何类型未知的空间字段列名 */
     public List<String> unresolvedGeomTypeFieldNames() {
-        return dataFieldList.stream()
+        return dataFieldList
+                .stream()
                 .filter(FieldBySchemaApo::isGeometryFieldIs)
                 .filter(f -> f.getGeomType() != null && f.getGeomType().getGeotoolsType() == null)
                 .map(FieldBySchemaApo::getColumnName)
@@ -259,8 +255,10 @@ public class DataFieldsApo implements Serializable {
 
     /** @deprecated 请使用 {@link #findField(Predicate)} */
     @Deprecated
-    public Optional<FieldBySchemaApo> getDataField(Function<FieldBySchemaApo, FieldBySchemaApo> mapper) {
-        return dataFieldList.stream()
+    public Optional<FieldBySchemaApo> getDataField(
+            Function<FieldBySchemaApo, FieldBySchemaApo> mapper) {
+        return dataFieldList
+                .stream()
                 .filter(f -> mapper.apply(f) != null)
                 .map(DataFieldsApo::copy)
                 .findFirst();

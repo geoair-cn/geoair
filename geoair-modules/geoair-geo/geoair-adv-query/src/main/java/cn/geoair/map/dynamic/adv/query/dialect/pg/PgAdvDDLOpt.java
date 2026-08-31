@@ -16,17 +16,13 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.dialect.DialectName;
-
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.postgresql.jdbc.PgResultSetMetaData;
 
-/**
- * PostgreSQL DDL操作实现类
- */
+/** PostgreSQL DDL操作实现类 */
 public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     public PgAdvDDLOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt) {
@@ -75,7 +71,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT COUNT(*) AS cnt FROM information_schema.tables "
-                        + "WHERE table_name = '{}' AND table_type = 'BASE TABLE'",
+                                + "WHERE table_name = '{}' AND table_type = 'BASE TABLE'",
                         nameNotSchema);
         if (StrUtil.isNotEmpty(schemaName)) {
             sql += StrUtil.format(" AND table_schema = '{}'", schemaName);
@@ -155,11 +151,12 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         List<FieldBySchemaApo> fields =
                 getAdvBaseOpt().bSelectObjList(sqlBuilder.toString(), FieldBySchemaApo.class);
-        fields.forEach(f -> {
-            f.setDialectName(getDialectName());
-            f.setOriginalColumnName(f.getColumnName());
-            f.determineGeometryFieldIs();
-        });
+        fields.forEach(
+                f -> {
+                    f.setDialectName(getDialectName());
+                    f.setOriginalColumnName(f.getColumnName());
+                    f.determineGeometryFieldIs();
+                });
 
         DataFieldsApo dataFieldsApo = new DataFieldsApo(fields);
         return dataFieldsApo;
@@ -196,13 +193,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
         // 处理长度/精度
         if (newField.getCharacterMaximumLength() != null
-            && (newField.getUdtName().contains("char")
-                || newField.getUdtName().contains("varchar"))) {
+                && (newField.getUdtName().contains("char")
+                        || newField.getUdtName().contains("varchar"))) {
             alterDef.append(StrUtil.format("({})", newField.getCharacterMaximumLength()));
         } else if (newField.getNumericPrecision() != null
-                   && newField.getNumericScale() != null
-                   && (newField.getUdtName().contains("numeric")
-                       || newField.getUdtName().contains("decimal"))) {
+                && newField.getNumericScale() != null
+                && (newField.getUdtName().contains("numeric")
+                        || newField.getUdtName().contains("decimal"))) {
             alterDef.append(
                     StrUtil.format(
                             "({}, {})",
@@ -245,11 +242,11 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT kcu.column_name "
-                        + "FROM information_schema.table_constraints tco "
-                        + "JOIN information_schema.key_column_usage kcu "
-                        + "ON tco.constraint_name = kcu.constraint_name "
-                        + "WHERE tco.table_name ='{}' AND tco.constraint_type = 'PRIMARY KEY' "
-                        + "ORDER BY kcu.ordinal_position",
+                                + "FROM information_schema.table_constraints tco "
+                                + "JOIN information_schema.key_column_usage kcu "
+                                + "ON tco.constraint_name = kcu.constraint_name "
+                                + "WHERE tco.table_name ='{}' AND tco.constraint_type = 'PRIMARY KEY' "
+                                + "ORDER BY kcu.ordinal_position",
                         tableName);
         if (StrUtil.isNotEmpty(dataSourceGetter.getSchemaName())) {
             sql += StrUtil.format(" AND tco.table_schema = '{}'", dataSourceGetter.getSchemaName());
@@ -267,7 +264,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT constraint_name FROM information_schema.table_constraints "
-                        + "WHERE table_name = '{}' AND constraint_type = '{}' AND constraint_name = '{}'",
+                                + "WHERE table_name = '{}' AND constraint_type = '{}' AND constraint_name = '{}'",
                         tableName,
                         constraintType,
                         constraintName);
@@ -332,8 +329,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                + "UPDATE {} f1 SET {} = {} f1.rn "
-                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                        + "UPDATE {} f1 SET {} = {} f1.rn "
+                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 quotedPkColumnName,
@@ -382,8 +379,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                + "UPDATE {} f1 SET {} = nr.rn "
-                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                        + "UPDATE {} f1 SET {} = nr.rn "
+                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 quotedPkColumnName);
@@ -409,8 +406,8 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                 String updateSql =
                         StrUtil.format(
                                 "WITH numbered_rows AS (SELECT ctid, row_number() OVER () AS rn FROM {}) "
-                                + "UPDATE {} f1 SET {} = nr.rn "
-                                + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
+                                        + "UPDATE {} f1 SET {} = nr.rn "
+                                        + "FROM numbered_rows nr WHERE f1.ctid = nr.ctid",
                                 qualifiedTableName,
                                 qualifiedTableName,
                                 quotedPkColumnName);
@@ -476,7 +473,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
                         StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                                 ? ""
                                 : StrUtil.format(
-                                "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
+                                        "AND schemaname = '{}'", dataSourceGetter.getSchemaName()));
         return getAdvBaseOpt().bSelectObjList(sql, IndexApo.class);
     }
 
@@ -492,7 +489,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         AdvQueryGlobalConfig config = getConfig();
         boolean enableQueryLog = config.isEnableQueryLog();
         if (enableQueryLog) {
-            config.setEnableQueryLog(false);  //  如果不关闭，就会死循环
+            config.setEnableQueryLog(false); //  如果不关闭，就会死循环
         }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         config.setEnableQueryLog(enableQueryLog);
@@ -507,7 +504,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         AdvQueryGlobalConfig config = getConfig();
         boolean enableQueryLog = config.isEnableQueryLog();
         if (enableQueryLog) {
-            config.setEnableQueryLog(false);   //  如果不关闭，就会死循环
+            config.setEnableQueryLog(false); //  如果不关闭，就会死循环
         }
         GirAdvOneRow girAdvOneRow = getAdvBaseOpt().bSelectOne(sql);
         config.setEnableQueryLog(enableQueryLog);
@@ -543,13 +540,13 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (StrUtil.isEmpty(actualSchema)) {
             sql =
                     "SELECT table_name FROM information_schema.tables "
-                    + "WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('information_schema', 'pg_catalog') "
-                    + "ORDER BY table_name";
+                            + "WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('information_schema', 'pg_catalog') "
+                            + "ORDER BY table_name";
         } else {
             sql =
                     StrUtil.format(
                             "SELECT table_name FROM information_schema.tables "
-                            + "WHERE table_type = 'BASE TABLE' AND table_schema = '{}' ORDER BY table_name",
+                                    + "WHERE table_type = 'BASE TABLE' AND table_schema = '{}' ORDER BY table_name",
                             actualSchema);
         }
 
@@ -573,17 +570,17 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (StrUtil.isEmpty(actualSchema)) {
             sql =
                     "SELECT "
-                    + fields
-                    + " FROM information_schema.tables "
-                    + "WHERE   table_schema NOT IN ('information_schema', 'pg_catalog') "
-                    + "ORDER BY table_name";
+                            + fields
+                            + " FROM information_schema.tables "
+                            + "WHERE   table_schema NOT IN ('information_schema', 'pg_catalog') "
+                            + "ORDER BY table_name";
         } else {
             sql =
                     StrUtil.format(
                             "SELECT "
-                            + fields
-                            + " FROM information_schema.tables "
-                            + "WHERE   table_schema = '{}' ORDER BY table_name",
+                                    + fields
+                                    + " FROM information_schema.tables "
+                                    + "WHERE   table_schema = '{}' ORDER BY table_name",
                             actualSchema);
         }
         List<SchemaTableApo> result = new ArrayList<>();
@@ -691,9 +688,9 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         if (columnTypeName.contains("char") || columnTypeName.contains("varchar")) {
             field.setCharacterMaximumLength(metaData.getColumnDisplaySize(columnIndex));
         } else if (columnTypeName.contains("int")
-                   || columnTypeName.contains("numeric")
-                   || columnTypeName.contains("decimal")
-                   || columnTypeName.contains("float")) {
+                || columnTypeName.contains("numeric")
+                || columnTypeName.contains("decimal")
+                || columnTypeName.contains("float")) {
             field.setNumericPrecision(metaData.getPrecision(columnIndex));
             field.setNumericScale(metaData.getScale(columnIndex));
         }
@@ -712,7 +709,7 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String sql =
                 StrUtil.format(
                         "SELECT COUNT(*) AS cnt FROM information_schema.routines "
-                        + "WHERE routine_name = '{}' AND routine_type = 'FUNCTION'",
+                                + "WHERE routine_name = '{}' AND routine_type = 'FUNCTION'",
                         nameNotSchema);
         if (StrUtil.isNotEmpty(schemaName)) {
             sql += StrUtil.format(" AND specific_schema = '{}'", schemaName);
@@ -727,30 +724,30 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS SELECT * FROM source
-//        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
-//                dstTableName, srcTableName);
-        return StrUtil.format(
-                "INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
+        //        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
+        //                dstTableName, srcTableName);
+        return StrUtil.format("INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target (LIKE source INCLUDING ALL)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
-                dstTableName, srcTableName);
+        return StrUtil.format(
+                "CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
+                dstTableName,
+                srcTableName);
     }
 
     @Override
     protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
-                dstTableName, sql);
+        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})", dstTableName, sql);
     }
 
     @Override
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
         // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) WITH NO DATA
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA",
-                dstTableName, sql);
+        return StrUtil.format(
+                "CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA", dstTableName, sql);
     }
 }

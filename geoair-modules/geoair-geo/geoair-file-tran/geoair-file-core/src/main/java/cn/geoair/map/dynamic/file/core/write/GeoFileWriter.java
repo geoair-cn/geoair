@@ -4,10 +4,8 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
-
 import java.io.Closeable;
 import java.util.List;
-
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**

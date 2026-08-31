@@ -7,13 +7,13 @@ import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmAdvSimplePageOpt;
-import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.adv.spring.GirSpringDmAdvExecutor;
 import cn.hutool.core.lang.Pair;
+import cn.hutool.db.dialect.DialectName;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
-
-import cn.hutool.db.dialect.DialectName;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +47,10 @@ public class DmAdaptationTest {
 
     @Test
     public void shouldBuildMergeUpsertSqlForDameng() {
-        DmAdvBaseUpdateOpt updateOpt = new DmAdvBaseUpdateOpt(AdvQueryGlobalConfig::of, AdvTypeHandlerRegistry.create(DialectName.DM,null));
+        DmAdvBaseUpdateOpt updateOpt =
+                new DmAdvBaseUpdateOpt(
+                        AdvQueryGlobalConfig::of,
+                        AdvTypeHandlerRegistry.create(DialectName.DM, null));
         updateOpt.setDataSourceGetter(buildDataSourceGetter());
 
         LinkedHashMap<String, Object> rowData = new LinkedHashMap<>();
@@ -66,7 +67,8 @@ public class DmAdaptationTest {
                 sql.contains(
                         "USING (SELECT ? AS \"id\", ? AS \"code\", ? AS \"name\" FROM DUAL) source"));
         Assert.assertTrue(
-                sql.contains("target.\"id\" = source.\"id\" AND target.\"code\" = source.\"code\""));
+                sql.contains(
+                        "target.\"id\" = source.\"id\" AND target.\"code\" = source.\"code\""));
         Assert.assertTrue(sql.contains("UPDATE SET target.\"name\" = source.\"name\""));
         Assert.assertTrue(
                 sql.contains(
@@ -77,7 +79,10 @@ public class DmAdaptationTest {
 
     @Test
     public void shouldBuildValidUpsertWhenAllFieldsAreConflictKeys() {
-        DmAdvBaseUpdateOpt updateOpt = new DmAdvBaseUpdateOpt(AdvQueryGlobalConfig::of,AdvTypeHandlerRegistry.create(DialectName.DM,null));
+        DmAdvBaseUpdateOpt updateOpt =
+                new DmAdvBaseUpdateOpt(
+                        AdvQueryGlobalConfig::of,
+                        AdvTypeHandlerRegistry.create(DialectName.DM, null));
         updateOpt.setDataSourceGetter(buildDataSourceGetter());
 
         LinkedHashMap<String, Object> rowData = new LinkedHashMap<>();
@@ -88,24 +93,27 @@ public class DmAdaptationTest {
                 updateOpt.getUpsertSql("demo_table", rowData, Arrays.asList("id", "code"));
         String sql = upsertSql.getKey();
 
-        Assert.assertTrue(sql.contains("WHEN MATCHED THEN UPDATE SET target.\"id\" = source.\"id\""));
+        Assert.assertTrue(
+                sql.contains("WHEN MATCHED THEN UPDATE SET target.\"id\" = source.\"id\""));
         Assert.assertEquals(new ArrayList<Object>(rowData.values()), upsertSql.getValue());
     }
 
     @Test
     public void shouldUseParentPagingCountAndRnConventions() {
         AtomicReference<String> lastCountSql = new AtomicReference<>();
-        IAdvBaseOpt baseOpt = buildBaseOpt((sql, sqlParam) -> {
-            lastCountSql.set(sql);
-            return row("count", 12L);
-        });
+        IAdvBaseOpt baseOpt =
+                buildBaseOpt(
+                        (sql, sqlParam) -> {
+                            lastCountSql.set(sql);
+                            return row("count", 12L);
+                        });
 
         TestableDmAdvSimplePageOpt pageOpt =
                 new TestableDmAdvSimplePageOpt(buildDataSourceGetter(), baseOpt, null, null);
 
-        Long count = pageOpt.executeCountSqlWithParamForTest(
-                "SELECT COUNT(*) AS count FROM demo",
-                SqlParamMap.of());
+        Long count =
+                pageOpt.executeCountSqlWithParamForTest(
+                        "SELECT COUNT(*) AS count FROM demo", SqlParamMap.of());
         Assert.assertEquals(Long.valueOf(12L), count);
         Assert.assertEquals("SELECT COUNT(*) AS count FROM demo", lastCountSql.get());
 
@@ -119,15 +127,17 @@ public class DmAdaptationTest {
 
     @Test
     public void shouldFallbackCurrentDatabaseToSchemaWhenDbNameMissing() {
-        IAdvBaseOpt baseOpt = buildBaseOpt((sql, sqlParam) -> {
-            if (sql.contains("SYS_CONTEXT('USERENV', 'DB_NAME')")) {
-                return row("database_name", "");
-            }
-            if (sql.contains("SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA')")) {
-                return row("schema_name", "SYSDBA");
-            }
-            return null;
-        });
+        IAdvBaseOpt baseOpt =
+                buildBaseOpt(
+                        (sql, sqlParam) -> {
+                            if (sql.contains("SYS_CONTEXT('USERENV', 'DB_NAME')")) {
+                                return row("database_name", "");
+                            }
+                            if (sql.contains("SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA')")) {
+                                return row("schema_name", "SYSDBA");
+                            }
+                            return null;
+                        });
 
         DmAdvDDLOpt ddlOpt = new DmAdvDDLOpt(buildDataSourceGetter(), baseOpt);
         Assert.assertEquals("SYSDBA", ddlOpt.dGetCurrentDataBase());
@@ -162,39 +172,43 @@ public class DmAdaptationTest {
                     }
                     if ("bSelectOne".equals(method.getName())) {
                         String sql = (String) args[0];
-                        GirSqlParam sqlParam = args.length > 1 && args[1] instanceof GirSqlParam
-                                ? (GirSqlParam) args[1]
-                                : null;
+                        GirSqlParam sqlParam =
+                                args.length > 1 && args[1] instanceof GirSqlParam
+                                        ? (GirSqlParam) args[1]
+                                        : null;
                         return handler.handle(sql, sqlParam);
                     }
-                    throw new UnsupportedOperationException("Not needed in DM adaptation tests: " + method.getName());
+                    throw new UnsupportedOperationException(
+                            "Not needed in DM adaptation tests: " + method.getName());
                 });
     }
 
     private static DataSource buildDataSource(String productName) {
-        DatabaseMetaData metaData = proxy(
-                DatabaseMetaData.class,
-                (method, args) -> {
-                    if ("getDatabaseProductName".equals(method.getName())) {
-                        return productName;
-                    }
-                    return defaultValue(method.getReturnType());
-                });
+        DatabaseMetaData metaData =
+                proxy(
+                        DatabaseMetaData.class,
+                        (method, args) -> {
+                            if ("getDatabaseProductName".equals(method.getName())) {
+                                return productName;
+                            }
+                            return defaultValue(method.getReturnType());
+                        });
 
-        Connection connection = proxy(
-                Connection.class,
-                (method, args) -> {
-                    if ("getMetaData".equals(method.getName())) {
-                        return metaData;
-                    }
-                    if ("close".equals(method.getName())) {
-                        return null;
-                    }
-                    if ("isClosed".equals(method.getName())) {
-                        return false;
-                    }
-                    return defaultValue(method.getReturnType());
-                });
+        Connection connection =
+                proxy(
+                        Connection.class,
+                        (method, args) -> {
+                            if ("getMetaData".equals(method.getName())) {
+                                return metaData;
+                            }
+                            if ("close".equals(method.getName())) {
+                                return null;
+                            }
+                            if ("isClosed".equals(method.getName())) {
+                                return false;
+                            }
+                            return defaultValue(method.getReturnType());
+                        });
 
         return new DataSource() {
             @Override
@@ -223,12 +237,10 @@ public class DmAdaptationTest {
             }
 
             @Override
-            public void setLogWriter(PrintWriter out) {
-            }
+            public void setLogWriter(PrintWriter out) {}
 
             @Override
-            public void setLoginTimeout(int seconds) {
-            }
+            public void setLoginTimeout(int seconds) {}
 
             @Override
             public int getLoginTimeout() {
@@ -251,21 +263,24 @@ public class DmAdaptationTest {
     }
 
     private static <T> T proxy(Class<T> type, InvocationHandlerAdapter handler) {
-        InvocationHandler invocationHandler = (proxy, method, args) -> {
-            if (method.getDeclaringClass() == Object.class) {
-                if ("toString".equals(method.getName())) {
-                    return type.getSimpleName() + "Proxy";
-                }
-                if ("hashCode".equals(method.getName())) {
-                    return System.identityHashCode(proxy);
-                }
-                if ("equals".equals(method.getName())) {
-                    return proxy == args[0];
-                }
-            }
-            return handler.invoke(method, args);
-        };
-        return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, invocationHandler));
+        InvocationHandler invocationHandler =
+                (proxy, method, args) -> {
+                    if (method.getDeclaringClass() == Object.class) {
+                        if ("toString".equals(method.getName())) {
+                            return type.getSimpleName() + "Proxy";
+                        }
+                        if ("hashCode".equals(method.getName())) {
+                            return System.identityHashCode(proxy);
+                        }
+                        if ("equals".equals(method.getName())) {
+                            return proxy == args[0];
+                        }
+                    }
+                    return handler.invoke(method, args);
+                };
+        return type.cast(
+                Proxy.newProxyInstance(
+                        type.getClassLoader(), new Class<?>[] {type}, invocationHandler));
     }
 
     private static Object defaultValue(Class<?> returnType) {
@@ -310,9 +325,11 @@ public class DmAdaptationTest {
     }
 
     private static class TestableDmAdvSimplePageOpt extends DmAdvSimplePageOpt {
-        TestableDmAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
-                                   cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt advGeoPreOpt,
-                                   cn.geoair.map.dynamic.adv.query.IAdvDDLOpt advDDLOpt) {
+        TestableDmAdvSimplePageOpt(
+                IDataSourceGetter dataSourceGetter,
+                IAdvBaseOpt baseOpt,
+                cn.geoair.map.dynamic.adv.query.IAdvGeoPreOpt advGeoPreOpt,
+                cn.geoair.map.dynamic.adv.query.IAdvDDLOpt advDDLOpt) {
             super(dataSourceGetter, baseOpt, advGeoPreOpt, advDDLOpt);
         }
 

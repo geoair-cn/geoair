@@ -1,19 +1,15 @@
 package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import java.lang.reflect.Method;
-import java.sql.Blob;
-
 import cn.geoair.map.dynamic.tools.convert.GirDMSpatialTran;
 import cn.geoair.map.dynamic.tools.convert.GirDMTran;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.WKBReader;
 
 /**
  * 达梦数据库空间类型处理器。
- * <p>
- * 读取：通过反射解析 {@code dm.jdbc.driver.DmdbStruct} → Gserialized → WKB → JTS Geometry。
- * 写入：转为 WKT 字符串，JDBC 原生兼容。
+ *
+ * <p>读取：通过反射解析 {@code dm.jdbc.driver.DmdbStruct} → Gserialized → WKB → JTS Geometry。 写入：转为 WKT
+ * 字符串，JDBC 原生兼容。
  *
  * @author zhangjun
  */
@@ -35,11 +31,8 @@ public class DmGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
     }
 
-    /**
-     * 判断是否为达梦 DmdbStruct 类型（通过类名判断，避免编译期依赖达梦驱动）
-     */
+    /** 判断是否为达梦 DmdbStruct 类型（通过类名判断，避免编译期依赖达梦驱动） */
     private boolean isDmdbStruct(Object obj) {
         return obj != null && "dm.jdbc.driver.DmdbStruct".equals(obj.getClass().getName());
     }
-
 }

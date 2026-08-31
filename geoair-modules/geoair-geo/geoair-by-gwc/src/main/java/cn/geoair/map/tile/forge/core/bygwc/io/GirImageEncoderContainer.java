@@ -1,11 +1,7 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.io;
-
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.MimeType;
 import cn.geoair.map.tile.forge.core.bygwc.io.codec.ImageEncoder;
-
-
 import java.awt.image.RenderedImage;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,13 +13,9 @@ import java.util.Map;
  * call the encode() method and internally it uses the writer associated to the input mimetype.
  */
 public class GirImageEncoderContainer {
-    /**
-     * Collection of all the ImageEncoder interface implementation
-     */
+    /** Collection of all the ImageEncoder interface implementation */
     private Collection<ImageEncoder> encoders;
-    /**
-     * Map of all the encoders for mimetype
-     */
+    /** Map of all the encoders for mimetype */
     private Map<String, ImageEncoder> mapEncoders;
 
     public GirImageEncoderContainer(List<ImageEncoder> encoders) {
@@ -52,7 +44,6 @@ public class GirImageEncoderContainer {
         }
         return mapEncoders.get(mimeType).isAggressiveOutputStreamSupported();
     }
-
 
     public void init(List<ImageEncoder> encoders) {
         this.encoders = encoders;

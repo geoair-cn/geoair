@@ -3,13 +3,12 @@ package cn.geoair.map.dynamic.tools.array;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.locationtech.jts.geom.*;
-
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
+import org.locationtech.jts.geom.*;
 
 /**
  * 几何对象与坐标数组互转接口实现类 基于JTS实现核心转换逻辑，支持指定坐标顺序，保证点顺序不变
@@ -18,7 +17,6 @@ import java.util.Arrays;
  * @date 2024/12/06
  */
 public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
-
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirGeom2ArrayUtils INSTANCE;
@@ -64,7 +62,6 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         return INSTANCE;
     }
 
-
     @Override
     public double[] pointToDoubleArray(Point point) {
         return pointToDoubleArray(point, CoordOrder.X_FIRST);
@@ -80,8 +77,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         Coordinate coord = point.getCoordinate();
         return CoordOrder.X_FIRST == actualOrder
-                ? new double[]{coord.x, coord.y} // X在前
-                : new double[]{coord.y, coord.x}; // Y在前
+                ? new double[] {coord.x, coord.y} // X在前
+                : new double[] {coord.y, coord.x}; // Y在前
     }
 
     @Override
@@ -343,7 +340,8 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
     }
 
     @Override
-    public LineString doubleListToLineString(List<double[]> coords, CoordOrder order, GeometryFactory factory) {
+    public LineString doubleListToLineString(
+            List<double[]> coords, CoordOrder order, GeometryFactory factory) {
         return doubleArrayToLineString(toLineArray(coords), order, factory);
     }
 
@@ -354,11 +352,13 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     @Override
     public Polygon doubleArrayToPolygon(double[][] shell) {
-        return doubleArrayToPolygon(shell, null, CoordOrder.X_FIRST, advToolsConfig.getGeometryFactory());
+        return doubleArrayToPolygon(
+                shell, null, CoordOrder.X_FIRST, advToolsConfig.getGeometryFactory());
     }
 
     @Override
-    public Polygon doubleArrayToPolygon(double[][] shell, CoordOrder order, GeometryFactory factory) {
+    public Polygon doubleArrayToPolygon(
+            double[][] shell, CoordOrder order, GeometryFactory factory) {
         return doubleArrayToPolygon(shell, null, order, factory);
     }
 
@@ -368,16 +368,17 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
         CoordOrder actualOrder = ObjectUtil.isNull(order) ? CoordOrder.X_FIRST : order;
         GeometryFactory actualFactory =
                 ObjectUtil.isNull(factory) ? advToolsConfig.getGeometryFactory() : factory;
-        LinearRing shellRing = actualFactory.createLinearRing(
-                toRingCoordinates(shell, actualOrder, "外环"));
+        LinearRing shellRing =
+                actualFactory.createLinearRing(toRingCoordinates(shell, actualOrder, "外环"));
         LinearRing[] holeRings;
         if (holes == null || holes.isEmpty()) {
             holeRings = new LinearRing[0];
         } else {
             holeRings = new LinearRing[holes.size()];
             for (int i = 0; i < holes.size(); i++) {
-                holeRings[i] = actualFactory.createLinearRing(
-                        toRingCoordinates(holes.get(i), actualOrder, "第" + i + "个洞"));
+                holeRings[i] =
+                        actualFactory.createLinearRing(
+                                toRingCoordinates(holes.get(i), actualOrder, "第" + i + "个洞"));
             }
         }
         return actualFactory.createPolygon(shellRing, holeRings);
@@ -399,10 +400,13 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
 
     /** 将坐标列表转换为 Point 所需的二维数组，并统一空值语义。 */
     private double[] toPointArray(List<Double> coords) {
-        if (coords == null || coords.size() != 2 || coords.get(0) == null || coords.get(1) == null) {
+        if (coords == null
+                || coords.size() != 2
+                || coords.get(0) == null
+                || coords.get(1) == null) {
             throw new IllegalArgumentException("坐标列表必须包含两个非空数值");
         }
-        return new double[]{coords.get(0), coords.get(1)};
+        return new double[] {coords.get(0), coords.get(1)};
     }
 
     /** 将线坐标列表转换为数组；坐标结构和数值由后续转换方法校验。 */
@@ -426,9 +430,10 @@ public class GirGeom2ArrayUtils implements GirGeom2ArrayOpt {
             }
             validateFinite(point[0], ringName + "第" + i + "个坐标的第一个值");
             validateFinite(point[1], ringName + "第" + i + "个坐标的第二个值");
-            result[i] = CoordOrder.X_FIRST == order
-                    ? new Coordinate(point[0], point[1])
-                    : new Coordinate(point[1], point[0]);
+            result[i] =
+                    CoordOrder.X_FIRST == order
+                            ? new Coordinate(point[0], point[1])
+                            : new Coordinate(point[1], point[0]);
         }
         if (!result[0].equals2D(result[result.length - 1])) {
             result = Arrays.copyOf(result, result.length + 1);

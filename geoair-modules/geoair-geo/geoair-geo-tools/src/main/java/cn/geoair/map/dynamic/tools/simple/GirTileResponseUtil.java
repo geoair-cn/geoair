@@ -5,14 +5,13 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseDefaultOpt;
 import cn.geoair.map.dynamic.tools.simple.response.GirTileResponseOpt;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
-
 import javax.servlet.http.HttpServletResponse;
 
 /**
  * {@link TileResponse} 到 Servlet HTTP 响应的便捷入口。
  *
- * <p>无参静态方法每次创建独立实例并使用默认 {@link GirTileResponseDefaultOpt}；如需自定义
- * 输出策略，应保留本类实例并通过 {@link #setTileResponseOpt(GirTileResponseOpt)} 设置。</p>
+ * <p>无参静态方法每次创建独立实例并使用默认 {@link GirTileResponseDefaultOpt}；如需自定义 输出策略，应保留本类实例并通过 {@link
+ * #setTileResponseOpt(GirTileResponseOpt)} 设置。
  *
  * @author 张俊
  * @date 2026/7/13
@@ -56,19 +55,23 @@ public class GirTileResponseUtil {
      * 使用默认输出策略将异常写入 HTTP 响应。
      *
      * @param exception 异常
-     * @param response  Servlet HTTP 响应
+     * @param response Servlet HTTP 响应
      */
     public static void buildFromException(Exception exception, HttpServletResponse response) {
-        GirTileResponseUtil.getInstance().getTileResponseOpt().buildFromException(exception, response);
+        GirTileResponseUtil.getInstance()
+                .getTileResponseOpt()
+                .buildFromException(exception, response);
     }
     /**
      * 使用默认输出策略将瓦片响应写入 HTTP 响应。
      *
      * @param tileResponse 瓦片响应
-     * @param response     Servlet HTTP 响应
+     * @param response Servlet HTTP 响应
      */
-
-    public static void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response) {
-        GirTileResponseUtil.getInstance().getTileResponseOpt().buildFromTileResponse(tileResponse, response);
+    public static void buildFromTileResponse(
+            TileResponse tileResponse, HttpServletResponse response) {
+        GirTileResponseUtil.getInstance()
+                .getTileResponseOpt()
+                .buildFromTileResponse(tileResponse, response);
     }
 }
