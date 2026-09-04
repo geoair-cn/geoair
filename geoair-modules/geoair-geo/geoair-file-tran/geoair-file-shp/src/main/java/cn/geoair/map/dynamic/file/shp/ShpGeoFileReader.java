@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -39,7 +38,8 @@ public class ShpGeoFileReader implements GeoFileReader {
     private FeatureIterator<SimpleFeature> featureIterator;
     private SimpleFeatureType featureType;
 
-    private final AtomicInteger currentRow = new AtomicInteger(0);
+    /** 当前迭代器已消费的要素数，用于顺序分页时判断是否需要跳过或重置 */
+    private int consumedCount = 0;
 
     @Override
     public void setLinkInfo(LinkInfo linkInfo) {
@@ -64,7 +64,9 @@ public class ShpGeoFileReader implements GeoFileReader {
     }
 
     /**
-     * 初始化 Shapefile 读取器
+     * 初始化 Shapefile 读取器。
+     * 仅创建 DataStore / FeatureSource / FeatureCollection / FeatureType，
+     * 不打开 FeatureIterator——迭代器由读取方法按需懒初始化。
      */
     private void initShpReader() {
         try {
@@ -82,10 +84,31 @@ public class ShpGeoFileReader implements GeoFileReader {
             featureSource = dataStore.getFeatureSource(typeName);
             featureCollection = featureSource.getFeatures();
             featureType = featureCollection.getSchema();
-            featureIterator = featureCollection.features();
         } catch (Exception e) {
             close();
             throw new GeoFileReadException("初始化 Shapefile 读取器失败", e);
+        }
+    }
+
+    /**
+     * 懒初始化迭代器：首次调用时打开，后续复用
+     */
+    private FeatureIterator<SimpleFeature> getOrCreateIterator() {
+        if (featureIterator == null) {
+            featureIterator = featureCollection.features();
+            consumedCount = 0;
+        }
+        return featureIterator;
+    }
+
+    /**
+     * 关闭实例级迭代器并重置消费计数（不 dispose DataStore）
+     */
+    private void closeIterator() {
+        if (featureIterator != null) {
+            featureIterator.close();
+            featureIterator = null;
+            consumedCount = 0;
         }
     }
 
@@ -102,27 +125,12 @@ public class ShpGeoFileReader implements GeoFileReader {
     @Override
     public GirAdvOneRow readNextRow(ExceptionConsumer exceptionConsumer) {
         try {
-            if (featureIterator == null || !featureIterator.hasNext()) {
+            FeatureIterator<SimpleFeature> iter = getOrCreateIterator();
+            if (!iter.hasNext()) {
                 return null;
             }
-
-            SimpleFeature feature = featureIterator.next();
-            currentRow.incrementAndGet();
-
-            Map<String, Object> attributes = new HashMap<>();
-            for (Property property : feature.getProperties()) {
-                String name = property.getName().getLocalPart();
-                Object value = property.getValue();
-
-                if (value instanceof Geometry) {
-                    Geometry geom = (Geometry) value;
-                    geom.setSRID(linkInfo.getSrid());
-                    attributes.put(name, geom);
-                } else {
-                    attributes.put(name, value);
-                }
-            }
-            return GirAdvOneRow.ofByMap(attributes);
+            consumedCount++;
+            return featureToRow(iter.next());
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
             throw new GeoFileReadException("读取 shp 单行数据失败", e);
@@ -131,9 +139,8 @@ public class ShpGeoFileReader implements GeoFileReader {
 
     @Override
     public Iterator<GirAdvOneRow> readRowIterator(ExceptionConsumer exceptionConsumer) {
-        resetIterator();
-
         return new Iterator<GirAdvOneRow>() {
+            private final FeatureIterator<SimpleFeature> iterator = featureCollection.features();
             private boolean closed = false;
 
             @Override
@@ -142,7 +149,7 @@ public class ShpGeoFileReader implements GeoFileReader {
                     return false;
                 }
                 try {
-                    return featureIterator != null && featureIterator.hasNext();
+                    return iterator.hasNext();
                 } catch (Exception e) {
                     notifyException(exceptionConsumer, e);
                     closeIterator();
@@ -159,7 +166,7 @@ public class ShpGeoFileReader implements GeoFileReader {
                     closeIterator();
                     throw new NoSuchElementException("无更多数据");
                 }
-                return readNextRow(exceptionConsumer);
+                return featureToRow(iterator.next());
             }
 
             @Override
@@ -168,17 +175,10 @@ public class ShpGeoFileReader implements GeoFileReader {
             }
 
             private void closeIterator() {
-                if (!closed && featureIterator != null) {
-                    featureIterator.close();
+                if (!closed) {
+                    iterator.close();
                     closed = true;
-                    currentRow.set(0);
                 }
-            }
-
-            @Override
-            protected void finalize() throws Throwable {
-                closeIterator();
-                super.finalize();
             }
         };
     }
@@ -195,21 +195,24 @@ public class ShpGeoFileReader implements GeoFileReader {
             int start = (pageNum - 1) * pageSize;
             int end = start + pageSize;
 
-            resetIterator();
+            // 回翻时重置迭代器（从头重新打开）
+            if (start < consumedCount) {
+                closeIterator();
+            }
+
+            FeatureIterator<SimpleFeature> iter = getOrCreateIterator();
+
+            // 跳到 start 位置；顺序读取时 consumedCount == start，无需跳过
+            while (consumedCount < start && iter.hasNext()) {
+                iter.next();
+                consumedCount++;
+            }
+
+            // 读取当前页数据
             List<GirAdvOneRow> list = new ArrayList<>();
-            AtomicInteger index = new AtomicInteger(0);
-
-            while (featureIterator.hasNext()) {
-                int i = index.getAndIncrement();
-                if (i < start) {
-                    featureIterator.next();
-                    continue;
-                }
-                if (i >= end) {
-                    break;
-                }
-
-                list.add(readNextRow(consumer));
+            while (consumedCount < end && iter.hasNext()) {
+                consumedCount++;
+                list.add(featureToRow(iter.next()));
             }
 
             pager.put(list, featureCollection.size(), param);
@@ -221,14 +224,23 @@ public class ShpGeoFileReader implements GeoFileReader {
     }
 
     /**
-     * 重置迭代器
+     * 将 SimpleFeature 转换为 GirAdvOneRow
      */
-    private void resetIterator() {
-        if (featureIterator != null) {
-            featureIterator.close();
+    private GirAdvOneRow featureToRow(SimpleFeature feature) {
+        Map<String, Object> attributes = new HashMap<>();
+        for (Property property : feature.getProperties()) {
+            String name = property.getName().getLocalPart();
+            Object value = property.getValue();
+
+            if (value instanceof Geometry) {
+                Geometry geom = (Geometry) value;
+                geom.setSRID(linkInfo.getSrid());
+                attributes.put(name, geom);
+            } else {
+                attributes.put(name, value);
+            }
         }
-        initShpReader();
-        currentRow.set(0);
+        return GirAdvOneRow.ofByMap(attributes);
     }
 
     /**
@@ -236,13 +248,13 @@ public class ShpGeoFileReader implements GeoFileReader {
      */
     @Override
     public void close() {
-        if (featureIterator != null) {
-            featureIterator.close();
-        }
+        closeIterator();
         if (dataStore != null) {
             dataStore.dispose();
+            dataStore = null;
         }
         featureCollection = null;
+        featureSource = null;
         featureType = null;
     }
 
