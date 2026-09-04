@@ -69,7 +69,7 @@ public class ForeachSqlNode implements SqlNode {
             if (currentIndex != 0) {
                 context.appendSql(separator);
             }
-            Context proxy = new Context(context.getData());
+            Context proxy = Context.withSharedData(context.getData());
             String childSqlText = getChildText(proxy, currentIndex);
             context.appendSql(childSqlText);
             currentIndex++;
