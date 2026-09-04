@@ -123,6 +123,9 @@ public class GeoFileTranImpl implements GeoFileTran {
 
                 @Override
                 public void setPageConfig(PageConfig pageConfig) {
+                    boolean parallelRead = reader.supportParallelPageRead();
+                    pageConfig.setParallelConsumeRecordIs(parallelRead);
+                    pageConfig.setParallelExecPageIs(parallelRead);
                     pageConfig.setPageNumStartByZero(false);
                     pageConfig.setSaveResultListIs(false).setPageSize((long) context.getBatchSize());
                 }

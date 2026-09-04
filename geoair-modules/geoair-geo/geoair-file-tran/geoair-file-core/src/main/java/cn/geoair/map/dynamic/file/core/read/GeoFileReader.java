@@ -22,6 +22,13 @@ public interface GeoFileReader extends Closeable {
 
     long getFeatureCount();
 
+    /**
+     *  是否支持并发读取
+     * @return
+     */
+    default boolean supportParallelPageRead() {
+        return true;
+    }
     // 读取表头
     SimpleFeatureType readHeader(ExceptionConsumer exceptionConsumer);
 

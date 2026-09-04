@@ -7,6 +7,7 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -49,6 +51,10 @@ public class ShpGeoFileReader implements GeoFileReader {
         initShpReader();
     }
 
+    public boolean supportParallelPageRead() {
+        return false;
+    }
+
     @Override
     public long getFeatureCount() {
         if (this.featureCollection == null) {
@@ -57,7 +63,9 @@ public class ShpGeoFileReader implements GeoFileReader {
         return this.featureCollection.size();
     }
 
-    /** 初始化 Shapefile 读取器 */
+    /**
+     * 初始化 Shapefile 读取器
+     */
     private void initShpReader() {
         try {
             File shpFile = new File(linkInfo.getShpFilePath());
@@ -212,7 +220,9 @@ public class ShpGeoFileReader implements GeoFileReader {
         return pager;
     }
 
-    /** 重置迭代器 */
+    /**
+     * 重置迭代器
+     */
     private void resetIterator() {
         if (featureIterator != null) {
             featureIterator.close();
@@ -221,7 +231,9 @@ public class ShpGeoFileReader implements GeoFileReader {
         currentRow.set(0);
     }
 
-    /** 关闭资源 */
+    /**
+     * 关闭资源
+     */
     @Override
     public void close() {
         if (featureIterator != null) {
