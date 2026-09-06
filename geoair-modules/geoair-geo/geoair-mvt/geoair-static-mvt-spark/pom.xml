@@ -48,6 +48,12 @@
       <version>${geoair.version}</version>
     </dependency>
 
+    <!-- 直接声明以优先于 Hadoop 3.2 传递的 protobuf 2.5.0，保证 MVT 编码/解码运行时可用。 -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
       <artifactId>geoair-jdbc-url</artifactId>
