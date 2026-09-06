@@ -87,6 +87,17 @@ public class GirAdvQuery {
     }
 
     /**
+     * 按稳定方言标识创建执行器，不会探测 JDBC 元数据。
+     *
+     * <p>适用于 Hutool {@link DialectName} 无法区分的兼容数据库，例如 {@code kingbase}、
+     * {@code opengauss}。内置方言标识可通过 {@link AdvExecutorFactory#getRegisteredProviders()} 查看。</p>
+     */
+    public static IAdvExecutor getIAdvExecutor(
+            String dialectId, DataSource dataSource, String dataSourceName) {
+        return AdvExecutorFactory.getAdvExecutorByDialectId(dialectId, dataSource, dataSourceName);
+    }
+
+    /**
      * 通过 DataSource + 方言直接获取执行器（跳过 JDBC 连接探测）
      *
      * <p>当调用方已经明确知道数据库类型时，使用此方法可以完全跳过
