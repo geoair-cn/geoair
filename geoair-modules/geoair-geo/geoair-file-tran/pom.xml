@@ -36,9 +36,12 @@
 
   <modules>
     <module>geoair-file-core</module>
+    <module>geoair-file-jdbc</module>
     <module>geoair-file-csv</module>
     <module>geoair-file-geojson</module>
     <module>geoair-file-postgis</module>
+    <module>geoair-file-oracle</module>
+    <module>geoair-file-mysql</module>
     <module>geoair-file-shp</module>
 <!--    <module>geoair-file-test</module>-->
   </modules>
@@ -69,12 +72,27 @@
       </dependency>
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-jdbc</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-file-geojson</artifactId>
         <version>${geoair.version}</version>
       </dependency>
       <dependency>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-file-postgis</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-oracle</artifactId>
+        <version>${geoair.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-mysql</artifactId>
         <version>${geoair.version}</version>
       </dependency>
     </dependencies>

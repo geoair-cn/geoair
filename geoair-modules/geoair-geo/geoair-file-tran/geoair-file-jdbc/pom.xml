@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-file-tran</artifactId>
+    <version>J8-dev-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>geoair-file-jdbc</artifactId>
+  <packaging>jar</packaging>
+  <name>geoair-file-jdbc</name>
+  <description>GeoAir 文件转换 JDBC 空间方言公共层</description>
+  <dependencies>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-file-core</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-jdbc-url</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-jdbc</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
