@@ -79,6 +79,13 @@
         <version>${ecc.vectortile.version}</version>
       </dependency>
 
+      <!-- VectorTile 生成代码需要 GeneratedMessageV3，不能被 Hadoop 3.2 的 protobuf 2.5.0 降级。 -->
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>net.postgis</groupId>
         <artifactId>postgis-jdbc</artifactId>
