@@ -90,7 +90,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
     @Override
     public List<String> eGetAllGeoLayerName() {
-        String schemaName = dataSourceGetter.getSchemaName();
+        String schemaName = resolveOwner(null);
         String sql = StrUtil.format(
                 "SELECT TABLE_NAME AS \"table_name\" FROM ALL_TAB_COLUMNS " +
                 "WHERE DATA_TYPE = 'SDO_GEOMETRY' AND OWNER = UPPER('{}') " +
@@ -110,7 +110,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         if (StrUtil.isEmpty(layerNameKeyword)) {
             return eGetAllGeoLayerName();
         }
-        String schemaName = dataSourceGetter.getSchemaName();
+        String schemaName = resolveOwner(null);
         // 转义单引号防止 SQL 注入
         String safeKeyword = layerNameKeyword.replace("'", "''");
         String sql = StrUtil.format(
@@ -198,10 +198,12 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         validateTableName(tableName);
         String nameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String owner = resolveOracleOwner(tableName);
 
         String sql = StrUtil.format(
                 "SELECT COLUMN_NAME AS \"column_name\" FROM ALL_TAB_COLUMNS " +
-                "WHERE TABLE_NAME = '{}' AND DATA_TYPE = 'SDO_GEOMETRY'",
+                "WHERE OWNER = UPPER('{}') AND TABLE_NAME = UPPER('{}') AND DATA_TYPE = 'SDO_GEOMETRY'",
+                owner,
                 nameNotSchema);
 
         List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
@@ -377,95 +379,129 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     public void eAddGeomColumn(String tableName, String geomFieldName, AdvEnumsTypeGeom geomType, int srid) {
         validateTableName(tableName);
         validateGeomFieldName(geomFieldName);
+        validateSrid(srid);
+        if (!ddlOpt.dIsTableExists(tableName)) {
+            throw new IllegalArgumentException("表不存在：" + tableName);
+        }
+        if (ddlOpt.dGetColumnsByTable(tableName)
+                .findField(field -> geomFieldName.equalsIgnoreCase(field.getColumnName())).isPresent()) {
+            throw new IllegalArgumentException("字段已存在，无法添加空间字段：" + geomFieldName);
+        }
 
         String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String metadataTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String indexName = buildDefaultSpatialIndexName(tableName, geomFieldName);
 
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql = StrUtil.format(
                 "ALTER TABLE {} ADD {} SDO_GEOMETRY",
                 qualifiedTableName, quotedGeomFieldName);
-        ddlOpt.dExecuteDDL(sql, tableName, "添加空间字段[" + geomFieldName + "]");
-
         String insertMetaSql = StrUtil.format(
                 "INSERT INTO USER_SDO_GEOM_METADATA (TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) " +
                 "VALUES (UPPER('{}'), UPPER('{}'), " +
                 "SDO_DIM_ARRAY(SDO_DIM_ELEMENT('X', -180, 180, 0.005), " +
                 "SDO_DIM_ELEMENT('Y', -90, 90, 0.005)), {})",
-                qualifiedTableName, geomFieldName, srid);
+                metadataTableName, geomFieldName, srid);
 
+        boolean fieldCreated = false;
         try {
+            // Oracle 的 DDL 会隐式提交，因此后续步骤失败时只能进行补偿清理。
+            ddlOpt.dExecuteDDL(sql, tableName, "添加空间字段[" + geomFieldName + "]");
+            fieldCreated = true;
             ddlOpt.dExecuteDDL(insertMetaSql, tableName, "插入空间元数据");
+            eCreateSpatialIndex(tableName, geomFieldName, indexName);
         } catch (Exception e) {
-            log.warn("插入空间元数据失败: {}", e.getMessage());
+            if (fieldCreated) {
+                compensateAddGeomColumnFailure(tableName, qualifiedTableName, metadataTableName, geomFieldName, indexName);
+            }
+            throw new RuntimeException("添加 Oracle 空间字段、元数据或索引失败；已尝试补偿清理", e);
         }
-
-        String indexName = StrUtil.format("IDX_{}_{}", tableName, geomFieldName).toUpperCase();
-        eCreateSpatialIndex(tableName, geomFieldName, indexName);
     }
 
     @Override
     public void eDropGeomColumn(String tableName, String geomFieldName) {
         validateTableName(tableName);
         validateGeomFieldName(geomFieldName);
+        if (!eGetGeomColumnNameListByTable(tableName).stream()
+                .anyMatch(column -> geomFieldName.equalsIgnoreCase(column))) {
+            throw new IllegalArgumentException("指定字段不是 Oracle SDO_GEOMETRY 字段：" + geomFieldName);
+        }
 
         String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String metadataTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        for (String indexName : findSpatialIndexNames(tableName, geomFieldName)) {
+            ddlOpt.dExecuteDDL(
+                    StrUtil.format("DROP INDEX {}", dialectTableNameProcessor.tbQuoteFieldName(indexName)),
+                    tableName,
+                    "删除空间字段关联索引[" + indexName + "]");
+        }
+        String sql = StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedGeomFieldName);
+        ddlOpt.dExecuteDDL(sql, tableName, "删除空间字段[" + geomFieldName + "]");
         String deleteMetaSql = StrUtil.format(
                 "DELETE FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
-                qualifiedTableName, geomFieldName);
-
+                metadataTableName, geomFieldName);
         try {
             ddlOpt.dExecuteDDL(deleteMetaSql, tableName, "删除空间元数据");
         } catch (Exception e) {
-            log.warn("删除空间元数据失败: {}", e.getMessage());
+            throw new IllegalStateException("Oracle 空间字段已删除，但空间元数据清理失败；请手动清理 USER_SDO_GEOM_METADATA，表="
+                    + metadataTableName + "，字段=" + geomFieldName, e);
         }
-
-        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
-        String sql = StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedGeomFieldName);
-        ddlOpt.dExecuteDDL(sql, tableName, "删除空间字段[" + geomFieldName + "]");
     }
 
     @Override
     public void eTransformSrid(String tableName, String geomFieldName, int targetSrid) {
         validateTableName(tableName);
         validateGeomFieldName(geomFieldName);
+        validateSrid(targetSrid);
+        if (!ddlOpt.dIsTableExists(tableName)) {
+            throw new IllegalArgumentException("表不存在：" + tableName);
+        }
 
         String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
+        String metadataTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
 
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql = StrUtil.format(
                 "UPDATE {} SET {} = SDO_CS.TRANSFORM({}, {}) WHERE {} IS NOT NULL",
                 qualifiedTableName, quotedGeomFieldName, quotedGeomFieldName, targetSrid, quotedGeomFieldName);
 
-        ddlOpt.dExecuteDDL(sql, tableName, "转换SRID为" + targetSrid);
-
         String updateMetaSql = StrUtil.format(
                 "UPDATE USER_SDO_GEOM_METADATA SET SRID = {} WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
-                targetSrid, qualifiedTableName, geomFieldName);
-
-        try {
-            ddlOpt.dExecuteDDL(updateMetaSql, tableName, "更新空间元数据SRID");
-        } catch (Exception e) {
-            log.warn("更新空间元数据SRID失败: {}", e.getMessage());
-        }
+                targetSrid, metadataTableName, geomFieldName);
+        // 两条均为 DML；放在同一连接中，避免数据已转换而元数据仍指向旧 SRID。
+        ddlOpt.dExecuteStatements(
+                Arrays.asList(sql, updateMetaSql), tableName, "Oracle Spatial SRID转换及元数据同步为" + targetSrid);
     }
 
     @Override
     public void eCreateSpatialIndex(String tableName, String geomFieldName, String indexName) {
         validateTableName(tableName);
         validateGeomFieldName(geomFieldName);
+        if (StrUtil.isBlank(indexName)) {
+            throw new IllegalArgumentException("空间索引名不能为空");
+        }
+        if (!eGetGeomColumnNameListByTable(tableName).stream()
+                .anyMatch(column -> geomFieldName.equalsIgnoreCase(column))) {
+            throw new IllegalArgumentException("指定字段不是 Oracle SDO_GEOMETRY 字段：" + geomFieldName);
+        }
 
         String qualifiedTableName = dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String sql = StrUtil.format(
                 "CREATE INDEX {} ON {} ({}) INDEXTYPE IS MDSYS.SPATIAL_INDEX",
-                indexName, qualifiedTableName, geomFieldName);
+                dialectTableNameProcessor.tbQuoteFieldName(indexName), qualifiedTableName, quotedGeomFieldName);
 
         ddlOpt.dExecuteDDL(sql, tableName, "创建空间索引[" + indexName + "]");
     }
 
     @Override
     public void eDropSpatialIndex(String tableName, String indexName) {
-        String sql = StrUtil.format("DROP INDEX {}", indexName);
+        validateTableName(tableName);
+        if (StrUtil.isBlank(indexName)) {
+            throw new IllegalArgumentException("索引名不能为空");
+        }
+        String sql = StrUtil.format("DROP INDEX {}", dialectTableNameProcessor.tbQuoteFieldName(indexName));
         ddlOpt.dExecuteDDL(sql, tableName, "删除空间索引[" + indexName + "]");
     }
 
@@ -476,7 +512,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT * FROM {} WHERE SDO_RELATE({}, SDO_GEOMETRY('{}', {}), 'MASK=ANYINTERACT') = 'TRUE'",
-                qualifiedTableName, quotedGeomFieldName, geometry, srid);
+                qualifiedTableName, quotedGeomFieldName, escapeSqlLiteral(geometry), srid);
     }
 
     @Override
@@ -484,7 +520,7 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
                 "SELECT * FROM {} WHERE SDO_RELATE({}, SDO_GEOMETRY('{}', {}), 'MASK=INSIDE') = 'TRUE'",
-                qualifiedTableName, quotedGeomFieldName, bboxWkt, srid);
+                qualifiedTableName, quotedGeomFieldName, escapeSqlLiteral(bboxWkt), srid);
     }
 
     @Override
@@ -492,16 +528,18 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
                                           String distanceAlias, String qualifiedTableName) {
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
-                "SELECT *, SDO_GEOM.SDO_DISTANCE({}, SDO_GEOMETRY('{}', {}), 0.005) AS \"{}\" FROM {}",
-                quotedGeomFieldName, geometry, srid, distanceAlias, qualifiedTableName);
+                "SELECT *, SDO_GEOM.SDO_DISTANCE({}, SDO_GEOMETRY('{}', {}), 0.005) AS {} FROM {}",
+                quotedGeomFieldName, escapeSqlLiteral(geometry), srid,
+                dialectTableNameProcessor.tbQuoteFieldName(distanceAlias), qualifiedTableName);
     }
 
     @Override
     public String getCentroidSql(String geomFieldName, String centerAlias, String qualifiedTableName) {
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         return StrUtil.format(
-                "SELECT {}, SDO_GEOM.SDO_CENTROID({}, 0.005) AS \"{}\" FROM {}",
-                "*", quotedGeomFieldName, centerAlias, qualifiedTableName);
+                "SELECT {}, SDO_GEOM.SDO_CENTROID({}, 0.005) AS {} FROM {}",
+                "*", quotedGeomFieldName,
+                dialectTableNameProcessor.tbQuoteFieldName(centerAlias), qualifiedTableName);
     }
 
     @Override
@@ -510,6 +548,19 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "SELECT id FROM {} WHERE SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT({}, 0.005) <> 'TRUE'",
                 qualifiedTableName, quotedGeomFieldName);
+    }
+
+    @Override
+    protected String buildValidateGeometriesByPrimaryKeysSql(
+            String qualifiedTableName, String geomFieldName, List<String> primaryKeys) {
+        String selectedKeys = primaryKeys.stream()
+                .map(dialectTableNameProcessor::tbQuoteFieldName)
+                .collect(java.util.stream.Collectors.joining(", "));
+        return StrUtil.format(
+                "SELECT {} FROM {} WHERE SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT({}, 0.005) <> 'TRUE'",
+                selectedKeys,
+                qualifiedTableName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
     }
 
     @Override
@@ -555,5 +606,98 @@ public class OracleAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public String eGetGeomColumnNameBySql(String dynamicSql, GirSqlParam sqlParam) {
         return eGetGeomColumnNameBySql(dynamicSql);
+    }
+
+    /**
+     * Oracle DDL 隐式提交，新增字段后的元数据或索引步骤失败时无法通过 rollback 恢复。
+     * 此处仅回退本次生成的索引、元数据和字段，所有补偿失败都会保留在日志中供人工处理。
+     */
+    private void compensateAddGeomColumnFailure(
+            String tableName,
+            String qualifiedTableName,
+            String metadataTableName,
+            String geomFieldName,
+            String indexName) {
+        try {
+            if (ddlOpt.dIndexesExists(tableName, indexName)) {
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("DROP INDEX {}", dialectTableNameProcessor.tbQuoteFieldName(indexName)),
+                        tableName,
+                        "回退Oracle空间索引");
+            }
+            ddlOpt.dExecuteDDL(
+                    StrUtil.format("DELETE FROM USER_SDO_GEOM_METADATA WHERE TABLE_NAME = UPPER('{}') AND COLUMN_NAME = UPPER('{}')",
+                            metadataTableName, geomFieldName),
+                    tableName,
+                    "回退Oracle空间元数据");
+            if (ddlOpt.dGetColumnsByTable(tableName)
+                    .findField(field -> geomFieldName.equalsIgnoreCase(field.getColumnName())).isPresent()) {
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName,
+                                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName)),
+                        tableName,
+                        "回退Oracle空间字段");
+            }
+        } catch (Exception compensationError) {
+            log.error("Oracle 添加空间字段失败后的补偿未完成，表={}, 字段={}, 索引={}",
+                    tableName, geomFieldName, indexName, compensationError);
+        }
+    }
+
+    /** 将 WKT 等外部文本安全嵌入 SQL 字符串字面量。 */
+    private static String escapeSqlLiteral(String value) {
+        return value == null ? "" : value.replace("'", "''");
+    }
+
+    /**
+     * 获取目标表所属的 Oracle Schema，避免 {@code ALL_*} 数据字典视图跨 Schema 混入同名表。
+     */
+    private String resolveOracleOwner(String tableName) {
+        String owner = resolveOwner(tableName);
+        if (StrUtil.isBlank(owner)) {
+            throw new IllegalStateException("无法确定 Oracle 表所属 Schema：" + tableName);
+        }
+        return owner;
+    }
+
+    /**
+     * 查询绑定到指定空间字段的 domain 索引。删除列前先显式删除这些索引，避免不同 Oracle
+     * 版本对 Spatial 索引依赖关系的处理差异导致 DDL 失败或留下无效索引。
+     */
+    private List<String> findSpatialIndexNames(String tableName, String geomFieldName) {
+        String owner = resolveOracleOwner(tableName);
+        String plainTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
+        String sql = StrUtil.format(
+                "SELECT c.INDEX_NAME AS \"index_name\" "
+                        + "FROM ALL_IND_COLUMNS c "
+                        + "JOIN ALL_INDEXES i ON i.OWNER = c.INDEX_OWNER AND i.INDEX_NAME = c.INDEX_NAME "
+                        + "WHERE c.TABLE_OWNER = UPPER('{}') AND c.TABLE_NAME = UPPER('{}') "
+                        + "AND c.COLUMN_NAME = UPPER('{}') AND i.INDEX_TYPE = 'DOMAIN'",
+                owner,
+                plainTableName,
+                geomFieldName);
+        List<String> indexNames = new ArrayList<>();
+        for (GirAdvOneRow row : baseOpt.bSelectList(sql)) {
+            String indexName = row.getStr("index_name");
+            if (StrUtil.isNotBlank(indexName)) {
+                indexNames.add(indexName);
+            }
+        }
+        return indexNames;
+    }
+
+    /**
+     * 生成同时兼容 Oracle 12.1 及更高版本的空间索引名。Oracle 12.1 的标识符上限为 30
+     * 个字符；截断部分追加稳定哈希，避免长表名、字段名组合发生碰撞。
+     */
+    private String buildDefaultSpatialIndexName(String tableName, String geomFieldName) {
+        String source = "IDX_" + dialectTableNameProcessor.tbGetTableNameNotSchema(tableName)
+                + "_" + geomFieldName;
+        String normalized = source.toUpperCase(Locale.ROOT).replaceAll("[^A-Z0-9_$#]", "_");
+        if (normalized.length() <= 30) {
+            return normalized;
+        }
+        String suffix = "_" + Integer.toHexString(normalized.hashCode()).toUpperCase(Locale.ROOT);
+        return normalized.substring(0, 30 - suffix.length()) + suffix;
     }
 }

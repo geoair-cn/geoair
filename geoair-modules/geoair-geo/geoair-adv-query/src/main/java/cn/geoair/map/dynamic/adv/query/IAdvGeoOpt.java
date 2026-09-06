@@ -473,7 +473,7 @@ public interface IAdvGeoOpt extends IAdvConfigOpt {
      *
      * @param tableName     表名
      * @param geomFieldName 空间字段名
-     * @return 无效的几何体ID列表
+     * @return 无效几何记录的主键列表；单字段主键返回主键值，复合主键返回按主键字段顺序组织的 {@link Map}
      */
     List<Object> eValidateGeometries(String tableName, String geomFieldName);
 

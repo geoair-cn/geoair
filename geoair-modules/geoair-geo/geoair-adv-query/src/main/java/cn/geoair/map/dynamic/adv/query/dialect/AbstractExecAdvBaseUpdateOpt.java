@@ -335,12 +335,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         int batchNum = 1;
         Connection connection = null;
         boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
 
         try {
             connection = dataSourceGetter.getConnection();
+            if (connection == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
             // 保存原始 autoCommit 状态
             originalAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
 
             // 循环每一批执行
             for (List<Pair<String, List<Object>>> currentBatchParam : batchGroupParams) {
@@ -355,7 +362,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             }
 
             // 整批全部无异常统一提交
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             long cost = stopWatch.getTotalTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
                     this.getClass(), "bUpdateBatchByPK",
@@ -364,11 +373,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         } catch (SQLException e) {
             // 异常回滚
-            try {
-                connection.rollback();
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
-            } catch (SQLException ex) {
-                AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
+            if (manageTransaction && connection != null) {
+                try {
+                    connection.rollback();
+                    AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+                } catch (SQLException ex) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).warn("事务回滚失败，表名：{}", tableName, ex);
+                }
             }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bUpdateBatchByPK",
@@ -379,7 +390,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             // 恢复原始 autoCommit 状态（重要：防止连接池污染）
             if (connection != null) {
                 try {
-                    connection.setAutoCommit(originalAutoCommit);
+                    if (connection.getAutoCommit() != originalAutoCommit) {
+                        connection.setAutoCommit(originalAutoCommit);
+                    }
                 } catch (SQLException e) {
                     AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
                 }
@@ -644,6 +657,7 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         if (CollUtil.isEmpty(conflictKeys)) {
             throw new IllegalArgumentException("冲突判定字段不能为空");
         }
+        validateConflictKeysInRowData(rowData, conflictKeys);
 
         String tableNameNotSchema = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String schemaNameByTableName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
@@ -667,6 +681,25 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         String updateClause = buildUpsertUpdateClause(rowData, conflictKeysList);
         String execSql = buildUpdateOrInsertSql(quoteTableName, fields, placeholders, conflictFields, updateClause);
         return Pair.of(execSql, params);
+    }
+
+    /**
+     * 校验 UPSERT 冲突字段均能从待写入行中取值。
+     *
+     * <p>SQL Server 等方言会在 {@code MERGE} 的 source 别名中引用这些字段；提前校验可避免
+     * 生成无法执行的 SQL。</p>
+     */
+    private void validateConflictKeysInRowData(Map<String, Object> rowData, List<String> conflictKeys) {
+        for (String conflictKey : conflictKeys) {
+            if (StrUtil.isBlank(conflictKey)) {
+                throw new IllegalArgumentException("冲突判定字段不能为空");
+            }
+            String normalizedConflictKey = dialectTableNameProcessor.tbUnquoteTableName(conflictKey);
+            boolean present = rowData.keySet().stream().anyMatch(key -> key.equalsIgnoreCase(normalizedConflictKey));
+            if (!present) {
+                throw new IllegalArgumentException("冲突判定字段未包含在待 UPSERT 数据中：" + normalizedConflictKey);
+            }
+        }
     }
 
     @Override
@@ -796,12 +829,19 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         int batchNum = 1;
         Connection connection = null;
         boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
 
         try {
             connection = dataSourceGetter.getConnection();
+            if (connection == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
             // 保存原始 autoCommit 状态
             originalAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
 
             for (List<Map<String, Object>> currentBatchData : batchGroupParams) {
                 stopWatch.start();
@@ -815,7 +855,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
             }
 
             // 全量批次执行完统一提交事务
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             long cost = stopWatch.getTotalTimeMillis();
             // 执行成功日志
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
@@ -825,11 +867,13 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
 
         } catch (SQLException e) {
             // 异常回滚
-            try {
-                connection.rollback();
-                AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
-            } catch (SQLException ex) {
-                AdvLogSql.of(dataSourceGetter, getConfig()).error("事务回滚失败，表名：{}", tableName, ex);
+            if (manageTransaction && connection != null) {
+                try {
+                    connection.rollback();
+                    AdvLogSql.of(dataSourceGetter, getConfig()).debug("事务回滚成功，表名：{}", tableName);
+                } catch (SQLException ex) {
+                    AdvLogSql.of(dataSourceGetter, getConfig()).error("事务回滚失败，表名：{}", tableName, ex);
+                }
             }
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(), "bUpsertBatch",
@@ -839,7 +883,9 @@ public abstract class AbstractExecAdvBaseUpdateOpt implements IAdvBaseUpdateOpt 
         } finally {
             if (connection != null) {
                 try {
-                    connection.setAutoCommit(originalAutoCommit);
+                    if (connection.getAutoCommit() != originalAutoCommit) {
+                        connection.setAutoCommit(originalAutoCommit);
+                    }
                 } catch (SQLException e) {
                     AdvLogSql.of(dataSourceGetter, getConfig()).warn("恢复连接 autoCommit 状态失败", e);
                 }

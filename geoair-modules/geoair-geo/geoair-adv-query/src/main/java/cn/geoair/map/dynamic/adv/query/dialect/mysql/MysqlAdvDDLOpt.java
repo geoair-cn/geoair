@@ -689,29 +689,27 @@ public class MysqlAdvDDLOpt extends AbstractExecAdvDDLOpt {
     }
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
-        // MySQL: CREATE TABLE IF NOT EXISTS target SELECT * FROM source
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} SELECT * FROM {}",
+        // 通用流程已先执行 CREATE TABLE LIKE，此处只负责复制数据。
+        return StrUtil.format("INSERT INTO {} SELECT * FROM {}",
                 dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
-        // MySQL: CREATE TABLE IF NOT EXISTS target LIKE source
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} LIKE {}",
+        // 目标表已由通用流程确保不存在，禁止 IF NOT EXISTS 静默复用旧表。
+        return StrUtil.format("CREATE TABLE {} LIKE {}",
                 dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
-        // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
+        return StrUtil.format("CREATE TABLE {} AS ({})",
                 dstTableName, sql);
     }
 
     @Override
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
-        // MySQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) LIMIT 0
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) LIMIT 0",
+        return StrUtil.format("CREATE TABLE {} AS ({}) LIMIT 0",
                 dstTableName, sql);
     }
 }

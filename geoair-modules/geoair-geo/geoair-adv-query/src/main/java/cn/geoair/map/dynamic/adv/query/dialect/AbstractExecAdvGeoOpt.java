@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,22 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
      */
     public abstract String getValidateGeometriesSql(
             String qualifiedTableName, String geomFieldName);
+
+    /**
+     * 构造查询无效几何记录主键的 SQL。
+     *
+     * <p>空间校验结果必须由真实主键定位，不能假定每张业务表都包含 {@code id} 字段。
+     * 该方法仅供 {@link #eValidateGeometries(String, String)} 使用；公开的
+     * {@link #getValidateGeometriesSql(String, String)} 保留原有的 SQL 文本构造语义，
+     * 以兼容已有调用方。</p>
+     *
+     * @param qualifiedTableName 已按方言处理的表名
+     * @param geomFieldName 几何字段名
+     * @param primaryKeys 表的主键字段，已由元数据查询确认非空
+     * @return 仅返回主键字段的无效几何查询 SQL
+     */
+    protected abstract String buildValidateGeometriesByPrimaryKeysSql(
+            String qualifiedTableName, String geomFieldName, List<String> primaryKeys);
 
     /**
      * 获取修复几何体的SQL
@@ -485,16 +502,31 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
             throw new RuntimeException("表[" + tableName + "]不存在");
         }
 
+        List<String> primaryKeys = getAdvDDLOpt().dGetPrimaryKeys(tableName);
+        if (CollectionUtil.isEmpty(primaryKeys)) {
+            throw new IllegalStateException("无法返回无效几何记录：表未定义主键：" + tableName);
+        }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = getValidateGeometriesSql(qualifiedTableName, geomFieldName);
+        String sql = buildValidateGeometriesByPrimaryKeysSql(
+                qualifiedTableName, geomFieldName, primaryKeys);
 
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
-        List<Object> invalidIds = new ArrayList<>();
+        List<Object> invalidKeys = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(rows)) {
-            rows.forEach(row -> invalidIds.add(row.get("id")));
+            for (GirAdvOneRow row : rows) {
+                if (primaryKeys.size() == 1) {
+                    invalidKeys.add(row.get(primaryKeys.get(0)));
+                    continue;
+                }
+                Map<String, Object> key = new LinkedHashMap<>();
+                for (String primaryKey : primaryKeys) {
+                    key.put(primaryKey, row.get(primaryKey));
+                }
+                invalidKeys.add(key);
+            }
         }
-        return invalidIds;
+        return invalidKeys;
     }
 
     @Override
@@ -519,22 +551,42 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
         Connection conn = null;
         Statement stmt = null;
         int updatedCount = 0;
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
         try {
             conn = dataSourceGetter.getConnection();
-            conn.setAutoCommit(false);
+            if (conn == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
+            originalAutoCommit = conn.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                conn.setAutoCommit(false);
+            }
             stmt = conn.createStatement();
             updatedCount = stmt.executeUpdate(sql);
-            conn.commit();
+            if (manageTransaction) {
+                conn.commit();
+            }
             log.debug("修复表[{}]中的无效几何体，共修复{}条记录", tableName, updatedCount);
         } catch (SQLException e) {
             try {
-                if (conn != null) conn.rollback();
+                if (manageTransaction && conn != null) conn.rollback();
             } catch (SQLException ex) {
                 log.warn("修复几何体回滚失败", ex);
             }
             log.error("修复表[{}]中的无效几何体失败", tableName, e);
             throw new RuntimeException("修复几何体失败: " + e.getMessage(), e);
         } finally {
+            if (conn != null) {
+                try {
+                    if (conn.getAutoCommit() != originalAutoCommit) {
+                        conn.setAutoCommit(originalAutoCommit);
+                    }
+                } catch (SQLException e) {
+                    log.warn("修复几何体后恢复自动提交模式失败", e);
+                }
+            }
             dataSourceGetter.closeResources(null, stmt, conn);
         }
         return updatedCount;

@@ -97,12 +97,18 @@ public abstract class AbstractExecDialectTableUtil implements DialectTableNamePr
 
     @Override
     public String tbQuoteTableName(String tableName) {
-        // 通用加引号逻辑：避免重复加引号
-        if (StrUtil.isEmpty(tableName)
-            || (tableName.startsWith(getQuoteChar()) && tableName.endsWith(getQuoteChar()))) {
+        if (StrUtil.isEmpty(tableName)) {
             return tableName;
         }
-        return StrUtil.wrap(tableName, getQuoteChar());
+        String identifier = tableName;
+        if (identifier.startsWith(getQuoteChar()) && identifier.endsWith(getQuoteChar())
+                && identifier.length() >= getQuoteChar().length() * 2) {
+            identifier = identifier.substring(getQuoteChar().length(),
+                    identifier.length() - getQuoteChar().length());
+            identifier = identifier.replace(getQuoteChar() + getQuoteChar(), getQuoteChar());
+        }
+        return getQuoteChar() + identifier.replace(getQuoteChar(), getQuoteChar() + getQuoteChar())
+                + getQuoteChar();
     }
 
     @Override

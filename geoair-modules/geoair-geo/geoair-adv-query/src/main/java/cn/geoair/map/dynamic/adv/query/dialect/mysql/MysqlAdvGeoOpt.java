@@ -222,7 +222,13 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
     @Override
     public List<String> eGetGeomColumnNameListByTable(String tableName) {
         validateTableName(tableName);
-        String schemaName = dataSourceGetter.getSchemaName();
+        String schemaName = dialectTableNameProcessor.tbExtractSchemaName(tableName);
+        if (StrUtil.isBlank(schemaName)) {
+            schemaName = dataSourceGetter.getSchemaName();
+        }
+        if (StrUtil.isBlank(schemaName)) {
+            throw new IllegalStateException("无法确定 MySQL 表所属数据库：" + tableName);
+        }
 
         String sql =
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
@@ -335,7 +341,10 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         StringBuilder where = new StringBuilder("WHERE ");
         for (int i = 0; i < geomFieldNames.size(); i++) {
             String field = geomFieldNames.get(i);
-            sridSelect.append(StrUtil.format("IFNULL(ST_SRID({}), -1) AS {}_srid", dialectTableNameProcessor.tbQuoteFieldName(field), field));
+            sridSelect.append(StrUtil.format(
+                    "IFNULL(ST_SRID({}), -1) AS {}",
+                    dialectTableNameProcessor.tbQuoteFieldName(field),
+                    dialectTableNameProcessor.tbQuoteFieldName(field + "_srid")));
             where.append(dialectTableNameProcessor.tbQuoteFieldName(field)).append(" IS NOT NULL");
             if (i != geomFieldNames.size() - 1) {
                 sridSelect.append(", ");
@@ -374,22 +383,28 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         if (StrUtil.isNotEmpty(eGetGeomColumnNameByTable(tableName))) {
             throw new RuntimeException("表[" + tableName + "]已存在空间字段，MySQL暂不支持多空间字段");
         }
+        if (hasColumn(tableName, geomFieldName)) {
+            throw new IllegalArgumentException("字段已存在，无法添加空间字段：" + geomFieldName);
+        }
 
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         // MySQL空间字段定义语法：GEOMETRY/SRID 或 具体类型（如POINT）
-        String sql =
-                StrUtil.format(
-                        "ALTER TABLE {} ADD COLUMN {} {} SRID {};",
-                        qualifiedTableName,
-                        dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                        geomType.getCode().toUpperCase(),
-                        srid);
-        ddlOpt.dExecuteDDL(sql, tableName, "添加MySQL空间字段[" + geomFieldName + "]");
-
-        // 创建MySQL空间索引（SPATIAL INDEX）
         String indexName = StrUtil.format("idx_{}_{}", tableName, geomFieldName);
-        eCreateSpatialIndex(tableName, geomFieldName, indexName);
+        String quotedGeomField = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        try {
+            ddlOpt.dExecuteStatements(Arrays.asList(
+                            StrUtil.format("ALTER TABLE {} ADD COLUMN {} {} SRID {}",
+                                    qualifiedTableName, quotedGeomField, geomType.getCode().toUpperCase(), srid),
+                            StrUtil.format("CREATE SPATIAL INDEX {} ON {} ({})",
+                                    dialectTableNameProcessor.tbQuoteFieldName(indexName), qualifiedTableName, quotedGeomField)),
+                    tableName,
+                    "添加MySQL空间字段及索引[" + geomFieldName + "]");
+        } catch (RuntimeException e) {
+            // MySQL DDL 无法整体回滚：索引创建失败时，尽量删除本次刚创建的字段。
+            compensateAddGeomColumnFailure(tableName, qualifiedTableName, geomFieldName, indexName);
+            throw new RuntimeException("添加MySQL空间字段或索引失败；已尝试清理新增字段", e);
+        }
     }
 
     @Override
@@ -435,65 +450,29 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String tempGeomField = "geom_" + IdUtil.simpleUUID().substring(0, 8);
 
+        String oldGeomFieldBack = geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8);
+        String quotedTempGeomField = dialectTableNameProcessor.tbQuoteFieldName(tempGeomField);
+        String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        String quotedOldGeomField = dialectTableNameProcessor.tbQuoteFieldName(oldGeomFieldBack);
+        List<String> statements = Arrays.asList(
+                // 必须使用 tempGeomField，历史实现误用了 geomFieldName，会立即触发重复列错误。
+                StrUtil.format("ALTER TABLE {} ADD COLUMN {} {} SRID 0",
+                        qualifiedTableName, quotedTempGeomField, geomType.getCode().toUpperCase()),
+                StrUtil.format("UPDATE {} SET {} = ST_Transform(ST_SetSRID({}, {}), {})",
+                        qualifiedTableName, quotedTempGeomField, quotedGeomFieldName, oldSrid, targetSrid),
+                StrUtil.format("ALTER TABLE {} MODIFY COLUMN {} {} SRID {}",
+                        qualifiedTableName, quotedTempGeomField, geomType.getCode().toUpperCase(), targetSrid),
+                StrUtil.format("ALTER TABLE {} RENAME COLUMN {} TO {}",
+                        qualifiedTableName, quotedGeomFieldName, quotedOldGeomField),
+                StrUtil.format("ALTER TABLE {} RENAME COLUMN {} TO {}",
+                        qualifiedTableName, quotedTempGeomField, quotedGeomFieldName),
+                StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedOldGeomField));
         try {
-            // 1. 新建临时字段
-            String createTempSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} ADD COLUMN {} {} SRID 0;",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                            geomType.getCode().toUpperCase());
-            ddlOpt.dExecuteDDL(createTempSql, tableName, "新建MySQL临时空间字段[" + tempGeomField + "]");
-
-            // 2. 拷贝并转换SRID（MySQL: ST_Transform）
-            String copySql =
-                    StrUtil.format(
-                            "UPDATE {} SET {} = ST_Transform(ST_SetSRID({}, {}), {});",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                            oldSrid,
-                            targetSrid);
-            ddlOpt.dExecuteDDL(copySql, tableName, "拷贝并转换SRID");
-
-            // 3. 修改临时字段SRID
-            String alterSridSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} MODIFY COLUMN {} {} SRID {};",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
-                            geomType.getCode().toUpperCase(),
-                            targetSrid);
-            ddlOpt.dExecuteDDL(alterSridSql, tableName, "修改临时字段SRID为" + targetSrid);
-
-            String geomFileNameBack = geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8);
-            // 4. 重命名原字段
-            String renameOldSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} RENAME COLUMN {} TO {};",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFileNameBack));
-            ddlOpt.dExecuteDDL(renameOldSql, tableName, "重命名原空间字段");
-
-            // 5. 重命名临时字段
-            String renameTempSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} RENAME COLUMN {} TO {};",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(tempGeomField),
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
-            ddlOpt.dExecuteDDL(renameTempSql, tableName, "重命名临时字段为原字段名");
-
-            // 6. 删除旧字段
-            String dropOldSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} DROP COLUMN {};",
-                            qualifiedTableName,
-                            dialectTableNameProcessor.tbQuoteFieldName(geomFileNameBack));
-            ddlOpt.dExecuteDDL(dropOldSql, tableName, "删除旧空间字段");
-        } catch (Exception e) {
-            throw new RuntimeException("MySQL SRID转换失败", e);
+            // MySQL DDL 会隐式提交；同一连接只能保证执行顺序，不能提供事务性回滚。
+            ddlOpt.dExecuteStatements(statements, tableName, "MySQL SRID转换为" + targetSrid);
+        } catch (RuntimeException e) {
+            compensateSridTransformFailure(tableName, qualifiedTableName, geomFieldName, tempGeomField, oldGeomFieldBack);
+            throw new RuntimeException("MySQL SRID转换失败；已尝试恢复原字段或清理临时字段，请检查异常日志确认最终状态", e);
         }
     }
 
@@ -525,7 +504,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String sql =
                 StrUtil.format(
                         "CREATE SPATIAL INDEX {} ON {} ({});",
-                        indexName,
+                        dialectTableNameProcessor.tbQuoteFieldName(indexName),
                         qualifiedTableName,
                         geomFieldName);
         ddlOpt.dExecuteDDL(sql, tableName, "创建MySQL空间索引[" + indexName + "]");
@@ -544,7 +523,8 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         }
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
-        String sql = StrUtil.format("ALTER TABLE {} DROP INDEX {};", qualifiedTableName, indexName);
+        String sql = StrUtil.format(
+                "ALTER TABLE {} DROP INDEX {};", qualifiedTableName, dialectTableNameProcessor.tbQuoteFieldName(indexName));
         ddlOpt.dExecuteDDL(sql, tableName, "删除MySQL空间索引[" + indexName + "]");
     }
 
@@ -556,7 +536,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "SELECT * FROM {} WHERE ST_Intersects({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
                 dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                geometry,
+                escapeSqlLiteral(geometry),
                 srid);
     }
 
@@ -568,7 +548,7 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "SELECT * FROM {} WHERE ST_Within({}, ST_GeomFromText('{}', {},'axis-order=long-lat'));",
                 qualifiedTableName,
                 dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                bboxWkt,
+                escapeSqlLiteral(bboxWkt),
                 srid);
     }
 
@@ -583,9 +563,9 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "SELECT *, ST_Distance({}, ST_GeomFromText('{}', {},'axis-order=long-lat')) AS {} FROM {};",
                 dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                geometry,
+                escapeSqlLiteral(geometry),
                 srid,
-                distanceAlias,
+                dialectTableNameProcessor.tbQuoteFieldName(distanceAlias),
                 qualifiedTableName);
     }
 
@@ -596,14 +576,29 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "SELECT *, ST_Centroid({}) AS {} FROM {};",
                 dialectTableNameProcessor.tbQuoteFieldName(geomFieldName),
-                centerAlias,
+                dialectTableNameProcessor.tbQuoteFieldName(centerAlias),
                 qualifiedTableName);
     }
 
     @Override
     public String getValidateGeometriesSql(String qualifiedTableName, String geomFieldName) {
         return StrUtil.format(
-                "SELECT id FROM {} WHERE NOT ST_IsValid({});", qualifiedTableName, geomFieldName);
+                "SELECT id FROM {} WHERE NOT ST_IsValid({});",
+                qualifiedTableName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
+    }
+
+    @Override
+    protected String buildValidateGeometriesByPrimaryKeysSql(
+            String qualifiedTableName, String geomFieldName, List<String> primaryKeys) {
+        String selectedKeys = primaryKeys.stream()
+                .map(dialectTableNameProcessor::tbQuoteFieldName)
+                .collect(java.util.stream.Collectors.joining(", "));
+        return StrUtil.format(
+                "SELECT {} FROM {} WHERE NOT ST_IsValid({});",
+                selectedKeys,
+                qualifiedTableName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
     }
 
     @Override
@@ -805,6 +800,85 @@ public class MysqlAdvGeoOpt extends AbstractExecAdvGeoOpt {
             dataSourceGetter.closeResources(rs, stmt, conn);
         }
         return null;
+    }
+
+    /**
+     * MySQL DDL 无法依靠 JDBC 回滚。失败后按字段实际状态进行保守补偿：优先恢复旧字段，
+     * 再删除未启用的临时字段。补偿本身也可能受索引、权限或连接中断影响，因此会保留原始异常。
+     */
+    private void compensateSridTransformFailure(
+            String tableName,
+            String qualifiedTableName,
+            String geomFieldName,
+            String tempGeomField,
+            String oldGeomFieldBack) {
+        try {
+            boolean hasOriginal = hasColumn(tableName, geomFieldName);
+            boolean hasTemporary = hasColumn(tableName, tempGeomField);
+            boolean hasBackup = hasColumn(tableName, oldGeomFieldBack);
+            String quotedOriginal = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+            String quotedTemporary = dialectTableNameProcessor.tbQuoteFieldName(tempGeomField);
+            String quotedBackup = dialectTableNameProcessor.tbQuoteFieldName(oldGeomFieldBack);
+
+            if (hasBackup) {
+                // 临时字段已替换为原字段名时，先移除转换后的字段，再还原旧字段。
+                if (hasOriginal) {
+                    ddlOpt.dExecuteDDL(
+                            StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedOriginal),
+                            tableName,
+                            "回退MySQL SRID转换后的空间字段");
+                }
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("ALTER TABLE {} RENAME COLUMN {} TO {}",
+                                qualifiedTableName, quotedBackup, quotedOriginal),
+                        tableName,
+                        "回退MySQL原空间字段名称");
+            }
+            if (hasTemporary && hasColumn(tableName, tempGeomField)) {
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedTemporary),
+                        tableName,
+                        "清理MySQL SRID转换临时字段");
+            }
+        } catch (Exception compensationError) {
+            log.error("MySQL SRID转换失败后的补偿未完成，表={}, 原字段={}, 临时字段={}, 备份字段={}",
+                    tableName, geomFieldName, tempGeomField, oldGeomFieldBack, compensationError);
+        }
+    }
+
+    private boolean hasColumn(String tableName, String columnName) {
+        return ddlOpt.dGetColumnsByTable(tableName)
+                .findField(field -> columnName.equalsIgnoreCase(field.getColumnName()))
+                .isPresent();
+    }
+
+    /** MySQL 建索引失败后，清理本次新建且尚未交付使用的空间字段。 */
+    private void compensateAddGeomColumnFailure(
+            String tableName, String qualifiedTableName, String geomFieldName, String indexName) {
+        try {
+            if (ddlOpt.dIndexesExists(tableName, indexName)) {
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("ALTER TABLE {} DROP INDEX {}", qualifiedTableName,
+                                dialectTableNameProcessor.tbQuoteFieldName(indexName)),
+                        tableName,
+                        "回退MySQL空间索引");
+            }
+            if (hasColumn(tableName, geomFieldName)) {
+                ddlOpt.dExecuteDDL(
+                        StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName,
+                                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName)),
+                        tableName,
+                        "回退MySQL空间字段");
+            }
+        } catch (Exception compensationError) {
+            log.error("MySQL 添加空间字段失败后的补偿未完成，表={}, 字段={}, 索引={}",
+                    tableName, geomFieldName, indexName, compensationError);
+        }
+    }
+
+    /** 将 WKT 等外部文本安全嵌入 SQL 字符串字面量。 */
+    private static String escapeSqlLiteral(String value) {
+        return value == null ? "" : value.replace("'", "''");
     }
 
 

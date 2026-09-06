@@ -95,7 +95,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
                         : StrUtil.format(
-                        "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
+                        "AND \"table_schema\" = '{}'", escapeSqlLiteral(dataSourceGetter.getSchemaName()));
         String sql = StrUtil.format(sqlTemp, schemaFilter);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -121,7 +121,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 StrUtil.isEmpty(dataSourceGetter.getSchemaName())
                         ? ""
                         : StrUtil.format(
-                        "AND \"table_schema\" = '{}'", dataSourceGetter.getSchemaName());
+                        "AND \"table_schema\" = '{}'", escapeSqlLiteral(dataSourceGetter.getSchemaName()));
         String sql = StrUtil.format(sqlTemp, safeKeyword, schemaFilter);
 
         List<GirAdvOneRow> result = baseOpt.bSelectList(sql);
@@ -242,7 +242,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String schemaFilter =
                 StrUtil.isEmpty(schemaName)
                         ? ""
-                        : StrUtil.format("AND \"table_schema\" = '{}'", schemaName);
+                        : StrUtil.format("AND \"table_schema\" = '{}'", escapeSqlLiteral(schemaName));
         String sql = StrUtil.format(sqlTemp, tableNameWithoutSchema, schemaFilter);
 
         List<GirAdvOneRow> rows = baseOpt.bSelectList(sql);
@@ -341,7 +341,10 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
             String field = geomFieldNames.get(i);
             String quotedField = dialectTableNameProcessor.tbQuoteFieldName(field);
             sridSelect.append(
-                    StrUtil.format("COALESCE(public.st_srid({}), -1) AS {}_srid", quotedField, field));
+                    StrUtil.format(
+                            "COALESCE(public.st_srid({}), -1) AS {}",
+                            quotedField,
+                            dialectTableNameProcessor.tbQuoteFieldName(field + "_srid")));
             where.append(quotedField).append(" IS NOT NULL");
             if (i != geomFieldNames.size() - 1) {
                 sridSelect.append(", ");
@@ -383,18 +386,16 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
-        String sql =
-                StrUtil.format(
-                        "ALTER TABLE {} ADD COLUMN {} geometry({}, {});",
-                        qualifiedTableName,
-                        quotedGeomFieldName,
-                        geomType.getCode(),
-                        srid);
-        getAdvDDLOpt().dExecuteDDL(sql, tableName, "添加空间字段[" + geomFieldName + "]");
-
-        // 创建空间索引
         String indexName = StrUtil.format("idx_{}_{}", tableName, geomFieldName);
-        eCreateSpatialIndex(tableName, geomFieldName, indexName);
+        String quotedIndexName = dialectTableNameProcessor.tbQuoteFieldName(indexName);
+        // PostgreSQL 支持事务化 DDL：字段和索引要么同时创建，要么同时回滚。
+        getAdvDDLOpt().dExecuteStatements(Arrays.asList(
+                        StrUtil.format("ALTER TABLE {} ADD COLUMN {} geometry({}, {})",
+                                qualifiedTableName, quotedGeomFieldName, geomType.getCode(), srid),
+                        StrUtil.format("CREATE INDEX {} ON {} USING GIST ({})",
+                                quotedIndexName, qualifiedTableName, quotedGeomFieldName)),
+                tableName,
+                "添加PostGIS空间字段及索引[" + geomFieldName + "]");
     }
 
     @Override
@@ -444,68 +445,23 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String quotedGeomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
         String quotedTempGeomField = dialectTableNameProcessor.tbQuoteFieldName(tempGeomField);
 
-        try {
-            // 1. 新建临时字段
-            String createTempSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} ADD COLUMN {} geometry({},0);",
-                            qualifiedTableName,
-                            quotedTempGeomField,
-                            geomType.name().toLowerCase());
-            getAdvDDLOpt().dExecuteDDL(createTempSql, tableName, "新建临时空间字段[" + tempGeomField + "]");
-
-            // 2. 拷贝数据
-            String copySql =
-                    StrUtil.format(
-                            "UPDATE {} SET {} =ST_SetSRID({}, {});",
-                            qualifiedTableName,
-                            quotedTempGeomField,
-                            quotedGeomFieldName,
-                            oldSrid);
-            getAdvDDLOpt().dExecuteDDL(copySql, tableName, "拷贝空间数据到临时字段");
-
-            // 3. 转换SRID
-            String transformSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} ALTER COLUMN {} TYPE geometry({}, {}) USING public.ST_Transform({}, {});",
-                            qualifiedTableName,
-                            quotedTempGeomField,
-                            geomType.name().toLowerCase(),
-                            targetSrid,
-                            quotedTempGeomField,
-                            targetSrid);
-            getAdvDDLOpt().dExecuteDDL(transformSql, tableName, "转换SRID为" + targetSrid);
-
-            // 4. 重命名原字段
-            String oldGeomFieldBack = geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8);
-            String quotedOldGeomFieldBack = dialectTableNameProcessor.tbQuoteFieldName(oldGeomFieldBack);
-            String renameOldSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} RENAME COLUMN {} TO {};",
-                            qualifiedTableName,
-                            quotedGeomFieldName,
-                            quotedOldGeomFieldBack);
-            getAdvDDLOpt().dExecuteDDL(renameOldSql, tableName, "重命名原空间字段");
-
-            // 5. 重命名临时字段
-            String renameTempSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} RENAME COLUMN {} TO {};",
-                            qualifiedTableName,
-                            quotedTempGeomField,
-                            quotedGeomFieldName);
-            getAdvDDLOpt().dExecuteDDL(renameTempSql, tableName, "重命名临时字段为原字段名");
-
-            // 6. 删除旧字段
-            String dropOldSql =
-                    StrUtil.format(
-                            "ALTER TABLE {} DROP COLUMN {};",
-                            qualifiedTableName,
-                            quotedOldGeomFieldBack);
-            getAdvDDLOpt().dExecuteDDL(dropOldSql, tableName, "删除旧空间字段");
-        } catch (Exception e) {
-            throw new RuntimeException("SRID转换失败", e);
-        }
+        // PostgreSQL 的常见 DDL 可参与事务，必须整体在同一连接中执行，避免半成品字段泄漏。
+        String oldGeomFieldBack = geomFieldName + "_old_" + IdUtil.simpleUUID().substring(0, 8);
+        String quotedOldGeomFieldBack = dialectTableNameProcessor.tbQuoteFieldName(oldGeomFieldBack);
+        List<String> statements = Arrays.asList(
+                StrUtil.format("ALTER TABLE {} ADD COLUMN {} geometry({},0)",
+                        qualifiedTableName, quotedTempGeomField, geomType.name().toLowerCase()),
+                StrUtil.format("UPDATE {} SET {} = ST_SetSRID({}, {})",
+                        qualifiedTableName, quotedTempGeomField, quotedGeomFieldName, oldSrid),
+                StrUtil.format("ALTER TABLE {} ALTER COLUMN {} TYPE geometry({}, {}) USING public.ST_Transform({}, {})",
+                        qualifiedTableName, quotedTempGeomField, geomType.name().toLowerCase(), targetSrid,
+                        quotedTempGeomField, targetSrid),
+                StrUtil.format("ALTER TABLE {} RENAME COLUMN {} TO {}",
+                        qualifiedTableName, quotedGeomFieldName, quotedOldGeomFieldBack),
+                StrUtil.format("ALTER TABLE {} RENAME COLUMN {} TO {}",
+                        qualifiedTableName, quotedTempGeomField, quotedGeomFieldName),
+                StrUtil.format("ALTER TABLE {} DROP COLUMN {}", qualifiedTableName, quotedOldGeomFieldBack));
+        getAdvDDLOpt().dExecuteStatements(statements, tableName, "PostGIS SRID整体转换为" + targetSrid);
     }
 
     @Override
@@ -532,10 +488,11 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         String qualifiedTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, tableName);
         geomFieldName = dialectTableNameProcessor.tbQuoteFieldName(geomFieldName);
+        String quotedIndexName = dialectTableNameProcessor.tbQuoteFieldName(indexName);
         String sql =
                 StrUtil.format(
                         "CREATE INDEX {} ON {} USING GIST ({});",
-                        indexName,
+                        quotedIndexName,
                         qualifiedTableName,
                         geomFieldName);
         getAdvDDLOpt().dExecuteDDL(sql, tableName, "创建空间索引[" + indexName + "]");
@@ -553,11 +510,10 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
             return;
         }
 
-        String sql =
-                StrUtil.format(
-                        "DROP INDEX IF EXISTS {}.{};",
-                        dialectTableNameProcessor.tbGetSchemaNameForSql(dataSourceGetter),
-                        indexName);
+        String sql = StrUtil.format(
+                "DROP INDEX IF EXISTS {}.{};",
+                dialectTableNameProcessor.tbGetSchemaNameForSql(dataSourceGetter),
+                dialectTableNameProcessor.tbQuoteFieldName(indexName));
         getAdvDDLOpt().dExecuteDDL(sql, tableName, "删除空间索引[" + indexName + "]");
     }
 
@@ -569,7 +525,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "SELECT * FROM {} WHERE public.ST_Intersects({}, public.ST_GeomFromText('{}', {}));",
                 qualifiedTableName,
                 quotedGeomFieldName,
-                geometry,
+                escapeSqlLiteral(geometry),
                 srid);
     }
 
@@ -581,7 +537,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "SELECT * FROM {} WHERE public.ST_Within({}, public.ST_GeomFromText('{}', {}));",
                 qualifiedTableName,
                 quotedGeomFieldName,
-                bboxWkt,
+                escapeSqlLiteral(bboxWkt),
                 srid);
     }
 
@@ -596,9 +552,9 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "SELECT *, public.ST_Distance({}, public.ST_GeomFromText('{}', {})) AS {} FROM {};",
                 quotedGeomFieldName,
-                geometry,
+                escapeSqlLiteral(geometry),
                 srid,
-                distanceAlias,
+                dialectTableNameProcessor.tbQuoteFieldName(distanceAlias),
                 qualifiedTableName);
     }
 
@@ -609,7 +565,7 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
         return StrUtil.format(
                 "SELECT *, public.ST_Centroid({}) AS {} FROM {};",
                 quotedGeomFieldName,
-                centerAlias,
+                dialectTableNameProcessor.tbQuoteFieldName(centerAlias),
                 qualifiedTableName);
     }
 
@@ -620,6 +576,19 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
                 "SELECT id FROM {} WHERE NOT public.ST_IsValid({});",
                 qualifiedTableName,
                 quotedGeomFieldName);
+    }
+
+    @Override
+    protected String buildValidateGeometriesByPrimaryKeysSql(
+            String qualifiedTableName, String geomFieldName, List<String> primaryKeys) {
+        String selectedKeys = primaryKeys.stream()
+                .map(dialectTableNameProcessor::tbQuoteFieldName)
+                .collect(java.util.stream.Collectors.joining(", "));
+        return StrUtil.format(
+                "SELECT {} FROM {} WHERE NOT public.ST_IsValid({});",
+                selectedKeys,
+                qualifiedTableName,
+                dialectTableNameProcessor.tbQuoteFieldName(geomFieldName));
     }
 
     @Override
@@ -746,5 +715,10 @@ public class PgAdvGeoOpt extends AbstractExecAdvGeoOpt {
             dataSourceGetter.closeResources(rs, stmt, conn);
         }
         return null;
+    }
+
+    /** 将 WKT 等外部文本安全嵌入 SQL 字符串字面量。 */
+    private static String escapeSqlLiteral(String value) {
+        return value == null ? "" : value.replace("'", "''");
     }
 }

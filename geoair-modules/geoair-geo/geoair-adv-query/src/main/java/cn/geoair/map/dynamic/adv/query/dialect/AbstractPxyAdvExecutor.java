@@ -920,6 +920,11 @@ public abstract class AbstractPxyAdvExecutor implements IAdvExecutor {
     }
 
     @Override
+    public int dExecuteStatements(List<String> sqlStatements, String tableName, String operation) {
+        return getAdvDDLOpt().dExecuteStatements(sqlStatements, tableName, operation);
+    }
+
+    @Override
     public void dDelTable(String tableNameWithSchema) {
         getAdvDDLOpt().dDelTable(tableNameWithSchema);
     }
