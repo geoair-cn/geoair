@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
+import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -92,4 +93,17 @@ public class MvtLayerSliceParameter implements Serializable {
 
     /** 写入 PBF 时采用的几何表达方式。 */
     private MvtLayerGeometryMode geometryMode = MvtLayerGeometryMode.ORIGINAL;
+
+
+
+    /**
+     * 深拷贝当前参数对象。
+     */
+    public MvtLayerSliceParameter copy() {
+        MvtLayerSliceParameter copy = new MvtLayerSliceParameter();
+
+        BeanUtil.copyProperties(this, copy);
+
+        return copy;
+    }
 }
