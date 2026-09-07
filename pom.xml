@@ -110,6 +110,7 @@
         <geojson-jackson.version>1.14</geojson-jackson.version>
         <velocity.version>1.7</velocity.version>
         <hadoop-version>3.4.0</hadoop-version>
+        <mysql.version>9.7.0</mysql.version>
         <spark.version>4.0.0</spark.version>
         <scala.version>2.13</scala.version>
         <janino.version>3.1.12</janino.version>

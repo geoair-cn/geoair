@@ -3,8 +3,8 @@ package cn.geoair.map.dynamic.file.mysql;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDataStoreParams;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDialect;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFinder;
 import org.geotools.data.mysql.MySQLDataStoreFactory;
 
 import java.util.Map;

@@ -1,7 +1,7 @@
 package cn.geoair.map.dynamic.file.jdbc;
 
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
-import org.geotools.data.DataStore;
+import org.geotools.api.data.DataStore;
 
 /**
  * JDBC 空间数据库方言。

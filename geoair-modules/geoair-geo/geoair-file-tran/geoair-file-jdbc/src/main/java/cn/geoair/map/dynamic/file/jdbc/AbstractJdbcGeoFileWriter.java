@@ -13,10 +13,11 @@ import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoWriterLinkInfo;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import org.geotools.data.DataStore;
+import org.geotools.api.data.DataStore;
+
 import org.locationtech.jts.geom.Geometry;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.GeometryDescriptor;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.feature.type.GeometryDescriptor;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
