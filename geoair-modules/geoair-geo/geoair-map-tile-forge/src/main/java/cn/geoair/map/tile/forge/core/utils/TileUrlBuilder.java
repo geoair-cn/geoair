@@ -53,8 +53,16 @@ public class TileUrlBuilder {
     /**
      * 构建三维地形瓦片服务URL
      */
+    @Deprecated
     public static String buildD3TerrainUrl(String dataId, String layerName, String fileName) {
         return "3dTerrainService/" + StrUtil.format("{}/{}/{}/layer.json", dataId, fileName, layerName);
+    }
+
+    /**
+     * 构建三维地形瓦片服务URL 后缀没有layer.json ，适配新版本的cesium
+     */
+    public static String buildD3TerrainUrlNoLayerJson(String dataId, String layerName, String fileName) {
+        return "3dTerrainService/" + StrUtil.format("{}/{}/{}", dataId, fileName, layerName);
     }
 
     /**
